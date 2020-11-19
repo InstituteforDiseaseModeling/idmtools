@@ -13,7 +13,10 @@ from typing import List
 base_directory = abspath(join(dirname(__file__), '..'))
 
 
-def timeout(seconds=10, error_message=os.strerror(errno.ETIME)):
+def timeout(seconds=10, error_message=None):
+    if error_message is None:
+        error_message = os.strerror(errno.ETIME)
+
     def decorator(func):
         def _handle_timeout(signum, frame):
             raise TimeoutError(error_message)

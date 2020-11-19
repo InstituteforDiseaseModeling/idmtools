@@ -21,7 +21,7 @@ def expand_path(path):
 
     if os.path.isdir(path):
 
-        for (dir, dirs, files) in os.walk(path):
+        for (dir, _dirs, files) in os.walk(path):
             for file in files:
                 paths.append(os.path.join(dir, file))
     else:

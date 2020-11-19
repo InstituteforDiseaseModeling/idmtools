@@ -4,12 +4,11 @@ import json
 import os
 from dataclasses import dataclass, field, InitVar
 from logging import getLogger, DEBUG
-from typing import List, Dict, NoReturn, Union, Optional, TYPE_CHECKING
+from typing import List, Dict, Union, Optional, TYPE_CHECKING
 from urllib.parse import urlparse
 from uuid import UUID
 from COMPS.Data import QueryCriteria
 from jinja2 import Environment
-
 from idmtools import IdmConfigParser
 from idmtools.assets import AssetCollection, Asset
 from idmtools.assets.file_list import FileList
@@ -118,7 +117,7 @@ class SingularityBuildWorkItem(InputDataWorkItem):
         """
         Calculate the context checksum of a singularity build
 
-        The context is the checksum of all the assets defined for input, the singularity definition file
+        The context is the checksum of all the assets defined for input, the singularity definition file, and the environment variables
 
         Returns:
 
@@ -131,21 +130,31 @@ class SingularityBuildWorkItem(InputDataWorkItem):
                 with open(asset.absolute_path, mode='rb') as ain:
                     calculate_md5_stream(ain, file_hash=file_hash)
             else:
-                item = io.BytesIO()
-                item.write(asset.bytes)
-                item.seek(0)
-                calculate_md5_stream(item, file_hash=file_hash)
+                self.__add_file_to_context(json.dumps([asset.filename, asset.relative_path, str(asset.checksum)], sort_keys=True) if asset.persisted else asset.bytes, file_hash)
 
         if len(self.environment_variables):
             contents = json.dumps(self.environment_variables, sort_keys=True)
-            item = io.BytesIO()
-            item.write(contents.encode('utf-8'))
-            item.seek(0)
-            calculate_md5_stream(item, file_hash=file_hash)
+            self.__add_file_to_context(contents, file_hash)
 
         if logger.isEnabledFor(DEBUG):
             logger.debug(f'Context: sha256:{file_hash.hexdigest()}')
         return f'sha256:{file_hash.hexdigest()}'
+
+    def __add_file_to_context(self, contents: Union[str, bytes], file_hash):
+        """
+        Add a specific file content to context checksum
+
+        Args:
+            contents: Contents
+            file_hash: File hash to add to
+
+        Returns:
+            None
+        """
+        item = io.BytesIO()
+        item.write(contents.encode('utf-8') if isinstance(contents, str) else contents)
+        item.seek(0)
+        calculate_md5_stream(item, file_hash=file_hash)
 
     def render_template(self) -> Optional[str]:
         """
@@ -198,8 +207,8 @@ class SingularityBuildWorkItem(InputDataWorkItem):
                 ac = sbi.platform._assets.get(None, query_criteria=qc)
             if ac:
                 ac = sbi.platform._assets.to_entity(ac[0])
-                if IdmConfigParser.is_output_enabled():
-                    logger.log(SUCCESS, f'Found existing container in {ac.id}')
+                if logger.isEnabledFor(DEBUG):
+                    logger.debug(f'Found existing container in {ac.id}')
             else:
                 ac = None
 
@@ -294,10 +303,13 @@ class SingularityBuildWorkItem(InputDataWorkItem):
         acs = comps_workitem.get_related_asset_collections(RelationType.Created)
         if acs:
             self.asset_collection = AssetCollection.from_id(acs[0].id, platform=platform if platform else self.platform)
+            if IdmConfigParser.is_output_enabled():
+                user_logger.log(SUCCESS, f"Created Singularity image as Asset Collection: {self.asset_collection.id}")
+                user_logger.log(SUCCESS, f"View AC at {self.platform.get_asset_collection_link(self.asset_collection)}")
             return self.asset_collection
         return None
 
-    def run(self, wait_until_done: bool = False, platform: 'IPlatform' = None, wait_on_done_progress: bool = True, wait_on_done: bool = True, **run_opts) -> NoReturn:
+    def run(self, wait_until_done: bool = False, platform: 'IPlatform' = None, wait_on_done_progress: bool = True, wait_on_done: bool = True, **run_opts) -> Optional[AssetCollection]:
         """
 
         Args:
@@ -316,14 +328,19 @@ class SingularityBuildWorkItem(InputDataWorkItem):
         ac = self.find_existing_container(self)
         if ac is None or self.force:
             super().run(**opts)
+            return self.asset_collection
         else:
+            if IdmConfigParser.is_output_enabled():
+                user_logger.log(SUCCESS, f"Existing build of image found with Asset Collection ID of {ac.id}")
+                user_logger.log(SUCCESS, f"View AC at {self.platform.get_asset_collection_link(ac)}")
             # Set id to None
             self.uid = None
             self.asset_collection = ac
             # how do we get id for original work item from AC?
             self.status = EntityStatus.SUCCEEDED
+            return self.asset_collection
 
-    def wait(self, wait_on_done_progress: bool = True, timeout: int = None, refresh_interval=None, platform: 'IPlatform' = None) -> Union[AssetCollection, None]:
+    def wait(self, wait_on_done_progress: bool = True, timeout: int = None, refresh_interval=None, platform: 'IPlatform' = None) -> Optional[AssetCollection]:
         """
         Waits on Singularity Build Work item to finish and fetches the resulting asset collection
 
@@ -343,3 +360,4 @@ class SingularityBuildWorkItem(InputDataWorkItem):
         super().wait(**opts)
         if self.status == EntityStatus.SUCCEEDED:
             return self.__fetch_finished_asset_collection(p)
+        return None

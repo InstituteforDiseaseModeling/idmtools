@@ -87,7 +87,7 @@ def build_project_commands():
     """
     result = get_project_list()
     # Now define all the cookie cutter projects
-    for name, details in result.items():
+    for _name, details in result.items():
         define_cookiecutter_project_command(details)
 
 

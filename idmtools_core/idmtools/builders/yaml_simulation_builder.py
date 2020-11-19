@@ -68,5 +68,4 @@ class YamlSimulationBuilder(ArmSimulationBuilder):
             self.add_arm(arm)
 
     def __iter__(self):
-        for tup in self.sweep_definitions:
-            yield tup
+        yield from self.sweep_definitions

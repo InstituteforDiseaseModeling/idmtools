@@ -127,11 +127,10 @@ def get_digest_from_docker_hub(repo, tag='latest'):
         json=True,
     )
     manifest = response.json()
-    if response.ok:
-        if manifest['count']:
-            images = list(filter(lambda x: x['architecture'] == "amd64", manifest['results'][0]['images']))
-            if len(images):
-                return images[0]['digest']
+    if response.ok and manifest['count']:
+        images = list(filter(lambda x: x['architecture'] == "amd64", manifest['results'][0]['images']))
+        if len(images):
+            return images[0]['digest']
 
     return None
 

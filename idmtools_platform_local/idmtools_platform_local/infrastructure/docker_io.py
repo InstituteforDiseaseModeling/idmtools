@@ -120,9 +120,8 @@ class DockerIO:
                 file = BytesIO(content.encode('utf-8'))
             else:
                 file = content
-        if file:
-            if isinstance(file, bytes):
-                file = BytesIO(file)
+        if file and isinstance(file, bytes):
+            file = BytesIO(file)
 
         if type(file) is str:
 

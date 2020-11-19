@@ -183,7 +183,7 @@ class TemplatedScriptTask(ITask):
         if simulation.parent.assets:
             # prep new asset collection in case we have to remove our asset from the experiment level
             new_assets = AssetCollection()
-            for i, asset in enumerate(simulation.parent.assets.assets):
+            for _i, asset in enumerate(simulation.parent.assets.assets):
                 # is it our script?
                 if asset.filename != self.script_path and asset.absolute_path != self.script_path:
                     # nope keep it
