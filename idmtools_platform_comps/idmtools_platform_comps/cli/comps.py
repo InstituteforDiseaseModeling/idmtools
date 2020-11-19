@@ -164,11 +164,9 @@ try:
                 ao.fetch_error()
             sys.exit(-1)
 
-
     @comps.group(help="Singularity commands")
     def singularity():
         pass
-
 
     @singularity.command(help="Build Singularity Image")
     @click.option('--common-input', default=[], multiple=True, help="Files")
@@ -209,7 +207,6 @@ try:
                     add_item(assets, file)
 
         sb.run(wait_until_done=wait, platform=p)
-
 
     @singularity.command(help="Pull Singularity Image")
     @click.argument('image_url')
