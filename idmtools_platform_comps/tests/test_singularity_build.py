@@ -66,7 +66,7 @@ class TestSingularityBuild(unittest.TestCase):
         self.assertIn("digest", sbi.image_tags)
         self.assertEqual(sbi.image_tags['digest'], 'sha256:d7342993700f8cd7aba8496c2d0e57be0666e80b4c441925fc6f9361fa81d10e')
         self.assertEqual(sbi.image_tags['image_url'], 'docker://alpine:3.12.1')
-        js = sbi._prep_workorder_before_create()
+        js = sbi._prep_work_order_before_create()
         self.assertIsInstance(js, dict)
         self.assertIsInstance(sbi.work_order, dict)
 
