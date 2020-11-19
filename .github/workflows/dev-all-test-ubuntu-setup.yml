@@ -1,4 +1,4 @@
-# run setup-dev to install packages and run smoke test
+# run setup-dev to install packages and run all test
 # trigger by push to dev branch
 
 name: "pr-all-test-ubuntu-setup"
