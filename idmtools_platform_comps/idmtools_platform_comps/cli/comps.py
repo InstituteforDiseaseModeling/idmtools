@@ -1,3 +1,4 @@
+import glob
 from getpass import getpass
 import sys
 from logging import getLogger
@@ -5,9 +6,33 @@ import tabulate
 import os
 from COMPS.CredentialPrompt import CredentialPrompt
 import json as json_parser
+from idmtools.assets import AssetCollection
+from idmtools_platform_comps.utils.singularity_build import SingularityBuildWorkItem
 
 logger = getLogger(__name__)
 user_logger = getLogger('user')
+
+
+def add_item(assets: AssetCollection, file: str):
+    """
+    Add Item
+
+    Args:
+        assets: Assets
+        file: File or Directory
+
+    Returns:
+
+    """
+    if os.path.isdir(file):
+        assets.add_directory(file)
+    elif os.path.isfile(file):
+        assets.add_asset(file)
+    else:
+        user_logger.error(f"Cannot find file {file}")
+        raise FileNotFoundError(f"Cannot find file {file}")
+
+
 try:
 
     class StaticCredentialPrompt(CredentialPrompt):
@@ -138,6 +163,77 @@ try:
             if ao.failed:
                 ao.fetch_error()
             sys.exit(-1)
+
+    @comps.group(help="Singularity commands")
+    def singularity():
+        pass
+
+    @singularity.command(help="Build Singularity Image")
+    @click.option('--common-input', default=[], multiple=True, help="Files")
+    @click.option('--common-input-glob', default=[], multiple=True, help="File patterns")
+    @click.option('--transient-input', default=[], multiple=True, help="Transient Files (Paths)")
+    @click.option('--transient-input-glob', default=[], multiple=True, help="Transient Files Glob Patterns")
+    @click.argument('definition_file')
+    @click.option('--wait/--no-wait', default=True, help="Wait on item to finish")
+    @click.option('--tag', default=[], type=(str, str), multiple=True, help="Extra Tags as Value Pairs for the Resulting AC")
+    @click.option('--workitem-tag', default=[], type=(str, str), multiple=True, help="Extra Tags as Value Pairs for the WorkItem")
+    @click.option('--name', default=None, help="Name of WorkItem. If not provided, one will be generated")
+    @click.option('--force/--no-force', default=False, help="Force build, ignoring build context")
+    @click.option('--image-name', default=None, help="Name of resulting image")
+    @click.pass_context
+    def build(ctx: click.Context, common_input, common_inputs_glob, transient_input, transient_inputs_glob, definition_file, wait, tag, workitem_tag, name, force, image_name: str):
+        p: COMPSPlatform = Platform(ctx.obj['config_block'])
+        if image_name and image_name.endswith(".sif"):
+            image_name = f'{image_name}.sif'
+        sb = SingularityBuildWorkItem(definition_file=definition_file, name=name, force=force, image_name=image_name)
+
+        if tag:
+            for name, value in tag:
+                sb.image_tags[name] = value
+
+        if workitem_tag:
+            for name, value in tag:
+                sb.tags[name] = value
+
+        # Add inputs from files
+        for assets, inputs in [(sb.assets, common_input), (sb.transient_assets, transient_input)]:
+            for file in inputs:
+                add_item(assets, file)
+
+        # And then from glob patterns
+        for assets, patterns in [(sb.assets, common_inputs_glob), (sb.transient_assets, transient_inputs_glob)]:
+            for pattern in patterns:
+                for file in glob.glob(pattern):
+                    add_item(assets, file)
+
+        sb.run(wait_until_done=wait, platform=p)
+
+    @singularity.command(help="Pull Singularity Image")
+    @click.argument('image_url')
+    @click.option('--wait/--no-wait', default=True, help="Wait on item to finish")
+    @click.option('--tag', default=[], type=(str, str), multiple=True, help="Extra Tags as Value Pairs for the Resulting AC")
+    @click.option('--workitem-tag', default=[], type=(str, str), multiple=True, help="Extra Tags as Value Pairs for the WorkItem")
+    @click.option('--name', default=None, help="Name of WorkItem. If not provided, one will be generated")
+    @click.option('--force/--no-force', default=False, help="Force build, ignoring build context")
+    @click.option('--image-name', default=None, help="Name of resulting image")
+    @click.pass_context
+    def pull(ctx: click.Context, image_url, wait, tag, workitem_tag, name, force, image_name: str):
+        p: COMPSPlatform = Platform(ctx.obj['config_block'])
+        if image_name and image_name.endswith(".sif"):
+            image_name = f'{image_name}.sif'
+        sb = SingularityBuildWorkItem(image_url=image_url, force=force, image_name=image_name)
+        sb.name = f"Pulling {image_url}" if name is None else name
+
+        if tag:
+            for name, value in tag:
+                sb.image_tags[name] = value
+
+        if workitem_tag:
+            for name, value in tag:
+                sb.tags[name] = value
+
+        sb.run(wait_until_done=wait, platform=p)
+
 
 except ImportError as e:
     logger.warning(f"COMPS CLI not enabled because a dependency is missing. Most likely it is either click or idmtools cli {e.args}")

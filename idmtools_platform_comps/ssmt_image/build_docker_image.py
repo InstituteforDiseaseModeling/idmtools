@@ -87,7 +87,10 @@ def get_latest_image_version_from_registry(username, password):
     logger.info(f"Loading Credentials from {url}")
     response = requests.get(url, auth=auth)
     logger.debug(f"Return Code: {response.status_code}")
-    if response.status_code == 200:
+    if response.status_code != 200:
+        logger.error(response.content)
+        raise Exception('Could not load images')
+    else:
         images = natsorted(response.json()['tags'], reverse=True)
         images = [i for i in images if len(i) > 6]
         logger.debug(f"Images: {images}")
@@ -101,9 +104,6 @@ def get_latest_image_version_from_registry(username, password):
             version = f'{BASE_VERSION}.0'
         logger.info(f"Next Version: {version}")
         return version
-    else:
-        logger.error(response.content)
-        raise Exception('Could not load images')
 
 
 def build_image(username, password, disable_keyring_load, disable_keyring_save):

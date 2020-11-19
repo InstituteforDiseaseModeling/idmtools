@@ -15,6 +15,8 @@ from idmtools.core import EntityStatus, ItemType
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities.iplatform import IPlatform
 
+ASSETS_PATH = "Assets\\"
+
 logger = getLogger(__name__)
 
 chars_to_replace = ['/', '\\', ':', "'", '"', '?', '<', '>', '*', '|', "\0", "(", ")", '`']
@@ -127,7 +129,7 @@ def get_file_from_collection(platform: IPlatform, collection_id: UUID, file_path
 
     # Look for the asset file in the collection
     file_name = ntpath.basename(file_path)
-    path = ntpath.dirname(file_path).lstrip("Assets\\")
+    path = ntpath.dirname(file_path).lstrip(ASSETS_PATH)
 
     for asset_file in ac.assets:
         if asset_file.file_name == file_name and (asset_file.relative_path or '') == path:

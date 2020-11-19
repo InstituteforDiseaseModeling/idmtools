@@ -426,10 +426,10 @@ class AssetizeOutput(SSMTWorkItem):
                     # user simulation's parent to wait
                     elif isinstance(item, Simulation):
                         if item.parent is None:
-                            if item.parent_id:
-                                item.parent = Experiment.from_id(item.parent_id)
-                            else:
+                            if not item.parent_id:
                                 raise ValueError(f"Cannot determine simulation {item.id}'s parent and item still in progress. Please wait on it to complete before AssetizingOutputs")
+                            else:
+                                item.parent = Experiment.from_id(item.parent_id)
                         item.parent.wait(**opts)
         if logger.isEnabledFor(DEBUG):
             logger.debug(f"Done waiting on items watching. Now waiting on Assetize Outputs: {self.id}")

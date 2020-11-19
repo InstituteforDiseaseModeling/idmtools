@@ -180,10 +180,10 @@ class Asset:
         Returns:
             Generator of bytearray
         """
-        if self.download_generator_hook:
-            return self.download_generator_hook()
-        else:
+        if not self.download_generator_hook:
             raise ValueError("To be able to download, the Asset needs to be fetched from a platform object")
+        else:
+            return self.download_generator_hook()
 
     def download_stream(self) -> BytesIO:
         """
