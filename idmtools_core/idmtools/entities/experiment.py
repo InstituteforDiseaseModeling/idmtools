@@ -166,8 +166,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
                 if len(self.simulations.items) == 0:
                     raise ValueError("You cannot run an empty experiment")
                 if logger.isEnabledFor(DEBUG):
-                    logger.debug("Using first task for task type")
-                    logger.debug("Using all tasks to gather assts")
+                    logger.debug("Using all tasks to gather assets")
                 task_class = self.__simulations[0].task.__class__
                 self.tags["task_type"] = f'{task_class.__module__}.{task_class.__name__}'
                 pbar = self.__simulations

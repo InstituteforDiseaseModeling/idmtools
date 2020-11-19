@@ -181,7 +181,7 @@ try:
     @click.option('--force/--no-force', default=False, help="Force build, ignoring build context")
     @click.option('--image-name', default=None, help="Name of resulting image")
     @click.pass_context
-    def build(ctx: click.Context, common_input, common_inputs_glob, transient_input, transient_inputs_glob, definition_file, wait, tag, workitem_tag, name, force, image_name: str):
+    def build(ctx: click.Context, common_input, common_input_glob, transient_input, transient_input_glob, definition_file, wait, tag, workitem_tag, name, force, image_name: str):
         p: COMPSPlatform = Platform(ctx.obj['config_block'])
         if image_name and image_name.endswith(".sif"):
             image_name = f'{image_name}.sif'
@@ -201,7 +201,7 @@ try:
                 add_item(assets, file)
 
         # And then from glob patterns
-        for assets, patterns in [(sb.assets, common_inputs_glob), (sb.transient_assets, transient_inputs_glob)]:
+        for assets, patterns in [(sb.assets, common_input_glob), (sb.transient_assets, transient_input_glob)]:
             for pattern in patterns:
                 for file in glob.glob(pattern):
                     add_item(assets, file)
