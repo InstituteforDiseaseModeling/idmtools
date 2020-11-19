@@ -320,7 +320,7 @@ class SingularityBuildWorkItem(InputDataWorkItem):
             return self.asset_collection
         return None
 
-    def run(self, wait_until_done: bool = False, platform: 'IPlatform' = None, wait_on_done_progress: bool = True, wait_on_done: bool = True, **run_opts) -> Optional[AssetCollection]:
+    def run(self, wait_until_done: bool = True, platform: 'IPlatform' = None, wait_on_done_progress: bool = True, wait_on_done: bool = True, **run_opts) -> Optional[AssetCollection]:
         """
 
         Args:
