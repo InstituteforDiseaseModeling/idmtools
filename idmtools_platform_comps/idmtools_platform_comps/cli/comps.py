@@ -180,8 +180,10 @@ try:
     @click.option('--name', default=None, help="Name of WorkItem. If not provided, one will be generated")
     @click.option('--force/--no-force', default=False, help="Force build, ignoring build context")
     @click.option('--image-name', default=None, help="Name of resulting image")
+    @click.option('--id-file/--no-id-file', default=True, help="Name of ID file to save build as")
+    @click.option('--id-filename', default=None, help="Name of ID file to save build as")
     @click.pass_context
-    def build(ctx: click.Context, common_input, common_input_glob, transient_input, transient_input_glob, definition_file, wait, tag, workitem_tag, name, force, image_name: str):
+    def build(ctx: click.Context, common_input, common_input_glob, transient_input, transient_input_glob, definition_file, wait, tag, workitem_tag, name, force, image_name: str, id_file: str, id_filename: str):
         p: COMPSPlatform = Platform(ctx.obj['config_block'])
         if image_name and image_name.endswith(".sif"):
             image_name = f'{image_name}.sif'
@@ -207,6 +209,12 @@ try:
                     add_item(assets, file)
 
         sb.run(wait_until_done=wait, platform=p)
+        if sb.succeeded and id_file:
+            if id_filename is None:
+                id_filename = "singularity_image.id"
+            user_logger.info(f"Saving ID to {id_filename}")
+            sb.to_id_file(id_filename, save_platform=True)
+
 
     @singularity.command(help="Pull Singularity Image")
     @click.argument('image_url')
@@ -216,8 +224,10 @@ try:
     @click.option('--name', default=None, help="Name of WorkItem. If not provided, one will be generated")
     @click.option('--force/--no-force', default=False, help="Force build, ignoring build context")
     @click.option('--image-name', default=None, help="Name of resulting image")
+    @click.option('--id-file', default=True, help="Save to id to a file. Default to the name of the workitem")
+    @click.option('--id-filename', default=None, help="Name of ID file to save build as")
     @click.pass_context
-    def pull(ctx: click.Context, image_url, wait, tag, workitem_tag, name, force, image_name: str):
+    def pull(ctx: click.Context, image_url, wait, tag, workitem_tag, name, force, image_name: str, id_file: str, id_filename: str):
         p: COMPSPlatform = Platform(ctx.obj['config_block'])
         if image_name and image_name.endswith(".sif"):
             image_name = f'{image_name}.sif'
@@ -233,6 +243,11 @@ try:
                 sb.tags[name] = value
 
         sb.run(wait_until_done=wait, platform=p)
+        if sb.succeeded and id_file:
+            if id_filename is None:
+                id_filename = "singularity_image.id"
+            user_logger.info(f"Saving ID to {id_filename}")
+            sb.to_id_file(id_filename, save_platform=True)
 
 
 except ImportError as e:
