@@ -42,7 +42,7 @@ class Asset:
     _checksum: Optional[str] = field(default=None, init=False)
 
     def __post_init__(self, content, checksum):
-        # Cache of our assset key
+        # Cache of our asset key
         self._key = None
         self._content = None if isinstance(content, property) else content
         self._checksum = checksum if not isinstance(checksum, property) else None
