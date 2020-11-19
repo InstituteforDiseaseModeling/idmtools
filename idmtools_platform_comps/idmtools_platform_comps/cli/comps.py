@@ -178,17 +178,19 @@ try:
     @click.argument('definition_file')
     @click.option('--wait/--no-wait', default=True, help="Wait on item to finish")
     @click.option('--tag', default=[], type=(str, str), multiple=True, help="Extra Tags as Value Pairs for the Resulting AC")
-    @click.option('--pull-tag', default=[], type=(str, str), multiple=True, help="Extra Tags as Value Pairs for the WorkItem")
+    @click.option('--workitem-tag', default=[], type=(str, str), multiple=True, help="Extra Tags as Value Pairs for the WorkItem")
+    @click.option('--name', default=None, help="Name of WorkItem. If not provided, one will be generated")
+    @click.option('--force/--no-force', default=False, help="Force build, ignoring build context")
     @click.pass_context
-    def build(ctx: click.Context, common_input, common_inputs_glob, transient_input, transient_inputs_glob, definition_file, wait, tag, pull_tag):
+    def build(ctx: click.Context, common_input, common_inputs_glob, transient_input, transient_inputs_glob, definition_file, wait, tag, workitem_tag, name, force):
         p: COMPSPlatform = Platform(ctx.obj['config_block'])
-        sb = SingularityBuildWorkItem(definition_file=definition_file)
+        sb = SingularityBuildWorkItem(definition_file=definition_file, name=name, force=force)
 
         if tag:
             for name, value in tag:
                 sb.image_tags[name] = value
 
-        if pull_tag:
+        if workitem_tag:
             for name, value in tag:
                 sb.tags[name] = value
 
@@ -210,18 +212,20 @@ try:
     @click.argument('image_url')
     @click.option('--wait/--no-wait', default=True, help="Wait on item to finish")
     @click.option('--tag', default=[], type=(str, str), multiple=True, help="Extra Tags as Value Pairs for the Resulting AC")
-    @click.option('--pull-tag', default=[], type=(str, str), multiple=True, help="Extra Tags as Value Pairs for the WorkItem")
+    @click.option('--workitem-tag', default=[], type=(str, str), multiple=True, help="Extra Tags as Value Pairs for the WorkItem")
+    @click.option('--name', default=None, help="Name of WorkItem. If not provided, one will be generated")
+    @click.option('--force/--no-force', default=False, help="Force build, ignoring build context")
     @click.pass_context
-    def pull(ctx: click.Context, image_url, wait, tag, pull_tag):
+    def pull(ctx: click.Context, image_url, wait, tag, workitem_tag, name, force):
         p: COMPSPlatform = Platform(ctx.obj['config_block'])
-        sb = SingularityBuildWorkItem(image_url=image_url)
-        sb.name = f"Pulling {image_url}"
+        sb = SingularityBuildWorkItem(image_url=image_url, force=force)
+        sb.name = f"Pulling {image_url}" if name is None else name
 
         if tag:
             for name, value in tag:
                 sb.image_tags[name] = value
 
-        if pull_tag:
+        if workitem_tag:
             for name, value in tag:
                 sb.tags[name] = value
 
