@@ -1,0 +1,51 @@
+Bootstrap: library
+From: ubuntu:20.04
+
+# can we bootstrap from other images...?
+
+# Stage: build
+
+%help
+    help information will go here
+
+# %files
+#    setup.py /opt/tmp_setup.py
+
+%environment
+    export LC_ALL=en_US.UTF-8
+    export LANG=en_US.UTF-8
+    export LANGUAGE=en_US.UTF-8
+
+%post
+    apt-get update \
+    && apt-get install -y locales \
+    && apt-get install -y tzdata \
+    && apt-get install -y git \
+    && apt-get install -y software-properties-common \
+    && add-apt-repository universe \
+    && apt-get update \
+    && apt-get install -y python3 \
+    && apt-get install -y python3-pip \
+    && pip3 install setuptools \
+    && pip3 install optuna
+
+
+    # if we don't clean this, it bloats the generated image size by a lot!
+    apt-get clean
+
+    # set language to en_US.UTF8
+    locale-gen en_US.UTF-8
+    update-locale LANG=en_US.UTF-8
+    dpkg-reconfigure --frontend=noninteractive locales
+    locale -a
+    export LANG=en_US.UTF-8
+    locale
+    env
+    echo Locale
+    cat /etc/default/locale
+    echo Timezone
+    cat /etc/timezone
+
+    # set timezone to pacific
+    ln -sf /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
+    dpkg-reconfigure -f noninteractive tzdata
