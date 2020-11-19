@@ -252,26 +252,25 @@ class SingularityBuildWorkItem(InputDataWorkItem):
         Returns:
 
         """
-        if not self.work_order:
-            self.__add_tags()
-            self.load_work_order(SB_BASE_WORKER_PATH)
-            if self.definition_file:
-                self.work_order['Build']['Input'] = "Assets/Singularity.def"
-            else:
-                self.work_order['Build']['Input'] = self.image_url
-            if len(self.environment_variables):
-                self.work_order['Build']['StaticEnvironment'] = self.environment_variables
-            if len(self.additional_mounts):
-                self.work_order['Build']['AdditionalMounts'] = self.additional_mounts
-            self.work_order['Build']['Output'] = self.image_name if self.image_name else "image.sif"
-            self.work_order['Build']['Tags'] = self.image_tags
-            self.work_order['Build']['Flags'] = dict()
-            if self.fix_permissions:
-                self.work_order['Build']['Flags']['Switches'] = ["--fix-perms"]
-            if self.library:
-                self.work_order['Build']['Flags']['--library'] = self.library
-            if self.section:
-                self.work_order['Build']['Flags']['--section'] = self.section
+        self.__add_tags()
+        self.load_work_order(SB_BASE_WORKER_PATH)
+        if self.definition_file:
+            self.work_order['Build']['Input'] = "Assets/Singularity.def"
+        else:
+            self.work_order['Build']['Input'] = self.image_url
+        if len(self.environment_variables):
+            self.work_order['Build']['StaticEnvironment'] = self.environment_variables
+        if len(self.additional_mounts):
+            self.work_order['Build']['AdditionalMounts'] = self.additional_mounts
+        self.work_order['Build']['Output'] = self.image_name if self.image_name else "image.sif"
+        self.work_order['Build']['Tags'] = self.image_tags
+        self.work_order['Build']['Flags'] = dict()
+        if self.fix_permissions:
+            self.work_order['Build']['Flags']['Switches'] = ["--fix-perms"]
+        if self.library:
+            self.work_order['Build']['Flags']['--library'] = self.library
+        if self.section:
+            self.work_order['Build']['Flags']['--section'] = self.section
         return self.work_order
 
     def pre_creation(self, platform: 'IPlatform') -> None:
