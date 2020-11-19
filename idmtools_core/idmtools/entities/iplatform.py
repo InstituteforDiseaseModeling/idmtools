@@ -708,7 +708,14 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             done_states = [EntityStatus.FAILED, EntityStatus.SUCCEEDED]
         # if we do not have a progress bar, return items state
         if child_attribute is None:
-            return item.status in done_states if isinstance(item, IWorkflowItem) else item.done
+            if isinstance(item, IWorkflowItem):
+                if item.status in done_states:
+                    progress_bar.update(1)
+                    progress_bar.close()
+                    return True
+                return False
+            else:
+                return item.done
 
         # if we do have a progress bar, update it
         done = 0
@@ -759,6 +766,8 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             elif isinstance(item, Suite):
                 prog = tqdm([], total=len(item.experiments), desc="Waiting on Suite to Finish running", unit="experiment")
                 child_attribute = 'experiments'
+            elif isinstance(item, IWorkflowItem):
+                prog = tqdm([], total=1, desc=f"Waiting on WorkItem {item.name}", unit="workitem")
         else:
             child_attribute = None
 
