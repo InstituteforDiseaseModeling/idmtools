@@ -736,8 +736,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             failed_warning['failed_warning'] = True
         return item.done
 
-    def wait_till_done_progress(self, item: IRunnableEntity, timeout: int = 60 * 60 * 24,
-                                refresh_interval: int = 5):
+    def wait_till_done_progress(self, item: IRunnableEntity, timeout: int = 60 * 60 * 24, refresh_interval: int = 5, wait_progress_desc: str = None):
         """
         Wait on an item to complete with progress bar
 
@@ -745,6 +744,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             item: Item to monitor
             timeout: Timeout on waiting
             refresh_interval: How often to refresh
+            wait_progress_desc: Wait Progress Description
 
         Returns:
             None
@@ -761,13 +761,13 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         if not IdmConfigParser.is_progress_bar_disabled():
             from tqdm import tqdm
             if isinstance(item, Experiment):
-                prog = tqdm([], total=len(item.simulations), desc="Waiting on Experiment to Finish running", unit="simulation")
+                prog = tqdm([], total=len(item.simulations), desc=wait_progress_desc if wait_progress_desc else "Waiting on Experiment to Finish running", unit="simulation")
                 child_attribute = 'simulations'
             elif isinstance(item, Suite):
-                prog = tqdm([], total=len(item.experiments), desc="Waiting on Suite to Finish running", unit="experiment")
+                prog = tqdm([], total=len(item.experiments), desc=wait_progress_desc if wait_progress_desc else "Waiting on Suite to Finish running", unit="experiment")
                 child_attribute = 'experiments'
             elif isinstance(item, IWorkflowItem):
-                prog = tqdm([], total=1, desc=f"Waiting on WorkItem {item.name}", unit="workitem")
+                prog = tqdm([], total=1, desc=wait_progress_desc if wait_progress_desc else f"Waiting on WorkItem {item.name}", unit="workitem")
         else:
             child_attribute = None
 
