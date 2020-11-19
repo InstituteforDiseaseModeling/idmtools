@@ -299,7 +299,7 @@ class SingularityBuildWorkItem(InputDataWorkItem):
             return self.asset_collection
         return None
 
-    def run(self, wait_until_done: bool = False, platform: 'IPlatform' = None, wait_on_done_progress: bool = True, wait_on_done: bool = True, **run_opts) -> NoReturn:
+    def run(self, wait_until_done: bool = False, platform: 'IPlatform' = None, wait_on_done_progress: bool = True, wait_on_done: bool = True, **run_opts) -> Optional[AssetCollection]:
         """
 
         Args:
@@ -317,7 +317,8 @@ class SingularityBuildWorkItem(InputDataWorkItem):
         self.platform = p
         ac = self.find_existing_container(self)
         if ac is None or self.force:
-            return super().run(**opts)
+            super().run(**opts)
+            return self.asset_collection
         else:
             if IdmConfigParser.is_output_enabled():
                 user_logger.log(SUCCESS, f"Existing build of image found with Asset Collection ID of {ac.id}")
@@ -329,7 +330,7 @@ class SingularityBuildWorkItem(InputDataWorkItem):
             self.status = EntityStatus.SUCCEEDED
             return self.asset_collection
 
-    def wait(self, wait_on_done_progress: bool = True, timeout: int = None, refresh_interval=None, platform: 'IPlatform' = None) -> Union[AssetCollection, None]:
+    def wait(self, wait_on_done_progress: bool = True, timeout: int = None, refresh_interval=None, platform: 'IPlatform' = None) -> Optional[AssetCollection]:
         """
         Waits on Singularity Build Work item to finish and fetches the resulting asset collection
 
