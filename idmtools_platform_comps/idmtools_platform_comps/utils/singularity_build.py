@@ -140,7 +140,7 @@ class SingularityBuildWorkItem(InputDataWorkItem):
             logger.debug(f'Context: sha256:{file_hash.hexdigest()}')
         return f'sha256:{file_hash.hexdigest()}'
 
-    def __add_file_to_context(self, contents: str, file_hash):
+    def __add_file_to_context(self, contents: Union[str, bytes], file_hash):
         """
         Add a specific file content to context checksum
 
@@ -152,7 +152,7 @@ class SingularityBuildWorkItem(InputDataWorkItem):
             None
         """
         item = io.BytesIO()
-        item.write(contents.encode('utf-8'))
+        item.write(contents.encode('utf-8') if isinstance(contents, str) else contents)
         item.seek(0)
         calculate_md5_stream(item, file_hash=file_hash)
 
