@@ -2,6 +2,7 @@ import hashlib
 import io
 import json
 import os
+import uuid
 from dataclasses import dataclass, field, InitVar
 from logging import getLogger, DEBUG
 from typing import List, Dict, Union, Optional, TYPE_CHECKING
@@ -14,6 +15,7 @@ from idmtools.assets import AssetCollection, Asset
 from idmtools.assets.file_list import FileList
 from idmtools.core import EntityStatus
 from idmtools.core.logging import SUCCESS
+from idmtools.entities.command_task import CommandTask
 from idmtools.entities.relation_type import RelationType
 from idmtools.utils.hashing import calculate_md5_stream
 from idmtools_platform_comps.ssmt_work_items.comps_workitems import InputDataWorkItem
@@ -62,6 +64,8 @@ class SingularityBuildWorkItem(InputDataWorkItem):
     force: bool = field(default=False)
     #: Don't include default tags
     disable_default_tags: bool = field(default=None)
+    # ID that is added to work item and then results collection that can be used to tied the items together
+    run_id: uuid.UUID = field(default=uuid.uuid4)
 
     #: loaded if url is docker://. Used to determine if we need to re-run a build
     __digest: Dict[str, str] = field(default=None)
@@ -75,6 +79,8 @@ class SingularityBuildWorkItem(InputDataWorkItem):
             self.name = "Singularity build"
         self.work_item_type = 'ImageBuilderWorker'
         self._image_url = None
+        # Set this for now. Later it should be replace with some type of Specialized worker identifier
+        self.task = CommandTask("ImageBuilderWorker")
         super().__post_init__(item_name, asset_collection_id, asset_files, user_files)
 
         self.image_url = image_url if isinstance(image_url, str) else None
@@ -222,18 +228,24 @@ class SingularityBuildWorkItem(InputDataWorkItem):
             None
         """
         self.image_tags['type'] = 'singularity'
+
         if not self.disable_default_tags:
+            # set the run id on the workitem and resulting tags
+            self.tags['run_id'] = str(self.run_id)
+            self.image_tags['run_id'] = str(self.run_id)
+            # Check for the digest
             if self.__digest and isinstance(self.__digest, str):
                 self.image_tags['digest'] = self.__digest
                 self.image_tags['image_from'] = self.__image_tag
                 if self.image_name is None:
                     self.image_name = self.__image_tag.strip(" /").replace(":", "_").replace("/", "_") + ".sif"
+            # If we are building from a file, add the build context
             elif self.definition_file:
                 self.image_tags['build_context'] = self.context_checksum()
             if self.image_url:
                 self.image_tags['image_url'] = self.image_url
 
-    def _prep_workorder_before_create(self) -> Dict[str, str]:
+    def _prep_work_order_before_create(self) -> Dict[str, str]:
         """
         Prep work order before creation
 
@@ -273,7 +285,7 @@ class SingularityBuildWorkItem(InputDataWorkItem):
         """
         super(SingularityBuildWorkItem, self).pre_creation(platform)
         self.__add_common_assets()
-        self._prep_workorder_before_create()
+        self._prep_work_order_before_create()
 
     def __add_common_assets(self):
         """
@@ -322,7 +334,7 @@ class SingularityBuildWorkItem(InputDataWorkItem):
 
         """
         p = super()._check_for_platform_from_context(platform)
-        opts = dict(wait_on_done_progress=wait_on_done_progress, wait_until_done=wait_until_done, wait_on_done=wait_on_done, platform=p)
+        opts = dict(wait_on_done_progress=wait_on_done_progress, wait_until_done=wait_until_done, wait_on_done=wait_on_done, platform=p, wait_progress_desc=f"Waiting for build of Singularity container: {self.name}")
         self.platform = p
         ac = self.find_existing_container(self)
         if ac is None or self.force:
@@ -339,7 +351,7 @@ class SingularityBuildWorkItem(InputDataWorkItem):
             self.status = EntityStatus.SUCCEEDED
             return self.asset_collection
 
-    def wait(self, wait_on_done_progress: bool = True, timeout: int = None, refresh_interval=None, platform: 'IPlatform' = None) -> Optional[AssetCollection]:
+    def wait(self, wait_on_done_progress: bool = True, timeout: int = None, refresh_interval=None, platform: 'IPlatform' = None, wait_progress_desc: str = None) -> Optional[AssetCollection]:
         """
         Waits on Singularity Build Work item to finish and fetches the resulting asset collection
 
@@ -348,13 +360,14 @@ class SingularityBuildWorkItem(InputDataWorkItem):
             timeout: Timeout for waiting on item. If none, wait will be forever
             refresh_interval: How often to refresh progress
             platform: Platform
+            wait_progress_desc: Wait Progress Description Text
 
         Returns:
             AssetCollection created if item succeeds
         """
         # wait on related items before we wait on our item
         p = super()._check_for_platform_from_context(platform)
-        opts = dict(wait_on_done_progress=wait_on_done_progress, timeout=timeout, refresh_interval=refresh_interval, platform=p)
+        opts = dict(wait_on_done_progress=wait_on_done_progress, timeout=timeout, refresh_interval=refresh_interval, platform=p, wait_progress_desc=wait_progress_desc)
 
         super().wait(**opts)
         if self.status == EntityStatus.SUCCEEDED:
