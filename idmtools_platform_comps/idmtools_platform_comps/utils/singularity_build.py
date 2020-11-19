@@ -117,7 +117,7 @@ class SingularityBuildWorkItem(InputDataWorkItem):
         """
         Calculate the context checksum of a singularity build
 
-        The context is the checksum of all the assets defined for input, the singularity definition file
+        The context is the checksum of all the assets defined for input, the singularity definition file, and the environment variables
 
         Returns:
 
@@ -130,21 +130,31 @@ class SingularityBuildWorkItem(InputDataWorkItem):
                 with open(asset.absolute_path, mode='rb') as ain:
                     calculate_md5_stream(ain, file_hash=file_hash)
             else:
-                item = io.BytesIO()
-                item.write(json.dumps([asset.filename, asset.relative_path, str(asset.checksum)], sort_keys=True).encode('utf-8') if asset.persisted else asset.bytes)
-                item.seek(0)
-                calculate_md5_stream(item, file_hash=file_hash)
+                self.__add_file_to_context(json.dumps([asset.filename, asset.relative_path, str(asset.checksum)], sort_keys=True) if asset.persisted else asset.bytes, file_hash)
 
         if len(self.environment_variables):
             contents = json.dumps(self.environment_variables, sort_keys=True)
-            item = io.BytesIO()
-            item.write(contents.encode('utf-8'))
-            item.seek(0)
-            calculate_md5_stream(item, file_hash=file_hash)
+            self.__add_file_to_context(contents, file_hash)
 
         if logger.isEnabledFor(DEBUG):
             logger.debug(f'Context: sha256:{file_hash.hexdigest()}')
         return f'sha256:{file_hash.hexdigest()}'
+
+    def __add_file_to_context(self, contents: str, file_hash):
+        """
+        Add a specific file content to context checksum
+
+        Args:
+            contents: Contents
+            file_hash: File hash to add to
+
+        Returns:
+            None
+        """
+        item = io.BytesIO()
+        item.write(contents.encode('utf-8'))
+        item.seek(0)
+        calculate_md5_stream(item, file_hash=file_hash)
 
     def render_template(self) -> Optional[str]:
         """
