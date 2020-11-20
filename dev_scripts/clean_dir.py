@@ -3,30 +3,24 @@ import argparse
 import os
 import glob
 import shutil
+from contextlib import suppress
 
 
 def clean_package_dir(glob_file_patterns, glob_delete_patterns, delete_directories):
     for gp in glob_file_patterns:
         for i in glob.glob(gp, recursive=True):
-            print(f"Removing {i}")
-            try:
+            with suppress(FileNotFoundError):
                 os.remove(i)
-            except FileNotFoundError:
-                pass
     for gp in glob_delete_patterns:
         for i in glob.glob(gp, recursive=True):
             print(f"Removing directory: {i}")
-            try:
+            with suppress(FileNotFoundError):
                 shutil.rmtree(i)
-            except FileNotFoundError:
-                pass
     for d in delete_directories:
         if os.path.exists(d):
             print(f"Removing directory: {d}")
-            try:
+            with suppress(FileNotFoundError):
                 shutil.rmtree(d)
-            except FileNotFoundError:
-                pass
 
 
 if __name__ == '__main__':

@@ -21,7 +21,7 @@ def expand_path(path):
 
     if os.path.isdir(path):
 
-        for (dir, dirs, files) in os.walk(path):
+        for (dir, _dirs, files) in os.walk(path):
             for file in files:
                 paths.append(os.path.join(dir, file))
     else:
@@ -44,9 +44,7 @@ def mkdir_p(path):
     try:
         makedirs(path)
     except OSError as exc:  # Python >2.5
-        if exc.errno == errno.EEXIST:
-            pass
-        else:
+        if exc.errno != errno.EEXIST:
             raise
 
 

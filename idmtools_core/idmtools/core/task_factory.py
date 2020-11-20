@@ -39,7 +39,7 @@ class TaskFactory:
         self._builders = TASK_BUILDERS
         aliases = dict()
         # register types as full paths as well
-        for model, spec in self._builders.items():
+        for _model, spec in self._builders.items():
             try:
                 aliases[f'{spec.get_type().__module__}.{spec.get_type().__name__}'] = spec
                 aliases[f'{spec.get_type().__name__}'] = spec

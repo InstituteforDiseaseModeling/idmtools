@@ -18,3 +18,4 @@ Utilities Unique to COMPS
 
 .. toctree::
    comps/assetize_output
+   comps/singularity_build.rst

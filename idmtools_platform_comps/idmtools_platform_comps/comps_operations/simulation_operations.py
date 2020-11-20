@@ -1,4 +1,5 @@
 from concurrent.futures.thread import ThreadPoolExecutor
+from contextlib import suppress
 
 from threading import Lock
 import time
@@ -87,10 +88,9 @@ def comps_batch_worker(simulations: List[Simulation], interface: 'CompsPlatformS
         if locked:
             # do commission asynchronously. If it fine if we happen to miss a commission
             def do_commission():
-                try:
+                with suppress(RuntimeError):
                     simulations[0].experiment.get_platform_object().commission()
-                except RuntimeError:
-                    pass
+
             executor.submit(do_commission)
             COMPS_EXPERIMENT_BATCH_COMMISSION_TIMESTAMP = current_time
             COMPS_EXPERIMENT_BATCH_COMMISSION_LOCK.release()

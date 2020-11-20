@@ -71,7 +71,7 @@ class IWorkflowItem(IAssetsEnabled, INamedEntity, IRunnableEntity, ABC):
         if self.task is None:
             warnings.warn("In 1.7.0, all work items require a Task")
 
-        self.tags = self.tags or {}
+        self.tags = self.tags or dict()
 
     def __repr__(self):
         return f"<WorkItem {self.uid}>"

@@ -31,8 +31,7 @@ def simulation_generator(builders, new_sim_func, additional_sims=None, batch_siz
             simulation.tags.update(tags)
             yield simulation
 
-    for sim in additional_sims:
-        yield sim
+    yield from additional_sims
 
 
 @dataclass(repr=False)

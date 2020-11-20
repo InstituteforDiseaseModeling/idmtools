@@ -6,7 +6,7 @@ from idmtools_models.python.python_task import PythonTask
 from idmtools_models.templated_script_task import TemplatedScriptTask, get_script_wrapper_unix_task, LINUX_PYTHON_PATH_WRAPPER
 
 
-platform = Platform("SLURM")
+platform = Platform("CALCULON")
 # This task can be anytype of task that would run python. Here we are running a simple model script that consumes the example
 # package "a_package"
 task = PythonTask(script_path="model.py", python_path='python3.6')

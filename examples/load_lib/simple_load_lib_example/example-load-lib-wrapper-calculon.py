@@ -54,5 +54,5 @@ def main():
 
 
 if __name__ == '__main__':
-    with Platform('SLURM') as platform:
+    with Platform('CALCULON') as platform:
         main()

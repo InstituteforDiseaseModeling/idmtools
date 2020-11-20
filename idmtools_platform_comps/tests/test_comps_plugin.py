@@ -14,7 +14,7 @@ from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.registry.platform_specification import PlatformPlugins
 from idmtools_platform_comps.comps_platform import COMPSPlatform
 from idmtools_platform_comps.plugin_info import COMPSPlatformSpecification
-from idmtools_platform_comps.utils.package_version import IDM_DOCKER_PROD, fetch_versions_from_server, get_latest_ssmt_image_version_from_artifactory
+from idmtools_platform_comps.utils.package_version import IDMTOOLS_DOCKER_PROD, fetch_versions_from_server, get_latest_ssmt_image_version_from_artifactory
 
 
 @allure.story("COMPS")
@@ -96,7 +96,7 @@ class TestCompsPlugin(unittest.TestCase):
             IdmConfigParser.clear_instance()
 
     def test_get_ssmt_versions(self):
-        url = os.path.join(IDM_DOCKER_PROD, 'comps_ssmt_worker')
+        url = os.path.join(IDMTOOLS_DOCKER_PROD, 'comps_ssmt_worker')
         versions = fetch_versions_from_server(url)
         prev_major = None
         pre_minor = None
