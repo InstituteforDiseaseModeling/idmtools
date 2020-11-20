@@ -13,13 +13,19 @@ Overview
 This directory contains examples using contains and the covasim image, as well as driving those through a snakemake script.
 
 
-To run you should first run `pip install -r requirements.txt`
+Getting Started
+---------------
 
-After that, you can execute the snakemake workflow using
+1. It is recommended you create a virtualenv
+2. After creating a virtualenv, run  `pip install -r requirements.txt`
+3. You can then execute with `snakemake -j` or by running `python3 create_covasim_sif.py` then the `run_*` scripts.
 
-```bash
-snakemake -j
-````
+Snakemake
+---------
+
+The snakefile demonstrated how to build a simple workflow. Here we are just executing a series of experiments when our base image changes.
+
+
 
 Development Scripts
 ===================

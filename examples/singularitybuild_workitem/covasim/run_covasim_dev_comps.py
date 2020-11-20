@@ -55,3 +55,5 @@ if __name__ == "__main__":
     )
     experiment.add_asset(os.path.join("inputs", "run_sim.py"))
     experiment.run(wait_until_done=True)
+    if experiment.succeeded:
+        experiment.to_id_file("dev.id")

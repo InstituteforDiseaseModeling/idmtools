@@ -3,15 +3,35 @@ rule all:
         "test_interventions.id",
         "run_scenarios.id",
         "run_sim.id",
-        "simple.id"
+        "simple.id",
+        "cli.id"
 
+
+
+rule build_base:
+    input:
+        "../ubuntu-20-04/ubuntu_20_04_base.def"
+    output:
+        "ubuntu.id"
+    shell:
+        "python3 build_ubuntu_base.py"
 
 rule build_covasim:
+    input:
+        "covasim_req.def",
+        "ubuntu.id"
     output:
-        "ubuntu.id",
         "covasim.id"
     shell:
         "python3 create_covasim.sif.py"
+
+rule cli:
+    input:
+        "covasim.id"
+    output:
+        "cli.id"
+    shell:
+        "python3 run_covasim_cli_script_comps.py"
 
 rule interventions:
     input:

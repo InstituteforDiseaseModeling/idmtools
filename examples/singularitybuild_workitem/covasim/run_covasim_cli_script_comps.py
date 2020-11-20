@@ -19,7 +19,7 @@ if __name__ == "__main__":
     task = CommandTask(command=command)
     ts = TemplatedSimulations(base_task=task)
     # Add our image
-    task.common_assets.add_assets(AssetCollection.from_id("e614cb2d-442a-eb11-a2dd-c4346bcb7271"))
+    task.common_assets.add_assets(AssetCollection.from_id_file("covasim.id"))
 
     experiment = Experiment.from_task(
         task,
@@ -27,3 +27,5 @@ if __name__ == "__main__":
         tags=dict(type='singularity', description='run covasim')
     )
     experiment.run(wait_until_done=True)
+    if experiment.succeeded:
+        experiment.to_id_file("cli.id")

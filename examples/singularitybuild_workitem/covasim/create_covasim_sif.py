@@ -15,15 +15,7 @@ if __name__ == '__main__':
     pwd = PurePath(__file__).parent
     ub_base = pwd.joinpath("..", "ubuntu-20-04")
     fp = pwd.joinpath("ubuntu.id")
-    if os.path.exists(fp):
-        sbi.add_assets(AssetCollection.from_id_file(fp))
-    else:
-        # or attempt build before hand
-        ubi = SingularityBuildWorkItem(name="Create ubuntu sif with def file", definition_file=ub_base.joinpath("ubuntu_20_04_base.def"), image_name="ubuntu.sif")
-        ubi.tags = dict(ubuntu="20.04")
-        ubi.run(wait_until_done=True, platform=platform)
-        ubi.asset_collection.to_id_file(fp)
-        sbi.add_assets(ubi.asset_collection)
+    sbi.add_assets(AssetCollection.from_id_file(fp))
     sbi.tags = dict(covasim=None)
     sbi.run(wait_until_done=True, platform=platform)
     if sbi.succeeded:

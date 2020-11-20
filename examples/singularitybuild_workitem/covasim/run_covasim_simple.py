@@ -28,4 +28,5 @@ if __name__ == "__main__":
     )
     experiment.add_asset(os.path.join("inputs", "simple.py"))
     experiment.run(wait_until_done=True)
-    experiment.to_id_file("simple.id")
+    if experiment.succeeded:
+        experiment.to_id_file("simple.id")
