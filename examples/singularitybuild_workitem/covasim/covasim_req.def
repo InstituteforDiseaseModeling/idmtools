@@ -6,7 +6,7 @@ From: Assets/ubuntu.sif
     export PYTHONPATH=Assets/:.
 
 %post
-    pip3 install numba==0.48.0
+    pip3 install --no-cache-dir numba==0.48.0
     cd /opt
     git clone https://github.com/InstituteforDiseaseModeling/covasim.git
     cd covasim
