@@ -36,5 +36,5 @@ Snakemake also support change detection my checksums the inputs. Any inputs that
 
 Development Scripts
 ===================
-When you are developing with covasim and changing code within the covasim library, or often updating the package, you most likely would want to use the `run_covasim_dev_comps.py` example. This example
+When you are developing with covasim and changing code within the covasim library, or often updating the package, you most likely would want to use the `run_covasim_dev.py` example. This example
 by default get the latest Covasim package from github and then adds it the assets. This could be adapted to add a local github checkout as well. 

@@ -31,7 +31,7 @@ rule cli:
     output:
         "cli.id"
     shell:
-        "python3 run_covasim_cli_script_comps.py"
+        "python3 run_covasim_cli_script.py"
 
 rule interventions:
     input:
