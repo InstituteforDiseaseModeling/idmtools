@@ -135,6 +135,13 @@ From: python:3.8.6
         self.assertTrue(sbi.succeeded)
         self.assertIsNotNone(sbi.asset_collection)
 
-
-
-
+    def test_singularity_from_definition_content_alpine(self):
+        sing_dir = os.path.join(COMMON_INPUT_PATH, 'singularity', 'alpine_simple')
+        def_file = os.path.join(sing_dir, 'Singularity.def')
+        with open(def_file, "r") as myfile:
+            data = myfile.read()
+        sbi = SingularityBuildWorkItem(definition_content=data)
+        sbi.add_asset(os.path.join(sing_dir, "run_model.py"))
+        sbi.run(wait_until_done=True)
+        self.assertTrue(sbi.succeeded)
+        self.assertIsNotNone(sbi.asset_collection)
