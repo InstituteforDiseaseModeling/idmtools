@@ -64,8 +64,7 @@ def execute(cmd: List['str'], cwd: str = base_directory, ignore_error: bool = Fa
     """
     logger.debug(f'Running {" ".join(cmd)}')
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, cwd=cwd)
-    for stdout_line in iter(process.stdout.readline, ""):
-        yield stdout_line
+    yield from iter(process.stdout.readline, "")
     process.stdout.close()
     return_code = process.wait()
     if return_code and not ignore_error:
@@ -143,7 +142,7 @@ if __name__ == "__main__":
     # use colorful logs except the first time
     console_log_level = logging.DEBUG if 'BUILD_DEBUG' in os.environ or args.verbose else logging.INFO
     try:
-        import coloredlogs
+        import coloredlogs  # noqa: I900
 
         coloredlogs.install(logger=logger, level=console_log_level, fmt="%(asctime)s [%(levelname)-8.8s]  %(message)s")
         logging.addLevelName(15, 'VERBOSE')

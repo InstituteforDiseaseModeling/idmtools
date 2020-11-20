@@ -51,7 +51,7 @@ else:
     version = f'{base_version}.0'
 
 os.makedirs(os.path.abspath('.depends'), exist_ok=True)
-for root, dirs, files in os.walk(os.path.join(LOCAL_PACKAGE_DIR, '.depends')):
+for root, _dirs, files in os.walk(os.path.join(LOCAL_PACKAGE_DIR, '.depends')):
     for file in files:
         os.remove(os.path.join(root, file))
 for package in ['idmtools_core']:

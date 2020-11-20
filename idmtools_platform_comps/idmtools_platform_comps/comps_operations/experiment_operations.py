@@ -5,11 +5,10 @@ from itertools import tee
 from logging import getLogger, DEBUG
 from typing import List, Type, Generator, NoReturn, Optional, TYPE_CHECKING
 from uuid import UUID
-
 from COMPS.Data import Experiment as COMPSExperiment, QueryCriteria, Configuration, Suite as COMPSSuite, \
     Simulation as COMPSSimulation
 from COMPS.Data.Simulation import SimulationState
-
+from idmtools import IdmConfigParser
 from idmtools.assets import AssetCollection, Asset
 from idmtools.core import ItemType, EntityStatus
 from idmtools.core.experiment_factory import experiment_factory
@@ -163,15 +162,11 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
 
         """
-        if experiment.status is not None:
-            if experiment.assets.is_editable():
-
-                # trigger precreate just to be sure
-                if not regather_common_assets:
-                    user_logger.warning(
-                        f"Not gathering common assets again since experiment exists on platform. If you need to add additional common assets, see {get_doc_base_url()}cookbook/assets.html#modifying-asset-collection")
-                experiment.pre_creation(self.platform, gather_assets=regather_common_assets)
-                self.send_assets(experiment)
+        if experiment.status is not None and experiment.assets.is_editable() and regather_common_assets:
+            experiment.pre_creation(self.platform, gather_assets=regather_common_assets)
+            self.send_assets(experiment)
+        else:
+            user_logger.warning(f"Not gathering common assets again since experiment exists on platform. If you need to add additional common assets, see {get_doc_base_url()}cookbook/asset_collections.html#modifying-asset-collection")
         return experiment
 
     def _get_experiment_command_line(self, check_command: bool, experiment: Experiment) -> CommandLine:
@@ -220,7 +215,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         return exp_command
 
     def post_create(self, experiment: Experiment, **kwargs) -> NoReturn:
-        if os.getenv('IDMTOOLS_SUPPRESS_OUTPUT', None) is None:
+        if IdmConfigParser.is_output_enabled():
             user_logger.log(SUCCESS, f"\nThe created experiment can be viewed at {self.platform.endpoint}/#explore/"
                                      f"Simulations?filters=ExperimentId={experiment.uid}\nSimulations are still being created\n"
                             )
@@ -288,15 +283,13 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             logger.debug(f'Commissioning experiment: {experiment.uid}')
         # commission only if rules we have items in created or none.
         # TODO add new status to entity status to track commissioned as well instead of raw comps
-        if any([s.status in [None, EntityStatus.CREATED] for s in experiment.simulations]):
-            # now check comps status
-            if any([s.get_platform_object().state in [SimulationState.Created] for s in experiment.simulations]):
-                po = experiment.get_platform_object()
-                po.commission()
-                # for now, we update here in the comps objects to refelect the new state
-                for sim in experiment.simulations:
-                    spo = sim.get_platform_object()
-                    spo._state = SimulationState.CommissionRequested
+        if any([s.status in [None, EntityStatus.CREATED] for s in experiment.simulations]) and any([s.get_platform_object().state in [SimulationState.Created] for s in experiment.simulations]):
+            po = experiment.get_platform_object()
+            po.commission()
+            # for now, we update here in the comps objects to reflect the new state
+            for sim in experiment.simulations:
+                spo = sim.get_platform_object()
+                spo._state = SimulationState.CommissionRequested
 
     def send_assets(self, experiment: Experiment, **kwargs):
         """

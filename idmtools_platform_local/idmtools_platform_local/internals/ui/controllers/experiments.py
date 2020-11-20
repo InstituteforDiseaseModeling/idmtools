@@ -1,14 +1,13 @@
 import logging
 import shutil
 import sys
+from contextlib import suppress
 from typing import Optional, List, Tuple, Dict
-
 import backoff
 from flask import current_app
 from flask_restful import Resource, reqparse, abort
 from sqlalchemy import String, func, or_, and_
 from sqlalchemy.exc import ProgrammingError, ResourceClosedError, OperationalError, DatabaseError
-
 from idmtools_platform_local.config import DATA_PATH
 from idmtools_platform_local.internals.data.job_status import JobStatus
 from idmtools_platform_local.internals.ui.controllers.utils import validate_tags
@@ -132,10 +131,7 @@ class Experiments(Resource):
 
         if args['data']:
             print(f'Deleting {job.data_path}')
-            try:
+            with suppress(FileNotFoundError):
                 shutil.rmtree(job.data_path)
-            except FileNotFoundError:
-                # we will assume it has been cleaned up manually
-                pass
         session.query(JobStatus).filter(or_(JobStatus.uuid == id, JobStatus.parent_uuid == id)).delete()
         return 204, None

@@ -41,7 +41,7 @@ def run_task(command: str, current_job: 'JobStatus', experiment_uuid: str, simul
                 try:
                     st = os.stat(fp)
                     os.chmod(fp, st.st_mode | stat.S_IEXEC)
-                except (OSError, PermissionError):
+                except OSError:
                     if logger.isEnabledFor(DEBUG):
                         logger.debug(f"Could not set execute permission on {fp}. Falling back to executing with bash")
                     # most likely windows host. We can try to run it using another method

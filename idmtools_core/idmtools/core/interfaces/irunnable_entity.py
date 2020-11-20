@@ -95,7 +95,7 @@ class IRunnableEntity(IEntity, metaclass=ABCMeta):
         if wait_until_done or wait_on_done:
             self.wait(wait_on_done_progress=wait_on_done_progress, platform=p)
 
-    def wait(self, wait_on_done_progress: bool = True, timeout: int = None, refresh_interval=None, platform: 'IPlatform' = None):
+    def wait(self, wait_on_done_progress: bool = True, timeout: int = None, refresh_interval=None, platform: 'IPlatform' = None, **kwargs):
         """
         Wait on an item to finish running
 
@@ -113,7 +113,7 @@ class IRunnableEntity(IEntity, metaclass=ABCMeta):
             return
         if self.status not in [EntityStatus.CREATED, EntityStatus.RUNNING]:
             raise ValueError("The item cannot be waited for if it is not in Running/Created state")
-        opts = dict()
+        opts = dict(**kwargs)
         if timeout:
             opts['timeout'] = timeout
         if refresh_interval:

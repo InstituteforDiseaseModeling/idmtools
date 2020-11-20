@@ -15,7 +15,9 @@ class SweepArm:
     Class that represents a parameter arm.
     """
 
-    def __init__(self, type=ArmType.cross, funcs=[]):
+    def __init__(self, type=ArmType.cross, funcs=None):
+        if funcs is None:
+            funcs = []
         self.sweep_functions = []
         self.type = type
 
@@ -151,5 +153,4 @@ class ArmSimulationBuilder(SimulationBuilder):
             self.sweep_definitions.extend(zip(*self.sweeps))
 
     def __iter__(self):
-        for tup in self.sweep_definitions:
-            yield tup
+        yield from self.sweep_definitions

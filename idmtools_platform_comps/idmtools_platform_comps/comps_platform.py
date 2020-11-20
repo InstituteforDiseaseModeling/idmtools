@@ -1,10 +1,7 @@
 # flake8: noqa E402
 import copy
-import json
 import logging
 # fix for comps weird import
-import os
-
 from idmtools.assets import AssetCollection
 from idmtools.entities.iworkflow_item import IWorkflowItem
 
@@ -13,7 +10,7 @@ from COMPS import Client
 logging.root.handlers = HANDLERS
 from dataclasses import dataclass, field
 from functools import partial
-from typing import List
+from typing import List, Dict
 from enum import Enum
 from idmtools.core import CacheEnabled, ItemType
 from idmtools.entities.iplatform import IPlatform
@@ -108,3 +105,6 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
     def get_asset_collection_link(self, asset_collection: AssetCollection):
         return f"{self.endpoint}/#explore/AssetCollections?filters=ID={asset_collection.uid}"
+
+    def get_username(self):
+        return Client.auth_manager()._username

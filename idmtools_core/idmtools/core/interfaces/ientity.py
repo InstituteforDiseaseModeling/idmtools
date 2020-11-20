@@ -1,5 +1,6 @@
 from abc import ABCMeta
 from dataclasses import dataclass, field
+from os import PathLike
 from typing import NoReturn, List, Any, Dict, Union, TYPE_CHECKING
 from uuid import UUID
 from idmtools.core import EntityStatus, ItemType, NoPlatformException
@@ -50,6 +51,36 @@ class IEntity(IItem, metaclass=ABCMeta):
         super().post_creation(platform)
 
     @classmethod
+    def from_id_file(cls, filename: Union[PathLike, str], platform: 'IPlatform' = None, **kwargs) -> 'IEntity':  # noqa E821:
+        """
+        Load from a file that container the id
+
+        Args:
+            filename: Filename to load
+            platform:
+            **kwargs:
+
+        Returns:
+
+        """
+        if isinstance(filename, PathLike):
+            filename = str(filename)
+        platform_block = None
+        with open(filename, 'r') as id_in:
+            item_id = id_in.read().strip()
+            if "::" in item_id:
+                item_id, platform_block = item_id.split("::")
+        if platform is None:
+            if platform_block:
+                from idmtools.core.platform_factory import Platform
+                platform = Platform(platform_block)
+            platform = cls.get_current_platform_or_error(platform)
+        if cls.item_type is None:
+            raise EnvironmentError("ItemType is None. This is most likely a badly derived IEntity that doesn't run set the default item type on the class")
+
+        return platform.get_item(item_id, cls.item_type, **kwargs)
+
+    @classmethod
     def from_id(cls, item_id: Union[str, UUID], platform: 'IPlatform' = None, **kwargs) -> 'IEntity':  # noqa E821
         """
         Load an item from an id
@@ -63,10 +94,7 @@ class IEntity(IItem, metaclass=ABCMeta):
             IEntity of object
         """
         if platform is None:
-            from idmtools.core.context import CURRENT_PLATFORM
-            if CURRENT_PLATFORM is None:
-                raise ValueError("You have to specify a platform to load the item from")
-            platform = CURRENT_PLATFORM
+            platform = cls.get_current_platform_or_error(platform)
         if cls.item_type is None:
             raise EnvironmentError("ItemType is None. This is most likely a badly derived IEntity that doesn't run set the default item type on the class")
         return platform.get_item(item_id, cls.item_type, **kwargs)
@@ -200,12 +228,35 @@ class IEntity(IItem, metaclass=ABCMeta):
         if self.platform is None:
             # check context for current platform
             if platform is None:
-                from idmtools.core.context import CURRENT_PLATFORM
-                if CURRENT_PLATFORM is None:
-                    raise NoPlatformException("No Platform defined on object, in current context, or passed to run")
-                platform = CURRENT_PLATFORM
+                platform = self.get_current_platform_or_error(platform)
             self.platform = platform
         return self.platform
+
+    @staticmethod
+    def get_current_platform_or_error(platform):
+        from idmtools.core.context import get_current_platform
+        p = get_current_platform()
+        if p is None:
+            raise NoPlatformException("No Platform defined on object, in current context, or passed to run")
+        return p
+
+    def to_id_file(self, filename: Union[str, PathLike], save_platform: bool = False):
+        """
+        Write a id file
+
+        Args:
+            filename: Filename to create
+            save_platform: Save platform to the file as well
+
+        Returns:
+
+        """
+        if isinstance(filename, PathLike):
+            filename = str(filename)
+        with open(filename, 'w') as filename:
+            filename.write(f'{self.id}')
+            if save_platform and hasattr(self.platform, '_config_block'):
+                filename.write(f"::{self.platform._config_block}")
 
 
 IEntityList = List[IEntity]

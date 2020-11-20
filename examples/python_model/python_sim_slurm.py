@@ -51,7 +51,7 @@ experiment.tags["tag1"] = 1
 # And maybe some custom Experiment Level Assets
 experiment.assets.add_directory(assets_directory=os.path.join("inputs", "python_model_with_deps", "Assets"))
 
-platform = Platform('SLURM')
+platform = Platform('CALCULON')
 
 experiment.run(wait_until_done=True)
 sys.exit(0 if experiment.succeeded else -1)

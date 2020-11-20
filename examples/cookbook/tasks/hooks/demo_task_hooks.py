@@ -29,7 +29,7 @@ def set_value(simulation, name, value):
     #user_logger.info(f"Set config for {name} to {value}")
 
 
-platform = Platform("SLURM2")
+platform = Platform("CALCULON")
 pl = RequirementsToAssetCollection(platform, pkg_list=['numpy', 'matplotlib', 'scipy'])
 ac_id = pl.run()
 ac = AssetCollection.from_id(ac_id, as_copy=True)

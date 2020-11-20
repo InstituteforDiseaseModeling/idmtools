@@ -10,7 +10,7 @@ from logging import getLogger
 # on windows virtual env is not populated through pymake
 if sys.platform == "win32" and 'VIRTUAL_ENV' in os.environ:
     sys.path.insert(0, os.environ['VIRTUAL_ENV'] + "\\Lib\\site-packages")
-import coloredlogs  # noqa: E402
+import coloredlogs  # noqa: E402,I900
 
 logging.addLevelName(15, 'VERBOSE')
 logging.addLevelName(35, 'SUCCESS')
@@ -25,8 +25,7 @@ def execute(cmd, env=None):
     final_env.update(env)
     print(shutil.which(cmd.split(" ")[0]))
     popen = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, shell=True, env=final_env)
-    for stdout_line in iter(popen.stdout.readline, ""):
-        yield stdout_line
+    yield from iter(popen.stdout.readline, "")
     popen.stdout.close()
     return_code = popen.wait()
     if return_code:

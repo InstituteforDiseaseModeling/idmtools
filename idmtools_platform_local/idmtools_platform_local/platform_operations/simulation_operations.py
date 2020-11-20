@@ -260,7 +260,7 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         assets = []
         sim_path = self.__get_simulation_path(self.platform, simulation)
 
-        for root, dirs, files in os.walk(sim_path, topdown=False):
+        for root, _dirs, files in os.walk(sim_path, topdown=False):
             for file in files:
                 fp = os.path.join(root, file)
                 asset = Asset(filename=file, persisted=True)
@@ -303,20 +303,18 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
         for asset in metadata['assets']:
             self.__convert_json_assets_to_assets(asset, sim_path, simulation.assets)
         # load task if requested
-        if load_task:
-            if 'tags' in local_sim and 'task_type' in local_sim['tags']:
-                try:
-                    if logger.isEnabledFor(DEBUG):
-                        logger.debug(f"Metadata: {metadata}")
-                    simulation.task = TaskFactory().create(local_sim['tags']['task_type'], **metadata['task'])
-                except Exception as e:
-                    user_logger.warning(f"Could not load task of type {local_sim['tags']['task_type']}. "
-                                        f"Received error {str(e)}")
-                    logger.exception(e)
+        if load_task and 'tags' in local_sim and 'task_type' in local_sim['tags']:
+            try:
+                if logger.isEnabledFor(DEBUG):
+                    logger.debug(f"Metadata: {metadata}")
+                simulation.task = TaskFactory().create(local_sim['tags']['task_type'], **metadata['task'])
+            except Exception as e:
+                user_logger.warning(f"Could not load task of type {local_sim['tags']['task_type']}. "
+                                    f"Received error {str(e)}")
+                logger.exception(e)
 
         # fallback for task
         if simulation.task is None:
-
             simulation.task = CommandTask(metadata['task']['command'])
 
         # convert task assets
