@@ -228,8 +228,6 @@ try:
     @click.pass_context
     def pull(ctx: click.Context, image_url, wait, tag, workitem_tag, name, force, image_name: str, id_file: str, id_filename: str):
         p: COMPSPlatform = Platform(ctx.obj['config_block'])
-        if image_name and image_name.endswith(".sif"):
-            image_name = f'{image_name}.sif'
         sb = SingularityBuildWorkItem(image_url=image_url, force=force, image_name=image_name)
         sb.name = f"Pulling {image_url}" if name is None else name
 

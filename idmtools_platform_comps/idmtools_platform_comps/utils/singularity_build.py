@@ -297,6 +297,8 @@ class SingularityBuildWorkItem(InputDataWorkItem):
 
         """
         super(SingularityBuildWorkItem, self).pre_creation(platform)
+        if self.image_name and not self.image_name.endswith(".sif"):
+            self.image_name = f'{self.image_name}.sif'
         self.__add_common_assets()
         self._prep_work_order_before_create()
 
