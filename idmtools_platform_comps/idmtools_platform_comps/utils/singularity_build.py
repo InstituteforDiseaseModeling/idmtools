@@ -269,7 +269,7 @@ class SingularityBuildWorkItem(InputDataWorkItem):
         """
         self.__add_tags()
         self.load_work_order(SB_BASE_WORKER_PATH)
-        if self.definition_file:
+        if self.definition_file or self.definition_content:
             self.work_order['Build']['Input'] = "Assets/Singularity.def"
         else:
             self.work_order['Build']['Input'] = self.image_url
