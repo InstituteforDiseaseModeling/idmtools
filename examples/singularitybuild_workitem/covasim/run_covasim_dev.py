@@ -26,7 +26,7 @@ def get_latest_release(version: str = None) -> PurePath:
                 raise ValueError(f"Could not find the tag {version}")
             tag = tag.pop()
         else:
-            tag = tags.pop()
+            tag = sorted(tags, key=lambda x: x["name"]).pop()
         output_path = PurePath(__file__).parent.joinpath('.covasim_versions', tag["name"])
         if not os.path.exists(output_path):
             df_name = f'{output_path}.download'
