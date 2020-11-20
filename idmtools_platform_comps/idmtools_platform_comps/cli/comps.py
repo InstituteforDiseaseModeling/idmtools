@@ -213,7 +213,6 @@ try:
             user_logger.info(f"Saving ID to {id_filename}")
             sb.to_id_file(id_filename, save_platform=True)
 
-
     @singularity.command(help="Pull Singularity Image")
     @click.argument('image_url')
     @click.option('--wait/--no-wait', default=True, help="Wait on item to finish")
