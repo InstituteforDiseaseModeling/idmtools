@@ -213,7 +213,7 @@ class SingularityBuildWorkItem(InputDataWorkItem):
             platform = CURRENT_PLATFORM
         ac = None
         if not sbi.force:  # don't search if it is going to be forced
-            qc = QueryCriteria().where_tag(['type=singularity']).select_children('assets')
+            qc = QueryCriteria().where_tag(['type=singularity']).select_children(['assets', 'tags']).orderby('date_created desc')
             if sbi.__digest:
                 qc.where_tag([f'digest={sbi.__digest}'])
             elif sbi.definition_file or sbi.definition_content:
@@ -239,8 +239,10 @@ class SingularityBuildWorkItem(InputDataWorkItem):
             None
         """
         self.image_tags['type'] = 'singularity'
-
+        # Disable all tags but image name and type
         if not self.disable_default_tags:
+            if self.platform is not None and hasattr(self.platform, 'get_username'):
+                self.image_tags['created_by'] = self.platform.get_username()
             # allow users to override run id using only the tag
             if 'run_id' in self.tags:
                 self.run_id = self.tags['run_id']
@@ -257,8 +259,21 @@ class SingularityBuildWorkItem(InputDataWorkItem):
             # If we are building from a file, add the build context
             elif self.definition_file:
                 self.image_tags['build_context'] = self.context_checksum()
+                if self.image_name is None:
+                    bn = PurePath(self.definition_file).name
+                    bn = str(bn).replace(".def", ".sif")
+                    self.image_name = bn
+
             if self.image_url:
                 self.image_tags['image_url'] = self.image_url
+
+        # Final fall back for image name
+        if self.image_name is None:
+            self.image_name = "image.sif"
+        if self.image_name and not self.image_name.endswith(".sif"):
+            self.image_name = f'{self.image_name}.sif'
+        # Add image name to the tags
+        self.image_tags['image_name'] = self.image_name
 
     def _prep_work_order_before_create(self) -> Dict[str, str]:
         """
@@ -299,8 +314,6 @@ class SingularityBuildWorkItem(InputDataWorkItem):
 
         """
         super(SingularityBuildWorkItem, self).pre_creation(platform)
-        if self.image_name and not self.image_name.endswith(".sif"):
-            self.image_name = f'{self.image_name}.sif'
         self.__add_common_assets()
         self._prep_work_order_before_create()
 
@@ -363,6 +376,8 @@ class SingularityBuildWorkItem(InputDataWorkItem):
                 user_logger.log(SUCCESS, f"View AC at {self.platform.get_asset_collection_link(ac)}")
             # Set id to None
             self.uid = None
+            if ac:
+                self.image_tags = ac.tags
             self.asset_collection = ac
             # how do we get id for original work item from AC?
             self.status = EntityStatus.SUCCEEDED

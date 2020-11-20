@@ -3,12 +3,17 @@ import unittest
 import allure
 import pytest
 from idmtools.assets import Asset
+from idmtools.core import TRUTHY_VALUES
 from idmtools.core.platform_factory import Platform
 from idmtools_platform_comps.utils.package_version import get_docker_manifest, get_digest_from_docker_hub
 from idmtools_platform_comps.utils.singularity_build import SingularityBuildWorkItem
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.decorators import linux_only
 from idmtools_test.utils.utils import get_case_name
+
+# Force test cases subject to caching to re-run
+# Set to 1 or t, or on to force
+FORCE = os.getenv("FORCE_SBI_TESTS", '0') in TRUTHY_VALUES
 
 
 @pytest.mark.comps
@@ -52,18 +57,24 @@ class TestSingularityBuild(unittest.TestCase):
         self.assertIsInstance(manifest, dict)
 
     def test_docker_fetch_version_tag(self):
-        sbi = SingularityBuildWorkItem(name=self.case_name)
+        sbi = SingularityBuildWorkItem(name=self.case_name, force=FORCE)
         sbi.image_url = "docker://docker-production.packages.idmod.org/idm/dtk-ubuntu-py3.7-mpich3.3-runtime:20.04.09"
         getattr(sbi, '_SingularityBuildWorkItem__add_tags')()
+        self.assertIn('image_name', sbi.image_tags)
+        self.assertEqual('image_name', 'alpine:3.12.1')
+        self.assertIn('created_by', sbi.image_tags)
         self.assertIn("digest", sbi.image_tags)
         self.assertEqual(sbi.image_tags['digest'], 'sha256:d0fd5396c017aa2b1da9022bb9e9ce420317b2bb36c3c3b4986da13b0c9755b9')
         self.assertEqual(sbi.image_tags['image_url'], 'docker://docker-production.packages.idmod.org/idm/dtk-ubuntu-py3.7-mpich3.3-runtime:20.04.09')
 
     def test_docker_fetch_version_from_dockerhub(self):
-        sbi = SingularityBuildWorkItem(name=self.case_name)
+        sbi = SingularityBuildWorkItem(name=self.case_name, force=FORCE)
         sbi.image_url = "docker://alpine:3.12.1"
         getattr(sbi, '_SingularityBuildWorkItem__add_tags')()
         self.assertIn("digest", sbi.image_tags)
+        self.assertIn('image_name', sbi.image_tags)
+        self.assertEqual('image_name', 'alpine:3.12.1')
+        self.assertIn('created_by', sbi.image_tags)
         self.assertEqual(sbi.image_tags['digest'], 'sha256:d7342993700f8cd7aba8496c2d0e57be0666e80b4c441925fc6f9361fa81d10e')
         self.assertEqual(sbi.image_tags['image_url'], 'docker://alpine:3.12.1')
         js = sbi._prep_work_order_before_create()
@@ -72,11 +83,13 @@ class TestSingularityBuild(unittest.TestCase):
 
     def test_comps_pull_alpine(self):
         # How can we make this test repeatable other than force?
-        sbi = SingularityBuildWorkItem()
+        sbi = SingularityBuildWorkItem(force=FORCE)
         sbi.image_url = "docker://alpine:3.11.6"
         sbi.run(wait_until_done=True, platform=self.platform)
         self.assertTrue(sbi.succeeded)
         self.assertIsNotNone(sbi.asset_collection)
+        self.assertIn('image_name', sbi.image_tags)
+        self.assertIn('created_by', sbi.image_tags)
 
     # because of new lines on python files, we have to make this different on different platforms
     @linux_only
@@ -90,7 +103,7 @@ class TestSingularityBuild(unittest.TestCase):
     def get_alpine_simple_builder(self):
         sing_dir = os.path.join(COMMON_INPUT_PATH, 'singularity', 'alpine_simple')
         def_file = os.path.join(sing_dir, 'Singularity.def')
-        sbi = SingularityBuildWorkItem(definition_file=def_file)
+        sbi = SingularityBuildWorkItem(definition_file=def_file, force=FORCE)
         sbi.add_asset(os.path.join(sing_dir, "run_model.py"))
         return sbi
 
@@ -99,13 +112,16 @@ class TestSingularityBuild(unittest.TestCase):
         sbi.run(wait_until_done=True)
         self.assertTrue(sbi.succeeded)
         self.assertIsNotNone(sbi.asset_collection)
+        self.assertIn('image_name', sbi.image_tags)
+        self.assertEqual(sbi.image_tags['image_name'], 'Singularity.sif')
+        self.assertIn('created_by', sbi.image_tags)
 
     def test_singularity_template(self):
         sing_dir = os.path.join(COMMON_INPUT_PATH, 'singularity', 'alpine_template')
         def_file = os.path.join(sing_dir, 'Singularity.jinja')
         sbi = SingularityBuildWorkItem(
             name=self.case_name,
-            definition_file=def_file, is_template=True,
+            definition_file=def_file, is_template=True, force=FORCE,
             template_args=dict(python_version='3.8.6', packages=['numpy', 'pandas', 'requests'])
         )
         rendered_def = sbi.render_template()
@@ -134,14 +150,18 @@ From: python:3.8.6
         sbi.run(wait_until_done=True, platform=self.platform)
         self.assertTrue(sbi.succeeded)
         self.assertIsNotNone(sbi.asset_collection)
+        self.assertIn('image_name', sbi.image_tags)
+        self.assertIn('created_by', sbi.image_tags)
 
     def test_singularity_from_definition_content_alpine(self):
         sing_dir = os.path.join(COMMON_INPUT_PATH, 'singularity', 'alpine_simple')
         def_file = os.path.join(sing_dir, 'Singularity.def')
         with open(def_file, "r") as myfile:
             data = myfile.read()
-        sbi = SingularityBuildWorkItem(definition_content=data)
+        sbi = SingularityBuildWorkItem(definition_content=data, force=FORCE)
         sbi.add_asset(os.path.join(sing_dir, "run_model.py"))
         sbi.run(wait_until_done=True)
         self.assertTrue(sbi.succeeded)
         self.assertIsNotNone(sbi.asset_collection)
+        self.assertIn('image_name', sbi.image_tags)
+        self.assertIn('created_by', sbi.image_tags)
