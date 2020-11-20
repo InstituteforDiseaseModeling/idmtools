@@ -20,7 +20,7 @@ Getting Started
 
 1. It is recommended you create a virtualenv
 2. After creating a virtualenv, run  `pip install -r requirements.txt`
-3. You can then execute with `snakemake -j` or by running `python3 create_covasim_sif.py` then the `run_*` scripts.
+3. You can then execute with `snakemake -j` or by running `python3 build_ubuntu_base.py`, then, `python3 create_covasim_sif.py`, and then `run_*` scripts.
 
 Snakemake
 ---------
