@@ -25,6 +25,11 @@ Snakemake
 
 The snakefile demonstrated how to build a simple workflow. Here we are just executing a series of experiments when our base image changes.
 
+We start the file with the rule `all`. Here we list all the files that must exist when we expect everything to be done.
+
+We then define a list of rules that actually do the work. For these rules, we specify the inputs, output, and the command. Snakemake will determine
+the execution order by building a directed acyclic graph(DAG) using of the work using the input and outputs to determine execution order. It then executes those items.
+Snakemake also support change detection my checksums the inputs. Any inputs that have changed will cause a job to be re-ran. 
 
 
 Development Scripts
