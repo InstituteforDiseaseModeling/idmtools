@@ -3,6 +3,8 @@
 **Table of Contents**
 
 - [Overview](#overview)
+  - [Getting Started](#getting-started)
+  - [Snakemake](#snakemake)
 - [Development Scripts](#development-scripts)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
