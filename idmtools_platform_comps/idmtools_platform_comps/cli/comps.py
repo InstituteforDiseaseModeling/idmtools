@@ -185,8 +185,6 @@ try:
     @click.pass_context
     def build(ctx: click.Context, common_input, common_input_glob, transient_input, transient_input_glob, definition_file, wait, tag, workitem_tag, name, force, image_name: str, id_file: str, id_filename: str):
         p: COMPSPlatform = Platform(ctx.obj['config_block'])
-        if image_name and image_name.endswith(".sif"):
-            image_name = f'{image_name}.sif'
         sb = SingularityBuildWorkItem(definition_file=definition_file, name=name, force=force, image_name=image_name)
 
         if tag:
