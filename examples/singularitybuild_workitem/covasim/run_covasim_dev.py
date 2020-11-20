@@ -50,6 +50,8 @@ if __name__ == "__main__":
     platform = Platform("CALCULON")
 
     # get from github
+    # You can specify a version here by adding a tag to the call below. For a list of versions
+    # see https://github.com/InstituteforDiseaseModeling/covasim/tags
     release_path = get_latest_release()
 
     # create commandline input for the task
