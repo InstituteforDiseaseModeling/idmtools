@@ -310,6 +310,7 @@ class SingularityBuildWorkItem(InputDataWorkItem):
         Returns:
 
         """
+        self.render_template()
         if self.definition_file:
             opts = dict(content=self.__rendered_template) if self.is_template else dict(absolute_path=self.definition_file)
             self.assets.add_or_replace_asset(Asset(filename="Singularity.def", **opts))
