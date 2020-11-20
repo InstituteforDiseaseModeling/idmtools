@@ -223,6 +223,8 @@ class SingularityBuildWorkItem(InputDataWorkItem):
                     logger.debug("Searching for existing containers")
                 ac = platform._assets.get(None, query_criteria=qc)
             if ac:
+                if logger.isEnabledFor(DEBUG):
+                    logger.debug(f"Found: {len(ac)} previous builds")
                 ac = platform._assets.to_entity(ac[0])
                 if logger.isEnabledFor(DEBUG):
                     logger.debug(f'Found existing container in {ac.id}')
@@ -263,7 +265,8 @@ class SingularityBuildWorkItem(InputDataWorkItem):
                     bn = PurePath(self.definition_file).name
                     bn = str(bn).replace(".def", ".sif")
                     self.image_name = bn
-
+            elif self.definition_content:
+                self.image_tags['build_context'] = self.context_checksum()
             if self.image_url:
                 self.image_tags['image_url'] = self.image_url
 

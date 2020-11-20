@@ -111,6 +111,7 @@ class TestSingularityBuild(unittest.TestCase):
         self.assertTrue(sbi.succeeded)
         self.assertIsNotNone(sbi.asset_collection)
         self.assertIn('image_name', sbi.image_tags)
+        self.assertIn('build_context', sbi.image_tags)
         self.assertEqual(sbi.image_tags['image_name'], 'Singularity.sif')
         self.assertIn('created_by', sbi.image_tags)
 
@@ -161,5 +162,6 @@ From: python:3.8.6
         sbi.run(wait_until_done=True)
         self.assertTrue(sbi.succeeded)
         self.assertIsNotNone(sbi.asset_collection)
+        self.assertIn('build_context', sbi.image_tags)
         self.assertIn('image_name', sbi.image_tags)
         self.assertIn('created_by', sbi.image_tags)
