@@ -13,7 +13,7 @@ from idmtools_test.utils.utils import get_case_name
 
 # Force test cases subject to caching to re-run
 # Set to 1 or t, or on to force
-FORCE = os.getenv("FORCE_SBI_TESTS", '1') in TRUTHY_VALUES
+FORCE = os.getenv("FORCE_SBI_TESTS", '0') in TRUTHY_VALUES
 
 
 @pytest.mark.comps
