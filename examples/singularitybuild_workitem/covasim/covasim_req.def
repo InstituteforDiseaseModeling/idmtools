@@ -1,6 +1,10 @@
 Bootstrap: localimage
 From: Assets/ubuntu.sif
 
+%environment
+    # ADD our asset to path so we can add live versions
+    export PYTHONPATH=Assets/:.
+
 %post
     pip3 install numba==0.48.0
     cd /opt

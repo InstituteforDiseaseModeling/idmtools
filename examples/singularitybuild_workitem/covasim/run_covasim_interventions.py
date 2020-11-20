@@ -15,16 +15,17 @@ if __name__ == "__main__":
     platform = Platform("CALCULON")
 
     # create commandline input for the task
-    command = CommandLine("singularity exec ./Assets/covasim_ubuntu.sif python3 Assets/simple.py")
+    command = CommandLine("singularity exec ./Assets/covasim_ubuntu.sif python3 Assets/test_interventions.py")
     task = CommandTask(command=command)
     ts = TemplatedSimulations(base_task=task)
     # Add our image
-    task.common_assets.add_assets(AssetCollection.from_id("e614cb2d-442a-eb11-a2dd-c4346bcb7271"))
+    task.common_assets.add_assets(AssetCollection.from_id_file("covasim.id"))
 
     experiment = Experiment.from_task(
         task,
         name=os.path.split(sys.argv[0])[1],
         tags=dict(type='singularity', description='run covasim')
     )
-    experiment.add_asset(os.path.join("inputs", "simple.py"))
+    experiment.add_asset(os.path.join("inputs", "test_interventions.py"))
     experiment.run(wait_until_done=True)
+    experiment.to_id_file("test_interventions.id")

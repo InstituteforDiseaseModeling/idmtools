@@ -421,3 +421,6 @@ examples/idmtools.ini
 /**/tests/reports/
 *.test_results.html
 allure_report.zip
+*.id
+/examples/singularitybuild_workitem/covasim/.covasim_versions/
+**/.snakemake/

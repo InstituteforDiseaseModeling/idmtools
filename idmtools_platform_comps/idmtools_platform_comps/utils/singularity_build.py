@@ -5,6 +5,7 @@ import os
 import uuid
 from dataclasses import dataclass, field, InitVar
 from logging import getLogger, DEBUG
+from os import PathLike
 from typing import List, Dict, Union, Optional, TYPE_CHECKING
 from urllib.parse import urlparse
 from uuid import UUID
@@ -33,7 +34,7 @@ user_logger = getLogger('user')
 @dataclass(repr=False)
 class SingularityBuildWorkItem(InputDataWorkItem):
     #: Path to definition file
-    definition_file: str = field(default=None)
+    definition_file: Union[PathLike, str] = field(default=None)
     #: definition content. Alternative to file
     definition_content: str = field(default=None)
     #: Enables Jinja parsing of the definition file or content
@@ -84,6 +85,8 @@ class SingularityBuildWorkItem(InputDataWorkItem):
         super().__post_init__(item_name, asset_collection_id, asset_files, user_files)
 
         self.image_url = image_url if isinstance(image_url, str) else None
+        if isinstance(self.definition_file, PathLike):
+            self.definition_file = str(self.definition_file)
 
     def get_container_info(self) -> Dict[str, str]:
         pass

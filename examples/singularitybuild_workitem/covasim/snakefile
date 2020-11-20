@@ -1,0 +1,46 @@
+rule all:
+    input:
+        "test_interventions.id",
+        "run_scenarios.id",
+        "run_sim.id",
+        "simple.id"
+
+
+rule build_covasim:
+    output:
+        "ubuntu.id",
+        "covasim.id"
+    shell:
+        "python3 create_covasim.sif.py"
+
+rule interventions:
+    input:
+        "covasim.id"
+    output:
+        "test_interventions.id"
+    shell:
+        "python3 run_covasim_interventions.py"
+
+rule scenarios:
+    input:
+        "covasim.id"
+    output:
+        "run_scenarios.id"
+    shell:
+        "python3 run_covasim_scenarios.py"
+
+rule sim:
+    input:
+        "covasim.id"
+    output:
+        "run_sim.id"
+    shell:
+        "python3 run_covasim_sim.py"
+
+rule simple:
+    input:
+        "covasim.id"
+    output:
+        "simple.id"
+    shell:
+        "python3 run_covasim_simple.py"
