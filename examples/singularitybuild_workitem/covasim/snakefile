@@ -23,7 +23,7 @@ rule build_covasim:
     output:
         "covasim.id"
     shell:
-        "python3 create_covasim.sif.py"
+        "python3 create_covasim_sif.py"
 
 rule cli:
     input:
@@ -35,7 +35,8 @@ rule cli:
 
 rule interventions:
     input:
-        "covasim.id"
+        "covasim.id",
+        "inputs/test_interventions.py"
     output:
         "test_interventions.id"
     shell:
@@ -43,7 +44,8 @@ rule interventions:
 
 rule scenarios:
     input:
-        "covasim.id"
+        "covasim.id",
+        "inputs/run_scenarios.py"
     output:
         "run_scenarios.id"
     shell:
@@ -51,7 +53,8 @@ rule scenarios:
 
 rule sim:
     input:
-        "covasim.id"
+        "covasim.id",
+        "inputs/run_sim.py"
     output:
         "run_sim.id"
     shell:
@@ -59,7 +62,8 @@ rule sim:
 
 rule simple:
     input:
-        "covasim.id"
+        "covasim.id",
+        "inputs/simple.py"
     output:
         "simple.id"
     shell:
