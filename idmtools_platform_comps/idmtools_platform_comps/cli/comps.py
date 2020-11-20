@@ -1,11 +1,11 @@
 import glob
-from getpass import getpass
-import sys
-from logging import getLogger
-import tabulate
-import os
-from COMPS.CredentialPrompt import CredentialPrompt
 import json as json_parser
+import os
+import sys
+import tabulate
+from getpass import getpass
+from logging import getLogger
+from COMPS.CredentialPrompt import CredentialPrompt
 from idmtools.assets import AssetCollection
 from idmtools_platform_comps.utils.singularity_build import SingularityBuildWorkItem
 
@@ -210,8 +210,6 @@ try:
 
         sb.run(wait_until_done=wait, platform=p)
         if sb.succeeded and id_file:
-            if id_filename is None:
-                id_filename = "singularity_image.id"
             user_logger.info(f"Saving ID to {id_filename}")
             sb.to_id_file(id_filename, save_platform=True)
 
@@ -241,8 +239,6 @@ try:
 
         sb.run(wait_until_done=wait, platform=p)
         if sb.succeeded and id_file:
-            if id_filename is None:
-                id_filename = "singularity_image.id"
             user_logger.info(f"Saving ID to {id_filename}")
             sb.to_id_file(id_filename, save_platform=True)
 

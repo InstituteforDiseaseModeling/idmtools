@@ -2,10 +2,12 @@ import hashlib
 import io
 import json
 import os
+import re
 import uuid
 from dataclasses import dataclass, field, InitVar
 from logging import getLogger, DEBUG
 from os import PathLike
+from pathlib import PurePath
 from typing import List, Dict, Union, Optional, TYPE_CHECKING
 from urllib.parse import urlparse
 from uuid import UUID
@@ -387,3 +389,28 @@ class SingularityBuildWorkItem(InputDataWorkItem):
         if self.status == EntityStatus.SUCCEEDED:
             return self.__fetch_finished_asset_collection(p)
         return None
+
+    def to_id_file(self, filename: Union[str, PathLike] = None, save_platform: bool = False):
+        """
+        Create an ID File
+
+        If the filename is not provided, it will be calculate for definition files or for docker pulls
+
+        Args:
+            filename: Filename
+            save_platform: Save Platform info to file as well
+
+        Returns:
+
+        """
+        if filename is None:
+            if self.definition_file:
+                base_name = PurePath(self.definition_file).name.replace(".def", ".id")
+                filename = str(PurePath(self.definition_file).parent.joinpath(base_name))
+            elif self.image_url:
+                filename = re.sub(r"(docker|shub)://", "", self.image_url).replace(":", "_")
+            else:
+                raise ValueError("Could not calculate the filename. Please specify one")
+            if not filename.endswith(".id"):
+                filename += ".id"
+        super(SingularityBuildWorkItem, self).to_id_file(filename, save_platform)
