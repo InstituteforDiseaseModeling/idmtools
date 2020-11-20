@@ -60,7 +60,8 @@ class TestSingularityBuild(unittest.TestCase):
         sbi = SingularityBuildWorkItem(name=self.case_name, force=FORCE)
         sbi.image_url = "docker://docker-production.packages.idmod.org/idm/dtk-ubuntu-py3.7-mpich3.3-runtime:20.04.09"
         getattr(sbi, '_SingularityBuildWorkItem__add_tags')()
-        self.assertIn('created_by', sbi.image_tags)
+        self.assertIn('image_name', sbi.image_tags)
+        self.assertEqual(sbi.image_tags['image_name'], 'idm_dtk-ubuntu-py3.7-mpich3.3-runtime_20.04.09.sif')
         self.assertIn("digest", sbi.image_tags)
         self.assertEqual(sbi.image_tags['digest'], 'sha256:d0fd5396c017aa2b1da9022bb9e9ce420317b2bb36c3c3b4986da13b0c9755b9')
         self.assertEqual(sbi.image_tags['image_url'], 'docker://docker-production.packages.idmod.org/idm/dtk-ubuntu-py3.7-mpich3.3-runtime:20.04.09')
@@ -70,7 +71,8 @@ class TestSingularityBuild(unittest.TestCase):
         sbi.image_url = "docker://alpine:3.12.1"
         getattr(sbi, '_SingularityBuildWorkItem__add_tags')()
         self.assertIn("digest", sbi.image_tags)
-        self.assertIn('created_by', sbi.image_tags)
+        self.assertIn('image_name', sbi.image_tags)
+        self.assertEqual(sbi.image_tags['image_name'], 'alpine_3.12.1.sif')
         self.assertEqual(sbi.image_tags['digest'], 'sha256:d7342993700f8cd7aba8496c2d0e57be0666e80b4c441925fc6f9361fa81d10e')
         self.assertEqual(sbi.image_tags['image_url'], 'docker://alpine:3.12.1')
         js = sbi._prep_work_order_before_create()
