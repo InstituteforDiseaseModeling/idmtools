@@ -59,9 +59,8 @@ if __name__ == "__main__":
     task = CommandTask(command=command)
 
     # If you wanted to load from a local repo, you could just provide that
-    # path instead of the github and disable the download on line 53
+    # path instead of the github and disable the download on line 55
     task.common_assets.add_directory(release_path.joinpath('covasim'), relative_path='covasim')
-    ts = TemplatedSimulations(base_task=task)
     # Add our image
     task.common_assets.add_assets(AssetCollection.from_id_file("covasim.id"))
 

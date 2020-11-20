@@ -17,7 +17,6 @@ if __name__ == "__main__":
     # create commandline input for the task
     command = CommandLine("singularity exec ./Assets/covasim_ubuntu.sif python3 Assets/test_interventions.py")
     task = CommandTask(command=command)
-    ts = TemplatedSimulations(base_task=task)
     # Add our image
     task.common_assets.add_assets(AssetCollection.from_id_file("covasim.id"))
 
