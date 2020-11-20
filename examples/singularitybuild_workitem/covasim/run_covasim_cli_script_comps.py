@@ -18,14 +18,12 @@ if __name__ == "__main__":
     command = CommandLine("singularity exec ./Assets/covasim_ubuntu.sif /opt/covasim/bin/covasim --pars '{pop_size:20000, pop_infected:1, n_days:360, rand_seed:1}'")
     task = CommandTask(command=command)
     ts = TemplatedSimulations(base_task=task)
-    common_assets = AssetCollection.from_id("e614cb2d-442a-eb11-a2dd-c4346bcb7271", as_copy=True)
+    # Add our image
+    task.common_assets.add_assets(AssetCollection.from_id("e614cb2d-442a-eb11-a2dd-c4346bcb7271"))
 
-    task.common_assets = common_assets
-
-    experiment = Experiment.from_task(task,
-                                      name=os.path.split(sys.argv[0])[1],
-                                      tags={
-                                          'type': 'singularity',
-                                          'description': 'run covasim'
-                                      })
+    experiment = Experiment.from_task(
+        task,
+        name=os.path.split(sys.argv[0])[1],
+        tags=dict(type='singularity', description='run covasim')
+    )
     experiment.run(wait_until_done=True)

@@ -215,7 +215,6 @@ try:
             user_logger.info(f"Saving ID to {id_filename}")
             sb.to_id_file(id_filename, save_platform=True)
 
-
     @singularity.command(help="Pull Singularity Image")
     @click.argument('image_url')
     @click.option('--wait/--no-wait', default=True, help="Wait on item to finish")
@@ -248,7 +247,6 @@ try:
                 id_filename = "singularity_image.id"
             user_logger.info(f"Saving ID to {id_filename}")
             sb.to_id_file(id_filename, save_platform=True)
-
 
 except ImportError as e:
     logger.warning(f"COMPS CLI not enabled because a dependency is missing. Most likely it is either click or idmtools cli {e.args}")

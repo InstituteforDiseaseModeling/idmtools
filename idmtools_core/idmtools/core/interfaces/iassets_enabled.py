@@ -23,7 +23,7 @@ class IAssetsEnabled(metaclass=ABCMeta):
         """
         pass
 
-    def add_assets(self, assets: TAssetList = None, fail_on_duplicate: bool = True) -> NoReturn:
+    def add_assets(self, assets: Union[TAssetList, AssetCollection] = None, fail_on_duplicate: bool = True) -> NoReturn:
         """
         Add more assets to :class:`~idmtools.assets.asset_collection.AssetCollection`.
         """

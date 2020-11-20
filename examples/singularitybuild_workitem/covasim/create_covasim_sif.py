@@ -9,7 +9,6 @@ from idmtools_platform_comps.utils.singularity_build import SingularityBuildWork
 if __name__ == '__main__':
     platform = Platform("CALCULON")
     sbi = SingularityBuildWorkItem(name="Create covasim sif with def file", definition_file="covasim_req.def", image_name="covasim_ubuntu.sif")
-    ac = AssetCollection.from_id("1694dda9-3f2a-eb11-a2dd-c4346bcb7271", as_copy=True)
-    sbi.add_assets(ac)
-    sbi.tags = {"covasim"}
+    sbi.add_assets(AssetCollection.from_id("1694dda9-3f2a-eb11-a2dd-c4346bcb7271"))
+    sbi.tags = dict(covasim=None)
     sbi.run(wait_until_done=True, platform=platform)
