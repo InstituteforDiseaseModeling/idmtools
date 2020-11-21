@@ -42,12 +42,7 @@ Documentation
 -------------
 * `#1279 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1279>`_ - Add examples to override config values
 * `#1285 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1285>`_ - Examples should use Calculon instead of SLURM alias
-* `#1302 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1302>`_ - cookbook link for modify modifying-asset-collection is wrong
-
-
-Feature Request
----------------
-* `#1116 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1116>`_ - Enable notification of status on mobile devices on job completion
+* `#1302 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1302>`_ - cookbook link for modifying-asset-collection is wrong
 
 
 Platforms
@@ -57,5 +52,5 @@ Platforms
 
 User Experience
 ---------------
-* `#1170 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1170>`_ - Add progress bar to upload of Assets through new callback
+* `#1170 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1170>`_ - Add progress bar to upload of Assets through new callback in pyCOMPS
 * `#1320 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1320>`_ - Add progress bar to workitems
