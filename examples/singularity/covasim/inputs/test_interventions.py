@@ -3,10 +3,15 @@ Demonstrate all interventions, taken from intervention docstrings
 '''
 
 #%% Housekeeping
+import os
+import sys
 
 import sciris as sc
 import pylab as pl
 import covasim as cv
+
+sys.path.insert(0, os.path.dirname(__file__))
+import sim_to_inset
 
 do_plot = 1
 verbose = 0
@@ -89,6 +94,10 @@ def test_all_interventions():
         sim.label = key
         sim.run(verbose=verbose)
 
+    # Set the output directory path
+    outputs = "outputs"
+    if not os.path.exists(outputs):
+        os.makedirs(outputs)
 
     #%% Plotting
     if do_plot:
@@ -98,7 +107,10 @@ def test_all_interventions():
             sim.plot()
             fig = pl.gcf()
             fig.axes[0].set_title(f'Simulation: {sim.label}')
-            fig.savefig(f"sim{str(i)}.png")
+            fig.savefig(os.path.join(outputs, f"sim{str(i)}.png"))
+            sim.to_json(filename=os.path.join(outputs, "results" + str(i) + ".json"))
+            sim.to_excel(filename=os.path.join(outputs, "results" + str(i) + ".xlsx"))
+            sim_to_inset.create_insetchart(sim.to_json(tostring=False), i)
             i = i + 1
 
     return
