@@ -11,7 +11,7 @@ from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform import IPlatform
 from idmtools.entities.simulation import Simulation
 
-command_format_str = "singularity exec ./Assets/covasim_ubuntu.sif python3 Assets/run_sim1.py {pop_size} {pop_infected} {n_days} {rand_seed}"
+command_format_str = "singularity exec ./Assets/covasim_ubuntu.sif python3 Assets/run_sim_sweep.py {pop_size} {pop_infected} {n_days} {rand_seed}"
 
 def create_config_before_provisioning(simulation: Simulation, platform: IPlatform):
     # set the command dynamically
