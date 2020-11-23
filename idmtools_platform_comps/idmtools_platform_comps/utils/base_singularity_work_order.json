@@ -1,0 +1,6 @@
+{
+  "WorkItem_Type": "ImageBuilderWorker",
+  "Build": {
+    "Type": "singularity"
+  }
+}

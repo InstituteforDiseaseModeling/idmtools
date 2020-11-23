@@ -55,7 +55,7 @@ class AnalyzeManager(CacheEnabled):
 
     def __init__(self, platform: 'IPlatform' = None, configuration: dict = None,
                  ids: List[Tuple[Union[str, UUID], ItemType]] = None,
-                 analyzers: List[IAnalyzer] = None, working_dir: str = os.getcwd(),
+                 analyzers: List[IAnalyzer] = None, working_dir: str = None,
                  partial_analyze_ok: bool = False, max_items: Optional[int] = None, verbose: bool = True,
                  force_manager_working_directory: bool = False,
                  exclude_ids: List[Union[str, UUID]] = None, analyze_failed_items: bool = False):
@@ -76,6 +76,8 @@ class AnalyzeManager(CacheEnabled):
             analyze_failed_items (bool, optional): Allows analyzing of failed items. Useful when you are trying to aggregate items that have failed. Defaults to False.
         """
         super().__init__()
+        if working_dir is None:
+            working_dir = os.getcwd()
         self.configuration = configuration or {}
         self.platform = platform
         self.__check_for_platform_from_context(platform)
@@ -347,8 +349,6 @@ class AnalyzeManager(CacheEnabled):
         with self.cache.transact():
             for analyzer in self.analyzers:
                 item_data_for_analyzer = {}
-                items = self.cache.iterkeys()
-                logger.debug(str([i for i in items]))
                 for item_id in self.cache:
                     logger.debug(f"Finalizing {item_id}")
                     item = self._items[item_id]

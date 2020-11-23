@@ -77,7 +77,7 @@ def get_frozen_item(obj):
     if isinstance(obj, list):
         return FrozenList()
 
-    if isinstance(obj, set) or isinstance(obj, frozenset):
+    if isinstance(obj, (set, frozenset)):
         return FrozenSet()
 
     if isinstance(obj, tuple):
@@ -120,7 +120,7 @@ def frozen_transform(obj=None):
         imlist = get_frozen_item(obj)
         return imlist
 
-    if isinstance(obj, set) or isinstance(obj, frozenset):
+    if isinstance(obj, (set, frozenset)):
         imset = get_frozen_item(obj)
         return imset
 

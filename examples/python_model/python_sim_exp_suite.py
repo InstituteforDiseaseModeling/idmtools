@@ -11,7 +11,7 @@ from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 
-platform = Platform('SLURM')
+platform = Platform('CALCULON')
 
 parameters = {'b' + str(x): x**2 for x in (2, 4, 6)}
 task = JSONConfiguredPythonTask(script_path=os.path.join("inputs", "python_model_with_deps", "Assets", "model.py"),

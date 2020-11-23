@@ -2,6 +2,7 @@ import copy
 import os
 from dataclasses import dataclass, field
 from logging import getLogger
+from os import PathLike
 from typing import List, NoReturn, TypeVar, Union, Any, Dict, TYPE_CHECKING
 from uuid import UUID
 from idmtools.assets import Asset, TAssetList
@@ -63,7 +64,7 @@ class AssetCollection(IEntity):
 
         Args:
             item_id: Asset Collection ID
-            platform: Platform Ojbect
+            platform: Platform Object
             as_copy: Should you load the object as a copy. When True, the contents of AC are copied, but not the id. Useful when editing ACs
             **kwargs:
 
@@ -90,7 +91,7 @@ class AssetCollection(IEntity):
         return cls(assets=assets)
 
     @staticmethod
-    def assets_from_directory(assets_directory: str, recursive: bool = True, flatten: bool = False,
+    def assets_from_directory(assets_directory: Union[str, PathLike], recursive: bool = True, flatten: bool = False,
                               filters: 'TAssetFilterList' = None,  # noqa: F821
                               filters_mode: FilterMode = FilterMode.OR,
                               forced_relative_path: str = None) -> List[Asset]:
@@ -117,6 +118,8 @@ class AssetCollection(IEntity):
         Returns:
             A list of assets.
         """
+        if isinstance(assets_directory, PathLike):
+            assets_directory = str(assets_directory)
         found_assets = []
         for entry in scan_directory(assets_directory, recursive):
             relative_path = os.path.relpath(os.path.dirname(entry.path), assets_directory)
@@ -156,15 +159,16 @@ class AssetCollection(IEntity):
         """
         return AssetCollection(self)
 
-    def add_directory(self, assets_directory: str, recursive: bool = True, flatten: bool = False,
+    def add_directory(self, assets_directory: Union[str, PathLike], recursive: bool = True, flatten: bool = False,
                       filters: 'TAssetFilterList' = None, filters_mode: FilterMode = FilterMode.OR,  # noqa: F821
                       relative_path: str = None):
         """
         Retrieve assets from the specified directory and add them to the collection.
         See :meth:`~AssetCollection.assets_from_directory` for arguments.
         """
-        assets = AssetCollection.assets_from_directory(assets_directory, recursive, flatten, filters, filters_mode,
-                                                       relative_path)
+        if isinstance(assets_directory, PathLike):
+            assets_directory = str(assets_directory)
+        assets = AssetCollection.assets_from_directory(assets_directory, recursive, flatten, filters, filters_mode, relative_path)
         for asset in assets:
             self.add_asset(asset)
 

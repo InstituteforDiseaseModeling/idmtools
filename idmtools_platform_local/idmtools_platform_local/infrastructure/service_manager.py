@@ -66,7 +66,7 @@ class DockerServiceManager:
 
     def init_services(self):
         self._services = dict()
-        for i, service in enumerate(SERVICES):
+        for _i, service in enumerate(SERVICES):
             sn = service.__name__.replace("Container", "").lower()
             if sn not in self._services:
                 self._services[sn] = service(**self.get_container_config(service))
@@ -144,7 +144,7 @@ class DockerServiceManager:
         """
         try:
             self.get_network()
-            for i, service in enumerate(SERVICES):
+            for _i, service in enumerate(SERVICES):
                 sn = service.__name__.replace("Container", "").lower()
                 # wait on services to be ready for workers
                 if sn in CONTAINER_WAIT:
@@ -212,7 +212,7 @@ class DockerServiceManager:
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f'Stopping {service.__class__.__name__}')
                 pool.submit(self.stop_service_and_wait, service)
-            for done in as_completed(futures):
+            for _done in as_completed(futures):
                 pass
 
     def get(self, container_name: str, create=True) -> Container:
@@ -292,10 +292,7 @@ class DockerServiceManager:
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f"Checking if port {port} is open on host {host}")
         with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as sock:
-            if isinstance(port, int) and sock.connect_ex((host, port)) == 0:
-                return True
-            else:
-                return False
+            return isinstance(port, int) and sock.connect_ex((host, port)) == 0
 
     @staticmethod
     def stop_service_and_wait(service) -> bool:

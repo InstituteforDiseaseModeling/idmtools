@@ -29,7 +29,7 @@ SetOfAssets = Set[AssetTuple]
 EntityFilterFunc = Callable[[CommissionableEntity.CommissionableEntity], bool]
 # Store the Done State
 DONE_STATE = [SimulationState.Failed, SimulationState.Canceled, SimulationState.Succeeded]
-HPC_JOBS_QUERY = QueryCriteria().select_children('hpc_jobs')
+HPC_JOBS_QUERY = QueryCriteria().select_children(['tags', 'hpc_jobs'])
 
 JOB_CONFIG = None
 

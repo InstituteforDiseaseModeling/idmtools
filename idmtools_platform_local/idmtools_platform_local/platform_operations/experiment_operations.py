@@ -333,7 +333,7 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
                     else:
                         break
 
-        for root, dirs, files in os.walk(full_path, topdown=False):
+        for root, _dirs, files in os.walk(full_path, topdown=False):
             for file in files:
                 fp = os.path.join(root, file)
                 asset = Asset(filename=file, persisted=True)

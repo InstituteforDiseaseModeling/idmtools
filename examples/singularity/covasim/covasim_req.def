@@ -1,0 +1,18 @@
+Bootstrap: localimage
+From: Assets/ubuntu.sif
+
+%environment
+    # ADD our asset to path so we can add live versions
+    export PYTHONPATH=Assets/:.
+
+%post
+    pip3 install --no-cache-dir numba==0.48.0
+    cd /opt
+    git clone https://github.com/InstituteforDiseaseModeling/covasim.git
+    cd covasim
+
+    /usr/bin/python3 setup.py develop full
+    /usr/bin/python3 -m site
+
+%runscript
+    echo Please specify a command. The default command for this container prints this message

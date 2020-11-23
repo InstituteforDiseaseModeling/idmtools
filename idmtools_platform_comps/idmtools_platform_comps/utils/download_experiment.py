@@ -3,6 +3,7 @@ import stat
 import sys
 from concurrent.futures._base import as_completed
 from concurrent.futures.thread import ThreadPoolExecutor
+from contextlib import suppress
 from idmtools import IdmConfigParser
 from idmtools.core.context import get_current_platform
 from idmtools.entities.experiment import Experiment
@@ -80,10 +81,8 @@ def download_experiment(experiment: Experiment, destination: str):
 
     for sim in experiment.simulations:
         sim_path = os.path.join(destination, sim.id)
-        try:
+        with suppress(FileExistsError):
             os.makedirs(sim_path, exist_ok=True)
-        except FileExistsError:
-            pass
 
         for output in get_current_platform()._simulations.all_files(sim):
             futures.append(pool.submit(download_asset, output, sim_path))
@@ -98,5 +97,5 @@ def download_experiment(experiment: Experiment, destination: str):
     else:
         from tqdm import tqdm
         items = tqdm(as_completed(futures), total=len(futures), unit="files")
-    for future in items:
+    for _future in items:
         pass

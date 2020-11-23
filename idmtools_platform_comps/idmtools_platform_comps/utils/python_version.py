@@ -17,12 +17,11 @@ def platform_task_hooks(task, platform):
         if isinstance(task, PythonTask):
             if platform.environment.lower() in SLURM_ENVIRONMENTS and task.python_path.lower() == 'python':
                 task.python_path = PYTHON_EXECUTABLE
-        elif isinstance(task, CommandTask):
-            if platform.environment.lower() in SLURM_ENVIRONMENTS:
-                cmd_list = task.command.executable.split(' ')
-                if cmd_list[0].lower() == 'python':
-                    cmd_list[0] = PYTHON_EXECUTABLE
-                    task.command.executable = ' '.join(cmd_list)
+        elif isinstance(task, CommandTask) and platform.environment.lower() in SLURM_ENVIRONMENTS:
+            cmd_list = task.command.executable.split(' ')
+            if cmd_list[0].lower() == 'python':
+                cmd_list[0] = PYTHON_EXECUTABLE
+                task.command.executable = ' '.join(cmd_list)
     except ImportError:
         pass
 

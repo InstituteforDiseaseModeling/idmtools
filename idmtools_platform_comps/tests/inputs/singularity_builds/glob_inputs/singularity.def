@@ -1,0 +1,9 @@
+Bootstrap: docker
+From: python:3.9-alpine
+
+%environment
+    # ADD our asset to path so we can add live versions
+    export PYTHONPATH=Assets/:.
+
+%runscript
+    echo Please specify a command. The default command for this container prints this message

@@ -6,8 +6,8 @@ import sys
 from collections import defaultdict
 from datetime import timezone
 
-import pygit2
-from github import Github
+import pygit2  # noqa: I900
+from github import Github  # noqa: I900
 
 if os.getenv('GIT_TOKEN') is None and len(sys.argv) != 2:
     print('You must specify GIT_TOKEN through argument or environment variable GIT_TOKEN')
@@ -117,14 +117,13 @@ for issue in gh_repo.get_issues(state='closed'):
                         issues_to_references[issue.number] = issue
                         release_notes[release][f'#{issue.number} - {issue.title}'] = [issue]
                         get_issue_type(issue.number, labels)
-                elif "dependencies" in labels:
-                    if issue.as_pull_request().merged_at is not None and not os.path.exists(release_file):
-                        issues_to_references[issue.number] = issue
-                        release_notes[release][f'#{issue.number} - {issue.title}'] = [issue]
-                        get_issue_type(issue.number, labels)
+                elif "dependencies" in labels and issue.as_pull_request().merged_at is not None and not os.path.exists(release_file):
+                    issues_to_references[issue.number] = issue
+                    release_notes[release][f'#{issue.number} - {issue.title}'] = [issue]
+                    get_issue_type(issue.number, labels)
 for release, contents in release_notes.items():
     release_file = os.path.join(DOCS_DIR, f'changelog_{release}.rst')
-    for message, commits in contents.items():
+    for message in contents.keys():
         m = regex_fix.match(message)
         if m and int(m.group(1)) in issues_to_references and issues_to_references[int(m.group(1))] is not None:
             cmsg = f'`#{int(m.group(1)):04d} ' \
@@ -149,8 +148,8 @@ section_template = '''
 
 final_out = ''
 for release, contents in release_notes_final.items():
-    release_file = os.path.join(DOCS_DIR, f'changelog_{release}.rst')
-    if not os.path.exists(release_file) and release != 'Development':
+    release_file = os.path.join(DOCS_DIR, 'changelog', f'changelog_{release}.rst')
+    if not os.path.exists(release_file):
         final_out = release_templates.format(**dict(release=release, release_under='=' * len(release)))
         scontents = sorted(contents.keys())
         for section in scontents:
@@ -162,13 +161,13 @@ for release, contents in release_notes_final.items():
         with open(release_file, 'w') as out:
             out.write(final_out)
 
-cl_name = os.path.join(DOCS_DIR, 'changelog.rst')
+cl_name = os.path.join(DOCS_DIR, 'changelog', 'changelog.rst')
 with open(cl_name, 'w') as out:
     out.write("=========\n")
     out.write("Changelog\n")
     out.write("=========\n")
     out.write("\n.. toctree::\n\n")
-    files = sorted(list(glob.glob(os.path.join(DOCS_DIR, 'changelog_*.rst'))))
+    files = sorted(list(glob.glob(os.path.join(DOCS_DIR, 'changelog', 'changelog_*.rst'))))
     for file in files:
         rf = release_expr.match(file)
         if rf:
