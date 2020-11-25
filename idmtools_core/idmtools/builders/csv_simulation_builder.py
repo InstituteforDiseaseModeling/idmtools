@@ -65,5 +65,4 @@ class CsvExperimentBuilder(SimulationBuilder):
             self.SweepFunctions.extend(product(*self.sweeps))
 
     def __iter__(self):
-        for tup in self.SweepFunctions:
-            yield tup
+        yield from self.SweepFunctions

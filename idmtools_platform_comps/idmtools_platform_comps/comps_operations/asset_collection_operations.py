@@ -7,6 +7,8 @@ from typing import Type, Union, List, TYPE_CHECKING, Optional
 from uuid import UUID
 import humanfriendly
 from COMPS.Data import AssetCollection as COMPSAssetCollection, QueryCriteria, AssetCollectionFile, SimulationFile, OutputFileMetadata, WorkItemFile
+from tqdm import tqdm
+from idmtools import IdmConfigParser
 from idmtools.assets import AssetCollection, Asset
 from idmtools.entities.iplatform_ops.iplatform_asset_collection_operations import IPlatformAssetCollectionOperations
 from idmtools_platform_comps.utils.general import get_file_as_generator
@@ -23,8 +25,7 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
     platform: 'COMPSPlatform'  # noqa F821
     platform_type: Type = field(default=COMPSAssetCollection)
 
-    def get(self, asset_collection_id: UUID, load_children: Optional[List[str]] = None,
-            query_criteria: Optional[QueryCriteria] = None, **kwargs) -> COMPSAssetCollection:
+    def get(self, asset_collection_id: Optional[UUID], load_children: Optional[List[str]] = None, query_criteria: Optional[QueryCriteria] = None, **kwargs) -> COMPSAssetCollection:
         """
         Get an asset collection by id
 
@@ -38,7 +39,10 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
             COMPSAssetCollection
         """
         children = load_children if load_children is not None else ["assets", "tags"]
+        if asset_collection_id is None and query_criteria is None:
+            raise ValueError("You cannot query for all asset collections. Please specify a query criteria or an id")
         query_criteria = query_criteria or QueryCriteria().select_children(children)
+
         return COMPSAssetCollection.get(id=asset_collection_id, query_criteria=query_criteria)
 
     def platform_create(self, asset_collection: AssetCollection, **kwargs) -> COMPSAssetCollection:
@@ -123,12 +127,25 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
                         relative_path=asset.relative_path,
                         md5_checksum=cksum
                     ))
-            if os.getenv('IDMTOOLS_SUPPRESS_OUTPUT', None) is None:
+            if IdmConfigParser.is_output_enabled():
                 user_logger.info(f"Uploading {len(missing_files)} files/{humanfriendly.format_size(total_size)}")
-            ac2.save()
+            callback = None
+            prog = None
+            if not IdmConfigParser.is_progress_bar_disabled():
+                prog = tqdm(desc="Uploading files", unit='file', total=len(missing_files))
+
+                def update_progress(total_files_uploaded):
+                    prog.n = total_files_uploaded
+                    prog.display()
+
+                callback = update_progress
+            ac2.save(upload_files_callback=callback)
+            if callback:
+                callback(len(missing_files))
+                prog.close()
             ac = ac2
         asset_collection.uid = ac.id
-        asset_collection._platform_object = asset_collection
+        asset_collection._platform_object = ac
         asset_collection.platform = self.platform
         asset_collection.platform_id = self.platform.uid
         return ac
@@ -152,15 +169,15 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
             ac.uid = asset_collection.id
             ac.tags = asset_collection.tags
         elif isinstance(asset_collection, list) and len(asset_collection):
-            if isinstance(asset_collection[0], (SimulationFile, WorkItemFile)):
-                for file in asset_collection:
-                    ac.add_asset(self.__simulation_file_to_asset(ac, file))
-            else:
+            if not isinstance(asset_collection[0], (SimulationFile, WorkItemFile)):
                 raise ValueError("Unknown asset list")
+            else:
+                for file in asset_collection:
+                    ac.add_asset(self.__simulation_file_to_asset(file))
         assets = asset_collection.assets if isinstance(asset_collection, COMPSAssetCollection) else asset_collection
         # if we have just one, make it a list
         if isinstance(asset_collection, SimulationFile):
-            ac.add_asset(self.__simulation_file_to_asset(ac, asset_collection))
+            ac.add_asset(self.__simulation_file_to_asset(asset_collection))
         if assets:
             # add items to asset collection
             for asset in assets:
@@ -178,11 +195,10 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
 
         return ac
 
-    def __simulation_file_to_asset(self, ac: AssetCollection, asset_collection: Union[SimulationFile, WorkItemFile]):
+    def __simulation_file_to_asset(self, asset_collection: Union[SimulationFile, WorkItemFile]):
         """
         Converts a Simulation File to an Asset
         Args:
-            ac: Asset Collection to add file
             asset_collection:
 
         Returns:

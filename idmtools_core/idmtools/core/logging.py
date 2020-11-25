@@ -1,6 +1,7 @@
 import atexit
 import logging
 import sys
+from contextlib import suppress
 from logging import getLogger
 from logging.handlers import QueueHandler, QueueListener, RotatingFileHandler
 from multiprocessing import Queue
@@ -37,10 +38,8 @@ class IDMQueueListener(QueueListener):
 
 class IDMQueueHandler(QueueHandler):
     def prepare(self, record):
-        try:
+        with suppress(ImportError):
             return super().prepare(record)
-        except ImportError:
-            pass
 
 
 class PrintHandler(logging.Handler):
@@ -212,12 +211,10 @@ def create_file_handler(file_level, formatter, filename):
 
 
 def reset_logging_handlers():
-    try:
+    with suppress(KeyError):
         # Remove all handlers associated with the root logger object.
         for handler in logging.root.handlers[:]:
             logging.root.removeHandler(handler)
-    except KeyError as e:  # noqa F841
-        pass
 
 
 def exclude_logging_classes(items_to_exclude=None):
@@ -241,10 +238,8 @@ def register_stop_logger_signal_handler(listener) -> NoReturn:
     """
 
     def stop_logger(*args, **kwargs):
-        try:
+        with suppress(Exception):
             listener.stop()
-        except Exception:
-            pass
 
     for s in [SIGINT, SIGTERM]:
         try:

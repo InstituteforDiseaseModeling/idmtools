@@ -381,6 +381,7 @@ examples/vistools/**/workitem_output/
 examples/**/requirements_updated.txt
 examples/analyzers/output_csv/
 examples/analyzers/output_tag/
+examples/workitem/image_builder/covasim/outputs/
 
 idmtools_core/tests/data
 idmtools_core/tests/reports/
@@ -420,3 +421,6 @@ examples/idmtools.ini
 /**/tests/reports/
 *.test_results.html
 allure_report.zip
+*.id
+/examples/singularity/covasim/.covasim_versions/
+**/.snakemake/

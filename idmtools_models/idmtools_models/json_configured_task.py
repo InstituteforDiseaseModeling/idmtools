@@ -179,7 +179,7 @@ class JSONConfiguredTask(ITask):
                         config = json.loads(config.decode('utf-8'))
             new_assets = []
             # filter our config from the simulation
-            for i, asset in enumerate(simulation.assets.assets):
+            for _i, asset in enumerate(simulation.assets.assets):
                 if asset.filename != cfn:
                     new_assets.append(asset)
             simulation.assets.assets = new_assets

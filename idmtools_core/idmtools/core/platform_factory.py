@@ -124,10 +124,10 @@ class Platform:
                 section = props[1]
                 is_alias = True
             else:
-                if missing_ok:
-                    section = dict() if default_missing is None else default_missing
-                else:
+                if not missing_ok:
                     raise e
+                else:
+                    section = dict() if default_missing is None else default_missing
 
         if platform_type is None:
             try:
@@ -135,12 +135,13 @@ class Platform:
                 platform_type = section.pop('type')
             except KeyError:
                 # try to use the block name as the type
-                if missing_ok:
-                    user_logger.warning("You are specifying a platform without a configuration file or configuration block. Be sure you have supplied all required parameters for the Platform as this can result in unexpected behaviour. Running this way is only recommended for development mode. Instead, "
-                                        "it is recommended you create an idmtools.ini to capture the config once you have tested and confirmed your configuration.")
-                    platform_type = block
-                else:
+                if not missing_ok:
                     raise ValueError("When creating a Platform you must specify the type in the block. For example:\n    type = COMPS")
+                else:
+                    user_logger.warning(
+                        "You are specifying a platform without a configuration file or configuration block. Be sure you have supplied all required parameters for the Platform as this can result in unexpected behaviour. Running this way is only recommended for development mode. Instead, "
+                        "it is recommended you create an idmtools.ini to capture the config once you have tested and confirmed your configuration.")
+                    platform_type = block
 
         # Make sure we support platform_type
         cls._validate_platform_type(platform_type)
@@ -173,7 +174,7 @@ class Platform:
         # Display block info
         try:
             from idmtools.core.logging import VERBOSE
-            if os.getenv('IDMTOOLS_SUPPRESS_OUTPUT', None) is None:
+            if IdmConfigParser.is_output_enabled():
                 if is_alias:
                     user_logger.log(VERBOSE, f"\n[{block}]")
                     user_logger.log(VERBOSE, json.dumps(section, indent=3))

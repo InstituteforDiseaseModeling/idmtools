@@ -1,10 +1,7 @@
 # flake8: noqa E402
 import copy
-import json
 import logging
 # fix for comps weird import
-import os
-
 from idmtools.assets import AssetCollection
 from idmtools.entities.iworkflow_item import IWorkflowItem
 
@@ -13,7 +10,7 @@ from COMPS import Client
 logging.root.handlers = HANDLERS
 from dataclasses import dataclass, field
 from functools import partial
-from typing import List
+from typing import List, Dict
 from enum import Enum
 from idmtools.core import CacheEnabled, ItemType
 from idmtools.entities.iplatform import IPlatform
@@ -53,29 +50,19 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     MAX_SUBDIRECTORY_LENGTH = 35  # avoid maxpath issues on COMPS
 
     endpoint: str = field(default="https://comps2.idmod.org", metadata={"help": "URL of the COMPS endpoint to use"})
-    environment: str = field(default="Bayesian",
-                             metadata={"help": "Name of the COMPS environment to target", "callback": environment_list})
-    priority: str = field(default=COMPSPriority.Lowest.value,
-                          metadata={"help": "Priority of the job", "choices": [p.value for p in COMPSPriority]})
-    simulation_root: str = field(default="$COMPS_PATH(USER)\\output", metadata={"help": "Location of the outputs"})
-    node_group: str = field(default=None, metadata={"help": "Node group to target"})
-    num_retries: int = field(default=0, metadata={"help": "How retries if the simulation fails",
-                                                  "validate": partial(validate_range, min=0, max=10)})
-    num_cores: int = field(default=1, metadata={"help": "How many cores per simulation",
-                                                "validate": partial(validate_range, min=1, max=32)})
-    max_workers: int = field(default=16, metadata={"help": "How many processes to spawn locally",
-                                                   "validate": partial(validate_range, min=1, max=32)})
-    batch_size: int = field(default=10, metadata={"help": "How many simulations per batch",
-                                                  "validate": partial(validate_range, min=1, max=100)})
-    min_time_between_commissions: int = field(default=15, metadata={
-        "help": "How many seconds between commission calls on an experiment. ",
-        "validate": partial(validate_range, min=10, max=300)})
-    exclusive: bool = field(default=False,
-                            metadata={"help": "Enable exclusive mode? (one simulation per node on the cluster)"})
+    environment: str = field(default="Bayesian",metadata=dict(help="Name of the COMPS environment to target", callback=environment_list))
+    priority: str = field(default=COMPSPriority.Lowest.value, metadata=dict(help="Priority of the job", choices=[p.value for p in COMPSPriority]))
+    simulation_root: str = field(default="$COMPS_PATH(USER)\\output", metadata=dict(help="Location of the outputs"))
+    node_group: str = field(default=None, metadata=dict(help="Node group to target"))
+    num_retries: int = field(default=0, metadata=dict(help="How retries if the simulation fails", validate=partial(validate_range, min=0, max=10)))
+    num_cores: int = field(default=1, metadata=dict(help="How many cores per simulation", validate=partial(validate_range, min=1, max=32)))
+    max_workers: int = field(default=16, metadata=dict(help="How many processes to spawn locally", validate=partial(validate_range, min=1, max=32)))
+    batch_size: int = field(default=10, metadata=dict(help="How many simulations per batch",validate=partial(validate_range, min=1, max=100)))
+    min_time_between_commissions: int = field(default=15, metadata=dict(help="How many seconds between commission calls on an experiment. ",validate=partial(validate_range, min=10, max=300)))
+    exclusive: bool = field(default=False, metadata=dict(help="Enable exclusive mode? (one simulation per node on the cluster)"))
     docker_image: str = field(default=None)
 
-    _platform_supports: List[PlatformRequirements] = field(default_factory=lambda: copy.deepcopy(supported_types),
-                                                           repr=False, init=False)
+    _platform_supports: List[PlatformRequirements] = field(default_factory=lambda: copy.deepcopy(supported_types), repr=False, init=False)
 
     _experiments: CompsPlatformExperimentOperations = field(**op_defaults, repr=False, init=False)
     _simulations: CompsPlatformSimulationOperations = field(**op_defaults, repr=False, init=False)
@@ -85,10 +72,6 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     _skip_login: bool = field(default=False, repr=False)
 
     def __post_init__(self):
-        # check if we should do output. Mainly command line that want to be piped don't output this
-        if os.getenv('IDMTOOLS_SUPPRESS_OUTPUT', None) is None:
-            print("\nUser Login:")
-            print(json.dumps({"endpoint": self.endpoint, "environment": self.environment}, indent=3))
         self.__init_interfaces()
         self.supported_types = {ItemType.EXPERIMENT, ItemType.SIMULATION, ItemType.SUITE, ItemType.ASSETCOLLECTION,
                                 ItemType.WORKFLOW_ITEM}
@@ -122,3 +105,6 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
     def get_asset_collection_link(self, asset_collection: AssetCollection):
         return f"{self.endpoint}/#explore/AssetCollections?filters=ID={asset_collection.uid}"
+
+    def get_username(self):
+        return Client.auth_manager()._username

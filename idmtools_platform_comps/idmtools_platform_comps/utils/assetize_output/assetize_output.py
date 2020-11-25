@@ -8,6 +8,8 @@ from dataclasses import dataclass, field
 from logging import getLogger, DEBUG
 from COMPS.Data.CommissionableEntity import CommissionableEntity
 from typing import List, Union, Callable, Dict
+
+from idmtools import IdmConfigParser
 from idmtools.assets import Asset, AssetCollection
 from idmtools.assets.file_list import FileList
 from idmtools.core.interfaces.irunnable_entity import IRunnableEntity
@@ -210,7 +212,7 @@ class AssetizeOutput(SSMTWorkItem):
         self.__pickle_pre_run()
         self.__pickle_filter_func()
         self.task.command = self.create_command()
-        if os.getenv('IDMTOOLS_SUPPRESS_OUTPUT', None) is None:
+        if IdmConfigParser.is_output_enabled():
             user_logger.info("Creating Watcher")
 
     def __generate_tags(self):
@@ -302,9 +304,8 @@ class AssetizeOutput(SSMTWorkItem):
                             user_logger.warning(f"Cannot determine environment of item of type {item_type} with id of {item.id}. Running assetize against items in other environments will result in an error")
                         elif po.configuration.environment_name.lower() != platform.environment.lower():
                             fail = True
-                    elif item_type == ItemType.WORKFLOW_ITEM:
-                        if po.environment_name.lower() != platform.environment.lower():
-                            fail = True
+                    elif item_type == ItemType.WORKFLOW_ITEM and po.environment_name.lower() != platform.environment.lower():
+                        fail = True
                     if fail:
                         raise CrossEnvironmentAssetizeNotSupport(f"You cannot assetize between environment. In this case, the {item_type.value} {item.id} is in {po.configuration.environment_name} but you are running your workitem in {platform.environment}")
 
@@ -425,10 +426,10 @@ class AssetizeOutput(SSMTWorkItem):
                     # user simulation's parent to wait
                     elif isinstance(item, Simulation):
                         if item.parent is None:
-                            if item.parent_id:
-                                item.parent = Experiment.from_id(item.parent_id)
-                            else:
+                            if not item.parent_id:
                                 raise ValueError(f"Cannot determine simulation {item.id}'s parent and item still in progress. Please wait on it to complete before AssetizingOutputs")
+                            else:
+                                item.parent = Experiment.from_id(item.parent_id)
                         item.parent.wait(**opts)
         if logger.isEnabledFor(DEBUG):
             logger.debug(f"Done waiting on items watching. Now waiting on Assetize Outputs: {self.id}")

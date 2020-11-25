@@ -5,7 +5,7 @@ from idmtools_models.python.python_task import PythonTask
 from idmtools_models.templated_script_task import get_script_wrapper_unix_task, LINUX_DICT_TO_ENVIRONMENT
 
 
-platform = Platform("SLURM")
+platform = Platform("CALCULON")
 # here we define the task we want to use the environment variables. In this example we have a simple python script that prints the EXAMPLE environment variable
 task = PythonTask(script_path="model.py")
 # Get a task to wrap the script in a shell script. Which get_script_wrapper function you use depends on the platform's OS
