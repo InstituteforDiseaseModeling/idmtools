@@ -21,6 +21,7 @@ from idmtools_platform_comps.utils.package_version import IDMTOOLS_DOCKER_PROD, 
 @allure.story("Plugins")
 @allure.suite("idmtools_platform_comps")
 class TestCompsPlugin(unittest.TestCase):
+
     @pytest.mark.smoke
     def test_comps_in_entrypoints(self):
         """

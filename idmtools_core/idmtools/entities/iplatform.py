@@ -461,8 +461,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         """
         for item in items:
             if item.item_type not in self.platform_type_map.values():
-                raise ValueError(
-                    f'Unable to create items of type: {item.item_type} for platform: {self.__class__.__name__}')
+                raise ValueError(f'Unable to create items of type: {item.item_type} for platform: {self.__class__.__name__}')
 
     def run_items(self, items: Union[IEntity, List[IEntity]], **kwargs):
         """

@@ -238,7 +238,7 @@ try:
         sb.run(wait_until_done=wait, platform=p)
         if sb.succeeded and id_file:
             user_logger.info(f"Saving ID to {id_filename}")
-            sb.to_id_file(id_filename, save_platform=True)
+            sb.asset_collection.to_id_file(id_filename, save_platform=True)
 
 except ImportError as e:
     logger.warning(f"COMPS CLI not enabled because a dependency is missing. Most likely it is either click or idmtools cli {e.args}")

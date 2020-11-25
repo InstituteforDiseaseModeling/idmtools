@@ -424,13 +424,16 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         if wait_until_done or wait_on_done:
             self.wait(wait_on_done_progress=wait_on_done_progress)
 
-    def to_dict(self):
+    def to_dict(self, exclude: List[str] = None):
         result = dict()
+        if exclude is None:
+            exclude = ['parent']
         for f in fields(self):
-            if not f.name.startswith("_") and f.name not in ['parent']:
+            if not f.name.startswith("_") and f.name not in exclude:
                 result[f.name] = getattr(self, f.name)
 
-        result['simulations'] = [s.id for s in self.simulations]
+        if 'simulations' not in exclude:
+            result['simulations'] = [s.id for s in self.simulations]
         result['_uid'] = self.uid
         return result
 

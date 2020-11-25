@@ -47,9 +47,7 @@ def as_dict(src, exclude: typing.List[str] = None, exclude_private_fields: bool 
     metadata = dataclasses.fields(src.__class__)
     for field in metadata:
         field_metadata = field.metadata
-        if (not exclude_private_fields or field.name[0] != '_') and \
-                ('exclude_from_metadata' not in field_metadata or not field_metadata['exclude_from_metadata']) and \
-                field.name not in exclude:
+        if (not exclude_private_fields or field.name[0] != '_') and ('exclude_from_metadata' not in field_metadata or not field_metadata['exclude_from_metadata']) and field.name not in exclude:
             result[field.name] = getattr(src, field.name)
     return result
 
@@ -62,8 +60,7 @@ def validate_user_inputs_against_dataclass(field_type, field_value):
             if ft in (int, float, str):
                 field_value[fn] = ft(field_value[fn]) if field_value[fn] is not None else field_value[fn]
             elif ft is bool:
-                field_value[fn] = ast.literal_eval(field_value[fn]) if isinstance(field_value[fn], str) else \
-                    field_value[fn]
+                field_value[fn] = ast.literal_eval(field_value[fn]) if isinstance(field_value[fn], str) else field_value[fn]
         except ValueError as e:
             user_logger.error(f"The field {fn} requires a value of type {ft.__name__}. You provided <{field_value[fn]}>")
             raise e

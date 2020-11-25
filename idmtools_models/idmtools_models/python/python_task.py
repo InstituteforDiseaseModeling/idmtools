@@ -1,6 +1,7 @@
 import os
 from dataclasses import dataclass, field
 from logging import getLogger
+from os import PathLike
 from typing import Set, List, Type, Union, TYPE_CHECKING
 from idmtools.assets import Asset, AssetCollection
 from idmtools.entities import CommandLine
@@ -17,12 +18,14 @@ logger = getLogger(__name__)
 
 @dataclass()
 class PythonTask(ITask):
-    script_path: str = field(default=None, metadata={"md": True})
+    script_path: Union[str, PathLike] = field(default=None, metadata={"md": True})
     python_path: str = field(default='python', metadata={"md": True})
     platform_requirements: Set[PlatformRequirements] = field(default_factory=lambda: [PlatformRequirements.PYTHON])
 
     def __post_init__(self):
         super().__post_init__()
+        if isinstance(self.script_path, PathLike):
+            self.script_path = str(self.script_path)
         if os.path.exists(self.script_path):
             if self.script_path:
                 self.script_path = os.path.abspath(self.script_path)

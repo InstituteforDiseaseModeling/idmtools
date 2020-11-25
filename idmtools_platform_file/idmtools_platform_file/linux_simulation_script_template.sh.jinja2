@@ -1,0 +1,4 @@
+#!{{ script_binary|default("/usr/bin/env bash") }}
+echo "Running {{ task.command }}"
+
+{{ task.command }} 2>stderr.log 1>stdout.log
