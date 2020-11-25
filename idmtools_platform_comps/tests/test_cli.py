@@ -65,6 +65,19 @@ class TestCompsCLI(unittest.TestCase):
 
     @allure.feature("Containers")
     def test_container_build(self):
+        if os.path.exists(pwd.joinpath("singularity.id")):
+            os.remove(pwd.joinpath("singularity.id"))
         result = run_command('comps', 'SLURM2', 'singularity', 'build', '--common-input-glob', str(pwd.joinpath('*.txt')), str(pwd.joinpath('singularity.def')), mix_stderr=False)
         self.assertTrue(result.exit_code == 0)
         self.assertTrue(os.path.exists(pwd.joinpath("singularity.id")))
+
+    @allure.feature("Containers")
+    def test_container_build_force_and_workitem_id(self):
+        id_files = ["builder.singularity.id", "singularity.id"]
+        for file in id_files:
+            if os.path.exists(pwd.joinpath(file)):
+                os.remove(pwd.joinpath(file))
+        result = run_command('comps', 'SLURM2', 'singularity', 'build', '--force', '--id-workitem', '--common-input-glob', str(pwd.joinpath('*.txt')), str(pwd.joinpath('singularity.def')), mix_stderr=False)
+        self.assertTrue(result.exit_code == 0)
+        for file in id_files:
+            self.assertTrue(os.path.exists(pwd.joinpath(file)))
