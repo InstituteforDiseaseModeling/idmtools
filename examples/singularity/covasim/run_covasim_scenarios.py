@@ -6,7 +6,6 @@ from idmtools.core.platform_factory import Platform
 from idmtools.entities import CommandLine
 from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
-from idmtools.entities.templated_simulation import TemplatedSimulations
 
 if __name__ == "__main__":
     here = os.path.dirname(__file__)

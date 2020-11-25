@@ -157,6 +157,8 @@ From: python:3.8.6
         def_file = os.path.join(sing_dir, 'Singularity.def')
         with open(def_file, "r") as myfile:
             data = myfile.read()
+            # make this test unique my changing checksum
+            data = data.replace("demo idmtools builds", "demo idmtools buildss")
         sbi = SingularityBuildWorkItem(definition_content=data, force=FORCE)
         sbi.add_asset(os.path.join(sing_dir, "run_model.py"))
         sbi.run(wait_until_done=True)

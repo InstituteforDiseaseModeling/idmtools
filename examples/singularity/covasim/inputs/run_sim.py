@@ -2,9 +2,13 @@
 Simple script for running Covasim
 '''
 import os
+import sys
 
 import sciris as sc
 import covasim as cv
+
+sys.path.insert(0, os.path.dirname(__file__))
+import sim_to_inset
 
 # Run options
 do_plot = 1
@@ -36,6 +40,8 @@ sim.run(verbose=verbose)
 
 sim.to_json(filename=os.path.join(outputs, "results.json"))
 sim.to_excel(filename=os.path.join(outputs, "results.xlsx"))
+
+sim_to_inset.create_insetchart(sim.to_json(tostring=False))
 
 if do_plot:
     sim.plot()

@@ -11,7 +11,6 @@ from idmtools.core.platform_factory import Platform
 from idmtools.entities import CommandLine
 from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
-from idmtools.entities.templated_simulation import TemplatedSimulations
 
 logger = getLogger('user')
 
@@ -70,6 +69,8 @@ if __name__ == "__main__":
         tags=dict(type='singularity', description='run covasim')
     )
     experiment.add_asset(os.path.join("inputs", "run_sim.py"))
+    experiment.add_asset(os.path.join("inputs", "sim_to_inset.py"))
+
     experiment.run(wait_until_done=True)
     # If we succeed, mark the experiment with an id file
     if experiment.succeeded:
