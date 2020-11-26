@@ -1,3 +1,4 @@
+import sys
 import typing
 from uuid import UUID
 
@@ -41,3 +42,27 @@ class UnsupportedPlatformType(Exception):
 
 class NoTaskFound(Exception):
     pass
+
+
+class DocLink(Exception):
+    pass
+
+
+def idmtools_error_handler(exctype, value: Exception, tb):
+    """
+    Global exception handler. This will write our errors in a nice format
+
+    Args:
+        exctype: Type of exception
+        value: Value of the exception
+        tb: Traceback
+
+    Returns:
+        None
+    """
+    if hasattr(value, 'doc_link'):
+        from idmtools.utils.info import get_help_version_url
+        print(f"{value.args[0]}. For more details, see {get_help_version_url(value.doc_link)}")
+
+    # Call native exception manager
+    sys.__excepthook__(exctype, value, tb)
