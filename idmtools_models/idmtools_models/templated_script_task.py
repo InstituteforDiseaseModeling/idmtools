@@ -1,4 +1,6 @@
+import inspect
 import os
+from contextlib import suppress
 from dataclasses import dataclass, field
 from functools import partial
 from logging import getLogger, DEBUG
@@ -248,6 +250,34 @@ class ScriptWrapperTask(ITask):
         if self.task is None:
             raise ValueError("Task is required")
 
+    @property
+    def command(self):
+        cmd = f'{self.template_script_task.command} "{self.task.command}"'
+        return cmd
+
+    @command.setter
+    def command(self, value: Union[str, CommandLine]):
+        callers = []
+        with suppress(KeyError, IndexError):
+            callers = inspect.stack()[1:3]
+        if not callers or callers[0].filename == __file__ or callers[1].filename == __file__:
+            if isinstance(value, property):
+                self._command = None
+            elif isinstance(value, str):
+                self._command = CommandLine.from_string(value)
+            else:
+                self._command = value
+        else:
+            self.task.command = value
+
+    @property
+    def wrapped_task(self):
+        return self.task
+
+    @wrapped_task.setter
+    def wrapped_task(self, value: ITask):
+        return None if isinstance(value, property) else value
+
     def gather_common_assets(self):
         """
         Gather all the common assets
@@ -302,10 +332,7 @@ class ScriptWrapperTask(ITask):
 
         """
         self.task.pre_creation(parent, platform)
-        # get command from wrapper command and add to wrapper script as item we call as argument to script
-        self.template_script_task.extra_command_arguments = str(self.task.command)
         self.template_script_task.pre_creation(parent, platform)
-        self.command = self.template_script_task.command
 
     def post_creation(self, parent: Union[Simulation, IWorkflowItem], platform: 'IPlatform'):
         self.task.post_creation(parent, platform)
