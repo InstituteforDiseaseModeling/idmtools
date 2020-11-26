@@ -58,7 +58,6 @@ try:
     from idmtools_platform_comps.utils.file_filter_workitem import DEFAULT_EXCLUDES
     from idmtools_platform_comps.comps_platform import COMPSPlatform
 
-
     @click.group(short_help="COMPS Related Commands")
     @click.argument('config-block')
     @click.pass_context
@@ -91,7 +90,6 @@ try:
         except PermissionError:
             user_logger.error(f"Could not loging to {platform.endpoint}")
             sys.exit(-1)
-
 
     @comps.command(help="Allows Downloading outputs from the command line")
     @click.option('--pattern', default=[], multiple=True, help="File patterns")
@@ -167,7 +165,6 @@ try:
             if dl_wi.failed:
                 dl_wi.fetch_error()
             sys.exit(-1)
-
 
     @comps.command(help="Allows assetizing outputs from the command line")
     @click.option('--pattern', default=[], multiple=True, help="File patterns")
