@@ -47,9 +47,21 @@ class TestCompsCLI(unittest.TestCase):
     @allure.feature("AssetizeOutputs")
     def test_assetize_dry_run_json(self):
         result = run_command('comps', 'Bayesian', 'assetize-outputs', '--experiment', '9311af40-1337-ea11-a2be-f0921c167861', '--dry-run', '--json', mix_stderr=False)
+        self.assertTrue(result.exit_code == 0, msg=result.output)
+        files = json.loads(result.stdout)
+        self.assertEqual(36, len(files))
+
+    @allure.feature("AssetizeOutputs")
+    def test_assetize_id(self):
+        fn = 'assetize.id'
+        op = PurePath(__file__).parent
+        if os.path.exists(op.joinpath(fn)):
+            os.remove(op)
+        result = run_command('comps', 'Bayesian', 'assetize-outputs', '--experiment', '9311af40-1337-ea11-a2be-f0921c167861', '--json', '--id-file', '--id-filename', fn, mix_stderr=False)
         self.assertTrue(result.exit_code == 0)
         files = json.loads(result.stdout)
         self.assertEqual(36, len(files))
+        self.assertTrue(os.path.exists(op.joinpath(fn)))
 
     @allure.feature("AssetizeOutputs")
     def test_cli_error(self):

@@ -50,11 +50,14 @@ try:
                 raise PermissionError('Failure authenticating')
             return {'Username': self.username, 'Password': self.password}
 
+
     os.environ['IDMTOOLS_NO_CONFIG_WARNING'] = '1'
     from idmtools.core.platform_factory import Platform
     import click
-    from idmtools_platform_comps.utils.assetize_output.assetize_output import AssetizeOutput, DEFAULT_EXCLUDES
+    from idmtools_platform_comps.utils.assetize_output.assetize_output import AssetizeOutput
+    from idmtools_platform_comps.utils.file_filter_workitem import DEFAULT_EXCLUDES
     from idmtools_platform_comps.comps_platform import COMPSPlatform
+
 
     @click.group(short_help="COMPS Related Commands")
     @click.argument('config-block')
@@ -89,6 +92,83 @@ try:
             user_logger.error(f"Could not loging to {platform.endpoint}")
             sys.exit(-1)
 
+
+    @comps.command(help="Allows Downloading outputs from the command line")
+    @click.option('--pattern', default=[], multiple=True, help="File patterns")
+    @click.option('--exclude-pattern', default=DEFAULT_EXCLUDES, multiple=True, help="File patterns")
+    @click.option('--experiment', default=[], multiple=True, help="Experiment ids to filter for files to download")
+    @click.option('--simulation', default=[], multiple=True, help="Simulation ids to filter for files to download")
+    @click.option('--work-item', default=[], multiple=True, help="WorkItems ids to filter for files to download")
+    @click.option('--asset-collection', default=[], multiple=True, help="Asset Collection ids to filter for files to download")
+    @click.option('--dry-run/--no-dry-run', default=False, help="Gather a list of files that would be downloaded instead of actually downloading")
+    @click.option('--wait/--no-wait', default=True, help="Wait on item to finish")
+    @click.option('--include-assets/--no-include-assets', default=False, help="Scan common assets of WorkItems and Experiments when filtering")
+    @click.option('--verbose/--no-verbose', default=True, help="Enable verbose output in worker")
+    @click.option('--json/--no-json', default=False, help="Outputs File list as JSON when used with dry run")
+    @click.option('--simulation-prefix-format-str', default=None, help="Simulation Prefix Format str. Defaults to '{simulation.id}'. For no prefix, pass a empty string")
+    @click.option('--work-item-prefix-format-str', default=None, help="WorkItem Prefix Format str. Defaults to ''")
+    @click.option('--name', default=None, help="Name of Download Workitem. If not provided, one will be generated")
+    @click.option('--output-path', default=os.getcwd(), help="Name of Download Workitem. If not provided, one will be generated")
+    @click.pass_context
+    def download(
+            ctx: click.Context, pattern, exclude_pattern, experiment, simulation, work_item, asset_collection, dry_run, wait,
+            include_assets, verbose, json, simulation_prefix_format_str, work_item_prefix_format_str, name, output_path,
+    ):
+        from idmtools_platform_comps.utils.download.download import DownloadWorkItem
+        if json:
+            os.environ['IDMTOOLS_SUPPRESS_OUTPUT'] = '1'
+
+        p: COMPSPlatform = Platform(ctx.obj['config_block'])
+
+        dl_wi = DownloadWorkItem(output_path=output_path)
+        if name:
+            dl_wi.name = name
+        if pattern:
+            dl_wi.file_patterns = list(pattern)
+        if exclude_pattern:
+            dl_wi.exclude_patterns = exclude_pattern if isinstance(exclude_pattern, list) else list(exclude_pattern)
+        dl_wi.related_experiments = list(experiment)
+        dl_wi.related_simulations = list(simulation)
+        dl_wi.related_work_items = list(work_item)
+        dl_wi.related_asset_collections = list(asset_collection)
+        dl_wi.include_assets = include_assets
+        dl_wi.dry_run = dry_run
+        dl_wi.verbose = verbose
+        if simulation_prefix_format_str is not None:
+            if simulation_prefix_format_str.strip() == "":
+                dl_wi.no_simulation_prefix = True
+            else:
+                dl_wi.simulation_prefix_format_str = simulation_prefix_format_str
+        if work_item_prefix_format_str is not None:
+            dl_wi.work_item_prefix_format_str = work_item_prefix_format_str
+
+        if dl_wi.total_items_watched() == 0:
+            user_logger.error("You must specify at least one item to download")
+
+        dl_wi.run(wait_until_done=False, platform=p)
+        if not json:
+            user_logger.info(f"Item can be viewed at {p.get_workitem_link(dl_wi)}")
+        if wait:
+            dl_wi.wait(wait_on_done_progress=wait)
+        if dl_wi.succeeded:
+            if dl_wi.dry_run:
+                file = p.get_files(dl_wi, ['file_list.json'])
+                file = file['file_list.json'].decode('utf-8')
+                if json:
+                    user_logger.info(file)
+                else:
+                    file = json_parser.loads(file)
+                    user_logger.info(tabulate.tabulate([x.values() for x in file], file[0].keys()))
+            else:
+                # Now
+                pass
+        elif dl_wi.failed:
+            user_logger.error("Assetized failed. Check logs in COMPS")
+            if dl_wi.failed:
+                dl_wi.fetch_error()
+            sys.exit(-1)
+
+
     @comps.command(help="Allows assetizing outputs from the command line")
     @click.option('--pattern', default=[], multiple=True, help="File patterns")
     @click.option('--exclude-pattern', default=DEFAULT_EXCLUDES, multiple=True, help="File patterns")
@@ -102,11 +182,19 @@ try:
     @click.option('--verbose/--no-verbose', default=True, help="Enable verbose output in worker")
     @click.option('--json/--no-json', default=False, help="Outputs File list as JSON when used with dry run")
     @click.option('--simulation-prefix-format-str', default=None, help="Simulation Prefix Format str. Defaults to '{simulation.id}'. For no prefix, pass a empty string")
-    @click.option('--work-item-prefix-format-str', default=None, help="WorfkItem Prefix Format str. Defaults to ''")
+    @click.option('--work-item-prefix-format-str', default=None, help="WorkItem Prefix Format str. Defaults to ''")
     @click.option('--tag', default=[], type=(str, str), multiple=True, help="Tags to add the created asset collection as pairs")
     @click.option('--name', default=None, help="Name of AssetizeWorkitem. If not provided, one will be generated")
+    @click.option('--id-file/--no-id-file', default=False, help="Enable or disable writing out an id file")
+    @click.option('--id-filename', default=None, help="Name of ID file to save build as. Required when id file is enabled")
     @click.pass_context
-    def assetize_outputs(ctx: click.Context, pattern, exclude_pattern, experiment, simulation, work_item, asset_collection, dry_run, wait, include_assets, verbose, json, simulation_prefix_format_str, work_item_prefix_format_str, tag, name):
+    def assetize_outputs(
+            ctx: click.Context, pattern, exclude_pattern, experiment, simulation, work_item, asset_collection, dry_run, wait,
+            include_assets, verbose, json, simulation_prefix_format_str, work_item_prefix_format_str, tag, name, id_file, id_filename
+    ):
+        if id_file:
+            if id_filename is None:
+                raise ValueError("--id-filename is required when filename is not provided")
         if json:
             os.environ['IDMTOOLS_SUPPRESS_OUTPUT'] = '1'
 
@@ -152,6 +240,8 @@ try:
                     file = json_parser.loads(file)
                     user_logger.info(tabulate.tabulate([x.values() for x in file], file[0].keys()))
             else:
+                if id_file:
+                    ao.asset_collection.to_id_file(id_filename)
                 user_logger.info(f"Created {ao.asset_collection.id}")
                 user_logger.info(f"It can be viewed at {p.get_asset_collection_link(ao.asset_collection)}")
                 user_logger.info("Items in Asset Collection")
