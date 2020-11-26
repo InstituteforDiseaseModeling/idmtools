@@ -50,7 +50,6 @@ try:
                 raise PermissionError('Failure authenticating')
             return {'Username': self.username, 'Password': self.password}
 
-
     os.environ['IDMTOOLS_NO_CONFIG_WARNING'] = '1'
     from idmtools.core.platform_factory import Platform
     import click
