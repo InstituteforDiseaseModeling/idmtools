@@ -827,11 +827,10 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         """
         return self._regather_assets_on_modify
 
-    def is_windows_platform(self) -> bool:
+    def is_windows_platform(self, item: IEntity = None) -> bool:
         """
-        Returns is the arget platform is a windows system
+        Returns is the target platform is a windows system
         """
-
         return self.are_requirements_met(PlatformRequirements.WINDOWS)
 
     @property

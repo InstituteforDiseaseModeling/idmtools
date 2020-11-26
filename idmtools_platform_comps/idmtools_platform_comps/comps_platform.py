@@ -3,6 +3,7 @@ import copy
 import logging
 # fix for comps weird import
 from idmtools.assets import AssetCollection
+from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities.iworkflow_item import IWorkflowItem
 
 HANDLERS = copy.copy(logging.getLogger().handlers)
@@ -108,3 +109,8 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
     def get_username(self):
         return Client.auth_manager()._username
+
+    def is_windows_platform(self, item: IEntity = None) -> bool:
+        if isinstance(item, IWorkflowItem):
+            return False
+        return super().is_windows_platform(item)
