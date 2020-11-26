@@ -2,7 +2,7 @@ import copy
 import time
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, field, fields
-from logging import getLogger, Logger
+from logging import getLogger
 from typing import Set, NoReturn, Union, Callable, List, TYPE_CHECKING, Dict
 from idmtools.assets import AssetCollection
 from idmtools.entities.command_line import CommandLine
@@ -43,9 +43,6 @@ class ITask(metaclass=ABCMeta):
     common_assets: AssetCollection = field(default_factory=AssetCollection)
     #: Transient(Simulation-level) assets
     transient_assets: AssetCollection = field(default_factory=AssetCollection)
-
-    # log to add to items to track provisioning of task
-    _task_log: Logger = field(default_factory=lambda: getLogger(__name__), compare=False, metadata=dict(pickle_ignore=True))
 
     def __post_init__(self):
         self._task_log = getLogger(f'{self.__class__.__name__ }_{time.time()}')
@@ -126,7 +123,7 @@ class ITask(metaclass=ABCMeta):
         if self.command is None:
             logger.error('Command is not defined')
             raise ValueError("Command is required for on task when preparing an experiment")
-        if platform.is_windows_platform():
+        if platform.is_windows_platform(parent):
             self.command.is_windows = True
         [hook(parent, platform) for hook in self.__pre_creation_hooks]
 
