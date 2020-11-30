@@ -66,8 +66,8 @@ def get_latest_package_version_from_artifactory(pkg_name, display_all=False):
         display_all: determine if output all package releases
     Returns: the latest version of ven package
     """
-    pkg_path = 'https://packages.idmod.org/artifactory/list/idm-pypi-production/'
-    pkg_url = os.path.join(pkg_path, pkg_name)
+    pkg_path = 'https://packages.idmod.org/api/pypi/pypi-production/simple/'
+    pkg_url = os.path.join(pkg_path, pkg_name, )
     return get_latest_version_from_site(pkg_url, display_all)
 
 
@@ -174,6 +174,8 @@ def get_latest_version_from_site(pkg_url, base_version: Optional[str] = None, di
     Returns: the latest version of ven package
     """
     all_releases = fetch_versions_from_server(pkg_url)
+    if all_releases is None:
+        raise ValueError(f"Could not determine latest version for package {pkg_url}. You can manually specify a version to avoid this error")
 
     if display_all:
         print(all_releases)
