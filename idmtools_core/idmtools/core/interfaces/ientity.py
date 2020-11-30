@@ -1,3 +1,4 @@
+import json
 from abc import ABCMeta
 from dataclasses import dataclass, field
 from os import PathLike
@@ -58,7 +59,7 @@ class IEntity(IItem, metaclass=ABCMeta):
         Args:
             filename: Filename to load
             platform:
-            **kwargs:
+            **kwargs: Platform extra arguments
 
         Returns:
 
@@ -69,11 +70,16 @@ class IEntity(IItem, metaclass=ABCMeta):
         with open(filename, 'r') as id_in:
             item_id = id_in.read().strip()
             if "::" in item_id:
-                item_id, platform_block = item_id.split("::")
+                parts = item_id.split("::")
+                if len(parts) == 2:
+                    item_id, platform_block = item_id.split("::")
+                elif len(parts) == 3:
+                    item_id, platform_block, extra_args = item_id.split("::")
+                    # TODO support extra args
         if platform is None:
             if platform_block:
                 from idmtools.core.platform_factory import Platform
-                platform = Platform(platform_block)
+                platform = Platform(platform_block, **kwargs)
             platform = cls.get_current_platform_or_error(platform)
         if cls.item_type is None:
             raise EnvironmentError("ItemType is None. This is most likely a badly derived IEntity that doesn't run set the default item type on the class")
@@ -240,23 +246,27 @@ class IEntity(IItem, metaclass=ABCMeta):
             raise NoPlatformException("No Platform defined on object, in current context, or passed to run")
         return p
 
-    def to_id_file(self, filename: Union[str, PathLike], save_platform: bool = False):
+    def to_id_file(self, filename: Union[str, PathLike], save_platform: bool = False, platform_args: Dict = None):
         """
         Write a id file
 
         Args:
             filename: Filename to create
             save_platform: Save platform to the file as well
+            platform_args: Platform Args
 
         Returns:
 
         """
+        from idmtools.utils.json import IDMJSONEncoder
         if isinstance(filename, PathLike):
             filename = str(filename)
         with open(filename, 'w') as filename:
             filename.write(f'{self.id}')
             if save_platform and hasattr(self.platform, '_config_block'):
                 filename.write(f"::{self.platform._config_block}")
+                if platform_args:
+                    filename.write(json.dumps(platform_args, cls=IDMJSONEncoder))
 
 
 IEntityList = List[IEntity]

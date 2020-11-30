@@ -266,10 +266,14 @@ try:
     @click.option('--name', default=None, help="Name of WorkItem. If not provided, one will be generated")
     @click.option('--force/--no-force', default=False, help="Force build, ignoring build context")
     @click.option('--image-name', default=None, help="Name of resulting image")
-    @click.option('--id-file/--no-id-file', default=True, help="Enable or disable writing out an id file")
+    @click.option('--id-file/--no-id-file', default=True, help="Enable or disable writing out an ID file that points to the created asset collection")
     @click.option('--id-filename', default=None, help="Name of ID file to save build as. If not specified, and id-file is enabled, a name is calculated")
+    @click.option('--id-workitem/--no-id-workitem', default=True, help="Enable or disable writing out an id file for the workitem")
+    @click.option('--id-workitem-failed/--no-id-workitem-failed', default=False, help="Write id of the workitem even if it failed. You need to enable --id-workitem for this is be active")
+    @click.option('--id-workitem-filename', default=None, help="Name of ID file to save workitem to. You need to enable --id-workitem for this is be active")
     @click.pass_context
-    def build(ctx: click.Context, common_input, common_input_glob, transient_input, transient_input_glob, definition_file, wait, tag, workitem_tag, name, force, image_name: str, id_file: str, id_filename: str):
+    def build(ctx: click.Context, common_input, common_input_glob, transient_input, transient_input_glob, definition_file, wait, tag, workitem_tag, name, force, image_name: str,
+              id_file: str, id_filename: str, id_workitem: bool, id_workitem_failed: bool, id_workitem_filename: str):
         p: COMPSPlatform = Platform(ctx.obj['config_block'])
         sb = SingularityBuildWorkItem(definition_file=definition_file, name=name, force=force, image_name=image_name)
 
@@ -294,8 +298,20 @@ try:
 
         sb.run(wait_until_done=wait, platform=p)
         if sb.succeeded and id_file:
-            user_logger.info(f"Saving ID to {id_filename}")
-            sb.to_id_file(id_filename, save_platform=True)
+            if id_filename is None:
+                id_filename = sb.get_id_filename()
+            user_logger.info(f"Saving the Asset collection ID that contains the image to {id_filename}")
+            sb.asset_collection.to_id_file(id_filename, save_platform=True)
+        if id_workitem:
+            # TODO when we should use platform id but that need to be updated through the code base
+            if sb.succeeded and sb._uid is None:
+                user_logger.warning("Cannot save workitem id because an existing container was found with the same inputs. You can force run using --force, but it is recommended to use the container used.")
+            elif id_workitem_failed or sb.succeeded:
+                if id_workitem_filename is None:
+                    id_workitem_filename = sb.get_id_filename(prefix="builder.")
+                user_logger.info(f"Saving the Builder Workitem ID that contains the image to {id_workitem_filename}")
+                sb.to_id_file(id_workitem_filename, save_platform=True)
+        sys.exit(0 if sb.succeeded else -1)
 
     @singularity.command(help="Pull Singularity Image")
     @click.argument('image_url')
@@ -325,6 +341,7 @@ try:
         if sb.succeeded and id_file:
             user_logger.info(f"Saving ID to {id_filename}")
             sb.to_id_file(id_filename, save_platform=True)
+        sys.exit(0 if sb.succeeded else -1)
 
 except ImportError as e:
     logger.warning(f"COMPS CLI not enabled because a dependency is missing. Most likely it is either click or idmtools cli {e.args}")

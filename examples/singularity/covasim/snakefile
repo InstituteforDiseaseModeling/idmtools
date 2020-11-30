@@ -2,7 +2,7 @@ rule all:
     input:
         "test_interventions.id",
         "run_scenarios.id",
-        "run_sim.id",
+        "run_sim_sweep.id",
         "simple.id",
         "cli.id"
 
@@ -51,14 +51,14 @@ rule scenarios:
     shell:
         "python3 run_covasim_scenarios.py"
 
-rule sim:
+rule sim_sweep:
     input:
         "covasim.id",
-        "inputs/run_sim.py"
+        "inputs/run_sim_sweep.py"
     output:
-        "run_sim.id"
+        "run_sim_sweep.id"
     shell:
-        "python3 run_covasim_sim.py"
+        "python3 run_covasim_sweep.py"
 
 rule simple:
     input:
