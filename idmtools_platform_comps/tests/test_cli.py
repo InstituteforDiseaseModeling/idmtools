@@ -107,8 +107,8 @@ class TestCompsCLI(unittest.TestCase):
         ac = pl.get_item(parts[0], ItemType.ASSETCOLLECTION)
         self.assertIn('type', ac.tags.keys())
         self.assertIn('image_name', ac.tags.keys())
-        self.assertEqual(ac['tags'], 'singularity')
-        self.assertEqual(ac['image_name'], 'singularity.sif')
+        self.assertEqual(ac.tags['type'], 'singularity')
+        self.assertEqual(ac.tags['image_name'], 'singularity.sif')
 
         # cleanup for next test
         for file in id_files:
