@@ -217,7 +217,8 @@ try:
             user_logger.info(f"Saving the Asset collection ID that contains the image to {id_filename}")
             sb.asset_collection.to_id_file(id_filename, save_platform=True)
         if id_workitem:
-            if sb.succeeded and sb.uid is None:
+            # TODO when we should use platform id but that need to be updated through the code base
+            if sb.succeeded and sb._uid is None:
                 user_logger.warning("Cannot save workitem id because an existing container was found with the same inputs. You can force run using --force, but it is recommended to use the container used.")
             elif id_workitem_failed or sb.succeeded:
                 if id_workitem_filename is None:
