@@ -102,10 +102,10 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         self.__init_interfaces()
 
     def get_workitem_link(self, work_item: IWorkflowItem):
-        return f"{self.endpoint}/#explore/WorkItems?filters=ID={work_item.uid}"
+        return f"{self.endpoint}/#explore/WorkItems?filters=Id={work_item.uid}"
 
     def get_asset_collection_link(self, asset_collection: AssetCollection):
-        return f"{self.endpoint}/#explore/AssetCollections?filters=ID={asset_collection.uid}"
+        return f"{self.endpoint}/#explore/AssetCollections?filters=Id={asset_collection.uid}"
 
     def get_username(self):
         return Client.auth_manager()._username
