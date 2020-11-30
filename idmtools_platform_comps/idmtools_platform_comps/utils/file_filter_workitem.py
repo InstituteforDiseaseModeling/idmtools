@@ -198,15 +198,7 @@ class FileFilterWorkItem(SSMTWorkItem, ABC):
         Returns:
 
         """
-        if self.total_items_watched() == 0:
-            raise AtLeastOneItemToWatch("You must specify at least one item to watch")
-
-        if len(self.file_patterns) == 0:
-            logger.info("No file pattern specified. Setting to default pattern '**' to filter for all outputs")
-            self.file_patterns.append("**")
-
-        self.__convert_ids_to_items(platform)
-        self.__ensure_all_dependencies_created_and_in_proper_env(platform)
+        self._filter_workitem_pre_creation(platform)
 
         super().pre_creation(platform)
 
@@ -226,6 +218,15 @@ class FileFilterWorkItem(SSMTWorkItem, ABC):
         self.task.command = self.create_command()
         if IdmConfigParser.is_output_enabled():
             user_logger.info("Creating Watcher")
+
+    def _filter_workitem_pre_creation(self, platform):
+        if self.total_items_watched() == 0:
+            raise AtLeastOneItemToWatch("You must specify at least one item to watch")
+        if len(self.file_patterns) == 0:
+            logger.info("No file pattern specified. Setting to default pattern '**' to filter for all outputs")
+            self.file_patterns.append("**")
+        self.__convert_ids_to_items(platform)
+        self.__ensure_all_dependencies_created_and_in_proper_env(platform)
 
     def __generate_name(self) -> str:
         """

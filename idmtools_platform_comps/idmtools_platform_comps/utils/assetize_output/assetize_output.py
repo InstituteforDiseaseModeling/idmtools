@@ -26,6 +26,27 @@ class AssetizeOutput(FileFilterWorkItem):
             command += f' --asset-tag "{name}={value}"'
         return command
 
+    def _filter_workitem_pre_creation(self, platform):
+        super(AssetizeOutput, self)._filter_workitem_pre_creation(platform)
+        if len(self.asset_tags) == 0:
+            self.__generate_tags()
+
+    def __generate_tags(self):
+        """
+        Add the defaults tags to the WorkItem
+
+        Returns:
+            None
+        """
+        for experiment in self.related_experiments:
+            self.asset_tags['AssetizedOutputfromFromExperiment'] = str(experiment.id)
+        for simulation in self.related_simulations:
+            self.asset_tags['AssetizedOutputfromFromSimulation'] = str(simulation.id)
+        for work_item in self.related_work_items:
+            self.asset_tags['AssetizedOutputfromFromWorkItem'] = str(work_item.id)
+        for ac in self.related_asset_collections:
+            self.asset_tags['AssetizedOutputfromAssetCollection'] = str(ac.id)
+
     def run(self, wait_until_done: bool = False, platform: 'IPlatform' = None, wait_on_done_progress: bool = True, wait_on_done: bool = True, **run_opts) -> Union[AssetCollection, None]:
         """
         Run the AssetizeOutput

@@ -75,11 +75,11 @@ class TestAssetizeOutput(unittest.TestCase):
         self.assertEqual(1, len(ao.file_patterns))
         self.assertEqual("**", ao.file_patterns[0])
         print(e.id)
-        self.assertEqual(ao.create_command(), f'python3 Assets/assetize_ssmt_script.py --file-pattern "**" --exclude-pattern "StdErr.txt" "StdOut.txt" "WorkOrder.json" "*.log" --asset-tag "AssetizedOutputfromFromExperiment={exp_id}" --simulation-prefix-format-str "{{simulation.id}}"')
+        self.assertEqual(ao.create_command(), f'python3 Assets/assetize_ssmt_script.py --file-pattern "**" --exclude-pattern "StdErr.txt" "StdOut.txt" "WorkOrder.json" "*.log" --simulation-prefix-format-str "{{simulation.id}}" --asset-tag "AssetizedOutputfromFromExperiment={exp_id}"')
         ao.verbose = True
-        self.assertEqual(ao.create_command(), f'python3 Assets/assetize_ssmt_script.py --file-pattern "**" --exclude-pattern "StdErr.txt" "StdOut.txt" "WorkOrder.json" "*.log" --asset-tag "AssetizedOutputfromFromExperiment={exp_id}" --simulation-prefix-format-str "{{simulation.id}}" --verbose')
+        self.assertEqual(ao.create_command(), f'python3 Assets/assetize_ssmt_script.py --file-pattern "**" --exclude-pattern "StdErr.txt" "StdOut.txt" "WorkOrder.json" "*.log" --simulation-prefix-format-str "{{simulation.id}}" --verbose --asset-tag "AssetizedOutputfromFromExperiment={exp_id}"')
         ao.clear_exclude_patterns()
-        self.assertEqual(ao.create_command(), f'python3 Assets/assetize_ssmt_script.py --file-pattern "**" --asset-tag "AssetizedOutputfromFromExperiment={exp_id}" --simulation-prefix-format-str "{{simulation.id}}" --verbose')
+        self.assertEqual(ao.create_command(), f'python3 Assets/assetize_ssmt_script.py --file-pattern "**" --simulation-prefix-format-str "{{simulation.id}}" --verbose --asset-tag "AssetizedOutputfromFromExperiment={exp_id}"')
 
         def pre_run_dummy():
             pass
@@ -91,15 +91,15 @@ class TestAssetizeOutput(unittest.TestCase):
             pass
         ao.pre_run_functions.append(pre_run_dummy)
         ao.entity_filter_function = entity_filter_dummy
-        
         ao.pre_creation(self.platform)
-        self.assertEqual(len(ao.assets), 3)
+        self.assertEqual(len(ao.assets), 7 if TEST_WITH_NEW_CODE else 5)
         self.assertIn("pre_run.py", [f.filename for f in ao.assets])
         self.assertIn("entity_filter_func.py", [f.filename for f in ao.assets])
-        self.assertEqual(ao.create_command(), f'python3 Assets/assetize_ssmt_script.py --file-pattern "**" --asset-tag "AssetizedOutputfromFromExperiment={exp_id}" --simulation-prefix-format-str "{{simulation.id}}" --pre-run-func pre_run_dummy --entity-filter-func entity_filter_dummy --verbose')
+        self.assertEqual(ao.create_command(), f'python3 Assets/assetize_ssmt_script.py --file-pattern "**" --simulation-prefix-format-str "{{simulation.id}}" --pre-run-func pre_run_dummy --entity-filter-func entity_filter_dummy --verbose --asset-tag "AssetizedOutputfromFromExperiment={exp_id}"')
 
         ao.pre_run_functions.append(another_pre_run_dummy)
-        self.assertEqual(ao.create_command(), f'python3 Assets/assetize_ssmt_script.py --file-pattern "**" --asset-tag "AssetizedOutputfromFromExperiment={exp_id}" --simulation-prefix-format-str "{{simulation.id}}" --pre-run-func pre_run_dummy --pre-run-func another_pre_run_dummy --entity-filter-func entity_filter_dummy --verbose')
+        self.assertEqual(ao.create_command(),
+                         f'python3 Assets/assetize_ssmt_script.py --file-pattern "**" --simulation-prefix-format-str "{{simulation.id}}" --pre-run-func pre_run_dummy --pre-run-func another_pre_run_dummy --entity-filter-func entity_filter_dummy --verbose --asset-tag "AssetizedOutputfromFromExperiment={exp_id}"')
 
     def test_comps_simple(self):
         task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"), parameters=dict(a=1))
