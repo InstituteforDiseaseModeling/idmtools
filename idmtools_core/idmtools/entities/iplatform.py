@@ -97,9 +97,10 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         try:
             s = inspect.stack()
-        except RuntimeError:
+        except (IndexError, RuntimeError):
             # in some high thread environments and under heavy load, we can get environment changes before retrieving
             # stack in those case assume we are good
+            # We can also encounter IndexError in dynamic environments like Snakemake, jinja, etc
             return "__newobj__"
         return s[2][3]
 

@@ -409,6 +409,23 @@ class SingularityBuildWorkItem(InputDataWorkItem):
             return self.__fetch_finished_asset_collection(p)
         return None
 
+    def get_id_filename(self, prefix: str = None) -> str:
+        if self.definition_file:
+            base_name = PurePath(self.definition_file).name.replace(".def", ".id")
+            if prefix:
+                base_name = f"{prefix}{base_name}"
+            filename = str(PurePath(self.definition_file).parent.joinpath(base_name))
+        elif self.image_url:
+            filename = re.sub(r"(docker|shub)://", "", self.image_url).replace(":", "_")
+            if filename:
+                filename = f"{prefix}{filename}"
+        else:
+            raise ValueError("Could not calculate the filename. Please specify one")
+        if not filename.endswith(".id"):
+            filename += ".id"
+
+        return filename
+
     def to_id_file(self, filename: Union[str, PathLike] = None, save_platform: bool = False):
         """
         Create an ID File
@@ -423,13 +440,5 @@ class SingularityBuildWorkItem(InputDataWorkItem):
 
         """
         if filename is None:
-            if self.definition_file:
-                base_name = PurePath(self.definition_file).name.replace(".def", ".id")
-                filename = str(PurePath(self.definition_file).parent.joinpath(base_name))
-            elif self.image_url:
-                filename = re.sub(r"(docker|shub)://", "", self.image_url).replace(":", "_")
-            else:
-                raise ValueError("Could not calculate the filename. Please specify one")
-            if not filename.endswith(".id"):
-                filename += ".id"
+            filename = self.get_id_filename(prefix='builder.')
         super(SingularityBuildWorkItem, self).to_id_file(filename, save_platform)
