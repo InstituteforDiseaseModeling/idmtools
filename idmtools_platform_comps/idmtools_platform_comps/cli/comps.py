@@ -179,7 +179,7 @@ try:
     @click.option('--json/--no-json', default=False, help="Outputs File list as JSON when used with dry run")
     @click.option('--simulation-prefix-format-str', default=None, help="Simulation Prefix Format str. Defaults to '{simulation.id}'. For no prefix, pass a empty string")
     @click.option('--work-item-prefix-format-str', default=None, help="WorkItem Prefix Format str. Defaults to ''")
-    @click.option('--tag', default=[], type=(str, str), multiple=True, help="Tags to add the created asset collection as pairs")
+    @click.option('--tag', default=[], type=(str, str), multiple=True, help="Tags to add to the created asset collection as pairs.")
     @click.option('--name', default=None, help="Name of AssetizeWorkitem. If not provided, one will be generated")
     @click.option('--id-file/--no-id-file', default=False, help="Enable or disable writing out an id file")
     @click.option('--id-filename', default=None, help="Name of ID file to save build as. Required when id file is enabled")
