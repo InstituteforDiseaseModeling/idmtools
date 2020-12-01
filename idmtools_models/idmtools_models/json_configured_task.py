@@ -75,10 +75,10 @@ class JSONConfiguredTask(ITask):
         """
         if self.config_file_name is not None:
             params = {self.envelope: self.parameters} if self.envelope else self.parameters
-            self._task_log.info('Adding JSON Configured File %s', self.config_file_name)
             if logger.isEnabledFor(DEBUG):
-                logger.info(f'Generating {self.config_file_name} as an asset from JSONConfiguredTask')
-                self._task_log.debug('Writing Config %s', json.dumps(params))
+                logger.debug('Adding JSON Configured File %s', self.config_file_name)
+                logger.debug(f'Generating {self.config_file_name} as an asset from JSONConfiguredTask')
+                logger.debug('Writing Config %s', json.dumps(params))
             assets.add_or_replace_asset(Asset(filename=self.config_file_name, content=json.dumps(params)))
 
     def set_parameter(self, key: TJSONConfigKeyType, value: TJSONConfigValueType):
@@ -92,7 +92,8 @@ class JSONConfiguredTask(ITask):
         Returns:
 
         """
-        self._task_log.info('Setting parameter %s to %s', key, str(value))
+        if logger.isEnabledFor(DEBUG):
+            logger.info('Setting parameter %s to %s', key, str(value))
         self.parameters[key] = value
         return {key: value}
 
@@ -120,8 +121,9 @@ class JSONConfiguredTask(ITask):
         Returns:
 
         """
-        for k, p in values.items():
-            self._task_log.info('Setting parameter %s to %s', k, str(p))
+        if logger.isEnabledFor(DEBUG):
+            for k, p in values.items():
+                logger.debug('Setting parameter %s to %s', k, str(p))
         self.parameters.update(values)
         return values
 

@@ -1,9 +1,13 @@
 import sys
 import typing
+from logging import getLogger
 from uuid import UUID
 
 if typing.TYPE_CHECKING:
     from idmtools.entities.iplatform import TPlatform
+
+user_logger = getLogger('user')
+logger = getLogger(__name__)
 
 
 class ExperimentNotFound(Exception):
@@ -62,7 +66,8 @@ def idmtools_error_handler(exctype, value: Exception, tb):
     """
     if hasattr(value, 'doc_link'):
         from idmtools.utils.info import get_help_version_url
-        print(f"{value.args[0]}. For more details, see {get_help_version_url(value.doc_link)}")
+        user_logger.error(f"{value.args[0]}. For more details, see {get_help_version_url(value.doc_link)}")
 
+    logger.exception(value)
     # Call native exception manager
     sys.__excepthook__(exctype, value, tb)

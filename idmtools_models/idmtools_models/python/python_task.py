@@ -1,6 +1,6 @@
 import os
 from dataclasses import dataclass, field
-from logging import getLogger
+from logging import getLogger, DEBUG
 from typing import Set, List, Type, Union, TYPE_CHECKING
 from idmtools.assets import Asset, AssetCollection
 from idmtools.entities import CommandLine
@@ -40,8 +40,8 @@ class PythonTask(ITask):
         Returns:
             AssetCollection
         """
-        # ensure that assets is in collection
-        self._task_log.info('Adding Common asset from %s', self.script_path)
+        if logger.isEnabledFor(DEBUG):
+            logger.debug('Adding Common asset from %s', self.script_path)
         self.common_assets.add_or_replace_asset(Asset(absolute_path=self.script_path))
         return self.common_assets
 

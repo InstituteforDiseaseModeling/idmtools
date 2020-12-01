@@ -45,8 +45,6 @@ class ITask(metaclass=ABCMeta):
     transient_assets: AssetCollection = field(default_factory=AssetCollection)
 
     def __post_init__(self):
-        self._task_log = getLogger(f'{self.__class__.__name__ }_{time.time()}')
-
         self.__pre_creation_hooks = []
         self.__post_creation_hooks = []
 
@@ -196,10 +194,10 @@ class ITask(metaclass=ABCMeta):
 
         Returns: dict
         """
-        return {"_task_log": None}
+        pass
 
     def post_setstate(self):
-        self._task_log = getLogger(__name__)
+        pass
 
     @property
     def pickle_ignore_fields(self):
@@ -226,7 +224,6 @@ class ITask(metaclass=ABCMeta):
         for k, v in self.__dict__.items():
             if k not in ['_task_log']:
                 setattr(result, k, copy.deepcopy(v, memo))
-        result._task_log = getLogger(__name__)
         return result
 
     def to_dict(self) -> Dict:
