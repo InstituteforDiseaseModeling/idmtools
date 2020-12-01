@@ -272,8 +272,9 @@ class FileFilterWorkItem(SSMTWorkItem, ABC):
                     # first test if the item is a file
                     if os.path.exists(item):
                         item = platform.get_item_from_id_file(item)
-                    else:
-                        item = platform.get_item(item, item_type, force=True)
+                    if isinstance(item, PathLike):
+                        user_logger.warning(f"Could not find a file with name {item}. Attempting to load as an ID")
+                    item = platform.get_item(item, item_type, force=True)
                 new_items.append(item)
             setattr(self, prop, new_items)
 

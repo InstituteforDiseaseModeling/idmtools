@@ -49,13 +49,20 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
             COMPSExperiment with items
         """
+
         columns = columns or ["id", "name", "suite_id"]
         comps_children = load_children if load_children is not None else ["tags", "configuration"]
         query_criteria = query_criteria or QueryCriteria().select(columns).select_children(comps_children)
-        return COMPSExperiment.get(
-            id=experiment_id,
-            query_criteria=query_criteria
-        )
+        try:
+            result = COMPSExperiment.get(
+                id=experiment_id,
+                query_criteria=query_criteria
+            )
+        except AttributeError as e:
+            user_logger.error(f"The id {experiment_id} could not be converted to an UUID. Please verify your id")
+            raise e
+
+        return result
 
     def pre_create(self, experiment: Experiment, **kwargs) -> NoReturn:
         """

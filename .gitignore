@@ -424,3 +424,4 @@ allure_report.zip
 *.id
 /examples/singularity/covasim/.covasim_versions/
 **/.snakemake/
+!/idmtools_test/idmtools_test/inputs/id_files/*
