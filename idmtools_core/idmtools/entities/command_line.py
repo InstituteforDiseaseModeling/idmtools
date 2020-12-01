@@ -1,7 +1,7 @@
 import re
 import shlex
 from typing import TypeVar, Dict, Any, List
-from dataclasses import dataclass, field, InitVar
+from dataclasses import dataclass, field
 
 
 @dataclass(init=False)
@@ -110,7 +110,7 @@ class CommandLine:
 
     @property
     def cmd(self):
-        return ' '.join(filter(None, [self._executable.strip(), self.options.strip(), self.arguments.strip()]))
+        return ' '.join(filter(None, [self._executable.strip() if self._executable else None, self.options.strip(), self.arguments.strip()]))
 
     def __str__(self):
         return self.cmd
