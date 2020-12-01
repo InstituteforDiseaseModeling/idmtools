@@ -105,7 +105,7 @@ try:
     @click.option('--simulation-prefix-format-str', default=None, help="Simulation Prefix Format str. Defaults to '{simulation.id}'. For no prefix, pass a empty string")
     @click.option('--work-item-prefix-format-str', default=None, help="WorkItem Prefix Format str. Defaults to ''")
     @click.option('--name', default=None, help="Name of Download Workitem. If not provided, one will be generated")
-    @click.option('--output-path', default=os.getcwd(), help="Name of Download Workitem. If not provided, one will be generated")
+    @click.option('--output-path', default=os.getcwd(), help="Output path to save zip")
     @click.pass_context
     def download(
             ctx: click.Context, pattern, exclude_pattern, experiment, simulation, work_item, asset_collection, dry_run, wait,

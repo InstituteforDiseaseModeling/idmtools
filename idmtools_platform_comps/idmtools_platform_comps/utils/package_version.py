@@ -4,7 +4,7 @@ import os
 import json
 from datetime import datetime
 from logging import getLogger
-from typing import Optional, List
+from typing import Optional, List, Type
 from urllib import request
 import requests
 from pkg_resources import parse_version
@@ -31,6 +31,27 @@ class LinkHTMLParser(HTMLParser):
         v = attr['href']
         v = v.rstrip('/')
         self.pkg_version.append(v)
+
+
+class LinkNameParser(HTMLParser):
+    previous_tag = None
+    pkg_version = set()
+    in_link = False
+
+    def handle_starttag(self, tag, attrs):
+        self.previous_tag = tag
+        self.in_link = tag == "a"
+
+    def handle_endtag(self, tag):
+        if tag == "a":
+            self.in_link = False
+
+    def handle_data(self, data):
+        if self.in_link:
+            parts = data.split("-")
+            excluded = ["rc", "dev", ".zip", ".tar.gz", ".b", ".whl", ".win32"]
+            if all([x not in parts[1] for x in excluded]):
+                self.pkg_version.add(parts[1])
 
 
 def get_latest_package_version_from_pypi(pkg_name, display_all=False):
@@ -136,13 +157,13 @@ def get_digest_from_docker_hub(repo, tag='latest'):
 
 
 @functools.lru_cache(8)
-def fetch_versions_from_server(pkg_url: str) -> List[str]:
+def fetch_versions_from_server(pkg_url: str, parser: Type[HTMLParser] = LinkHTMLParser) -> List[str]:
     """
     Fetch all versions from server
 
     Args:
         pkg_url: Url to fetch
-
+        parser: Parser tp use
     Returns:
 
     """
@@ -153,7 +174,7 @@ def fetch_versions_from_server(pkg_url: str) -> List[str]:
 
     html_str = resp.text
 
-    parser = LinkHTMLParser()
+    parser = parser()
     parser.feed(html_str)
     releases = parser.pkg_version
     releases = [v for v in releases if not v.startswith('.')]
@@ -173,7 +194,7 @@ def get_latest_version_from_site(pkg_url, base_version: Optional[str] = None, di
         display_all: determine if output all package releases
     Returns: the latest version of ven package
     """
-    all_releases = fetch_versions_from_server(pkg_url)
+    all_releases = fetch_versions_from_server(pkg_url, parser=LinkNameParser)
     if all_releases is None:
         raise ValueError(f"Could not determine latest version for package {pkg_url}. You can manually specify a version to avoid this error")
 

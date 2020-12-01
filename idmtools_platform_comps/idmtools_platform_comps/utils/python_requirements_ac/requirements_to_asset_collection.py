@@ -257,7 +257,7 @@ class RequirementsToAssetCollection:
 
     def consolidate_requirements(self):
         """
-        Combine requiremtns and dynamic requirements (a list):
+        Combine requirements and dynamic requirements (a list):
           - get the latest version of package if version is not provided
           - dynamic requirements will overwrites the requirements file
 
