@@ -1,5 +1,7 @@
 import functools
 import os
+import subprocess
+import sys
 import tempfile
 from pathlib import PurePath
 from COMPS import Data
@@ -10,7 +12,6 @@ from idmtools.builders import SimulationBuilder
 from idmtools.core.enums import EntityStatus
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform import IPlatform
-from idmtools.entities.iworkflow_item import IWorkflowItem
 from idmtools_models.templated_script_task import get_script_wrapper_unix_task
 from idmtools_platform_comps import __version__ as platform_comps_version
 
@@ -26,6 +27,7 @@ CORE_PACKAGE_FILENAME = f"idmtools-{CORE_VERSION}.tar.gz"
 COMPS_LOCAL_PACKAGE = CURRENT_DIR.parent.parent.parent.joinpath("idmtools_platform_comps", "dist", COMPS_PACKAGE_FILENAME)
 CORE_LOCAL_PACKAGE = CURRENT_DIR.parent.parent.parent.joinpath("idmtools_core", "dist", CORE_PACKAGE_FILENAME)
 COMPS_LOAD_SSMT_PACKAGES_WRAPPER = f"""
+set -o noglob
 echo Running $@ 
 
 echo after install of newer idmtools
@@ -34,7 +36,6 @@ export PYTHONPATH=$(pwd)/Assets/site-packages:$(pwd)/Assets/:$PYTHONPATH
 
 pip install Assets/{CORE_PACKAGE_FILENAME} --force --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
 pip install Assets/{COMPS_PACKAGE_FILENAME} --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
-
 
 $@
 """
@@ -53,10 +54,17 @@ def load_library_dynamically(item, platform: IPlatform):
     for file in [COMPS_LOCAL_PACKAGE, CORE_LOCAL_PACKAGE]:
         item.assets.add_asset(file)
     item.task = get_script_wrapper_unix_task(task=item.task, template_content=COMPS_LOAD_SSMT_PACKAGES_WRAPPER)
-
     item.task.gather_common_assets()
     item.task.pre_creation(item, platform)
     # item.assets.add_assets(item.task.gather_common_assets(), fail_on_duplicate=False)
+
+
+def run_package_dists():
+    mk = "pymake" if sys.platform == "win32" else "make"
+    print("Running Dist for core")
+    subprocess.call(f"{mk} dist", cwd=CORE_LOCAL_PACKAGE.parent.parent, shell=True)
+    print("Running Dist for comps")
+    subprocess.call(f"{mk} dist", cwd=COMPS_LOCAL_PACKAGE.parent.parent, shell=True)
 
 
 def get_asset_collection_id_for_simulation_id(sim_id):

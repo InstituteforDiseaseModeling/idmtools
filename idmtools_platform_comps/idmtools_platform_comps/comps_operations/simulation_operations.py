@@ -222,6 +222,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             platform_task_hooks(simulation.task, self.platform)
             comps_configuration['executable_path'] = simulation.task.command.executable
         sim_task = simulation.task.command.arguments + " " + simulation.task.command.options
+        sim_task = sim_task.strip()
         if comps_exp_config.simulation_input_args != sim_task:
             logger.info(f'Overriding simulation_input_args for sim to {sim_task}')
             comps_configuration['simulation_input_args'] = sim_task

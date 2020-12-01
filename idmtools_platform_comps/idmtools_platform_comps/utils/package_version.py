@@ -67,7 +67,7 @@ def get_latest_pypi_package_version_from_artifactory(pkg_name, display_all=False
     Returns: the latest version of ven package
     """
     pkg_path = 'https://packages.idmod.org/artifactory/api/pypi/pypi-production/simple'
-    pkg_url = os.path.join(pkg_path, pkg_name, 'json')
+    pkg_url = os.path.join(pkg_path, pkg_name)
     return get_latest_version_from_site(pkg_url, display_all)
 
 

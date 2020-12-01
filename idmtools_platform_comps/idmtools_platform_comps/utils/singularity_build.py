@@ -78,8 +78,6 @@ class SingularityBuildWorkItem(InputDataWorkItem):
     __rendered_template: str = field(default=None)
 
     def __post_init__(self, item_name: str, asset_collection_id: UUID, asset_files: FileList, user_files: FileList, image_url: str):
-        if self.name is None:
-            self.name = "Singularity build"
         self.work_item_type = 'ImageBuilderWorker'
         self._image_url = None
         # Set this for now. Later it should be replace with some type of Specialized worker identifier
@@ -316,6 +314,10 @@ class SingularityBuildWorkItem(InputDataWorkItem):
         Returns:
 
         """
+        if self.name is None:
+            self.name = "Singularity Build"
+            if self.definition_file:
+                self.name += f" of {PurePath(self.definition_file).name}"
         super(SingularityBuildWorkItem, self).pre_creation(platform)
         self.__add_common_assets()
         self._prep_work_order_before_create()

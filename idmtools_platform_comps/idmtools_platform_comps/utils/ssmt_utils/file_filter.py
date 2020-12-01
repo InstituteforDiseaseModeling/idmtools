@@ -458,11 +458,10 @@ def parse_filter_args_common(args: argparse.Namespace):
         args.file_pattern = ["**"]
     entity_filter_func = apply_custom_filters(args)
     for i, a in enumerate(args.exclude_pattern):
-        if a.startswith("'") and a.endswith("'"):
-            args.exclude_pattern[i] = a.strip("'")
+        args.exclude_pattern[i] = a.replace("\\*", "*")
     for i, a in enumerate(args.file_pattern):
         if a.startswith("'") and a.endswith("'"):
-            args.file_pattern[i] = a.strip("'")
+            args.file_pattern[i] = a.replace("\\*", "*")
     for i in ['simulation_prefix_format_str', 'work_item_prefix_format_str']:
         si = getattr(args, i)
         if si and si.startswith("'") and si.endswith("'"):

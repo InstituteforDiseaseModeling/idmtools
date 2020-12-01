@@ -10,7 +10,7 @@ from idmtools_platform_comps.utils.assetize_output.assetize_output import Asseti
 from idmtools_platform_comps.utils.file_filter_workitem import AtLeastOneItemToWatch, CrossEnvironmentFilterNotSupport
 from idmtools_platform_comps.utils.ssmt_utils.file_filter import is_file_excluded
 from idmtools_test import COMMON_INPUT_PATH
-from idmtools_test.utils.comps import load_library_dynamically
+from idmtools_test.utils.comps import load_library_dynamically, run_package_dists
 from idmtools_test.utils.test_task import TestTask
 
 TEST_WITH_NEW_CODE = os.environ.get("TEST_WITH_PACKAGES", 'n').lower() in TRUTHY_VALUES
@@ -23,6 +23,12 @@ class TestAssetizeOutput(unittest.TestCase):
         super().setUp()
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         self.platform = Platform("COMPS2")
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        if TEST_WITH_NEW_CODE:
+            # Run package dists
+            run_package_dists()
 
     @pytest.mark.smoke
     def test_experiment_can_be_watched(self):

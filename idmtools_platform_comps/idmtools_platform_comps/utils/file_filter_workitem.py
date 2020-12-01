@@ -13,6 +13,7 @@ from idmtools import IdmConfigParser
 from idmtools.assets import Asset, AssetCollection
 from idmtools.assets.file_list import FileList
 from idmtools.core.interfaces.irunnable_entity import IRunnableEntity
+from idmtools.entities import CommandLine
 from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform import IPlatform
@@ -199,9 +200,6 @@ class FileFilterWorkItem(SSMTWorkItem, ABC):
 
         """
         self._filter_workitem_pre_creation(platform)
-
-        super().pre_creation(platform)
-
         if self.name is None:
             self.name = self.__generate_name()
 
@@ -215,9 +213,11 @@ class FileFilterWorkItem(SSMTWorkItem, ABC):
                 self.assets.add_or_replace_asset(utils_dir.joinpath(file))
         self.__pickle_pre_run()
         self.__pickle_filter_func()
-        self.task.command = self.create_command()
+        self.task.command = CommandLine(self.create_command(), is_windows=False)
         if IdmConfigParser.is_output_enabled():
             user_logger.info("Creating Watcher")
+
+        super().pre_creation(platform)
 
     def _filter_workitem_pre_creation(self, platform):
         if self.total_items_watched() == 0:

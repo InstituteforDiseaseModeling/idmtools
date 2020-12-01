@@ -119,7 +119,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         # create initial configuration object
         comps_config = dict(
             environment_name=self.platform.environment,
-            simulation_input_args=command_arg,
+            simulation_input_args=command_arg.strip(),
             working_directory_root=os.path.join(simulation_root, subdirectory).replace('\\', '/'),
             executable_path=executable_path,
             node_group_name=self.platform.node_group,
@@ -192,8 +192,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             # run pre-creation in case task use it to produce the command line dynamically
             task.pre_creation(sim, self.platform)
             exp_command = task.command
-        elif isinstance(experiment.simulations, ExperimentParentIterator) and isinstance(experiment.simulations.items,
-                                                                                         TemplatedSimulations):
+        elif isinstance(experiment.simulations, ExperimentParentIterator) and isinstance(experiment.simulations.items, TemplatedSimulations):
             if logger.isEnabledFor(DEBUG):
                 logger.debug("ParentIterator/TemplatedSimulations detected. Using base_task for command")
             from idmtools.entities.simulation import Simulation
