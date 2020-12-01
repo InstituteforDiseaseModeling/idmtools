@@ -1,6 +1,5 @@
 import functools
 import operator
-import os
 import json
 from datetime import datetime
 from logging import getLogger
