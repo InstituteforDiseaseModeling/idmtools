@@ -13,7 +13,7 @@ from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.comps import load_library_dynamically, run_package_dists
 from idmtools_test.utils.test_task import TestTask
 
-TEST_WITH_NEW_CODE = os.environ.get("TEST_WITH_PACKAGES", 'n').lower() in TRUTHY_VALUES
+TEST_WITH_NEW_CODE = os.environ.get("TEST_WITH_PACKAGES", 'y').lower() in TRUTHY_VALUES
 
 
 @pytest.mark.comps
@@ -98,7 +98,7 @@ class TestAssetizeOutput(unittest.TestCase):
         ao.pre_run_functions.append(pre_run_dummy)
         ao.entity_filter_function = entity_filter_dummy
         ao.pre_creation(self.platform)
-        self.assertEqual(len(ao.assets), 7 if TEST_WITH_NEW_CODE else 5)
+        self.assertEqual(len(ao.assets), 5)
         self.assertIn("pre_run.py", [f.filename for f in ao.assets])
         self.assertIn("entity_filter_func.py", [f.filename for f in ao.assets])
         self.assertEqual(ao.create_command(), f'python3 Assets/assetize_ssmt_script.py --file-pattern "**" --simulation-prefix-format-str "{{simulation.id}}" --pre-run-func pre_run_dummy --entity-filter-func entity_filter_dummy --verbose --asset-tag "AssetizedOutputfromFromExperiment={exp_id}"')
