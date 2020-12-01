@@ -25,6 +25,10 @@ class DownloadWorkItem(FileFilterWorkItem):
         self._ssmt_script = str(PurePath(__file__).parent.joinpath("download_ssmt.py"))
         super().__post_init__(item_name, asset_collection_id, asset_files, user_files, command)
 
+    def _extra_command_args(self, command: str):
+        if self.zip_name != "output.zip":
+            command += f" --zip-name {self.zip_name}"
+
     def wait(self, wait_on_done_progress: bool = True, timeout: int = None, refresh_interval=None, platform: 'IPlatform' = None) -> None:
         """
         Waits on Download WorkItem to finish. This first waits on any dependent items to finish(Experiment/Simulation/WorkItems)
