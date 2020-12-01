@@ -1,9 +1,11 @@
 from abc import ABCMeta, abstractmethod
 from logging import getLogger
-from typing import Any, NoReturn, List, TypeVar, Dict, Optional, Union
-from idmtools.core.interfaces.iitem import IItemList
-from idmtools.entities.iworkflow_item import IWorkflowItem
-from idmtools.entities.simulation import Simulation
+from typing import Any, NoReturn, List, TypeVar, Dict, Optional, Union, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from idmtools.core.interfaces.iitem import IItemList
+    from idmtools.entities.iworkflow_item import IWorkflowItem
+    from idmtools.entities.simulation import Simulation
 
 logger = getLogger(__name__)
 
@@ -41,7 +43,7 @@ class IAnalyzer(metaclass=ABCMeta):
         """
         pass
 
-    def per_group(self, items: IItemList) -> NoReturn:
+    def per_group(self, items: 'IItemList') -> NoReturn:
         """
         Call once before running the apply on the items.
 
@@ -55,7 +57,7 @@ class IAnalyzer(metaclass=ABCMeta):
         """
         pass
 
-    def filter(self, item: Union[IWorkflowItem, Simulation]) -> bool:
+    def filter(self, item: Union['IWorkflowItem', 'Simulation']) -> bool:
         """
         Decide whether the analyzer should process a simulation.
 
@@ -68,7 +70,7 @@ class IAnalyzer(metaclass=ABCMeta):
         return True
 
     @abstractmethod
-    def map(self, data: Dict[str, Any], item: Union[IWorkflowItem, Simulation]) -> Any:
+    def map(self, data: Dict[str, Any], item: Union['IWorkflowItem', 'Simulation']) -> Any:
         """
         In parallel for each simulation, consume raw data from filenames and emit selected data.
 
@@ -82,7 +84,7 @@ class IAnalyzer(metaclass=ABCMeta):
         return None
 
     @abstractmethod
-    def reduce(self, all_data: Dict[Union[IWorkflowItem, Simulation], Any]) -> Any:
+    def reduce(self, all_data: Dict[Union['IWorkflowItem', 'Simulation'], Any]) -> Any:
         """
         Combine the :meth:`map` data for a set of items into an aggregate result.
 

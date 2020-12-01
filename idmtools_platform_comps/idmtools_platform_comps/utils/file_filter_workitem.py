@@ -1,6 +1,8 @@
 import copy
 import json
+import os
 from abc import ABC
+from os import PathLike
 from pathlib import PurePath
 from uuid import UUID
 import re
@@ -266,8 +268,12 @@ class FileFilterWorkItem(SSMTWorkItem, ABC):
         for prop, item_type in WI_PROPERTY_MAP.items():
             new_items = []
             for item in getattr(self, prop):
-                if isinstance(item, str):
-                    item = platform.get_item(item, item_type, force=True)
+                if isinstance(item, (str, PathLike)):
+                    # first test if the item is a file
+                    if os.path.exists(item):
+                        item = platform.get_item_from_id_file(item)
+                    else:
+                        item = platform.get_item(item, item_type, force=True)
                 new_items.append(item)
             setattr(self, prop, new_items)
 

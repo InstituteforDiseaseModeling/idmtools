@@ -3,6 +3,7 @@ from abc import ABCMeta
 from dataclasses import dataclass
 from dataclasses import fields, field
 from functools import partial
+from os import PathLike
 from pathlib import PureWindowsPath, PurePath
 from itertools import groupby
 from logging import getLogger, DEBUG
@@ -15,6 +16,7 @@ from idmtools.core.interfaces.ientity import IEntity
 from idmtools.core.interfaces.iitem import IItem
 from idmtools.core.interfaces.irunnable_entity import IRunnableEntity
 from idmtools.entities.experiment import Experiment
+from idmtools.core.id_file import read_id_file
 from idmtools.entities.iplatform_ops.iplatform_asset_collection_operations import IPlatformAssetCollectionOperations
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
@@ -859,6 +861,31 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             return str(PureWindowsPath(*args))
         else:
             return str(PurePath(*args))
+
+    def id_from_file(self, filename: str):
+        """
+        Load just the id portion of a id file
+
+        Args:
+            filename: Filename
+
+        Returns:
+
+        """
+        item_id, item_type, platform_block, extra_args = read_id_file(filename)
+        return item_id
+
+    def get_item_from_id_file(self, id_filename: Union[PathLike, str]) -> IEntity:
+        """
+        Load an item from an id file. This ignores the platform in the file
+        Args:
+            id_filename: Filename to load
+
+        Returns:
+
+        """
+        item_id, item_type, platform_block, extra_args = read_id_file(id_filename)
+        return self.get_item(item_id, ItemType[item_type.upper()])
 
 
 TPlatform = TypeVar("TPlatform", bound=IPlatform)

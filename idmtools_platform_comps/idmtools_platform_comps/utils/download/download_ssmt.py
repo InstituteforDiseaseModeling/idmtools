@@ -27,8 +27,14 @@ def get_argument_parser():
     return p
 
 
-def create_archive_from_files(args: Namespace, files, files_from_ac):
-    with zipfile.ZipFile(args.zip_name, mode="w", compression=zipfile.ZIP_LZMA) as zo:
+def create_archive_from_files(args: Namespace, files, files_from_ac, compress_type: str = "lzma"):
+    if compress_type == "lzma":
+        compress_type = zipfile.ZIP_LZMA
+    elif compress_type == "deflate":
+        compress_type = zipfile.ZIP_DEFLATED
+    elif compress_type == "bz":
+        compress_type = zipfile.ZIP_BZIP2
+    with zipfile.ZipFile(args.zip_name, mode="w", compression=compress_type) as zo:
         for f in tqdm(sorted(files, key=lambda x: x[1]), total=len(files), mininterval=5, maxinterval=15):
             if logger.isEnabledFor(DEBUG):
                 logger.debug(f"Adding {f[0]} to {f[1]}")
@@ -43,6 +49,7 @@ def create_archive_from_files(args: Namespace, files, files_from_ac):
 if __name__ == "__main__":  # pragma: no cover
     # build our argument parser and then parse the command line
     parser = get_argument_parser()
+    parser.add_argument("--compress-type", choices=["lzma", "deflate", "bz2"], default="lzma")
     args = parser.parse_args()
 
     # Set our JOB config global with config provided

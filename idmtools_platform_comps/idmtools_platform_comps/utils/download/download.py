@@ -1,5 +1,7 @@
 import os
+import zipfile
 from dataclasses import dataclass, field
+from enum import Enum
 from logging import getLogger, DEBUG
 from pathlib import PurePath
 from uuid import UUID
@@ -15,11 +17,19 @@ logger = getLogger(__name__)
 user_logger = getLogger('user')
 
 
+class CompressType(Enum):
+    lzma = 'lzma'
+    deflate = 'deflate'
+    bz = "bz"
+
+
 @dataclass(repr=False)
 class DownloadWorkItem(FileFilterWorkItem):
     output_path: str = field(default_factory=os.getcwd)
+    extract_after_download: bool = field(default=True)
     delete_after_download: bool = field(default=True)
     zip_name: str = field(default='output.zip')
+    compress_type: CompressType = field(default=CompressType.lzma)
 
     def __post_init__(self, item_name: str, asset_collection_id: UUID, asset_files: FileList, user_files: FileList, command: str):
         self._ssmt_script = str(PurePath(__file__).parent.joinpath("download_ssmt.py"))
@@ -28,6 +38,8 @@ class DownloadWorkItem(FileFilterWorkItem):
     def _extra_command_args(self, command: str) -> str:
         if self.zip_name != "output.zip":
             command += f" --zip-name {self.zip_name}"
+        if self.compress_type != "lzma":
+            command += f" --compress-type {self.compress_type.value}"
         return command
 
     def wait(self, wait_on_done_progress: bool = True, timeout: int = None, refresh_interval=None, platform: 'IPlatform' = None) -> None:
@@ -53,15 +65,30 @@ class DownloadWorkItem(FileFilterWorkItem):
             # Download our zip
             po: WorkItem = self.get_platform_object(platform=self.platform)
             oi = po.retrieve_output_file_info([self.zip_name])
+            zip_name = PurePath(self.output_path).joinpath(self.zip_name)
             with tqdm(total=oi[0].length, unit='B', unit_scale=True, unit_divisor=1024) as pbar:
-                with open(PurePath(self.output_path).joinpath(self.zip_name), 'wb') as zo:
-                    for chunk in get_file_as_generator(oi[0]):
-                        pbar.update(len(chunk))
-                        zo.write(chunk)
+                self.__download_file(oi, pbar, zip_name)
+                if self.extract_after_download:
+                    self.__extract_output(zip_name)
 
             if self.delete_after_download:
-                if logger.isEnabledFor(DEBUG):
-                    logger.debug("Deleting workitem")
+                if self.extract_after_download:
+                    user_logger.debug(f"Removing {zip_name}")
+                    os.remove(zip_name)
                 user_logger.debug(f'Deleting workitem {self.uid}')
                 po.delete()
                 self.uid = None
+
+    def __extract_output(self, zip_name):
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f"Extracting {zip_name}")
+        with zipfile.ZipFile(zip_name, 'r') as zin:
+            zin.extractall(self.output_path)
+
+    def __download_file(self, oi, pbar, zip_name):
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f"Downloading file to {zip_name}")
+        with open(zip_name, 'wb') as zo:
+            for chunk in get_file_as_generator(oi[0]):
+                pbar.update(len(chunk))
+                zo.write(chunk)
