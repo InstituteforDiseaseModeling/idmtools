@@ -49,9 +49,10 @@ class LinkNameParser(HTMLParser):
     def handle_data(self, data):
         if self.in_link:
             parts = data.split("-")
-            excluded = ["rc", "dev", ".zip", ".tar.gz", ".b", ".whl", ".win32"]
-            if all([x not in parts[1] for x in excluded]):
-                self.pkg_version.add(parts[1])
+            if len(parts) >= 2:
+                excluded = ["rc", "dev", ".zip", ".tar.gz", ".b", ".whl", ".win32"]
+                if all([x not in parts[1] for x in excluded]):
+                    self.pkg_version.add(parts[1])
 
 
 def get_latest_package_version_from_pypi(pkg_name, display_all=False):
@@ -103,7 +104,7 @@ def get_latest_ssmt_image_version_from_artifactory(pkg_name='comps_ssmt_worker',
     """
     pkg_path = IDMTOOLS_DOCKER_PROD
     pkg_url = os.path.join(pkg_path, pkg_name)
-    return get_latest_version_from_site(pkg_url, base_version, display_all)
+    return get_latest_version_from_site(pkg_url, base_version, display_all, parser=LinkHTMLParser)
 
 
 def get_docker_manifest(image_path="idmtools/comps_ssmt_worker", repo_base=IDM_DOCKER_PROD):
@@ -184,7 +185,7 @@ def fetch_versions_from_server(pkg_url: str, parser: Type[HTMLParser] = LinkHTML
 
 
 @functools.lru_cache(3)
-def get_latest_version_from_site(pkg_url, base_version: Optional[str] = None, display_all=False):
+def get_latest_version_from_site(pkg_url, base_version: Optional[str] = None, display_all=False, parser: Type[HTMLParser] = LinkNameParser):
     """
     Utility to get the latest version for a given package name
 
@@ -194,7 +195,7 @@ def get_latest_version_from_site(pkg_url, base_version: Optional[str] = None, di
         display_all: determine if output all package releases
     Returns: the latest version of ven package
     """
-    all_releases = fetch_versions_from_server(pkg_url, parser=LinkNameParser)
+    all_releases = fetch_versions_from_server(pkg_url, parser=parser)
     if all_releases is None:
         raise ValueError(f"Could not determine latest version for package {pkg_url}. You can manually specify a version to avoid this error")
 

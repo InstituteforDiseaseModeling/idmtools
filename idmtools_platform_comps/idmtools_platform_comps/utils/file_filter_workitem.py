@@ -131,7 +131,7 @@ class FileFilterWorkItem(SSMTWorkItem, ABC):
 
         return command
 
-    def _extra_command_args(self, command: str):
+    def _extra_command_args(self, command: str) -> str:
         return command
 
     def __pickle_pre_run(self):
