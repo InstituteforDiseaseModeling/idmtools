@@ -44,6 +44,15 @@ class DownloadWorkItem(FileFilterWorkItem):
         super().__post_init__(item_name, asset_collection_id, asset_files, user_files, command)
 
     def _extra_command_args(self, command: str) -> str:
+        """
+        Add specific additional arguments for the download command. In this case, only the zip name and compression type can be changed
+
+        Args:
+            command: Command to append additional items to
+
+        Returns:
+            Updated command
+        """
         if self.zip_name != "output.zip":
             command += f" --zip-name {self.zip_name}"
         if self.compress_type != "lzma":
@@ -88,12 +97,32 @@ class DownloadWorkItem(FileFilterWorkItem):
                 self.uid = None
 
     def __extract_output(self, zip_name):
+        """
+        Extra output from our zip file
+
+        Args:
+            zip_name: Zip file to extract
+
+        Returns:
+
+        """
         if logger.isEnabledFor(DEBUG):
             logger.debug(f"Extracting {zip_name}")
         with zipfile.ZipFile(zip_name, 'r') as zin:
             zin.extractall(self.output_path)
 
     def __download_file(self, oi, pbar, zip_name):
+        """
+        Download our file tracking progress as we go
+
+        Args:
+            oi: Stream to download
+            pbar: Prograss Bar
+            zip_name: Zip file to save to
+
+        Returns:
+            None
+        """
         if logger.isEnabledFor(DEBUG):
             logger.debug(f"Downloading file to {zip_name}")
         with open(zip_name, 'wb') as zo:
