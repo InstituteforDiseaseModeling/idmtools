@@ -7,7 +7,7 @@ from os import PathLike
 from pathlib import PureWindowsPath, PurePath
 from itertools import groupby
 from logging import getLogger, DEBUG
-from typing import Dict, List, NoReturn, Type, TypeVar, Any, Union, Tuple, Set, Iterator, Callable
+from typing import Dict, List, NoReturn, Type, TypeVar, Any, Union, Tuple, Set, Iterator, Callable, Optional
 from uuid import UUID
 from idmtools import IdmConfigParser
 from idmtools.core import CacheEnabled, UnknownItemException, EntityContainer, UnsupportedPlatformType
@@ -875,17 +875,18 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         item_id, item_type, platform_block, extra_args = read_id_file(filename)
         return item_id
 
-    def get_item_from_id_file(self, id_filename: Union[PathLike, str]) -> IEntity:
+    def get_item_from_id_file(self, id_filename: Union[PathLike, str], item_type: Optional[ItemType] = None) -> IEntity:
         """
         Load an item from an id file. This ignores the platform in the file
         Args:
             id_filename: Filename to load
+            item_type: Optional item type
 
         Returns:
 
         """
-        item_id, item_type, platform_block, extra_args = read_id_file(id_filename)
-        return self.get_item(item_id, ItemType[item_type.upper()])
+        item_id, file_item_type, platform_block, extra_args = read_id_file(id_filename)
+        return self.get_item(item_id, item_type if item_type else ItemType[file_item_type.upper()])
 
 
 TPlatform = TypeVar("TPlatform", bound=IPlatform)
