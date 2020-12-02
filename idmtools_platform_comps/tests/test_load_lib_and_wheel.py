@@ -2,16 +2,14 @@ import allure
 import os
 import sys
 from pathlib import Path
-
 import pytest
-
 from idmtools.assets import AssetCollection, Asset
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
-from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection import \
-    RequirementsToAssetCollection
+from idmtools_platform_comps.utils.package_version import get_latest_pypi_package_version_from_artifactory
+from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection import RequirementsToAssetCollection
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.utils import del_folder
 
@@ -31,6 +29,28 @@ class TestLoadLibWheel(ITestWithPersistence):
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)
         self.platform = Platform('COMPS2')
+
+    @pytest.mark.smoke
+    def test_get_latest_package(self):
+        package = get_latest_pypi_package_version_from_artifactory('numpy')
+        self.assertIsNotNone(package)
+
+        package = get_latest_pypi_package_version_from_artifactory('numpy', base_version="1.18")
+        self.assertEqual(package, '1.18.5')
+
+    @pytest.mark.smoke
+    def test_get_latest_package_idm(self):
+        package = get_latest_pypi_package_version_from_artifactory('idmtools')
+        self.assertIsNotNone(package)
+
+        package = get_latest_pypi_package_version_from_artifactory('idmtools', base_version="1.5")
+        self.assertEqual(package, '1.5.1')
+
+        package = get_latest_pypi_package_version_from_artifactory('idmtools-platform-comps')
+        self.assertIsNotNone(package)
+
+        package = get_latest_pypi_package_version_from_artifactory('idmtools-platform-comps', base_version="1.5")
+        self.assertEqual(package, '1.5.2')
 
     @pytest.mark.long
     @pytest.mark.comps

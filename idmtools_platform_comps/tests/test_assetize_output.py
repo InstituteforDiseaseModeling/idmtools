@@ -1,11 +1,16 @@
 import os
+from pathlib import PurePath
+
 import allure
 import pytest
 import unittest
 from idmtools.core import EntityStatus, TRUTHY_VALUES
 from idmtools.core.platform_factory import Platform
+from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
+from idmtools.entities.simulation import Simulation
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
+from idmtools_models.python.python_task import PythonTask
 from idmtools_platform_comps.utils.assetize_output.assetize_output import AssetizeOutput
 from idmtools_platform_comps.utils.file_filter_workitem import AtLeastOneItemToWatch, CrossEnvironmentFilterNotSupport
 from idmtools_platform_comps.utils.ssmt_utils.file_filter import is_file_excluded
@@ -275,3 +280,29 @@ class TestAssetizeOutput(unittest.TestCase):
         self.assertEqual(60, len(filelist))
         py_files = [f for f in ac if f.filename.endswith('.py')]
         self.assertEqual(60, len(py_files))
+
+    def test_benchmark(self):
+        ranges_to_test = [10, 100, 250]
+
+        experiment = Experiment(name=self.case_name, tags=dict(benchmark='assetize'))
+        experiment.assets.add_directory(PurePath(COMMON_INPUT_PATH).joinpath('python', 'output_generator'))
+        for i in ranges_to_test:
+            task = CommandTask(f"python Assets/generate.py --chunks {i}")
+            experiment.simulations.append(Simulation.from_task(task, tags=dict(chunks=i)))
+
+        experiment.run(wait_on_done=True)
+        self.assertTrue(experiment.succeeded)
+
+        wait_for = []
+        for i, total in enumerate(ranges_to_test):
+            ao = AssetizeOutput(name=self.case_name, related_simulations=[experiment.simulations[i]], file_patterns=["*.chunk"], tags=dict(chunks=total), verbose=True)
+            if TEST_WITH_NEW_CODE:
+                ao.add_pre_creation_hook(load_library_dynamically)
+            ao.run(platform=self.platform)
+            wait_for.append(ao)
+        for i, total in enumerate(ranges_to_test):
+            wait_for[i].wait(wait_on_done_progress=True)
+            ac = wait_for[i].asset_collection
+            self.assertTrue(wait_for[i].succeeded)
+            self.assertIsNotNone(ac)
+            self.assertEqual(len(ac.assets), total)

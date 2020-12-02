@@ -79,17 +79,18 @@ def get_latest_package_version_from_pypi(pkg_name, display_all=False):
     return latest_version
 
 
-def get_latest_pypi_package_version_from_artifactory(pkg_name, display_all=False):
+def get_latest_pypi_package_version_from_artifactory(pkg_name, display_all=False, base_version: str = None):
     """
     Utility to get the latest version for a given package name
     Args:
         pkg_name: package name given
         display_all: determine if output all package releases
+        base_version: Base version
     Returns: the latest version of ven package
     """
     pkg_path = 'https://packages.idmod.org/artifactory/api/pypi/pypi-production/simple'
     pkg_url = "/".join([pkg_path, pkg_name])
-    return get_latest_version_from_site(pkg_url, display_all)
+    return get_latest_version_from_site(pkg_url, display_all=display_all, base_version=base_version)
 
 
 def get_latest_ssmt_image_version_from_artifactory(pkg_name='comps_ssmt_worker', base_version: Optional[str] = None, display_all=False):
