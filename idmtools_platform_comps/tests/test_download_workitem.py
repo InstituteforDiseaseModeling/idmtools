@@ -9,9 +9,10 @@ import pytest
 import unittest
 from idmtools.core import TRUTHY_VALUES
 from idmtools.core.platform_factory import Platform
-from idmtools_platform_comps.utils.download.download import DownloadWorkItem
+from idmtools_platform_comps.utils.download.download import DownloadWorkItem, CompressType
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.comps import load_library_dynamically, run_package_dists
+from idmtools_test.utils.decorators import linux_only, windows_only
 
 TEST_WITH_NEW_CODE = os.environ.get("TEST_WITH_PACKAGES", 'y').lower() in TRUTHY_VALUES
 
@@ -28,6 +29,24 @@ class TestDownloadWorkItem(unittest.TestCase):
     def setUpClass(cls) -> None:
         if TEST_WITH_NEW_CODE:
             run_package_dists()
+
+    @linux_only
+    def test_default_compress_type_linux(self):
+        di = DownloadWorkItem()
+        self.assertEqual(di.compress_type, CompressType.lzma)
+
+    @windows_only
+    def test_default_compress_windows(self):
+        di = DownloadWorkItem()
+        self.assertEqual(di.compress_type, CompressType.lzma)
+
+    @windows_only
+    def test_default_compress_windows_no_delete(self):
+        di = DownloadWorkItem(delete_after_download=False)
+        self.assertEqual(di.compress_type, CompressType.deflate)
+
+        di = DownloadWorkItem(extract_after_download=False)
+        self.assertEqual(di.compress_type, CompressType.deflate)
 
     def test_comps_download(self):
         try:

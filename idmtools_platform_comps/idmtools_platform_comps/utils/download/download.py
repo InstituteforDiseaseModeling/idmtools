@@ -1,4 +1,5 @@
 import os
+import sys
 import zipfile
 from dataclasses import dataclass, field
 from enum import Enum
@@ -29,10 +30,17 @@ class DownloadWorkItem(FileFilterWorkItem):
     extract_after_download: bool = field(default=True)
     delete_after_download: bool = field(default=True)
     zip_name: str = field(default='output.zip')
-    compress_type: CompressType = field(default=CompressType.lzma)
+    compress_type: CompressType = field(default=None)
 
     def __post_init__(self, item_name: str, asset_collection_id: UUID, asset_files: FileList, user_files: FileList, command: str):
         self._ssmt_script = str(PurePath(__file__).parent.joinpath("download_ssmt.py"))
+        if self.compress_type is None:
+            if (self.extract_after_download and self.delete_after_download) or sys.platform != 'win32':
+                self.compress_type = CompressType.lzma
+            elif sys.platform == 'win32':
+                self.compress_type = CompressType.deflate
+            else:
+                self.compress_type = CompressType.lzma
         super().__post_init__(item_name, asset_collection_id, asset_files, user_files, command)
 
     def _extra_command_args(self, command: str) -> str:
