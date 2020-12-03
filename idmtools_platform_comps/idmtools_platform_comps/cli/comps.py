@@ -6,6 +6,7 @@ import tabulate
 from getpass import getpass
 from logging import getLogger
 from COMPS.CredentialPrompt import CredentialPrompt
+import json as je
 from idmtools.assets import AssetCollection
 from idmtools_platform_comps.utils.singularity_build import SingularityBuildWorkItem
 
@@ -239,12 +240,16 @@ try:
             else:
                 if id_file:
                     ao.asset_collection.to_id_file(id_filename)
-                user_logger.info(f"Created {ao.asset_collection.id}")
-                user_logger.info(f"It can be viewed at {p.get_asset_collection_link(ao.asset_collection)}")
-                user_logger.info("Items in Asset Collection")
-                user_logger.info("-------------------------")
-                for asset in ao.asset_collection:
-                    user_logger.info(asset.short_remote_path())
+                if json:
+                    result = [i.short_remote_path() for i in ao.asset_collection.assets]
+                    user_logger.info(je.dumps(result))
+                else:
+                    user_logger.info(f"Created {ao.asset_collection.id}")
+                    user_logger.info(f"It can be viewed at {p.get_asset_collection_link(ao.asset_collection)}")
+                    user_logger.info("Items in Asset Collection")
+                    user_logger.info("-------------------------")
+                    for asset in ao.asset_collection:
+                        user_logger.info(asset.short_remote_path())
         elif ao.failed:
             user_logger.error("Assetized failed. Check logs in COMPS")
             if ao.failed:

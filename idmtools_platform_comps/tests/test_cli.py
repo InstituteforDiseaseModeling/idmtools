@@ -118,14 +118,14 @@ class TestCompsCLI(unittest.TestCase):
             asset_id_content = cin.read()
 
         parts = content.split("::")
-        self.assertTrue(len(parts) == 2)
+        self.assertTrue(len(parts) == 3)
         pl = Platform("SLURM2")
         wi = pl.get_item(parts[0], ItemType.WORKFLOW_ITEM)
         self.assertIn('WorkItem_Type', wi.tags.keys())
         self.assertEqual(wi.tags['WorkItem_Type'], 'ImageBuilderWorker')
 
         parts = asset_id_content.split("::")
-        self.assertTrue(len(parts) == 2)
+        self.assertTrue(len(parts) == 3)
         ac = pl.get_item(parts[0], ItemType.ASSETCOLLECTION)
         self.assertIn('type', ac.tags.keys())
         self.assertIn('image_name', ac.tags.keys())

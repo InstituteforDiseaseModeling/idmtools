@@ -1,8 +1,13 @@
 from logging import getLogger
+from typing import TYPE_CHECKING
+
 from idmtools import IdmConfigParser
 from idmtools.assets import AssetCollection
 from idmtools.entities import Suite
 from idmtools.registry.hook_specs import pre_create_item_impl
+
+if TYPE_CHECKING:
+    from idmtools.core.interfaces.ientity import IEntity
 
 logger = getLogger(__name__)
 user_logger = getLogger('user')
@@ -28,10 +33,3 @@ def git_add_tag(item: 'IEntity', **kwargs):
                 item.tags['git_branch'] = repo.head.tracking_branch()
         except ImportError:
             user_logger.warning("You need gitpython installed to have this functionality")
-
-
-from idmtools.registry.functions import FunctionPluginManager
-
-pl = FunctionPluginManager()
-pl.register(git_add_tag)
-pl.hook.pre_create_item_spec(None)
