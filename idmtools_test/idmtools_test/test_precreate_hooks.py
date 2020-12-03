@@ -13,6 +13,10 @@ logger = getLogger(__name__)
 @pre_create_item_impl
 def idmtools_platform_pre_create_item(item: 'IEntity', **kwargs):
     # do it dynamically
+    load_packages_to_ssmt_image_dynamically(item)
+
+
+def load_packages_to_ssmt_image_dynamically(item):
     if os.environ.get("TEST_WITH_PACKAGES", 'y').lower() in TRUTHY_VALUES:
         logger.debug("TEST WITH NEW CODE is enabled. Adding COMPS and IDMTOOLS package to asset")
         if isinstance(item, (AssetizeOutput, DownloadWorkItem)):
