@@ -1,6 +1,8 @@
 import functools
 import operator
 import json
+import re
+from abc import ABC
 from datetime import datetime
 from logging import getLogger
 from typing import Optional, List, Type
@@ -10,6 +12,8 @@ from pkg_resources import parse_version
 from packaging.version import parse
 from html.parser import HTMLParser
 
+PYPI_PRODUCTION_SIMPLE = 'https://packages.idmod.org/artifactory/api/pypi/pypi-production/simple'
+
 IDM_DOCKER_PROD = 'https://packages.idmod.org/artifactory/list/docker-production'
 IDMTOOLS_DOCKER_PROD = f'{IDM_DOCKER_PROD}/idmtools/'
 MANIFEST_URL = "https://hub.docker.com/v2/repositories/library/{repository}/tags/?page_size=25&page=1&name={tag}"
@@ -17,9 +21,16 @@ MANIFEST_URL = "https://hub.docker.com/v2/repositories/library/{repository}/tags
 logger = getLogger(__name__)
 
 
-class LinkHTMLParser(HTMLParser):
+class PackageHTMLParser(HTMLParser, ABC):
     previous_tag = None
-    pkg_version = []
+    pkg_version = None
+
+    def __init__(self):
+        super().__init__()
+        self.pkg_version = set()
+
+
+class LinkHTMLParser(PackageHTMLParser):
 
     def handle_starttag(self, tag, attrs):
         self.previous_tag = tag
@@ -29,13 +40,12 @@ class LinkHTMLParser(HTMLParser):
         attr = dict(attrs)
         v = attr['href']
         v = v.rstrip('/')
-        self.pkg_version.append(v)
+        self.pkg_version.add(v)
 
 
-class LinkNameParser(HTMLParser):
-    previous_tag = None
-    pkg_version = set()
+class LinkNameParser(PackageHTMLParser):
     in_link = False
+    ver_pattern = re.compile(r'^[\d\.brcdev\+nightly]+$')
 
     def handle_starttag(self, tag, attrs):
         self.previous_tag = tag
@@ -49,9 +59,12 @@ class LinkNameParser(HTMLParser):
         if self.in_link:
             parts = data.split("-")
             if len(parts) >= 2:
-                excluded = ["rc", "dev", ".zip", ".tar.gz", ".b", ".whl", ".win32"]
-                if all([x not in parts[1] for x in excluded]):
+                if self.ver_pattern.match(parts[1]):
                     self.pkg_version.add(parts[1])
+                elif parts[1].endswith(".zip"):
+                    self.pkg_version.add(parts[1][:-4])
+                elif parts[1].endswith(".tar.gz"):
+                    self.pkg_version.add(parts[1][:-7])
 
 
 def get_latest_package_version_from_pypi(pkg_name, display_all=False):
@@ -88,9 +101,24 @@ def get_latest_pypi_package_version_from_artifactory(pkg_name, display_all=False
         base_version: Base version
     Returns: the latest version of ven package
     """
-    pkg_path = 'https://packages.idmod.org/artifactory/api/pypi/pypi-production/simple'
-    pkg_url = "/".join([pkg_path, pkg_name])
+    pkg_url = "/".join([PYPI_PRODUCTION_SIMPLE, pkg_name])
     return get_latest_version_from_site(pkg_url, display_all=display_all, base_version=base_version)
+
+
+def get_pypi_package_versions_from_artifactory(pkg_name, display_all=False, base_version: str = None, exclude_pre_release: bool = True):
+    """
+    Utility to get versions of a package in artifactory
+
+    Args:
+        pkg_name: package name given
+        display_all: determine if output all package releases
+        base_version: Base version
+        exclude_pre_release: Exclude any prerelease versions
+
+    Returns: the latest version of ven package
+    """
+    pkg_url = "/".join([PYPI_PRODUCTION_SIMPLE, pkg_name])
+    return get_versions_from_site(pkg_url, base_version, display_all=display_all, parser=LinkNameParser, exclude_pre_release=exclude_pre_release)
 
 
 def get_latest_ssmt_image_version_from_artifactory(pkg_name='comps_ssmt_worker', base_version: Optional[str] = None, display_all=False):
@@ -158,7 +186,7 @@ def get_digest_from_docker_hub(repo, tag='latest'):
 
 
 @functools.lru_cache(8)
-def fetch_versions_from_server(pkg_url: str, parser: Type[HTMLParser] = LinkHTMLParser) -> List[str]:
+def fetch_versions_from_server(pkg_url: str, parser: Type[PackageHTMLParser] = LinkHTMLParser) -> List[str]:
     """
     Fetch all versions from server
 
@@ -185,14 +213,17 @@ def fetch_versions_from_server(pkg_url: str, parser: Type[HTMLParser] = LinkHTML
 
 
 @functools.lru_cache(3)
-def get_latest_version_from_site(pkg_url, base_version: Optional[str] = None, display_all=False, parser: Type[HTMLParser] = LinkNameParser):
+def get_versions_from_site(pkg_url, base_version: Optional[str] = None, display_all=False, parser: Type[PackageHTMLParser] = LinkNameParser, exclude_pre_release: bool = True):
     """
-    Utility to get the latest version for a given package name
+    Utility to get the the available versions for a package. The default properties filter out pre releases. You can also include a base version to only list items starting with a particular version
 
     Args:
         pkg_url: package name given
-        base_version: Optional base version. Versions above this will not be added.
+        base_version: Optional base version. Versions above this will not be added. For example, to get versions 1.18.5, 1.18.4, 1.18.3, 1.18.2 pass 1.18
         display_all: determine if output all package releases
+        parser: Parser needs to be a HTMLParser that returns a pkg_versions
+        exclude_pre_release: Exclude prerelease versions
+
     Returns: the latest version of ven package
     """
     all_releases = fetch_versions_from_server(pkg_url, parser=parser)
@@ -201,13 +232,36 @@ def get_latest_version_from_site(pkg_url, base_version: Optional[str] = None, di
 
     if display_all:
         print(all_releases)
-
-    release_versions = [ver for ver in all_releases if not parse(ver).is_prerelease]
+    if exclude_pre_release:
+        ver_pattern = re.compile(r'^[\d\.]+$')
+        release_versions = [ver for ver in all_releases if ver_pattern.match(ver)]
+    else:
+        release_versions = all_releases
 
     # comps_ssmt_worker will store only x.x.x.x
     if 'comps_ssmt_worker' in pkg_url.lower():
         release_versions = [ver for ver in release_versions if len(ver.split('.')) == 4]
 
+    if base_version:
+        release_versions = [ver for ver in release_versions if ver.startswith(base_version)]
+    return release_versions
+
+
+@functools.lru_cache(3)
+def get_latest_version_from_site(pkg_url, base_version: Optional[str] = None, display_all=False, parser: Type[PackageHTMLParser] = LinkNameParser, exclude_pre_release: bool = True):
+    """
+    Utility to get the latest version for a given package name
+
+    Args:
+        pkg_url: package name given
+        base_version: Optional base version. Versions above this will not be added.
+        display_all: determine if output all package releases
+        parser: Parser needs to be a HTMLParser that returns a pkg_versions
+        exclude_pre_release: Exclude pre-release versions
+
+    Returns: the latest version of ven package
+    """
+    release_versions = get_versions_from_site(pkg_url, base_version, display_all=display_all, parser=parser, exclude_pre_release=exclude_pre_release)
     if base_version:
         # only use the longest match latest
         version_compatible_portion = ".".join(base_version.split(".")[:2])
@@ -216,5 +270,4 @@ def get_latest_version_from_site(pkg_url, base_version: Optional[str] = None, di
             if ".".join(ver.split('.')[:2]) == version_compatible_portion:
                 return ver
         return None
-    else:
-        return release_versions[0] if release_versions else None
+    return release_versions[0] if release_versions else None

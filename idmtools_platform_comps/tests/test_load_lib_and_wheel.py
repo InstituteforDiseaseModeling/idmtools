@@ -8,7 +8,7 @@ from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
-from idmtools_platform_comps.utils.package_version import get_latest_pypi_package_version_from_artifactory
+from idmtools_platform_comps.utils.package_version import get_latest_pypi_package_version_from_artifactory, get_versions_from_site, get_pypi_package_versions_from_artifactory
 from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection import RequirementsToAssetCollection
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.utils import del_folder
@@ -31,12 +31,31 @@ class TestLoadLibWheel(ITestWithPersistence):
         self.platform = Platform('COMPS2')
 
     @pytest.mark.smoke
-    def test_get_latest_package(self):
+    def test_get_latest_package_and_get_packages(self):
         package = get_latest_pypi_package_version_from_artifactory('numpy')
         self.assertIsNotNone(package)
 
         package = get_latest_pypi_package_version_from_artifactory('numpy', base_version="1.18")
         self.assertEqual(package, '1.18.5')
+
+        package = get_latest_pypi_package_version_from_artifactory('statsmodels')
+        self.assertIsNotNone(package)
+
+        package = get_pypi_package_versions_from_artifactory('statsmodels')
+        self.assertIsNotNone(package)
+        self.assertIsInstance(package, list)
+        self.assertEqual(package[-1], '0.4.0')
+
+        package = get_pypi_package_versions_from_artifactory('statsmodels', exclude_pre_release=False)
+        self.assertIsNotNone(package)
+        self.assertIsInstance(package, list)
+        self.assertEqual(package[-1], '0.4.0')
+
+        package = get_pypi_package_versions_from_artifactory('statsmodels', base_version="0.5", exclude_pre_release=False)
+        self.assertIsNotNone(package)
+        self.assertEqual(2, len(package))
+        self.assertIsInstance(package, list)
+        self.assertEqual(package[-1], '0.5.0rc1')
 
     @pytest.mark.smoke
     def test_get_latest_package_idm(self):
@@ -46,11 +65,31 @@ class TestLoadLibWheel(ITestWithPersistence):
         package = get_latest_pypi_package_version_from_artifactory('idmtools', base_version="1.5")
         self.assertEqual(package, '1.5.1')
 
+        package = get_pypi_package_versions_from_artifactory('idmtools')
+        self.assertIsNotNone(package)
+        self.assertIsInstance(package, list)
+        self.assertEqual(package[-1], '0.2.0')
+
         package = get_latest_pypi_package_version_from_artifactory('idmtools-platform-comps')
         self.assertIsNotNone(package)
 
         package = get_latest_pypi_package_version_from_artifactory('idmtools-platform-comps', base_version="1.5")
         self.assertEqual(package, '1.5.2')
+
+        package = get_pypi_package_versions_from_artifactory('rse-api')
+        self.assertIsNotNone(package)
+        self.assertIsInstance(package, list)
+        self.assertEqual(package[-1], '1.0.0')
+
+        package = get_pypi_package_versions_from_artifactory('rse-db')
+        self.assertIsNotNone(package)
+        self.assertIsInstance(package, list)
+        self.assertEqual(package[-1], '1.0.0')
+
+        package = get_pypi_package_versions_from_artifactory('dtk-tools')
+        self.assertIsNotNone(package)
+        self.assertIsInstance(package, list)
+        self.assertEqual(package[-1], '1.0.0')
 
     @pytest.mark.long
     @pytest.mark.comps
