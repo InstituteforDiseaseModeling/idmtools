@@ -5,6 +5,7 @@ from uuid import UUID
 from idmtools.assets import AssetCollection
 from idmtools.core import CacheEnabled
 from idmtools.entities.iplatform_ops.utils import batch_create_items
+from idmtools.registry.functions import FunctionPluginManager
 
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
@@ -26,6 +27,7 @@ class IPlatformAssetCollectionOperations(CacheEnabled, ABC):
         Returns:
             NoReturn
         """
+        FunctionPluginManager.instance().hook.idmtools_platform_pre_create_item(item=asset_collection, **kwargs)
         asset_collection.pre_creation(self.platform)
 
     def post_create(self, asset_collection: AssetCollection, **kwargs) -> NoReturn:

@@ -72,6 +72,7 @@ class TestCompsCLI(unittest.TestCase):
             os.remove(op.joinpath(fn))
         result = run_command('comps', 'Bayesian', 'assetize-outputs', '--experiment', '9311af40-1337-ea11-a2be-f0921c167861', '--json', '--id-file', '--id-filename', fn, mix_stderr=False)
         self.assertTrue(result.exit_code == 0)
+        print(result.stdout)
         files = json.loads(result.stdout)
         self.assertEqual(36, len(files))
         self.assertTrue(os.path.exists(op.joinpath(fn)))

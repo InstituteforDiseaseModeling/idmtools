@@ -10,6 +10,7 @@ from idmtools.assets import Asset
 from idmtools.core.enums import EntityStatus, ItemType
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.utils import batch_create_items
+from idmtools.registry.functions import FunctionPluginManager
 
 logger = getLogger(__name__)
 if TYPE_CHECKING:  # pragma: no cover
@@ -46,6 +47,7 @@ class IPlatformExperimentOperations(ABC):
         Returns:
             NoReturn
         """
+        FunctionPluginManager.instance().hook.idmtools_platform_pre_create_item(item=experiment, **kwargs)
         experiment.pre_creation(self.platform)
 
     def post_create(self, experiment: Experiment, **kwargs) -> NoReturn:

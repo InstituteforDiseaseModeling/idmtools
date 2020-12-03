@@ -8,6 +8,7 @@ from idmtools.core.cache_enabled import CacheEnabled
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.utils import batch_create_items
 from idmtools.entities.simulation import Simulation
+from idmtools.registry.functions import FunctionPluginManager
 
 
 @dataclass
@@ -40,6 +41,7 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         Returns:
             NoReturn
         """
+        FunctionPluginManager.instance().hook.idmtools_platform_pre_create_item(item=simulation, **kwargs)
         simulation.pre_creation(self.platform)
 
     def post_create(self, simulation: Simulation, **kwargs) -> NoReturn:

@@ -60,9 +60,8 @@ setup(
     packages=find_packages(exclude=["tests"]),
     entry_points=dict(
         idmtools_experiment=["idmtools_experiment = idmtools.entities.experiment:ExperimentSpecification"],
-        idmtools_task=  # noqa: E251
-        ["idmtools_task_command = idmtools.entities.command_task:CommandTaskSpecification",
-         "idmtools_task_docker = idmtools.core.docker_task:DockerTaskSpecification"]
+        idmtools_task=["idmtools_task_command = idmtools.entities.command_task:CommandTaskSpecification", "idmtools_task_docker = idmtools.core.docker_task:DockerTaskSpecification"],
+        idmtools_hooks=["idmtools_add_git_tag = idmtools.plugins.git_commit"]
     ),
     python_requires='>=3.6.*, !=3.7.0, !=3.7.1, !=3.7.2',
     test_suite='tests',
