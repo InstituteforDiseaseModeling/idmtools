@@ -22,7 +22,7 @@ user_logger = getLogger('user')
 
 
 class NoFileFound(Exception):
-    doc_link: str = "platforms/comps/assetize_output.html#errors"
+    doc_link: str = "platforms/comps/errors.html#errors"
 
 
 def create_asset_collection(file_list: SetOfAssets, ac_files: List[AssetCollectionFile], tags: Dict[str, str]):  # pragma: no cover

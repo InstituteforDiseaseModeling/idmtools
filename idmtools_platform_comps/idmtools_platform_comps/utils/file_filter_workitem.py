@@ -27,7 +27,7 @@ from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
 from idmtools.core.enums import ItemType, EntityStatus
 
 EntityFilterFunc = Callable[[CommissionableEntity], bool]
-AssetizableItem = Union[Experiment, Simulation, IWorkflowItem]
+FilterableSSMTItem = Union[Experiment, Simulation, IWorkflowItem]
 logger = getLogger(__name__)
 user_logger = getLogger("user")
 
@@ -42,13 +42,13 @@ WI_PROPERTY_MAP = dict(
 DEFAULT_EXCLUDES = ["StdErr.txt", "StdOut.txt", "WorkOrder.json", "*.log"]
 
 
-# Error thrown when user tries to assetize across Comps Environments
+# Error thrown when user tries to filter across Comps Environments
 class CrossEnvironmentFilterNotSupport(Exception):
-    doc_link: str = "platforms/comps/assetize_output.html#errors"
+    doc_link: str = "platforms/comps/errors.html#errors"
 
 
 class AtLeastOneItemToWatch(Exception):
-    doc_link: str = "platforms/comps/assetize_output.html#errors"
+    doc_link: str = "platforms/comps/errors.html#errors"
 
 
 @dataclass(repr=False)
@@ -59,11 +59,11 @@ class FileFilterWorkItem(SSMTWorkItem, ABC):
     exclude_patterns: List[str] = field(default_factory=lambda: copy.copy(DEFAULT_EXCLUDES))
     #: Include Assets directories. This allows patterns to also include items from the assets directory
     include_assets: bool = field(default=False)
-    #: Formatting pattern for directory names. Simulations tend to have similar outputs so Assetize puts those in directories using the simulation id by default as the directory name
+    #: Formatting pattern for directory names. Simulations tend to have similar outputs so the workitem puts those in directories using the simulation id by default as the directory name
     simulation_prefix_format_str: str = field(default="{simulation.id}")
-    #: WorkFlowItem outputs will not have a folder prefix by default. If you are assetizing multiple work items, you may want to set this to "{workflow_item.id}"
+    #: WorkFlowItem outputs will not have a folder prefix by default. If you are filtering multiple work items, you may want to set this to "{workflow_item.id}"
     work_item_prefix_format_str: str = field(default=None)
-    #: Simulations outputs will not have a folder. Useful when you are assetizing a single simulation
+    #: Simulations outputs will not have a folder. Useful when you are filtering a single simulation
     no_simulation_prefix: bool = field(default=False)
     #: Enable verbose
     verbose: bool = field(default=False)
@@ -337,7 +337,7 @@ class FileFilterWorkItem(SSMTWorkItem, ABC):
             self.from_items(item)
         raise FileNotFoundError(f"Cannot find the item with {item_id} of type {item_type}")
 
-    def from_items(self, item: Union[AssetizableItem, List[AssetizableItem]]):
+    def from_items(self, item: Union[FilterableSSMTItem, List[FilterableSSMTItem]]):
         """
         Add items to load assets from
 
