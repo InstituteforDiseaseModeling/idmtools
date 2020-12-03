@@ -1,6 +1,5 @@
 import os
 from pathlib import PurePath
-
 import allure
 import pytest
 import unittest
@@ -10,7 +9,6 @@ from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
-from idmtools_models.python.python_task import PythonTask
 from idmtools_platform_comps.utils.assetize_output.assetize_output import AssetizeOutput
 from idmtools_platform_comps.utils.file_filter_workitem import AtLeastOneItemToWatch, CrossEnvironmentFilterNotSupport
 from idmtools_platform_comps.utils.ssmt_utils.file_filter import is_file_excluded

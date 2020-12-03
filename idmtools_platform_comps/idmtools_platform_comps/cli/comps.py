@@ -160,7 +160,7 @@ try:
                 # Now
                 pass
         elif dl_wi.failed:
-            user_logger.error("Assetized failed. Check logs in COMPS")
+            user_logger.error("Download failed. Check logs in COMPS")
             if dl_wi.failed:
                 dl_wi.fetch_error()
             sys.exit(-1)

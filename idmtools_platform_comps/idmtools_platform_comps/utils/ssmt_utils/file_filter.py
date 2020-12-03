@@ -80,10 +80,10 @@ def gather_files(directory: str, file_patterns: List[str], exclude_patterns: Lis
         for file in glob.iglob(sd, recursive=True):
             # Ensure it is a file and not a directory
             if logger.isEnabledFor(DEBUG):
-                logger.debug(f'{file} matching pattern. Is Dir: {os.path.isdir(file)}. Is Link: {os.path.islink(file)}')
+                logger.debug(f'{file.encode("ascii", "ignore").decode("utf-8")} matching pattern. Is Dir: {os.path.isdir(file)}. Is Link: {os.path.islink(file)}')
             if os.path.isfile(file):
                 if logger.isEnabledFor(DEBUG):
-                    logger.debug(f'Found file {file}')
+                    logger.debug(f'Found file {file.encode("ascii", "ignore").decode("utf-8")}')
                 # Create our shortname. This will remove the base directory from the file. Eg
                 # If are scanning C:\ABC\, the file C:\ABC\DEF\123.txt will be DEF\123.txt
                 short_name = file.replace(directory + os.path.sep, "")

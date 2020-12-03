@@ -36,9 +36,8 @@ def create_archive_from_files(args: Namespace, files, files_from_ac, compress_ty
         compress_type = zipfile.ZIP_BZIP2
     with zipfile.ZipFile(args.zip_name, mode="w", compression=compress_type) as zo:
         for f in tqdm(sorted(files, key=lambda x: x[1]), total=len(files), mininterval=5, maxinterval=15):
-            if logger.isEnabledFor(DEBUG):
-                logger.debug(f"Adding {f[0]} to {f[1]}")
-            zo.write(f[0], f[1])
+            logger.info(f"Adding {f[0].encode('ascii', 'ignore').decode('utf-8')} to {f[1].encode('ascii', 'ignore').decode('utf-8')}")
+            zo.write(f[0], f[1].encode('ascii', 'ignore').decode('utf-8'))
         for f in tqdm(files_from_ac, total=len(files_from_ac), mininterval=5, maxinterval=15):
             fn = PurePath(f.relative_path).joinpath(f.file_name) if f.relative_path else f.file_name
             if logger.isEnabledFor(DEBUG):

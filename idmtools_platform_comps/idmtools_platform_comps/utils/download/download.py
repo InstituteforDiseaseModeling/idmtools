@@ -81,20 +81,21 @@ class DownloadWorkItem(FileFilterWorkItem):
         if self.status == EntityStatus.SUCCEEDED and not self.dry_run:
             # Download our zip
             po: WorkItem = self.get_platform_object(platform=self.platform)
-            oi = po.retrieve_output_file_info([self.zip_name])
-            zip_name = PurePath(self.output_path).joinpath(self.zip_name)
-            with tqdm(total=oi[0].length, unit='B', unit_scale=True, unit_divisor=1024) as pbar:
-                self.__download_file(oi, pbar, zip_name)
-                if self.extract_after_download:
-                    self.__extract_output(zip_name)
+            if self._uid:
+                oi = po.retrieve_output_file_info([self.zip_name])
+                zip_name = PurePath(self.output_path).joinpath(self.zip_name)
+                with tqdm(total=oi[0].length, unit='B', unit_scale=True, unit_divisor=1024) as pbar:
+                    self.__download_file(oi, pbar, zip_name)
+                    if self.extract_after_download:
+                        self.__extract_output(zip_name)
 
-            if self.delete_after_download:
-                if self.extract_after_download:
-                    user_logger.debug(f"Removing {zip_name}")
-                    os.remove(zip_name)
-                user_logger.debug(f'Deleting workitem {self.uid}')
-                po.delete()
-                self.uid = None
+                if self.delete_after_download:
+                    if self.extract_after_download:
+                        user_logger.debug(f"Removing {zip_name}")
+                        os.remove(zip_name)
+                    user_logger.debug(f'Deleting workitem {self.uid}')
+                    po.delete()
+                    self.uid = None
 
     def __extract_output(self, zip_name):
         """
@@ -125,6 +126,8 @@ class DownloadWorkItem(FileFilterWorkItem):
         """
         if logger.isEnabledFor(DEBUG):
             logger.debug(f"Downloading file to {zip_name}")
+        parent_dir = PurePath(zip_name).parent
+        os.makedirs(parent_dir, exist_ok=True)
         with open(zip_name, 'wb') as zo:
             for chunk in get_file_as_generator(oi[0]):
                 pbar.update(len(chunk))
