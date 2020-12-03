@@ -6,11 +6,12 @@ from logging import DEBUG
 from pathlib import PurePath
 import allure
 import pytest
-
 from idmtools.core import ItemType
 from idmtools.core.logging import setup_logging
 from idmtools.core.platform_factory import Platform
+from idmtools_test.test_precreate_hooks import TEST_WITH_NEW_CODE
 from idmtools_test.utils.cli import run_command, get_subcommands_from_help_result
+from idmtools_test.utils.comps import run_package_dists
 from idmtools_test.utils.decorators import run_in_temp_dir
 
 pwd = PurePath(__file__).parent.joinpath('inputs', 'singularity_builds', 'glob_inputs')
@@ -19,6 +20,13 @@ pwd = PurePath(__file__).parent.joinpath('inputs', 'singularity_builds', 'glob_i
 @pytest.mark.comps
 @allure.story("CLI")
 class TestCompsCLI(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        # To enable this, you need to also set the env var TEST_WITH_PACKAGES to t or y
+        if TEST_WITH_NEW_CODE:
+            # Run package dists
+            run_package_dists()
 
     @classmethod
     def setUpClass(cls) -> None:
@@ -52,6 +60,7 @@ class TestCompsCLI(unittest.TestCase):
     def test_assetize_dry_run_json(self):
         result = run_command('comps', 'Bayesian', 'assetize-outputs', '--experiment', '9311af40-1337-ea11-a2be-f0921c167861', '--dry-run', '--json', mix_stderr=False)
         self.assertTrue(result.exit_code == 0, msg=result.output)
+        print(result.stdout)
         files = json.loads(result.stdout)
         self.assertEqual(36, len(files))
 
@@ -60,7 +69,7 @@ class TestCompsCLI(unittest.TestCase):
         fn = 'assetize.id'
         op = PurePath(__file__).parent
         if os.path.exists(op.joinpath(fn)):
-            os.remove(op)
+            os.remove(op.joinpath(fn))
         result = run_command('comps', 'Bayesian', 'assetize-outputs', '--experiment', '9311af40-1337-ea11-a2be-f0921c167861', '--json', '--id-file', '--id-filename', fn, mix_stderr=False)
         self.assertTrue(result.exit_code == 0)
         files = json.loads(result.stdout)
@@ -71,7 +80,7 @@ class TestCompsCLI(unittest.TestCase):
     def test_cli_error(self):
         result = run_command('comps', 'Bayesian', 'assetize-outputs', '--experiment', '9311af40-1337-ea11-a2be-f0921c167861', '--pattern', '34234234')
         self.assertTrue(result.exit_code == -1)
-        self.assertIn("No files found for related items", result.stdout)
+        self.assertIn("No files found with patterns specified", result.stdout)
 
     @allure.feature("Containers")
     def test_container_pull(self):

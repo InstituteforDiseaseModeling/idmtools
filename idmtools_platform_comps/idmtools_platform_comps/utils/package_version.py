@@ -132,7 +132,7 @@ def get_latest_ssmt_image_version_from_artifactory(pkg_name='comps_ssmt_worker',
     """
     pkg_path = IDMTOOLS_DOCKER_PROD
     pkg_url = "/".join([pkg_path, pkg_name])
-    return get_latest_version_from_site(pkg_url, base_version, display_all, parser=LinkHTMLParser)
+    return get_latest_version_from_site(pkg_url, base_version=base_version, display_all=display_all, parser=LinkHTMLParser)
 
 
 def get_docker_manifest(image_path="idmtools/comps_ssmt_worker", repo_base=IDM_DOCKER_PROD):
@@ -238,12 +238,12 @@ def get_versions_from_site(pkg_url, base_version: Optional[str] = None, display_
     else:
         release_versions = all_releases
 
+    if base_version:
+        release_versions = [ver for ver in release_versions if ver.startswith(base_version)]
+
     # comps_ssmt_worker will store only x.x.x.x
     if 'comps_ssmt_worker' in pkg_url.lower():
         release_versions = [ver for ver in release_versions if len(ver.split('.')) == 4]
-
-    if base_version:
-        release_versions = [ver for ver in release_versions if ver.startswith(base_version)]
     return release_versions
 
 

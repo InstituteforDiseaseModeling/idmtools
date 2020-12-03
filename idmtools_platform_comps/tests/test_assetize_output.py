@@ -13,10 +13,9 @@ from idmtools_platform_comps.utils.assetize_output.assetize_output import Asseti
 from idmtools_platform_comps.utils.file_filter_workitem import AtLeastOneItemToWatch, CrossEnvironmentFilterNotSupport
 from idmtools_platform_comps.utils.ssmt_utils.file_filter import is_file_excluded
 from idmtools_test import COMMON_INPUT_PATH
+from idmtools_test.test_precreate_hooks import TEST_WITH_NEW_CODE
 from idmtools_test.utils.comps import load_library_dynamically, run_package_dists
 from idmtools_test.utils.test_task import TestTask
-
-TEST_WITH_NEW_CODE = os.environ.get("TEST_WITH_PACKAGES", 'y').lower() in TRUTHY_VALUES
 
 
 @pytest.mark.comps
@@ -114,8 +113,6 @@ class TestAssetizeOutput(unittest.TestCase):
         task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"), parameters=dict(a=1))
         e = Experiment.from_task(name=self.case_name, task=task)
         ao = AssetizeOutput(name=self.case_name, verbose=True)
-        if TEST_WITH_NEW_CODE:
-            ao.add_pre_creation_hook(load_library_dynamically)
         ao.from_items(e)
         ao.run(wait_on_done=True, platform=self.platform)
 
@@ -134,8 +131,6 @@ class TestAssetizeOutput(unittest.TestCase):
         e.simulations.items[0].tags['index'] = 1
         ao = AssetizeOutput(name=self.case_name, verbose=True, simulation_prefix_format_str='{simulation.tags["index"]}')
         ao.from_items(e)
-        if TEST_WITH_NEW_CODE:
-            ao.add_pre_creation_hook(load_library_dynamically)
         ao.run(wait_on_done=True, platform=self.platform)
 
         self.assertTrue(e.succeeded)
@@ -147,8 +142,6 @@ class TestAssetizeOutput(unittest.TestCase):
 
     def test_experiment_all(self):
         ao = AssetizeOutput(name=self.case_name, related_experiments=['9311af40-1337-ea11-a2be-f0921c167861'], verbose=True)
-        if TEST_WITH_NEW_CODE:
-            ao.add_pre_creation_hook(load_library_dynamically)
         ac = ao.run(wait_on_done=True, platform=self.platform)
 
         self.assertTrue(ao.succeeded)
@@ -160,8 +153,6 @@ class TestAssetizeOutput(unittest.TestCase):
 
     def test_experiment_duplicate_error(self):
         ao = AssetizeOutput(name=self.case_name, related_experiments=['9311af40-1337-ea11-a2be-f0921c167861'], no_simulation_prefix=True)
-        if TEST_WITH_NEW_CODE:
-            ao.add_pre_creation_hook(load_library_dynamically)
         ao.run(wait_on_done=True, platform=self.platform)
 
         self.assertTrue(ao.failed)
@@ -172,8 +163,6 @@ class TestAssetizeOutput(unittest.TestCase):
 
     def test_experiment(self):
         ao = AssetizeOutput(name=self.case_name, related_experiments=['9311af40-1337-ea11-a2be-f0921c167861'], file_patterns=["**/a.csv"], verbose=True)
-        if TEST_WITH_NEW_CODE:
-            ao.add_pre_creation_hook(load_library_dynamically)
         ac = ao.run(wait_on_done=True, platform=self.platform)
 
         self.assertTrue(ao.succeeded)
@@ -192,8 +181,6 @@ class TestAssetizeOutput(unittest.TestCase):
 
     def test_experiment_sim_prefix(self):
         ao = AssetizeOutput(name=self.case_name, related_experiments=['9311af40-1337-ea11-a2be-f0921c167861'], simulation_prefix_format_str="{simulation.state}/{simulation.id}", file_patterns=["**/a.csv"], verbose=True)
-        if TEST_WITH_NEW_CODE:
-            ao.add_pre_creation_hook(load_library_dynamically)
         ac = ao.run(wait_on_done=True, platform=self.platform)
 
         self.assertTrue(ao.succeeded)
@@ -205,8 +192,6 @@ class TestAssetizeOutput(unittest.TestCase):
 
     def test_simulation(self):
         ao = AssetizeOutput(name=self.case_name, related_simulations=['9d11af40-1337-ea11-a2be-f0921c167861'], file_patterns=["**/*.csv"], verbose=True)
-        if TEST_WITH_NEW_CODE:
-            ao.add_pre_creation_hook(load_library_dynamically)
         ac = ao.run(wait_on_done=True, platform=self.platform)
 
         self.assertTrue(ao.succeeded)
@@ -218,8 +203,6 @@ class TestAssetizeOutput(unittest.TestCase):
 
     def test_workitem(self):
         ao = AssetizeOutput(name=self.case_name, related_work_items=['a6d11db7-1603-e911-80ca-f0921c167866'], file_patterns=["*.png"], verbose=True)
-        if TEST_WITH_NEW_CODE:
-            ao.add_pre_creation_hook(load_library_dynamically)
         ac = ao.run(wait_on_done=True, platform=self.platform)
 
         self.assertTrue(ao.succeeded)
@@ -232,8 +215,6 @@ class TestAssetizeOutput(unittest.TestCase):
         with self.subTest("test_workitem_prefix"):
 
             ao2 = AssetizeOutput(name=self.case_name, related_work_items=['a6d11db7-1603-e911-80ca-f0921c167866', ao], file_patterns=["**.txt"], exclude_patterns=['WorkOrder.json'], verbose=True, work_item_prefix_format_str="{work_item.name}")
-            if TEST_WITH_NEW_CODE:
-                ao2.add_pre_creation_hook(load_library_dynamically)
             ac = ao2.run(wait_on_done=True, platform=self.platform)
             self.assertTrue(ao2.succeeded)
             self.assertIsNotNone(ac)
@@ -244,8 +225,6 @@ class TestAssetizeOutput(unittest.TestCase):
 
     def test_filter_ac(self):
         ao = AssetizeOutput(name=self.case_name, related_asset_collections=['2b53af74-2b4a-e711-80c1-f0921c167860'], file_patterns=["**/libvectorstats.dll"], verbose=True)
-        if TEST_WITH_NEW_CODE:
-            ao.add_pre_creation_hook(load_library_dynamically)
         ac = ao.run(wait_on_done=True, platform=self.platform)
 
         self.assertTrue(ao.succeeded)
@@ -257,8 +236,6 @@ class TestAssetizeOutput(unittest.TestCase):
 
     def test_dry_run(self):
         ao = AssetizeOutput(name=self.case_name, related_simulations=['9d11af40-1337-ea11-a2be-f0921c167861'], related_asset_collections=['2b53af74-2b4a-e711-80c1-f0921c167860'], verbose=True, dry_run=True)
-        if TEST_WITH_NEW_CODE:
-            ao.add_pre_creation_hook(load_library_dynamically)
         ac = ao.run(wait_on_done=True, platform=self.platform)
 
         self.assertTrue(ao.succeeded)
@@ -266,8 +243,6 @@ class TestAssetizeOutput(unittest.TestCase):
 
     def test_simulation_include_assets(self):
         ao = AssetizeOutput(name=self.case_name, related_experiments=['874586c5-860a-eb11-a2c2-f0921c167862'], file_patterns=["**/*.py"], verbose=True, include_assets=True)
-        if TEST_WITH_NEW_CODE:
-            ao.add_pre_creation_hook(load_library_dynamically)
         ac = ao.run(wait_on_done=True, platform=self.platform)
 
         self.assertTrue(ao.succeeded)
@@ -294,8 +269,6 @@ class TestAssetizeOutput(unittest.TestCase):
         wait_for = []
         for i, total in enumerate(ranges_to_test):
             ao = AssetizeOutput(name=self.case_name, related_simulations=[experiment.simulations[i]], file_patterns=["*.chunk"], tags=dict(chunks=total), verbose=True)
-            if TEST_WITH_NEW_CODE:
-                ao.add_pre_creation_hook(load_library_dynamically)
             ao.run(platform=self.platform)
             wait_for.append(ao)
         for i, total in enumerate(ranges_to_test):

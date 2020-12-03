@@ -1,5 +1,4 @@
 import os
-
 __version__ = '1.6.1+nightly'
 
 current_directory = os.path.dirname(os.path.realpath(__file__))

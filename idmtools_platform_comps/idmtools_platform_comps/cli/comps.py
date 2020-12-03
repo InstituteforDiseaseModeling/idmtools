@@ -124,6 +124,7 @@ try:
             dl_wi.file_patterns = list(pattern)
         if exclude_pattern:
             dl_wi.exclude_patterns = exclude_pattern if isinstance(exclude_pattern, list) else list(exclude_pattern)
+
         dl_wi.related_experiments = list(experiment)
         dl_wi.related_simulations = list(simulation)
         dl_wi.related_work_items = list(work_item)

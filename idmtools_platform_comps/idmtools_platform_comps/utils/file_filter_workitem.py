@@ -202,7 +202,7 @@ class FileFilterWorkItem(SSMTWorkItem, ABC):
 
         """
         self._filter_workitem_pre_creation(platform)
-        if self.name is None:
+        if self.name is None or self.name == "idmtools workflow item":
             self.name = self.__generate_name()
 
         current_dir = PurePath(__file__).parent
