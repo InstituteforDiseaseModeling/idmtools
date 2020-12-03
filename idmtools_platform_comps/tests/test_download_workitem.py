@@ -3,18 +3,15 @@ import shutil
 import tempfile
 from glob import glob
 from pathlib import PurePath
-
 import allure
 import pytest
 import unittest
-from idmtools.core import TRUTHY_VALUES
 from idmtools.core.platform_factory import Platform
 from idmtools_platform_comps.utils.download.download import DownloadWorkItem, CompressType
 from idmtools_test import COMMON_INPUT_PATH
-from idmtools_test.utils.comps import load_library_dynamically, run_package_dists
+from idmtools_test.test_precreate_hooks import TEST_WITH_NEW_CODE
+from idmtools_test.utils.comps import run_package_dists
 from idmtools_test.utils.decorators import linux_only, windows_only
-
-TEST_WITH_NEW_CODE = os.environ.get("TEST_WITH_PACKAGES", 'y').lower() in TRUTHY_VALUES
 
 
 @pytest.mark.comps
@@ -55,8 +52,6 @@ class TestDownloadWorkItem(unittest.TestCase):
                                      related_experiments=['9311af40-1337-ea11-a2be-f0921c167861'], file_patterns=["output/*.csv"],
                                      simulation_prefix_format_str='{simulation.tags["a"]}_{simulation.tags["b"]}', verbose=True, output_path=dirpath,
                                      )
-            if TEST_WITH_NEW_CODE:
-                dl_wi.add_pre_creation_hook(load_library_dynamically)
             dl_wi.run(wait_on_done=True, platform=self.platform)
             self.assertTrue(dl_wi.succeeded)
             files_downloaded = list(glob(os.path.join(dirpath, "**"), recursive=True))
@@ -74,8 +69,6 @@ class TestDownloadWorkItem(unittest.TestCase):
                                      related_experiments=[id_file], file_patterns=["output/*.csv"],
                                      simulation_prefix_format_str='{simulation.tags["a"]}_{simulation.tags["b"]}', verbose=True, output_path=dirpath,
                                      )
-            if TEST_WITH_NEW_CODE:
-                dl_wi.add_pre_creation_hook(load_library_dynamically)
             dl_wi.run(wait_on_done=True, platform=self.platform)
             self.assertTrue(dl_wi.succeeded)
             files_downloaded = list(glob(os.path.join(dirpath, "**"), recursive=True))

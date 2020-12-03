@@ -69,7 +69,7 @@ class SSMTWorkItem(ICOMPSWorkflowItem):
         else:
             ssmt_image = SSMT_STAGING_IMAGE
 
-        release = get_latest_ssmt_image_version_from_artifactory(base_version=".".join(__version__.replace("+nightly", "").split(".")[:2]))
+        release = get_latest_ssmt_image_version_from_artifactory(base_version=__version__)
 
         docker_image = f'{ssmt_image}:{release}'
         if logger.isEnabledFor(DEBUG):

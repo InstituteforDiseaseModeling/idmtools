@@ -132,6 +132,7 @@ def get_latest_ssmt_image_version_from_artifactory(pkg_name='comps_ssmt_worker',
     """
     pkg_path = IDMTOOLS_DOCKER_PROD
     pkg_url = "/".join([pkg_path, pkg_name])
+    base_version = ".".join(base_version.replace("+nightly", "").split(".")[:2])
     return get_latest_version_from_site(pkg_url, base_version=base_version, display_all=display_all, parser=LinkHTMLParser)
 
 
