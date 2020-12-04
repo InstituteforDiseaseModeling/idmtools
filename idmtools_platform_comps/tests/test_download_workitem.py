@@ -55,7 +55,7 @@ class TestDownloadWorkItem(unittest.TestCase):
             dl_wi.run(wait_on_done=True, platform=self.platform)
             self.assertTrue(dl_wi.succeeded)
             files_downloaded = list(glob(os.path.join(dirpath, "**"), recursive=True))
-            self.assertEqual(len([x for x in files_downloaded if os.path.isfile(x)]), 27)
+            self.assertEqual(len([x for x in files_downloaded if os.path.isfile(x) and x.endswith(".csv")]), 27)
             self.assertEqual(len([x for x in files_downloaded if os.path.isdir(x) and "output" in x]), 9)
             self.assertTrue(not os.path.exists(os.path.join(dirpath, "output.zip")))
         finally:
