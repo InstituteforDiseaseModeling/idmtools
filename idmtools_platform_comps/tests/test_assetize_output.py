@@ -1,5 +1,7 @@
 import os
 from pathlib import PurePath
+from unittest import skipIf
+
 import allure
 import pytest
 import unittest
@@ -254,6 +256,7 @@ class TestAssetizeOutput(unittest.TestCase):
         py_files = [f for f in ac if f.filename.endswith('.py')]
         self.assertEqual(60, len(py_files))
 
+    @skipIf(os.getenv("IDMTOOLS_BENCHMARKS", "f") not in TRUTHY_VALUES, reason="Benchmarks not enabled. Enabled with IDMTOOLS_BENCHMARKS")
     def test_benchmark(self):
         ranges_to_test = [10, 100, 250]
 

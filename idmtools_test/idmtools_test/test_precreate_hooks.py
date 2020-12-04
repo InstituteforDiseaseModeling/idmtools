@@ -17,7 +17,7 @@ def idmtools_platform_pre_create_item(item: 'IEntity', **kwargs):
 
 
 def load_packages_to_ssmt_image_dynamically(item):
-    if os.environ.get("TEST_WITH_PACKAGES", 'y').lower() in TRUTHY_VALUES:
+    if os.environ.get("TEST_WITH_PACKAGES", 'n').lower() in TRUTHY_VALUES:
         logger.debug("TEST WITH NEW CODE is enabled. Adding COMPS and IDMTOOLS package to asset")
         if isinstance(item, (AssetizeOutput, DownloadWorkItem)):
             item.add_pre_creation_hook(load_library_dynamically)
