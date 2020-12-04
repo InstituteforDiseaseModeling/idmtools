@@ -1,6 +1,8 @@
 import atexit
 import logging
+import os
 import sys
+import time
 from contextlib import suppress
 from logging import getLogger
 from logging.handlers import QueueHandler, QueueListener, RotatingFileHandler
@@ -18,6 +20,23 @@ VERBOSE = 15
 NOTICE = 25
 SUCCESS = 35
 CRITICAL = 50
+
+
+class SafeRotatingFileHandler(RotatingFileHandler):
+
+    def doRollover(self) -> None:
+        attempts = 0
+        while True:
+            try:
+                super().doRollover()
+                break
+            except PermissionError:
+                attempts += 1
+                if attempts > 3:
+                    # add a pid to make unique or expand
+                    self.baseFilename += f".{os.getpid()}"
+                    attempts = 0
+                time.sleep(0.08)
 
 
 class IDMQueueListener(QueueListener):
@@ -202,7 +221,7 @@ def set_file_logging(file_level: int, formatter: logging.Formatter, filename: st
 
 def create_file_handler(file_level, formatter, filename):
     try:
-        file_handler = RotatingFileHandler(filename, maxBytes=(2 ** 20) * 10, backupCount=5)
+        file_handler = SafeRotatingFileHandler(filename, maxBytes=(2 ** 20) * 10, backupCount=5)
         file_handler.setLevel(file_level)
         file_handler.setFormatter(formatter)
     except PermissionError:
