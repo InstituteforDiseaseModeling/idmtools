@@ -50,7 +50,7 @@ class TestDownloadWorkItem(unittest.TestCase):
             dirpath = tempfile.mkdtemp()
             dl_wi = DownloadWorkItem(name=self.case_name,
                                      related_experiments=['9311af40-1337-ea11-a2be-f0921c167861'], file_patterns=["output/*.csv"],
-                                     simulation_prefix_format_str='{simulation.tags["a"]}_{simulation.tags["b"]}', verbose=True, output_path=dirpath,
+                                     simulation_prefix_format_str='{simulation.tags["a"]}_{simulation.tags["b"]}', verbose=True, output_path=dirpath, delete_after_download=False, compress_type=CompressType.deflate
                                      )
             dl_wi.run(wait_on_done=True, platform=self.platform)
             self.assertTrue(dl_wi.succeeded)

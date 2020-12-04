@@ -47,7 +47,7 @@ class IPlatformExperimentOperations(ABC):
         Returns:
             NoReturn
         """
-        FunctionPluginManager.instance().hook.idmtools_platform_pre_create_item(item=experiment, **kwargs)
+        FunctionPluginManager.instance().hook.idmtools_platform_pre_create_item(item=experiment, kwargs=kwargs)
         experiment.pre_creation(self.platform)
 
     def post_create(self, experiment: Experiment, **kwargs) -> NoReturn:
@@ -183,11 +183,11 @@ class IPlatformExperimentOperations(ABC):
         # check sims
         logger.debug("Ensuring simulations exist")
         if isinstance(experiment.simulations, (GeneratorType, Iterator)):
-            experiment.simulations = self.platform._create_items_of_type(experiment.simulations, ItemType.SIMULATION)
+            experiment.simulations = self.platform._create_items_of_type(experiment.simulations, ItemType.SIMULATION, **kwargs)
         elif len(experiment.simulations) == 0:
             raise ValueError("You cannot have an experiment with no simulations")
         else:
-            experiment.simulations = self.platform._create_items_of_type(experiment.simulations, ItemType.SIMULATION)
+            experiment.simulations = self.platform._create_items_of_type(experiment.simulations, ItemType.SIMULATION, **kwargs)
 
     def post_run_item(self, experiment: Experiment, **kwargs):
         """

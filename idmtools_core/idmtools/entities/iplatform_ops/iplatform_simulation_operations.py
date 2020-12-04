@@ -41,7 +41,7 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         Returns:
             NoReturn
         """
-        FunctionPluginManager.instance().hook.idmtools_platform_pre_create_item(item=simulation, **kwargs)
+        FunctionPluginManager.instance().hook.idmtools_platform_pre_create_item(item=simulation, kwargs=kwargs)
         simulation.pre_creation(self.platform)
 
     def post_create(self, simulation: Simulation, **kwargs) -> NoReturn:

@@ -57,7 +57,7 @@ class IPlatformSuiteOperations(ABC):
         Returns:
             NoReturn
         """
-        FunctionPluginManager.instance().hook.idmtools_platform_pre_create_item(item=suite, **kwargs)
+        FunctionPluginManager.instance().hook.idmtools_platform_pre_create_item(item=suite, kwargs=kwargs)
         suite.pre_creation(self.platform)
 
     def post_create(self, suite: Suite, **kwargs) -> NoReturn:

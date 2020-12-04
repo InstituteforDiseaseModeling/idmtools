@@ -27,7 +27,7 @@ class IPlatformAssetCollectionOperations(CacheEnabled, ABC):
         Returns:
             NoReturn
         """
-        FunctionPluginManager.instance().hook.idmtools_platform_pre_create_item(item=asset_collection, **kwargs)
+        FunctionPluginManager.instance().hook.idmtools_platform_pre_create_item(item=asset_collection, kwargs=kwargs)
         asset_collection.pre_creation(self.platform)
 
     def post_create(self, asset_collection: AssetCollection, **kwargs) -> NoReturn:

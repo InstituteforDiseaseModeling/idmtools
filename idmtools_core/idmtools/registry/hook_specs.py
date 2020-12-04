@@ -16,12 +16,12 @@ function_hook_impl = HookimplMarker(IDMTOOLS_HOOKS)
 
 
 @function_hook_spec
-def idmtools_platform_pre_create_item(item: 'IEntity', **kwargs) -> 'IEntity':
+def idmtools_platform_pre_create_item(item: 'IEntity', kwargs) -> 'IEntity':
     """
     This callback is called by the pre_create of each object type on a platform. An item can be a suite, workitem, simulation, asset collection or an experiment
     Args:
         item:
-        **kwargs:
+        kwargs: extra args
 
     Returns:
 

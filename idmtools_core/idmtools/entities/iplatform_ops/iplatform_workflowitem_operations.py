@@ -57,7 +57,7 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
         Returns:
             NoReturn
         """
-        FunctionPluginManager.instance().hook.idmtools_platform_pre_create_item(item=workflow_item, **kwargs)
+        FunctionPluginManager.instance().hook.idmtools_platform_pre_create_item(item=workflow_item, kwargs=kwargs)
         workflow_item.pre_creation(self.platform)
 
     def post_create(self, workflow_item: IWorkflowItem, **kwargs) -> NoReturn:

@@ -434,7 +434,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             result.extend(self._create_items_of_type(group, key))
         return result
 
-    def _create_items_of_type(self, items: Iterator[IEntity], item_type: ItemType):
+    def _create_items_of_type(self, items: Iterator[IEntity], item_type: ItemType, **kwargs):
         """
         Creates items of specific type using batches
 
@@ -446,7 +446,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         """
         interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item_type]
-        ni = getattr(self, interface).batch_create(items)
+        ni = getattr(self, interface).batch_create(items, **kwargs)
         return ni
 
     def _is_item_list_supported(self, items: List[IEntity]):
