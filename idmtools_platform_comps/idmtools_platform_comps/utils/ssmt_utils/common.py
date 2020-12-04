@@ -4,8 +4,7 @@ import traceback
 from argparse import Namespace
 from logging import getLogger, DEBUG
 from COMPS import Client
-
-from idmtools import idmtools_error_handler
+from idmtools.core.exceptions import idmtools_error_handler
 
 logger = getLogger(__name__)
 user_logger = getLogger('user')
