@@ -1,4 +1,4 @@
-backoff>=1.10.0,<1.2
+backoff>=1.10.0,<1.11
 coloredlogs~=14.0
 diskcache==5.1.0
 humanfriendly~=8.2
