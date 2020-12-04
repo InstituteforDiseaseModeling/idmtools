@@ -109,7 +109,7 @@ if __name__ == "__main__":  # pragma: no cover
     print(args)
 
     # Parse the common arguments common to filter scripts
-    entity_filter_func = parse_filter_args_common(args)
+    entity_filter_func, fn_format_func = parse_filter_args_common(args)
     # Parse our Tags
     asset_tags = build_asset_tags(args)
 
@@ -120,7 +120,7 @@ if __name__ == "__main__":  # pragma: no cover
     wi = WorkItem.get(os.environ['COMPS_WORKITEM_GUID'])
 
     # Gather all our files in Experiments, Simulations, and Asset Collections
-    files, files_from_ac = filter_files_and_assets(args, entity_filter_func, wi)
+    files, files_from_ac = filter_files_and_assets(args, entity_filter_func, wi, fn_format_func)
     if len(files) == 0 and len(files_from_ac) == 0:
         raise NoFileFound("No files found with patterns specified. Please verify your filters.")
 

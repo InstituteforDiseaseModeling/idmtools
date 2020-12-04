@@ -256,6 +256,22 @@ class TestAssetizeOutput(unittest.TestCase):
         py_files = [f for f in ac if f.filename.endswith('.py')]
         self.assertEqual(60, len(py_files))
 
+    def test_simulation_include_assets_custom_func(self):
+        def rename_func(filename):
+            return filename.replace("Assets/", "")
+
+        ao = AssetizeOutput(name=self.case_name, related_experiments=['874586c5-860a-eb11-a2c2-f0921c167862'], file_patterns=["**/*.py"], verbose=True, include_assets=True, filename_format_function=rename_func)
+        ac = ao.run(wait_on_done=True, platform=self.platform)
+
+        self.assertTrue(ao.succeeded)
+        self.assertIsNotNone(ac)
+
+        self.assertEqual(ac, ao.asset_collection)
+        filelist = [f.filename for f in ac]
+        self.assertEqual(60, len(filelist))
+        py_files = [f for f in ac if f.filename.endswith('.py')]
+        self.assertEqual(60, len(py_files))
+
     @skipIf(os.getenv("IDMTOOLS_BENCHMARKS", "f") not in TRUTHY_VALUES, reason="Benchmarks not enabled. Enabled with IDMTOOLS_BENCHMARKS")
     def test_benchmark(self):
         ranges_to_test = [10, 100, 250]

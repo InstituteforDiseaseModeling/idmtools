@@ -28,6 +28,7 @@ from idmtools.core.enums import ItemType, EntityStatus
 
 EntityFilterFunc = Callable[[CommissionableEntity], bool]
 FilterableSSMTItem = Union[Experiment, Simulation, IWorkflowItem]
+FilenameFormatFunction = Callable[[str], str]
 logger = getLogger(__name__)
 user_logger = getLogger("user")
 
@@ -71,6 +72,8 @@ class FileFilterWorkItem(SSMTWorkItem, ABC):
     pre_run_functions: List[Callable] = field(default_factory=list)
     #: Python Function to filter entities. This Function should receive a Comps CommissionableEntity. True means include item, false is don't
     entity_filter_function: EntityFilterFunc = field(default=None)
+    #: Function to pass a custom function that is called on the name. This can be used to do advanced mapping or renaming of files
+    filename_format_function: FilenameFormatFunction = field(default=None)
     #: Enables running jobs without creating executing. It instead produces a file list of what would be includes in the final filter
     dry_run: bool = field(default=False)
 
@@ -120,6 +123,9 @@ class FileFilterWorkItem(SSMTWorkItem, ABC):
         if self.entity_filter_function:
             command += f' --entity-filter-func {self.entity_filter_function.__name__}'
 
+        if self.filename_format_function:
+            command += f' --filename-format-func {self.filename_format_function.__name__}'
+
         if self.verbose:
             command += ' --verbose'
 
@@ -149,6 +155,17 @@ class FileFilterWorkItem(SSMTWorkItem, ABC):
                 new_source = self.__format_function_source(function)
                 source += "\n\n" + new_source
             self.assets.add_or_replace_asset(Asset(filename='pre_run.py', content=source))
+
+    def __pickle_format_func(self):
+        """
+        Pickle Format filename Function
+
+        Returns:
+
+        """
+        if self.filename_format_function:
+            new_source = self.__format_function_source(self.filename_format_function)
+            self.assets.add_or_replace_asset(Asset(filename='filename_format_func.py', content=new_source))
 
     def __pickle_filter_func(self):
         """
@@ -214,6 +231,7 @@ class FileFilterWorkItem(SSMTWorkItem, ABC):
             for file in self._ssmt_depends:
                 self.assets.add_or_replace_asset(utils_dir.joinpath(file))
         self.__pickle_pre_run()
+        self.__pickle_format_func()
         self.__pickle_filter_func()
         self.task.command = CommandLine(self.create_command(), is_windows=False)
         if IdmConfigParser.is_output_enabled():

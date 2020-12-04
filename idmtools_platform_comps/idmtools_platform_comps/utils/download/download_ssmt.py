@@ -57,7 +57,7 @@ if __name__ == "__main__":  # pragma: no cover
     sys.excepthook = get_error_handler_dump_config_and_error(JOB_CONFIG)
 
     # Parse the common arguments common to filter scripts
-    entity_filter_func = parse_filter_args_common(args)
+    entity_filter_func, fn_format_func = parse_filter_args_common(args)
 
     # login
     client = login_to_env()
@@ -66,7 +66,7 @@ if __name__ == "__main__":  # pragma: no cover
     wi = WorkItem.get(os.environ['COMPS_WORKITEM_GUID'])
 
     # Gather all our files in Experiments, Simulations, and Asset Collections
-    files, files_from_ac = filter_files_and_assets(args, entity_filter_func, wi)
+    files, files_from_ac = filter_files_and_assets(args, entity_filter_func, wi, fn_format_func)
     ensure_no_duplicates(files_from_ac, files)
 
     if args.dry_run:
