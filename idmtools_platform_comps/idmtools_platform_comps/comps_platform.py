@@ -2,7 +2,8 @@
 import copy
 import logging
 # fix for comps weird import
-from idmtools.assets import AssetCollection
+from idmtools.assets.asset_collection import AssetCollection
+from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities.iworkflow_item import IWorkflowItem
 
 HANDLERS = copy.copy(logging.getLogger().handlers)
@@ -10,13 +11,12 @@ from COMPS import Client
 logging.root.handlers = HANDLERS
 from dataclasses import dataclass, field
 from functools import partial
-from typing import List, Dict
+from typing import List
 from enum import Enum
 from idmtools.core import CacheEnabled, ItemType
 from idmtools.entities.iplatform import IPlatform
 from idmtools.entities.platform_requirements import PlatformRequirements
-from idmtools_platform_comps.comps_operations.asset_collection_operations import \
-    CompsPlatformAssetCollectionOperations
+from idmtools_platform_comps.comps_operations.asset_collection_operations import CompsPlatformAssetCollectionOperations
 from idmtools_platform_comps.comps_operations.experiment_operations import CompsPlatformExperimentOperations
 from idmtools_platform_comps.comps_operations.simulation_operations import CompsPlatformSimulationOperations
 from idmtools_platform_comps.comps_operations.suite_operations import CompsPlatformSuiteOperations
@@ -101,10 +101,15 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         self.__init_interfaces()
 
     def get_workitem_link(self, work_item: IWorkflowItem):
-        return f"{self.endpoint}/#explore/WorkItems?filters=ID={work_item.uid}"
+        return f"{self.endpoint}/#explore/WorkItems?filters=Id={work_item.uid}"
 
     def get_asset_collection_link(self, asset_collection: AssetCollection):
-        return f"{self.endpoint}/#explore/AssetCollections?filters=ID={asset_collection.uid}"
+        return f"{self.endpoint}/#explore/AssetCollections?filters=Id={asset_collection.uid}"
 
     def get_username(self):
         return Client.auth_manager()._username
+
+    def is_windows_platform(self, item: IEntity = None) -> bool:
+        if isinstance(item, IWorkflowItem):
+            return False
+        return super().is_windows_platform(item)

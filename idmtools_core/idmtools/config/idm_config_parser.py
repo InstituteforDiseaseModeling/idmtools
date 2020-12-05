@@ -312,6 +312,10 @@ class IdmConfigParser:
         if cls._instance is None:
             cls(dir_path, file_name)
 
+        # Call our startup plugins
+        from idmtools.registry.functions import FunctionPluginManager
+        FunctionPluginManager.instance().hook.idmtools_on_start()
+
     @classmethod
     @initialization()
     def get_config_path(cls) -> str:

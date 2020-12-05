@@ -127,7 +127,7 @@ class TestCOMPSPlatform(ITestWithPersistence):
         self.assertTrue(experiment.succeeded)
 
         exp_raw = experiment.get_platform_object()
-        self.assertEqual(exp_raw.configuration.simulation_input_args, "--version ")
+        self.assertEqual(exp_raw.configuration.simulation_input_args, "--version")
         self.assertEqual(exp_raw.configuration.executable_path, "python3")
         # because of ordering, we have to check both items
         sim0 = experiment.simulations[0].get_platform_object()
@@ -136,7 +136,7 @@ class TestCOMPSPlatform(ITestWithPersistence):
         self.assertIsNotNone(sim1.configuration)
         self.assertIsNone(sim0.configuration.simulation_input_args)
         self.assertIsNone(sim0.configuration.executable_path)
-        self.assertEqual(sim1.configuration.simulation_input_args, "--help ")
+        self.assertEqual(sim1.configuration.simulation_input_args, "--help")
         self.assertEqual(sim1.configuration.executable_path, "python3")
         self.assertEqual(sim1.configuration.min_cores, 2)
         self.assertEqual(sim1.configuration.max_cores, 2)

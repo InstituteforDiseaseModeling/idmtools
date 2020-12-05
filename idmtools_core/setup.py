@@ -15,7 +15,7 @@ for file_prefix in ['', 'dev_', 'build_']:
     with open(f'{filename}.txt') as requirements_file:
         extra_require_files[file_prefix.strip("_") if file_prefix else filename] = requirements_file.read().split("\n")
 
-version = '1.6.1'
+version = '1.6.2'
 
 extras = {
     'test': extra_require_files['build'] + extra_require_files['dev'],
@@ -60,9 +60,8 @@ setup(
     packages=find_packages(exclude=["tests"]),
     entry_points=dict(
         idmtools_experiment=["idmtools_experiment = idmtools.entities.experiment:ExperimentSpecification"],
-        idmtools_task=  # noqa: E251
-        ["idmtools_task_command = idmtools.entities.command_task:CommandTaskSpecification",
-         "idmtools_task_docker = idmtools.core.docker_task:DockerTaskSpecification"]
+        idmtools_task=["idmtools_task_command = idmtools.entities.command_task:CommandTaskSpecification", "idmtools_task_docker = idmtools.core.docker_task:DockerTaskSpecification"],
+        idmtools_hooks=["idmtools_add_git_tag = idmtools.plugins.git_commit"]
     ),
     python_requires='>=3.6.*, !=3.7.0, !=3.7.1, !=3.7.2',
     test_suite='tests',

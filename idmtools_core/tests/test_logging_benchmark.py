@@ -1,3 +1,5 @@
+from contextlib import suppress
+
 import allure
 import concurrent
 import allure
@@ -35,7 +37,8 @@ class TestLoggingBenchmark(TestCase):
 
     @classmethod
     def tearDownClass(cls) -> None:
-        cls.listener.stop()
+        if cls.listener:
+            cls.listener.stop()
 
     @run_test_in_n_seconds(10)
     def test_logger_threaded_performance(self):
@@ -59,3 +62,18 @@ class TestLoggingBenchmark(TestCase):
             futures = [p.submit(log_process_id) for i in range(LOG_TESTS_TO_RUN)]
             for future in concurrent.futures.as_completed(futures):
                 self.assertTrue(future.result())
+
+    def test_logging_rotation_safe(self):
+        # create all backups so we trigger delete and move
+        logs = []
+        try:
+            for i in range(1, 5):
+                with suppress(PermissionError):
+                    logs.append(open(f"idmtools.log.{i}", "w"))
+
+                # now write to the log
+                logger = getLogger("test_logging_rotation_safe")
+                for i in range(125000):
+                    logger.info(f"{i}")
+        finally:
+            del logs

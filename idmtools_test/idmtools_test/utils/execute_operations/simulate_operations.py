@@ -121,11 +121,11 @@ class TestExecutePlatformSimulationOperation(IPlatformSimulationOperations):
         experiment_id = None
         for simulation in sims:
             if simulation.status is None:
-                self.pre_create(simulation)
+                self.pre_create(simulation, **kwargs)
                 experiment_id = simulation.parent_id
                 simulation.uid = uuid4()
                 self.save_metadata(simulation)
-                self.post_create(simulation)
+                self.post_create(simulation, **kwargs)
                 simulations.append(simulation)
             else:
                 simulations.append(simulation)

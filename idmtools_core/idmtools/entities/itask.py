@@ -1,8 +1,7 @@
 import copy
-import time
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, field, fields
-from logging import getLogger, Logger
+from logging import getLogger
 from typing import Set, NoReturn, Union, Callable, List, TYPE_CHECKING, Dict
 from idmtools.assets import AssetCollection
 from idmtools.entities.command_line import CommandLine
@@ -44,12 +43,7 @@ class ITask(metaclass=ABCMeta):
     #: Transient(Simulation-level) assets
     transient_assets: AssetCollection = field(default_factory=AssetCollection)
 
-    # log to add to items to track provisioning of task
-    _task_log: Logger = field(default_factory=lambda: getLogger(__name__), compare=False, metadata=dict(pickle_ignore=True))
-
     def __post_init__(self):
-        self._task_log = getLogger(f'{self.__class__.__name__ }_{time.time()}')
-
         self.__pre_creation_hooks = []
         self.__post_creation_hooks = []
 
@@ -126,7 +120,7 @@ class ITask(metaclass=ABCMeta):
         if self.command is None:
             logger.error('Command is not defined')
             raise ValueError("Command is required for on task when preparing an experiment")
-        if platform.is_windows_platform():
+        if platform.is_windows_platform(parent):
             self.command.is_windows = True
         [hook(parent, platform) for hook in self.__pre_creation_hooks]
 
@@ -199,10 +193,10 @@ class ITask(metaclass=ABCMeta):
 
         Returns: dict
         """
-        return {"_task_log": None}
+        pass
 
     def post_setstate(self):
-        self._task_log = getLogger(__name__)
+        pass
 
     @property
     def pickle_ignore_fields(self):
@@ -229,7 +223,6 @@ class ITask(metaclass=ABCMeta):
         for k, v in self.__dict__.items():
             if k not in ['_task_log']:
                 setattr(result, k, copy.deepcopy(v, memo))
-        result._task_log = getLogger(__name__)
         return result
 
     def to_dict(self) -> Dict:

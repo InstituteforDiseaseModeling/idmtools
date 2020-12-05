@@ -8,7 +8,8 @@ Simulation, Workitem and other Asset Collections. In Addition, you can create as
 For examples, 3 simulations and an Asset Collection, or an experiment and a workItem. Assetize Outputs is implemented
 as a workitem that depends on other items to complete before running.
 
-AssetizeOutputs using glob patterns to select or deselect files. See https://docs.python.org/3/library/glob.html for details on glob patterns. The default configuration is set to Assetize all outputs, "**" pattern, and exclude the "StdOut.txt", "StdErr.txt", and "WorkOrder.json" files.
+AssetizeOutputs using glob patterns to select or deselect files. See https://docs.python.org/3/library/glob.html for details on glob patterns.
+The default configuration is set to Assetize all outputs, "**" pattern, and exclude the "StdOut.txt", "StdErr.txt", and "WorkOrder.json" files.
 
 You can see a list of files that will be assetized without assetizing them by using the dry_run parameter. The file
 list will be in the output of the work item.
@@ -21,7 +22,4 @@ You can also run this command from the CLI. For details, see :ref:`COMPS CLI ref
 Errors
 ------
 
-NoFileFound - This means the patterns you specified resulted in no files found. Review your patterns.
-CrossEnvironmentAssetizeNotSupport - This occurs when you attempt to assestize an item in a COMPS environment that does not match that of the workitem. Use the same environment for your workitem as you did for your original item
-AtLeastOneItemToWatch - You cannot run assetize without linking at least one item
-DuplicateAsset - The resulting asset collection would have duplicate assets. See the error for a list of duplicate assets. This often occurs when assetizing either Experiments or multiple items. With Experiments, this can be avoided by using the *simulation_prefix_format_str* to place the assets into sub-folders. When processing multiple work items with files that would overlap, you can use *work_item_prefix_format_str*. For other cases, you may need to do multiple runs and exclude patterns. For example, if you are assetizing trying to combine two AssetCollections with a single file that overlaps.
+See :ref:`COMPS Errors reference<COMPS_Errors>`

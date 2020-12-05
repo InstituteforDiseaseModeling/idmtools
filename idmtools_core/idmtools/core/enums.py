@@ -1,6 +1,6 @@
 from enum import Enum
 
-TRUTHY_VALUES = ['1', 'y', 'yes', 'on', 'true', 't']
+TRUTHY_VALUES = ['1', 'y', 'yes', 'on', 'true', 't', 1, True]
 
 
 class EntityStatus(Enum):

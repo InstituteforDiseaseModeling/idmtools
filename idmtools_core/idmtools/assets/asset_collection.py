@@ -189,7 +189,7 @@ class AssetCollection(IEntity):
             return False
         return True
 
-    def add_asset(self, asset: Union[Asset, str], fail_on_duplicate: bool = True, fail_on_deep_comparison: bool = False, **kwargs):  # noqa: F821
+    def add_asset(self, asset: Union[Asset, str, PathLike], fail_on_duplicate: bool = True, fail_on_deep_comparison: bool = False, **kwargs):  # noqa: F821
         """
         Add an asset to the collection.
 
@@ -202,8 +202,8 @@ class AssetCollection(IEntity):
            **kwargs: Arguments to pass to Asset constructor when asset is a string
         """
         self.is_editable(True)
-        if isinstance(asset, str):
-            asset = Asset(absolute_path=asset, **kwargs)
+        if isinstance(asset, (str, PathLike)):
+            asset = Asset(absolute_path=str(asset), **kwargs)
         # do a simple check first
         if asset in self.assets:
             if fail_on_duplicate:
@@ -257,7 +257,7 @@ class AssetCollection(IEntity):
         for asset in assets:
             self.add_asset(asset, fail_on_duplicate, fail_on_deep_comparison)
 
-    def add_or_replace_asset(self, asset: Union[Asset, str], fail_on_deep_comparison: bool = False):
+    def add_or_replace_asset(self, asset: Union[Asset, str, PathLike], fail_on_deep_comparison: bool = False):
         """
         Add or replaces an asset in a collection
 
@@ -269,7 +269,7 @@ class AssetCollection(IEntity):
             None.
         """
         self.is_editable(True)
-        tasset = Asset(asset) if isinstance(asset, str) else asset
+        tasset = Asset(asset) if isinstance(asset, (str, PathLike)) else asset
         index = self.find_index_of_asset(tasset)
         if index is not None:
             if fail_on_deep_comparison and not tasset.deep_equals(self.assets[index]):
