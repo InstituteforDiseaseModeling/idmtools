@@ -4,17 +4,14 @@ import json
 import os
 import unittest
 import uuid
+import diskcache as dc
 from collections import defaultdict
-
 import pytest
-
 from idmtools.assets import Asset
 from idmtools.builders import SimulationBuilder
 from idmtools.core.platform_factory import Platform, platform
 from COMPS.Data import Experiment as COMPSExperiment, QueryCriteria
 from logging import getLogger
-import diskcache as dc
-
 from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask

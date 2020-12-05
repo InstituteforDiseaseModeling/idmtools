@@ -1,4 +1,3 @@
-import json
 from abc import ABCMeta
 from dataclasses import dataclass, field
 from os import PathLike
@@ -6,6 +5,7 @@ from typing import NoReturn, List, Any, Dict, Union, TYPE_CHECKING
 from uuid import UUID
 from idmtools.core import EntityStatus, ItemType, NoPlatformException
 from idmtools.core.interfaces.iitem import IItem
+from idmtools.core.id_file import read_id_file, write_id_file
 from idmtools.services.platforms import PlatformPersistService
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -64,18 +64,8 @@ class IEntity(IItem, metaclass=ABCMeta):
         Returns:
 
         """
-        if isinstance(filename, PathLike):
-            filename = str(filename)
-        platform_block = None
-        with open(filename, 'r') as id_in:
-            item_id = id_in.read().strip()
-            if "::" in item_id:
-                parts = item_id.split("::")
-                if len(parts) == 2:
-                    item_id, platform_block = item_id.split("::")
-                elif len(parts) == 3:
-                    item_id, platform_block, extra_args = item_id.split("::")
-                    # TODO support extra args
+        item_id, item_type_in_file, platform_block, extra_args = read_id_file(filename)
+
         if platform is None:
             if platform_block:
                 from idmtools.core.platform_factory import Platform
@@ -258,15 +248,7 @@ class IEntity(IItem, metaclass=ABCMeta):
         Returns:
 
         """
-        from idmtools.utils.json import IDMJSONEncoder
-        if isinstance(filename, PathLike):
-            filename = str(filename)
-        with open(filename, 'w') as filename:
-            filename.write(f'{self.id}')
-            if save_platform and hasattr(self.platform, '_config_block'):
-                filename.write(f"::{self.platform._config_block}")
-                if platform_args:
-                    filename.write(json.dumps(platform_args, cls=IDMJSONEncoder))
+        write_id_file(filename, self, save_platform, platform_args)
 
 
 IEntityList = List[IEntity]

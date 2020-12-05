@@ -243,9 +243,9 @@ class RequirementsToAssetCollection:
         Returns: the latest version of ven package
         """
         from idmtools_platform_comps.utils.package_version import get_latest_package_version_from_pypi
-        from idmtools_platform_comps.utils.package_version import get_latest_package_version_from_artifactory
+        from idmtools_platform_comps.utils.package_version import get_latest_pypi_package_version_from_artifactory
 
-        latest_version = get_latest_package_version_from_artifactory(pkg_name, display_all)
+        latest_version = get_latest_pypi_package_version_from_artifactory(pkg_name, display_all)
 
         if not latest_version:
             latest_version = get_latest_package_version_from_pypi(pkg_name, display_all)
@@ -257,7 +257,7 @@ class RequirementsToAssetCollection:
 
     def consolidate_requirements(self):
         """
-        Combine requiremtns and dynamic requirements (a list):
+        Combine requirements and dynamic requirements (a list):
           - get the latest version of package if version is not provided
           - dynamic requirements will overwrites the requirements file
 

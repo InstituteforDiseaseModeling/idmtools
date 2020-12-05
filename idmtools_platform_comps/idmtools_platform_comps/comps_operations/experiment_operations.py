@@ -49,13 +49,20 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
             COMPSExperiment with items
         """
+
         columns = columns or ["id", "name", "suite_id"]
         comps_children = load_children if load_children is not None else ["tags", "configuration"]
         query_criteria = query_criteria or QueryCriteria().select(columns).select_children(comps_children)
-        return COMPSExperiment.get(
-            id=experiment_id,
-            query_criteria=query_criteria
-        )
+        try:
+            result = COMPSExperiment.get(
+                id=experiment_id,
+                query_criteria=query_criteria
+            )
+        except AttributeError as e:
+            user_logger.error(f"The id {experiment_id} could not be converted to an UUID. Please verify your id")
+            raise e
+
+        return result
 
     def pre_create(self, experiment: Experiment, **kwargs) -> NoReturn:
         """
@@ -119,7 +126,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         # create initial configuration object
         comps_config = dict(
             environment_name=self.platform.environment,
-            simulation_input_args=command_arg,
+            simulation_input_args=command_arg.strip(),
             working_directory_root=os.path.join(simulation_root, subdirectory).replace('\\', '/'),
             executable_path=executable_path,
             node_group_name=self.platform.node_group,
@@ -192,8 +199,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             # run pre-creation in case task use it to produce the command line dynamically
             task.pre_creation(sim, self.platform)
             exp_command = task.command
-        elif isinstance(experiment.simulations, ExperimentParentIterator) and isinstance(experiment.simulations.items,
-                                                                                         TemplatedSimulations):
+        elif isinstance(experiment.simulations, ExperimentParentIterator) and isinstance(experiment.simulations.items, TemplatedSimulations):
             if logger.isEnabledFor(DEBUG):
                 logger.debug("ParentIterator/TemplatedSimulations detected. Using base_task for command")
             from idmtools.entities.simulation import Simulation
