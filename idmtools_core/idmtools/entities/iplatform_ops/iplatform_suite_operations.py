@@ -5,6 +5,8 @@ from uuid import UUID
 from idmtools.core.enums import EntityStatus, ItemType
 from idmtools.entities.iplatform_ops.utils import batch_create_items
 from idmtools.entities.suite import Suite
+from idmtools.registry.functions import FunctionPluginManager
+
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
 
@@ -55,6 +57,7 @@ class IPlatformSuiteOperations(ABC):
         Returns:
             NoReturn
         """
+        FunctionPluginManager.instance().hook.idmtools_platform_pre_create_item(item=suite, kwargs=kwargs)
         suite.pre_creation(self.platform)
 
     def post_create(self, suite: Suite, **kwargs) -> NoReturn:

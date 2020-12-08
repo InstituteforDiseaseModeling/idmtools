@@ -1,3 +1,4 @@
+import copy
 from functools import partial
 from logging import getLogger
 import numpy
@@ -18,8 +19,10 @@ user_logger = getLogger('user')
 
 def create_config_before_provisioning(simulation: Simulation, platform: IPlatform):
     # set the command dynamically
-    simulation.task.task.command = CommandLine.from_string(command_format_str.format(**simulation.task.config))
-    user_logger.info(f"Set command for simulation to: {simulation.task.task.command}")
+    simulation.task.command = CommandLine.from_string(command_format_str.format(**simulation.task.config))
+    user_logger.info(f"Set command for simulation to: {simulation.task.command}")
+    # return configs as tags
+    return copy.deepcopy(simulation.task.config)
 
 
 def set_value(simulation, name, value):

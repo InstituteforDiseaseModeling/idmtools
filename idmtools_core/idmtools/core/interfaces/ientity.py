@@ -5,6 +5,7 @@ from typing import NoReturn, List, Any, Dict, Union, TYPE_CHECKING
 from uuid import UUID
 from idmtools.core import EntityStatus, ItemType, NoPlatformException
 from idmtools.core.interfaces.iitem import IItem
+from idmtools.core.id_file import read_id_file, write_id_file
 from idmtools.services.platforms import PlatformPersistService
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -58,22 +59,17 @@ class IEntity(IItem, metaclass=ABCMeta):
         Args:
             filename: Filename to load
             platform:
-            **kwargs:
+            **kwargs: Platform extra arguments
 
         Returns:
 
         """
-        if isinstance(filename, PathLike):
-            filename = str(filename)
-        platform_block = None
-        with open(filename, 'r') as id_in:
-            item_id = id_in.read().strip()
-            if "::" in item_id:
-                item_id, platform_block = item_id.split("::")
+        item_id, item_type_in_file, platform_block, extra_args = read_id_file(filename)
+
         if platform is None:
             if platform_block:
                 from idmtools.core.platform_factory import Platform
-                platform = Platform(platform_block)
+                platform = Platform(platform_block, **kwargs)
             platform = cls.get_current_platform_or_error(platform)
         if cls.item_type is None:
             raise EnvironmentError("ItemType is None. This is most likely a badly derived IEntity that doesn't run set the default item type on the class")
@@ -240,23 +236,19 @@ class IEntity(IItem, metaclass=ABCMeta):
             raise NoPlatformException("No Platform defined on object, in current context, or passed to run")
         return p
 
-    def to_id_file(self, filename: Union[str, PathLike], save_platform: bool = False):
+    def to_id_file(self, filename: Union[str, PathLike], save_platform: bool = False, platform_args: Dict = None):
         """
         Write a id file
 
         Args:
             filename: Filename to create
             save_platform: Save platform to the file as well
+            platform_args: Platform Args
 
         Returns:
 
         """
-        if isinstance(filename, PathLike):
-            filename = str(filename)
-        with open(filename, 'w') as filename:
-            filename.write(f'{self.id}')
-            if save_platform and hasattr(self.platform, '_config_block'):
-                filename.write(f"::{self.platform._config_block}")
+        write_id_file(filename, self, save_platform, platform_args)
 
 
 IEntityList = List[IEntity]

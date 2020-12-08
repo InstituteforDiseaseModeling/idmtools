@@ -53,9 +53,6 @@ class IWorkflowItem(IAssetsEnabled, INamedEntity, IRunnableEntity, ABC):
         if item_name is not None and not isinstance(item_name, property):
             self.name = item_name
 
-        if self.name is None:
-            raise ValueError("Name is required")
-
         if user_files and not isinstance(user_files, property):
             # user property since it can convert file lists
             self.user_files = user_files
@@ -104,6 +101,9 @@ class IWorkflowItem(IAssetsEnabled, INamedEntity, IRunnableEntity, ABC):
         """
         Called before the actual creation of the entity.
         """
+        if self.name is None:
+            raise ValueError("Name is required")
+
         files_to_be_removed = ('comps_log.log', 'idmtools.log')
         super().pre_creation(platform)
         if self.task:

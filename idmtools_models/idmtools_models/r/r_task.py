@@ -1,6 +1,6 @@
 import os
 from dataclasses import field, dataclass
-from logging import getLogger
+from logging import getLogger, DEBUG
 from typing import Type, Union, TYPE_CHECKING
 from idmtools.assets import Asset, AssetCollection
 from idmtools.core.docker_task import DockerTask
@@ -23,7 +23,8 @@ class RTask(DockerTask):
     def __post_init__(self):
         super().__post_init__()
         cmd_str = f'{self.r_path} ./Assets/{os.path.basename(self.script_path)}'
-        self._task_log.info('Setting command line to %s', cmd_str)
+        if logger.isEnabledFor(DEBUG):
+            logger.info('Setting command line to %s', cmd_str)
         self.command = CommandLine.from_string(cmd_str)
 
     def reload_from_simulation(self, simulation: Simulation, **kwargs):
@@ -43,7 +44,8 @@ class RTask(DockerTask):
 
         """
         super().gather_common_assets()
-        self._task_log.info('Adding Common asset from %s', self.script_path)
+        if logger.isEnabledFor(DEBUG):
+            logger.info('Adding Common asset from %s', self.script_path)
         self.common_assets.add_or_replace_asset(Asset(absolute_path=self.script_path))
         return self.common_assets
 
