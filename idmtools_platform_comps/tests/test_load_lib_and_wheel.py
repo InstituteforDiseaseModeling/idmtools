@@ -98,7 +98,7 @@ class TestLoadLibWheel(ITestWithPersistence):
         # First load 'zipp' package (note: comps does not have 'zipp' package)
         # ------------------------------------------------------
         requirements_path = os.path.join(model_path, 'requirements.txt')
-        pL = Platform('COMPS2', num_cores=2)
+        pL = Platform('SLURM', num_cores=2)
         rta = RequirementsToAssetCollection(platform=pL, requirements_path=requirements_path)
         ac_id = rta.run(rerun=True)
 
