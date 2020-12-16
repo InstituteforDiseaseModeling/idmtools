@@ -30,12 +30,16 @@ class RequirementsToAssetCollection:
     pkg_list: list = field(default=None)
     #: list of wheel files locally to upload and install
     local_wheels: list = field(default=None)
+    # User tags
+    tags: dict = field(default=None)
     #: Internal checksum to calculate unique requirements set has be ran before
     _checksum: str = field(default=None, init=False)
     #: Calculated requirements including versions
     _requirements: List[str] = field(default=None, init=False)
     #: Since requirements vary by os, target it on the platform as well
     _os_target: str = field(default=None, init=False)
+    #: Reserved tags
+    __reserved_tag: list = field(default=None, init=False)
 
     def __post_init__(self):
         if not any([self.requirements_path, self.pkg_list, self.local_wheels]):
@@ -53,6 +57,8 @@ class RequirementsToAssetCollection:
         self.pkg_list = self.pkg_list or []
         self.local_wheels = [os.path.abspath(whl) for whl in self.local_wheels] if self.local_wheels else []
         self._os_target = "win" if "slurm" not in self.platform.environment.lower() and self.platform.environment.lower() not in SLURM_ENVS else "linux"
+        self.tags = self.tags or {}
+        self.__reserved_tag = ['idmtools', 'task_type', MD5_KEY.format(self._os_target)]
 
     @property
     def checksum(self):
@@ -124,7 +130,8 @@ class RequirementsToAssetCollection:
         Returns:
 
         """
-        user_logger.info(f"Creating an updated requirements file ensuring all versions are specified at {REQUIREMENT_FILE}")
+        user_logger.info(
+            f"Creating an updated requirements file ensuring all versions are specified at {REQUIREMENT_FILE}")
         req_content = '\n'.join(self.requirements)
         with open(REQUIREMENT_FILE, 'w') as outfile:
             outfile.write(req_content)
@@ -142,7 +149,8 @@ class RequirementsToAssetCollection:
 
         # check if ac with tag idmtools-requirements-md5 = my_md5 exists
         ac_list = COMPSAssetCollection.get(
-            query_criteria=QueryCriteria().select_children('tags').where_tag([f'{MD5_KEY.format(self._os_target)}={md5_str}']))
+            query_criteria=QueryCriteria().select_children('tags').where_tag(
+                [f'{MD5_KEY.format(self._os_target)}={md5_str}']))
 
         # if exists, get ac and return it
         if len(ac_list) > 0:
@@ -188,6 +196,18 @@ class RequirementsToAssetCollection:
         experiment = Experiment(name=exp_name, simulations=[task.to_simulation()])
         experiment.add_asset(Asset(REQUIREMENT_FILE))
         experiment.tags = {MD5_KEY.format(self._os_target): self.checksum}
+
+        # Avoid conflict to reserved tag
+        if len(set(self.tags).intersection(self.__reserved_tag)) > 0:
+            raise Exception(f"{self.__reserved_tag} are reserved tags, please use other tags!")
+
+        # Remove conflicts in case
+        for tag in self.__reserved_tag:
+            self.tags.pop(tag, None)
+
+        # Update experiment's tags
+        experiment.tags.update(self.tags)
+
         self.add_wheels_to_assets(experiment)
         user_logger.info("Run install of python requirements on COMPS. To view the details, see the experiment below")
         experiment.run(wait_until_done=True, platform=self.platform, use_short_path=True)
@@ -209,11 +229,17 @@ class RequirementsToAssetCollection:
             logger.debug(f'md5_str: {md5_str}')
 
         wi_name = "wi to create ac"
-        command = f"python3 {MODEL_CREATE_AC} {exp_id} {md5_str} {self.platform.endpoint} {self._os_target}"
-        tags = {MD5_KEY.format(self._os_target): self.checksum}
+        command = f"python3 {MODEL_CREATE_AC} {exp_id} {self.platform.endpoint} {self._os_target}"
 
-        user_logger.info("Converting Python Packages to an Asset Collection. This may take some time for large dependency lists")
-        wi = SSMTWorkItem(name=wi_name, command=command, transient_assets=AssetCollection([os.path.join(CURRENT_DIRECTORY, MODEL_CREATE_AC)]), tags=tags, related_experiments=[exp_id])
+        # Update tags
+        tags = {MD5_KEY.format(self._os_target): self.checksum}
+        tags.update(self.tags)
+
+        user_logger.info(
+            "Converting Python Packages to an Asset Collection. This may take some time for large dependency lists")
+        wi = SSMTWorkItem(name=wi_name, command=command,
+                          transient_assets=AssetCollection([os.path.join(CURRENT_DIRECTORY, MODEL_CREATE_AC)]),
+                          tags=tags, related_experiments=[exp_id])
 
         wi.run(wait_on_done=True, platform=self.platform)
 
