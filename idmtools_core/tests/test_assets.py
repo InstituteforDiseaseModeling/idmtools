@@ -1,3 +1,5 @@
+from pathlib import PurePath
+
 import allure
 import json
 import os
@@ -10,6 +12,7 @@ from idmtools.assets.errors import DuplicatedAssetError
 from idmtools.core import FilterMode
 from idmtools.utils.filters.asset_filters import asset_in_directory, file_name_is
 from idmtools_test import COMMON_INPUT_PATH
+from idmtools_test.utils.decorators import run_in_temp_dir
 
 
 @pytest.mark.assets
@@ -325,6 +328,27 @@ class TestAssets(unittest.TestCase):
             assets2.add_asset(Asset(content=f"{i}", filename=f"{i}"))
         assets1.add_assets(assets2)
 
+    @run_in_temp_dir
+    def test_ignore_git(self):
+        # make test data
+        bd = PurePath("test_directory")
+        gd = bd.joinpath(".git")
+        os.makedirs(gd, exist_ok=True)
+
+        with open(bd.joinpath("test1.txt"), "w") as fout:
+            fout.write("1")
+
+        with open(gd.joinpath("test2.txt"), "w") as fout:
+            fout.write("2")
+
+        ac = AssetCollection()
+        ac.add_directory(bd)
+
+        self.assertEqual(len(ac), 1)
+
+        ac = AssetCollection()
+        ac.add_directory(bd, no_ignore=True)
+        self.assertEqual(len(ac), 2)
 
 if __name__ == '__main__':
     unittest.main()
