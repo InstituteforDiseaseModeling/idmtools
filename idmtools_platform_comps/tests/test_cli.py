@@ -46,6 +46,11 @@ class TestCompsCLI(unittest.TestCase):
         setup_logging(level=DEBUG, filename='idmtools.log', force=True)
 
     def test_subcommands_exists(self):
+        result = run_command('--help')
+        print(result.stdout)
+        lines = get_subcommands_from_help_result(result)
+        with self.subTest("test_comps_subcommand"):
+            self.assertIn('comps', lines)
         result = run_command('comps', '--help')
         print(result.stdout)
         lines = get_subcommands_from_help_result(result)
