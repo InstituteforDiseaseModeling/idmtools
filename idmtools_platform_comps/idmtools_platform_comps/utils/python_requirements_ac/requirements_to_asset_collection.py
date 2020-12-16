@@ -20,9 +20,6 @@ logger = getLogger(__name__)
 user_logger = getLogger("user")
 
 
-# RESERVED_TAGS = []
-
-
 @dataclass(repr=False)
 class RequirementsToAssetCollection:
     #: Platform object
