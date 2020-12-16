@@ -207,7 +207,7 @@ class IdmConfigParser:
 
         # Do import locally to prevent load error
         from idmtools import __version__
-        if "+nightly" in __version__ and os.getenv('IDMTOOLS_HIDE_DEV_WARNING', None) is None:
+        if "+nightly" in __version__ and os.getenv('IDMTOOLS_HIDE_DEV_WARNING', None) is None and os.getenv("_IDMTOOLS_COMPLETE", None) is None:
             user_logger.warning(f"You are using a development version of idmtools, version {__version__}!")
 
     @classmethod
