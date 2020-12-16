@@ -47,6 +47,7 @@ class TestCompsCLI(unittest.TestCase):
 
     def test_subcommands_exists(self):
         result = run_command('comps', '--help')
+        print(result.stdout)
         lines = get_subcommands_from_help_result(result)
         # ensure our command is in the options
         with self.subTest("test_assetize_subcommand"):
@@ -71,8 +72,8 @@ class TestCompsCLI(unittest.TestCase):
         if os.path.exists(op.joinpath(fn)):
             os.remove(op.joinpath(fn))
         result = run_command('comps', 'Bayesian', 'assetize-outputs', '--experiment', '9311af40-1337-ea11-a2be-f0921c167861', '--json', '--id-file', '--id-filename', fn, mix_stderr=False)
-        self.assertTrue(result.exit_code == 0)
         print(result.stdout)
+        self.assertTrue(result.exit_code == 0)
         files = json.loads(result.stdout)
         self.assertEqual(36, len(files))
         self.assertTrue(os.path.exists(op.joinpath(fn)))
@@ -80,12 +81,14 @@ class TestCompsCLI(unittest.TestCase):
     @allure.feature("AssetizeOutputs")
     def test_cli_error(self):
         result = run_command('comps', 'Bayesian', 'assetize-outputs', '--experiment', '9311af40-1337-ea11-a2be-f0921c167861', '--pattern', '34234234')
+        print(result.stdout)
         self.assertTrue(result.exit_code == -1)
         self.assertIn("No files found with patterns specified", result.stdout)
 
     @allure.feature("Containers")
     def test_container_pull(self):
         result = run_command('comps', 'SLURM2', 'singularity', 'pull', 'docker://python:3.8.6', mix_stderr=False)
+        print(result.stdout)
         self.assertTrue(result.exit_code == 0)
         self.assertTrue(os.path.exists("python_3.8.6.id"))
 
@@ -95,6 +98,7 @@ class TestCompsCLI(unittest.TestCase):
         if os.path.exists(pwd.joinpath("singularity.id")):
             os.remove(pwd.joinpath("singularity.id"))
         result = run_command('comps', 'SLURM2', 'singularity', 'build', '--common-input-glob', str(pwd.joinpath('*.txt')), str(pwd.joinpath('singularity.def')), mix_stderr=False)
+        print(result.stdout)
         self.assertTrue(result.exit_code == 0)
         self.assertTrue(os.path.exists(pwd.joinpath("singularity.id")))
 
@@ -106,6 +110,7 @@ class TestCompsCLI(unittest.TestCase):
             if os.path.exists(pwd.joinpath(file)):
                 os.remove(pwd.joinpath(file))
         result = run_command('comps', 'SLURM2', 'singularity', 'build', '--force', '--id-workitem', '--common-input-glob', str(pwd.joinpath('*.txt')), str(pwd.joinpath('singularity.def')), mix_stderr=False)
+        print(result.stdout)
         self.assertTrue(result.exit_code == 0)
         for file in id_files:
             self.assertTrue(os.path.exists(pwd.joinpath(file)))
