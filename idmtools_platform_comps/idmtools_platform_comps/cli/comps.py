@@ -115,6 +115,7 @@ try:
         from idmtools_platform_comps.utils.download.download import DownloadWorkItem
         if json:
             os.environ['IDMTOOLS_SUPPRESS_OUTPUT'] = '1'
+            os.environ['DISABLE_PROGRESS_BAR'] = '1'
 
         p: COMPSPlatform = Platform(ctx.obj['config_block'])
 
@@ -195,6 +196,7 @@ try:
                 raise ValueError("--id-filename is required when filename is not provided")
         if json:
             os.environ['IDMTOOLS_SUPPRESS_OUTPUT'] = '1'
+            os.environ['DISABLE_PROGRESS_BAR'] = '1'
 
         p: COMPSPlatform = Platform(ctx.obj['config_block'])
         ao = AssetizeOutput()
