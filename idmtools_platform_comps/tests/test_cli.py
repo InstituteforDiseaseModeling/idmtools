@@ -49,6 +49,9 @@ class TestCompsCLI(unittest.TestCase):
         result = run_command('--help')
         print(result.stdout)
         lines = get_subcommands_from_help_result(result)
+        if "Warning: could not load plugin. See `-c comps_subcommand" in result.stdout:
+            result2 = run_command('comps_subcommand', '--help')
+            print(result2.stdout)
         with self.subTest("test_comps_subcommand"):
             self.assertIn('comps', lines)
         result = run_command('comps', '--help')
