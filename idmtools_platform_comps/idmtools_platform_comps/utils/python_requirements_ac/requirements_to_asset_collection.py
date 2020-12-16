@@ -190,7 +190,7 @@ class RequirementsToAssetCollection:
         experiment.tags = {MD5_KEY.format(self._os_target): self.checksum}
         self.add_wheels_to_assets(experiment)
         user_logger.info("Run install of python requirements on COMPS. To view the details, see the experiment below")
-        experiment.run(wait_until_done=True, platform=self.platform, use_short_path=True)
+        experiment.run(wait_until_done=True, platform=self.platform, use_short_path=True, num_cores=1)
 
         if experiment.succeeded:
             return experiment
