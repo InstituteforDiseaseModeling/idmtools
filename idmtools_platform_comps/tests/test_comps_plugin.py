@@ -112,7 +112,7 @@ class TestCompsPlugin(unittest.TestCase):
     def test_get_next_ssmt_version(self):
         test_versions = ['1.10.0.2', '1.10.0.1', '1.6.0.1', '1.5.1.7', '1.5.1.6', '1.5.0.2', '1.4.0.0', '1.3.0.0', '1.2.2.0', '1.2.0.0',
                          '1.1.0.2', '1.1.0.0', '1.0.1.0', '1.0.0', '1.0.0.0']
-        with mock.patch('idmtools_platform_comps.utils.package_version.fetch_versions_from_server', return_value=test_versions) as mocK_fetch:
+        with mock.patch('idmtools_platform_comps.utils.package_version.get_versions_from_site', return_value=test_versions) as mocK_fetch:
             self.assertEqual(get_latest_ssmt_image_version_from_artifactory(base_version="1.10.0.0"), "1.10.0.2")
             self.assertEqual(get_latest_ssmt_image_version_from_artifactory(base_version="1.5.0.1"), "1.5.1.7")
             self.assertEqual(get_latest_ssmt_image_version_from_artifactory(base_version="1.5.1.1"), "1.5.1.7")
