@@ -210,9 +210,9 @@ try:
             include_assets, verbose, json, simulation_prefix_format_str, work_item_prefix_format_str, tag, name, id_file, id_filename
     ):
 
-        if id_file:
-            if id_filename is None:
-                raise ValueError("--id-filename is required when filename is not provided")
+        if id_file and id_filename is None:
+            user_logger.error("--id-filename is required when filename is not provided")
+            sys.exit(-1)
         if json:
             os.environ['IDMTOOLS_SUPPRESS_OUTPUT'] = '1'
             os.environ['IDMTOOLS_DISABLE_PROGRESS_BAR'] = '1'
@@ -340,6 +340,7 @@ try:
                 sb.to_id_file(id_workitem_filename, save_platform=True)
         sys.exit(0 if sb.succeeded else -1)
 
+
     @singularity.command(help="Pull Singularity Image")
     @click.argument('image_url')
     @click.option('--wait/--no-wait', default=True, help="Wait on item to finish")
@@ -350,8 +351,12 @@ try:
     @click.option('--image-name', default=None, help="Name of resulting image")
     @click.option('--id-file/--no-id-file', default=True, help="Enable or disable writing out an id file")
     @click.option('--id-filename', default=None, help="Name of ID file to save build as. If not specified, and id-file is enabled, a name is calculated")
+    @click.option('--id-workitem/--no-id-workitem', default=True, help="Enable or disable writing out an id file for the workitem")
+    @click.option('--id-workitem-failed/--no-id-workitem-failed', default=False, help="Write id of the workitem even if it failed. You need to enable --id-workitem for this is be active")
+    @click.option('--id-workitem-filename', default=None, help="Name of ID file to save workitem to. You need to enable --id-workitem for this is be active")
     @click.pass_context
-    def pull(ctx: click.Context, image_url, wait, tag, workitem_tag, name, force, image_name: str, id_file: str, id_filename: str):
+    def pull(ctx: click.Context, image_url, wait, tag, workitem_tag, name, force, image_name: str, id_file: str, id_filename: str,
+             id_workitem: bool, id_workitem_failed: bool, id_workitem_filename: str):
         p: COMPSPlatform = Platform(ctx.obj['config_block'])
         sb = SingularityBuildWorkItem(image_url=image_url, force=force, image_name=image_name)
         sb.name = f"Pulling {image_url}" if name is None else name
@@ -366,8 +371,18 @@ try:
 
         sb.run(wait_until_done=wait, platform=p)
         if sb.succeeded and id_file:
+            if id_filename is None:
+                id_filename = sb.get_id_filename()
             user_logger.info(f"Saving ID to {id_filename}")
-            sb.to_id_file(id_filename, save_platform=True)
+            sb.asset_collection.to_id_file(id_filename, save_platform=True)
+
+        if id_workitem and sb.succeeded and sb._uid is None:
+            user_logger.warning("Cannot save workitem id because an existing container was found with the same inputs. You can force run using --force, but it is recommended to use the container used.")
+        elif id_workitem_failed or sb.succeeded:
+            if id_workitem_filename is None:
+                id_workitem_filename = sb.get_id_filename(prefix="builder.")
+            user_logger.info(f"Saving the Builder Workitem ID that contains the image to {id_workitem_filename}")
+            sb.to_id_file(id_workitem_filename, save_platform=True)
         sys.exit(0 if sb.succeeded else -1)
 
 except ImportError as e:

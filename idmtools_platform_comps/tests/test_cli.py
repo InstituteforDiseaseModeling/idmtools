@@ -95,6 +95,7 @@ class TestCompsCLI(unittest.TestCase):
     def test_container_pull(self):
         result = run_command('comps', 'SLURM2', 'singularity', 'pull', 'docker://python:3.8.6', mix_stderr=False)
         print(result.stdout)
+        print(result.stderr)
         self.assertTrue(result.exit_code == 0)
         self.assertTrue(os.path.exists("python_3.8.6.id"))
 
