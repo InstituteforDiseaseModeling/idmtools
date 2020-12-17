@@ -23,13 +23,6 @@ class TestCompsCLI(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        # To enable this, you need to also set the env var TEST_WITH_PACKAGES to t or y
-        if TEST_WITH_NEW_CODE:
-            # Run package dists
-            run_package_dists()
-
-    @classmethod
-    def setUpClass(cls) -> None:
         # Setup logging for cli
         os.environ['IDMTOOLS_LOGGING_USER_PRINT'] = '1'
         os.environ['IDMTOOLS_HIDE_DEV_WARNING'] = '1'
@@ -37,6 +30,11 @@ class TestCompsCLI(unittest.TestCase):
         with suppress(PermissionError):
             if os.path.exists(pwd.joinpath("singularity.id")):
                 os.remove(pwd.joinpath("singularity.id"))
+
+        # To enable this, you need to also set the env var TEST_WITH_PACKAGES to t or y
+        if TEST_WITH_NEW_CODE:
+            # Run package dists
+            run_package_dists()
 
     @classmethod
     def tearDownClass(cls) -> None:
