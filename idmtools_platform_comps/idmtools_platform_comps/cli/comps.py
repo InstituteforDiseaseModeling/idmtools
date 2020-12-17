@@ -107,19 +107,34 @@ try:
     @click.option('--work-item-prefix-format-str', default=None, help="WorkItem Prefix Format str. Defaults to ''")
     @click.option('--name', default=None, help="Name of Download Workitem. If not provided, one will be generated")
     @click.option('--output-path', default=os.getcwd(), help="Output path to save zip")
+    @click.option('--delete-after-download/--no-delete-after-download', default=True, help="Delete the workitem used to gather files after download")
+    @click.option('--extract-after-download/--no-extract-after-download', default=True, help="Extract zip after download")
+    @click.option('--zip-name', default="output.zip", help="Name of zipfile")
     @click.pass_context
     def download(
             ctx: click.Context, pattern, exclude_pattern, experiment, simulation, work_item, asset_collection, dry_run, wait,
-            include_assets, verbose, json, simulation_prefix_format_str, work_item_prefix_format_str, name, output_path,
+            include_assets, verbose, json, simulation_prefix_format_str, work_item_prefix_format_str, name, output_path, delete_after_download,
+            extract_after_download, zip_name
     ):
         from idmtools_platform_comps.utils.download.download import DownloadWorkItem
+
+        if json and not dry_run:
+            user_logger.error("You cannot return JSON without enabling dry-run mode")
+            sys.exit(-1)
+
         if json:
             os.environ['IDMTOOLS_SUPPRESS_OUTPUT'] = '1'
-            os.environ['DISABLE_PROGRESS_BAR'] = '1'
+            os.environ['IDMTOOLS_DISABLE_PROGRESS_BAR'] = '1'
 
         p: COMPSPlatform = Platform(ctx.obj['config_block'])
 
-        dl_wi = DownloadWorkItem(output_path=output_path)
+        dl_wi = DownloadWorkItem(
+            output_path=output_path,
+            delete_after_download=delete_after_download,
+            extract_after_download=extract_after_download,
+            zip_name=zip_name
+        )
+
         if name:
             dl_wi.name = name
         if pattern:
@@ -146,7 +161,7 @@ try:
             user_logger.error("You must specify at least one item to download")
 
         dl_wi.run(wait_until_done=False, platform=p)
-        if not json:
+        if not json and not delete_after_download:
             user_logger.info(f"Item can be viewed at {p.get_workitem_link(dl_wi)}")
         if wait:
             dl_wi.wait(wait_on_done_progress=wait)
@@ -160,7 +175,6 @@ try:
                     file = json_parser.loads(file)
                     user_logger.info(tabulate.tabulate([x.values() for x in file], file[0].keys()))
             else:
-                # Now
                 pass
         elif dl_wi.failed:
             user_logger.error("Download failed. Check logs in COMPS")
@@ -191,12 +205,13 @@ try:
             ctx: click.Context, pattern, exclude_pattern, experiment, simulation, work_item, asset_collection, dry_run, wait,
             include_assets, verbose, json, simulation_prefix_format_str, work_item_prefix_format_str, tag, name, id_file, id_filename
     ):
+
         if id_file:
             if id_filename is None:
                 raise ValueError("--id-filename is required when filename is not provided")
         if json:
             os.environ['IDMTOOLS_SUPPRESS_OUTPUT'] = '1'
-            os.environ['DISABLE_PROGRESS_BAR'] = '1'
+            os.environ['IDMTOOLS_DISABLE_PROGRESS_BAR'] = '1'
 
         p: COMPSPlatform = Platform(ctx.obj['config_block'])
         ao = AssetizeOutput()
