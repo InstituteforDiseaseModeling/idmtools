@@ -1,9 +1,8 @@
-from unittest import mock
-
 import allure
 import tempfile
 import os
 import unittest
+from unittest import mock
 import dataclasses
 import pytest
 from idmtools import IdmConfigParser
