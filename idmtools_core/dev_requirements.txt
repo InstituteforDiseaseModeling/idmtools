@@ -1,11 +1,11 @@
-allure-pytest~=2.8.23
+allure-pytest~=2.8.24
 junitparser~=1.6.3
 livereload~=2.6.3
 pytest-cache~=1.0
 pytest-cov~=2.10.1
-pytest-html~=3.1.0
+pytest-html~=3.1.1
 pytest-runner~=5.2
 pytest-timeout~=1.4.2
-pytest-xdist~=2.1
-pytest~=6.1.2
+pytest-xdist~=2.2
+pytest~=6.2.1
 xmlrunner~=1.7.7
