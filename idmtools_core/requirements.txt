@@ -1,5 +1,5 @@
 backoff>=1.10.0,<1.11
-coloredlogs>=14.0,<=15.0
+coloredlogs~=15.0
 diskcache~=5.1.0
 humanfriendly
 more-itertools~=8.6.0
