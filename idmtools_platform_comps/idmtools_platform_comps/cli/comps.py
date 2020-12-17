@@ -122,6 +122,10 @@ try:
             user_logger.error("You cannot return JSON without enabling dry-run mode")
             sys.exit(-1)
 
+        if dry_run and delete_after_download:
+            user_logger.warning("You are using dry-run with delete after download. This will most result in an empty file list since "
+                                "the item will be deleted before the output can be fetched.")
+
         if json:
             os.environ['IDMTOOLS_SUPPRESS_OUTPUT'] = '1'
             os.environ['IDMTOOLS_DISABLE_PROGRESS_BAR'] = '1'
@@ -166,7 +170,7 @@ try:
         if wait:
             dl_wi.wait(wait_on_done_progress=wait)
         if dl_wi.succeeded:
-            if dl_wi.dry_run:
+            if dl_wi.dry_run and not delete_after_download:
                 file = p.get_files(dl_wi, ['file_list.json'])
                 file = file['file_list.json'].decode('utf-8')
                 if json:
