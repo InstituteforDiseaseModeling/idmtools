@@ -1,7 +1,7 @@
 backoff>=1.10.0,<1.11
 coloredlogs>=14.0,<=15.0
 diskcache==5.1.0
-humanfriendly<=9.1
+humanfriendly
 more-itertools~=8.6.0
 numpy!=1.19.4
 pandas>=1.1.4,<1.2
