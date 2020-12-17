@@ -4,7 +4,7 @@ import json
 import re
 from abc import ABC
 from datetime import datetime
-from logging import getLogger
+from logging import getLogger, DEBUG
 from typing import Optional, List, Type
 from urllib import request
 import requests
@@ -262,8 +262,12 @@ def get_latest_version_from_site(pkg_url, base_version: Optional[str] = None, di
 
     Returns: the latest version of ven package
     """
+    if logger.isEnabledFor(DEBUG):
+        logger.debug(f"Fetching version from {pkg_url} with base {base_version}")
     release_versions = get_versions_from_site(pkg_url, base_version, display_all=display_all, parser=parser, exclude_pre_release=exclude_pre_release)
     if base_version:
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f"Finding latest of matches for version {base_version} from {release_versions}")
         # only use the longest match latest
         version_compatible_portion = ".".join(base_version.split(".")[:2])
 

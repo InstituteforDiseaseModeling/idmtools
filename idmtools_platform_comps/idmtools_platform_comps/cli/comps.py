@@ -340,7 +340,6 @@ try:
                 sb.to_id_file(id_workitem_filename, save_platform=True)
         sys.exit(0 if sb.succeeded else -1)
 
-
     @singularity.command(help="Pull Singularity Image")
     @click.argument('image_url')
     @click.option('--wait/--no-wait', default=True, help="Wait on item to finish")
