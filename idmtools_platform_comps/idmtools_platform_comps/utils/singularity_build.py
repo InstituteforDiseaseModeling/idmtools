@@ -412,6 +412,8 @@ class SingularityBuildWorkItem(InputDataWorkItem):
         return None
 
     def get_id_filename(self, prefix: str = None) -> str:
+        if prefix is None:
+            prefix = ''
         if self.definition_file:
             base_name = PurePath(self.definition_file).name.replace(".def", ".id")
             if prefix:

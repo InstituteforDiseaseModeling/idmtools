@@ -8,6 +8,8 @@ from pathlib import PurePath
 from uuid import UUID
 from COMPS.Data import WorkItem
 from tqdm import tqdm
+
+from idmtools import IdmConfigParser
 from idmtools.assets.file_list import FileList
 from idmtools.core import EntityStatus
 from idmtools.entities.iplatform import IPlatform
@@ -84,16 +86,18 @@ class DownloadWorkItem(FileFilterWorkItem):
             if self._uid:
                 oi = po.retrieve_output_file_info([self.zip_name])
                 zip_name = PurePath(self.output_path).joinpath(self.zip_name)
-                with tqdm(total=oi[0].length, unit='B', unit_scale=True, unit_divisor=1024) as pbar:
+                with tqdm(total=oi[0].length, unit='B', unit_scale=True, unit_divisor=1024, desc="Downloading Files") as pbar:
                     self.__download_file(oi, pbar, zip_name)
                     if self.extract_after_download:
                         self.__extract_output(zip_name)
 
                 if self.delete_after_download:
                     if self.extract_after_download:
-                        user_logger.debug(f"Removing {zip_name}")
+                        if IdmConfigParser.is_output_enabled():
+                            user_logger.debug(f"Removing {zip_name}")
                         os.remove(zip_name)
-                    user_logger.debug(f'Deleting workitem {self.uid}')
+                    if IdmConfigParser.is_output_enabled():
+                        user_logger.debug(f'Deleting workitem {self.uid}')
                     po.delete()
                     self.uid = None
 
