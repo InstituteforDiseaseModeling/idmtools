@@ -58,7 +58,9 @@ jobs:
           path: idmtools_cli/tests/reports/
       - name: run idmtools_core tests
         run: |
-          cd idmtools_core
+          cd idmtools_core/tests
+          sed -i '1s/^/PARALLEL_TEST_COUNT ?= 4/' Makefile
+          cd ..
           make test-all
       - name: Upload idmtools_core all test results
         uses: actions/upload-artifact@v2
@@ -68,7 +70,9 @@ jobs:
           path: idmtools_core/tests/reports/
       - name: run idmtools_models tests
         run: |
-          cd idmtools_models
+          cd idmtools_models/tests
+          sed -i '1s/^/PARALLEL_TEST_COUNT ?= 4/' Makefile
+          cd ..
           make test-all
       - name: Upload idmtools_models all test results
         uses: actions/upload-artifact@v2
@@ -78,7 +82,9 @@ jobs:
           path: idmtools_models/tests/results/
       - name: run idmtools_platform_comps tests
         run: |
-          cd idmtools_platform_comps
+          cd idmtools_platform_comps/tests
+          sed -i '1s/12/4/' Makefile
+          cd ..
           make test-all
       - name: Upload idmtools_platform_comps test results
         uses: actions/upload-artifact@v2
