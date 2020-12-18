@@ -46,7 +46,9 @@ jobs:
           echo '${{ env.bamboo_password }}' | docker login idm-docker-staging.packages.idmod.org --username ${{ env.bamboo_user }} --password-stdin
       - name: run idmtools_cli tests
         run: |
-          cd idmtools_cli
+          cd idmtools_cli/tests
+          echo 'PARALLEL_TEST_COUNT ?= 4' >> Makefile
+          cd ..
           make test-all
       - name: Upload idmtools_cli all test results
         uses: actions/upload-artifact@v2
