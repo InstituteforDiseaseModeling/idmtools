@@ -107,7 +107,7 @@ class TestCompsPlugin(unittest.TestCase):
             prev_major = int(parts[0])
             pre_minor = int(parts[1])
 
-    #
+    @pytest.mark.serial
     def test_get_next_ssmt_version(self):
         test_versions = ['1.10.0.2', '1.10.0.1', '1.6.0.1', '1.5.1.7', '1.5.1.6', '1.5.0.2', '1.4.0.0', '1.3.0.0', '1.2.2.0', '1.2.0.0',
                          '1.1.0.2', '1.1.0.0', '1.0.1.0', '1.0.0', '1.0.0.0']
