@@ -87,7 +87,7 @@ jobs:
       - name: run idmtools_platform_local tests
         run: |
           cd idmtools_platform_local
-           make test-all
+          make test-all
       - name: Upload idmtools_platform_local all test results
         uses: actions/upload-artifact@v2
         if: failure()
