@@ -107,18 +107,38 @@ try:
     @click.option('--work-item-prefix-format-str', default=None, help="WorkItem Prefix Format str. Defaults to ''")
     @click.option('--name', default=None, help="Name of Download Workitem. If not provided, one will be generated")
     @click.option('--output-path', default=os.getcwd(), help="Output path to save zip")
+    @click.option('--delete-after-download/--no-delete-after-download', default=True, help="Delete the workitem used to gather files after download")
+    @click.option('--extract-after-download/--no-extract-after-download', default=True, help="Extract zip after download")
+    @click.option('--zip-name', default="output.zip", help="Name of zipfile")
     @click.pass_context
     def download(
             ctx: click.Context, pattern, exclude_pattern, experiment, simulation, work_item, asset_collection, dry_run, wait,
-            include_assets, verbose, json, simulation_prefix_format_str, work_item_prefix_format_str, name, output_path,
+            include_assets, verbose, json, simulation_prefix_format_str, work_item_prefix_format_str, name, output_path, delete_after_download,
+            extract_after_download, zip_name
     ):
         from idmtools_platform_comps.utils.download.download import DownloadWorkItem
+
+        if json and not dry_run:
+            user_logger.error("You cannot return JSON without enabling dry-run mode")
+            sys.exit(-1)
+
+        if dry_run and delete_after_download:
+            user_logger.warning("You are using dry-run with delete after download. This will most result in an empty file list since "
+                                "the item will be deleted before the output can be fetched.")
+
         if json:
             os.environ['IDMTOOLS_SUPPRESS_OUTPUT'] = '1'
+            os.environ['IDMTOOLS_DISABLE_PROGRESS_BAR'] = '1'
 
         p: COMPSPlatform = Platform(ctx.obj['config_block'])
 
-        dl_wi = DownloadWorkItem(output_path=output_path)
+        dl_wi = DownloadWorkItem(
+            output_path=output_path,
+            delete_after_download=delete_after_download,
+            extract_after_download=extract_after_download,
+            zip_name=zip_name
+        )
+
         if name:
             dl_wi.name = name
         if pattern:
@@ -145,12 +165,12 @@ try:
             user_logger.error("You must specify at least one item to download")
 
         dl_wi.run(wait_until_done=False, platform=p)
-        if not json:
+        if not json and not delete_after_download:
             user_logger.info(f"Item can be viewed at {p.get_workitem_link(dl_wi)}")
         if wait:
             dl_wi.wait(wait_on_done_progress=wait)
         if dl_wi.succeeded:
-            if dl_wi.dry_run:
+            if dl_wi.dry_run and not delete_after_download:
                 file = p.get_files(dl_wi, ['file_list.json'])
                 file = file['file_list.json'].decode('utf-8')
                 if json:
@@ -159,7 +179,6 @@ try:
                     file = json_parser.loads(file)
                     user_logger.info(tabulate.tabulate([x.values() for x in file], file[0].keys()))
             else:
-                # Now
                 pass
         elif dl_wi.failed:
             user_logger.error("Download failed. Check logs in COMPS")
@@ -190,11 +209,13 @@ try:
             ctx: click.Context, pattern, exclude_pattern, experiment, simulation, work_item, asset_collection, dry_run, wait,
             include_assets, verbose, json, simulation_prefix_format_str, work_item_prefix_format_str, tag, name, id_file, id_filename
     ):
-        if id_file:
-            if id_filename is None:
-                raise ValueError("--id-filename is required when filename is not provided")
+
+        if id_file and id_filename is None:
+            user_logger.error("--id-filename is required when filename is not provided")
+            sys.exit(-1)
         if json:
             os.environ['IDMTOOLS_SUPPRESS_OUTPUT'] = '1'
+            os.environ['IDMTOOLS_DISABLE_PROGRESS_BAR'] = '1'
 
         p: COMPSPlatform = Platform(ctx.obj['config_block'])
         ao = AssetizeOutput()
@@ -329,8 +350,12 @@ try:
     @click.option('--image-name', default=None, help="Name of resulting image")
     @click.option('--id-file/--no-id-file', default=True, help="Enable or disable writing out an id file")
     @click.option('--id-filename', default=None, help="Name of ID file to save build as. If not specified, and id-file is enabled, a name is calculated")
+    @click.option('--id-workitem/--no-id-workitem', default=True, help="Enable or disable writing out an id file for the workitem")
+    @click.option('--id-workitem-failed/--no-id-workitem-failed', default=False, help="Write id of the workitem even if it failed. You need to enable --id-workitem for this is be active")
+    @click.option('--id-workitem-filename', default=None, help="Name of ID file to save workitem to. You need to enable --id-workitem for this is be active")
     @click.pass_context
-    def pull(ctx: click.Context, image_url, wait, tag, workitem_tag, name, force, image_name: str, id_file: str, id_filename: str):
+    def pull(ctx: click.Context, image_url, wait, tag, workitem_tag, name, force, image_name: str, id_file: str, id_filename: str,
+             id_workitem: bool, id_workitem_failed: bool, id_workitem_filename: str):
         p: COMPSPlatform = Platform(ctx.obj['config_block'])
         sb = SingularityBuildWorkItem(image_url=image_url, force=force, image_name=image_name)
         sb.name = f"Pulling {image_url}" if name is None else name
@@ -345,8 +370,18 @@ try:
 
         sb.run(wait_until_done=wait, platform=p)
         if sb.succeeded and id_file:
+            if id_filename is None:
+                id_filename = sb.get_id_filename()
             user_logger.info(f"Saving ID to {id_filename}")
-            sb.to_id_file(id_filename, save_platform=True)
+            sb.asset_collection.to_id_file(id_filename, save_platform=True)
+
+        if id_workitem and sb.succeeded and sb._uid is None:
+            user_logger.warning("Cannot save workitem id because an existing container was found with the same inputs. You can force run using --force, but it is recommended to use the container used.")
+        elif id_workitem_failed or sb.succeeded:
+            if id_workitem_filename is None:
+                id_workitem_filename = sb.get_id_filename(prefix="builder.")
+            user_logger.info(f"Saving the Builder Workitem ID that contains the image to {id_workitem_filename}")
+            sb.to_id_file(id_workitem_filename, save_platform=True)
         sys.exit(0 if sb.succeeded else -1)
 
 except ImportError as e:

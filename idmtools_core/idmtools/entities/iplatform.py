@@ -712,8 +712,9 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         if child_attribute is None:
             if isinstance(item, IWorkflowItem):
                 if item.status in done_states:
-                    progress_bar.update(1)
-                    progress_bar.close()
+                    if progress_bar:
+                        progress_bar.update(1)
+                        progress_bar.close()
                     return True
                 return False
             else:
