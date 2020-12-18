@@ -34,6 +34,7 @@ jobs:
         run: |
           pip install idmtools[full] --index-url=https://${{ env.bamboo_user }}:${{ env.bamboo_password }}@packages.idmod.org/api/pypi/pypi-staging/simple
           pip install idmtools-test --index-url=https://${{ env.bamboo_user }}:${{ env.bamboo_password }}@packages.idmod.org/api/pypi/pypi-staging/simple
+          pip install idmtools[test] --index-url=https://${{ env.bamboo_user }}:${{ env.bamboo_password }}@packages.idmod.org/api/pypi/pypi-staging/simple
       - name: login to comps2
         run: |
           python dev_scripts/create_auth_token_args.py --username $COMPS_USER --password $COMPS_PASSWORD
@@ -45,51 +46,51 @@ jobs:
           echo '${{ env.bamboo_password }}' | docker login idm-docker-staging.packages.idmod.org --username ${{ env.bamboo_user }} --password-stdin
       - name: run idmtools_cli smoke tests
         run: |
-          cd idmtools_cli/tests
-          py.test --durations=3 -v --junitxml=test_results.xml -m "smoke"
-      - name: Upload idmtools_cli smoke test results
+          cd idmtools_cli
+          make test-smoke
+      - name: Upload idmtools_cli all smoke test results
         uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: idmtools_cli_test_results
-          path: idmtools_cli/tests/test_results.xml
+          path: idmtools_cli/tests/reports/
       - name: run idmtools_core smoke tests
         run: |
-          cd idmtools_core/tests
-          py.test --durations=3 -v --junitxml=test_results.xml -m "smoke"
-      - name: Upload idmtools_core smoke test results
+          cd idmtools_core
+          make test-smoke
+      - name: Upload idmtools_core all smoke test results
         uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: idmtools_core_test_results
-          path: idmtools_core/tests/test_results.xml
-      - name: run idmtools_models tests
+          path: idmtools_core/tests/reports/
+      - name: run idmtools_models smoke tests
         run: |
-          cd idmtools_models/tests
-          py.test --durations=3 -v --junitxml=test_results.xml -m "smoke"
-      - name: Upload idmtools_models smoke test results
+          cd idmtools_models
+          make test-smoke
+      - name: Upload idmtools_models all smoke test results
         uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: idmtools_models_test_results
-          path: idmtools_models/tests/test_results.xml
-      - name: run idmtools_platform_comps tests
+          path: idmtools_models/tests/results/
+      - name: run idmtools_platform_comps smoke tests
         run: |
-          cd idmtools_platform_comps/tests
-          py.test --durations=3 -v --junitxml=test_results.xml -m "smoke"
-      - name: Upload idmtools_platform_comps test results
+          cd idmtools_platform_comps
+          make test-smoke
+      - name: Upload idmtools_platform_comps smoke test results
         uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: idmtools_platform_comps_test_results
-          path: idmtools_platform_comps/tests/test_results.xml
+          path: idmtools_platform_comps/tests/results/
       - name: run idmtools_platform_local smoke tests
         run: |
-          cd idmtools_platform_local/tests
-          py.test --durations=3 -v --junitxml=test_results.xml -m "smoke"
-      - name: Upload idmtools_platform_local smoke test results
+          cd idmtools_platform_local
+          make test-smoke
+      - name: Upload idmtools_platform_local all smoke test results
         uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: idmtools_platform_local_test_results
-          path: idmtools_platform_local/tests/test_results.xml
+          path: idmtools_platform_local/tests/results/
