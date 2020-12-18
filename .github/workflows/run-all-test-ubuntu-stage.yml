@@ -47,7 +47,7 @@ jobs:
       - name: run idmtools_cli tests
         run: |
           cd idmtools_cli/tests
-          echo 'PARALLEL_TEST_COUNT ?= 4' >> Makefile
+          sed -i '1s/^/PARALLEL_TEST_COUNT ?= 4/' Makefile
           cd ..
           make test-all
       - name: Upload idmtools_cli all test results
