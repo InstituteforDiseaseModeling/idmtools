@@ -9,8 +9,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]
-        python-version: [3.6, 3.7, 3.8]
+        os: [self-linux]
+        python-version: ['3.6.x', '3.7.x', '3.8.x', '3.9.x']
     env:
       bamboo_user: ${{ secrets.PYPI_STAGING_USERNAME }}
       bamboo_password: ${{ secrets.PYPI_STAGING_PASSWORD }}
