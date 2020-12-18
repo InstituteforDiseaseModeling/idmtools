@@ -34,6 +34,7 @@ jobs:
         run: |
           pip install idmtools[full] --index-url=https://${{ env.bamboo_user }}:${{ env.bamboo_password }}@packages.idmod.org/api/pypi/pypi-staging/simple
           pip install idmtools-test --index-url=https://${{ env.bamboo_user }}:${{ env.bamboo_password }}@packages.idmod.org/api/pypi/pypi-staging/simple
+          pip install idmtools[test] --index-url=https://${{ env.bamboo_user }}:${{ env.bamboo_password }}@packages.idmod.org/api/pypi/pypi-staging/simple
       - name: login to comps2
         run: |
           python dev_scripts/create_auth_token_args.py --username $COMPS_USER --password $COMPS_PASSWORD
