@@ -266,10 +266,10 @@ def get_latest_version_from_site(pkg_url, base_version: Optional[str] = None, di
         logger.debug(f"Fetching version from {pkg_url} with base {base_version}")
     release_versions = get_versions_from_site(pkg_url, base_version, display_all=display_all, parser=parser, exclude_pre_release=exclude_pre_release)
     if base_version:
-        if logger.isEnabledFor(DEBUG):
-            logger.debug(f"Finding latest of matches for version {base_version} from {release_versions}")
         # only use the longest match latest
         version_compatible_portion = ".".join(base_version.split(".")[:2])
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f"Finding latest of matches for version {base_version} from {release_versions} using {version_compatible_portion}")
 
         for ver in release_versions:
             if ".".join(ver.split('.')[:2]) == version_compatible_portion:
