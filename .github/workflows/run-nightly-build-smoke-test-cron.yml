@@ -50,51 +50,59 @@ jobs:
       - name: login to docker staging
         run: |
           echo '${{ env.bamboo_password }}' | docker login idm-docker-staging.packages.idmod.org --username ${{ env.bamboo_user }} --password-stdin
-      - name: run idmtools_cli smoke tests
+      - name: run idmtools_cli tests
         run: |
-          cd idmtools_cli
+          cd idmtools_cli/tests
+          sed -i '1s/^/PARALLEL_TEST_COUNT ?= 4/' Makefile
+          cd ..
           make test-smoke
-      - name: Upload idmtools_cli all smoke test results
+      - name: Upload idmtools_cli all test results
         uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: idmtools_cli_test_results
           path: idmtools_cli/tests/reports/
-      - name: run idmtools_core smoke tests
+      - name: run idmtools_core tests
         run: |
-          cd idmtools_core
+          cd idmtools_core/tests
+          sed -i '1s/^/PARALLEL_TEST_COUNT ?= 4/' Makefile
+          cd ..
           make test-smoke
-      - name: Upload idmtools_core all smoke test results
+      - name: Upload idmtools_core all test results
         uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: idmtools_core_test_results
           path: idmtools_core/tests/reports/
-      - name: run idmtools_models smoke tests
+      - name: run idmtools_models tests
         run: |
-          cd idmtools_models
+          cd idmtools_models/tests
+          sed -i '1s/^/PARALLEL_TEST_COUNT ?= 4/' Makefile
+          cd ..
           make test-smoke
-      - name: Upload idmtools_models all smoke test results
+      - name: Upload idmtools_models all test results
         uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: idmtools_models_test_results
           path: idmtools_models/tests/results/
-      - name: run idmtools_platform_comps smoke tests
+      - name: run idmtools_platform_comps tests
         run: |
-          cd idmtools_platform_comps
+          cd idmtools_platform_comps/tests
+          sed -i 's/12/4/' Makefile
+          cd ..
           make test-smoke
-      - name: Upload idmtools_platform_comps smoke test results
+      - name: Upload idmtools_platform_comps test results
         uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: idmtools_platform_comps_test_results
           path: idmtools_platform_comps/tests/results/
-      - name: run idmtools_platform_local smoke tests
+      - name: run idmtools_platform_local tests
         run: |
           cd idmtools_platform_local
           make test-smoke
-      - name: Upload idmtools_platform_local all smoke test results
+      - name: Upload idmtools_platform_local all test results
         uses: actions/upload-artifact@v2
         if: failure()
         with:

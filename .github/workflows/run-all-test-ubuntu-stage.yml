@@ -83,7 +83,7 @@ jobs:
       - name: run idmtools_platform_comps tests
         run: |
           cd idmtools_platform_comps/tests
-          sed -i '1s/12/4/' Makefile
+          sed -i 's/12/4/' Makefile
           cd ..
           make test-all
       - name: Upload idmtools_platform_comps test results
