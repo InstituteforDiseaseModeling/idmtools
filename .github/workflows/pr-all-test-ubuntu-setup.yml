@@ -276,20 +276,20 @@ jobs:
             local:
               - 'idmtools_platform_local/**'
       - uses: actions/cache@v2
-        if: steps.filter.outputs.core == 'true' || steps.filter.outputs.comps == 'true' || steps.filter.outputs.models == 'true'
+        if: steps.filter.outputs.core == 'true' || steps.filter.outputs.local == 'true' || steps.filter.outputs.models == 'true'
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/*_requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
-        if: steps.filter.outputs.core == 'true' || steps.filter.outputs.comps == 'true' || steps.filter.outputs.models == 'true'
+        if: steps.filter.outputs.core == 'true' || steps.filter.outputs.local == 'true' || steps.filter.outputs.models == 'true'
         uses: actions/setup-python@v2.1.4
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
       - name: Install Python dependencies
-        if: steps.filter.outputs.core == 'true' || steps.filter.outputs.comps == 'true' || steps.filter.outputs.models == 'true'
+        if: steps.filter.outputs.core == 'true' || steps.filter.outputs.local == 'true' || steps.filter.outputs.models == 'true'
         run: |
           pip install idm-buildtools flake8 wheel --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
       - name: Run setup-dev
@@ -298,7 +298,7 @@ jobs:
         run: |
           make setup-dev
       - name: login to comps2
-        if: steps.filter.outputs.core == 'true' || steps.filter.outputs.comps == 'true' || steps.filter.outputs.models == 'true'
+        if: steps.filter.outputs.core == 'true' || steps.filter.outputs.local == 'true' || steps.filter.outputs.models == 'true'
         run: |
           python dev_scripts/create_auth_token_args.py --username $COMPS_USER --password $COMPS_PASSWORD
       - name: run idmtools_platform_local all tests
