@@ -15,7 +15,7 @@ CLDIR=$(PDS)clean_dir.py
 PYPI_URL?=https://packages.idmod.org/api/pypi/idm-pypi-staging/
 
 help: 
-	$(PDS)get_help_from_makefile.py
+	help-from-makefile -f $(mkfile_path)
 
 clean: ## Clean most of the temp-data from the project
 	$(MAKE) -C tests clean
