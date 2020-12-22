@@ -73,6 +73,7 @@ coverage-all: ## Generate a code-coverage report using all tests
 	$(MAKE) -C tests $@
 
 # Release related rules
+#######################
 
 dist: clean ## build our package
 	python setup.py sdist
