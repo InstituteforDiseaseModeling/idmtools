@@ -1,6 +1,5 @@
 import copy
 from abc import ABCMeta, abstractmethod
-from contextlib import suppress
 from dataclasses import dataclass, field, fields
 from logging import getLogger
 from typing import Set, NoReturn, Union, Callable, List, TYPE_CHECKING, Dict
