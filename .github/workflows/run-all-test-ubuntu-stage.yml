@@ -84,16 +84,6 @@ jobs:
         with:
           name: idmtools_platform_comps_test_results
           path: idmtools_platform_comps/tests/results/
-      - name: run idmtools_platform_local tests
-        run: |
-          cd idmtools_platform_local
-          make test-all
-      - name: Upload idmtools_platform_local all test results
-        uses: actions/upload-artifact@v2
-        if: failure()
-        with:
-          name: idmtools_platform_local_test_results
-          path: idmtools_platform_local/tests/results/
 
   run-local:
     runs-on: ${{ matrix.os }}
@@ -104,7 +94,7 @@ jobs:
     env:
       bamboo_user: ${{ secrets.PYPI_STAGING_USERNAME }}
       bamboo_password: ${{ secrets.PYPI_STAGING_PASSWORD }}
-    if: "contains(github.event.head_commit.message, 'Run ubuntu local test!')"
+    if: "contains(github.event.head_commit.message, 'Run ubuntu all test!')"
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
@@ -125,12 +115,6 @@ jobs:
           pip install idmtools[full] --index-url=https://${{ env.bamboo_user }}:${{ env.bamboo_password }}@packages.idmod.org/api/pypi/pypi-staging/simple
           pip install idmtools-test --index-url=https://${{ env.bamboo_user }}:${{ env.bamboo_password }}@packages.idmod.org/api/pypi/pypi-staging/simple
           pip install idmtools[test] --index-url=https://${{ env.bamboo_user }}:${{ env.bamboo_password }}@packages.idmod.org/api/pypi/pypi-staging/simple
-      - name: login to comps2
-        run: |
-          python dev_scripts/create_auth_token_args.py --username $COMPS_USER --password $COMPS_PASSWORD
-        env:
-          COMPS_USER: ${{ secrets.COMPS_USER }}
-          COMPS_PASSWORD: ${{ secrets.COMPS_PASSWORD }}
       - name: login to docker staging
         run: |
           echo '${{ env.bamboo_password }}' | docker login idm-docker-staging.packages.idmod.org --username ${{ env.bamboo_user }} --password-stdin
