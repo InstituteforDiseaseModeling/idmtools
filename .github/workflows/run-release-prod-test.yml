@@ -20,7 +20,7 @@ jobs:
           architecture: x64
       - name: Install Python dependencies
         run: |
-          pip install idm-buildtools flake8 wheel --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+          pip install idm-buildtools flake8 wheel pygit2 --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
       - name: Install dataclass
         if: ${{ matrix.python-version }} == 3.6
         run: |
