@@ -1,0 +1,48 @@
+# This GA can be triggered with commit message "Run prod ubuntu all test!". it install prod packages with any branch code
+name: "run-all-test-ubuntu-prod"
+on: [ push, pull_request ]
+
+jobs:
+  run-all-test-ubuntu-prod:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+        python-version: [3.7]
+    if: "contains(github.event.head_commit.message, 'Run prod comps test!')"
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+      - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
+      - name: Install Python dependencies
+        run: |
+          pip install idm-buildtools flake8 wheel pygit2 --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+      - name: Install dataclass
+        if: ${{ matrix.python-version }} == 3.6
+        run: |
+          pip install dataclasses
+      - name: download idmtools packages from production jfrog
+        run: |
+          pip install idmtools[full] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+          pip install idmtools-test --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+          pip install idmtools[test] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+      - name: login to comps2
+        run: |
+          python dev_scripts/create_auth_token_args.py --username $COMPS_USER --password $COMPS_PASSWORD
+        env:
+          COMPS_USER: ${{ secrets.COMPS_USER }}
+          COMPS_PASSWORD: ${{ secrets.COMPS_PASSWORD }}
+      - name: run idmtools_platform_comps tests
+        run: |
+          cd idmtools_platform_comps
+          PARALLEL_TEST_COUNT=2 make test-all
+      - name: Upload idmtools_platform_comps test results
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: idmtools_platform_comps_test_results
+          path: idmtools_platform_comps/tests/results/
