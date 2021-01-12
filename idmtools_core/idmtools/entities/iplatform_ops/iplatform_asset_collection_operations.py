@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from logging import DEBUG
+from logging import DEBUG, getLogger
 from typing import Any, List, Type, NoReturn, TYPE_CHECKING
 from uuid import UUID
 from idmtools.assets import AssetCollection
-from idmtools.core import CacheEnabled, getLogger
+from idmtools.core import CacheEnabled
 from idmtools.entities.iplatform_ops.utils import batch_create_items
 from idmtools.registry.functions import FunctionPluginManager
 
