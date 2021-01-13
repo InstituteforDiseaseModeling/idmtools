@@ -46,19 +46,10 @@ class RequirementsToAssetCollection:
             raise ValueError(
                 "Impossible to proceed without either requirements path or with package list or local wheels!")
 
-        if self.platform is None:
-            # Try to detect platform
-            from idmtools.core.context import get_current_platform
-            p = get_current_platform()
-            if p is not None:
-                self.platform = p
-
         self.requirements_path = os.path.abspath(self.requirements_path) if self.requirements_path else None
         self.pkg_list = self.pkg_list or []
         self.local_wheels = [os.path.abspath(whl) for whl in self.local_wheels] if self.local_wheels else []
-        self._os_target = "win" if "slurm" not in self.platform.environment.lower() and self.platform.environment.lower() not in SLURM_ENVS else "linux"
         self.tags = self.tags or {}
-        self.__reserved_tag = ['idmtools', 'task_type', MD5_KEY.format(self._os_target)]
 
     @property
     def checksum(self):
@@ -92,6 +83,18 @@ class RequirementsToAssetCollection:
 
         Returns: return ac id based on the requirements if Experiment and WorkItem Succeeded
         """
+
+        # Late validation
+        if self.platform is None:
+            # Try to detect platform
+            from idmtools.core.context import get_current_platform
+            p = get_current_platform()
+            if p is not None:
+                self.platform = p
+
+        self._os_target = "win" if "slurm" not in self.platform.environment.lower() and self.platform.environment.lower() not in SLURM_ENVS else "linux"
+        self.__reserved_tag = ['idmtools', 'task_type', MD5_KEY.format(self._os_target)]
+
         # Check if ac with md5 exists
         ac = self.retrieve_ac_by_tag()
 
@@ -259,28 +262,6 @@ class RequirementsToAssetCollection:
             except:  # noqa: E722
                 pass
 
-    @staticmethod
-    def get_latest_version(pkg_name, display_all=False):
-        """
-        Utility to get the latest version for a given package name
-        Args:
-            pkg_name: package name given
-            display_all: determine if output all package releases
-        Returns: the latest version of ven package
-        """
-        from idmtools_platform_comps.utils.package_version import get_latest_package_version_from_pypi
-        from idmtools_platform_comps.utils.package_version import get_latest_pypi_package_version_from_artifactory
-
-        latest_version = get_latest_pypi_package_version_from_artifactory(pkg_name, display_all)
-
-        if not latest_version:
-            latest_version = get_latest_package_version_from_pypi(pkg_name, display_all)
-
-        if not latest_version:
-            raise Exception(f"Failed to retrieve the latest version of '{pkg_name}'.")
-
-        return latest_version
-
     def consolidate_requirements(self):
         """
         Combine requirements and dynamic requirements (a list):
@@ -290,6 +271,7 @@ class RequirementsToAssetCollection:
         Returns: the consolidated requirements (as a list)
         """
         import pkg_resources
+        from idmtools_platform_comps.utils.package_version import get_pkg_match_version
 
         req_dict = {}
         comment_list = []
@@ -314,15 +296,13 @@ class RequirementsToAssetCollection:
                 req_dict[req.name] = req.specs
 
         missing_version_dict = {k: v for k, v in req_dict.items() if len(v) == 0 or v[0][1] == ''}
-        has_version_dict = {k: v for k, v in req_dict.items() if k not in missing_version_dict}
 
         update_req_list = []
-        for k, v in has_version_dict.items():
-            update_req_list.append(f'{k}=={v[0][1]}')
-
-        for k in missing_version_dict.keys():
-            latest = self.get_latest_version(k)
-            update_req_list.append(f"{k}=={latest}")
+        for k, v in req_dict.items():
+            pkg_name = k
+            base_version = None if k in missing_version_dict else v[0][1]
+            test = '==' if k in missing_version_dict else v[0][0]
+            update_req_list.append(f'{pkg_name}=={get_pkg_match_version(pkg_name, base_version, test)}')
 
         if self.local_wheels:
             update_req_list.extend([f"Assets/{os.path.basename(whl)}" for whl in self.local_wheels])
