@@ -13,7 +13,7 @@ from idmtools.registry.master_plugin_registry import MasterPluginRegistry
 user_logger = getLogger('user')
 
 
-@cli.group()
+@cli.group(short_help="Contains commands related to examples download")
 def gitrepo():
     pass
 
