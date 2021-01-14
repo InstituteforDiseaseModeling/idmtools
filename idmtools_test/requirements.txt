@@ -2,7 +2,7 @@ idmtools~=1.6.2
 pytest
 pytest-runner~=5.2
 xmlrunner~=1.7.7
-sqlalchemy~=1.3.20
+sqlalchemy~=1.3.22
 psycopg2-binary~=2.8.6
 flask~=1.1
 Flask-AutoIndex~=0.6.6
