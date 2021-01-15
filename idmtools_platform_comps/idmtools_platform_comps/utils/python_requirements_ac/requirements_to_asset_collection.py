@@ -31,7 +31,7 @@ class RequirementsToAssetCollection:
     #: list of wheel files locally to upload and install
     local_wheels: list = field(default=None)
     # User tags
-    tags: dict = field(default=None)
+    asset_tags: dict = field(default=None)
     #: Internal checksum to calculate unique requirements set has be ran before
     _checksum: str = field(default=None, init=False)
     #: Calculated requirements including versions
@@ -49,7 +49,7 @@ class RequirementsToAssetCollection:
         self.requirements_path = os.path.abspath(self.requirements_path) if self.requirements_path else None
         self.pkg_list = self.pkg_list or []
         self.local_wheels = [os.path.abspath(whl) for whl in self.local_wheels] if self.local_wheels else []
-        self.tags = self.tags or {}
+        self.asset_tags = self.asset_tags or {}
 
     @property
     def checksum(self):
@@ -201,15 +201,15 @@ class RequirementsToAssetCollection:
         experiment.tags = {MD5_KEY.format(self._os_target): self.checksum}
 
         # Avoid conflict to reserved tag
-        if len(set(self.tags).intersection(self.__reserved_tag)) > 0:
+        if len(set(self.asset_tags).intersection(self.__reserved_tag)) > 0:
             raise Exception(f"{self.__reserved_tag} are reserved tags, please use other tags!")
 
         # Remove conflicts in case
         for tag in self.__reserved_tag:
-            self.tags.pop(tag, None)
+            self.asset_tags.pop(tag, None)
 
         # Update experiment's tags
-        experiment.tags.update(self.tags)
+        experiment.tags.update(self.asset_tags)
 
         self.add_wheels_to_assets(experiment)
         user_logger.info("Run install of python requirements on COMPS. To view the details, see the experiment below")
@@ -236,7 +236,7 @@ class RequirementsToAssetCollection:
 
         # Update tags
         tags = {MD5_KEY.format(self._os_target): self.checksum}
-        tags.update(self.tags)
+        tags.update(self.asset_tags)
 
         user_logger.info(
             "Converting Python Packages to an Asset Collection. This may take some time for large dependency lists")
