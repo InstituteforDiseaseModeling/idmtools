@@ -303,38 +303,43 @@ try:
 
     @comps.command(help="Create ac from requirement file")
     @click.argument('requirement')
-    @click.option('--tag', multiple=True, help="Tag to be added to AC. Format: 'key:value'")
+    @click.option('--asset_tag', multiple=True, help="Tag to be added to AC. Format: 'key:value'")
     @click.option('--pkg', multiple=True, help="Package for override. Format: 'key==value'")
     @click.option('--wheel', multiple=True, help="Local wheel file")
     @click.pass_context
-    def req2ac(ctx: click.Context, requirement, tag: Optional[List[str]], pkg: Optional[List[str]],
+    def req2ac(ctx: click.Context, requirement, asset_tag: Optional[List[str]], pkg: Optional[List[str]],
                wheel: Optional[List[str]]):
         from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection import \
             RequirementsToAssetCollection
 
-        tags, pkg_list, wheel_list = _validate_inputs(tag, pkg, wheel)
+        pkg_list = list(pkg)
+        wheel_list = [os.path.abspath(w) for w in wheel]
+        tags = dict()
+        for t in asset_tag:
+            parts = t.split(':')
+            tags[parts[0]] = parts[1]
+
         p: COMPSPlatform = Platform(ctx.obj['config_block'])
         pl = RequirementsToAssetCollection(p, requirements_path=requirement, pkg_list=pkg_list,
-                                           local_wheels=wheel_list, tags=tags)
+                                           local_wheels=wheel_list, asset_tags=tags)
         ac_id = pl.run()
         print(ac_id)
 
 
     @comps.command(help="Check ac existing based on requirement file")
     @click.argument('requirement')
-    @click.option('--tag', multiple=True, help="Tag to be added to AC. Format: 'key:value'")
     @click.option('--pkg', multiple=True, help="Package for override. Format: 'key==value'")
     @click.option('--wheel', multiple=True, help="Local wheel file")
     @click.pass_context
-    def ac_exist(ctx: click.Context, requirement, tag: Optional[List[str]], pkg: Optional[List[str]],
+    def ac_exist(ctx: click.Context, requirement, pkg: Optional[List[str]],
                  wheel: Optional[List[str]]):
         from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection import \
             RequirementsToAssetCollection
 
-        tags, pkg_list, wheel_list = _validate_inputs(tag, pkg, wheel)
+        pkg_list = list(pkg)
+        wheel_list = [os.path.abspath(w) for w in wheel]
         p: COMPSPlatform = Platform(ctx.obj['config_block'])
-        pl = RequirementsToAssetCollection(p, requirements_path=requirement, pkg_list=pkg_list,
-                                           local_wheels=wheel_list, tags=tags)
+        pl = RequirementsToAssetCollection(p, requirements_path=requirement, pkg_list=pkg_list, local_wheels=wheel_list)
         # Check if ac with md5 exists
         ac = pl.retrieve_ac_by_tag()
         if ac:
@@ -345,19 +350,18 @@ try:
 
     @comps.command(help="Build Updated_Requirements from requirement file")
     @click.argument('requirement')
-    @click.option('--tag', multiple=True, help="Tag to be added to AC. Format: 'key:value'")
     @click.option('--pkg', multiple=True, help="Package for override. Format: 'key==value'")
     @click.option('--wheel', multiple=True, help="Local wheel file")
     @click.pass_context
-    def updated_requirements(ctx: click.Context, requirement, tag: Optional[List[str]], pkg: Optional[List[str]],
+    def updated_requirements(ctx: click.Context, requirement, pkg: Optional[List[str]],
                              wheel: Optional[List[str]]):
         from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection import \
             RequirementsToAssetCollection
 
-        tags, pkg_list, wheel_list = _validate_inputs(tag, pkg, wheel)
-        p: COMPSPlatform = Platform(ctx.obj['config_block'])
-        pl = RequirementsToAssetCollection(p, requirements_path=requirement, pkg_list=pkg_list,
-                                           local_wheels=wheel_list, tags=tags)
+        pkg_list = list(pkg)
+        wheel_list = [os.path.abspath(w) for w in wheel]
+        pl = RequirementsToAssetCollection(None, requirements_path=requirement, pkg_list=pkg_list,
+                                           local_wheels=wheel_list)
         pl.save_updated_requirements()
         req = open('requirements_updated.txt').read()
         print(req)
@@ -365,32 +369,19 @@ try:
 
     @comps.command(help="Construct checksum from requirement file")
     @click.argument('requirement')
-    @click.option('--tag', multiple=True, help="Tag to be added to AC. Format: 'key:value'")
     @click.option('--pkg', multiple=True, help="Package for override. Format: 'key==value'")
     @click.option('--wheel', multiple=True, help="Local wheel file")
     @click.pass_context
-    def checksum(ctx: click.Context, requirement, tag: Optional[List[str]], pkg: Optional[List[str]],
+    def checksum(ctx: click.Context, requirement, pkg: Optional[List[str]],
                  wheel: Optional[List[str]]):
         from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection import \
             RequirementsToAssetCollection
 
-        tags, pkg_list, wheel_list = _validate_inputs(tag, pkg, wheel)
-        p: COMPSPlatform = Platform(ctx.obj['config_block'])
-        pl = RequirementsToAssetCollection(p, requirements_path=requirement, pkg_list=pkg_list,
-                                           local_wheels=wheel_list, tags=tags)
+        pkg_list = list(pkg)
+        wheel_list = [os.path.abspath(w) for w in wheel]
+        pl = RequirementsToAssetCollection(None, requirements_path=requirement, pkg_list=pkg_list,
+                                           local_wheels=wheel_list)
         print(pl.checksum)
-
-
-    def _validate_inputs(tag_list, pkg_list, wheel_list):
-        tags = dict()
-        for t in tag_list:
-            parts = t.split(':')
-            tags[parts[0]] = parts[1]
-
-        pkg_list = list(pkg_list)
-        wheel_list = [os.path.abspath(w) for w in wheel_list]
-
-        return tags, pkg_list, wheel_list
 
 
     @comps.group(help="Singularity commands")
