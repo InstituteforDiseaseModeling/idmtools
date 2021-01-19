@@ -1,15 +1,18 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from logging import DEBUG
 from typing import Type, Any, List, Tuple, Dict, NoReturn, TYPE_CHECKING
 from uuid import UUID
 from idmtools.assets import Asset
-from idmtools.core import CacheEnabled
+from idmtools.core import CacheEnabled, getLogger
 from idmtools.entities.iplatform_ops.utils import batch_create_items
 from idmtools.entities.iworkflow_item import IWorkflowItem
 from idmtools.registry.functions import FunctionPluginManager
 
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
+
+logger = getLogger(__name__)
 
 
 @dataclass
@@ -57,7 +60,11 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
         Returns:
             NoReturn
         """
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Calling idmtools_platform_pre_create_item")
         FunctionPluginManager.instance().hook.idmtools_platform_pre_create_item(item=workflow_item, kwargs=kwargs)
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Calling pre_creation")
         workflow_item.pre_creation(self.platform)
 
     def post_create(self, workflow_item: IWorkflowItem, **kwargs) -> NoReturn:
@@ -71,6 +78,8 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
         Returns:
             NoReturn
         """
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Calling post_creation")
         workflow_item.post_creation(self.platform)
 
     def create(self, workflow_item: IWorkflowItem, do_pre: bool = True, do_post: bool = True, **kwargs) -> Any:
@@ -91,10 +100,16 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
         if workflow_item.status is not None:
             return workflow_item._platform_object, workflow_item.uid
         if do_pre:
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("Calling pre_create")
             self.pre_create(workflow_item, **kwargs)
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Calling platform_create")
         ret = self.platform_create(workflow_item, **kwargs)
         workflow_item.platform = self.platform
         if do_post:
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("Calling post_create")
             self.post_create(workflow_item, **kwargs)
         return ret
 
@@ -126,6 +141,8 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
         # ensure the item is created before running
         # TODO what status are valid here? Create only?
         if workflow_item.status is None:
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("Calling create")
             self.create(workflow_item)
 
     def post_run_item(self, workflow_item: IWorkflowItem, **kwargs):
@@ -150,8 +167,14 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
         Returns:
 
         """
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Calling pre_run_item")
         self.pre_run_item(workflow_item, **kwargs)
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Calling platform_run_item")
         self.platform_run_item(workflow_item, **kwargs)
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Calling post_run_item")
         self.post_run_item(workflow_item, **kwargs)
 
     @abstractmethod
