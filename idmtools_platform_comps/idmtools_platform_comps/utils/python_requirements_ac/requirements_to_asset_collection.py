@@ -1,5 +1,5 @@
-import hashlib
 import os
+import hashlib
 from dataclasses import dataclass, field
 from logging import getLogger, DEBUG
 from typing import List
@@ -297,14 +297,19 @@ class RequirementsToAssetCollection:
 
         missing_version_dict = {k: v for k, v in req_dict.items() if len(v) == 0 or v[0][1] == ''}
 
-        update_req_list = []
+        req_list = []
         for k, v in req_dict.items():
             pkg_name = k
             base_version = None if k in missing_version_dict else v[0][1]
             test = '==' if k in missing_version_dict else v[0][0]
-            update_req_list.append(f'{pkg_name}=={get_pkg_match_version(pkg_name, base_version, test)}')
+            req_list.append(f'{pkg_name}=={get_pkg_match_version(pkg_name, base_version, test)}')
 
+        wheel_list = []
         if self.local_wheels:
-            update_req_list.extend([f"Assets/{os.path.basename(whl)}" for whl in self.local_wheels])
+            wheel_list.extend([f"Assets/{os.path.basename(whl)}" for whl in self.local_wheels])
+
+        req_list = sorted(req_list, reverse=False)
+        wheel_list = sorted(wheel_list, reverse=False)
+        update_req_list = req_list + wheel_list
 
         return update_req_list
