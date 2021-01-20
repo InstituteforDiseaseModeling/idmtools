@@ -348,42 +348,6 @@ try:
             print("AC doesn't exist")
 
 
-    @comps.command(help="Build Updated_Requirements from requirement file")
-    @click.argument('requirement')
-    @click.option('--pkg', multiple=True, help="Package for override. Format: 'key==value'")
-    @click.option('--wheel', multiple=True, help="Local wheel file")
-    @click.pass_context
-    def updated_requirements(ctx: click.Context, requirement, pkg: Optional[List[str]],
-                             wheel: Optional[List[str]]):
-        from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection import \
-            RequirementsToAssetCollection
-
-        pkg_list = list(pkg)
-        wheel_list = [os.path.abspath(w) for w in wheel]
-        pl = RequirementsToAssetCollection(None, requirements_path=requirement, pkg_list=pkg_list,
-                                           local_wheels=wheel_list)
-        pl.save_updated_requirements()
-        req = open('requirements_updated.txt').read()
-        print(req)
-
-
-    @comps.command(help="Construct checksum from requirement file")
-    @click.argument('requirement')
-    @click.option('--pkg', multiple=True, help="Package for override. Format: 'key==value'")
-    @click.option('--wheel', multiple=True, help="Local wheel file")
-    @click.pass_context
-    def checksum(ctx: click.Context, requirement, pkg: Optional[List[str]],
-                 wheel: Optional[List[str]]):
-        from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection import \
-            RequirementsToAssetCollection
-
-        pkg_list = list(pkg)
-        wheel_list = [os.path.abspath(w) for w in wheel]
-        pl = RequirementsToAssetCollection(None, requirements_path=requirement, pkg_list=pkg_list,
-                                           local_wheels=wheel_list)
-        print(pl.checksum)
-
-
     @comps.group(help="Singularity commands")
     def singularity():
         pass
