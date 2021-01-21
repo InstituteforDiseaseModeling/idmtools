@@ -17,7 +17,7 @@ def package():
 def latest(name: Optional[str]):
     """
     \b
-    Display all idmtools available examples
+    Display the latest version of a package
     Args:
         name: package name
     """
@@ -32,7 +32,7 @@ def latest(name: Optional[str]):
 def compatible(name: Optional[str], base_version: Optional[str]):
     """
     \b
-    Display all idmtools available examples
+    Display the latest compatible version of a package
     Args:
         name: package name
         base_version: package version
@@ -48,7 +48,7 @@ def compatible(name: Optional[str], base_version: Optional[str]):
 def view(name: Optional[str], all: Optional[bool]):
     """
     \b
-    Display all idmtools available examples
+    Display all package versions
     Args:
         name: package name
         all: True/False - return all or only released versions
@@ -58,11 +58,18 @@ def view(name: Optional[str], all: Optional[bool]):
     print(versions)
 
 
-@package.command(help="Build Updated_Requirements from requirement file")
+@package.command()
 @click.argument('requirement')
 @click.option('--pkg', multiple=True, help="Package for override. Format: 'key==value'")
 @click.option('--wheel', multiple=True, help="Local wheel file")
 def updated_requirements(requirement, pkg: Optional[List[str]], wheel: Optional[List[str]]):
+    """
+    \b
+    Build Updated_Requirements from requirement file
+    Args:
+        pkg: package name (along with version)
+        wheel: package wheel file
+    """
     from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection import \
         RequirementsToAssetCollection
 
@@ -74,11 +81,18 @@ def updated_requirements(requirement, pkg: Optional[List[str]], wheel: Optional[
     print(req)
 
 
-@package.command(help="Construct checksum from requirement file")
+@package.command()
 @click.argument('requirement')
 @click.option('--pkg', multiple=True, help="Package for override. Format: 'key==value'")
 @click.option('--wheel', multiple=True, help="Local wheel file")
 def checksum(requirement, pkg: Optional[List[str]], wheel: Optional[List[str]]):
+    """
+    \b
+    Construct checksum from requirement file
+    Args:
+        pkg: package name (along with version)
+        wheel: package wheel file
+    """
     from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection import \
         RequirementsToAssetCollection
 

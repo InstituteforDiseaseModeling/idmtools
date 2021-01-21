@@ -301,7 +301,7 @@ try:
             sys.exit(-1)
 
 
-    @comps.command(help="Create ac from requirement file")
+    @comps.command()
     @click.argument('requirement')
     @click.option('--asset_tag', multiple=True, help="Tag to be added to AC. Format: 'key:value'")
     @click.option('--pkg', multiple=True, help="Package for override. Format: 'key==value'")
@@ -309,6 +309,14 @@ try:
     @click.pass_context
     def req2ac(ctx: click.Context, requirement, asset_tag: Optional[List[str]], pkg: Optional[List[str]],
                wheel: Optional[List[str]]):
+        """
+        \b
+        Create ac from requirement file
+        Args:
+            asset_tag: tag to be added to ac
+            pkg: package name (along with version)
+            wheel: package wheel file
+        """
         from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection import \
             RequirementsToAssetCollection
 
@@ -326,13 +334,20 @@ try:
         print(ac_id)
 
 
-    @comps.command(help="Check ac existing based on requirement file")
+    @comps.command()
     @click.argument('requirement')
-    @click.option('--pkg', multiple=True, help="Package for override. Format: 'key==value'")
+    @click.option('--pkg', multiple=True, help="Package used for override. Format: say, 'key==value'")
     @click.option('--wheel', multiple=True, help="Local wheel file")
     @click.pass_context
     def ac_exist(ctx: click.Context, requirement, pkg: Optional[List[str]],
                  wheel: Optional[List[str]]):
+        """
+        \b
+        Check ac existing based on requirement file
+        Args:
+            pkg: package name (along with version)
+            wheel: package wheel file
+        """
         from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection import \
             RequirementsToAssetCollection
 
