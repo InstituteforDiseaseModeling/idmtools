@@ -8,11 +8,11 @@ user_logger = getLogger('user')
 
 
 @cli.group(short_help="Contains commands related to package versions")
-def pkg():
+def package():
     pass
 
 
-@pkg.command()
+@package.command()
 @click.option('--name', required=True, type=str, help="package name")
 def latest(name: Optional[str]):
     """
@@ -26,7 +26,7 @@ def latest(name: Optional[str]):
     print(v)
 
 
-@pkg.command()
+@package.command()
 @click.option('--name', required=True, type=str, help="package name")
 @click.option('--base_version', required=True, default=None, type=str, help="package version")
 def compatible(name: Optional[str], base_version: Optional[str]):
@@ -42,7 +42,7 @@ def compatible(name: Optional[str], base_version: Optional[str]):
     print(v)
 
 
-@pkg.command()
+@package.command()
 @click.option('--name', required=True, type=str, help="package name")
 @click.option('--all', type=bool, default=True, help="package version")
 def view(name: Optional[str], all: Optional[bool]):
@@ -58,7 +58,7 @@ def view(name: Optional[str], all: Optional[bool]):
     print(versions)
 
 
-@pkg.command(help="Build Updated_Requirements from requirement file")
+@package.command(help="Build Updated_Requirements from requirement file")
 @click.argument('requirement')
 @click.option('--pkg', multiple=True, help="Package for override. Format: 'key==value'")
 @click.option('--wheel', multiple=True, help="Local wheel file")
@@ -74,7 +74,7 @@ def updated_requirements(requirement, pkg: Optional[List[str]], wheel: Optional[
     print(req)
 
 
-@pkg.command(help="Construct checksum from requirement file")
+@package.command(help="Construct checksum from requirement file")
 @click.argument('requirement')
 @click.option('--pkg', multiple=True, help="Package for override. Format: 'key==value'")
 @click.option('--wheel', multiple=True, help="Local wheel file")
