@@ -137,14 +137,15 @@ def peep(url: Optional[str], raw: Optional[bool]):
 
 
 @gitrepo.command()
-@click.option('--type', default=None, multiple=True, help="Download examples by type(COMPSPlatform, PythonTask, etc)")
+@click.option('--type', default=None, multiple=True, help="Download examples by type (COMPSPlatform, PythonTask, etc)")
 @click.option('--url', default=None, multiple=True, help="Repo files url")
 @click.option('--output', default='./', help="Files download destination")
-def download(type: Optional[List[str]], url: Optional[str], output: Optional[str]):
+def download(type: Optional[str], url: Optional[str], output: Optional[str]):
     """
     \b
     Download files from GitHub repo to user location
     Args:
+        type: Object type (COMPSPlatform, PythonTask, etc)
         url: GitHub repo files url
         output: Local folder
 
@@ -154,14 +155,15 @@ def download(type: Optional[List[str]], url: Optional[str], output: Optional[str
 
 
 @examples.command(name='download')
-@click.option('--type', default=None, multiple=True, help="Download examples by type(COMPSPlatform, PythonTask, etc)")
+@click.option('--type', default=None, multiple=True, help="Download examples by type (COMPSPlatform, PythonTask, etc)")
 @click.option('--url', default=None, multiple=True, help="Repo files url")
 @click.option('--output', default='./', help="Files download destination")
-def download_alias(type: Optional[List[str]], url: Optional[List[str]], output: Optional[str]):
+def download_alias(type: Optional[str], url: Optional[List[str]], output: Optional[str]):
     """
     \b
     Download examples from specified location
     Args:
+        type: Object type (COMPSPlatform, PythonTask, etc)
         url: GitHub repo files url
         output: Local folder
 
