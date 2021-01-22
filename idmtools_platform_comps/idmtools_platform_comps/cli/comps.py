@@ -302,13 +302,14 @@ try:
 
 
     @comps.command()
-    @click.argument('requirement')
+    @click.argument('requirement', type=click.Path(exists=True), required=False)
     @click.option('--asset_tag', multiple=True, help="Tag to be added to AC. Format: 'key:value'")
     @click.option('--pkg', multiple=True, help="Package for override. Format: 'key==value'")
     @click.option('--wheel', multiple=True, help="Local wheel file")
     @click.pass_context
-    def req2ac(ctx: click.Context, requirement, asset_tag: Optional[List[str]], pkg: Optional[List[str]],
-               wheel: Optional[List[str]]):
+    def req2ac(ctx: click.Context, requirement: str = None, asset_tag: Optional[List[str]] = None,
+               pkg: Optional[List[str]] = None,
+               wheel: Optional[List[str]] = None):
         """
         \b
         Create ac from requirement file
@@ -335,12 +336,12 @@ try:
 
 
     @comps.command()
-    @click.argument('requirement')
+    @click.argument('requirement', type=click.Path(exists=True), required=False)
     @click.option('--pkg', multiple=True, help="Package used for override. Format: say, 'key==value'")
     @click.option('--wheel', multiple=True, help="Local wheel file")
     @click.pass_context
-    def ac_exist(ctx: click.Context, requirement, pkg: Optional[List[str]],
-                 wheel: Optional[List[str]]):
+    def ac_exist(ctx: click.Context, requirement: str = None, pkg: Optional[List[str]] = None,
+                 wheel: Optional[List[str]] = None):
         """
         \b
         Check ac existing based on requirement file

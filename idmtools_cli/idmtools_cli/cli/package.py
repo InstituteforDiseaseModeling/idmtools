@@ -14,7 +14,7 @@ def package():
 
 @package.command()
 @click.option('--name', required=True, type=str, help="package name")
-def latest(name: Optional[str]):
+def latest_version(name: Optional[str]):
     """
     \b
     Display the latest version of a package
@@ -29,7 +29,7 @@ def latest(name: Optional[str]):
 @package.command()
 @click.option('--name', required=True, type=str, help="package name")
 @click.option('--base_version', required=True, default=None, type=str, help="package version")
-def compatible(name: Optional[str], base_version: Optional[str]):
+def compatible_version(name: Optional[str], base_version: Optional[str]):
     """
     \b
     Display the latest compatible version of a package
@@ -45,7 +45,7 @@ def compatible(name: Optional[str], base_version: Optional[str]):
 @package.command()
 @click.option('--name', required=True, type=str, help="package name")
 @click.option('--all', type=bool, default=True, help="package version")
-def view(name: Optional[str], all: Optional[bool]):
+def list_versions(name: Optional[str], all: Optional[bool]):
     """
     \b
     Display all package versions
@@ -59,10 +59,10 @@ def view(name: Optional[str], all: Optional[bool]):
 
 
 @package.command()
-@click.argument('requirement')
+@click.argument('requirement', type=click.Path(exists=True), required=False)
 @click.option('--pkg', multiple=True, help="Package for override. Format: 'key==value'")
 @click.option('--wheel', multiple=True, help="Local wheel file")
-def updated_requirements(requirement, pkg: Optional[List[str]], wheel: Optional[List[str]]):
+def updated_requirements(requirement: str = None, pkg: Optional[List[str]] = None, wheel: Optional[List[str]] = None):
     """
     \b
     Build Updated_Requirements from requirement file
@@ -82,10 +82,10 @@ def updated_requirements(requirement, pkg: Optional[List[str]], wheel: Optional[
 
 
 @package.command()
-@click.argument('requirement')
+@click.argument('requirement', type=click.Path(exists=True), required=False)
 @click.option('--pkg', multiple=True, help="Package for override. Format: 'key==value'")
 @click.option('--wheel', multiple=True, help="Local wheel file")
-def checksum(requirement, pkg: Optional[List[str]], wheel: Optional[List[str]]):
+def checksum(requirement: str = None, pkg: Optional[List[str]] = None, wheel: Optional[List[str]] = None):
     """
     \b
     Construct checksum from requirement file

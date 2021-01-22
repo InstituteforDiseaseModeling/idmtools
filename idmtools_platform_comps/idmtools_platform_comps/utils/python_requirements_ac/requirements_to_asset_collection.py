@@ -44,7 +44,7 @@ class RequirementsToAssetCollection:
     def __post_init__(self):
         if not any([self.requirements_path, self.pkg_list, self.local_wheels]):
             raise ValueError(
-                "Impossible to proceed without either requirements path or with package list or local wheels!")
+                "Impossible to proceed without either requirements path or package list or local wheels!")
 
         self.requirements_path = os.path.abspath(self.requirements_path) if self.requirements_path else None
         self.pkg_list = self.pkg_list or []
