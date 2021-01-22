@@ -1,14 +1,16 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from logging import getLogger, DEBUG
 from typing import Type, Any, List, Dict, NoReturn, Optional
 from uuid import UUID
-
 from idmtools.assets import Asset
 from idmtools.core.cache_enabled import CacheEnabled
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.utils import batch_create_items
 from idmtools.entities.simulation import Simulation
 from idmtools.registry.functions import FunctionPluginManager
+
+logger = getLogger(__name__)
 
 
 @dataclass
@@ -41,7 +43,11 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         Returns:
             NoReturn
         """
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Calling idmtools_platform_pre_create_item")
         FunctionPluginManager.instance().hook.idmtools_platform_pre_create_item(item=simulation, kwargs=kwargs)
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Calling pre_creation")
         simulation.pre_creation(self.platform)
 
     def post_create(self, simulation: Simulation, **kwargs) -> NoReturn:
@@ -55,6 +61,8 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         Returns:
             NoReturn
         """
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Calling post_creation")
         simulation.post_creation(self.platform)
 
     def create(self, simulation: Simulation, do_pre: bool = True, do_post: bool = True, **kwargs) -> Any:
@@ -75,9 +83,17 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
             return simulation
         if do_pre:
             self.pre_create(simulation, **kwargs)
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("Finished pre_create")
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Calling platform_create")
         ret = self.platform_create(simulation, **kwargs)
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Finished platform_create")
         if do_post:
             self.post_create(simulation, **kwargs)
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("Finished post_create")
         return ret
 
     @abstractmethod

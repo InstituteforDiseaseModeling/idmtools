@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from logging import getLogger, DEBUG
 from typing import Type, Any, List, Tuple, Dict, NoReturn, TYPE_CHECKING
 from uuid import UUID
 from idmtools.core.enums import EntityStatus, ItemType
@@ -9,6 +10,8 @@ from idmtools.registry.functions import FunctionPluginManager
 
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
+
+logger = getLogger(__name__)
 
 
 @dataclass
@@ -57,7 +60,11 @@ class IPlatformSuiteOperations(ABC):
         Returns:
             NoReturn
         """
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Calling idmtools_platform_pre_create_item")
         FunctionPluginManager.instance().hook.idmtools_platform_pre_create_item(item=suite, kwargs=kwargs)
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Calling pre_creation")
         suite.pre_creation(self.platform)
 
     def post_create(self, suite: Suite, **kwargs) -> NoReturn:
@@ -95,9 +102,17 @@ class IPlatformSuiteOperations(ABC):
             return suite._platform_object, suite.uid
         if do_pre:
             self.pre_create(suite, **kwargs)
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("Finished pre_create")
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Calling platform_create")
         ret = self.platform_create(suite, **kwargs)
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Finished platform_create")
         if do_post:
             self.post_create(suite, **kwargs)
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("Finished post_create")
         return ret
 
     @abstractmethod
@@ -135,7 +150,11 @@ class IPlatformSuiteOperations(ABC):
             if exp.status is None:
                 exps_to_commission.append(exp)
         if exps_to_commission:
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("Calling run_items")
             self.platform.run_items(exps_to_commission, **kwargs)
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("Finished run_items")
 
     def post_run_item(self, suite: Suite, **kwargs):
         """
@@ -159,8 +178,14 @@ class IPlatformSuiteOperations(ABC):
         Returns:
 
         """
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Calling pre_run_item")
         self.pre_run_item(suite)
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Calling platform_run_item")
         self.platform_run_item(suite)
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Calling post_run_item")
         self.post_run_item(suite)
 
     def platform_run_item(self, suite: Suite, **kwargs):

@@ -14,7 +14,7 @@ def main() -> NoReturn:
     os.environ['IDMTOOLS_NO_CONFIG_WARNING'] = '1'
     from idmtools_cli.cli.entrypoint import cli
     start()
-    cli()
+    cli(auto_envvar_prefix='IDMTOOLS_CLI')
 
 
 def start() -> NoReturn:

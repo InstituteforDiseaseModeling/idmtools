@@ -84,7 +84,7 @@ try:
         if password:
             user_logger.warning("Password the password via the command line is considered insecure")
         else:
-            password = getpass("Password")
+            password = getpass("Password:")
         # make platform object to load info from alias or config but don't login
         platform = Platform(ctx.obj['config_block'], _skip_login=True)
 
