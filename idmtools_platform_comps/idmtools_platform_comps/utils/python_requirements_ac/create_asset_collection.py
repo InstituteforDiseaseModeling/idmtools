@@ -92,7 +92,7 @@ def main():  # pragma: no cover
     # Retrieve experiment's tags
     _reserved_tag = ['idmtools', 'task_type', MD5_KEY.format(os_target)]
     comps_exp = Experiment.get(exp_id, QueryCriteria().select_children('tags'))
-    user_tags = {key: value for key, value in comps_exp.tags if key not in _reserved_tag}
+    user_tags = {key: value for key, value in comps_exp.tags.items() if key not in _reserved_tag}
 
     # Get md5_str
     md5_str = exp_tags.get(MD5_KEY.format(os_target), None)
