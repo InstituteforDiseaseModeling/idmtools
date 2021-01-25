@@ -10,4 +10,4 @@ PyYaml>=5.3.0,<5.4
 tabulate~=0.8.7
 tqdm>=4.52.0,<5
 packaging>=20.4,<21.0
-pygit2~=1.5.0
+pygit2>=1.4.0,<1.6.0
