@@ -388,7 +388,7 @@ def get_pkg_match_version(pkg_name, base_version=None, test='==', validate=True)
     if test == '==':
         return base_version
 
-    index = versions.lindex(base_version)
+    index = versions.index(base_version)
 
     if test == '<':
         return versions[index + 1] if index > -1 else None
