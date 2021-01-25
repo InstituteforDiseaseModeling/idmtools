@@ -40,7 +40,6 @@ def start() -> NoReturn:
     import idmtools_cli.cli.system_info  # noqa: F401
     import idmtools_cli.cli.gitrepo  # noqa: F401
     import idmtools_cli.cli.package  # noqa: F401
-    import idmtools_cli.cli.comps_zdu  # noqa: F401
     platform_plugins = PlatformCLIPlugins()
     from idmtools_cli.cli.init import build_project_commands
     build_project_commands()
