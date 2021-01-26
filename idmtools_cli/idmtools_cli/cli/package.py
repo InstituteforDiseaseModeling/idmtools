@@ -44,7 +44,7 @@ def compatible_version(name: Optional[str], base_version: Optional[str]):
 
 @package.command()
 @click.option('--name', required=True, type=str, help="package name")
-@click.option('--all', type=bool, default=True, help="package version")
+@click.option('--all/--no-all', type=bool, default=False, help="package version")
 def list_versions(name: Optional[str], all: Optional[bool]):
     """
     \b
@@ -54,7 +54,7 @@ def list_versions(name: Optional[str], all: Optional[bool]):
         all: True/False - return all or only released versions
     """
     from idmtools_platform_comps.utils.package_version import fetch_package_versions
-    versions = fetch_package_versions(name, all)
+    versions = fetch_package_versions(name, not all)
     print(versions)
 
 
