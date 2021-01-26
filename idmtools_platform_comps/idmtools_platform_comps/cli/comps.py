@@ -52,14 +52,12 @@ try:
                 raise PermissionError('Failure authenticating')
             return {'Username': self.username, 'Password': self.password}
 
-
     os.environ['IDMTOOLS_NO_CONFIG_WARNING'] = '1'
     from idmtools.core.platform_factory import Platform
     import click
     from idmtools_platform_comps.utils.assetize_output.assetize_output import AssetizeOutput
     from idmtools_platform_comps.utils.file_filter_workitem import DEFAULT_EXCLUDES
     from idmtools_platform_comps.comps_platform import COMPSPlatform
-
 
     @click.group(short_help="COMPS Related Commands")
     @click.argument('config-block')
@@ -71,7 +69,6 @@ try:
         CONFIG_BLOCK - Name of configuration section or alias to load COMPS connection information from
         """
         ctx.obj = dict(config_block=config_block)
-
 
     @comps.command(help="Login to COMPS")
     @click.option('--username', required=True, help="Username")
@@ -95,7 +92,6 @@ try:
         except PermissionError:
             user_logger.error(f"Could not loging to {platform.endpoint}")
             sys.exit(-1)
-
 
     @comps.command(help="Allows Downloading outputs from the command line")
     @click.option('--pattern', default=[], multiple=True, help="File patterns")
@@ -201,7 +197,6 @@ try:
                 dl_wi.fetch_error()
             sys.exit(-1)
 
-
     @comps.command(help="Allows assetizing outputs from the command line")
     @click.option('--pattern', default=[], multiple=True, help="File patterns")
     @click.option('--exclude-pattern', default=DEFAULT_EXCLUDES, multiple=True, help="File patterns")
@@ -300,7 +295,6 @@ try:
                 ao.fetch_error()
             sys.exit(-1)
 
-
     @comps.command()
     @click.argument('requirement', type=click.Path(exists=True), required=False)
     @click.option('--asset_tag', multiple=True, help="Tag to be added to AC. Format: 'key:value'")
@@ -334,7 +328,6 @@ try:
         ac_id = pl.run()
         print(ac_id)
 
-
     @comps.command()
     @click.argument('requirement', type=click.Path(exists=True), required=False)
     @click.option('--pkg', multiple=True, help="Package used for override. Format: say, 'key==value'")
@@ -363,11 +356,9 @@ try:
         else:
             print("AC doesn't exist")
 
-
     @comps.group(help="Singularity commands")
     def singularity():
         pass
-
 
     @singularity.command(help="Build Singularity Image")
     @click.option('--common-input', default=[], multiple=True, help="Files")
@@ -436,7 +427,6 @@ try:
                 user_logger.info(f"Saving the Builder Workitem ID that contains the image to {id_workitem_filename}")
                 sb.to_id_file(id_workitem_filename, save_platform=True)
         sys.exit(0 if sb.succeeded else -1)
-
 
     @singularity.command(help="Pull Singularity Image")
     @click.argument('image_url')

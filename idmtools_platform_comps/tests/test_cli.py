@@ -62,6 +62,8 @@ class TestCompsCLI(unittest.TestCase):
             self.assertIn('singularity', lines)
         with self.subTest("test_login_subcommand"):
             self.assertIn('login', lines)
+        with self.subTest("test_req2ac_subcommand"):
+            self.assertIn('req2ac', lines)
 
     @allure.feature("AssetizeOutputs")
     def test_assetize_dry_run_json(self):
