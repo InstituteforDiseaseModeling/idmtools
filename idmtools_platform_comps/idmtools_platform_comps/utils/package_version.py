@@ -319,7 +319,7 @@ def fetch_package_versions_from_pypi(pkg_name):
     url = PKG_PYPI.format(pkg_name)
     try:
         releases = json.loads(request.urlopen(url).read())['releases']
-    except:
+    except Exception:
         return None
 
     return releases
