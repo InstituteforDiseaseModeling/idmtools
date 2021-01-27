@@ -64,6 +64,15 @@ class RequirementsToAssetCollection:
         return self._checksum
 
     @property
+    def md5_tag(self):
+        """
+         Returns:
+            The md5 tag.
+        """
+        self.init_platform()
+        return {MD5_KEY.format(self._os_target): self.checksum}
+
+    @property
     def requirements(self):
         """
         Returns:
@@ -73,6 +82,17 @@ class RequirementsToAssetCollection:
             self._requirements = self.consolidate_requirements()
 
         return self._requirements
+
+    def init_platform(self):
+        if self.platform is None:
+            # Try to detect platform
+            from idmtools.core.context import get_current_platform
+            p = get_current_platform()
+            if p is not None:
+                self.platform = p
+
+        self._os_target = "win" if "slurm" not in self.platform.environment.lower() and self.platform.environment.lower() not in SLURM_ENVS else "linux"
+        self.__reserved_tag = ['idmtools', 'task_type', MD5_KEY.format(self._os_target)]
 
     def run(self, rerun=False):
         """
@@ -85,15 +105,7 @@ class RequirementsToAssetCollection:
         """
 
         # Late validation
-        if self.platform is None:
-            # Try to detect platform
-            from idmtools.core.context import get_current_platform
-            p = get_current_platform()
-            if p is not None:
-                self.platform = p
-
-        self._os_target = "win" if "slurm" not in self.platform.environment.lower() and self.platform.environment.lower() not in SLURM_ENVS else "linux"
-        self.__reserved_tag = ['idmtools', 'task_type', MD5_KEY.format(self._os_target)]
+        self.init_platform()
 
         # Check if ac with md5 exists
         ac = self.retrieve_ac_by_tag()
@@ -146,6 +158,9 @@ class RequirementsToAssetCollection:
             md5_check: also can use custom md5 string as search tag
         Returns: comps asset collection
         """
+        # Late validation
+        self.init_platform()
+
         md5_str = md5_check or self.checksum
         if logger.isEnabledFor(DEBUG):
             logger.debug(f'md5_str: {md5_str}')
@@ -198,7 +213,7 @@ class RequirementsToAssetCollection:
         task = JSONConfiguredPythonTask(script_path=os.path.join(CURRENT_DIRECTORY, MODEL_LOAD_LIB))
         experiment = Experiment(name=exp_name, simulations=[task.to_simulation()])
         experiment.add_asset(Asset(REQUIREMENT_FILE))
-        experiment.tags = {MD5_KEY.format(self._os_target): self.checksum}
+        experiment.tags = self.md5_tag
 
         # Avoid conflict to reserved tag
         if len(set(self.asset_tags).intersection(self.__reserved_tag)) > 0:
