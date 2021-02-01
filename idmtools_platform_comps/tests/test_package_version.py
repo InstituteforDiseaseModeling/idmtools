@@ -100,6 +100,83 @@ class TestPackageVersionCLI(unittest.TestCase):
         self.assertTrue(result.exit_code == 0, msg=result.output)
         self.assertTrue("astor==0.7.1", result.stdout_bytes.decode('utf-8'))
 
+    @allure.feature("req2ac")
+    # cli: idmtools package checksum --pkg astor==0.8.1 --pkg idmtools==1.6.2
+    def test_req2ac_checksum_pkg_order(self):
+        result1 = run_command('package', 'checksum', '--pkg', 'astor==0.8.1', '--pkg', 'idmtools==1.6.2',
+                              mix_stderr=False)
+        self.assertTrue(result1.exit_code == 0, msg=result1.output)
+        result2 = run_command('package', 'checksum', '--pkg', 'idmtools==1.6.2', '--pkg', 'astor==0.8.1',
+                              mix_stderr=False)
+        self.assertTrue(result2.exit_code == 0, msg=result2.output)
+        self.assertEqual(result1.output, result2.output)
+        self.assertTrue("8c815fe17f8d7dfeb790b5d0041b288a", result1.output)
+
+    @allure.feature("req2ac")
+    # cli: idmtools package checksum --wheel wheel_file_1 --wheel wheel_file_2
+    def test_req2ac_checksum_wheels_order(self):
+        result1 = run_command('package', 'checksum', '--wheel', wheel_file_1, '--wheel', wheel_file_2,
+                              mix_stderr=False)
+        self.assertTrue(result1.exit_code == 0, msg=result1.output)
+        result2 = run_command('package', 'checksum', '--wheel', wheel_file_2, '--wheel', wheel_file_1,
+                              mix_stderr=False)
+        self.assertTrue(result2.exit_code == 0, msg=result2.output)
+        self.assertEqual(result1.output, result2.output)
+        self.assertTrue("d2e204cfbf40e78d6b18fe862f422512", result1.output)
+
+    @allure.feature("req2ac")
+    # cli: idmtools package updated-requirements --wheel wheel_file_1 --wheel wheel_file_2
+    def test_req2ac_updated_requirements_wheels_order(self):
+        result1 = run_command('package', 'updated-requirements', '--wheel', wheel_file_1, '--wheel', wheel_file_2,
+                              mix_stderr=False)
+        self.assertTrue(result1.exit_code == 0, msg=result1.output)
+        result2 = run_command('package', 'updated-requirements', '--wheel', wheel_file_2, '--wheel', wheel_file_1,
+                              mix_stderr=False)
+        self.assertTrue(result2.exit_code == 0, msg=result2.output)
+        self.assertEqual(result1.output, result2.output)
+        self.assertTrue("d2e204cfbf40e78d6b18fe862f422512", result1.output)
+        self.assertTrue('Assets/fake_wheel_file_a.whl\nAssets/fake_wheel_file_b.whl\n',
+                        result1.stdout_bytes.decode('utf-8'))
+
+    @allure.feature("req2ac")
+    # cli: idmtools package updated-requirements --pkg astor~=0.7.0 --pkg idmtools==1.6.2
+    def test_req2ac_updated_requirements_pgk_order(self):
+        result1 = run_command('package', 'updated-requirements', '--pkg', 'astor~=0.7.0', '--pkg', 'idmtools==1.6.2',
+                              mix_stderr=False)
+        self.assertTrue(result1.exit_code == 0, msg=result1.output)
+        result2 = run_command('package', 'updated-requirements', '--pkg', 'idmtools==1.6.2', '--pkg', 'astor~=0.7.0',
+                              mix_stderr=False)
+        self.assertTrue(result2.exit_code == 0, msg=result2.output)
+        self.assertEqual(result1.output, result2.output)
+        self.assertTrue("astor==0.7.1\nidmtools==1.6.2\n", result1.output)
+        self.assertTrue("astor==0.7.1\nidmtools==1.6.2\n", result1.stdout_bytes.decode('utf-8'))
+
+    @allure.feature("req2ac")
+    # cli: idmtools package updated-requirements --pkg astor==0.8.1 --pkg idmtools==1.6.2 --wheel wheel_file_1 --wheel wheel_file_2
+    def test_req2ac_checksum_pkg_wheels_order(self):
+        result1 = run_command('package', 'checksum', '--pkg', 'astor==0.8.1', '--pkg', 'idmtools==1.6.2',
+                              '--wheel', wheel_file_1, '--wheel', wheel_file_2, mix_stderr=False)
+        self.assertTrue(result1.exit_code == 0, msg=result1.output)
+        result2 = run_command('package', 'checksum', '--pkg', 'idmtools==1.6.2', '--pkg', 'astor==0.8.1',
+                              '--wheel', wheel_file_2, '--wheel', wheel_file_1, mix_stderr=False)
+        self.assertTrue(result2.exit_code == 0, msg=result2.output)
+        self.assertEqual(result1.output, result2.output)
+        self.assertTrue("8d50bf1f9fc60b806d9816bf5809748d", result1.output)
+
+    @allure.feature("req2ac")
+    # cli: idmtools package updated-requirements --pkg astor==0.8.1 --pkg idmtools==1.6.2 --wheel wheel_file_1 --wheel wheel_file_2
+    def test_req2ac_updated_requirements_pkg_wheels_order(self):
+        result1 = run_command('package', 'updated-requirements', '--pkg', 'astor==0.8.1', '--pkg', 'idmtools==1.6.2',
+                              '--wheel', wheel_file_1, '--wheel', wheel_file_2, mix_stderr=False)
+        self.assertTrue(result1.exit_code == 0, msg=result1.output)
+        result2 = run_command('package', 'updated-requirements', '--pkg', 'idmtools==1.6.2', '--pkg', 'astor==0.8.1',
+                              '--wheel', wheel_file_2, '--wheel', wheel_file_1, mix_stderr=False)
+        self.assertTrue(result2.exit_code == 0, msg=result2.output)
+        self.assertEqual(result1.output, result2.output)
+        self.assertTrue("8d50bf1f9fc60b806d9816bf5809748d", result1.output)
+        self.assertTrue('astor==0.8.1\nidmtools==1.6.2\nAssets/fake_wheel_file_a.whl\nAssets/fake_wheel_file_b.whl\n',
+                        result1.stdout_bytes.decode('utf-8'))
+
     @pytest.mark.serial
     def test_get_pkg_match_version(self):
         test_versions = ['10.0.0', '0.8.1', '0.8.0', '0.7.1', '0.7.0', '0.6.2', '0.6.1', '0.6', '0.5', '0.4.1', '0.4',
