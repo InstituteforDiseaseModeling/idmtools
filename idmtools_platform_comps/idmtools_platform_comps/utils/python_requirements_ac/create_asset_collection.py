@@ -89,13 +89,18 @@ def main():  # pragma: no cover
     comps_exp = Experiment.get(exp_id, QueryCriteria().select_children('tags'))
     exp_tags = comps_exp.tags
 
+    # Retrieve experiment's tags
+    _reserved_tag = ['idmtools', 'task_type', MD5_KEY.format(os_target)]
+    comps_exp = Experiment.get(exp_id, QueryCriteria().select_children('tags'))
+    user_tags = {key: value for key, value in comps_exp.tags.items() if key not in _reserved_tag}
+
     # Get md5_str
     md5_str = exp_tags.get(MD5_KEY.format(os_target), None)
 
     # Collect ac's tags
     ac = AssetCollection()
     tags = {MD5_KEY.format(os_target): md5_str}
-    tags.update(exp_tags)
+    tags.update(user_tags)
     ac.set_tags(tags)
 
     # Create asset collection

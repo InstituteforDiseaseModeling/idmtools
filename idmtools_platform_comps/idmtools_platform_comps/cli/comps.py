@@ -2,6 +2,7 @@ import glob
 import json as json_parser
 import os
 import sys
+from typing import Optional, List
 import tabulate
 from getpass import getpass
 from logging import getLogger
@@ -85,7 +86,8 @@ try:
         platform = Platform(ctx.obj['config_block'], _skip_login=True)
 
         try:
-            Client.login(platform.endpoint, StaticCredentialPrompt(comps_url=platform.endpoint, username=username, password=password))
+            Client.login(platform.endpoint,
+                         StaticCredentialPrompt(comps_url=platform.endpoint, username=username, password=password))
             user_logger.log(SUCCESS, "Login succeeded")
         except PermissionError:
             user_logger.error(f"Could not loging to {platform.endpoint}")
@@ -97,23 +99,31 @@ try:
     @click.option('--experiment', default=[], multiple=True, help="Experiment ids to filter for files to download")
     @click.option('--simulation', default=[], multiple=True, help="Simulation ids to filter for files to download")
     @click.option('--work-item', default=[], multiple=True, help="WorkItems ids to filter for files to download")
-    @click.option('--asset-collection', default=[], multiple=True, help="Asset Collection ids to filter for files to download")
-    @click.option('--dry-run/--no-dry-run', default=False, help="Gather a list of files that would be downloaded instead of actually downloading")
+    @click.option('--asset-collection', default=[], multiple=True,
+                  help="Asset Collection ids to filter for files to download")
+    @click.option('--dry-run/--no-dry-run', default=False,
+                  help="Gather a list of files that would be downloaded instead of actually downloading")
     @click.option('--wait/--no-wait', default=True, help="Wait on item to finish")
-    @click.option('--include-assets/--no-include-assets', default=False, help="Scan common assets of WorkItems and Experiments when filtering")
+    @click.option('--include-assets/--no-include-assets', default=False,
+                  help="Scan common assets of WorkItems and Experiments when filtering")
     @click.option('--verbose/--no-verbose', default=True, help="Enable verbose output in worker")
     @click.option('--json/--no-json', default=False, help="Outputs File list as JSON when used with dry run")
-    @click.option('--simulation-prefix-format-str', default=None, help="Simulation Prefix Format str. Defaults to '{simulation.id}'. For no prefix, pass a empty string")
+    @click.option('--simulation-prefix-format-str', default=None,
+                  help="Simulation Prefix Format str. Defaults to '{simulation.id}'. For no prefix, pass a empty string")
     @click.option('--work-item-prefix-format-str', default=None, help="WorkItem Prefix Format str. Defaults to ''")
     @click.option('--name', default=None, help="Name of Download Workitem. If not provided, one will be generated")
     @click.option('--output-path', default=os.getcwd(), help="Output path to save zip")
-    @click.option('--delete-after-download/--no-delete-after-download', default=True, help="Delete the workitem used to gather files after download")
-    @click.option('--extract-after-download/--no-extract-after-download', default=True, help="Extract zip after download")
+    @click.option('--delete-after-download/--no-delete-after-download', default=True,
+                  help="Delete the workitem used to gather files after download")
+    @click.option('--extract-after-download/--no-extract-after-download', default=True,
+                  help="Extract zip after download")
     @click.option('--zip-name', default="output.zip", help="Name of zipfile")
     @click.pass_context
     def download(
-            ctx: click.Context, pattern, exclude_pattern, experiment, simulation, work_item, asset_collection, dry_run, wait,
-            include_assets, verbose, json, simulation_prefix_format_str, work_item_prefix_format_str, name, output_path, delete_after_download,
+            ctx: click.Context, pattern, exclude_pattern, experiment, simulation, work_item, asset_collection, dry_run,
+            wait,
+            include_assets, verbose, json, simulation_prefix_format_str, work_item_prefix_format_str, name, output_path,
+            delete_after_download,
             extract_after_download, zip_name
     ):
         from idmtools_platform_comps.utils.download.download import DownloadWorkItem
@@ -123,8 +133,9 @@ try:
             sys.exit(-1)
 
         if dry_run and delete_after_download:
-            user_logger.warning("You are using dry-run with delete after download. This will most result in an empty file list since "
-                                "the item will be deleted before the output can be fetched.")
+            user_logger.warning(
+                "You are using dry-run with delete after download. This will most result in an empty file list since "
+                "the item will be deleted before the output can be fetched.")
 
         if json:
             os.environ['IDMTOOLS_SUPPRESS_OUTPUT'] = '1'
@@ -193,21 +204,28 @@ try:
     @click.option('--simulation', default=[], multiple=True, help="Simulation ids to assetize")
     @click.option('--work-item', default=[], multiple=True, help="WorkItems ids to assetize")
     @click.option('--asset-collection', default=[], multiple=True, help="Asset Collection ids to assetize")
-    @click.option('--dry-run/--no-dry-run', default=False, help="Gather a list of files that would be assetized instead of actually assetizing")
+    @click.option('--dry-run/--no-dry-run', default=False,
+                  help="Gather a list of files that would be assetized instead of actually assetizing")
     @click.option('--wait/--no-wait', default=True, help="Wait on item to finish")
-    @click.option('--include-assets/--no-include-assets', default=False, help="Scan common assets of WorkItems and Experiments when filtering")
+    @click.option('--include-assets/--no-include-assets', default=False,
+                  help="Scan common assets of WorkItems and Experiments when filtering")
     @click.option('--verbose/--no-verbose', default=True, help="Enable verbose output in worker")
     @click.option('--json/--no-json', default=False, help="Outputs File list as JSON when used with dry run")
-    @click.option('--simulation-prefix-format-str', default=None, help="Simulation Prefix Format str. Defaults to '{simulation.id}'. For no prefix, pass a empty string")
+    @click.option('--simulation-prefix-format-str', default=None,
+                  help="Simulation Prefix Format str. Defaults to '{simulation.id}'. For no prefix, pass a empty string")
     @click.option('--work-item-prefix-format-str', default=None, help="WorkItem Prefix Format str. Defaults to ''")
-    @click.option('--tag', default=[], type=(str, str), multiple=True, help="Tags to add to the created asset collection as pairs.")
+    @click.option('--tag', default=[], type=(str, str), multiple=True,
+                  help="Tags to add to the created asset collection as pairs.")
     @click.option('--name', default=None, help="Name of AssetizeWorkitem. If not provided, one will be generated")
     @click.option('--id-file/--no-id-file', default=False, help="Enable or disable writing out an id file")
-    @click.option('--id-filename', default=None, help="Name of ID file to save build as. Required when id file is enabled")
+    @click.option('--id-filename', default=None,
+                  help="Name of ID file to save build as. Required when id file is enabled")
     @click.pass_context
     def assetize_outputs(
-            ctx: click.Context, pattern, exclude_pattern, experiment, simulation, work_item, asset_collection, dry_run, wait,
-            include_assets, verbose, json, simulation_prefix_format_str, work_item_prefix_format_str, tag, name, id_file, id_filename
+            ctx: click.Context, pattern, exclude_pattern, experiment, simulation, work_item, asset_collection, dry_run,
+            wait,
+            include_assets, verbose, json, simulation_prefix_format_str, work_item_prefix_format_str, tag, name,
+            id_file, id_filename
     ):
 
         if id_file and id_filename is None:
@@ -277,6 +295,67 @@ try:
                 ao.fetch_error()
             sys.exit(-1)
 
+    @comps.command()
+    @click.argument('requirement', type=click.Path(exists=True), required=False)
+    @click.option('--asset_tag', multiple=True, help="Tag to be added to AC. Format: 'key:value'")
+    @click.option('--pkg', multiple=True, help="Package for override. Format: 'key==value'")
+    @click.option('--wheel', multiple=True, help="Local wheel file")
+    @click.pass_context
+    def req2ac(ctx: click.Context, requirement: str = None, asset_tag: Optional[List[str]] = None,
+               pkg: Optional[List[str]] = None,
+               wheel: Optional[List[str]] = None):
+        """
+        \b
+        Create ac from requirement file
+        Args:
+            asset_tag: tag to be added to ac
+            pkg: package name (along with version)
+            wheel: package wheel file
+        """
+        from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection import \
+            RequirementsToAssetCollection
+
+        pkg_list = list(pkg)
+        wheel_list = [os.path.abspath(w) for w in wheel]
+        tags = dict()
+        for t in asset_tag:
+            parts = t.split(':')
+            tags[parts[0]] = parts[1]
+
+        p: COMPSPlatform = Platform(ctx.obj['config_block'])
+        pl = RequirementsToAssetCollection(p, requirements_path=requirement, pkg_list=pkg_list,
+                                           local_wheels=wheel_list, asset_tags=tags)
+        ac_id = pl.run()
+        print(ac_id)
+
+    @comps.command()
+    @click.argument('requirement', type=click.Path(exists=True), required=False)
+    @click.option('--pkg', multiple=True, help="Package used for override. Format: say, 'key==value'")
+    @click.option('--wheel', multiple=True, help="Local wheel file")
+    @click.pass_context
+    def ac_exist(ctx: click.Context, requirement: str = None, pkg: Optional[List[str]] = None,
+                 wheel: Optional[List[str]] = None):
+        """
+        \b
+        Check ac existing based on requirement file
+        Args:
+            pkg: package name (along with version)
+            wheel: package wheel file
+        """
+        from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection import \
+            RequirementsToAssetCollection
+
+        pkg_list = list(pkg)
+        wheel_list = [os.path.abspath(w) for w in wheel]
+        p: COMPSPlatform = Platform(ctx.obj['config_block'])
+        pl = RequirementsToAssetCollection(p, requirements_path=requirement, pkg_list=pkg_list, local_wheels=wheel_list)
+        # Check if ac with md5 exists
+        ac = pl.retrieve_ac_by_tag()
+        if ac:
+            print("AC exist: ", ac.id)
+        else:
+            print("AC doesn't exist")
+
     @comps.group(help="Singularity commands")
     def singularity():
         pass
@@ -288,18 +367,26 @@ try:
     @click.option('--transient-input-glob', default=[], multiple=True, help="Transient Files Glob Patterns")
     @click.argument('definition_file')
     @click.option('--wait/--no-wait', default=True, help="Wait on item to finish")
-    @click.option('--tag', default=[], type=(str, str), multiple=True, help="Extra Tags as Value Pairs for the Resulting AC")
-    @click.option('--workitem-tag', default=[], type=(str, str), multiple=True, help="Extra Tags as Value Pairs for the WorkItem")
+    @click.option('--tag', default=[], type=(str, str), multiple=True,
+                  help="Extra Tags as Value Pairs for the Resulting AC")
+    @click.option('--workitem-tag', default=[], type=(str, str), multiple=True,
+                  help="Extra Tags as Value Pairs for the WorkItem")
     @click.option('--name', default=None, help="Name of WorkItem. If not provided, one will be generated")
     @click.option('--force/--no-force', default=False, help="Force build, ignoring build context")
     @click.option('--image-name', default=None, help="Name of resulting image")
-    @click.option('--id-file/--no-id-file', default=True, help="Enable or disable writing out an ID file that points to the created asset collection")
-    @click.option('--id-filename', default=None, help="Name of ID file to save build as. If not specified, and id-file is enabled, a name is calculated")
-    @click.option('--id-workitem/--no-id-workitem', default=True, help="Enable or disable writing out an id file for the workitem")
-    @click.option('--id-workitem-failed/--no-id-workitem-failed', default=False, help="Write id of the workitem even if it failed. You need to enable --id-workitem for this is be active")
-    @click.option('--id-workitem-filename', default=None, help="Name of ID file to save workitem to. You need to enable --id-workitem for this is be active")
+    @click.option('--id-file/--no-id-file', default=True,
+                  help="Enable or disable writing out an ID file that points to the created asset collection")
+    @click.option('--id-filename', default=None,
+                  help="Name of ID file to save build as. If not specified, and id-file is enabled, a name is calculated")
+    @click.option('--id-workitem/--no-id-workitem', default=True,
+                  help="Enable or disable writing out an id file for the workitem")
+    @click.option('--id-workitem-failed/--no-id-workitem-failed', default=False,
+                  help="Write id of the workitem even if it failed. You need to enable --id-workitem for this is be active")
+    @click.option('--id-workitem-filename', default=None,
+                  help="Name of ID file to save workitem to. You need to enable --id-workitem for this is be active")
     @click.pass_context
-    def build(ctx: click.Context, common_input, common_input_glob, transient_input, transient_input_glob, definition_file, wait, tag, workitem_tag, name, force, image_name: str,
+    def build(ctx: click.Context, common_input, common_input_glob, transient_input, transient_input_glob,
+              definition_file, wait, tag, workitem_tag, name, force, image_name: str,
               id_file: str, id_filename: str, id_workitem: bool, id_workitem_failed: bool, id_workitem_filename: str):
         p: COMPSPlatform = Platform(ctx.obj['config_block'])
         sb = SingularityBuildWorkItem(definition_file=definition_file, name=name, force=force, image_name=image_name)
@@ -332,7 +419,8 @@ try:
         if id_workitem:
             # TODO when we should use platform id but that need to be updated through the code base
             if sb.succeeded and sb._uid is None:
-                user_logger.warning("Cannot save workitem id because an existing container was found with the same inputs. You can force run using --force, but it is recommended to use the container used.")
+                user_logger.warning(
+                    "Cannot save workitem id because an existing container was found with the same inputs. You can force run using --force, but it is recommended to use the container used.")
             elif id_workitem_failed or sb.succeeded:
                 if id_workitem_filename is None:
                     id_workitem_filename = sb.get_id_filename(prefix="builder.")
@@ -343,18 +431,25 @@ try:
     @singularity.command(help="Pull Singularity Image")
     @click.argument('image_url')
     @click.option('--wait/--no-wait', default=True, help="Wait on item to finish")
-    @click.option('--tag', default=[], type=(str, str), multiple=True, help="Extra Tags as Value Pairs for the Resulting AC")
-    @click.option('--workitem-tag', default=[], type=(str, str), multiple=True, help="Extra Tags as Value Pairs for the WorkItem")
+    @click.option('--tag', default=[], type=(str, str), multiple=True,
+                  help="Extra Tags as Value Pairs for the Resulting AC")
+    @click.option('--workitem-tag', default=[], type=(str, str), multiple=True,
+                  help="Extra Tags as Value Pairs for the WorkItem")
     @click.option('--name', default=None, help="Name of WorkItem. If not provided, one will be generated")
     @click.option('--force/--no-force', default=False, help="Force build, ignoring build context")
     @click.option('--image-name', default=None, help="Name of resulting image")
     @click.option('--id-file/--no-id-file', default=True, help="Enable or disable writing out an id file")
-    @click.option('--id-filename', default=None, help="Name of ID file to save build as. If not specified, and id-file is enabled, a name is calculated")
-    @click.option('--id-workitem/--no-id-workitem', default=True, help="Enable or disable writing out an id file for the workitem")
-    @click.option('--id-workitem-failed/--no-id-workitem-failed', default=False, help="Write id of the workitem even if it failed. You need to enable --id-workitem for this is be active")
-    @click.option('--id-workitem-filename', default=None, help="Name of ID file to save workitem to. You need to enable --id-workitem for this is be active")
+    @click.option('--id-filename', default=None,
+                  help="Name of ID file to save build as. If not specified, and id-file is enabled, a name is calculated")
+    @click.option('--id-workitem/--no-id-workitem', default=True,
+                  help="Enable or disable writing out an id file for the workitem")
+    @click.option('--id-workitem-failed/--no-id-workitem-failed', default=False,
+                  help="Write id of the workitem even if it failed. You need to enable --id-workitem for this is be active")
+    @click.option('--id-workitem-filename', default=None,
+                  help="Name of ID file to save workitem to. You need to enable --id-workitem for this is be active")
     @click.pass_context
-    def pull(ctx: click.Context, image_url, wait, tag, workitem_tag, name, force, image_name: str, id_file: str, id_filename: str,
+    def pull(ctx: click.Context, image_url, wait, tag, workitem_tag, name, force, image_name: str, id_file: str,
+             id_filename: str,
              id_workitem: bool, id_workitem_failed: bool, id_workitem_filename: str):
         p: COMPSPlatform = Platform(ctx.obj['config_block'])
         sb = SingularityBuildWorkItem(image_url=image_url, force=force, image_name=image_name)
@@ -376,7 +471,8 @@ try:
             sb.asset_collection.to_id_file(id_filename, save_platform=True)
 
         if id_workitem and sb.succeeded and sb._uid is None:
-            user_logger.warning("Cannot save workitem id because an existing container was found with the same inputs. You can force run using --force, but it is recommended to use the container used.")
+            user_logger.warning(
+                "Cannot save workitem id because an existing container was found with the same inputs. You can force run using --force, but it is recommended to use the container used.")
         elif id_workitem_failed or sb.succeeded:
             if id_workitem_filename is None:
                 id_workitem_filename = sb.get_id_filename(prefix="builder.")
@@ -385,4 +481,5 @@ try:
         sys.exit(0 if sb.succeeded else -1)
 
 except ImportError as e:
-    logger.warning(f"COMPS CLI not enabled because a dependency is missing. Most likely it is either click or idmtools cli {e.args}")
+    logger.warning(
+        f"COMPS CLI not enabled because a dependency is missing. Most likely it is either click or idmtools cli {e.args}")
