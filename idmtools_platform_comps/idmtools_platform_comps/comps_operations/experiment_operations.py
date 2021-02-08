@@ -21,6 +21,7 @@ from idmtools.utils.collections import ExperimentParentIterator
 from idmtools.utils.info import get_doc_base_url
 from idmtools.utils.time import timestamp
 from idmtools_platform_comps.utils.general import clean_experiment_name, convert_comps_status
+from idmtools_platform_comps.utils.python_version import SLURM_ENVIRONMENTS
 
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools_platform_comps.comps_platform import COMPSPlatform
@@ -117,28 +118,32 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         # Get the experiment command line
         exp_command: CommandLine = self._get_experiment_command_line(check_command, experiment)
 
-        if command_arg is None:
+        if command_arg is None and exp_command is not None:
             command_arg = exp_command.arguments + " " + exp_command.options
 
-        if executable_path is None:
+        if executable_path is None and exp_command is not None:
             executable_path = exp_command.executable
 
         # create initial configuration object
-        comps_config = dict(
-            environment_name=self.platform.environment,
-            simulation_input_args=command_arg.strip(),
-            working_directory_root=os.path.join(simulation_root, subdirectory).replace('\\', '/'),
-            executable_path=executable_path,
-            node_group_name=self.platform.node_group,
-            maximum_number_of_retries=self.platform.num_retries,
-            priority=self.platform.priority if priority is None else priority,
-            min_cores=self.platform.num_cores if num_cores is None else num_cores,
-            max_cores=self.platform.num_cores if num_cores is None else num_cores,
-            exclusive=self.platform.exclusive
-        )
-
+        if isinstance(experiment.simulations, ExperimentParentIterator) and isinstance(experiment.simulations.items, TemplatedSimulations):
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("ParentIterator/TemplatedSimulations detected")
+            if experiment.simulations.items.base_task.has_workorder and self.platform.environment.lower() in SLURM_ENVIRONMENTS:
+                comps_config = self.work_order_config(simulation_root, subdirectory, priority)
+            else:
+                comps_config = self.no_work_order_config(command_arg, executable_path, simulation_root, num_cores,
+                                                         subdirectory, priority)
+        else:
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("List of simulations detected")
+            if experiment.simulations[0].task.has_workorder and self.platform.environment.lower() in SLURM_ENVIRONMENTS:
+                comps_config = self.work_order_config(simulation_root, subdirectory, priority)
+            else:
+                comps_config = self.no_work_order_config(command_arg, executable_path, simulation_root, num_cores,
+                                                         subdirectory, priority)
         if logger.isEnabledFor(DEBUG):
             logger.debug(f'COMPS Experiment Configs: {str(comps_config)}')
+
         config = Configuration(**comps_config)
 
         e = COMPSExperiment(name=experiment.name,
@@ -312,8 +317,8 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         if experiment.assets.count == 0:
             logger.warning('Experiment has no assets to send')
             return
-
         ac = self.platform._assets.create(experiment.assets)
+
         if logger.isEnabledFor(DEBUG):
             logger.debug(f'Asset collection for experiment: {experiment.id} is: {ac.id}')
 
@@ -409,3 +414,34 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         else:
             assets = copy.deepcopy(experiment.assets.assets)
         return assets
+
+    def work_order_config(self, simulation_root: str, subdirectory: Optional[int], priority: Optional[str]):
+        comps_config = dict(
+            environment_name=self.platform.environment,
+            simulation_input_args=None,
+            working_directory_root=os.path.join(simulation_root, subdirectory).replace('\\', '/'),
+            executable_path=None,
+            node_group_name=None,
+            maximum_number_of_retries=self.platform.num_retries,
+            priority=self.platform.priority if priority is None else priority,
+            min_cores=None,
+            max_cores=None,
+            exclusive=None
+        )
+        return comps_config
+
+    def no_work_order_config(self, command_arg: Optional[str], executable_path: Optional[str], simulation_root: str,
+                             num_cores: Optional[int], subdirectory: Optional[int], priority: Optional[str]):
+        comps_config = dict(
+            environment_name=self.platform.environment,
+            simulation_input_args=command_arg.strip(),
+            working_directory_root=os.path.join(simulation_root, subdirectory).replace('\\', '/'),
+            executable_path=executable_path,
+            node_group_name=self.platform.node_group,
+            maximum_number_of_retries=self.platform.num_retries,
+            priority=self.platform.priority if priority is None else priority,
+            min_cores=self.platform.num_cores if num_cores is None else num_cores,
+            max_cores=self.platform.num_cores if num_cores is None else num_cores,
+            exclusive=self.platform.exclusive
+        )
+        return comps_config

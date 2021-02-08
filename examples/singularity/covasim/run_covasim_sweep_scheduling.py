@@ -10,6 +10,13 @@ from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.templated_simulation import TemplatedSimulations
 
+
+def add_file(simulation, file_name, file_path):
+    with open(file_path, "r") as jsonFile:
+        data = json.loads(jsonFile.read())
+    data["Command"] = simulation.task.command.cmd
+    simulation.task.transient_assets.add_asset(Asset(filename="WorkOrder.json", content=json.dumps(data)))
+
 def set_value(simulation, name, value):
     fix_value = round(value, 2) if isinstance(value, float) else value
     # add argument
@@ -24,6 +31,8 @@ if __name__ == "__main__":
     # create commandline input for the task
     command = CommandLine(f"singularity exec ./Assets/covasim_ubuntu.sif python3 Assets/run_sim_sweep.py")
     task = CommandTask(command=command)
+    task.has_workorder = True # flag to use WorkOrder.json
+
     ts = TemplatedSimulations(base_task=task)
     # Add our image
     task.common_assets.add_assets(AssetCollection.from_id_file("covasim.id"))
@@ -33,11 +42,12 @@ if __name__ == "__main__":
     sb.add_sweep_definition(partial(set_value, name="pop_infected"), [10, 100, 1000])
     sb.add_sweep_definition(partial(set_value, name="n_days"), [100, 110, 120])
     sb.add_sweep_definition(partial(set_value, name="rand_seed"), [1234, 4567])
+    # add file to each simulation
+    sb.add_sweep_definition(partial(add_file, file_name="WorkOrder_orig.json"), "./WorkOrder_orig.json")
     ts.add_builder(sb)
-
     experiment = Experiment.from_template(ts, name=os.path.split(sys.argv[0])[1])
     experiment.add_asset(os.path.join("inputs", "run_sim_sweep.py"))
     experiment.add_asset(os.path.join("inputs", "sim_to_inset.py"))
     experiment.run(wait_until_done=True)
     if experiment.succeeded:
-        experiment.to_id_file("run_sim_sweep.id")
+        experiment.to_id_file("run_sim_sweep_scheduling.id")

@@ -24,6 +24,7 @@ from idmtools.entities.iplatform_ops.utils import batch_create_items
 from idmtools.entities.simulation import Simulation
 from idmtools.utils.json import IDMJSONEncoder
 from idmtools_platform_comps.utils.general import convert_comps_status, get_asset_for_comps_item, clean_experiment_name
+from idmtools_platform_comps.utils.python_version import SLURM_ENVIRONMENTS
 
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools_platform_comps.comps_platform import COMPSPlatform
@@ -175,6 +176,22 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             kwargs['asset_collection_id'] = asset_collection_id
             kwargs.update(simulation._platform_kwargs)
             config = self.get_simulation_config_from_simulation(simulation, **kwargs)
+
+        if simulation.task.has_workorder:
+            comps_config = dict(
+                environment_name=config.environment_name,
+                simulation_input_args=None,
+                working_directory_root=config.working_directory_root,
+                executable_path=None,
+                node_group_name=None,
+                maximum_number_of_retries=config.maximum_number_of_retries,
+                priority=config.priority,
+                min_cores=None,
+                max_cores=None,
+                exclusive=None
+            )
+            config = Configuration(**comps_config)
+
         if simulation.name:
             simulation.name = clean_experiment_name(simulation.name)
         s = COMPSSimulation(
@@ -301,7 +318,10 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         if comps_sim is None:
             comps_sim = simulation.get_platform_object()
         for asset in simulation.assets:
-            comps_sim.add_file(simulationfile=SimulationFile(asset.filename, 'input'), data=asset.bytes)
+            if asset.filename == 'WorkOrder.json' and self.platform.environment.lower() in SLURM_ENVIRONMENTS:
+                comps_sim.add_file(simulationfile=SimulationFile(asset.filename, 'WorkOrder'), data=asset.bytes)
+            else:
+                comps_sim.add_file(simulationfile=SimulationFile(asset.filename, 'input'), data=asset.bytes)
 
         # add metadata
         if add_metadata:
