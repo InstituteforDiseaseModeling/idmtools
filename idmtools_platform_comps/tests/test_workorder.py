@@ -23,21 +23,6 @@ from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.common_experiments import wait_on_experiment_and_check_all_sim_status
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
-setA = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="a")
-setB = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="b")
-setC = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="c")
-
-
-class setParam:
-    def __init__(self, param: str):
-        self.param = param
-
-    def __call__(self, simulation: Simulation, value) -> Dict[str, any]:
-        # set simulation name
-        simulation.name = f'{simulation.parent.name}_{self.param}_{value}'
-        return JSONConfiguredPythonTask.set_parameter_sweep_callback(simulation, self.param, value)
-
-
 @pytest.mark.comps
 @pytest.mark.python
 @allure.story("COMPS")
@@ -56,12 +41,13 @@ class TestWorkOrder(ITestWithPersistence):
         Returns:
 
         """
+        # create task with script. here script doesn't matter. it will override by WorkOrder.json's command
         task = JSONConfiguredPythonTask(
             script_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"),
             parameters=(dict(c=0)))
 
         # use WorkOrder.json which override input commandline command and arguments
-        task.transient_assets.add_asset(os.path.join(COMMON_INPUT_PATH, "compsplatform", "WorkOrder.json"))
+        task.transient_assets.add_asset(os.path.join(COMMON_INPUT_PATH, "scheduling", "slurm", "WorkOrder.json"))
         task.has_workorder = True  # need to set this flag to use WorkOrder.json
 
         ts = TemplatedSimulations(base_task=task)
@@ -114,16 +100,16 @@ class TestWorkOrder(ITestWithPersistence):
         sb.add_sweep_definition(partial(set_value, name="n_days"), [100, 110])
         sb.add_sweep_definition(partial(set_value, name="rand_seed"), [1234, 4567])
         sb.add_sweep_definition(partial(add_file, file_name="WorkOrder1.json"),
-                                os.path.join(COMMON_INPUT_PATH, "compsplatform", "WorkOrder1.json"))
+                                os.path.join(COMMON_INPUT_PATH, "scheduling", "slurm", "WorkOrder1.json"))
 
         ts.add_builder(sb)
 
         experiment = Experiment.from_template(ts, name=self.case_name)
-        experiment.add_asset(os.path.join(COMMON_INPUT_PATH, "compsplatform", "commandline_model.py"))
+        experiment.add_asset(os.path.join(COMMON_INPUT_PATH, "scheduling", "slurm", "commandline_model.py"))
         wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform)
         self.assertTrue(experiment.succeeded)
 
-        # only varify first simulation's stdout.txt
+        # only verify first simulation's stdout.txt
         files = self.platform.get_files(item=experiment.simulations[0], files=['stdout.txt', 'WorkOrder.json'])
         stdout_content = files['stdout.txt'].decode('utf-8').replace("\\\\", "\\")
         stdout_content = stdout_content.replace("\\", "")
@@ -167,30 +153,27 @@ class TestWorkOrder(ITestWithPersistence):
                     # don't check full version in case comps updates system
                     self.assertIn('Python 3.6', content)
 
-    @pytest.mark.timeout(60)
-    def test_no_slurm_wrapper(self):
+    def test_workorder_hpc(self):
         """
-        To test in no slurm cluster, even we upload WorkOrder.json to comps, comps does not use it for Executable command
+        To test workorder run in hpc cluster
         Returns:
 
         """
-        cmd = "python --version"
-        task = CommandTask(cmd)
-        platform = Platform("BAYESIAN")
-        task.common_assets.add_asset(Asset(filename="test_package.py", content="a=\'123\'"))
-        wrapper_task: TemplatedScriptTask = get_script_wrapper_windows_task(task,
-                                                                            template_content=WINDOWS_PYTHON_PATH_WRAPPER)
-        # upload WorkOrder.json to simulation root dir
-        wrapper_task.transient_assets.add_asset(os.path.join(COMMON_INPUT_PATH, "compsplatform", "WorkOrder.json"))
-        wrapper_task.has_workorder = True
-        experiment = Experiment.from_task(wrapper_task, name=self.case_name)
-        wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform)
-        self.assertTrue(experiment.succeeded)
+        task = JSONConfiguredPythonTask(
+            script_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"),
+            parameters=(dict(c=0)))
+
+        task.transient_assets.add_asset(os.path.join(COMMON_INPUT_PATH, "scheduling", "hpc", "WorkOrder.json"))
+        task.has_workorder = True  # need to set this flag to use WorkOrder.json
+
+        experiment = Experiment.from_task(task, name=self.case_name)
+        with Platform('COMPS2') as platform:
+            experiment.run(wait_on_done=True)
+            self.assertTrue(experiment.succeeded)
 
         for sim in experiment.simulations:
             assets = platform._simulations.all_files(sim)
             for asset in assets:
                 if asset.filename in ["stdout.txt"]:
                     content = asset.content.decode('utf-8').replace("\\\\", "\\")
-                    # verify simulation Executable command is not from WorkOrder.json in this case but from original cmd
-                    self.assertIn('Python 3.6', content)
+                    self.assertIn('hello test', content)

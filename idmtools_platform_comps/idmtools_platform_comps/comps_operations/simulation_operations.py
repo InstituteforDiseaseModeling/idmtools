@@ -318,7 +318,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         if comps_sim is None:
             comps_sim = simulation.get_platform_object()
         for asset in simulation.assets:
-            if asset.filename == 'WorkOrder.json' and self.platform.environment.lower() in SLURM_ENVIRONMENTS:
+            if asset.filename == 'WorkOrder.json':
                 comps_sim.add_file(simulationfile=SimulationFile(asset.filename, 'WorkOrder'), data=asset.bytes)
             else:
                 comps_sim.add_file(simulationfile=SimulationFile(asset.filename, 'input'), data=asset.bytes)

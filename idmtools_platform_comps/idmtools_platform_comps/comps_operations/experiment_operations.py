@@ -128,7 +128,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         if isinstance(experiment.simulations, ExperimentParentIterator) and isinstance(experiment.simulations.items, TemplatedSimulations):
             if logger.isEnabledFor(DEBUG):
                 logger.debug("ParentIterator/TemplatedSimulations detected")
-            if experiment.simulations.items.base_task.has_workorder and self.platform.environment.lower() in SLURM_ENVIRONMENTS:
+            if experiment.simulations.items.base_task.has_workorder:
                 comps_config = self.work_order_config(simulation_root, subdirectory, priority)
             else:
                 comps_config = self.no_work_order_config(command_arg, executable_path, simulation_root, num_cores,
@@ -136,7 +136,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         else:
             if logger.isEnabledFor(DEBUG):
                 logger.debug("List of simulations detected")
-            if experiment.simulations[0].task.has_workorder and self.platform.environment.lower() in SLURM_ENVIRONMENTS:
+            if experiment.simulations[0].task.has_workorder:
                 comps_config = self.work_order_config(simulation_root, subdirectory, priority)
             else:
                 comps_config = self.no_work_order_config(command_arg, executable_path, simulation_root, num_cores,

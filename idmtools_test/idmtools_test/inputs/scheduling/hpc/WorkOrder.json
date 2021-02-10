@@ -1,0 +1,7 @@
+{
+  "Command": "python -c \"print('hello test')\"",
+  "NodeGroupName": "emod_abcd",
+  "NumCores": 1,
+  "SingleNode": false,
+  "Exclusive": false
+}
