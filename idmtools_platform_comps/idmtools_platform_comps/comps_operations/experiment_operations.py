@@ -21,7 +21,6 @@ from idmtools.utils.collections import ExperimentParentIterator
 from idmtools.utils.info import get_doc_base_url
 from idmtools.utils.time import timestamp
 from idmtools_platform_comps.utils.general import clean_experiment_name, convert_comps_status
-from idmtools_platform_comps.utils.python_version import SLURM_ENVIRONMENTS
 
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools_platform_comps.comps_platform import COMPSPlatform
