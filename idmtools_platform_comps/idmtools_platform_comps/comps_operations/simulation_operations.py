@@ -176,21 +176,6 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             kwargs.update(simulation._platform_kwargs)
             config = self.get_simulation_config_from_simulation(simulation, **kwargs)
 
-        if simulation.task.has_workorder:
-            comps_config = dict(
-                environment_name=config.environment_name,
-                simulation_input_args=None,
-                working_directory_root=config.working_directory_root,
-                executable_path=None,
-                node_group_name=None,
-                maximum_number_of_retries=config.maximum_number_of_retries,
-                priority=config.priority,
-                min_cores=None,
-                max_cores=None,
-                exclusive=None
-            )
-            config = Configuration(**comps_config)
-
         if simulation.name:
             simulation.name = clean_experiment_name(simulation.name)
         s = COMPSSimulation(
@@ -244,6 +229,10 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             comps_configuration['simulation_input_args'] = sim_task
         if logger.isEnabledFor(DEBUG):
             logger.debug(f'Simulation config: {str(comps_configuration)}')
+        if simulation.platform.has_workorder:
+            comps_configuration['simulation_input_args'] = None
+            comps_configuration['executable_path'] = None
+
         return Configuration(**comps_configuration)
 
     def batch_create(self, simulations: List[Simulation], num_cores: int = None, priority: str = None, asset_collection_id: Union[str, UUID] = None, **kwargs) -> \
@@ -317,7 +306,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         if comps_sim is None:
             comps_sim = simulation.get_platform_object()
         for asset in simulation.assets:
-            if asset.filename == 'WorkOrder.json':
+            if asset.filename == 'WorkOrder.json' and simulation.platform.has_workorder:
                 comps_sim.add_file(simulationfile=SimulationFile(asset.filename, 'WorkOrder'), data=asset.bytes)
             else:
                 comps_sim.add_file(simulationfile=SimulationFile(asset.filename, 'input'), data=asset.bytes)

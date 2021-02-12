@@ -21,7 +21,6 @@ task = JSONConfiguredPythonTask(script_path=os.path.join("inputs", "python_model
 
 # load WorkOrder.json file from local to each simulation via task. the actual command in comps will contain in this file
 task.transient_assets.add_asset(os.path.join("inputs", "python_model_with_deps", "WorkOrder.json"))
-task.has_workorder = True  # need to set this flag to use WorkOrder.json
 
 # now let's use this task to create a TemplatedSimulation builder. This will build new simulations from sweep builders
 # we will define later. We can also use it to manipulate the base_task or the base_simulation
@@ -105,8 +104,8 @@ experiment.assets.add_directory(assets_directory=os.path.join("inputs", "python_
 # In order to run the experiment, we need to create a `Platform`
 # The `Platform` defines where we want to run our simulation.
 # You can easily switch platforms by changing the Platform to for example 'Local'
-with Platform('CALCULON'):
-
+with Platform('CALCULON') as platform:
+    platform.set_core_scheduling()
     # The last step is to call run() on the ExperimentManager to run the simulations.
     experiment.run(True)
     # use system status as the exit code

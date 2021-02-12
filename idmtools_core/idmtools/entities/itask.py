@@ -42,7 +42,6 @@ class ITask(metaclass=ABCMeta):
     common_assets: AssetCollection = field(default_factory=AssetCollection)
     #: Transient(Simulation-level) assets
     transient_assets: AssetCollection = field(default_factory=AssetCollection)
-    has_workorder: bool = field(default=False)
 
     def __post_init__(self):
         self.__pre_creation_hooks = []

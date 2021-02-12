@@ -48,7 +48,6 @@ class TestWorkOrder(ITestWithPersistence):
 
         # use WorkOrder.json which override input commandline command and arguments
         task.transient_assets.add_asset(os.path.join(COMMON_INPUT_PATH, "scheduling", "slurm", "WorkOrder.json"))
-        task.has_workorder = True  # need to set this flag to use WorkOrder.json
 
         ts = TemplatedSimulations(base_task=task)
         builder = SimulationBuilder()
@@ -60,6 +59,7 @@ class TestWorkOrder(ITestWithPersistence):
         ts.add_builder(builder)
 
         experiment = Experiment.from_template(ts, name=self.case_name)
+        self.platform.set_core_scheduling()
         wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform)
         self.assertTrue(experiment.succeeded)
         for sim in experiment.simulations:
@@ -80,7 +80,7 @@ class TestWorkOrder(ITestWithPersistence):
             with open(file_path, "r") as jsonFile:
                 data = json.loads(jsonFile.read())
             data["Command"] = simulation.task.command.cmd
-            simulation.task.transient_assets.add_asset(Asset(filename="WorkOrder.json", content=json.dumps(data)))
+            simulation.task.transient_assets.add_asset(Asset(filename=file_name, content=json.dumps(data)))
 
         def set_value(simulation, name, value):
             fix_value = round(value, 2) if isinstance(value, float) else value
@@ -91,7 +91,7 @@ class TestWorkOrder(ITestWithPersistence):
 
         # create commandline input for the task
         command = CommandLine("python3 Assets/commandline_model.py")
-        task = CommandTask(command=command, has_workorder=True)  # set has_workorder to True to take WorkOrder.json
+        task = CommandTask(command=command)
         ts = TemplatedSimulations(base_task=task)
 
         sb = SimulationBuilder()
@@ -99,13 +99,14 @@ class TestWorkOrder(ITestWithPersistence):
         sb.add_sweep_definition(partial(set_value, name="pop_infected"), [10, 100])
         sb.add_sweep_definition(partial(set_value, name="n_days"), [100, 110])
         sb.add_sweep_definition(partial(set_value, name="rand_seed"), [1234, 4567])
-        sb.add_sweep_definition(partial(add_file, file_name="WorkOrder1.json"),
+        sb.add_sweep_definition(partial(add_file, file_name="WorkOrder.json"),
                                 os.path.join(COMMON_INPUT_PATH, "scheduling", "slurm", "WorkOrder1.json"))
 
         ts.add_builder(sb)
 
         experiment = Experiment.from_template(ts, name=self.case_name)
         experiment.add_asset(os.path.join(COMMON_INPUT_PATH, "scheduling", "slurm", "commandline_model.py"))
+        self.platform.set_core_scheduling()
         wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform)
         self.assertTrue(experiment.succeeded)
 
@@ -140,8 +141,8 @@ class TestWorkOrder(ITestWithPersistence):
         wrapper_task.script_binary = "/bin/bash"
         # upload WorkOrder.json to simulation root dir
         wrapper_task.transient_assets.add_asset(os.path.join("inputs", "WorkOrder.json"))
-        wrapper_task.has_workorder = True
         experiment = Experiment.from_task(wrapper_task, name=self.case_name)
+        self.platform.set_core_scheduling()
         wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform)
         self.assertTrue(experiment.succeeded)
 
@@ -164,10 +165,10 @@ class TestWorkOrder(ITestWithPersistence):
             parameters=(dict(c=0)))
 
         task.transient_assets.add_asset(os.path.join(COMMON_INPUT_PATH, "scheduling", "hpc", "WorkOrder.json"))
-        task.has_workorder = True  # need to set this flag to use WorkOrder.json
 
         experiment = Experiment.from_task(task, name=self.case_name)
         with Platform('COMPS2') as platform:
+            platform.set_core_scheduling()
             experiment.run(wait_on_done=True)
             self.assertTrue(experiment.succeeded)
 

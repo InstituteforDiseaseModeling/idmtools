@@ -124,22 +124,22 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             executable_path = exp_command.executable
 
         # create initial configuration object
-        if isinstance(experiment.simulations, ExperimentParentIterator) and isinstance(experiment.simulations.items, TemplatedSimulations):
-            if logger.isEnabledFor(DEBUG):
-                logger.debug("ParentIterator/TemplatedSimulations detected")
-            if experiment.simulations.items.base_task.has_workorder:
-                comps_config = self.work_order_config(simulation_root, subdirectory, priority)
-            else:
-                comps_config = self.no_work_order_config(command_arg, executable_path, simulation_root, num_cores,
-                                                         subdirectory, priority)
-        else:
-            if logger.isEnabledFor(DEBUG):
-                logger.debug("List of simulations detected")
-            if experiment.simulations[0].task.has_workorder:
-                comps_config = self.work_order_config(simulation_root, subdirectory, priority)
-            else:
-                comps_config = self.no_work_order_config(command_arg, executable_path, simulation_root, num_cores,
-                                                         subdirectory, priority)
+        comps_config = dict(
+            environment_name=self.platform.environment,
+            simulation_input_args=command_arg.strip() if command_arg is not None else None,
+            working_directory_root=os.path.join(simulation_root, subdirectory).replace('\\', '/'),
+            executable_path=executable_path,
+            node_group_name=self.platform.node_group,
+            maximum_number_of_retries=self.platform.num_retries,
+            priority=self.platform.priority if priority is None else priority,
+            min_cores=self.platform.num_cores if num_cores is None else num_cores,
+            max_cores=self.platform.num_cores if num_cores is None else num_cores,
+            exclusive=self.platform.exclusive
+        )
+
+        if self.platform.has_workorder:
+            comps_config.update(executable_path=None, node_group_name=None, min_cores=None, max_cores=None, exclusive=None)
+
         if logger.isEnabledFor(DEBUG):
             logger.debug(f'COMPS Experiment Configs: {str(comps_config)}')
 
@@ -192,6 +192,10 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             Command line for Experiment
         """
         from idmtools_platform_comps.utils.python_version import platform_task_hooks
+
+        if experiment.platform.has_workorder:
+            return None
+
         if isinstance(experiment.simulations, Generator):
             if logger.isEnabledFor(DEBUG):
                 logger.debug("Simulations generator detected. Copying generator and using first task as command")
@@ -413,34 +417,3 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         else:
             assets = copy.deepcopy(experiment.assets.assets)
         return assets
-
-    def work_order_config(self, simulation_root: str, subdirectory: Optional[int], priority: Optional[str]):
-        comps_config = dict(
-            environment_name=self.platform.environment,
-            simulation_input_args=None,
-            working_directory_root=os.path.join(simulation_root, subdirectory).replace('\\', '/'),
-            executable_path=None,
-            node_group_name=None,
-            maximum_number_of_retries=self.platform.num_retries,
-            priority=self.platform.priority if priority is None else priority,
-            min_cores=None,
-            max_cores=None,
-            exclusive=None
-        )
-        return comps_config
-
-    def no_work_order_config(self, command_arg: Optional[str], executable_path: Optional[str], simulation_root: str,
-                             num_cores: Optional[int], subdirectory: Optional[int], priority: Optional[str]):
-        comps_config = dict(
-            environment_name=self.platform.environment,
-            simulation_input_args=command_arg.strip(),
-            working_directory_root=os.path.join(simulation_root, subdirectory).replace('\\', '/'),
-            executable_path=executable_path,
-            node_group_name=self.platform.node_group,
-            maximum_number_of_retries=self.platform.num_retries,
-            priority=self.platform.priority if priority is None else priority,
-            min_cores=self.platform.num_cores if num_cores is None else num_cores,
-            max_cores=self.platform.num_cores if num_cores is None else num_cores,
-            exclusive=self.platform.exclusive
-        )
-        return comps_config

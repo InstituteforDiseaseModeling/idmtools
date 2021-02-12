@@ -22,7 +22,8 @@ class TestPackageVersionCLI(unittest.TestCase):
         pass
 
     @allure.feature("req2ac")
-    # cli: idmtools comps SLRUM2 req2ac --asset_tag test:123 --pkg astor~=0.7.0
+    @pytest.mark.skip("this test will fail in Github Action due to different user creating another ac with same package")
+    # cli: idmtools comps SLURM2 req2ac --asset_tag test:123 --pkg astor~=0.7.0
     def test_create_ac_with_req2ac(self):
         result = run_command('comps', 'SLURM2', 'req2ac', '--asset_tag', 'test:123', '--pkg', 'astor~=0.7.0',
                              mix_stderr=False)
@@ -35,7 +36,8 @@ class TestPackageVersionCLI(unittest.TestCase):
         self.assertTrue(len(assets) > 0)
 
     @allure.feature("req2ac")
-    # cli: idmtools comps SLRUM2 ac-exist --pkg astor~=0.7.0
+    @pytest.mark.skip("this test will fail in Github Action due to different user creating another ac with same package")
+    # cli: idmtools comps SLURM2 ac-exist --pkg astor~=0.7.0
     def test_ac_exist_with_req2ac(self):
         result = run_command('comps', 'SLURM2', 'ac-exist', '--pkg', 'astor~=0.7.0', mix_stderr=False)
         self.assertTrue(result.exit_code == 0, msg=result.output)
@@ -47,7 +49,7 @@ class TestPackageVersionCLI(unittest.TestCase):
         self.assertTrue(len(assets) > 0)
 
     @allure.feature("req2ac")
-    # cli: idmtools comps SLRUM2 ac-exist --pkg pytest==3.0.0
+    # cli: idmtools comps SLURM2 ac-exist --pkg pytest==3.0.0
     def test_ac_not_exist_with_req2ac(self):
         result = run_command('comps', 'SLURM2', 'ac-exist', '--pkg', 'pytest==3.0.0', mix_stderr=False)
         self.assertTrue(result.exit_code == 0, msg=result.output)
