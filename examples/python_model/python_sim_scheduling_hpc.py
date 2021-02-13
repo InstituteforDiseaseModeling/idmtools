@@ -68,8 +68,7 @@ experiment.tags["tag1"] = 1
 experiment.assets.add_directory(assets_directory=os.path.join("inputs", "python_model_with_deps", "Assets"))
 
 with Platform('BELEGOST') as platform:
-    platform.set_core_scheduling()
     # The last step is to call run() on the ExperimentManager to run the simulations.
-    experiment.run(True)
+    experiment.run(True, scheduling=True)
     # use system status as the exit code
     sys.exit(0 if experiment.succeeded else -1)

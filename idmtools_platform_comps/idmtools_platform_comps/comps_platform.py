@@ -61,7 +61,6 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     min_time_between_commissions: int = field(default=15, metadata=dict(help="How many seconds between commission calls on an experiment. ",validate=partial(validate_range, min=10, max=300)))
     exclusive: bool = field(default=False, metadata=dict(help="Enable exclusive mode? (one simulation per node on the cluster)"))
     docker_image: str = field(default=None)
-    _has_workorder: bool = field(default=False)
 
     _platform_supports: List[PlatformRequirements] = field(default_factory=lambda: copy.deepcopy(supported_types), repr=False, init=False)
 
@@ -115,11 +114,5 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             return False
         return super().is_windows_platform(item)
 
-    def set_core_scheduling(self):
-        self._has_workorder = True
-
-    @property
-    def has_workorder(self):
-        return self._has_workorder
 
 

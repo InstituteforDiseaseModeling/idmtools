@@ -28,7 +28,6 @@ if __name__ == "__main__":
     here = os.path.dirname(__file__)
     # Create a platform to run the workitem
     platform = Platform("CALCULON")
-    platform.set_core_scheduling()
     # create commandline input for the task
     command = CommandLine(f"singularity exec ./Assets/covasim_ubuntu.sif python3 Assets/run_sim_sweep.py")
     task = CommandTask(command=command)
@@ -48,6 +47,6 @@ if __name__ == "__main__":
     experiment = Experiment.from_template(ts, name=os.path.split(sys.argv[0])[1])
     experiment.add_asset(os.path.join("inputs", "run_sim_sweep.py"))
     experiment.add_asset(os.path.join("inputs", "sim_to_inset.py"))
-    experiment.run(wait_until_done=True)
+    experiment.run(wait_until_done=True, scheduling=True)
     if experiment.succeeded:
         experiment.to_id_file("run_sim_sweep_scheduling.id")

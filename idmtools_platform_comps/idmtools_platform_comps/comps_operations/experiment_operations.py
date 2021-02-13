@@ -101,6 +101,8 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         """
         # TODO check experiment task supported
 
+        scheduling = kwargs.get("scheduling", False)
+
         # Cleanup the name
         experiment.name = clean_experiment_name(experiment.name)
 
@@ -137,8 +139,8 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             exclusive=self.platform.exclusive
         )
 
-        if self.platform.has_workorder:
-            comps_config.update(executable_path=None, node_group_name=None, min_cores=None, max_cores=None, exclusive=None)
+        if scheduling:
+            comps_config.update(executable_path=None, node_group_name=None, min_cores=None, max_cores=None, exclusive=None, simulation_input_args=None)
 
         if logger.isEnabledFor(DEBUG):
             logger.debug(f'COMPS Experiment Configs: {str(comps_config)}')
@@ -192,9 +194,6 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             Command line for Experiment
         """
         from idmtools_platform_comps.utils.python_version import platform_task_hooks
-
-        if experiment.platform.has_workorder:
-            return None
 
         if isinstance(experiment.simulations, Generator):
             if logger.isEnabledFor(DEBUG):

@@ -49,7 +49,6 @@ experiment.add_asset(os.path.join("inputs", "scheduling", "commandline_model.py"
 
 
 with Platform('CALCULON') as platform:
-    platform.set_core_scheduling()
-    experiment.run(wait_on_done=True)
+    experiment.run(wait_on_done=True, scheduling=True)
     # use system status as the exit code
     sys.exit(0 if experiment.succeeded else -1)
