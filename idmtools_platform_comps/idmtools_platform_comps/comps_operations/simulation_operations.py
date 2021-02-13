@@ -205,6 +205,8 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         Returns:
             Configuration
         """
+        scheduling = kwargs.get("scheduling", False)
+
         comps_configuration = dict()
         if asset_collection_id:
             comps_configuration['asset_collection_id'] = asset_collection_id
@@ -229,9 +231,9 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             comps_configuration['simulation_input_args'] = sim_task
         if logger.isEnabledFor(DEBUG):
             logger.debug(f'Simulation config: {str(comps_configuration)}')
-        if simulation.platform.has_workorder:
-            comps_configuration['simulation_input_args'] = None
-            comps_configuration['executable_path'] = None
+        if scheduling:
+            comps_configuration.update(executable_path=None, node_group_name=None, min_cores=None, max_cores=None,
+                                exclusive=None, simulation_input_args=None)
 
         return Configuration(**comps_configuration)
 
@@ -306,7 +308,8 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         if comps_sim is None:
             comps_sim = simulation.get_platform_object()
         for asset in simulation.assets:
-            if asset.filename == 'WorkOrder.json' and simulation.platform.has_workorder:
+            # if asset.filename == 'WorkOrder.json' and simulation.platform.has_workorder: # [TODO]
+            if asset.filename == 'WorkOrder.json':
                 comps_sim.add_file(simulationfile=SimulationFile(asset.filename, 'WorkOrder'), data=asset.bytes)
             else:
                 comps_sim.add_file(simulationfile=SimulationFile(asset.filename, 'input'), data=asset.bytes)

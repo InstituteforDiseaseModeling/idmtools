@@ -71,7 +71,7 @@ def param_update(simulation: Simulation, param: str, value: Any) -> Dict[str, An
 # that we want the param value to always be "a" so we can perform our sweep
 setA = partial(param_update, param="a")
 # now add the sweep to our builder
-builder.add_sweep_definition(setA, range(3))
+builder.add_sweep_definition(setA, range(1))
 
 
 # An alternative to using partial is define a class that store the param and is callable later. let's use that technique
@@ -90,7 +90,7 @@ class setParam:
 
 
 # Now add our sweep on a list
-builder.add_sweep_definition(setParam("b"), [1, 2, 3])
+builder.add_sweep_definition(setParam("b"), [3])
 ts.add_builder(builder)
 
 # Now we can create our Experiment using our template builder
@@ -105,8 +105,7 @@ experiment.assets.add_directory(assets_directory=os.path.join("inputs", "python_
 # The `Platform` defines where we want to run our simulation.
 # You can easily switch platforms by changing the Platform to for example 'Local'
 with Platform('CALCULON') as platform:
-    platform.set_core_scheduling()
     # The last step is to call run() on the ExperimentManager to run the simulations.
-    experiment.run(True)
+    experiment.run(True, scheduling=True)
     # use system status as the exit code
     sys.exit(0 if experiment.succeeded else -1)

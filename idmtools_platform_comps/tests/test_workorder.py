@@ -59,8 +59,7 @@ class TestWorkOrder(ITestWithPersistence):
         ts.add_builder(builder)
 
         experiment = Experiment.from_template(ts, name=self.case_name)
-        self.platform.set_core_scheduling()
-        wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform)
+        wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform, scheduling=True)
         self.assertTrue(experiment.succeeded)
         for sim in experiment.simulations:
             assets = self.platform._simulations.all_files(sim)
@@ -106,8 +105,8 @@ class TestWorkOrder(ITestWithPersistence):
 
         experiment = Experiment.from_template(ts, name=self.case_name)
         experiment.add_asset(os.path.join(COMMON_INPUT_PATH, "scheduling", "slurm", "commandline_model.py"))
-        self.platform.set_core_scheduling()
-        wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform)
+        # self.platform.set_core_scheduling()
+        wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform, scheduling=True)
         self.assertTrue(experiment.succeeded)
 
         # only verify first simulation's stdout.txt
@@ -142,8 +141,8 @@ class TestWorkOrder(ITestWithPersistence):
         # upload WorkOrder.json to simulation root dir
         wrapper_task.transient_assets.add_asset(os.path.join("inputs", "WorkOrder.json"))
         experiment = Experiment.from_task(wrapper_task, name=self.case_name)
-        self.platform.set_core_scheduling()
-        wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform)
+        # self.platform.set_core_scheduling()
+        wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform, scheduling=True)
         self.assertTrue(experiment.succeeded)
 
         for sim in experiment.simulations:
@@ -168,8 +167,8 @@ class TestWorkOrder(ITestWithPersistence):
 
         experiment = Experiment.from_task(task, name=self.case_name)
         with Platform('COMPS2') as platform:
-            platform.set_core_scheduling()
-            experiment.run(wait_on_done=True)
+            # platform.set_core_scheduling()
+            experiment.run(wait_on_done=True, scheduling=True)
             self.assertTrue(experiment.succeeded)
 
         for sim in experiment.simulations:
