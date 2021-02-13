@@ -6,7 +6,7 @@ from typing import Any, Dict
 
 import pytest
 
-from idmtools.assets import Asset
+from idmtools.assets import Asset, AssetCollection
 from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType
 
@@ -19,9 +19,12 @@ from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_models.templated_script_task import TemplatedScriptTask, get_script_wrapper_unix_task, \
     LINUX_PYTHON_PATH_WRAPPER, get_script_wrapper_windows_task, WINDOWS_PYTHON_PATH_WRAPPER
+from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection import \
+    RequirementsToAssetCollection
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.common_experiments import wait_on_experiment_and_check_all_sim_status
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
+
 
 @pytest.mark.comps
 @pytest.mark.python
@@ -75,6 +78,7 @@ class TestWorkOrder(ITestWithPersistence):
         Returns:
 
         """
+
         def add_file(simulation, file_name, file_path):
             with open(file_path, "r") as jsonFile:
                 data = json.loads(jsonFile.read())
@@ -105,7 +109,6 @@ class TestWorkOrder(ITestWithPersistence):
 
         experiment = Experiment.from_template(ts, name=self.case_name)
         experiment.add_asset(os.path.join(COMMON_INPUT_PATH, "scheduling", "slurm", "commandline_model.py"))
-        # self.platform.set_core_scheduling()
         wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform, scheduling=True)
         self.assertTrue(experiment.succeeded)
 
@@ -141,7 +144,6 @@ class TestWorkOrder(ITestWithPersistence):
         # upload WorkOrder.json to simulation root dir
         wrapper_task.transient_assets.add_asset(os.path.join("inputs", "WorkOrder.json"))
         experiment = Experiment.from_task(wrapper_task, name=self.case_name)
-        # self.platform.set_core_scheduling()
         wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform, scheduling=True)
         self.assertTrue(experiment.succeeded)
 
@@ -167,7 +169,6 @@ class TestWorkOrder(ITestWithPersistence):
 
         experiment = Experiment.from_task(task, name=self.case_name)
         with Platform('COMPS2') as platform:
-            # platform.set_core_scheduling()
             experiment.run(wait_on_done=True, scheduling=True)
             self.assertTrue(experiment.succeeded)
 
@@ -177,3 +178,45 @@ class TestWorkOrder(ITestWithPersistence):
                 if asset.filename in ["stdout.txt"]:
                     content = asset.content.decode('utf-8').replace("\\\\", "\\")
                     self.assertIn('hello test', content)
+
+    def test_workorder_environment(self):
+        """
+        To test python task with WorkOrder.json's environment. command in WorkOrder.json is python Assets/model.py
+        in COMPS, file layout is:
+        Assets-
+              |_MyExternalLibarary
+                       |_function.py
+              |_model.py
+              |_site-packages
+                    |_numpy
+        in order for model.py to call MyExternalLibarary.function which uses numpy package, MyExternalLibarary.function
+        and numpy must be in PYTHONPATH
+        So we add "PYTHONPATH": "$PYTHONPATH:$PWD/Assets:$PWD/Assets/site-packages" in WorkOrder.json
+
+        Returns:
+        """
+        # add numpy package to cluster
+        pl = RequirementsToAssetCollection(self.platform, pkg_list=['numpy==1.19.5'])
+        ac_id = pl.run()
+        # add numpy to common_assets for a task
+        common_assets = AssetCollection.from_id(ac_id, as_copy=True)
+        # create task which generate config.json and upload script and assets
+        task = JSONConfiguredPythonTask(
+            script_path=os.path.join(COMMON_INPUT_PATH, "python", "model.py"), parameters=dict(a=1, b=10),
+            envelope="parameters", common_assets=common_assets)
+
+        # add local WorkOrder2.json to comps and change file name to WorkOrder.json
+        with open(os.path.join(COMMON_INPUT_PATH, "scheduling", "slurm", "WorkOrder2.json"), "r") as jsonFile:
+            data = json.loads(jsonFile.read())
+        task.transient_assets.add_asset(Asset(filename="WorkOrder.json", content=json.dumps(data)))
+
+        # Add another folder to comps Assets
+        task.common_assets.add_directory(assets_directory=os.path.join(COMMON_INPUT_PATH, "python", "Assets"))
+        experiment = Experiment.from_task(task, name=self.case_name)
+        wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform, scheduling=True)
+
+        # only verify first simulation's stdout.txt
+        files = self.platform.get_files(item=experiment.simulations[0], files=['stdout.txt'])
+        stdout_content = files['stdout.txt'].decode('utf-8').replace("\\\\", "\\")
+        stdout_content = stdout_content.replace("\\", "")
+        self.assertIn("11", stdout_content)  # a+b = 1+10 = 11
