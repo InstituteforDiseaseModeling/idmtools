@@ -8,7 +8,6 @@ import pytest
 
 from idmtools.assets import Asset, AssetCollection
 from idmtools.builders import SimulationBuilder
-from idmtools.core import ItemType
 
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import CommandLine
@@ -18,7 +17,7 @@ from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_models.templated_script_task import TemplatedScriptTask, get_script_wrapper_unix_task, \
-    LINUX_PYTHON_PATH_WRAPPER, get_script_wrapper_windows_task, WINDOWS_PYTHON_PATH_WRAPPER
+    LINUX_PYTHON_PATH_WRAPPER
 from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection import \
     RequirementsToAssetCollection
 from idmtools_test import COMMON_INPUT_PATH

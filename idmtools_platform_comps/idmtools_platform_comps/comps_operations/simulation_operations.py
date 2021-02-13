@@ -233,7 +233,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             logger.debug(f'Simulation config: {str(comps_configuration)}')
         if scheduling:
             comps_configuration.update(executable_path=None, node_group_name=None, min_cores=None, max_cores=None,
-                                exclusive=None, simulation_input_args=None)
+                                       exclusive=None, simulation_input_args=None)
 
         return Configuration(**comps_configuration)
 
