@@ -1,3 +1,4 @@
+from os import PathLike
 from dataclasses import dataclass, field, fields
 from logging import getLogger, DEBUG
 from typing import List, Union, Mapping, Any, Type, TypeVar, Dict, TYPE_CHECKING
@@ -176,11 +177,11 @@ class Simulation(IAssetsEnabled, INamedEntity):
         result['task'] = self.task.to_dict() if self.task else None
         return result
 
-    def add_work_order(self, file_name: str = "WorkOrder.json", file_path: str = "./WorkOrder.json",
+    def add_work_order(self, file_name: str = "WorkOrder.json", file_path: Union[str, PathLike] = "./WorkOrder.json",
                        update: bool = True, scheduling: bool = True):
         import json
 
-        with open(file_path, "r") as jsonFile:
+        with open(str(file_path), "r") as jsonFile:
             data = json.loads(jsonFile.read())
 
         if update:

@@ -1,5 +1,6 @@
 import copy
 import uuid
+from os import PathLike
 from dataclasses import dataclass, field, InitVar, fields
 from logging import getLogger, DEBUG
 from types import GeneratorType
@@ -488,7 +489,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
             user_logger.info(f"Simulation Type: {type(self.__simulations)}")
             user_logger.info(f"Assets: {self.assets}")
 
-    def add_work_order(self, file_name: str = "WorkOrder.json", file_path: str = "./WorkOrder.json"):
+    def add_work_order(self, file_name: str = "WorkOrder.json", file_path: Union[str, PathLike] = "./WorkOrder.json"):
         if isinstance(self.simulations.items, TemplatedSimulations):
             if len(self.simulations.items) == 0:
                 raise ValueError("You cannot run an empty experiment")
