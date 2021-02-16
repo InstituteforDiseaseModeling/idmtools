@@ -1,8 +1,7 @@
 import os
 import sys
-import json
 from functools import partial
-from idmtools.assets import AssetCollection, Asset
+from idmtools.assets import AssetCollection
 from idmtools.builders import SimulationBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import CommandLine
@@ -12,10 +11,8 @@ from idmtools.entities.templated_simulation import TemplatedSimulations
 
 
 def add_file(simulation, file_name, file_path):
-    with open(file_path, "r") as jsonFile:
-        data = json.loads(jsonFile.read())
-    data["Command"] = simulation.task.command.cmd
-    simulation.task.transient_assets.add_asset(Asset(filename=file_name, content=json.dumps(data)))
+    simulation.add_work_order(file_name=file_name, file_path=file_path)
+
 
 def set_value(simulation, name, value):
     fix_value = round(value, 2) if isinstance(value, float) else value
@@ -23,6 +20,7 @@ def set_value(simulation, name, value):
     simulation.task.command.add_raw_argument(str(fix_value))
     # add tag with our value
     simulation.tags[name] = fix_value
+
 
 if __name__ == "__main__":
     here = os.path.dirname(__file__)

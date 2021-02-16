@@ -49,11 +49,12 @@ with Platform('CALCULON') as platform:
         # add some experiment level assets
         common_assets=common_assets
     )
-    # add WorkOrder.json to each simulation as transient_assets
-    task.transient_assets.add_asset(os.path.join("inputs", "scheduling", "WorkOrder.json"))
 
     # create templatedsimulation
     ts = TemplatedSimulations(base_task=task)
+
+    # add WorkOrder.json to each simulation as transient_assets
+    ts.add_work_order(file_path=os.path.join("inputs", "scheduling", "WorkOrder.json"))
 
     # create build and define our sweeps
     builder = SimulationBuilder()
