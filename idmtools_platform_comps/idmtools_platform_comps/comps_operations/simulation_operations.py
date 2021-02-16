@@ -184,7 +184,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             configuration=config
         )
 
-        self.send_assets(simulation, s)
+        self.send_assets(simulation, s, **kwargs)
         s.set_tags(simulation.tags)
         simulation._platform_object = s
         return s
@@ -205,13 +205,20 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         Returns:
             Configuration
         """
-        scheduling = kwargs.get("scheduling", False)
+        global_scheduling = kwargs.get("scheduling", False)
+        sim_scheduling = getattr(simulation, 'scheduling', False)
+        scheduling = global_scheduling and sim_scheduling
 
         comps_configuration = dict()
+        if global_scheduling:
+            config = getattr(self.platform, 'comps_config', {})
+            comps_exp_config = Configuration(**config)
+        else:
+            comps_exp: COMPSExperiment = simulation.parent.get_platform_object()
+            comps_exp_config: Configuration = comps_exp.configuration
+
         if asset_collection_id:
             comps_configuration['asset_collection_id'] = asset_collection_id
-        comps_exp: COMPSExperiment = simulation.parent.get_platform_object()
-        comps_exp_config: Configuration = comps_exp.configuration
         if num_cores is not None and num_cores != comps_exp_config.max_cores:
             logger.info(f'Overriding cores for sim to {num_cores}')
             comps_configuration['max_cores'] = num_cores
@@ -305,11 +312,12 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         Returns:
             None
         """
+        scheduling = kwargs.get("scheduling", False) and getattr(simulation, 'scheduling', False)
+
         if comps_sim is None:
             comps_sim = simulation.get_platform_object()
         for asset in simulation.assets:
-            # if asset.filename == 'WorkOrder.json' and simulation.platform.has_workorder: # [TODO]
-            if asset.filename == 'WorkOrder.json':
+            if asset.filename.lower() == 'workorder.json' and scheduling:
                 comps_sim.add_file(simulationfile=SimulationFile(asset.filename, 'WorkOrder'), data=asset.bytes)
             else:
                 comps_sim.add_file(simulationfile=SimulationFile(asset.filename, 'input'), data=asset.bytes)
