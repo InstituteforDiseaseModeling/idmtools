@@ -20,12 +20,13 @@ from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 task = JSONConfiguredPythonTask(script_path=os.path.join("inputs", "python_model_with_deps", "Assets", "model.py"),
                                 parameters=(dict(c=0)))
 
-# load WorkOrder.json file from local to each simulation via task. the actual command in comps will contain in this file
-task.transient_assets.add_asset(os.path.join("inputs", "scheduling", "WorkOrder.json"))
-
 # now let's use this task to create a TemplatedSimulation builder. This will build new simulations from sweep builders
 # we will define later. We can also use it to manipulate the base_task or the base_simulation
 ts = TemplatedSimulations(base_task=task)
+
+# load WorkOrder.json file from local to each simulation via task. the actual command in comps will contain in this file
+ts.add_work_order(file_path=os.path.join("inputs", "scheduling", "WorkOrder.json"))
+
 # We can define common metadata like tags across all the simulations using the base_simulation object
 ts.base_simulation.tags['tag1'] = 1
 
@@ -69,6 +70,6 @@ experiment.assets.add_directory(assets_directory=os.path.join("inputs", "python_
 
 with Platform('BELEGOST') as platform:
     # The last step is to call run() on the ExperimentManager to run the simulations.
-    experiment.run(True, scheduling=True)
+    experiment.run(True, scheduling=True, abc=1, executable_path='hello.py', use_short_path=3, command_arg='zdu_arg', num_cores=11, priority='high')
     # use system status as the exit code
     sys.exit(0 if experiment.succeeded else -1)

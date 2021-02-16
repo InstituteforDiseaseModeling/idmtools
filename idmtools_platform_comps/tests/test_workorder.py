@@ -1,14 +1,10 @@
 import allure
-import json
 import os
 from functools import partial
 from typing import Any, Dict
-
 import pytest
-
 from idmtools.assets import Asset, AssetCollection
 from idmtools.builders import SimulationBuilder
-
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import CommandLine
 from idmtools.entities.command_task import CommandTask
@@ -48,10 +44,15 @@ class TestWorkOrder(ITestWithPersistence):
             script_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"),
             parameters=(dict(c=0)))
 
-        # use WorkOrder.json which override input commandline command and arguments
-        task.transient_assets.add_asset(os.path.join(COMMON_INPUT_PATH, "scheduling", "slurm", "WorkOrder.json"))
+        # # use WorkOrder.json which override input commandline command and arguments
+        # task.transient_assets.add_asset(os.path.join(COMMON_INPUT_PATH, "scheduling", "slurm", "WorkOrder.json"))
 
         ts = TemplatedSimulations(base_task=task)
+
+        # use WorkOrder.json which override input commandline command and arguments
+        ts.add_work_order(file_path=os.path.join(COMMON_INPUT_PATH, "scheduling", "slurm", "WorkOrder.json"))
+
+
         builder = SimulationBuilder()
 
         def param_update(simulation: Simulation, param: str, value: Any) -> Dict[str, Any]:
@@ -77,12 +78,8 @@ class TestWorkOrder(ITestWithPersistence):
         Returns:
 
         """
-
         def add_file(simulation, file_name, file_path):
-            with open(file_path, "r") as jsonFile:
-                data = json.loads(jsonFile.read())
-            data["Command"] = simulation.task.command.cmd
-            simulation.task.transient_assets.add_asset(Asset(filename=file_name, content=json.dumps(data)))
+            simulation.add_work_order(file_name=file_name, file_path=file_path)
 
         def set_value(simulation, name, value):
             fix_value = round(value, 2) if isinstance(value, float) else value
@@ -140,9 +137,12 @@ class TestWorkOrder(ITestWithPersistence):
         wrapper_task: TemplatedScriptTask = get_script_wrapper_unix_task(task,
                                                                          template_content=LINUX_PYTHON_PATH_WRAPPER)
         wrapper_task.script_binary = "/bin/bash"
-        # upload WorkOrder.json to simulation root dir
-        wrapper_task.transient_assets.add_asset(os.path.join("inputs", "WorkOrder.json"))
+
         experiment = Experiment.from_task(wrapper_task, name=self.case_name)
+
+        # upload WorkOrder.json to simulation root dir
+        experiment.add_work_order(file_path=os.path.join("inputs", "WorkOrder.json"))
+
         wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform, scheduling=True)
         self.assertTrue(experiment.succeeded)
 
@@ -164,9 +164,9 @@ class TestWorkOrder(ITestWithPersistence):
             script_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"),
             parameters=(dict(c=0)))
 
-        task.transient_assets.add_asset(os.path.join(COMMON_INPUT_PATH, "scheduling", "hpc", "WorkOrder.json"))
-
         experiment = Experiment.from_task(task, name=self.case_name)
+        experiment.add_work_order(file_path=os.path.join(COMMON_INPUT_PATH, "scheduling", "hpc", "WorkOrder.json"))
+
         with Platform('COMPS2') as platform:
             experiment.run(wait_on_done=True, scheduling=True)
             self.assertTrue(experiment.succeeded)
@@ -204,14 +204,11 @@ class TestWorkOrder(ITestWithPersistence):
             script_path=os.path.join(COMMON_INPUT_PATH, "python", "model.py"), parameters=dict(a=1, b=10),
             envelope="parameters", common_assets=common_assets)
 
-        # add local WorkOrder2.json to comps and change file name to WorkOrder.json
-        with open(os.path.join(COMMON_INPUT_PATH, "scheduling", "slurm", "WorkOrder2.json"), "r") as jsonFile:
-            data = json.loads(jsonFile.read())
-        task.transient_assets.add_asset(Asset(filename="WorkOrder.json", content=json.dumps(data)))
-
         # Add another folder to comps Assets
         task.common_assets.add_directory(assets_directory=os.path.join(COMMON_INPUT_PATH, "python", "Assets"))
         experiment = Experiment.from_task(task, name=self.case_name)
+        # add local WorkOrder2.json to comps and change file name to WorkOrder.json
+        experiment.add_work_order(file_path=os.path.join(COMMON_INPUT_PATH, "scheduling", "slurm", "WorkOrder2.json"))
         wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform, scheduling=True)
 
         # only verify first simulation's stdout.txt
