@@ -15,7 +15,6 @@ if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
     from idmtools.entities.experiment import Experiment
 
-
 logger = getLogger(__name__)
 user_logger = getLogger('user')
 
@@ -176,6 +175,21 @@ class Simulation(IAssetsEnabled, INamedEntity):
         result['_uid'] = self.uid
         result['task'] = self.task.to_dict() if self.task else None
         return result
+
+    def add_work_order(self, file_name: str = "WorkOrder.json", file_path: str = "./WorkOrder.json",
+                       update: bool = True, scheduling: bool = True):
+        import json
+
+        with open(file_path, "r") as jsonFile:
+            data = json.loads(jsonFile.read())
+
+        if update:
+            data["Command"] = self.task.command.cmd
+
+        self.task.transient_assets.add_asset(Asset(filename=file_name, content=json.dumps(data)))
+
+        if scheduling:
+            setattr(self, 'scheduling', True)
 
 
 # TODO Rename to T simulation once old simulation is one
