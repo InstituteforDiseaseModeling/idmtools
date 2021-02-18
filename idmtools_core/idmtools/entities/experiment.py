@@ -1,6 +1,5 @@
 import copy
 import uuid
-from os import PathLike
 from dataclasses import dataclass, field, InitVar, fields
 from logging import getLogger, DEBUG
 from types import GeneratorType
@@ -18,8 +17,7 @@ from idmtools.core.logging import SUCCESS, NOTICE
 from idmtools.entities.itask import ITask
 from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.entities.templated_simulation import TemplatedSimulations
-from idmtools.registry.experiment_specification import ExperimentPluginSpecification, get_model_impl, \
-    get_model_type_impl
+from idmtools.registry.experiment_specification import ExperimentPluginSpecification, get_model_impl, get_model_type_impl
 from idmtools.registry.plugin_specification import get_description_impl
 from idmtools.utils.collections import ExperimentParentIterator
 from idmtools.utils.entities import get_default_tags
@@ -95,11 +93,9 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
             status = None  # this will trigger experiment creation on a platform
         elif any([s == EntityStatus.RUNNING for s in sim_statuses]):
             status = EntityStatus.RUNNING
-        elif any([s == EntityStatus.CREATED for s in sim_statuses]) and any(
-                [s in [EntityStatus.FAILED, EntityStatus.SUCCEEDED] for s in sim_statuses]):
+        elif any([s == EntityStatus.CREATED for s in sim_statuses]) and any([s in [EntityStatus.FAILED, EntityStatus.SUCCEEDED] for s in sim_statuses]):
             status = EntityStatus.RUNNING
-        elif any([s is None for s in sim_statuses]) and any(
-                [s in [EntityStatus.FAILED, EntityStatus.SUCCEEDED] for s in sim_statuses]):
+        elif any([s is None for s in sim_statuses]) and any([s in [EntityStatus.FAILED, EntityStatus.SUCCEEDED] for s in sim_statuses]):
             status = EntityStatus.CREATED
         elif any([s == EntityStatus.FAILED for s in sim_statuses]):
             status = EntityStatus.FAILED
@@ -397,8 +393,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         p = super()._check_for_platform_from_context(platform)
         return p._experiments.list_assets(self, children, **kwargs)
 
-    def run(self, wait_until_done: bool = False, platform: 'IPlatform' = None, regather_common_assets: bool = None,
-            wait_on_done_progress: bool = True, wait_on_done: bool = False,
+    def run(self, wait_until_done: bool = False, platform: 'IPlatform' = None, regather_common_assets: bool = None, wait_on_done_progress: bool = True, wait_on_done: bool = False,
             **run_opts) -> NoReturn:
         """
         Runs an experiment on a platform
@@ -422,10 +417,8 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
             message = "To modify an experiment's asset collection, you must make a copy of it first. For example\nexperiment.assets = experiment.assets.copy()"
             user_logger.error(message)  # Show it bold red to user
             raise ValueError(message)
-        if not self.assets.is_editable() and isinstance(self.simulations.items,
-                                                        TemplatedSimulations) and not regather_common_assets:
-            user_logger.warning(
-                "You are modifying and existing experiment by using a template without gathering common assets. Ensure your Template configuration is the same as existing experiments or enable gathering of new common assets through regather_common_assets.")
+        if not self.assets.is_editable() and isinstance(self.simulations.items, TemplatedSimulations) and not regather_common_assets:
+            user_logger.warning("You are modifying and existing experiment by using a template without gathering common assets. Ensure your Template configuration is the same as existing experiments or enable gathering of new common assets through regather_common_assets.")
         run_opts['regather_common_assets'] = regather_common_assets
         p.run_items(self, **run_opts)
         if wait_until_done or wait_on_done:
@@ -443,8 +436,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
 
     # Define this here for better completion in IDEs for end users
     @classmethod
-    def from_id(cls, item_id: Union[str, uuid.UUID], platform: 'IPlatform' = None, copy_assets: bool = False,
-                **kwargs) -> 'Experiment':
+    def from_id(cls, item_id: Union[str, uuid.UUID], platform: 'IPlatform' = None, copy_assets: bool = False, **kwargs) -> 'Experiment':
         """
         Helper function to provide better intellisense to end users
 
@@ -488,25 +480,6 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         if verbose:
             user_logger.info(f"Simulation Type: {type(self.__simulations)}")
             user_logger.info(f"Assets: {self.assets}")
-
-    def add_work_order(self, file_name: str = "WorkOrder.json", file_path: Union[str, PathLike] = "./WorkOrder.json"):
-        if isinstance(self.simulations.items, TemplatedSimulations):
-            if len(self.simulations.items) == 0:
-                raise ValueError("You cannot run an empty experiment")
-            if logger.isEnabledFor(DEBUG):
-                logger.debug("Using Base task from template for WorkOrder.json assets")
-            self.simulations.items.add_work_order(file_name=file_name, file_path=file_path)
-            for sim in self.simulations.items.extra_simulations():
-                sim.add_work_order(file_name=file_name, file_path=file_path)
-        elif isinstance(self.simulations.items, List):
-            if len(self.simulations.items) == 0:
-                raise ValueError("You cannot run an empty experiment")
-            if logger.isEnabledFor(DEBUG):
-                logger.debug("Using all tasks to gather assets")
-            for sim in self.simulations.items:
-                sim.add_work_order(file_name=file_name, file_path=file_path)
-        elif isinstance(self.simulations.items, List) and len(self.simulations.items) == 0:
-            raise ValueError("You cannot run an empty experiment")
 
 
 class ExperimentSpecification(ExperimentPluginSpecification):
