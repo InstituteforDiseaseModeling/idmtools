@@ -26,8 +26,7 @@ def _add_work_order_asset(_simulation: Simulation, _file_name: str = "WorkOrder.
 
 
 def add_work_order(item: Union[Experiment, Simulation, TemplatedSimulations], file_name: str = "WorkOrder.json",
-                   file_path: Union[str, PathLike] = "./WorkOrder.json", update: bool = True,
-                   scheduling: bool = True):
+                   file_path: Union[str, PathLike] = "./WorkOrder.json", update: bool = True):
     if isinstance(item, Simulation):
         _add_work_order_asset(item, _file_name=file_name, _file_path=file_path, _update=update)
     elif isinstance(item, TemplatedSimulations):
