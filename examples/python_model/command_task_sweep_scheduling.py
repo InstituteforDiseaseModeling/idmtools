@@ -7,13 +7,14 @@ from idmtools.entities import CommandLine
 from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.templated_simulation import TemplatedSimulations
+from idmtools_platform_comps.utils.schedule_simulations import add_work_order
 
 
 # utility function to add updated WorkOrder.json to each simulation as linked file via simulation task
 # first loads original workorder file from local, then update Command field in it from each simulation object's
 # simulation.task.command.cmd, then write updated command to WorkOrder.json, and load this file to simulation
 def add_file(simulation, file_name, file_path):
-    simulation.add_work_order(file_name=file_name, file_path=file_path)
+    add_work_order(simulation, file_name=file_name, file_path=file_path)
 
 
 # Update each sweep parameter in simulation and add to command line argument to command

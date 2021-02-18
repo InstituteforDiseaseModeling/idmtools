@@ -8,10 +8,11 @@ from idmtools.entities import CommandLine
 from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.templated_simulation import TemplatedSimulations
+from idmtools_platform_comps.utils.schedule_simulations import add_work_order
 
 
 def add_file(simulation, file_name, file_path):
-    simulation.add_work_order(file_name=file_name, file_path=file_path)
+    add_work_order(simulation, file_name=file_name, file_path=file_path)
 
 
 def set_value(simulation, name, value):

@@ -13,6 +13,7 @@ from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
+from idmtools_platform_comps.utils.schedule_simulations import add_work_order
 
 # first define our base task. please see the detail explanation in examples/python_models/python_sim.py
 # if we do not use WorkOrder.json, this task will create simulation command run as "python Assets/model.py" in comps
@@ -24,15 +25,16 @@ task = JSONConfiguredPythonTask(script_path=os.path.join("inputs", "python_model
 # we will define later. We can also use it to manipulate the base_task or the base_simulation
 ts = TemplatedSimulations(base_task=task)
 
-# load WorkOrder.json file from local to each simulation via task. the actual command in comps will contain in this file
-ts.add_work_order(file_path=os.path.join("inputs", "scheduling", "WorkOrder.json"))
-
 # We can define common metadata like tags across all the simulations using the base_simulation object
 ts.base_simulation.tags['tag1'] = 1
+
+# load WorkOrder.json file from local to each simulation via task. the actual command in comps will contain in this file
+add_work_order(ts, file_path=os.path.join("inputs", "scheduling", "WorkOrder.json"))
 
 # Since we have our templated simulation object now, let's define our sweeps
 # To do that we need to use a builder
 builder = SimulationBuilder()
+
 
 # define an utility function that will update a single parameter at a
 # time on the model and add that param/value pair as a tag on our simulation.
@@ -70,6 +72,7 @@ experiment.assets.add_directory(assets_directory=os.path.join("inputs", "python_
 
 with Platform('BELEGOST') as platform:
     # The last step is to call run() on the ExperimentManager to run the simulations.
-    experiment.run(True, scheduling=True, abc=1, executable_path='hello.py', use_short_path=3, command_arg='zdu_arg', num_cores=11, priority='high')
+    experiment.run(True, scheduling=True, abc=1, executable_path='hello.py', use_short_path=3, command_arg='zdu_arg',
+                   num_cores=11, priority='high')
     # use system status as the exit code
     sys.exit(0 if experiment.succeeded else -1)

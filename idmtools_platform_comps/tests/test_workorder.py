@@ -12,6 +12,7 @@ from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
+from idmtools_platform_comps.utils.schedule_simulations import add_work_order
 from idmtools_models.templated_script_task import TemplatedScriptTask, get_script_wrapper_unix_task, \
     LINUX_PYTHON_PATH_WRAPPER
 from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection import \
@@ -50,7 +51,7 @@ class TestWorkOrder(ITestWithPersistence):
         ts = TemplatedSimulations(base_task=task)
 
         # use WorkOrder.json which override input commandline command and arguments
-        ts.add_work_order(file_path=os.path.join(COMMON_INPUT_PATH, "scheduling", "slurm", "WorkOrder.json"))
+        add_work_order(ts, file_path=os.path.join(COMMON_INPUT_PATH, "scheduling", "slurm", "WorkOrder.json"))
 
 
         builder = SimulationBuilder()
@@ -79,7 +80,7 @@ class TestWorkOrder(ITestWithPersistence):
 
         """
         def add_file(simulation, file_name, file_path):
-            simulation.add_work_order(file_name=file_name, file_path=file_path)
+            add_work_order(simulation, file_name=file_name, file_path=file_path)
 
         def set_value(simulation, name, value):
             fix_value = round(value, 2) if isinstance(value, float) else value
@@ -141,7 +142,7 @@ class TestWorkOrder(ITestWithPersistence):
         experiment = Experiment.from_task(wrapper_task, name=self.case_name)
 
         # upload WorkOrder.json to simulation root dir
-        experiment.add_work_order(file_path=os.path.join("inputs", "WorkOrder.json"))
+        add_work_order(experiment, file_path=os.path.join("inputs", "WorkOrder.json"))
 
         wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform, scheduling=True)
         self.assertTrue(experiment.succeeded)
@@ -165,7 +166,7 @@ class TestWorkOrder(ITestWithPersistence):
             parameters=(dict(c=0)))
 
         experiment = Experiment.from_task(task, name=self.case_name)
-        experiment.add_work_order(file_path=os.path.join(COMMON_INPUT_PATH, "scheduling", "hpc", "WorkOrder.json"))
+        add_work_order(experiment, file_path=os.path.join(COMMON_INPUT_PATH, "scheduling", "hpc", "WorkOrder.json"))
 
         with Platform('COMPS2') as platform:
             experiment.run(wait_on_done=True, scheduling=True)
@@ -208,7 +209,7 @@ class TestWorkOrder(ITestWithPersistence):
         task.common_assets.add_directory(assets_directory=os.path.join(COMMON_INPUT_PATH, "python", "Assets"))
         experiment = Experiment.from_task(task, name=self.case_name)
         # add local WorkOrder2.json to comps and change file name to WorkOrder.json
-        experiment.add_work_order(file_path=os.path.join(COMMON_INPUT_PATH, "scheduling", "slurm", "WorkOrder2.json"))
+        add_work_order(experiment, file_path=os.path.join(COMMON_INPUT_PATH, "scheduling", "slurm", "WorkOrder2.json"))
         wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform, scheduling=True)
 
         # only verify first simulation's stdout.txt
