@@ -25,6 +25,7 @@ from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
+from idmtools_platform_comps.utils.schedule_simulations import add_work_order
 from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection import \
     RequirementsToAssetCollection
 
@@ -54,7 +55,7 @@ with Platform('CALCULON') as platform:
     ts = TemplatedSimulations(base_task=task)
 
     # add WorkOrder.json to each simulation as transient_assets
-    ts.add_work_order(file_path=os.path.join("inputs", "scheduling", "WorkOrder.json"))
+    add_work_order(ts, file_path=os.path.join("inputs", "scheduling", "WorkOrder.json"))
 
     # create build and define our sweeps
     builder = SimulationBuilder()
