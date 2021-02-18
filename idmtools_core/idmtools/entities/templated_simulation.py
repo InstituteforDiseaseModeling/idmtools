@@ -1,8 +1,9 @@
 import copy
+from os import PathLike
 from dataclasses import dataclass, field, fields, InitVar
 from functools import partial
 from itertools import chain
-from typing import Set, Generator, Dict, Any, List, TYPE_CHECKING
+from typing import Set, Generator, Dict, Any, List, Union, TYPE_CHECKING
 from more_itertools import grouper
 from idmtools.builders.simulation_builder import SimulationBuilder
 from idmtools.entities.itask import ITask
@@ -213,3 +214,25 @@ class TemplatedSimulations:
     @classmethod
     def from_task(cls, task: ITask, tags: Dict[str, Any] = None) -> 'TemplatedSimulations':
         return TemplatedSimulations(base_task=task, tags=tags)
+
+    def add_work_order(self, file_name: str = "WorkOrder.json", file_path: Union[str, PathLike] = "./WorkOrder.json",
+                       update: bool = False, scheduling: bool = True):
+        import json
+        from idmtools.assets import Asset
+
+        with open(str(file_path), "r") as jsonFile:
+            data = json.loads(jsonFile.read())
+
+        if update:
+            from idmtools.core.context import CURRENT_PLATFORM
+            if CURRENT_PLATFORM is None:
+                from idmtools.core import NoPlatformException
+                raise NoPlatformException("No Platform defined on object, in current context, or passed to run")
+            platform = CURRENT_PLATFORM
+            self.base_task.pre_creation(None, platform)
+            data["Command"] = self.base_task.command.cmd
+
+        self.base_task.transient_assets.add_asset(Asset(filename=file_name, content=json.dumps(data)))
+
+        if scheduling:
+            setattr(self.base_simulation, 'scheduling', True)
