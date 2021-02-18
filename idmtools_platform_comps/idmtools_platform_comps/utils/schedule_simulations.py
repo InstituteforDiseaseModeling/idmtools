@@ -26,11 +26,11 @@ def _add_work_order_asset(_simulation: Simulation, _file_name: str = "WorkOrder.
 
 
 def add_work_order(item: Union[Experiment, Simulation, TemplatedSimulations], file_name: str = "WorkOrder.json",
-                   file_path: Union[str, PathLike] = "./WorkOrder.json", update: bool = True):
+                   file_path: Union[str, PathLike] = "./WorkOrder.json"):
     if isinstance(item, Simulation):
-        _add_work_order_asset(item, _file_name=file_name, _file_path=file_path, _update=update)
+        _add_work_order_asset(item, _file_name=file_name, _file_path=file_path, _update=True)
     elif isinstance(item, TemplatedSimulations):
-        _add_work_order_asset(item.base_simulation, _file_name=file_name, _file_path=file_path, _update=update)
+        _add_work_order_asset(item.base_simulation, _file_name=file_name, _file_path=file_path, _update=False)
     elif isinstance(item, Experiment):
         if isinstance(item.simulations.items, TemplatedSimulations):
             if len(item.simulations.items) == 0:
@@ -38,16 +38,16 @@ def add_work_order(item: Union[Experiment, Simulation, TemplatedSimulations], fi
             if logger.isEnabledFor(DEBUG):
                 logger.debug("Using Base task from template for WorkOrder.json assets")
             _add_work_order_asset(item.simulations.items.base_simulation, _file_name=file_name, _file_path=file_path,
-                                  _update=update)
+                                  _update=False)
             for sim in item.simulations.items.extra_simulations():
-                _add_work_order_asset(sim, _file_name=file_name, _file_path=file_path, _update=update)
+                _add_work_order_asset(sim, _file_name=file_name, _file_path=file_path, _update=True)
         elif isinstance(item.simulations.items, List):
             if len(item.simulations.items) == 0:
                 raise ValueError("You cannot run an empty experiment")
             if logger.isEnabledFor(DEBUG):
                 logger.debug("Using all tasks to gather assets")
             for sim in item.simulations.items:
-                _add_work_order_asset(sim, _file_name=file_name, _file_path=file_path, _update=update)
+                _add_work_order_asset(sim, _file_name=file_name, _file_path=file_path, _update=True)
         elif isinstance(item.simulations.items, List) and len(item.simulations.items) == 0:
             raise ValueError("You cannot run an empty experiment")
     else:
@@ -63,30 +63,30 @@ def _add_schedule_config_asset(simulation: Simulation, _config: dict, _update: b
 
 
 def add_schedule_config(item: Union[Experiment, Simulation, TemplatedSimulations], command: str = None,
-                        node_group_name: str = 'idm_cd', num_cores: int = 1, update: bool = True, **config_opts):
+                        node_group_name: str = 'idm_cd', num_cores: int = 1, **config_opts):
     config = dict(Command=command, NodeGroupName=node_group_name, NumCores=num_cores)
     config.update(config_opts)
 
     if isinstance(item, Simulation):
-        _add_schedule_config_asset(item, _config=config, _update=update)
+        _add_schedule_config_asset(item, _config=config, _update=True)
     elif isinstance(item, TemplatedSimulations):
-        _add_schedule_config_asset(item.base_simulation, _config=config, _update=update)
+        _add_schedule_config_asset(item.base_simulation, _config=config, _update=False)
     elif isinstance(item, Experiment):
         if isinstance(item.simulations.items, TemplatedSimulations):
             if len(item.simulations.items) == 0:
                 raise ValueError("You cannot run an empty experiment")
             if logger.isEnabledFor(DEBUG):
                 logger.debug("Using Base task from template for WorkOrder.json assets")
-            _add_schedule_config_asset(item.simulations.items.base_simulation, _config=config, _update=update)
+            _add_schedule_config_asset(item.simulations.items.base_simulation, _config=config, _update=False)
             for sim in item.simulations.items.extra_simulations():
-                _add_schedule_config_asset(sim, _config=config, _update=update)
+                _add_schedule_config_asset(sim, _config=config, _update=True)
         elif isinstance(item.simulations.items, List):
             if len(item.simulations.items) == 0:
                 raise ValueError("You cannot run an empty experiment")
             if logger.isEnabledFor(DEBUG):
                 logger.debug("Using all tasks to gather assets")
             for sim in item.simulations.items:
-                _add_schedule_config_asset(sim, _config=config, _update=update)
+                _add_schedule_config_asset(sim, _config=config, _update=True)
         elif isinstance(item.simulations.items, List) and len(item.simulations.items) == 0:
             raise ValueError("You cannot run an empty experiment")
     else:
