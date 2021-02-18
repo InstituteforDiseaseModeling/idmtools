@@ -1,9 +1,8 @@
 import copy
-from os import PathLike
 from dataclasses import dataclass, field, fields, InitVar
 from functools import partial
 from itertools import chain
-from typing import Set, Generator, Dict, Any, List, Union, TYPE_CHECKING
+from typing import Set, Generator, Dict, Any, List, TYPE_CHECKING
 from more_itertools import grouper
 from idmtools.builders.simulation_builder import SimulationBuilder
 from idmtools.entities.itask import ITask
