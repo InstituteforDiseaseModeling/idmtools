@@ -1,6 +1,5 @@
 import copy
 import uuid
-from os import PathLike
 from dataclasses import dataclass, field, InitVar, fields
 from logging import getLogger, DEBUG
 from types import GeneratorType
@@ -488,25 +487,6 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         if verbose:
             user_logger.info(f"Simulation Type: {type(self.__simulations)}")
             user_logger.info(f"Assets: {self.assets}")
-
-    def add_work_order(self, file_name: str = "WorkOrder.json", file_path: Union[str, PathLike] = "./WorkOrder.json"):
-        if isinstance(self.simulations.items, TemplatedSimulations):
-            if len(self.simulations.items) == 0:
-                raise ValueError("You cannot run an empty experiment")
-            if logger.isEnabledFor(DEBUG):
-                logger.debug("Using Base task from template for WorkOrder.json assets")
-            self.simulations.items.add_work_order(file_name=file_name, file_path=file_path)
-            for sim in self.simulations.items.extra_simulations():
-                sim.add_work_order(file_name=file_name, file_path=file_path)
-        elif isinstance(self.simulations.items, List):
-            if len(self.simulations.items) == 0:
-                raise ValueError("You cannot run an empty experiment")
-            if logger.isEnabledFor(DEBUG):
-                logger.debug("Using all tasks to gather assets")
-            for sim in self.simulations.items:
-                sim.add_work_order(file_name=file_name, file_path=file_path)
-        elif isinstance(self.simulations.items, List) and len(self.simulations.items) == 0:
-            raise ValueError("You cannot run an empty experiment")
 
 
 class ExperimentSpecification(ExperimentPluginSpecification):
