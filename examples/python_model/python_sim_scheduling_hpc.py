@@ -13,7 +13,7 @@ from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
-from idmtools_platform_comps.utils.schedule_simulations import add_work_order
+from idmtools_platform_comps.utils.scheduling import add_work_order
 
 # first define our base task. please see the detail explanation in examples/python_models/python_sim.py
 # if we do not use WorkOrder.json, this task will create simulation command run as "python Assets/model.py" in comps

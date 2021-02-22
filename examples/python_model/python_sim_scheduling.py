@@ -25,7 +25,7 @@ from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
-from idmtools_platform_comps.utils.schedule_simulations import add_work_order
+from idmtools_platform_comps.utils.scheduling import add_work_order
 from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection import \
     RequirementsToAssetCollection
 
