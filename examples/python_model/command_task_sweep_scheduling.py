@@ -7,7 +7,7 @@ from idmtools.entities import CommandLine
 from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.templated_simulation import TemplatedSimulations
-from idmtools_platform_comps.utils.schedule_simulations import default_add_workerorder_sweep_callback
+from idmtools_platform_comps.utils.scheduling import default_add_workerorder_sweep_callback
 
 
 # Update each sweep parameter in simulation and add to command line argument to command
