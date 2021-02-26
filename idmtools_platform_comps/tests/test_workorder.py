@@ -12,7 +12,7 @@ from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
-from idmtools_platform_comps.utils.schedule_simulations import add_work_order
+from idmtools_platform_comps.utils.scheduling import add_work_order
 from idmtools_models.templated_script_task import TemplatedScriptTask, get_script_wrapper_unix_task, \
     LINUX_PYTHON_PATH_WRAPPER
 from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection import \
@@ -20,6 +20,7 @@ from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.common_experiments import wait_on_experiment_and_check_all_sim_status
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
+from idmtools_platform_comps.utils.scheduling import default_add_workerorder_sweep_callback
 
 
 @pytest.mark.comps
@@ -79,8 +80,6 @@ class TestWorkOrder(ITestWithPersistence):
         Returns:
 
         """
-        def add_file(simulation, file_name, file_path):
-            add_work_order(simulation, file_name=file_name, file_path=file_path)
 
         def set_value(simulation, name, value):
             fix_value = round(value, 2) if isinstance(value, float) else value
@@ -99,8 +98,8 @@ class TestWorkOrder(ITestWithPersistence):
         sb.add_sweep_definition(partial(set_value, name="pop_infected"), [10, 100])
         sb.add_sweep_definition(partial(set_value, name="n_days"), [100, 110])
         sb.add_sweep_definition(partial(set_value, name="rand_seed"), [1234, 4567])
-        sb.add_sweep_definition(partial(add_file, file_name="WorkOrder.json"),
-                                os.path.join(COMMON_INPUT_PATH, "scheduling", "slurm", "WorkOrder1.json"))
+        sb.add_sweep_definition(partial(default_add_workerorder_sweep_callback, file_name="WorkOrder.json"),
+                                file_path=os.path.join(COMMON_INPUT_PATH, "scheduling", "slurm", "WorkOrder1.json"))
 
         ts.add_builder(sb)
 

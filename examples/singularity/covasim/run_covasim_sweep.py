@@ -1,8 +1,7 @@
 import os
 import sys
-import json
 from functools import partial
-from idmtools.assets import AssetCollection, Asset
+from idmtools.assets import AssetCollection
 from idmtools.builders import SimulationBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import CommandLine

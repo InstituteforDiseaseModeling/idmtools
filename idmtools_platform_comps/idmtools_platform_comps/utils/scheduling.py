@@ -11,6 +11,13 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+# utility function to add updated WorkOrder.json to each simulation as linked file via simulation task
+# first loads original workorder file from local, then update Command field in it from each simulation object's
+# simulation.task.command.cmd, then write updated command to WorkOrder.json, and load this file to simulation
+def default_add_workerorder_sweep_callback(simulation, file_name, file_path):
+    add_work_order(simulation, file_name=file_name, file_path=file_path)
+
+
 def _add_work_order_asset(_simulation: Simulation, _file_name: str = "WorkOrder.json",
                           _file_path: Union[str, PathLike] = "./WorkOrder.json", _update: bool = True):
 
