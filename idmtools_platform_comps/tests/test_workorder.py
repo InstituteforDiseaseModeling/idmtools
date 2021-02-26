@@ -99,7 +99,7 @@ class TestWorkOrder(ITestWithPersistence):
         sb.add_sweep_definition(partial(set_value, name="n_days"), [100, 110])
         sb.add_sweep_definition(partial(set_value, name="rand_seed"), [1234, 4567])
         sb.add_sweep_definition(partial(default_add_workerorder_sweep_callback, file_name="WorkOrder.json"),
-                                file_path=os.path.join(COMMON_INPUT_PATH, "scheduling", "slurm", "WorkOrder1.json"))
+                                os.path.join(COMMON_INPUT_PATH, "scheduling", "slurm", "WorkOrder1.json"))
 
         ts.add_builder(sb)
 
