@@ -38,7 +38,7 @@ if __name__ == "__main__":
     sb.add_sweep_definition(partial(set_value, name="rand_seed"), [1234, 4567])
     # add file to each simulation
     sb.add_sweep_definition(partial(default_add_workerorder_sweep_callback, file_name="WorkOrder.json"),
-                            file_path="./WorkOrder_orig.json")
+                            "./WorkOrder_orig.json")
     ts.add_builder(sb)
     experiment = Experiment.from_template(ts, name=os.path.split(sys.argv[0])[1])
     experiment.add_asset(os.path.join("inputs", "run_sim_sweep.py"))
