@@ -18,6 +18,12 @@ def default_add_workerorder_sweep_callback(simulation, file_name, file_path):
     add_work_order(simulation, file_name=file_name, file_path=file_path)
 
 
+def default_add_schedule_config_sweep_callback(simulation, command: str = None,
+                                               node_group_name: str = 'idm_cd', num_cores: int = 1, **config_opts):
+    add_schedule_config(simulation, command=command, node_group_name=node_group_name, num_cores=num_cores,
+                        **config_opts["config_opts"])
+
+
 def scheduled(simulation: Simulation):
     scheduling = getattr(simulation, 'scheduling', False)
     return scheduling
