@@ -7,6 +7,7 @@ from typing import Any, Dict
 import pytest
 from idmtools.assets import Asset, AssetCollection
 from idmtools.builders import SimulationBuilder
+from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import CommandLine
 from idmtools.entities.command_task import CommandTask
@@ -14,6 +15,7 @@ from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
+from idmtools_platform_comps.ssmt_work_items.work_order import DockerWorkOrder, ExecutionDefinition
 from idmtools_platform_comps.utils.scheduling import add_work_order, add_schedule_config, \
     default_add_schedule_config_sweep_callback
 from idmtools_models.templated_script_task import TemplatedScriptTask, get_script_wrapper_unix_task, \
@@ -408,3 +410,27 @@ class TestWorkOrder(ITestWithPersistence):
         stdout_content = files['stdout.txt'].decode('utf-8').replace("\\\\", "\\")
         stdout_content = stdout_content.replace("\\", "")
         self.assertIn("11", stdout_content)  # a+b = 1+10 = 11
+
+    def test_workorder_in_SSMTWorkItem(self):
+        asset_files = AssetCollection()
+        asset_files.add_asset(os.path.join("inputs", "population_analyzer.py"))
+        asset_files.add_asset(os.path.join("inputs", "run_population_analyzer.py"))
+        user_files = AssetCollection()
+        user_files.add_asset(os.path.join("inputs", "idmtools.ini"))
+        experiment_id = "8bb8ae8f-793c-ea11-a2be-f0921c167861"  # COMPS2 exp
+        command = "cat run_population_analyzer.py"  # anything since it will be override with WorkOrder.json file
+        from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
+        wi = SSMTWorkItem(name=self.case_name, command=command, transient_assets=user_files, assets=asset_files, tags={'idmtools': self.case_name})
+        # overrode workorder.json with user provide file
+        wo = wi.load_work_order(os.path.join("inputs", "workitems", "ssmt", "WorkOrder.json"))
+        wi.run(wait_on_done=True)
+        local_output_path = "output"
+        out_filenames = ["output/" + experiment_id + "/population.png", "output/" + experiment_id + "/population.json",
+                         "WorkOrder.json"]
+        self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
+        files = self.platform.get_files(item=wi, files=out_filenames)
+        workorder_content = files['WorkOrder.json'].decode('utf-8')
+        s1 = json.loads(workorder_content)
+        s2 = json.loads("{\"WorkItem_Type\": \"DockerWorker\", \"Execution\": {\"ImageName\": \"docker-production.packages.idmod.org/idmtools/comps_ssmt_worker:1.6.2.9\", \"Command\": \"python3 Assets/run_population_analyzer.py 8bb8ae8f-793c-ea11-a2be-f0921c167861\", \"DebugFileName\": \"debug.txt\"}}")
+        self.assertDictEqual(s1, s2)
+
