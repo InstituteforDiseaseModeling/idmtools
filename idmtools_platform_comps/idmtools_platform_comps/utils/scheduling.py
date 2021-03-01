@@ -18,17 +18,24 @@ def default_add_workerorder_sweep_callback(simulation, file_name, file_path):
     add_work_order(simulation, file_name=file_name, file_path=file_path)
 
 
+def scheduled(simulation: Simulation):
+    scheduling = getattr(simulation, 'scheduling', False)
+    return scheduling
+
+
 def _add_work_order_asset(_simulation: Simulation, _file_name: str = "WorkOrder.json",
                           _file_path: Union[str, PathLike] = "./WorkOrder.json", _update: bool = True):
+    if scheduled(_simulation):
+        return
 
     with open(str(_file_path), "r") as jsonFile:
-        data = json.loads(jsonFile.read())
+        _config = json.loads(jsonFile.read())
 
-    if _update:
-        data["Command"] = _simulation.task.command.cmd
+    if _update and len(_simulation.task.command.cmd) > 0:
+        _config["Command"] = _simulation.task.command.cmd
 
-    _simulation.task.transient_assets.add_asset(Asset(filename=_file_name, content=json.dumps(data)))
-
+    ctn = json.dumps(_config, indent=3)
+    _simulation.task.transient_assets.add_asset(Asset(filename=_file_name, content=ctn))
     setattr(_simulation, 'scheduling', True)
 
 
@@ -61,12 +68,16 @@ def add_work_order(item: Union[Experiment, Simulation, TemplatedSimulations], fi
         raise ValueError("The method only support object type: Experiment, Simulation, TemplatedSimulations!")
 
 
-def _add_schedule_config_asset(simulation: Simulation, _config: dict, _update: bool = True):
-    if _update:
-        _config["Command"] = simulation.task.command.cmd
+def _add_schedule_config_asset(_simulation: Simulation, _config: dict, _update: bool = True):
+    if scheduled(_simulation):
+        return
+
+    if _update and len(_simulation.task.command.cmd) > 0:
+        _config["Command"] = _simulation.task.command.cmd
 
     ctn = json.dumps(_config, indent=3)
-    simulation.task.transient_assets.add_asset(Asset(filename="Work_order.json", content=ctn))
+    _simulation.task.transient_assets.add_asset(Asset(filename="WorkOrder.json", content=ctn))
+    setattr(_simulation, 'scheduling', True)
 
 
 def add_schedule_config(item: Union[Experiment, Simulation, TemplatedSimulations], command: str = None,
