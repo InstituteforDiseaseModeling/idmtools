@@ -1,3 +1,5 @@
+import json
+
 import allure
 import os
 from functools import partial
@@ -114,8 +116,9 @@ class TestWorkOrder(ITestWithPersistence):
             stdout_content)
 
         workorder_content = files['WorkOrder.json'].decode('utf-8').replace("\\\\", "\\")
-        self.assertEqual(workorder_content,
-                         "{\"Command\": \"python3 Assets/commandline_model.py 10000 10 100 1234\", \"NodeGroupName\": \"idm_cd\", \"NumCores\": 1, \"NumProcesses\": 1, \"NumNodes\": 1, \"Environment\": {\"key1\": \"value1\", \"key2:\": \"value2\"}}")
+        s1 = json.loads(workorder_content)
+        s2 = json.loads("{\"Command\": \"python3 Assets/commandline_model.py 10000 10 100 1234\", \"NodeGroupName\": \"idm_cd\", \"NumCores\": 1, \"NumProcesses\": 1, \"NumNodes\": 1, \"Environment\": {\"key1\": \"value1\", \"key2:\": \"value2\"}}")
+        self.assertDictEqual(s1, s2)
 
     @pytest.mark.timeout(60)
     def test_wrapper_script_execute_comps(self):
@@ -258,7 +261,6 @@ class TestWorkOrder(ITestWithPersistence):
         Returns:
 
         """
-        import json
 
         def set_value(simulation, name, value):
             fix_value = round(value, 2) if isinstance(value, float) else value
