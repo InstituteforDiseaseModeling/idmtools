@@ -54,7 +54,8 @@ def get_model1_templated_experiment(case_name, parameters=None):
 
 
 def wait_on_experiment_and_check_all_sim_status(tc, experiment, platform=None,
-                                                expected_status: EntityStatus = EntityStatus.SUCCEEDED):
+                                                expected_status: EntityStatus = EntityStatus.SUCCEEDED,
+                                                scheduling=False):
     """
     Run experiment and wait for it to finish then check all sims succeeded
     Args:
@@ -65,7 +66,7 @@ def wait_on_experiment_and_check_all_sim_status(tc, experiment, platform=None,
     Returns:
 
     """
-    experiment.run(wait_until_done=True)
+    experiment.run(wait_until_done=True, scheduling=scheduling)
     if isinstance(tc, type):
         tc.assertTrue(tc, all([s.status == expected_status for s in experiment.simulations]))
     else:
