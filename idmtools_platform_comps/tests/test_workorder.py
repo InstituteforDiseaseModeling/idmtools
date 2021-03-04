@@ -413,7 +413,7 @@ class TestWorkOrder(ITestWithPersistence):
 
     def test_workorder_in_workitem(self):
         """
-          To test WorkItem's WorkOrder.json, user can dynamic pull docker image from idm's production artifactory directly
+          To test WorkItem's WorkOrder.json, user can dynamically pull docker image from idm's production artifactory directly
           instead of old way which had to deploy docker image to docker worker host machine
           in this example, we pull nyu dtk docker image to docker worker, then execute Eradication command in comps's
           WorkItem
