@@ -22,28 +22,34 @@ class TestPackageVersionCLI(unittest.TestCase):
         pass
 
     @allure.feature("req2ac")
-    @pytest.mark.skip("this test will fail in Github Action due to different user creating another ac with same package")
     # cli: idmtools comps SLURM2 req2ac --asset_tag test:123 --pkg astor~=0.7.0
     def test_create_ac_with_req2ac(self):
+        # run req2ac to get ac_id
         result = run_command('comps', 'SLURM2', 'req2ac', '--asset_tag', 'test:123', '--pkg', 'astor~=0.7.0',
                              mix_stderr=False)
         self.assertTrue(result.exit_code == 0, msg=result.output)
         print(result.stdout)
-        ac_id = "ca2c7680-5a5f-eb11-a2c2-f0921c167862"
-        self.assertIn(ac_id, result.stdout)
+        ac_id = result.stdout.strip()
+
+        # run ac-exist to verify ac
         ac = AssetCollection.from_id(ac_id, as_copy=True)
         assets = [asset for asset in ac.assets if "astor-0.7.1" in asset.relative_path]
         self.assertTrue(len(assets) > 0)
 
     @allure.feature("req2ac")
-    @pytest.mark.skip("this test will fail in Github Action due to different user creating another ac with same package")
     # cli: idmtools comps SLURM2 ac-exist --pkg astor~=0.7.0
     def test_ac_exist_with_req2ac(self):
-        result = run_command('comps', 'SLURM2', 'ac-exist', '--pkg', 'astor~=0.7.0', mix_stderr=False)
-        self.assertTrue(result.exit_code == 0, msg=result.output)
-        print(result.stdout)
-        ac_id = "ca2c7680-5a5f-eb11-a2c2-f0921c167862"
-        self.assertIn(ac_id, result.output)
+        # run req2ac to get ac_id
+        result1 = run_command('comps', 'SLURM2', 'req2ac', '--pkg', 'astor~=0.7.0', mix_stderr=False)
+        self.assertTrue(result1.exit_code == 0, msg=result1.output)
+        print(result1.stdout)
+        ac_id = result1.stdout.strip()
+
+        # run ac-exist to verify ac
+        result2 = run_command('comps', 'SLURM2', 'ac-exist', '--pkg', 'astor~=0.7.0', mix_stderr=False)
+        self.assertTrue(result2.exit_code == 0, msg=result2.output)
+        print(result2.stdout)
+        self.assertIn(ac_id, result2.output)
         ac = AssetCollection.from_id(ac_id, as_copy=True)
         assets = [asset for asset in ac.assets if "astor-0.7.1" in asset.relative_path]
         self.assertTrue(len(assets) > 0)
