@@ -1,0 +1,11 @@
+{
+  "Command": "python -c \"print('hello test')\"",
+  "NodeGroupName": "idm_abcd",
+  "NumCores": 2,
+  "NumProcesses": 1,
+  "NumNodes": 1,
+  "Environment": {
+    "key1": "value1",
+    "key2:": "value2"
+  }
+}

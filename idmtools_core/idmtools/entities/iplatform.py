@@ -3,10 +3,11 @@ from abc import ABCMeta
 from dataclasses import dataclass
 from dataclasses import fields, field
 from functools import partial
+from os import PathLike
 from pathlib import PureWindowsPath, PurePath
 from itertools import groupby
 from logging import getLogger, DEBUG
-from typing import Dict, List, NoReturn, Type, TypeVar, Any, Union, Tuple, Set, Iterator, Callable
+from typing import Dict, List, NoReturn, Type, TypeVar, Any, Union, Tuple, Set, Iterator, Callable, Optional
 from uuid import UUID
 from idmtools import IdmConfigParser
 from idmtools.core import CacheEnabled, UnknownItemException, EntityContainer, UnsupportedPlatformType
@@ -15,6 +16,7 @@ from idmtools.core.interfaces.ientity import IEntity
 from idmtools.core.interfaces.iitem import IItem
 from idmtools.core.interfaces.irunnable_entity import IRunnableEntity
 from idmtools.entities.experiment import Experiment
+from idmtools.core.id_file import read_id_file
 from idmtools.entities.iplatform_ops.iplatform_asset_collection_operations import IPlatformAssetCollectionOperations
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
@@ -97,9 +99,10 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         try:
             s = inspect.stack()
-        except RuntimeError:
+        except (IndexError, RuntimeError):
             # in some high thread environments and under heavy load, we can get environment changes before retrieving
             # stack in those case assume we are good
+            # We can also encounter IndexError in dynamic environments like Snakemake, jinja, etc
             return "__newobj__"
         return s[2][3]
 
@@ -412,12 +415,13 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             self.cache.delete(cache_key)
         return cache_key
 
-    def create_items(self, items: Union[List[IEntity], IEntity]) -> List[IEntity]:
+    def create_items(self, items: Union[List[IEntity], IEntity], **kwargs) -> List[IEntity]:
         """
         Create items (simulations, experiments, or suites) on the platform. The function will batch the items based on
         type and call the self._create_batch for creation
         Args:
             items: The list of items to create.
+            kwargs: Extra arguments
         Returns:
             List of item IDs created.
         """
@@ -428,10 +432,10 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         result = []
         for key, group in groupby(items, lambda x: x.item_type):
-            result.extend(self._create_items_of_type(group, key))
+            result.extend(self._create_items_of_type(group, key, **kwargs))
         return result
 
-    def _create_items_of_type(self, items: Iterator[IEntity], item_type: ItemType):
+    def _create_items_of_type(self, items: Iterator[IEntity], item_type: ItemType, **kwargs):
         """
         Creates items of specific type using batches
 
@@ -443,7 +447,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         """
         interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item_type]
-        ni = getattr(self, interface).batch_create(items)
+        ni = getattr(self, interface).batch_create(items, **kwargs)
         return ni
 
     def _is_item_list_supported(self, items: List[IEntity]):
@@ -708,8 +712,9 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         if child_attribute is None:
             if isinstance(item, IWorkflowItem):
                 if item.status in done_states:
-                    progress_bar.update(1)
-                    progress_bar.close()
+                    if progress_bar:
+                        progress_bar.update(1)
+                        progress_bar.close()
                     return True
                 return False
             else:
@@ -826,11 +831,10 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         """
         return self._regather_assets_on_modify
 
-    def is_windows_platform(self) -> bool:
+    def is_windows_platform(self, item: IEntity = None) -> bool:
         """
-        Returns is the arget platform is a windows system
+        Returns is the target platform is a windows system
         """
-
         return self.are_requirements_met(PlatformRequirements.WINDOWS)
 
     @property
@@ -858,6 +862,32 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             return str(PureWindowsPath(*args))
         else:
             return str(PurePath(*args))
+
+    def id_from_file(self, filename: str):
+        """
+        Load just the id portion of a id file
+
+        Args:
+            filename: Filename
+
+        Returns:
+
+        """
+        item_id, item_type, platform_block, extra_args = read_id_file(filename)
+        return item_id
+
+    def get_item_from_id_file(self, id_filename: Union[PathLike, str], item_type: Optional[ItemType] = None) -> IEntity:
+        """
+        Load an item from an id file. This ignores the platform in the file
+        Args:
+            id_filename: Filename to load
+            item_type: Optional item type
+
+        Returns:
+
+        """
+        item_id, file_item_type, platform_block, extra_args = read_id_file(id_filename)
+        return self.get_item(item_id, item_type if item_type else ItemType[file_item_type.upper()])
 
 
 TPlatform = TypeVar("TPlatform", bound=IPlatform)

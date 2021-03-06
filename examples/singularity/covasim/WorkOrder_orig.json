@@ -1,0 +1,11 @@
+{
+  "Command": "singularity exec ./Assets/covasim_ubuntu.sif python3 Assets/run_sim_sweep.py {pop_size} {pop_infected} {n_days} {rand_seed}",
+  "NodeGroupName": "idm_cd",
+  "NumCores": 1,
+  "NumProcesses": 1,
+  "NumNodes": 1,
+  "Environment": {
+    "key1": "value1",
+    "key2:": "value2"
+  }
+}

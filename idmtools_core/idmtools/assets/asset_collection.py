@@ -16,6 +16,8 @@ from idmtools.utils.file import scan_directory
 from idmtools.utils.filters.asset_filters import default_asset_file_filter
 from idmtools.utils.info import get_doc_base_url
 
+IGNORE_DIRECTORIES = ['.git', '.svn', '.venv', '.idea', '.Rproj.user', '$RECYCLE.BIN', '__pycache__']
+
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
 
@@ -94,7 +96,7 @@ class AssetCollection(IEntity):
     def assets_from_directory(assets_directory: Union[str, PathLike], recursive: bool = True, flatten: bool = False,
                               filters: 'TAssetFilterList' = None,  # noqa: F821
                               filters_mode: FilterMode = FilterMode.OR,
-                              forced_relative_path: str = None) -> List[Asset]:
+                              forced_relative_path: str = None, no_ignore: bool = False) -> List[Asset]:
         """
         Create assets for files in a given directory.
 
@@ -107,6 +109,7 @@ class AssetCollection(IEntity):
                 the collection; False filters it out. See :meth:`~idmtools.utils.filters.asset_filters`.
             filters_mode: When given multiple filters, either OR or AND the results.
             forced_relative_path: Prefix a relative path to the path created from the root directory.
+            no_ignore: Should we not ignore common directories(.git, .svn. etc) The full list is defined in IGNORE_DIRECTORIES
 
         Examples:
             For **relative_path**, given the following folder structure root/a/1,txt root/b.txt and
@@ -121,7 +124,7 @@ class AssetCollection(IEntity):
         if isinstance(assets_directory, PathLike):
             assets_directory = str(assets_directory)
         found_assets = []
-        for entry in scan_directory(assets_directory, recursive):
+        for entry in scan_directory(assets_directory, recursive, IGNORE_DIRECTORIES if not no_ignore else None):
             relative_path = os.path.relpath(os.path.dirname(entry.path), assets_directory)
             found_assets.append(Asset(absolute_path=os.path.abspath(entry.path),
                                       relative_path=None if relative_path == "." else relative_path,
@@ -161,14 +164,14 @@ class AssetCollection(IEntity):
 
     def add_directory(self, assets_directory: Union[str, PathLike], recursive: bool = True, flatten: bool = False,
                       filters: 'TAssetFilterList' = None, filters_mode: FilterMode = FilterMode.OR,  # noqa: F821
-                      relative_path: str = None):
+                      relative_path: str = None, no_ignore: bool = False):
         """
         Retrieve assets from the specified directory and add them to the collection.
         See :meth:`~AssetCollection.assets_from_directory` for arguments.
         """
         if isinstance(assets_directory, PathLike):
             assets_directory = str(assets_directory)
-        assets = AssetCollection.assets_from_directory(assets_directory, recursive, flatten, filters, filters_mode, relative_path)
+        assets = AssetCollection.assets_from_directory(assets_directory, recursive, flatten, filters, filters_mode, relative_path, no_ignore)
         for asset in assets:
             self.add_asset(asset)
 
@@ -189,7 +192,7 @@ class AssetCollection(IEntity):
             return False
         return True
 
-    def add_asset(self, asset: Union[Asset, str], fail_on_duplicate: bool = True, fail_on_deep_comparison: bool = False, **kwargs):  # noqa: F821
+    def add_asset(self, asset: Union[Asset, str, PathLike], fail_on_duplicate: bool = True, fail_on_deep_comparison: bool = False, **kwargs):  # noqa: F821
         """
         Add an asset to the collection.
 
@@ -202,8 +205,8 @@ class AssetCollection(IEntity):
            **kwargs: Arguments to pass to Asset constructor when asset is a string
         """
         self.is_editable(True)
-        if isinstance(asset, str):
-            asset = Asset(absolute_path=asset, **kwargs)
+        if isinstance(asset, (str, PathLike)):
+            asset = Asset(absolute_path=str(asset), **kwargs)
         # do a simple check first
         if asset in self.assets:
             if fail_on_duplicate:
@@ -257,7 +260,7 @@ class AssetCollection(IEntity):
         for asset in assets:
             self.add_asset(asset, fail_on_duplicate, fail_on_deep_comparison)
 
-    def add_or_replace_asset(self, asset: Union[Asset, str], fail_on_deep_comparison: bool = False):
+    def add_or_replace_asset(self, asset: Union[Asset, str, PathLike], fail_on_deep_comparison: bool = False):
         """
         Add or replaces an asset in a collection
 
@@ -269,7 +272,7 @@ class AssetCollection(IEntity):
             None.
         """
         self.is_editable(True)
-        tasset = Asset(asset) if isinstance(asset, str) else asset
+        tasset = Asset(asset) if isinstance(asset, (str, PathLike)) else asset
         index = self.find_index_of_asset(tasset)
         if index is not None:
             if fail_on_deep_comparison and not tasset.deep_equals(self.assets[index]):

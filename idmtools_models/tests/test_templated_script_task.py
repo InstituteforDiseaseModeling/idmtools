@@ -5,6 +5,7 @@ from unittest import TestCase
 import pytest
 from idmtools.assets import Asset
 from idmtools.core.platform_factory import Platform
+from idmtools.entities import CommandLine
 from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 from idmtools_models.templated_script_task import TemplatedScriptTask, \
@@ -73,7 +74,7 @@ class TestTemplatedScriptTask(TestCase):
 
         """
         cmd = 'python -c "import os; print(os.environ)"'
-        task = CommandTask(cmd)
+        task = CommandTask(CommandLine.from_string(cmd, as_raw_args=True))
         template = """
         set PYTHONPATH=%CWD%\\Assets\\l
         %*

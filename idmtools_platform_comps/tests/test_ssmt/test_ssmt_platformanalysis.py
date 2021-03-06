@@ -5,16 +5,15 @@ import json
 import os
 import sys
 import pytest
-
 from idmtools.assets import AssetCollection
 from idmtools_platform_comps import __version__ as platform_comps_version
 from idmtools import __version__ as core_version
 from idmtools.analysis.platform_anaylsis import PlatformAnalysis
 from idmtools.core.platform_factory import Platform
+from idmtools_test.utils.comps import COMPS_LOCAL_PACKAGE, CORE_LOCAL_PACKAGE, COMPS_LOAD_SSMT_PACKAGES_WRAPPER
 from idmtools_test.utils.decorators import run_in_temp_dir
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools.core import ItemType, TRUTHY_VALUES
-
 analyzer_path = os.path.join(os.path.dirname(__file__), "..", "inputs")
 sys.path.insert(0, analyzer_path)
 from simple_analyzer import SimpleAnalyzer  # noqa
@@ -22,18 +21,6 @@ from csv_analyzer import CSVAnalyzer  # noqa
 from infectiousness_csv_analyzer import InfectiousnessCSVAnalyzer  # noqa
 from node_csv_analyzer import NodeCSVAnalyzer  # noqa
 
-comps_package_filename = f"idmtools_platform_comps-{platform_comps_version.replace('nightly.0', 'nightly')}.tar.gz"
-core_package_filename = f"idmtools-{core_version.replace('nightly.0', 'nightly')}.tar.gz"
-comps_local_package = os.path.abspath(os.path.join(os.path.dirname(__file__), f"../../dist/{comps_package_filename}"))
-core_local_package = os.path.abspath(os.path.join(os.path.dirname(__file__), f"../../../idmtools_core/dist/{core_package_filename}"))
-shell_script = f"""
-export PYTHONPATH=$(pwd)/Assets/site-packages:$(pwd)/Assets/:$PYTHONPATH
-
-pip install Assets/{core_package_filename} --force --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
-pip install Assets/{comps_package_filename} --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
-
-$*
-"""
 # When enabled, ssmt tests will attempt to upload packages from local environment and install before run. You need to rebuild the the packages when code changes using pymake dist in the idmtools_core and ./idmtools_platform_comps directories
 test_with_new_code = os.environ.get("TEST_WITH_PACKAGES", 'n').lower() in TRUTHY_VALUES
 
@@ -41,7 +28,7 @@ test_with_new_code = os.environ.get("TEST_WITH_PACKAGES", 'n').lower() in TRUTHY
 @functools.lru_cache(1)
 def write_wrapper_script():
     f = tempfile.NamedTemporaryFile(suffix='.sh', mode='wb', delete=False)
-    f.write(shell_script.replace("\r", "").encode('utf-8'))
+    f.write(COMPS_LOAD_SSMT_PACKAGES_WRAPPER.replace("\r", "").encode('utf-8'))
     f.flush()
     return f.name
 
@@ -72,7 +59,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
         if test_with_new_code:
             wrapper = write_wrapper_script()
             extra_args['wrapper_shell_script'] = wrapper
-            extra_args['asset_files'] = [core_local_package, comps_local_package]
+            extra_args['asset_files'] = [CORE_LOCAL_PACKAGE, COMPS_LOCAL_PACKAGE]
         analysis = PlatformAnalysis(platform=platform, experiment_ids=[experiment_id], analyzers=[SimpleAnalyzer], analyzers_args=[{'filenames': ['config.json']}], analysis_name=self.case_name, tags={'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}, **extra_args)
 
         analysis.analyze(check_status=True)
@@ -113,7 +100,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
         if test_with_new_code:
             wrapper = write_wrapper_script()
             extra_args['wrapper_shell_script'] = write_wrapper_script()
-            extra_args['asset_files'] = [core_local_package, comps_local_package]
+            extra_args['asset_files'] = [CORE_LOCAL_PACKAGE, COMPS_LOCAL_PACKAGE]
         analysis = PlatformAnalysis(platform=self.platform, experiment_ids=[experiment_id], analyzers=[CSVAnalyzer], analyzers_args=[{'filenames': ['output/c.csv'], 'parse': True}], analysis_name=self.case_name, tags={'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}, **extra_args)
 
         analysis.analyze(check_status=True)
@@ -147,7 +134,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
         if test_with_new_code:
             wrapper = write_wrapper_script()
             extra_args['wrapper_shell_script'] = wrapper
-            extra_args['asset_files'] = [core_local_package, comps_local_package]
+            extra_args['asset_files'] = [CORE_LOCAL_PACKAGE, COMPS_LOCAL_PACKAGE]
         analysis = PlatformAnalysis(platform=self.platform, experiment_ids=[exp_id], analyzers=[InfectiousnessCSVAnalyzer, NodeCSVAnalyzer], analyzers_args=[filenames, filenames_2], analysis_name=self.case_name, tags={'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}, **extra_args)
 
         analysis.analyze(check_status=True)
@@ -185,7 +172,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
         if test_with_new_code:
             wrapper = write_wrapper_script()
             extra_args['wrapper_shell_script'] = wrapper
-            extra_args['asset_files'] = [core_local_package, comps_local_package]
+            extra_args['asset_files'] = [CORE_LOCAL_PACKAGE, COMPS_LOCAL_PACKAGE]
         analysis = PlatformAnalysis(platform=self.platform, experiment_ids=[exp_id], analyzers=analyzers, analyzers_args=[filenames, filenames_2], analysis_name=self.case_name, tags={'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}, **extra_args)
 
         analysis.analyze(check_status=True)
@@ -208,7 +195,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
         else:
             self.assertEqual(execution['Command'], "python3 platform_analysis_bootstrap.py --experiment-ids " + exp_id + " --analyzers custom_csv_analyzer.InfectiousnessCSVAnalyzer,custom_csv_analyzer.NodeCSVAnalyzer --block COMPS2")
 
-    @pytest.mark.skipif(not os.path.exists(comps_local_package) or not os.path.exists(core_local_package), reason=f"To run this, you need both {comps_local_package} and {core_local_package}. You can create these files by running pymake dist in each package directory")
+    @pytest.mark.skipif(not os.path.exists(COMPS_LOCAL_PACKAGE) or not os.path.exists(CORE_LOCAL_PACKAGE), reason=f"To run this, you need both {COMPS_LOCAL_PACKAGE} and {CORE_LOCAL_PACKAGE}. You can create these files by running pymake dist in each package directory")
     def test_using_newest_code(self):
         """
         This test uploads local packages and installs them remotely before running allowing us to test change to core, or comps packages without needing a new docker image(mostly)
@@ -226,7 +213,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
 
         # load_idmtools = RequirementsToAssetCollection(local_wheels=)
         # ac_id = load_idmtools.run()
-        analysis = PlatformAnalysis(platform=self.platform, experiment_ids=[experiment_id], analyzers=[SimpleAnalyzer], analyzers_args=[{'filenames': ['config.json']}], analysis_name=self.case_name, asset_files=AssetCollection([core_local_package, comps_local_package]), pre_run_func=pre_load_func,
+        analysis = PlatformAnalysis(platform=self.platform, experiment_ids=[experiment_id], analyzers=[SimpleAnalyzer], analyzers_args=[{'filenames': ['config.json']}], analysis_name=self.case_name, asset_files=AssetCollection([CORE_LOCAL_PACKAGE, COMPS_LOCAL_PACKAGE]), pre_run_func=pre_load_func,
                                     wrapper_shell_script=wrapper)
 
         analysis.analyze(check_status=True)

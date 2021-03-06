@@ -1,4 +1,7 @@
+import copy
+import inspect
 import os
+from contextlib import suppress
 from dataclasses import dataclass, field
 from functools import partial
 from logging import getLogger, DEBUG
@@ -248,6 +251,46 @@ class ScriptWrapperTask(ITask):
         if self.task is None:
             raise ValueError("Task is required")
 
+        if isinstance(self.task, dict):
+            self.task = self.from_dict(self.task)
+        if isinstance(self.template_script_task, dict):
+            self.template_script_task = self.from_dict(self.template_script_task)
+
+    @staticmethod
+    def from_dict(task_dictionary: Dict[str, Any]):
+        from idmtools.core.task_factory import TaskFactory
+        task_args = {k: v for k, v in task_dictionary.items() if k not in ['task_type']}
+        return TaskFactory().create(task_dictionary['task_type'], **task_args)
+
+    @property
+    def command(self):
+        cmd = copy.deepcopy(self.template_script_task.command)
+        cmd.add_raw_argument(str(self.task.command))
+        return cmd
+
+    @command.setter
+    def command(self, value: Union[str, CommandLine]):
+        callers = []
+        with suppress(KeyError, IndexError):
+            callers = inspect.stack()[1:3]
+        if not callers or callers[0].filename == __file__ or callers[1].filename == __file__:
+            if isinstance(value, property):
+                self._command = None
+            elif isinstance(value, str):
+                self._command = CommandLine.from_string(value)
+            else:
+                self._command = value
+        else:
+            self.task.command = value
+
+    @property
+    def wrapped_task(self):
+        return self.task
+
+    @wrapped_task.setter
+    def wrapped_task(self, value: ITask):
+        return None if isinstance(value, property) else value
+
     def gather_common_assets(self):
         """
         Gather all the common assets
@@ -278,17 +321,7 @@ class ScriptWrapperTask(ITask):
         Returns:
 
         """
-        from idmtools.core.task_factory import TaskFactory
-        # check if the task is a dict
-        if isinstance(simulation.task.task, dict):
-            # process sub task first
-            task_args = {k: v for k, v in simulation.task.task.items() if k not in ['task_type']}
-            simulation.task.task = TaskFactory().create(simulation.task.task['task_type'], **task_args)
-            simulation.task.task.reload_from_simulation(simulation)
-
-            simulation.task.template_script_task = simulation.task.task
-        else:
-            logger.warning("Unable to load subtask")
+        pass
 
     def pre_creation(self, parent: Union[Simulation, IWorkflowItem], platform: 'IPlatform'):
         """
@@ -302,10 +335,7 @@ class ScriptWrapperTask(ITask):
 
         """
         self.task.pre_creation(parent, platform)
-        # get command from wrapper command and add to wrapper script as item we call as argument to script
-        self.template_script_task.extra_command_arguments = str(self.task.command)
         self.template_script_task.pre_creation(parent, platform)
-        self.command = self.template_script_task.command
 
     def post_creation(self, parent: Union[Simulation, IWorkflowItem], platform: 'IPlatform'):
         self.task.post_creation(parent, platform)

@@ -1,0 +1,12 @@
+{
+  "Command": "python3 Assets/commandline_model.py {pop_size} {pop_infected} {n_days} {rand_seed}",
+  "NodeGroupName": "idm_abcd",
+  "NumCores": 1,
+  "NumProcesses": 1,
+  "NumNodes": 1,
+  "EnableMpi": false,
+  "Environment": {
+    "key1": "value1",
+    "key2:": "value2"
+  }
+}

@@ -272,7 +272,7 @@ class Asset:
         """
 
         if self.relative_path:
-            path = PurePosixPath(self.relative_path).joinpath(self.filename)
+            path = PurePosixPath(self.relative_path.replace("\\", "/")).joinpath(self.filename)
         else:
             path = PurePosixPath(self.filename)
         return str(path)

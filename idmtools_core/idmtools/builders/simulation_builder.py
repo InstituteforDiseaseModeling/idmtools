@@ -92,8 +92,7 @@ class SimulationBuilder:
                              f"needs to take a {self.SIMULATION_ATTR} argument!")
 
         # Retrieve all the free parameters of the signature (other than `simulation`)
-        remaining_parameters = [name for name, param in parameters.items() if
-                                name != self.SIMULATION_ATTR and param.default == inspect.Parameter.empty]
+        remaining_parameters = [name for name, param in parameters.items() if name != self.SIMULATION_ATTR and param.default == inspect.Parameter.empty]
 
         # If we have more than one free parameter => error
         if len(remaining_parameters) > 1:

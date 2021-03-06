@@ -1,15 +1,22 @@
 import os
+from pathlib import PurePath
+from unittest import skipIf
 
 import allure
 import pytest
 import unittest
-from idmtools.core import EntityStatus
+from idmtools.core import EntityStatus, TRUTHY_VALUES
 from idmtools.core.platform_factory import Platform
+from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
+from idmtools.entities.simulation import Simulation
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
-from idmtools_platform_comps.utils.assetize_output.assetize_output import AssetizeOutput, CrossEnvironmentAssetizeNotSupport, AtLeastOneItemToWatch
-from idmtools_platform_comps.utils.assetize_output.assetize_ssmt_script import is_file_excluded
+from idmtools_platform_comps.utils.assetize_output.assetize_output import AssetizeOutput
+from idmtools_platform_comps.utils.file_filter_workitem import AtLeastOneItemToWatch, CrossEnvironmentFilterNotSupport
+from idmtools_platform_comps.utils.ssmt_utils.file_filter import is_file_excluded
 from idmtools_test import COMMON_INPUT_PATH
+from idmtools_test.test_precreate_hooks import TEST_WITH_NEW_CODE
+from idmtools_test.utils.comps import load_library_dynamically, run_package_dists
 from idmtools_test.utils.test_task import TestTask
 
 
@@ -20,6 +27,12 @@ class TestAssetizeOutput(unittest.TestCase):
         super().setUp()
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         self.platform = Platform("COMPS2")
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        if TEST_WITH_NEW_CODE:
+            # Run package dists
+            run_package_dists()
 
     @pytest.mark.smoke
     def test_experiment_can_be_watched(self):
@@ -72,11 +85,11 @@ class TestAssetizeOutput(unittest.TestCase):
         self.assertEqual(1, len(ao.file_patterns))
         self.assertEqual("**", ao.file_patterns[0])
         print(e.id)
-        self.assertEqual(ao.create_command(), f'python3 Assets/assetize_ssmt_script.py --file-pattern "**" --exclude-pattern "StdErr.txt" --exclude-pattern "StdOut.txt" --exclude-pattern "WorkOrder.json" --exclude-pattern "*.log" --asset-tag "AssetizedOutputfromFromExperiment={exp_id}" --simulation-prefix-format-str "{{simulation.id}}"')
+        self.assertEqual(ao.create_command(), f'python3 Assets/assetize_ssmt_script.py --file-pattern "**" --exclude-pattern "StdErr.txt" "StdOut.txt" "WorkOrder.json" "*.log" --simulation-prefix-format-str "{{simulation.id}}" --asset-tag "AssetizedOutputfromFromExperiment={exp_id}"')
         ao.verbose = True
-        self.assertEqual(ao.create_command(), f'python3 Assets/assetize_ssmt_script.py --file-pattern "**" --exclude-pattern "StdErr.txt" --exclude-pattern "StdOut.txt" --exclude-pattern "WorkOrder.json" --exclude-pattern "*.log" --asset-tag "AssetizedOutputfromFromExperiment={exp_id}" --simulation-prefix-format-str "{{simulation.id}}" --verbose')
+        self.assertEqual(ao.create_command(), f'python3 Assets/assetize_ssmt_script.py --file-pattern "**" --exclude-pattern "StdErr.txt" "StdOut.txt" "WorkOrder.json" "*.log" --simulation-prefix-format-str "{{simulation.id}}" --verbose --asset-tag "AssetizedOutputfromFromExperiment={exp_id}"')
         ao.clear_exclude_patterns()
-        self.assertEqual(ao.create_command(), f'python3 Assets/assetize_ssmt_script.py --file-pattern "**" --asset-tag "AssetizedOutputfromFromExperiment={exp_id}" --simulation-prefix-format-str "{{simulation.id}}" --verbose')
+        self.assertEqual(ao.create_command(), f'python3 Assets/assetize_ssmt_script.py --file-pattern "**" --simulation-prefix-format-str "{{simulation.id}}" --verbose --asset-tag "AssetizedOutputfromFromExperiment={exp_id}"')
 
         def pre_run_dummy():
             pass
@@ -88,15 +101,15 @@ class TestAssetizeOutput(unittest.TestCase):
             pass
         ao.pre_run_functions.append(pre_run_dummy)
         ao.entity_filter_function = entity_filter_dummy
-        
         ao.pre_creation(self.platform)
-        self.assertEqual(len(ao.assets), 3)
+        self.assertEqual(len(ao.assets), 5)
         self.assertIn("pre_run.py", [f.filename for f in ao.assets])
         self.assertIn("entity_filter_func.py", [f.filename for f in ao.assets])
-        self.assertEqual(ao.create_command(), f'python3 Assets/assetize_ssmt_script.py --file-pattern "**" --asset-tag "AssetizedOutputfromFromExperiment={exp_id}" --simulation-prefix-format-str "{{simulation.id}}" --pre-run-func pre_run_dummy --entity-filter-func entity_filter_dummy --verbose')
+        self.assertEqual(ao.create_command(), f'python3 Assets/assetize_ssmt_script.py --file-pattern "**" --simulation-prefix-format-str "{{simulation.id}}" --pre-run-func pre_run_dummy --entity-filter-func entity_filter_dummy --verbose --asset-tag "AssetizedOutputfromFromExperiment={exp_id}"')
 
         ao.pre_run_functions.append(another_pre_run_dummy)
-        self.assertEqual(ao.create_command(), f'python3 Assets/assetize_ssmt_script.py --file-pattern "**" --asset-tag "AssetizedOutputfromFromExperiment={exp_id}" --simulation-prefix-format-str "{{simulation.id}}" --pre-run-func pre_run_dummy --pre-run-func another_pre_run_dummy --entity-filter-func entity_filter_dummy --verbose')
+        self.assertEqual(ao.create_command(),
+                         f'python3 Assets/assetize_ssmt_script.py --file-pattern "**" --simulation-prefix-format-str "{{simulation.id}}" --pre-run-func pre_run_dummy --pre-run-func another_pre_run_dummy --entity-filter-func entity_filter_dummy --verbose --asset-tag "AssetizedOutputfromFromExperiment={exp_id}"')
 
     def test_comps_simple(self):
         task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"), parameters=dict(a=1))
@@ -125,7 +138,7 @@ class TestAssetizeOutput(unittest.TestCase):
         self.assertTrue(e.succeeded)
         self.assertTrue(ao.succeeded)
         #
-        assets = [a.short_remote_path().replace("\\", '/') for a in ao.asset_collection]
+        assets = [a.short_remote_path() for a in ao.asset_collection]
         self.assertIn('1/config.json', assets)
         self.assertIn('1/output/result.json', assets)
 
@@ -163,10 +176,10 @@ class TestAssetizeOutput(unittest.TestCase):
 
     def test_experiment_cross_environment_fail(self):
         ao = AssetizeOutput(name=self.case_name, related_experiments=['9311af40-1337-ea11-a2be-f0921c167861'], file_patterns=["**/a.csv"], verbose=True)
-        with self.assertRaises(CrossEnvironmentAssetizeNotSupport) as err:
+        with self.assertRaises(CrossEnvironmentFilterNotSupport) as err:
             ac = ao.run(wait_on_done=True, platform=Platform("SLURM2"))
 
-        self.assertEqual('You cannot assetize between environment. In this case, the Experiment 9311af40-1337-ea11-a2be-f0921c167861 is in Bayesian but you are running your workitem in SlurmStage', err.exception.args[0])
+        self.assertEqual('You cannot filter files between environment. In this case, the Experiment 9311af40-1337-ea11-a2be-f0921c167861 is in Bayesian but you are running your workitem in SlurmStage', err.exception.args[0])
 
     def test_experiment_sim_prefix(self):
         ao = AssetizeOutput(name=self.case_name, related_experiments=['9311af40-1337-ea11-a2be-f0921c167861'], simulation_prefix_format_str="{simulation.state}/{simulation.id}", file_patterns=["**/a.csv"], verbose=True)
@@ -243,3 +256,43 @@ class TestAssetizeOutput(unittest.TestCase):
         py_files = [f for f in ac if f.filename.endswith('.py')]
         self.assertEqual(60, len(py_files))
 
+    def test_simulation_include_assets_custom_func(self):
+        def rename_func(filename):
+            return filename.replace("Assets/", "")
+
+        ao = AssetizeOutput(name=self.case_name, related_experiments=['874586c5-860a-eb11-a2c2-f0921c167862'], file_patterns=["**/*.py"], verbose=True, include_assets=True, filename_format_function=rename_func)
+        ac = ao.run(wait_on_done=True, platform=self.platform)
+
+        self.assertTrue(ao.succeeded)
+        self.assertIsNotNone(ac)
+
+        self.assertEqual(ac, ao.asset_collection)
+        filelist = [f.filename for f in ac]
+        self.assertEqual(60, len(filelist))
+        py_files = [f for f in ac if f.filename.endswith('.py')]
+        self.assertEqual(60, len(py_files))
+
+    @skipIf(os.getenv("IDMTOOLS_BENCHMARKS", "f") not in TRUTHY_VALUES, reason="Benchmarks not enabled. Enabled with IDMTOOLS_BENCHMARKS")
+    def test_benchmark(self):
+        ranges_to_test = [10, 100, 250]
+
+        experiment = Experiment(name=self.case_name, tags=dict(benchmark='assetize'))
+        experiment.assets.add_directory(PurePath(COMMON_INPUT_PATH).joinpath('python', 'output_generator'))
+        for i in ranges_to_test:
+            task = CommandTask(f"python Assets/generate.py --chunks {i}")
+            experiment.simulations.append(Simulation.from_task(task, tags=dict(chunks=i)))
+
+        experiment.run(wait_on_done=True)
+        self.assertTrue(experiment.succeeded)
+
+        wait_for = []
+        for i, total in enumerate(ranges_to_test):
+            ao = AssetizeOutput(name=self.case_name, related_simulations=[experiment.simulations[i]], file_patterns=["*.chunk"], tags=dict(chunks=total), verbose=True)
+            ao.run(platform=self.platform)
+            wait_for.append(ao)
+        for i, total in enumerate(ranges_to_test):
+            wait_for[i].wait(wait_on_done_progress=True)
+            ac = wait_for[i].asset_collection
+            self.assertTrue(wait_for[i].succeeded)
+            self.assertIsNotNone(ac)
+            self.assertEqual(len(ac.assets), total)

@@ -20,6 +20,7 @@ import configparser
 import os
 import subprocess
 import sys
+from datetime import datetime
 
 import sphinx_rtd_theme
 
@@ -37,7 +38,7 @@ else:
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.imgmath',
+    'sphinx.ext.mathjax',
     'sphinx.ext.githubpages',
     'sphinx.ext.autodoc',
     'sphinxcontrib.napoleon',
@@ -81,7 +82,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'idmtools'
-copyright = u'2020, Bill & Melinda Gates Foundation. All rights reserved.'
+copyright = f'1999 - {datetime.today().year}, Bill & Melinda Gates Foundation. All rights reserved.'
 author = u'Institute for Disease Modeling'
 
 # The version info for the project you're documenting, acts as replacement for

@@ -28,6 +28,7 @@ class TestWrapperTask(ITestWithPersistence):
         # Define out template for out bat file
         template = """
         set PYTHONPATH=%CWD%\\Assets\\l
+        echo Running %*
         %*
         """
 

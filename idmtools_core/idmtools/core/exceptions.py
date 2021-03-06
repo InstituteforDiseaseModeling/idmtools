@@ -1,8 +1,13 @@
+import sys
 import typing
+from logging import getLogger
 from uuid import UUID
 
 if typing.TYPE_CHECKING:
     from idmtools.entities.iplatform import TPlatform
+
+user_logger = getLogger('user')
+logger = getLogger(__name__)
 
 
 class ExperimentNotFound(Exception):
@@ -41,3 +46,28 @@ class UnsupportedPlatformType(Exception):
 
 class NoTaskFound(Exception):
     pass
+
+
+class DocLink(Exception):
+    pass
+
+
+def idmtools_error_handler(exctype, value: Exception, tb):
+    """
+    Global exception handler. This will write our errors in a nice format
+
+    Args:
+        exctype: Type of exception
+        value: Value of the exception
+        tb: Traceback
+
+    Returns:
+        None
+    """
+    if hasattr(value, 'doc_link'):
+        from idmtools.utils.info import get_help_version_url
+        user_logger.error(f"{value.args[0]}. For more details, see {get_help_version_url(value.doc_link)}")
+
+    logger.exception(value)
+    # Call native exception manager
+    sys.__excepthook__(exctype, value, tb)

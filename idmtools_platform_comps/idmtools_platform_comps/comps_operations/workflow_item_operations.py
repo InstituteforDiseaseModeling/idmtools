@@ -9,12 +9,10 @@ from COMPS.Data.WorkItem import RelationType, WorkerOrPluginKey
 from idmtools import IdmConfigParser
 from idmtools.assets import AssetCollection
 from idmtools.core import ItemType
-from idmtools.entities import Suite
-from idmtools.entities.experiment import Experiment
+from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities.generic_workitem import GenericWorkItem
 from idmtools.entities.iplatform_ops.iplatform_workflowitem_operations import IPlatformWorkflowItemOperations
 from idmtools.entities.iworkflow_item import IWorkflowItem
-from idmtools.entities.simulation import Simulation
 from idmtools_platform_comps.utils.general import convert_comps_workitem_status
 
 if typing.TYPE_CHECKING:
@@ -103,35 +101,11 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         if logger.isEnabledFor(DEBUG):
             logger.debug("Set the relationships")
 
-        # Sets the related experiments
-        if work_item.related_experiments:
-            for exp_id in work_item.related_experiments:
-                i = exp_id.id if isinstance(exp_id, Experiment) else exp_id
-                wi.add_related_experiment(i, RelationType.DependsOn)
-
-        # Sets the related simulations
-        if work_item.related_simulations:
-            for sim_id in work_item.related_simulations:
-                i = sim_id.id if isinstance(sim_id, Simulation) else sim_id
-                wi.add_related_simulation(i, RelationType.DependsOn)
-
-        # Sets the related suites
-        if work_item.related_suites:
-            for suite_id in work_item.related_suites:
-                i = suite_id.id if isinstance(suite_id, Suite) else suite_id
-                wi.add_related_suite(i, RelationType.DependsOn)
-
-        # Sets the related work items
-        if work_item.related_work_items:
-            for wi_id in work_item.related_work_items:
-                i = wi_id.id if isinstance(wi_id, IWorkflowItem) else wi_id
-                wi.add_related_work_item(i, RelationType.DependsOn)
-
-        # Sets the related asset collection
-        if work_item.related_asset_collections:
-            for ac_id in work_item.related_asset_collections:
-                i = ac_id.id if isinstance(ac_id, AssetCollection) else ac_id
-                wi.add_related_asset_collection(i, RelationType.DependsOn)
+        # Ensure any items that are objects are converted to ids
+        for attr_name in ['related_experiments', 'related_simulations', 'related_work_items', 'related_asset_collections']:
+            if getattr(work_item, attr_name):
+                for item in getattr(work_item, attr_name):
+                    getattr(wi, f'add_{attr_name[:-1]}')(item.id if isinstance(item, IEntity) else item, RelationType.DependsOn)
 
         # Set the ID back in the object
         work_item.uid = wi.id

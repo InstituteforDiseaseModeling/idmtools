@@ -32,7 +32,7 @@ def batch_items(items: Union[Iterable, Generator], batch_size=16):
     raise StopIteration
 
 
-def item_batch_worker_thread(create_func: Callable, items: Union[List]) -> List:
+def item_batch_worker_thread(create_func: Callable, items: Union[List], **kwargs) -> List:
     """
     Default batch worker thread function. It just calls create on each item
 
@@ -48,7 +48,7 @@ def item_batch_worker_thread(create_func: Callable, items: Union[List]) -> List:
 
     ret = []
     for item in items:
-        ret.append(create_func(item))
+        ret.append(create_func(item, **kwargs))
 
     return ret
 

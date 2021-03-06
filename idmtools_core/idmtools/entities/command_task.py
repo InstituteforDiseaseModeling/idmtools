@@ -3,11 +3,11 @@ from typing import List, Callable, Type, Union, TYPE_CHECKING
 from idmtools.assets import AssetCollection
 from idmtools.entities.itask import ITask
 from idmtools.registry.task_specification import TaskSpecification
+from idmtools.entities.simulation import Simulation
 
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
     from idmtools.entities.iworkflow_item import IWorkflowItem
-    from idmtools.entities.simulation import Simulation
 
 
 @dataclass()
@@ -59,7 +59,7 @@ class CommandTask(ITask):
 
     def pre_creation(self, parent: Union['Simulation', 'IWorkflowItem'], platform: 'IPlatform'):
         super().pre_creation(parent, platform)
-        if platform.is_windows_platform():
+        if platform.is_windows_platform(parent):
             self.command.is_windows = True
 
 

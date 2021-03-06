@@ -3,8 +3,11 @@ FROM ubuntu:18.04
 # Install dependencies
 RUN apt-get update
 
+ENV PYTHONPATH=./Assets/:./Assets/site-packages/:.
 # set the timezone - do this before installing python
-RUN export DEBIAN_FRONTEND=noninteractive && apt-get install -y tzdata
+RUN export DEBIAN_FRONTEND=noninteractive && \
+    apt-get update && \
+    apt-get install -y tzdata
 RUN ln -fs /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
 RUN dpkg-reconfigure --frontend noninteractive tzdata
 

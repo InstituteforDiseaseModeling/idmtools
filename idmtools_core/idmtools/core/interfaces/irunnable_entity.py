@@ -5,6 +5,7 @@ from typing import List, Callable, TYPE_CHECKING, NoReturn
 from abc import ABCMeta
 from idmtools.core import EntityStatus
 from idmtools.core.interfaces.ientity import IEntity
+from idmtools.registry.functions import FunctionPluginManager
 
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
@@ -123,3 +124,18 @@ class IRunnableEntity(IEntity, metaclass=ABCMeta):
             p.wait_till_done_progress(self, **opts)
         else:
             p.wait_till_done(self, **opts)
+
+        self.after_done()
+
+    def after_done(self):
+        """
+        Run after an item is done after waiting. Currently we call the on succeeded and on failure plugins
+
+        Returns:
+            Runs after an item is done after waiting
+        """
+        FunctionPluginManager.instance().hook.idmtools_runnable_on_done(item=self)
+        if self.succeeded:
+            FunctionPluginManager.instance().hook.idmtools_runnable_on_succeeded(item=self)
+        else:
+            FunctionPluginManager.instance().hook.idmtools_runnable_on_failure(item=self)
