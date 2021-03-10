@@ -72,7 +72,6 @@ experiment.assets.add_directory(assets_directory=os.path.join("inputs", "python_
 
 with Platform('BELEGOST') as platform:
     # The last step is to call run() on the ExperimentManager to run the simulations.
-    experiment.run(True, scheduling=True, abc=1, executable_path='hello.py', use_short_path=3, command_arg='zdu_arg',
-                   num_cores=11, priority='high')
+    experiment.run(True, scheduling=True, priority='Highest')
     # use system status as the exit code
     sys.exit(0 if experiment.succeeded else -1)
