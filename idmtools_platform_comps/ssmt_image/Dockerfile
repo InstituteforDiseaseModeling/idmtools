@@ -32,6 +32,9 @@ ADD pip.conf /etc/pip.conf
 
 COPY .depends/* /tmp/
 
+RUN pip3 install -U pip && \
+    pip install pygit2
+
 RUN bash -c "pip3 install /tmp/*.gz --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple"
 
 # make the PIP index configurable so we can build against staging, production, or a local PyPI server
