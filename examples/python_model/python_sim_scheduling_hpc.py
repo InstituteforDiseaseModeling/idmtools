@@ -71,7 +71,15 @@ experiment.tags["tag1"] = 1
 experiment.assets.add_directory(assets_directory=os.path.join("inputs", "python_model_with_deps", "Assets"))
 
 with Platform('BELEGOST') as platform:
-    # The last step is to call run() on the ExperimentManager to run the simulations.
+    # Call run() with 'scheduling=True' to run simulations with scheduling using WorkOrder.json(loaded above)
+    # There are few ways to schedule computation resources in COMPS:
+    #    1. add_work_order() method to add WorkOrder.json file to simulations as transient asset
+    #    2. add_schedule_config() method can be used to add dynamic WorkOrder.json to simulations as transient asset
+    #    3. add additional parameters to Platform creation with Platform(**kwargs) in kwargs
+    #    4. idmtools.ini
+    # the order of precedence is WorkOrder.json > Platform() > idmtools.ini
+    # with experiment.run method, you can also passin other options like 'priority=Highest' here to override any
+    # priority value either passed in from idmtools.ini or defined in Platform(**kwargs)
     experiment.run(True, scheduling=True, priority='Highest')
     # use system status as the exit code
     sys.exit(0 if experiment.succeeded else -1)
