@@ -22,6 +22,7 @@ class TestPackageVersionCLI(unittest.TestCase):
         pass
 
     @allure.feature("req2ac")
+    @pytest.mark.serial
     # cli: idmtools comps SLURM2 req2ac --asset_tag test:123 --pkg astor~=0.7.0
     def test_create_ac_with_req2ac(self):
         # run req2ac to get ac_id
@@ -37,6 +38,7 @@ class TestPackageVersionCLI(unittest.TestCase):
         self.assertTrue(len(assets) > 0)
 
     @allure.feature("req2ac")
+    @pytest.mark.serial
     # cli: idmtools comps SLURM2 ac-exist --pkg astor~=0.7.0
     def test_ac_exist_with_req2ac(self):
         # run req2ac to get ac_id
