@@ -28,17 +28,11 @@ By configuring a ``workorder.json`` file and adding it as a transient asset you 
 **Example workorder.json for HPC clusters**::
 
     {
-      "Command": "python3 Assets/model1.py",
+      "Command": "python -c \"print('hello test')\"",
       "NodeGroupName": "idm_abcd",
       "NumCores": 1,
-      "NumProcesses": 1,
-      "NumNodes": 1,
-      "Environment": {
-        "key1": "value1",
-        "key2:": "value2",
-        "PYTHONPATH": "$PYTHONPATH:$PWD/Assets:$PWD/Assets/site-packages",
-        "PATH": "$PATH:$PWD/Assets:$PWD/Assets/site-packages"
-      }
+      "SingleNode": false,
+      "Exclusive": false
     }
 
 **Example workorder.json for SLURM clusters**::
@@ -172,8 +166,7 @@ The following schemas, for both HPC and SLURM clusters on |COMPS_s|, list the av
         },
         "Environment": {
           "type": "object",
-          "description": "Environment variables to set in the job environment; these can be dynamically 
-          expanded (e.g. $PATH)",
+          "description": "Environment variables to set in the job environment; these can be dynamically expanded (e.g. $PATH)",
           "additionalProperties": {
             "type": "string"
           }
