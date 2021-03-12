@@ -1,8 +1,8 @@
 {
   "WorkItem_Type": "DockerWorker",
   "Execution": {
-    "ImageName": "docker-production.packages.idmod.org/idmtools/comps_ssmt_worker:1.6.2.9",
-    "Command": "python3 Assets/run_population_analyzer.py 8bb8ae8f-793c-ea11-a2be-f0921c167861",
+    "ImageName": "docker-production.packages.idmod.org/nyu/dtk:20200306",
+    "Command": "/dtk/Eradication -v",
     "DebugFileName": "debug.txt"
   }
 }
