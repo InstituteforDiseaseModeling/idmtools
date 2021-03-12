@@ -45,7 +45,8 @@ extensions = [
     'sphinx.ext.todo',
     'plantweb.directive',
     'sphinxcontrib.programoutput',
-    'sphinx_copybutton'
+    'sphinx_copybutton',
+    'sphinx.ext.intersphinx'
 ]
 
 plantuml = 'plantweb'
@@ -57,8 +58,7 @@ autodoc_default_options = {
 }
 
 autodoc_mock_imports = ['pika',
-                        'dramatiq'
-                        ]
+                        'dramatiq']
 
 
 napoleon_google_docstring = True
@@ -388,4 +388,9 @@ texinfo_documents = [
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
-# intersphinx_mapping = {'https://docs.python.org/': None}
+intersphinx_mapping = {'python': ('https://docs.python.org/3', None),
+                       'emod_api': ('https://docs.idmod.org/projects/emod-api/en/latest/', None),
+                       'emodpy': ('https://docs.idmod.org/projects/emodpy/en/latest/', None),
+                       'pycomps': ('https://docs.idmod.org/projects/pycomps/en/latest/', None)
+                       }
+
