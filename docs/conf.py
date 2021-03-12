@@ -58,10 +58,7 @@ autodoc_default_options = {
 }
 
 autodoc_mock_imports = ['pika',
-                        'dramatiq',
-                        'idmtools_platform_comps.cli.utils',
-                        'idmtools_platform_comps.utils.disk_usage',
-                        'idmtools_platform_local.platform_operations.uitils']
+                        'dramatiq']
 
 
 napoleon_google_docstring = True
