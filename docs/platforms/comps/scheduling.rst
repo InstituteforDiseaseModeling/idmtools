@@ -23,7 +23,7 @@ Choosing the correct scheduling scenario will depend upon your specific research
 Configuration
 -------------
 
-By configuring a ``workorder.json`` file and adding it as a transient asset you can take advantage of the full scheduling support provided with |COMPS_s|. Scheduling information included in the workorder.json file will take precedent over any scheduling information you may have in the idmtools.ini file or scheduling parameters passed to a work item. The following examples shows some of the options available to include in a workorder.json file. To see the list of alias' for the clusters on |COMPS_s|, use the following CLI command: ``idmtools info plugins platform-aliases``.
+By configuring a ``workorder.json`` file and adding it as a transient asset you can take advantage of the full scheduling support provided with |COMPS_s|. Scheduling information included in the workorder.json file will take precedent over any scheduling information you may have in the idmtools.ini file or scheduling parameters passed to :py:class:`~idmtools.core.platform_factory.Platform`. The following examples shows some of the options available to include in a workorder.json file.
 
 **Example workorder.json for HPC clusters**::
 
@@ -80,6 +80,8 @@ For addition information and specifics of using a workorder.json file within Pyt
 
 .. literalinclude:: ../../../examples/python_model/python_sim_scheduling_hpc.py
     :language: python
+
+To see the list of platform alias', such as BELEGOST and CALCULON, use the following CLI command: ``idmtools info plugins platform-aliases``.
 
 .. _Schemas:
 
