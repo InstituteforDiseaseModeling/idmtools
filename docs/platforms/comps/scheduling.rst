@@ -3,7 +3,7 @@
 Scheduling
 ==========
 
-Idmtools supports job scheduling on the |COMPS_s| platform, which includes support for multiple scenarios depending upon the scheduling needs of your specific research needs and requirements. For example, you could schedule your simulations to run under a single process on the same node and with a specified number of cores. For more information about this and other supported scenarios, see `Scenarios`_. To use the full scheduling capabilites included within |COMPS_s| you must add the ``workorder.json`` as a transient asset. This is a one time task to complete for your project. For more information about scheduling configuration, see `Configuration`_. `Examples`_ are provided from which you can leverage to help get started and gain a better understanding. `Schemas`_ enumerate the available options that may be included in workorder.json.
+|IT_s| supports job scheduling on the |COMPS_s| platform, which includes support for multiple scenarios depending upon the scheduling needs of your specific research needs and requirements. For example, you could schedule your simulations to run under a single process on the same node and with a specified number of cores. For more information about this and other supported scenarios, see `Scenarios`_. To use the full scheduling capabilites included within |COMPS_s| you must add the ``workorder.json`` as a transient asset. This is a one time task to complete for your project. For more information about scheduling configuration, see `Configuration`_. `Examples`_ are provided from which you can leverage to help get started and gain a better understanding. `Schemas`_ enumerate the available options that may be included in workorder.json.
 
 
 .. _Scenarios:
