@@ -110,23 +110,23 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         if use_short_path:
             logger.debug("Setting Simulation Root to $COMPS_PATH(USER)")
             simulation_root = "$COMPS_PATH(USER)"
-            subdirectory = 'rac' + '_' + timestamp()    # also shorten subdirectory
+            subdirectory = 'rac' + '_' + timestamp()  # also shorten subdirectory
         else:
             simulation_root = self.platform.simulation_root
 
         # Get the experiment command line
         exp_command: CommandLine = self._get_experiment_command_line(check_command, experiment)
 
-        if command_arg is None:
+        if command_arg is None and exp_command is not None:
             command_arg = exp_command.arguments + " " + exp_command.options
 
-        if executable_path is None:
+        if executable_path is None and exp_command is not None:
             executable_path = exp_command.executable
 
         # create initial configuration object
         comps_config = dict(
             environment_name=self.platform.environment,
-            simulation_input_args=command_arg.strip(),
+            simulation_input_args=command_arg.strip() if command_arg is not None else None,
             working_directory_root=os.path.join(simulation_root, subdirectory).replace('\\', '/'),
             executable_path=executable_path,
             node_group_name=self.platform.node_group,
@@ -137,8 +137,17 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             exclusive=self.platform.exclusive
         )
 
+        if kwargs.get("scheduling", False):
+            import copy
+            # save a copy of default config
+            setattr(self.platform, 'comps_config', copy.deepcopy(comps_config))
+            # clear some not-supported parameters
+            comps_config.update(executable_path=None, node_group_name=None, min_cores=None, max_cores=None,
+                                exclusive=None, simulation_input_args=None)
+
         if logger.isEnabledFor(DEBUG):
             logger.debug(f'COMPS Experiment Configs: {str(comps_config)}')
+
         config = Configuration(**comps_config)
 
         e = COMPSExperiment(name=experiment.name,
@@ -159,7 +168,8 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         self.send_assets(experiment)
         return e
 
-    def platform_modify_experiment(self, experiment: Experiment, regather_common_assets: bool = False, **kwargs) -> Experiment:
+    def platform_modify_experiment(self, experiment: Experiment, regather_common_assets: bool = False,
+                                   **kwargs) -> Experiment:
         """
         Executed when an Experiment is being ran that is already in Created, Done, In Progress, or Failed State
         Args:
@@ -173,7 +183,8 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             experiment.pre_creation(self.platform, gather_assets=regather_common_assets)
             self.send_assets(experiment)
         else:
-            user_logger.warning(f"Not gathering common assets again since experiment exists on platform. If you need to add additional common assets, see {get_doc_base_url()}cookbook/asset_collections.html#modifying-asset-collection")
+            user_logger.warning(
+                f"Not gathering common assets again since experiment exists on platform. If you need to add additional common assets, see {get_doc_base_url()}cookbook/asset_collections.html#modifying-asset-collection")
         return experiment
 
     def _get_experiment_command_line(self, check_command: bool, experiment: Experiment) -> CommandLine:
@@ -188,6 +199,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             Command line for Experiment
         """
         from idmtools_platform_comps.utils.python_version import platform_task_hooks
+
         if isinstance(experiment.simulations, Generator):
             if logger.isEnabledFor(DEBUG):
                 logger.debug("Simulations generator detected. Copying generator and using first task as command")
@@ -199,7 +211,8 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             # run pre-creation in case task use it to produce the command line dynamically
             task.pre_creation(sim, self.platform)
             exp_command = task.command
-        elif isinstance(experiment.simulations, ExperimentParentIterator) and isinstance(experiment.simulations.items, TemplatedSimulations):
+        elif isinstance(experiment.simulations, ExperimentParentIterator) and isinstance(experiment.simulations.items,
+                                                                                         TemplatedSimulations):
             if logger.isEnabledFor(DEBUG):
                 logger.debug("ParentIterator/TemplatedSimulations detected. Using base_task for command")
             from idmtools.entities.simulation import Simulation
@@ -289,7 +302,8 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             logger.debug(f'Commissioning experiment: {experiment.uid}')
         # commission only if rules we have items in created or none.
         # TODO add new status to entity status to track commissioned as well instead of raw comps
-        if any([s.status in [None, EntityStatus.CREATED] for s in experiment.simulations]) and any([s.get_platform_object().state in [SimulationState.Created] for s in experiment.simulations]):
+        if any([s.status in [None, EntityStatus.CREATED] for s in experiment.simulations]) and any(
+                [s.get_platform_object().state in [SimulationState.Created] for s in experiment.simulations]):
             po = experiment.get_platform_object()
             po.commission()
             # for now, we update here in the comps objects to reflect the new state
@@ -312,8 +326,8 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         if experiment.assets.count == 0:
             logger.warning('Experiment has no assets to send')
             return
-
         ac = self.platform._assets.create(experiment.assets)
+
         if logger.isEnabledFor(DEBUG):
             logger.debug(f'Asset collection for experiment: {experiment.id} is: {ac.id}')
 

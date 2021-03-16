@@ -1,0 +1,13 @@
+{
+  "Command": "python3 Assets/model.py",
+  "NodeGroupName": "idm_abcd",
+  "NumCores": 1,
+  "NumProcesses": 1,
+  "NumNodes": 1,
+  "Environment": {
+    "key1": "value1",
+    "key2:": "value2",
+    "PYTHONPATH": "$PYTHONPATH:$PWD/Assets:$PWD/Assets/site-packages",
+    "PATH": "$PATH:$PWD/Assets:$PWD/Assets/site-packages"
+  }
+}

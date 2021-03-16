@@ -11,7 +11,7 @@ CLDIR=$(PDS)clean_dir.py
 COVERAGE_PATH=tests/.coverage
 
 help:
-	$(PDS)get_help_from_makefile.py
+	help-from-makefile -f $(mkfile_path)
 
 clean: stop-allure ## Clean most common outputs(Logs, Test Results, etc)
 	-$(MAKEALL) --parallel clean

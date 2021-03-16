@@ -24,6 +24,7 @@ from idmtools.entities.iplatform_ops.utils import batch_create_items
 from idmtools.entities.simulation import Simulation
 from idmtools.utils.json import IDMJSONEncoder
 from idmtools_platform_comps.utils.general import convert_comps_status, get_asset_for_comps_item, clean_experiment_name
+from idmtools_platform_comps.utils.scheduling import scheduled
 
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools_platform_comps.comps_platform import COMPSPlatform
@@ -175,6 +176,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             kwargs['asset_collection_id'] = asset_collection_id
             kwargs.update(simulation._platform_kwargs)
             config = self.get_simulation_config_from_simulation(simulation, **kwargs)
+
         if simulation.name:
             simulation.name = clean_experiment_name(simulation.name)
         s = COMPSSimulation(
@@ -183,7 +185,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             configuration=config
         )
 
-        self.send_assets(simulation, s)
+        self.send_assets(simulation, s, **kwargs)
         s.set_tags(simulation.tags)
         simulation._platform_object = s
         return s
@@ -204,11 +206,20 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         Returns:
             Configuration
         """
+        global_scheduling = kwargs.get("scheduling", False)
+        sim_scheduling = getattr(simulation, 'scheduling', False)
+        scheduling = global_scheduling and sim_scheduling
+
         comps_configuration = dict()
+        if global_scheduling:
+            config = getattr(self.platform, 'comps_config', {})
+            comps_exp_config = Configuration(**config)
+        else:
+            comps_exp: COMPSExperiment = simulation.parent.get_platform_object()
+            comps_exp_config: Configuration = comps_exp.configuration
+
         if asset_collection_id:
             comps_configuration['asset_collection_id'] = asset_collection_id
-        comps_exp: COMPSExperiment = simulation.parent.get_platform_object()
-        comps_exp_config: Configuration = comps_exp.configuration
         if num_cores is not None and num_cores != comps_exp_config.max_cores:
             logger.info(f'Overriding cores for sim to {num_cores}')
             comps_configuration['max_cores'] = num_cores
@@ -228,6 +239,10 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             comps_configuration['simulation_input_args'] = sim_task
         if logger.isEnabledFor(DEBUG):
             logger.debug(f'Simulation config: {str(comps_configuration)}')
+        if scheduling:
+            comps_configuration.update(executable_path=None, node_group_name=None, min_cores=None, max_cores=None,
+                                       exclusive=None, simulation_input_args=None)
+
         return Configuration(**comps_configuration)
 
     def batch_create(self, simulations: List[Simulation], num_cores: int = None, priority: str = None, asset_collection_id: Union[str, UUID] = None, **kwargs) -> \
@@ -298,10 +313,15 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         Returns:
             None
         """
+        scheduling = kwargs.get("scheduling", False) and scheduled(simulation)
+
         if comps_sim is None:
             comps_sim = simulation.get_platform_object()
         for asset in simulation.assets:
-            comps_sim.add_file(simulationfile=SimulationFile(asset.filename, 'input'), data=asset.bytes)
+            if asset.filename.lower() == 'workorder.json' and scheduling:
+                comps_sim.add_file(simulationfile=SimulationFile(asset.filename, 'WorkOrder'), data=asset.bytes)
+            else:
+                comps_sim.add_file(simulationfile=SimulationFile(asset.filename, 'input'), data=asset.bytes)
 
         # add metadata
         if add_metadata:

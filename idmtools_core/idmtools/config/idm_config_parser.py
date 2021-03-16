@@ -54,7 +54,10 @@ class IdmConfigParser:
             cls._instance._load_config_file(dir_path, file_name)
             # Only error when a user overrides the filename for idmtools.ini
             if (dir_path != "." or file_name != default_config) and not cls.found_ini():
-                raise ValueError(f"The configuration file {os.path.join(dir_path, file_name)} was not found!")
+                raise FileNotFoundError(f"The configuration file {os.path.join(dir_path, file_name)} was not found!")
+            # Call our startup plugins
+            from idmtools.registry.functions import FunctionPluginManager
+            FunctionPluginManager.instance().hook.idmtools_on_start()
         return cls._instance
 
     @classmethod
@@ -156,10 +159,12 @@ class IdmConfigParser:
         # init logging here as this is our most likely entry-point into an idmtools "application"
         from idmtools.core.logging import VERBOSE
 
+        # Look for the config file. First check environment vars
         if "IDMTOOLS_CONFIG_FILE" in os.environ:
             if not os.path.exists(os.environ["IDMTOOLS_CONFIG_FILE"]):
                 raise FileNotFoundError(f'Cannot for idmtools config at {os.environ["IDMTOOLS_CONFIG_FILE"]}')
             ini_file = os.environ["IDMTOOLS_CONFIG_FILE"]
+        # Try find file
         else:
             ini_file = cls._find_config(dir_path, file_name)
             # Fallback to user home directories
@@ -167,6 +172,8 @@ class IdmConfigParser:
                 global_config = cls.get_global_configuration_name()
                 if os.path.exists(global_config):
                     ini_file = global_config
+
+        # If we didn't find a file, warn the user and init logging
         if ini_file is None:
             if os.getenv("IDMTOOLS_NO_CONFIG_WARNING", "F").lower() not in TRUTHY_VALUES:
                 # We use print since logger isn't configured unless there is an override(cli)
@@ -174,6 +181,7 @@ class IdmConfigParser:
             cls._init_logging()
             return
 
+        # Load file
         cls._config_path = ini_file
         cls._config = ConfigParser()
         cls._config.read(ini_file)
@@ -311,10 +319,6 @@ class IdmConfigParser:
 
         if cls._instance is None:
             cls(dir_path, file_name)
-
-        # Call our startup plugins
-        from idmtools.registry.functions import FunctionPluginManager
-        FunctionPluginManager.instance().hook.idmtools_on_start()
 
     @classmethod
     @initialization()
