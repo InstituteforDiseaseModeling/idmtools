@@ -15,7 +15,7 @@ for file_prefix in ['', 'dev_', 'build_']:
     with open(f'{filename}.txt') as requirements_file:
         extra_require_files[file_prefix.strip("_") if file_prefix else filename] = requirements_file.read().split("\n")
 
-version = '1.6.3'
+version = '1.6.3+nightly'
 
 extras = {
     'test': extra_require_files['build'] + extra_require_files['dev'],
