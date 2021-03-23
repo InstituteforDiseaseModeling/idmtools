@@ -24,7 +24,8 @@ def build_asset_file_list(prefix=LIBRARY_ROOT_PREFIX):
     for root, _, filenames in os.walk(prefix):
         for filename in filenames:
             asset = AssetCollectionFile(file_name=os.path.basename(filename),
-                                        relative_path=os.path.join("site-packages", root.replace(prefix, "").strip("/")).strip("/"),
+                                        relative_path=os.path.join("site-packages",
+                                                                   root.replace(prefix, "").strip("/")).strip("/"),
                                         md5_checksum=calculate_md5(os.path.join(root, filename))
                                         )
             output.append(asset)
@@ -50,25 +51,21 @@ def get_first_simulation_of_experiment(exp_id):
 def main():  # pragma: no cover
     print(sys.argv)
 
-    if len(sys.argv) < 4:
+    if len(sys.argv) < 3:
         raise Exception(
-            "The script needs to be called with `python <model.py> <experiment_id> <md5_str> <endpoint> <os_str>'.\n{}".format(
+            "The script needs to be called with `python <model.py> <experiment_id> <endpoint> <os_str>'.\n{}".format(
                 " ".join(sys.argv)))
 
     # Get the experiments
     exp_id = sys.argv[1]
     print('exp_id: ', exp_id)
 
-    # Get mds
-    md5_str = sys.argv[2]
-    print('md5_str: ', md5_str)
-
     # Get endpoint
-    endpoint = sys.argv[3]
+    endpoint = sys.argv[2]
     print('endpoint: ', endpoint)
 
     # Platform key
-    os_target = sys.argv[4]
+    os_target = sys.argv[3]
     print('os: ', os_target)
 
     client = Client()
@@ -85,10 +82,25 @@ def main():  # pragma: no cover
 
     # Output files
     max_files = 10
-    print('Display the first 10 files:\n', "\n".join([f"{a.relative_path}/{a.file_name}" for a in asset_files[0:max_files]]))
+    print('Display the first 10 files:\n',
+          "\n".join([f"{a.relative_path}/{a.file_name}" for a in asset_files[0:max_files]]))
 
+    # Retrieve experiment's tags
+    comps_exp = Experiment.get(exp_id, QueryCriteria().select_children('tags'))
+    exp_tags = comps_exp.tags
+
+    # Retrieve experiment's tags
+    _reserved_tag = ['idmtools', 'task_type', MD5_KEY.format(os_target)]
+    comps_exp = Experiment.get(exp_id, QueryCriteria().select_children('tags'))
+    user_tags = {key: value for key, value in comps_exp.tags.items() if key not in _reserved_tag}
+
+    # Get md5_str
+    md5_str = exp_tags.get(MD5_KEY.format(os_target), None)
+
+    # Collect ac's tags
     ac = AssetCollection()
     tags = {MD5_KEY.format(os_target): md5_str}
+    tags.update(user_tags)
     ac.set_tags(tags)
 
     # Create asset collection
@@ -116,7 +128,8 @@ def main():  # pragma: no cover
                 ac2.add_asset(acf)
 
         print("\n\n\n=====================\nUploading files not in comps: " + "\n".join(
-            [f"{a.relative_path}/{a.file_name}" for a in ac2.assets if a.md5_checksum in missing_files or a.md5_checksum is None]))
+            [f"{a.relative_path}/{a.file_name}" for a in ac2.assets if
+             a.md5_checksum in missing_files or a.md5_checksum is None]))
 
         sys.stdout.flush()
         ac2.save()

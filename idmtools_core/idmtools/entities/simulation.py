@@ -15,7 +15,6 @@ if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
     from idmtools.entities.experiment import Experiment
 
-
 logger = getLogger(__name__)
 user_logger = getLogger('user')
 

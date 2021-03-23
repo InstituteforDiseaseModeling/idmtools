@@ -74,7 +74,7 @@ class TestAnalyzersLocal(ITestWithPersistence):
 
         cls.exp_id = e.uid
 
-    @pytest.mark.timeout(90)
+    @pytest.mark.timeout(180)
     @pytest.mark.long
     def test_AddAnalyzer(self):
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName

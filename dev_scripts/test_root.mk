@@ -24,7 +24,7 @@ COVERAGE_OPTS := --cov-config=.coveragerc --cov-branch --cov-append --cov=idmtoo
 
 
 help:  ## This help
-	$(PDS)get_help_from_makefile.py -f $(mkfile_path)
+	help-from-makefile -f $(mkfile_path)
 
 clean:
 	-$(RM) -rf .pytest_cache .test_platform reports assets *.log *.log* *.buildlog __pycache__ *.html *.xml .coverage

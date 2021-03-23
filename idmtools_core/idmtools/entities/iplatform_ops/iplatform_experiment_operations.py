@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from concurrent.futures import as_completed
 from concurrent.futures.thread import ThreadPoolExecutor
 from dataclasses import dataclass
-from logging import getLogger
+from logging import getLogger, DEBUG
 from types import GeneratorType
 from typing import Type, Any, NoReturn, Tuple, List, Dict, Iterator, Union, TYPE_CHECKING
 from uuid import UUID
@@ -47,7 +47,11 @@ class IPlatformExperimentOperations(ABC):
         Returns:
             NoReturn
         """
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Calling idmtools_platform_pre_create_item hooks")
         FunctionPluginManager.instance().hook.idmtools_platform_pre_create_item(item=experiment, kwargs=kwargs)
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Calling experiment pre_creation")
         experiment.pre_creation(self.platform)
 
     def post_create(self, experiment: Experiment, **kwargs) -> NoReturn:
@@ -61,6 +65,8 @@ class IPlatformExperimentOperations(ABC):
         Returns:
             NoReturn
         """
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Calling experiment post_creation")
         experiment.post_creation(self.platform)
 
     def create(self, experiment: Experiment, do_pre: bool = True, do_post: bool = True, **kwargs) -> \
@@ -79,14 +85,26 @@ class IPlatformExperimentOperations(ABC):
             Created platform item and the UUID of said item
         """
         if experiment.status is not None:
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("Calling experiment platform_modify_experiment")
             experiment = self.platform_modify_experiment(experiment, **kwargs)
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("Finished platform_modify_experiment")
             return experiment
         if do_pre:
             self.pre_create(experiment, **kwargs)
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("Finished pre_create")
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Calling platform_create")
         experiment._platform_object = self.platform_create(experiment, **kwargs)
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Finished platform_create")
         experiment.platform = self.platform
         if do_post:
             self.post_create(experiment, **kwargs)
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("Finished post_create")
         return experiment
 
     @abstractmethod
@@ -173,21 +191,34 @@ class IPlatformExperimentOperations(ABC):
         Returns:
 
         """
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Calling pre_run")
         experiment.pre_run(self.platform)
         # ensure the item is created before running
         if experiment.status is None:
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("Calling create")
             self.create(experiment, **kwargs)
         else:
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("Calling platform_modify_experiment")
             experiment = self.platform_modify_experiment(experiment, **kwargs)
 
         # check sims
-        logger.debug("Ensuring simulations exist")
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Ensuring simulations exist")
         if isinstance(experiment.simulations, (GeneratorType, Iterator)):
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("Calling _create_items_of_type for sims")
             experiment.simulations = self.platform._create_items_of_type(experiment.simulations, ItemType.SIMULATION, **kwargs)
         elif len(experiment.simulations) == 0:
             raise ValueError("You cannot have an experiment with no simulations")
         else:
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("Calling _create_items_of_type for sims")
             experiment.simulations = self.platform._create_items_of_type(experiment.simulations, ItemType.SIMULATION, **kwargs)
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Finished checking simulations")
 
     def post_run_item(self, experiment: Experiment, **kwargs):
         """
@@ -212,9 +243,15 @@ class IPlatformExperimentOperations(ABC):
         Returns:
 
         """
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Calling pre_run_item")
         self.pre_run_item(experiment, **kwargs)
         if experiment.status not in [EntityStatus.FAILED, EntityStatus.SUCCEEDED]:
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("Calling platform_run_item")
             self.platform_run_item(experiment, **kwargs)
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("Calling post_run_item")
             self.post_run_item(experiment, **kwargs)
 
     @abstractmethod
