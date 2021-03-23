@@ -1,5 +1,5 @@
-import hashlib
 import os
+import hashlib
 from dataclasses import dataclass, field
 from logging import getLogger, DEBUG
 from typing import List
@@ -30,29 +30,26 @@ class RequirementsToAssetCollection:
     pkg_list: list = field(default=None)
     #: list of wheel files locally to upload and install
     local_wheels: list = field(default=None)
+    # User tags
+    asset_tags: dict = field(default=None)
     #: Internal checksum to calculate unique requirements set has be ran before
     _checksum: str = field(default=None, init=False)
     #: Calculated requirements including versions
     _requirements: List[str] = field(default=None, init=False)
     #: Since requirements vary by os, target it on the platform as well
     _os_target: str = field(default=None, init=False)
+    #: Reserved tags
+    __reserved_tag: list = field(default=None, init=False)
 
     def __post_init__(self):
         if not any([self.requirements_path, self.pkg_list, self.local_wheels]):
             raise ValueError(
-                "Impossible to proceed without either requirements path or with package list or local wheels!")
-
-        if self.platform is None:
-            # Try to detect platform
-            from idmtools.core.context import get_current_platform
-            p = get_current_platform()
-            if p is not None:
-                self.platform = p
+                "Impossible to proceed without either requirements path or package list or local wheels!")
 
         self.requirements_path = os.path.abspath(self.requirements_path) if self.requirements_path else None
         self.pkg_list = self.pkg_list or []
         self.local_wheels = [os.path.abspath(whl) for whl in self.local_wheels] if self.local_wheels else []
-        self._os_target = "win" if "slurm" not in self.platform.environment.lower() and self.platform.environment.lower() not in SLURM_ENVS else "linux"
+        self.asset_tags = self.asset_tags or {}
 
     @property
     def checksum(self):
@@ -67,6 +64,15 @@ class RequirementsToAssetCollection:
         return self._checksum
 
     @property
+    def md5_tag(self):
+        """
+         Returns:
+            The md5 tag.
+        """
+        self.init_platform()
+        return {MD5_KEY.format(self._os_target): self.checksum}
+
+    @property
     def requirements(self):
         """
         Returns:
@@ -77,6 +83,17 @@ class RequirementsToAssetCollection:
 
         return self._requirements
 
+    def init_platform(self):
+        if self.platform is None:
+            # Try to detect platform
+            from idmtools.core.context import get_current_platform
+            p = get_current_platform()
+            if p is not None:
+                self.platform = p
+
+        self._os_target = "win" if "slurm" not in self.platform.environment.lower() and self.platform.environment.lower() not in SLURM_ENVS else "linux"
+        self.__reserved_tag = ['idmtools', 'task_type', MD5_KEY.format(self._os_target)]
+
     def run(self, rerun=False):
         """
         The working logic of this utility:
@@ -86,6 +103,10 @@ class RequirementsToAssetCollection:
 
         Returns: return ac id based on the requirements if Experiment and WorkItem Succeeded
         """
+
+        # Late validation
+        self.init_platform()
+
         # Check if ac with md5 exists
         ac = self.retrieve_ac_by_tag()
 
@@ -124,7 +145,8 @@ class RequirementsToAssetCollection:
         Returns:
 
         """
-        user_logger.info(f"Creating an updated requirements file ensuring all versions are specified at {REQUIREMENT_FILE}")
+        user_logger.info(
+            f"Creating an updated requirements file ensuring all versions are specified at {REQUIREMENT_FILE}")
         req_content = '\n'.join(self.requirements)
         with open(REQUIREMENT_FILE, 'w') as outfile:
             outfile.write(req_content)
@@ -136,13 +158,17 @@ class RequirementsToAssetCollection:
             md5_check: also can use custom md5 string as search tag
         Returns: comps asset collection
         """
+        # Late validation
+        self.init_platform()
+
         md5_str = md5_check or self.checksum
         if logger.isEnabledFor(DEBUG):
             logger.debug(f'md5_str: {md5_str}')
 
         # check if ac with tag idmtools-requirements-md5 = my_md5 exists
         ac_list = COMPSAssetCollection.get(
-            query_criteria=QueryCriteria().select_children('tags').where_tag([f'{MD5_KEY.format(self._os_target)}={md5_str}']))
+            query_criteria=QueryCriteria().select_children('tags').where_tag(
+                [f'{MD5_KEY.format(self._os_target)}={md5_str}']))
 
         # if exists, get ac and return it
         if len(ac_list) > 0:
@@ -187,10 +213,22 @@ class RequirementsToAssetCollection:
         task = JSONConfiguredPythonTask(script_path=os.path.join(CURRENT_DIRECTORY, MODEL_LOAD_LIB))
         experiment = Experiment(name=exp_name, simulations=[task.to_simulation()])
         experiment.add_asset(Asset(REQUIREMENT_FILE))
-        experiment.tags = {MD5_KEY.format(self._os_target): self.checksum}
+        experiment.tags = self.md5_tag
+
+        # Avoid conflict to reserved tag
+        if len(set(self.asset_tags).intersection(self.__reserved_tag)) > 0:
+            raise Exception(f"{self.__reserved_tag} are reserved tags, please use other tags!")
+
+        # Remove conflicts in case
+        for tag in self.__reserved_tag:
+            self.asset_tags.pop(tag, None)
+
+        # Update experiment's tags
+        experiment.tags.update(self.asset_tags)
+
         self.add_wheels_to_assets(experiment)
         user_logger.info("Run install of python requirements on COMPS. To view the details, see the experiment below")
-        experiment.run(wait_until_done=True, platform=self.platform, use_short_path=True)
+        experiment.run(wait_until_done=True, platform=self.platform, use_short_path=True, num_cores=1)
 
         if experiment.succeeded:
             return experiment
@@ -209,11 +247,17 @@ class RequirementsToAssetCollection:
             logger.debug(f'md5_str: {md5_str}')
 
         wi_name = "wi to create ac"
-        command = f"python3 {MODEL_CREATE_AC} {exp_id} {md5_str} {self.platform.endpoint} {self._os_target}"
-        tags = {MD5_KEY.format(self._os_target): self.checksum}
+        command = f"python3 {MODEL_CREATE_AC} {exp_id} {self.platform.endpoint} {self._os_target}"
 
-        user_logger.info("Converting Python Packages to an Asset Collection. This may take some time for large dependency lists")
-        wi = SSMTWorkItem(name=wi_name, command=command, transient_assets=AssetCollection([os.path.join(CURRENT_DIRECTORY, MODEL_CREATE_AC)]), tags=tags, related_experiments=[exp_id])
+        # Update tags
+        tags = {MD5_KEY.format(self._os_target): self.checksum}
+        tags.update(self.asset_tags)
+
+        user_logger.info(
+            "Converting Python Packages to an Asset Collection. This may take some time for large dependency lists")
+        wi = SSMTWorkItem(name=wi_name, command=command,
+                          transient_assets=AssetCollection([os.path.join(CURRENT_DIRECTORY, MODEL_CREATE_AC)]),
+                          tags=tags, related_experiments=[exp_id])
 
         wi.run(wait_on_done=True, platform=self.platform)
 
@@ -233,28 +277,6 @@ class RequirementsToAssetCollection:
             except:  # noqa: E722
                 pass
 
-    @staticmethod
-    def get_latest_version(pkg_name, display_all=False):
-        """
-        Utility to get the latest version for a given package name
-        Args:
-            pkg_name: package name given
-            display_all: determine if output all package releases
-        Returns: the latest version of ven package
-        """
-        from idmtools_platform_comps.utils.package_version import get_latest_package_version_from_pypi
-        from idmtools_platform_comps.utils.package_version import get_latest_pypi_package_version_from_artifactory
-
-        latest_version = get_latest_pypi_package_version_from_artifactory(pkg_name, display_all)
-
-        if not latest_version:
-            latest_version = get_latest_package_version_from_pypi(pkg_name, display_all)
-
-        if not latest_version:
-            raise Exception(f"Failed to retrieve the latest version of '{pkg_name}'.")
-
-        return latest_version
-
     def consolidate_requirements(self):
         """
         Combine requirements and dynamic requirements (a list):
@@ -264,6 +286,7 @@ class RequirementsToAssetCollection:
         Returns: the consolidated requirements (as a list)
         """
         import pkg_resources
+        from idmtools_platform_comps.utils.package_version import get_pkg_match_version
 
         req_dict = {}
         comment_list = []
@@ -288,17 +311,20 @@ class RequirementsToAssetCollection:
                 req_dict[req.name] = req.specs
 
         missing_version_dict = {k: v for k, v in req_dict.items() if len(v) == 0 or v[0][1] == ''}
-        has_version_dict = {k: v for k, v in req_dict.items() if k not in missing_version_dict}
 
-        update_req_list = []
-        for k, v in has_version_dict.items():
-            update_req_list.append(f'{k}=={v[0][1]}')
+        req_list = []
+        for k, v in req_dict.items():
+            pkg_name = k
+            base_version = None if k in missing_version_dict else v[0][1]
+            test = '==' if k in missing_version_dict else v[0][0]
+            req_list.append(f'{pkg_name}=={get_pkg_match_version(pkg_name, base_version, test)}')
 
-        for k in missing_version_dict.keys():
-            latest = self.get_latest_version(k)
-            update_req_list.append(f"{k}=={latest}")
-
+        wheel_list = []
         if self.local_wheels:
-            update_req_list.extend([f"Assets/{os.path.basename(whl)}" for whl in self.local_wheels])
+            wheel_list.extend([f"Assets/{os.path.basename(whl)}" for whl in self.local_wheels])
+
+        req_list = sorted(req_list, reverse=False)
+        wheel_list = sorted(wheel_list, reverse=False)
+        update_req_list = req_list + wheel_list
 
         return update_req_list

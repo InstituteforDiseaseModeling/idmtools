@@ -415,12 +415,13 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             self.cache.delete(cache_key)
         return cache_key
 
-    def create_items(self, items: Union[List[IEntity], IEntity]) -> List[IEntity]:
+    def create_items(self, items: Union[List[IEntity], IEntity], **kwargs) -> List[IEntity]:
         """
         Create items (simulations, experiments, or suites) on the platform. The function will batch the items based on
         type and call the self._create_batch for creation
         Args:
             items: The list of items to create.
+            kwargs: Extra arguments
         Returns:
             List of item IDs created.
         """
@@ -431,7 +432,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         result = []
         for key, group in groupby(items, lambda x: x.item_type):
-            result.extend(self._create_items_of_type(group, key))
+            result.extend(self._create_items_of_type(group, key, **kwargs))
         return result
 
     def _create_items_of_type(self, items: Iterator[IEntity], item_type: ItemType, **kwargs):
@@ -712,8 +713,9 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         if child_attribute is None:
             if isinstance(item, IWorkflowItem):
                 if item.status in done_states:
-                    progress_bar.update(1)
-                    progress_bar.close()
+                    if progress_bar:
+                        progress_bar.update(1)
+                        progress_bar.close()
                     return True
                 return False
             else:

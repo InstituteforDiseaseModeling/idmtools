@@ -23,13 +23,6 @@ class TestCompsCLI(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        # To enable this, you need to also set the env var TEST_WITH_PACKAGES to t or y
-        if TEST_WITH_NEW_CODE:
-            # Run package dists
-            run_package_dists()
-
-    @classmethod
-    def setUpClass(cls) -> None:
         # Setup logging for cli
         os.environ['IDMTOOLS_LOGGING_USER_PRINT'] = '1'
         os.environ['IDMTOOLS_HIDE_DEV_WARNING'] = '1'
@@ -37,6 +30,11 @@ class TestCompsCLI(unittest.TestCase):
         with suppress(PermissionError):
             if os.path.exists(pwd.joinpath("singularity.id")):
                 os.remove(pwd.joinpath("singularity.id"))
+
+        # To enable this, you need to also set the env var TEST_WITH_PACKAGES to t or y
+        if TEST_WITH_NEW_CODE:
+            # Run package dists
+            run_package_dists()
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -46,7 +44,16 @@ class TestCompsCLI(unittest.TestCase):
         setup_logging(level=DEBUG, filename='idmtools.log', force=True)
 
     def test_subcommands_exists(self):
+        result = run_command('--help')
+        print(result.stdout)
+        lines = get_subcommands_from_help_result(result)
+        if "Warning: could not load plugin. See `-c comps_subcommand" in result.stdout:
+            result2 = run_command('comps_subcommand', '--help')
+            print(result2.stdout)
+        with self.subTest("test_comps_subcommand"):
+            self.assertIn('comps', lines)
         result = run_command('comps', '--help')
+        print(result.stdout)
         lines = get_subcommands_from_help_result(result)
         # ensure our command is in the options
         with self.subTest("test_assetize_subcommand"):
@@ -55,6 +62,8 @@ class TestCompsCLI(unittest.TestCase):
             self.assertIn('singularity', lines)
         with self.subTest("test_login_subcommand"):
             self.assertIn('login', lines)
+        with self.subTest("test_req2ac_subcommand"):
+            self.assertIn('req2ac', lines)
 
     @allure.feature("AssetizeOutputs")
     def test_assetize_dry_run_json(self):
@@ -71,8 +80,8 @@ class TestCompsCLI(unittest.TestCase):
         if os.path.exists(op.joinpath(fn)):
             os.remove(op.joinpath(fn))
         result = run_command('comps', 'Bayesian', 'assetize-outputs', '--experiment', '9311af40-1337-ea11-a2be-f0921c167861', '--json', '--id-file', '--id-filename', fn, mix_stderr=False)
-        self.assertTrue(result.exit_code == 0)
         print(result.stdout)
+        self.assertTrue(result.exit_code == 0)
         files = json.loads(result.stdout)
         self.assertEqual(36, len(files))
         self.assertTrue(os.path.exists(op.joinpath(fn)))
@@ -80,12 +89,15 @@ class TestCompsCLI(unittest.TestCase):
     @allure.feature("AssetizeOutputs")
     def test_cli_error(self):
         result = run_command('comps', 'Bayesian', 'assetize-outputs', '--experiment', '9311af40-1337-ea11-a2be-f0921c167861', '--pattern', '34234234')
+        print(result.stdout)
         self.assertTrue(result.exit_code == -1)
         self.assertIn("No files found with patterns specified", result.stdout)
 
     @allure.feature("Containers")
     def test_container_pull(self):
         result = run_command('comps', 'SLURM2', 'singularity', 'pull', 'docker://python:3.8.6', mix_stderr=False)
+        print(result.stdout)
+        print(result.stderr)
         self.assertTrue(result.exit_code == 0)
         self.assertTrue(os.path.exists("python_3.8.6.id"))
 
@@ -95,6 +107,7 @@ class TestCompsCLI(unittest.TestCase):
         if os.path.exists(pwd.joinpath("singularity.id")):
             os.remove(pwd.joinpath("singularity.id"))
         result = run_command('comps', 'SLURM2', 'singularity', 'build', '--common-input-glob', str(pwd.joinpath('*.txt')), str(pwd.joinpath('singularity.def')), mix_stderr=False)
+        print(result.stdout)
         self.assertTrue(result.exit_code == 0)
         self.assertTrue(os.path.exists(pwd.joinpath("singularity.id")))
 
@@ -106,6 +119,7 @@ class TestCompsCLI(unittest.TestCase):
             if os.path.exists(pwd.joinpath(file)):
                 os.remove(pwd.joinpath(file))
         result = run_command('comps', 'SLURM2', 'singularity', 'build', '--force', '--id-workitem', '--common-input-glob', str(pwd.joinpath('*.txt')), str(pwd.joinpath('singularity.def')), mix_stderr=False)
+        print(result.stdout)
         self.assertTrue(result.exit_code == 0)
         for file in id_files:
             self.assertTrue(os.path.exists(pwd.joinpath(file)))

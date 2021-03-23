@@ -1,0 +1,11 @@
+{
+  "Command": "python3 Assets/model.py --config config.json",
+  "NodeGroupName": "idm_cd",
+  "NumCores": 4,
+  "NumProcesses": 1,
+  "NumNodes": 1,
+  "Environment": {
+    "key1": "value1",
+    "key2:": "value2"
+  }
+}

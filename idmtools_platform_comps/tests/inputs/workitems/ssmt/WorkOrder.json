@@ -1,0 +1,8 @@
+{
+  "WorkItem_Type": "DockerWorker",
+  "Execution": {
+    "ImageName": "docker-production.packages.idmod.org/nyu/dtk:20200306",
+    "Command": "/dtk/Eradication -v",
+    "DebugFileName": "debug.txt"
+  }
+}

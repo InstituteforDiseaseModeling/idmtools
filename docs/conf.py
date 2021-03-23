@@ -20,6 +20,7 @@ import configparser
 import os
 import subprocess
 import sys
+from datetime import datetime
 
 import sphinx_rtd_theme
 
@@ -37,14 +38,15 @@ else:
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.imgmath',
+    'sphinx.ext.mathjax',
     'sphinx.ext.githubpages',
     'sphinx.ext.autodoc',
     'sphinxcontrib.napoleon',
     'sphinx.ext.todo',
     'plantweb.directive',
     'sphinxcontrib.programoutput',
-    'sphinx_copybutton'
+    'sphinx_copybutton',
+    'sphinx.ext.intersphinx'
 ]
 
 plantuml = 'plantweb'
@@ -56,8 +58,7 @@ autodoc_default_options = {
 }
 
 autodoc_mock_imports = ['pika',
-                        'dramatiq'
-                        ]
+                        'dramatiq']
 
 
 napoleon_google_docstring = True
@@ -81,7 +82,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'idmtools'
-copyright = u'2020, Bill & Melinda Gates Foundation. All rights reserved.'
+copyright = f'1999 - {datetime.today().year}, Bill & Melinda Gates Foundation. All rights reserved.'
 author = u'Institute for Disease Modeling'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -387,4 +388,9 @@ texinfo_documents = [
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
-# intersphinx_mapping = {'https://docs.python.org/': None}
+intersphinx_mapping = {'python': ('https://docs.python.org/3', None),
+                       'emod_api': ('https://docs.idmod.org/projects/emod-api/en/latest/', None),
+                       'emodpy': ('https://docs.idmod.org/projects/emodpy/en/latest/', None),
+                       'pycomps': ('https://docs.idmod.org/projects/pycomps/en/latest/', None)
+                       }
+

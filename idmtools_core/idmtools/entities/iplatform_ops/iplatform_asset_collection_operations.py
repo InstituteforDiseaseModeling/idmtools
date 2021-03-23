@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from logging import DEBUG, getLogger
 from typing import Any, List, Type, NoReturn, TYPE_CHECKING
 from uuid import UUID
 from idmtools.assets import AssetCollection
@@ -9,6 +10,7 @@ from idmtools.registry.functions import FunctionPluginManager
 
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
+logger = getLogger(__name__)
 
 
 @dataclass
@@ -27,7 +29,11 @@ class IPlatformAssetCollectionOperations(CacheEnabled, ABC):
         Returns:
             NoReturn
         """
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Calling idmtools_platform_pre_create_item")
         FunctionPluginManager.instance().hook.idmtools_platform_pre_create_item(item=asset_collection, kwargs=kwargs)
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Calling pre_creation")
         asset_collection.pre_creation(self.platform)
 
     def post_create(self, asset_collection: AssetCollection, **kwargs) -> NoReturn:
@@ -41,6 +47,8 @@ class IPlatformAssetCollectionOperations(CacheEnabled, ABC):
         Returns:
             NoReturn
         """
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Calling post_creation")
         asset_collection.post_creation(self.platform)
 
     def create(self, asset_collection: AssetCollection, do_pre: bool = True, do_post: bool = True, **kwargs) -> Any:
@@ -60,9 +68,15 @@ class IPlatformAssetCollectionOperations(CacheEnabled, ABC):
         if asset_collection.status is not None:
             return asset_collection._platform_object
         if do_pre:
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("Calling pre_create")
             self.pre_create(asset_collection, **kwargs)
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Calling platform_create")
         ret = self.platform_create(asset_collection, **kwargs)
         if do_post:
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("Calling post_create")
             self.post_create(asset_collection, **kwargs)
         return ret
 
