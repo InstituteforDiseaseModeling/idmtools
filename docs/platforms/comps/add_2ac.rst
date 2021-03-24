@@ -10,7 +10,7 @@ the |COMPS_s| platform.
 Add files
 ---------
 
-Files can be added specifically or by addomg one or more directories to an asset collection.
+Files can be added specifically or by adding one or more directories to an asset collection.
 
 Add specific files
 ^^^^^^^^^^^^^^^^^^
