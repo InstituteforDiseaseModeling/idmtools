@@ -366,7 +366,7 @@ try:
     @click.option('-c', '--command', type=str, required=True,
                   help='Command for SSMT work item to execute (e.g. \"python myscript.py\"). Required.')
     @click.option('-i', '--docker-image', type=str, required=False, default=None,
-                  help='Docker image to use. Default: Latest SSMT docker image for selected endpoint.')
+                  help='Name of docker image to use. Default: Latest SSMT docker image for selected endpoint.')
     @click.pass_context
     def run_ssmt(ctx: click.Context, wi_name, files, suite_id, command, docker_image):
         from idmtools.assets.file_list import FileList
