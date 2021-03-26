@@ -356,6 +356,32 @@ try:
         else:
             print("AC doesn't exist")
 
+    @comps.command(help="Run a script on SSMT in COMPS")
+    @click.option('-n', '--wi-name', type=str, required=True,
+                  help='Name of work item to run. Required.')
+    @click.option('-f', '--files', type=str, required=True,
+                  help='Directory containing files to add to work item as assets. Required.')
+    @click.option('-id', '--suite-id', type=str, required=True,
+                  help='The id of a suite containing experiments to connect the SSMT work item to. Required.')
+    @click.option('-c', '--command', type=str, required=True,
+                  help='Command for SSMT work item to execute (e.g. \"python myscript.py\"). Required.')
+    @click.option('-i', '--docker-image', type=str, required=False, default=None,
+                  help='Docker image to use. Default: Latest SSMT docker image for selected endpoint.')
+    @click.pass_context
+    def run_ssmt(ctx: click.Context, wi_name, files, suite_id, command, docker_image):
+        from idmtools.assets.file_list import FileList
+        from idmtools.core import ItemType
+        from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
+
+        user_files = FileList(root=files)
+        platform = Platform(ctx.obj['config_block'])
+        suite = platform.get_item(suite_id, ItemType.SUITE, raw=False)
+        experiment_ids = [str(exp.id) for exp in suite.experiments]
+        wi = SSMTWorkItem(item_name=wi_name, command=command, transient_assets=user_files.to_asset_collection(),
+                          related_experiments=experiment_ids, docker_image=docker_image)
+        wi.run(True, platform=platform)
+        print('SSMT work item id: %s' % wi.id)
+
     @comps.group(help="Singularity commands")
     def singularity():
         pass
