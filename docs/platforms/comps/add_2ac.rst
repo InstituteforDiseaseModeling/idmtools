@@ -39,10 +39,10 @@ as shown in the following example::
 Add libraries
 -------------
 
-To add a specific library to an asset collection you first add the libary package name to a 
+To add a specific library to an asset collection you first add the library package name to a 
 requirements file, either lib_requirements_linux.txt or lib_requirements_wins.txt, and place 
 the file in the root directory containing your model files. Then you 
-use the ``add_libs_utils.py`` script to add the libary to the asset collection on |COMPS_s|.
+use the ``add_libs_utils.py`` script to add the library to the asset collection on |COMPS_s|.
 
 Add to requirements file
 ^^^^^^^^^^^^^^^^^^^^^^^^
