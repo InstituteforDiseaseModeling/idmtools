@@ -32,7 +32,7 @@ if __name__ == '__main__':
 
     parser.add_argument('--comps_url', default='https://comps2.idmod.org', help='comps url')
     parser.add_argument('--username', help='entry username')
-    parser.add_argument('--password', default=os.getvar("COMPS_PASS", None), help='entry password')
+    parser.add_argument('--password', default=os.getenv("COMPS_PASS", None), help='entry password')
 
     args = parser.parse_args()
     if args.password is None:
