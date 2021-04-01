@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import argparse
 import os
+import sys
 from COMPS import Client  # noqa: I900
 from COMPS.CredentialPrompt import CredentialPrompt  # noqa: I900
 
