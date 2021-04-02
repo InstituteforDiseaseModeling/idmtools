@@ -8,7 +8,7 @@ from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 
 # load up an existing experiment with completed simulations
-from idmtools_platform_comps.utils.general import update_tags_for_existing_item
+from idmtools_platform_comps.utils.general import update_item
 
 with Platform('Calculon') as platform:
     # Create First Experiment
@@ -26,8 +26,8 @@ with Platform('Calculon') as platform:
     simulations = experiment.simulations.items
     for sim in simulations:
         tags = {"a": 1, "b": "test"}
-        update_tags_for_existing_item(platform, sim.id, ItemType.SIMULATION, tags)
+        update_item(platform, sim.id, ItemType.SIMULATION, tags)
 
-    # update experiment tags
+    # update experiment tags and name
     tags_exp = {"exp_tag": "test"}
-    update_tags_for_existing_item(platform, experiment.id, ItemType.EXPERIMENT, tags_exp)
+    update_item(platform, experiment.id, ItemType.EXPERIMENT, tags_exp, "new experiment name")

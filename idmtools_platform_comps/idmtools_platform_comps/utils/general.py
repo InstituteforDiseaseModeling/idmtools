@@ -228,7 +228,7 @@ def get_asset_for_comps_item(platform: IPlatform, item: IEntity, files: List[str
     return ret
 
 
-def update_tags_for_existing_item(platform: Platform, item_id: str, item_type: ItemType = None, tags=None):
+def update_item(platform: IPlatform, item_id: str, item_type: ItemType, tags: dict=None, name: str=None):
     """
 
     Args:
@@ -236,6 +236,7 @@ def update_tags_for_existing_item(platform: Platform, item_id: str, item_type: I
         item_id: experiment/simulation/workitem id
         item_type: The type of the object to be retrieved
         tags: tags dict for update
+        name: name of experiment/simulation/workitem
     Returns:
 
     """
@@ -244,4 +245,6 @@ def update_tags_for_existing_item(platform: Platform, item_id: str, item_type: I
     if tags is not None:
         current_tags.update(tags)
         comps_item.set_tags(current_tags)
-        comps_item.save()
+    if name is not None:
+        comps_item.name = name
+    comps_item.save()
