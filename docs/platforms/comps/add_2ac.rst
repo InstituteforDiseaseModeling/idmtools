@@ -23,7 +23,8 @@ There are multiple ways of adding to experiment:
 
 * Add list of Asset or AssetCollection to experiment::
 
-    ac = AssetCollection.from_directory(assets_directory=os.path.abspath(os.path.join(COMMON_INPUT_PATH, "assets", collections")))experiment.add_assets(ac)
+    ac = AssetCollection.from_directory(assets_directory=os.path.abspath(os.path.join(COMMON_INPUT_PATH, "assets", collections")))
+    experiment.add_assets(ac)
 
 * Add file as Asset to experiment::
 
