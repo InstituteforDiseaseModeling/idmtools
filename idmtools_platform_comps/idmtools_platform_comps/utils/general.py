@@ -14,8 +14,7 @@ from requests import RequestException
 
 from idmtools.core import EntityStatus, ItemType
 from idmtools.core.interfaces.ientity import IEntity
-
-from idmtools_core.idmtools.entities.iplatform import IPlatform
+from idmtools.entities.iplatform import IPlatform
 
 ASSETS_PATH = "Assets\\"
 
