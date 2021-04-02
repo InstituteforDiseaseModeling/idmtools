@@ -33,6 +33,7 @@ from idmtools_platform_comps.utils.scheduling import default_add_workerorder_swe
 @allure.story("COMPS")
 @allure.story("Python")
 @allure.suite("idmtools_platform_comps")
+@pytest.mark.serial
 class TestWorkOrder(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
