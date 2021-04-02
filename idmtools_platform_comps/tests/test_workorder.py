@@ -37,7 +37,7 @@ class TestWorkOrder(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)
-        self.platform = Platform('SLURM2')
+        self.platform = Platform('SlurmStage')
 
     def test_workorder_pythontask(self):
         """
