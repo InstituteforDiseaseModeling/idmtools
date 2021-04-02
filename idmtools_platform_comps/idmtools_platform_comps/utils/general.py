@@ -9,7 +9,6 @@ from COMPS.Data import Simulation, SimulationFile, AssetCollectionFile, WorkItem
 from COMPS.Data.AssetFile import AssetFile
 from COMPS.Data.Simulation import SimulationState
 from COMPS.Data.WorkItem import WorkItemState, WorkItem
-from idmtools.core.platform_factory import Platform
 from requests import RequestException
 
 from idmtools.core import EntityStatus, ItemType
@@ -228,7 +227,7 @@ def get_asset_for_comps_item(platform: IPlatform, item: IEntity, files: List[str
     return ret
 
 
-def update_item(platform: IPlatform, item_id: str, item_type: ItemType, tags: dict=None, name: str=None):
+def update_item(platform: IPlatform, item_id: str, item_type: ItemType, tags: dict = None, name: str = None):
     """
 
     Args:
