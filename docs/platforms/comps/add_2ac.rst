@@ -3,38 +3,70 @@
 Add to asset collection
 =======================
 
-|IT_s| allows you to add files, such as input and model libraries, to an :term:`asset collection` 
-on |COMPS_s|. This allows you access and use these files when running model simulations on 
+|IT_s| allows you to add assets, such as input files and model libraries, to an :term:`asset collection` 
+on |COMPS_s|. This allows you to access and use these assets when running model simulations on 
 the |COMPS_s| platform.
 
-Add files
----------
+Add assets
+----------
 
-Files can be added specifically or by adding one or more directories to an asset collection.
+There are two primary ways of adding assets (experiment and task):
 
-Add specific files
-^^^^^^^^^^^^^^^^^^
+Add assets to experiment
+^^^^^^^^^^^^^^^^^^^^^^^^
 
-To add specific files to an asset collection you can use the 
-:py:meth:`~idmtools.assets.asset_collection.AssetCollection.add_asset` 
-or :py:meth:`~idmtools.assets.asset_collection.AssetCollection.add_assets` 
-methods in the :py:class:`~idmtools.assets.asset_collection.AssetCollection` class. 
+There are multiple ways of adding to experiment:
 
-The following example shows how to add a Linux command-line shell file `file_name.sh` 
-from the directory `inputs`, which is a local directory relative to the root 
-of the model project files, and then add it to the experiment object::
+* Add directory to experiment/workitem::
 
-    experiment.add_asset (os.path.join("inputs", "file_name.sh"))
+    experiment.assets.add_directory(assets_directory=os.path.join("inputs", "python_model_with_deps", "Assets"))
 
-Add directories
-^^^^^^^^^^^^^^^
+For more information, see `python_sim_slurm`_.
 
-To add directories to an asset collection you can use 
-the :py:meth:`~idmtools.assets.asset_collection.AssetCollection.add_directory` method in 
-the :py:class:`~idmtools.assets.asset_collection.AssetCollection` class, 
-as shown in the following example::
+.. _python_sim_slurm: https://github.com/InstituteforDiseaseModeling/idmtools/tree/master/examples/python_model/python_sim_slurm.py
 
-    experiment.assets.add_directory(assets_directory=os.path.join("yourlocaldir1", "youlocaldir2"))
+* Add list of Asset or AssetCollection to experiment::
+
+    ac = AssetCollection.from_directory(assets_directory=os.path.abspath(os.path.join(COMMON_INPUT_PATH, "assets", "collections")))
+	experiment.add_assets(ac)
+
+For more information, see `test_experiment_factory`_.
+
+.. _test_experiment_factory: https://github.com/InstituteforDiseaseModeling/idmtools/tree/master/idmtools_core/tests/test_experiment_factory.py
+
+* Add file as Asset to experiment::
+
+    experiment.add_asset(os.path.join("inputs", "scheduling", "commandline_model.py"))
+
+For more information, see `command_task_sweep_scheduling`_.
+
+.. _command_task_sweep_scheduling: https://github.com/InstituteforDiseaseModeling/idmtools/tree/master/examples/python_model/command_task_sweep_scheduling.py
+
+Add assets via task (then add task to experiment/workitem)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+There are multiple ways of adding via task:
+
+* Add files to common_assets or transient_assets to task::
+
+    task.common_assets.add_asset(os.path.join(INPUT_PATH, os_type, "bin", "schema.json"))
+    task.transient_assets.add_asset(os.path.join(INPUT_PATH, "campaign_template.json"))
+
+* Add list of Asset or AssetCollection to task::
+
+    task.common_assets.add_assets(AssetCollection.from_id_file("covasim.id"))
+
+For more information, see `run_covasim_interventions`_.
+
+.. _run_covasim_interventions: https://github.com/InstituteforDiseaseModeling/idmtools/tree/master/examples/singularity/covasim/run_covasim_interventions.py
+
+* Add from directory::
+
+    task.common_assets.add_directory(assets_directory=os.path.join(COMMON_INPUT_PATH, "python", "Assets"))
+
+For more information, see `test_workorder`_.
+
+.. _test_workorder: https://github.com/InstituteforDiseaseModeling/idmtools/tree/master/idmtools_platform_comps/tests/test_workorder.py
 
 Add libraries
 -------------
