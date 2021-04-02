@@ -9,11 +9,13 @@ from COMPS.Data import Simulation, SimulationFile, AssetCollectionFile, WorkItem
 from COMPS.Data.AssetFile import AssetFile
 from COMPS.Data.Simulation import SimulationState
 from COMPS.Data.WorkItem import WorkItemState, WorkItem
+from idmtools.core.platform_factory import Platform
 from requests import RequestException
 
 from idmtools.core import EntityStatus, ItemType
 from idmtools.core.interfaces.ientity import IEntity
-from idmtools.entities.iplatform import IPlatform
+
+from idmtools_core.idmtools.entities.iplatform import IPlatform
 
 ASSETS_PATH = "Assets\\"
 
@@ -225,3 +227,22 @@ def get_asset_for_comps_item(platform: IPlatform, item: IEntity, files: List[str
                 else:
                     ret[file_path] = get_file_from_collection(platform, collection_id, normalized_path)
     return ret
+
+
+def update_tags_for_existing_item(platform: Platform, item_id: str, item_type: ItemType = None, tags=None):
+    """
+
+    Args:
+        platform: Platform
+        item_id: experiment/simulation/workitem id
+        item_type: The type of the object to be retrieved
+        tags: tags dict for update
+    Returns:
+
+    """
+    comps_item = platform.get_item(item_id, item_type, raw=True)
+    current_tags = comps_item.tags
+    if tags is not None:
+        current_tags.update(tags)
+        comps_item.set_tags(current_tags)
+        comps_item.save()

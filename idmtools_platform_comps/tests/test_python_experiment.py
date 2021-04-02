@@ -23,6 +23,7 @@ from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
+from idmtools_platform_comps.utils.general import update_tags_for_existing_item
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.common_experiments import get_model1_templated_experiment, get_model_py_templated_experiment, \
     wait_on_experiment_and_check_all_sim_status
@@ -545,6 +546,32 @@ class TestPythonExperiment(ITestWithPersistence):
         expected_list_sorted = sorted(expected_list, key=itemgetter('filename', 'relative_path'))
         actual_list_sorted = sorted(actual_list, key=itemgetter('filename', 'relative_path'))
         self.assertEqual(expected_list_sorted, actual_list_sorted)
+
+    def test_update_tags_for_existing_sims_exp(self):
+        # Create First Experiment
+        builder = SimulationBuilder()
+        builder.add_sweep_definition(JSONConfiguredPythonTask.set_parameter_partial("a"),
+                                     [i for i in range(2)])
+        model_path = os.path.join("inputs", "compsplatform", "working_model.py")
+        sims_template = TemplatedSimulations(base_task=JSONConfiguredPythonTask(script_path=model_path))
+        sims_template.add_builder(builder=builder)
+
+        experiment = Experiment.from_template(sims_template, name=self.case_name)
+        experiment.run(wait_until_done=True)
+
+        # update simulation tags - notes simulations are already in COMPS
+        simulations = experiment.simulations.items
+        for sim in simulations:
+            tags = {"aa": 1, "b": "test"}
+            update_tags_for_existing_item(self.platform, sim.id, ItemType.SIMULATION, tags)
+
+        # update experiment tags
+        tags_exp = {"exp_tag": "test"}
+        update_tags_for_existing_item(self.platform, experiment.id, ItemType.EXPERIMENT, tags_exp)
+        tag_value = "idmtools_models.python.json_python_task.JSONConfiguredPythonTask"
+        expected_tags = [{'a': '0', 'aa': '1', 'b': 'test', 'task_type': tag_value},
+                         {'a': '1', 'aa': '1', 'b': 'test', 'task_type': tag_value}]
+        validate_sim_tags(self, experiment.id, expected_tags, tag_value)
 
 
 if __name__ == '__main__':

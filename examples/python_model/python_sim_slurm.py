@@ -52,6 +52,9 @@ experiment.tags["tag1"] = 1
 experiment.assets.add_directory(assets_directory=os.path.join("inputs", "python_model_with_deps", "Assets"))
 
 platform = Platform('CALCULON')
+experiment.run()
 
-experiment.run(wait_until_done=True)
+# customized wait interval
+platform.wait_till_done(experiment, refresh_interval=1)
+# use system status as the exit code
 sys.exit(0 if experiment.succeeded else -1)
