@@ -21,26 +21,13 @@ There are multiple ways of adding to experiment:
 
     experiment.assets.add_directory(assets_directory=os.path.join("inputs", "python_model_with_deps", "Assets"))
 
-For more information, see `python_sim_slurm`_.
-
-.. _python_sim_slurm: https://github.com/InstituteforDiseaseModeling/idmtools/tree/master/examples/python_model/python_sim_slurm.py
-
 * Add list of Asset or AssetCollection to experiment::
 
-    ac = AssetCollection.from_directory(assets_directory=os.path.abspath(os.path.join(COMMON_INPUT_PATH, "assets", "collections")))
-	experiment.add_assets(ac)
-
-For more information, see `test_experiment_factory`_.
-
-.. _test_experiment_factory: https://github.com/InstituteforDiseaseModeling/idmtools/tree/master/idmtools_core/tests/test_experiment_factory.py
+    ac = AssetCollection.from_directory(assets_directory=os.path.abspath(os.path.join(COMMON_INPUT_PATH, "assets", collections")))experiment.add_assets(ac)
 
 * Add file as Asset to experiment::
 
     experiment.add_asset(os.path.join("inputs", "scheduling", "commandline_model.py"))
-
-For more information, see `command_task_sweep_scheduling`_.
-
-.. _command_task_sweep_scheduling: https://github.com/InstituteforDiseaseModeling/idmtools/tree/master/examples/python_model/command_task_sweep_scheduling.py
 
 Add assets via task (then add task to experiment/workitem)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -56,17 +43,9 @@ There are multiple ways of adding via task:
 
     task.common_assets.add_assets(AssetCollection.from_id_file("covasim.id"))
 
-For more information, see `run_covasim_interventions`_.
-
-.. _run_covasim_interventions: https://github.com/InstituteforDiseaseModeling/idmtools/tree/master/examples/singularity/covasim/run_covasim_interventions.py
-
 * Add from directory::
 
     task.common_assets.add_directory(assets_directory=os.path.join(COMMON_INPUT_PATH, "python", "Assets"))
-
-For more information, see `test_workorder`_.
-
-.. _test_workorder: https://github.com/InstituteforDiseaseModeling/idmtools/tree/master/idmtools_platform_comps/tests/test_workorder.py
 
 Add libraries
 -------------
