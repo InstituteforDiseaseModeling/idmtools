@@ -12,6 +12,7 @@ TSweepFunction = Union[
 ]
 
 MULTIPLE_ARGS_MUST_BE_ITERABLE_ERROR = "When defining a sweep across multiple parameters, they must be specified either in a Dict in the form of {{ KeyWork: Values }} where values is a list or [ Param1-Vals, Param2-Vals] where Param1-Vals and Param2-Vals are lists/iterables."
+PARAMETER_LENGTH_MUST_MATCH_ERROR = "The parameters in the callback must match the length of the arguments/keyword arguments passed."
 
 
 class SimulationBuilder:
@@ -177,11 +178,15 @@ class SimulationBuilder:
                 generated_values = product(*values)
                 self.sweeps.append(partial(function, **self._map_multi_argument_array(remaining_parameters, v)) for v in generated_values)
             else:
-                raise ValueError(f"The parameters in the callback must match the length of the arguments/keyword arguments passed. Currently the callback has {len(remaining_parameters)} and {len(values)}")
+                raise ValueError(f"{PARAMETER_LENGTH_MUST_MATCH_ERROR} Currently the callback has {len(remaining_parameters)} parameters and there were {len(values)} arguments passed.")
         elif isinstance(values, dict):
+            if len(values.keys()) != len(remaining_parameters):
+                raise ValueError(f"{PARAMETER_LENGTH_MUST_MATCH_ERROR}. Currently the callback has {len(remaining_parameters)} parameters and there were {len(values.keys())} arguments passed.")
             for key, vals in values.items():
                 if not isinstance(vals, Iterable):
                     raise ValueError(f"{MULTIPLE_ARGS_MUST_BE_ITERABLE_ERROR} Please correct item at index {key}")
+                elif key not in remaining_parameters:
+                    raise ValueError(f"Unknown keyword parameter passed: {key}. Support keyword args are {', '.join(remaining_parameters)}")
             list(map(self._update_count, values))
             generated_values = product(*values.values())
             self.sweeps.append(partial(function, **self._map_multi_argument_array(values.keys(), v)) for v in generated_values)

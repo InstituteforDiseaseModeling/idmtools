@@ -107,6 +107,17 @@ class TestMultipleBuilders(ITestWithPersistence):
 
         self.__validate_a_b_sb_test(a_values, b_values, sb)
 
+    def test_simulation_builder_args_mismatch(self):
+        """Test simulation builder using multiple arguments that do not match the callback
+        """
+        sb = SimulationBuilder()
+        a_values = range(1, 5)
+        b_values = ["c", "d"]
+        c_values = range(1, 2)
+        with self.assertRaises(ValueError) as context:
+            sb.add_multiple_parameter_sweep_definition(update_command_task, a_values, b_values, c_values)
+        self.assertIn("2 parameters and there were 3 arguments", context.exception.args[0])
+
     def test_simulation_builder_args_single_dict(self):
 
         sb = SimulationBuilder()
@@ -122,6 +133,24 @@ class TestMultipleBuilders(ITestWithPersistence):
         b_values = ["c", "d"]
         sb.add_multiple_parameter_sweep_definition(update_command_task, **dict(a=a_values, b=b_values))
         self.__validate_a_b_sb_test(a_values, b_values, sb)
+
+    def test_simulation_builder_kwargs_mismatch_count(self):
+        """Test simulation builder using kwargs but with more arguments than parameters"""
+        sb = SimulationBuilder()
+        a_values = range(1, 5)
+        b_values = ["c", "d"]
+        with self.assertRaises(ValueError) as context:
+            sb.add_multiple_parameter_sweep_definition(update_command_task, **dict(a=a_values, b=b_values, c=range(1, 2)))
+        self.assertIn("2 parameters and there were 3 arguments", context.exception.args[0])
+
+    def test_simulation_builder_kwargs_mismatch_name(self):
+        """Test simulation builder using kwargs but with arguments that don't match parameters"""
+        sb = SimulationBuilder()
+        a_values = range(1, 5)
+        b_values = ["c", "d"]
+        with self.assertRaises(ValueError) as context:
+            sb.add_multiple_parameter_sweep_definition(update_command_task, **dict(a=a_values, b2=b_values))
+        self.assertIn("Unknown keyword parameter passed: b2", context.exception.args[0])
 
     def __validate_a_b_sb_test(self, a_values, b_values, sb):
         tt = TestTask()
