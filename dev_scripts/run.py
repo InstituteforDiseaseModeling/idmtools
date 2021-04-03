@@ -1,4 +1,8 @@
 #!/usr/bin/env python
+"""Run a command and filter output or redirect to a log.
+
+Used by some build processes to log build steps or reduce verbosity of others
+"""
 import shutil
 import argparse
 import logging
@@ -19,6 +23,15 @@ logger = getLogger(__name__)
 
 
 def execute(cmd, env=None):
+    """Execute the command.
+
+    Args:
+        cmd: Command to run
+        env: Environment dict to populate in the command subprocess
+
+    Yields:
+        Lines of output from the command being ran. Stdout and stderr are combined
+    """
     if env is None:
         env = dict()
     final_env = dict(os.environ)
@@ -33,6 +46,14 @@ def execute(cmd, env=None):
 
 
 def setup_logging(working_dir):
+    """Configures our logging.
+
+    Args:
+        working_dir: Directory to configure logging at
+
+    Returns:
+        None
+    """
     logger.setLevel(logging.DEBUG)
     log_formatter = logging.Formatter("%(asctime)s [%(levelname)-8.8s]  %(message)s")
     file_handler = logging.FileHandler("%s/make.buildlog" % os.path.abspath(working_dir))

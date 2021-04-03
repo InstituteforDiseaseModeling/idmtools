@@ -1,5 +1,8 @@
 #!/usr/bin/env python
+"""Launches a directory in a browser.
 
+This script is used to view local documentation, coverage reports, etc
+"""
 import os
 import sys
 import webbrowser

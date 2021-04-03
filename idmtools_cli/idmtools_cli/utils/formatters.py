@@ -1,5 +1,5 @@
+"""Utility functions around formatting output for cli."""
 from __future__ import absolute_import
-
 import re
 from .utils import tsplit, schunk
 
@@ -8,7 +8,7 @@ NEWLINES = ('\n', '\r', '\r\n')
 
 def clean(s: str):
     """
-    Clean string
+    Clean string so that all special formatting is stripped.
 
     Args:
         s: str
@@ -25,6 +25,7 @@ def clean(s: str):
 def min_width(string, cols: int, padding=' '):
     """
     Returns given string with right padding.
+
     Args:
         string: string to be formatted
         cols: min width the text to be formatted
@@ -44,7 +45,8 @@ def min_width(string, cols: int, padding=' '):
 
 def max_width(string: str, cols: int, separator='\n'):
     """
-    Returns a freshly formatted
+    Returns a freshly formatted.
+
     Args:
         string: string to be formatted
         cols: max width the text to be formatted
@@ -53,7 +55,6 @@ def max_width(string: str, cols: int, separator='\n'):
     Returns:
         String formatted with max width
     """
-
     stack = tsplit(string, NEWLINES)
 
     for i, substring in enumerate(stack):

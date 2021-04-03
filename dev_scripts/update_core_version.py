@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+"""Utility script to update references to idmtools_core in requirements.txt files when versions change."""
 import glob
 import os
 import re
@@ -8,11 +9,10 @@ CORE_PATH = os.path.join(REPO_PATH, 'idmtools_core')
 
 
 def get_current_version() -> str:
-    """
-    Find current version of core
+    """Find current version of core.
 
     Returns:
-
+        Current version of core
     """
     with open(os.path.join(CORE_PATH, '.bumpversion.cfg')) as vin:
         contents = vin.read()
@@ -24,9 +24,10 @@ def get_current_version() -> str:
 
 def update_requirements():
     """
-    Find all the files with idmtools core as dependency and updates
-    Returns:
+    Find all the files with idmtools core as dependency and updates.
 
+    Returns:
+        None
     """
     core_expr = re.compile(r'idmtools([~=]+[+0-9.a-z]+)?$', re.MULTILINE)
     current_version = get_current_version()
