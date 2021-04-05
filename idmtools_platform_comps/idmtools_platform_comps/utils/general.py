@@ -229,7 +229,9 @@ def get_asset_for_comps_item(platform: IPlatform, item: IEntity, files: List[str
 
 def update_item(platform: IPlatform, item_id: str, item_type: ItemType, tags: dict = None, name: str = None):
     """
-    Util function to update existing COMPS experiment/simulation/workitem's tags or name
+    Util function to update existing COMPS experiment/simulation/workitem's tags or
+    For example, you can add/update simulation's tag once its post-process is done to mark the simulation with
+    more meanful text with tag/name
     Args:
         platform: Platform
         item_id: experiment/simulation/workitem id
