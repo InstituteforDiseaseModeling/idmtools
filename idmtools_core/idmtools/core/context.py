@@ -1,3 +1,10 @@
+"""
+Manages the IDM context, mostly around the platform object.
+
+This context allows us to easily fetch what platforms we are executing on and also supported nested, multi-platform operations.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 from logging import getLogger
 from typing import TYPE_CHECKING
 
@@ -11,6 +18,15 @@ CURRENT_PLATFORM: 'IPlatform' = None
 
 
 def set_current_platform(platform: 'IPlatform'):
+    """
+    Set the current platform that is being used to execute scripts.
+
+    Args:
+        platform: Platform to set
+
+    Returns:
+        None
+    """
     global CURRENT_PLATFORM, current_platform_stack
     if CURRENT_PLATFORM and CURRENT_PLATFORM != platform and platform not in current_platform_stack:
         current_platform_stack.append(CURRENT_PLATFORM)
@@ -18,6 +34,12 @@ def set_current_platform(platform: 'IPlatform'):
 
 
 def remove_current_platform():
+    """
+    Set CURRENT_PLATFORM to None and delete old platform object.
+
+    Returns:
+        None
+    """
     global CURRENT_PLATFORM, current_platform_stack
     old_current_platform = CURRENT_PLATFORM
     if len(current_platform_stack):
@@ -30,7 +52,7 @@ def remove_current_platform():
 
 def clear_context():
     """
-    Clear all platforms from context
+    Clear all platforms from context.
     """
     global CURRENT_PLATFORM, current_platform_stack
     old_current_platform = CURRENT_PLATFORM
@@ -41,6 +63,6 @@ def clear_context():
 
 def get_current_platform() -> 'IPlatform':
     """
-    Get current platform
+    Get current platform.
     """
     return CURRENT_PLATFORM

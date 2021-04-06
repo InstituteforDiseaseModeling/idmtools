@@ -1,10 +1,15 @@
+"""
+Tools to format different outputs for human consumption.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 from collections.abc import Iterable
 from typing import Type
 
 
 def on_off(test) -> str:
     """
-    Print on or off depending on boolean state of test
+    Print on or off depending on boolean state of test.
 
     Args:
         test: Boolean/object to check state
@@ -16,12 +21,31 @@ def on_off(test) -> str:
 
 
 def pluralize(word, plural_suffix="s"):
+    """
+    Convert work to plural form.
+
+    Args:
+        word: Word
+        plural_suffix: plural suffix. Default to s
+
+    Returns:
+        Pluralized string
+    """
     if isinstance(word, Iterable):
         return plural_suffix if len(word) > 1 else ""
     return plural_suffix if word > 1 else ""
 
 
 def verbose_timedelta(delta):
+    """
+    The verbose_timedelta provides ms accurate, human readable of a time delta.
+
+    Args:
+        delta:
+
+    Returns:
+        Time delta
+    """
     if isinstance(delta, float):
         if delta < 1:
             return "0 seconds"
@@ -51,20 +75,20 @@ def verbose_timedelta(delta):
 
 def get_qualified_class_name(cls: Type) -> str:
     """
-    Return the full class name for an object
+    Return the full class name for an object.
 
     Args:
         cls: Class object to get name
 
     Returns:
-
+        Fully qualified class name
     """
     return f'{cls.__module__}.{cls.__name__}'
 
 
 def get_qualified_class_name_from_obj(obj: object) -> str:
     """
-    Return the full class name from object
+    Return the full class name from object.
 
     Args:
         obj: Object

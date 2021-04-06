@@ -1,3 +1,8 @@
+"""
+idmtools CsvExperimentBuilder definition.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import pandas as pd
 import numpy as np
 from numbers import Number
@@ -14,10 +19,25 @@ class CsvExperimentBuilder(SimulationBuilder):
     """
 
     def __init__(self):
+        """
+        Initialize our CsvExperimentBuilder.
+        """
         super().__init__()
         self.SweepFunctions = []
 
     def add_sweeps_from_file(self, file_path, func_map=None, type_map=None, sep=","):
+        """
+        Create sweeps from a CSV file.
+
+        Args:
+            file_path: Path to file
+            func_map: Function map
+            type_map: Type
+            sep: CSV Seperator
+
+        Returns:
+            None
+        """
         if type_map is None:
             type_map = {}
         if func_map is None:
@@ -25,7 +45,7 @@ class CsvExperimentBuilder(SimulationBuilder):
 
         def strip_column(x):
             """
-            strip white spaces for Number type column
+            Strip white spaces for Number type column.
             """
             y = x.strip() if not isinstance(x, Number) else x
             return np.nan if y == '' else y
@@ -65,4 +85,5 @@ class CsvExperimentBuilder(SimulationBuilder):
             self.SweepFunctions.extend(product(*self.sweeps))
 
     def __iter__(self):
+        """Iterator."""
         yield from self.SweepFunctions

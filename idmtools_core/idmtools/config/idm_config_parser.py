@@ -1,3 +1,8 @@
+"""
+idmtools IdmConfig paraer, the main configuration engine for idmtools.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import copy
 import platform
 from pathlib import Path
@@ -17,6 +22,16 @@ user_logger = getLogger('user')
 
 
 def initialization(force=False):
+    """
+    Initialization decorator for configuration methods.
+
+    Args:
+        force: Force initialization
+
+    Returns:
+        Wrapper function
+    """
+
     def wrap(func):
         def wrapped_f(*args, **kwargs):
             IdmConfigParser.ensure_init(force=force)
@@ -48,7 +63,6 @@ class IdmConfigParser:
         Returns:
             An :class:`IdmConfigParser` instance.
         """
-
         if not cls._instance:
             cls._instance = super(IdmConfigParser, cls).__new__(cls)
             cls._instance._load_config_file(dir_path, file_name)
@@ -62,6 +76,16 @@ class IdmConfigParser:
 
     @classmethod
     def retrieve_dict_config_block(cls, field_type, section) -> Dict[str, Any]:
+        """
+        Retrieve dictionary config block.
+
+        Args:
+            field_type: Field type
+            section: Section to load
+
+        Returns:
+            Dictionary of the config block
+        """
         import ast
 
         inputs = copy.deepcopy(section)
@@ -99,8 +123,7 @@ class IdmConfigParser:
     @classmethod
     def _find_config(cls, dir_path: str = None, file_name: str = default_config) -> None:
         """
-        Recursively search for the INI configuration file starting from the **dir_path** provided
-        up to the root, stopping once one is found.
+        Recursively search for the INI configuration file starting from the **dir_path** provided up to the root, stopping once one is found.
 
         Args:
             dir_path: The directory to start looking for the INI configuration file.
@@ -123,8 +146,8 @@ class IdmConfigParser:
 
     @staticmethod
     def get_global_configuration_name() -> str:
-        """
-        Get Global Configuration Name
+        r"""
+        Get Global Configuration Name.
 
         Returns:
             On Windows, this returns %LOCALDATA%\\idmtools\\idmtools.ini
@@ -281,7 +304,7 @@ class IdmConfigParser:
     @classmethod
     def is_progress_bar_disabled(cls) -> bool:
         """
-        Are progress bars disabled
+        Are progress bars disabled.
 
         Returns:
             Return is progress bars should be enabled
@@ -291,7 +314,7 @@ class IdmConfigParser:
     @classmethod
     def is_output_enabled(cls) -> bool:
         """
-        Is output enabled
+        Is output enabled.
 
         Returns:
             Return if output should be disabled
@@ -363,7 +386,7 @@ class IdmConfigParser:
     @classmethod
     def display_config_block_details(cls, block):
         """
-        Display the values of a config block
+        Display the values of a config block.
 
         Args:
             block: Block to print
@@ -381,9 +404,10 @@ class IdmConfigParser:
     @initialization()
     def has_section(cls, section: str) -> bool:
         """
-        Does the config contain a section
+        Does the config contain a section.
+
         Args:
-            section:
+            section: Section to check for
 
         Returns:
             True if the section exists, False otherwise
@@ -393,6 +417,16 @@ class IdmConfigParser:
     @classmethod
     @initialization
     def has_option(cls, section: str, option: str):
+        """
+        Does the config have an option in specified section?
+
+        Args:
+            section: Section
+            option: Option
+
+        Returns:
+            True if config has option
+        """
         return cls._config.has_option(section, option, fallback=None)
 
     @classmethod

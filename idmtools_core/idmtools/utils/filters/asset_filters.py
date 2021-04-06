@@ -23,8 +23,12 @@ if typing.TYPE_CHECKING:
 def default_asset_file_filter(asset: 'TAsset') -> 'bool':
     """
     Default filter to leave out Python caching.
+
     This filter is used in the creation of
     :class:`~idmtools.assets.asset_collection.AssetCollection`, regardless of user filters.
+
+    Returns:
+        True if no files match default patterns of "__py_cache__" and ".pyc"
     """
     patterns = [
         "__pycache__",
@@ -40,24 +44,31 @@ def file_name_is(asset: 'TAsset', filenames: 'List[str]') -> 'bool':
     Args:
         asset: The asset to filter.
         filenames: List of filenames to filter on.
+
+    Returns:
+        True if asset.filename in filenames
     """
     return asset.filename in filenames
 
 
 def file_extension_is(asset: 'TAsset', extensions: 'List[str]') -> 'bool':
     """
-        Restrict filtering to assets with the indicated filetypes.
+    Restrict filtering to assets with the indicated filetypes.
 
-        Args:
-            asset: The asset to filter.
-            extensions: List of extensions to filter on.
-        """
+    Args:
+        asset: The asset to filter.
+        extensions: List of extensions to filter on.
+
+    Returns:
+        True if extension in extensions
+    """
     return asset.extension in extensions
 
 
 def asset_in_directory(asset: 'TAsset', directories: 'List[str]', base_path: str = None) -> 'bool':
     """
     Restrict filtering to assets within a given directory.
+
     This filter is not strict and simply checks if the directory portion is present in the assets absolute path.
 
     Args:

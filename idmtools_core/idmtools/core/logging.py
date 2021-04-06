@@ -1,3 +1,10 @@
+"""
+idmtools logging module.
+
+We configure our logging here, manage multi-process logging, alternate logging level, and additional utilities to manage logging.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import atexit
 import logging
 import os
@@ -23,8 +30,20 @@ CRITICAL = 50
 
 
 class SafeRotatingFileHandler(RotatingFileHandler):
+    """
+    SafeRotatingFileHandler allows us to handle errors that occur during roll-over of multi-process log events.
+    """
 
     def doRollover(self) -> None:
+        """
+        Perform rollover safely.
+
+        We loop and try to move the log file. If we encounter an issue, we try to retry three times.
+        If we failed after three times, we try a new process id appended to file name.
+
+        Returns:
+            None
+        """
         attempts = 0
         while True:
             try:
@@ -40,6 +59,9 @@ class SafeRotatingFileHandler(RotatingFileHandler):
 
 
 class IDMQueueListener(QueueListener):
+    """
+    IDMQueueListener provided a queue for multi-processing logging.
+    """
 
     def dequeue(self, block):
         """
@@ -56,13 +78,39 @@ class IDMQueueListener(QueueListener):
 
 
 class IDMQueueHandler(QueueHandler):
+    """
+    IDMQueueHandler provided a log handler that references a queue.
+    """
+
     def prepare(self, record):
+        """
+        Prepare a record for queuing.
+
+        Args:
+            record: Record to queue
+
+        Returns:
+            Queue record
+        """
         with suppress(ImportError):
             return super().prepare(record)
 
 
 class PrintHandler(logging.Handler):
+    """
+    A simple print handler. Used in cases where logging fails.
+    """
+
     def handle(self, record: logging.LogRecord) -> None:
+        """
+        Simple log handler that prints to stdout.
+
+        Args:
+            record: Record to print
+
+        Returns:
+            None
+        """
         print(record.message)
 
 
@@ -131,7 +179,7 @@ def setup_logging(level: Union[int, str] = logging.WARN, filename: str = 'idmtoo
 
 def setup_handlers(level: int, filename, console: bool = False, file_level: int = None):
     """
-    Setup Handlers for Global and user Loggers
+    Setup Handlers for Global and user Loggers.
 
     Args:
         level: Level for the common logger
@@ -167,13 +215,13 @@ def setup_handlers(level: int, filename, console: bool = False, file_level: int 
 
 def setup_user_logger(console: bool):
     """
-    Setup the user logger. This logger is meant for user output only
+    Setup the user logger. This logger is meant for user output only.
 
     Args:
-        console: Is Console enabled. If so, we don't install a user loger
+        console: Is Console enabled. If so, we don't install a user logger
 
     Returns:
-
+        None
     """
     from idmtools import IdmConfigParser
     # should we do colored log output. We only should if
@@ -190,7 +238,7 @@ def setup_user_logger(console: bool):
 
 def set_file_logging(file_level: int, formatter: logging.Formatter, filename: str):
     """
-    Set File Logging
+    Set File Logging.
 
     Args:
         file_level: File Level
@@ -219,7 +267,18 @@ def set_file_logging(file_level: int, formatter: logging.Formatter, filename: st
     return file_handler
 
 
-def create_file_handler(file_level, formatter, filename):
+def create_file_handler(file_level, formatter: logging.Formatter, filename: str):
+    """
+    Create a SafeRotatingFileHandler for idmtools.log.
+
+    Args:
+        file_level: Level to log to file
+        formatter: Formatter to set on the handler
+        filename: Filename to use
+
+    Returns:
+        SafeRotatingFileHandler with properties provided
+    """
     try:
         file_handler = SafeRotatingFileHandler(filename, maxBytes=(2 ** 20) * 10, backupCount=5)
         file_handler.setLevel(file_level)
@@ -230,6 +289,12 @@ def create_file_handler(file_level, formatter, filename):
 
 
 def reset_logging_handlers():
+    """
+    Reset all the logging handlers by removing the root handler.
+
+    Returns:
+        None
+    """
     with suppress(KeyError):
         # Remove all handlers associated with the root logger object.
         for handler in logging.root.handlers[:]:
@@ -237,6 +302,15 @@ def reset_logging_handlers():
 
 
 def exclude_logging_classes(items_to_exclude=None):
+    """
+    Exclude items from our logger by setting level to warning.
+
+    Args:
+        items_to_exclude: Items to exclude
+
+    Returns:
+        None
+    """
     if items_to_exclude is None:
         items_to_exclude = ['urllib3', 'COMPS', 'paramiko', 'matplotlib']
     # remove comps by default

@@ -1,3 +1,8 @@
+"""
+idmtools SimulationBuilder definition.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import inspect
 from functools import partial
 from inspect import signature
@@ -36,6 +41,9 @@ class SimulationBuilder:
     SIMULATION_ATTR = 'simulation'
 
     def __init__(self):
+        """
+        Constructor.
+        """
         self.sweeps = []
         self.count = 0
 
@@ -43,6 +51,7 @@ class SimulationBuilder:
                              values: Union[List[Any], Iterable]):
         """
         Add a parameter sweep definition.
+
         A sweep definition is composed of a function and a list of values to call the function with.
 
         Args:
@@ -112,10 +121,24 @@ class SimulationBuilder:
             self.count = len(values)
 
     def __iter__(self):
+        """
+        Iterator of the simulation builder.
+
+        We duplicate the generators here so we can loop over multiple times.
+
+        Returns:
+            The iterator
+        """
         old_sw, new_sw = duplicate_list_of_generators(self.sweeps)
 
         yield from product(*old_sw)
         self.sweeps = new_sw
 
     def __len__(self):
+        """
+        Total simulations to be built by builder. This is a Product of all total values for each sweep.
+
+        Returns:
+            Simulation count
+        """
         return self.count

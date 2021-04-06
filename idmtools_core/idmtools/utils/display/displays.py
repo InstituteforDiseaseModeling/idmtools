@@ -1,3 +1,8 @@
+"""
+Tools around displays and formatting.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 from abc import ABCMeta, abstractmethod
 from typing import Any
 from tabulate import tabulate
@@ -8,6 +13,7 @@ from idmtools.utils.collections import cut_iterable_to
 class IDisplaySetting(metaclass=ABCMeta):
     """
     Base class for a display setting.
+
     The child class needs to implement the :meth:`display` method.
 
     Includes:
@@ -17,16 +23,33 @@ class IDisplaySetting(metaclass=ABCMeta):
     """
 
     def __init__(self, header: str = None, field: str = None):
+        """
+        Initialize our IDisplaySetting.
+
+        Args:
+            header: Header for display
+            field: Optional field to display instead of object
+        """
         self.header = header
         self.field = field
 
     def get_object(self, obj: Any) -> Any:
+        """
+        Get object or field depending if field is set.
+
+        Args:
+            obj: Object to get
+
+        Returns:
+            Either obj.field or obj depending if self.field is set
+        """
         return getattr(obj, self.field) if self.field else obj
 
     @abstractmethod
     def display(self, obj: Any) -> str:
         """
         Display the object.
+
         Note that the attribute (identified by self.field) should be handled with :meth:`get_object`.
 
         Args:
@@ -44,6 +67,15 @@ class StringDisplaySetting(IDisplaySetting):
     """
 
     def display(self, obj):
+        """
+        Display object.
+
+        Args:
+            obj: Object to display
+
+        Returns:
+            String of object
+        """
         obj = self.get_object(obj)
         return str(obj)
 
@@ -55,6 +87,8 @@ class DictDisplaySetting(IDisplaySetting):
 
     def __init__(self, header: str = None, field: str = None, max_items: int = 10, flat: bool = False):
         """
+        DictDisplay.
+
         Args:
             header: Optional field header.
             field: The field in the object to consider.
@@ -66,6 +100,15 @@ class DictDisplaySetting(IDisplaySetting):
         self.flat = flat
 
     def display(self, obj: Any) -> str:
+        """
+        Display a dictionary.
+
+        Args:
+            obj: Object to display
+
+        Returns:
+            String display of object
+        """
         # Retrieve our object
         obj = self.get_object(obj)
 
@@ -96,6 +139,8 @@ class TableDisplay(IDisplaySetting):
 
     def __init__(self, columns, max_rows=5, field=None):
         """
+        Initialize our TableDisplay.
+
         Args:
            columns: A list of display settings.
            max_rows: The maximum number of rows to display.
@@ -105,7 +150,16 @@ class TableDisplay(IDisplaySetting):
         self.columns = columns
         self.max_rows = max_rows
 
-    def display(self, obj):
+    def display(self, obj) -> str:
+        """
+        Display our object as a table.
+
+        Args:
+            obj: Object to display
+
+        Returns:
+            Table represented as a string of the object
+        """
         # Retrieve our object
         obj = super().get_object(obj)
 

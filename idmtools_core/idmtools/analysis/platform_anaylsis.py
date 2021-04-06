@@ -1,3 +1,11 @@
+"""
+Platform Analysis is a wrapper to allow execution of analysis through SSMT vs Locally.
+
+Running remotely has great advantages over local execution with the biggest being more compute resources and less data transfer.
+Platform Analysis tries to make the process of running remotely similar to local execution.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import re
 from typing import List, Callable, Union, Type
 import inspect
@@ -15,23 +23,27 @@ user_logger = getLogger('user')
 
 
 class PlatformAnalysis:
+    """
+    PlatformAnalysis allows remote Analysis on the server.
+    """
 
     def __init__(self, platform: IPlatform, experiment_ids: List['str'], analyzers: List[Type[IAnalyzer]], analyzers_args=None, analysis_name: str = 'WorkItem Test', tags=None, additional_files: Union[FileList, AssetCollection, List[str]] = None, asset_collection_id=None,
                  asset_files: Union[FileList, AssetCollection, List[str]] = None, wait_till_done: bool = True,
                  idmtools_config: str = None, pre_run_func: Callable = None, wrapper_shell_script: str = None, verbose: bool = False):
         """
+        Initialize our platform analysis.
 
         Args:
             platform: Platform
-            experiment_ids:
-            analyzers:
-            analyzers_args:
-            analysis_name:
-            tags:
-            additional_files:
-            asset_collection_id:
-            asset_files:
-            wait_till_done:
+            experiment_ids: Experiment ids
+            analyzers: Analyzers to run
+            analyzers_args: Arguments for our analyzers
+            analysis_name: Analysis name
+            tags: Tags for the workitem
+            additional_files: Additional files for server analysis
+            asset_collection_id: Asset Collection to use
+            asset_files: Asset files to attach
+            wait_till_done: Wait until analysis is done
             idmtools_config: Optional path to idmtools.ini to use on server. Mostly useful for development
             pre_run_func: A function (with no arguments) to be executed before analysis starts on the remote server
             wrapper_shell_script: Optional path to a wrapper shell script. This script should redirect all arguments to command passed to it. Mostly useful for development purposes
@@ -66,6 +78,18 @@ class PlatformAnalysis:
         self.validate_args()
 
     def analyze(self, check_status=True):
+        """
+        Analyze remotely.
+
+        Args:
+            check_status: Should we check status
+
+        Returns:
+            None
+
+        Notes:
+            TODO: check_status is not being used
+        """
         command = self._prep_analyze()
 
         logger.debug(f"Command: {command}")
@@ -82,6 +106,12 @@ class PlatformAnalysis:
         logger.debug(f"Status: {self.wi.status}")
 
     def _prep_analyze(self):
+        """
+        Pre for analysis.
+
+        Returns:
+            None
+        """
         # Add the platform_analysis_bootstrap.py file to the collection
         dir_path = os.path.dirname(os.path.realpath(__file__))
         self.additional_files.add_or_replace_asset(os.path.join(dir_path, "platform_analysis_bootstrap.py"))
@@ -129,9 +159,24 @@ class PlatformAnalysis:
         return command
 
     def __pickle_analyzers(self, args_dict):
+        """
+        Pickle our analyzers and add as assets.
+
+        Args:
+            args_dict: Analyzer and args
+
+        Returns:
+            None
+        """
         self.additional_files.add_or_replace_asset(Asset(filename='analyzer_args.pkl', content=pickle.dumps(args_dict)))
 
     def __pickle_pre_run(self):
+        """
+        Pickle objects before we run and add items as assets.
+
+        Returns:
+            None
+        """
         source = inspect.getsource(self.pre_run_func).splitlines()
         space_base = 0
         while source[0][space_base] == " ":
@@ -144,6 +189,12 @@ class PlatformAnalysis:
         self.additional_files.add_or_replace_asset(Asset(filename="pre_run.py", content="\n".join(new_source)))
 
     def validate_args(self):
+        """
+        Validate arguments for the platform analysis and analyzers.
+
+        Returns:
+            None
+        """
         if self.analyzers_args is None:
             self.analyzers_args = [{}] * len(self.analyzers)
             return
@@ -159,4 +210,10 @@ class PlatformAnalysis:
             exit()
 
     def get_work_item(self):
+        """
+        Get work item using to run analysis job on server.
+
+        Returns:
+            Workflow item
+        """
         return self.wi
