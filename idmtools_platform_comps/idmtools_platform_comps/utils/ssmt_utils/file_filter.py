@@ -475,8 +475,7 @@ def apply_custom_filters(args: argparse.Namespace):
 
     1. Check if there is a pre_run_func(s) defined.
     1b) If there are pre-run funcs, run each of those
-    2) Is there an entity_filter_func. This function allows us to filter items(Experiment/Simulations/etc) directly.
-       If not defined, we use a default function returns true.
+    2) Is there an entity_filter_func. This function allows us to filter items(Experiment/Simulations/etc) directly. If not defined, we use a default function returns true.
     3) If filename format function is defined, we set that, otherwise we use the default which just uses the original file name
 
     Args:

@@ -7,7 +7,7 @@ import copy
 import collections
 from enum import Enum
 from itertools import product
-from typing import Tuple, List, Callable, Iterable
+from typing import Tuple, List, Callable, Iterable, Any
 
 from idmtools.builders import SimulationBuilder
 
