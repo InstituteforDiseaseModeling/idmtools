@@ -77,7 +77,7 @@ def execute(cmd: List['str'], cwd: str = base_directory, ignore_error: bool = Fa
 def process_output(output_line: str):
     """Process output line for display.
 
-    This function adds coloring, filters out output and strips non-ascii characters(Docker builds have some odd characters)
+    This function adds coloring, filters output, and strips non-ascii characters(Docker builds have some odd characters)
 
     Args:
         output_line: Output line
