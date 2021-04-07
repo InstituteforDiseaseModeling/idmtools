@@ -57,10 +57,10 @@ class CommandLine:
         Returns:
 
         """
-        self._raw_args.append(arg)
+        self._raw_args.append(str(arg))
 
     def add_option(self, option, value):
-        self._options[option] = value
+        self._options[option] = str(value)
 
     @property
     def options(self):
