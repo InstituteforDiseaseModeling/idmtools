@@ -8,6 +8,6 @@ flask~=1.1
 Flask-AutoIndex~=0.6.6
 flask_restful~=0.3.8
 Flask-SQLAlchemy~=2.4.4
-matplotlib~=3.3.4
+matplotlib~=3.4.1
 Werkzeug==1.0.1
 numpy!=1.19.4
