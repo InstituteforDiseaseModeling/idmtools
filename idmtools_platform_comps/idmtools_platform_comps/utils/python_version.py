@@ -1,15 +1,26 @@
+"""idmtools special comps hooks.
+
+Notes:
+    - TODO update this to use new function plugins
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 SLURM_ENVIRONMENTS = ['slurmdev', 'slurm2', 'slurmstage', 'calculon']
 PYTHON_EXECUTABLE = 'python3'
 
 
 def platform_task_hooks(task, platform):
     """
-    Update task with new python command: python3
+    Update python task with proper python executable.
+
     Args:
         task: PythonTask or CommandTask
         platform: the platform user uses
 
     Returns: re-build task
+
+    Notes:
+        - TODO revisit with SingularityTasks later
     """
     try:
         from idmtools_models.python.python_task import PythonTask

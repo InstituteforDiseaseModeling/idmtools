@@ -1,3 +1,8 @@
+"""idmtools comps cli comands.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
+# flake8: D301
 import glob
 import json as json_parser
 import os
@@ -17,14 +22,17 @@ user_logger = getLogger('user')
 
 def add_item(assets: AssetCollection, file: str):
     """
-    Add Item
+    Add Item.
 
     Args:
         assets: Assets
         file: File or Directory
 
     Returns:
+        None
 
+    Raises:
+        FileNotFoundError if file cannot be found.
     """
     if os.path.isdir(file):
         assets.add_directory(file)
@@ -38,7 +46,9 @@ def add_item(assets: AssetCollection, file: str):
 try:
 
     class StaticCredentialPrompt(CredentialPrompt):
+        """Provides a class to allow login to comps from a username password that is static or provided."""
         def __init__(self, comps_url, username, password):
+            """Constructor."""
             if (comps_url is None) or (username is None) or (password is None):
                 raise RuntimeError('Missing comps_url, or username or password')
             self._times_prompted = 0
@@ -47,6 +57,7 @@ try:
             self.password = password
 
         def prompt(self):
+            """Return our stores username and password."""
             self._times_prompted = self._times_prompted + 1
             if self._times_prompted > 3:
                 raise PermissionError('Failure authenticating')
@@ -64,17 +75,18 @@ try:
     @click.pass_context
     def comps(ctx: click.Context, config_block):
         """
-        Commands related to managing the COMPS platform
+        Commands related to managing the COMPS platform.
 
         CONFIG_BLOCK - Name of configuration section or alias to load COMPS connection information from
         """
         ctx.obj = dict(config_block=config_block)
 
+
     @comps.command(help="Login to COMPS")
     @click.option('--username', required=True, help="Username")
     @click.option('--password', help="Password")
     @click.pass_context
-    def login(ctx: click.Context, username, password):
+    def login(ctx: click.Context, username, password):  # noqa D103
         from COMPS import Client
         from idmtools.core.logging import SUCCESS
         os.environ['IDMTOOLS_SUPPRESS_OUTPUT'] = '1'
@@ -119,7 +131,7 @@ try:
                   help="Extract zip after download")
     @click.option('--zip-name', default="output.zip", help="Name of zipfile")
     @click.pass_context
-    def download(
+    def download(  # noqa D103
             ctx: click.Context, pattern, exclude_pattern, experiment, simulation, work_item, asset_collection, dry_run,
             wait,
             include_assets, verbose, json, simulation_prefix_format_str, work_item_prefix_format_str, name, output_path,
@@ -221,7 +233,7 @@ try:
     @click.option('--id-filename', default=None,
                   help="Name of ID file to save build as. Required when id file is enabled")
     @click.pass_context
-    def assetize_outputs(
+    def assetize_outputs(  # noqa D103
             ctx: click.Context, pattern, exclude_pattern, experiment, simulation, work_item, asset_collection, dry_run,
             wait,
             include_assets, verbose, json, simulation_prefix_format_str, work_item_prefix_format_str, tag, name,
@@ -295,25 +307,24 @@ try:
                 ao.fetch_error()
             sys.exit(-1)
 
-    @comps.command()
-    @click.argument('requirement', type=click.Path(exists=True), required=False)
-    @click.option('--asset_tag', multiple=True, help="Tag to be added to AC. Format: 'key:value'")
-    @click.option('--pkg', multiple=True, help="Package for override. Format: 'key==value'")
-    @click.option('--wheel', multiple=True, help="Local wheel file")
-    @click.pass_context
-    def req2ac(ctx: click.Context, requirement: str = None, asset_tag: Optional[List[str]] = None,
-               pkg: Optional[List[str]] = None,
-               wheel: Optional[List[str]] = None):
-        """
+
+    @comps.command(help="""
         \b
         Create ac from requirement file
         Args:
             asset_tag: tag to be added to ac
             pkg: package name (along with version)
             wheel: package wheel file
-        """
-        from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection import \
-            RequirementsToAssetCollection
+        """)
+    @click.argument('requirement', type=click.Path(exists=True), required=False)
+    @click.option('--asset_tag', multiple=True, help="Tag to be added to AC. Format: 'key:value'")
+    @click.option('--pkg', multiple=True, help="Package for override. Format: 'key==value'")
+    @click.option('--wheel', multiple=True, help="Local wheel file")
+    @click.pass_context
+    def req2ac(ctx: click.Context, requirement: str = None, asset_tag: Optional[List[str]] = None,  # noqa D103
+               pkg: Optional[List[str]] = None,
+               wheel: Optional[List[str]] = None):
+        from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection import RequirementsToAssetCollection
 
         pkg_list = list(pkg)
         wheel_list = [os.path.abspath(w) for w in wheel]
@@ -328,22 +339,21 @@ try:
         ac_id = pl.run()
         print(ac_id)
 
-    @comps.command()
-    @click.argument('requirement', type=click.Path(exists=True), required=False)
-    @click.option('--pkg', multiple=True, help="Package used for override. Format: say, 'key==value'")
-    @click.option('--wheel', multiple=True, help="Local wheel file")
-    @click.pass_context
-    def ac_exist(ctx: click.Context, requirement: str = None, pkg: Optional[List[str]] = None,
-                 wheel: Optional[List[str]] = None):
-        """
+
+    @comps.command(help="""
         \b
         Check ac existing based on requirement file
         Args:
             pkg: package name (along with version)
             wheel: package wheel file
-        """
-        from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection import \
-            RequirementsToAssetCollection
+        """)
+    @click.argument('requirement', type=click.Path(exists=True), required=False)
+    @click.option('--pkg', multiple=True, help="Package used for override. Format: say, 'key==value'")
+    @click.option('--wheel', multiple=True, help="Local wheel file")
+    @click.pass_context
+    def ac_exist(ctx: click.Context, requirement: str = None, pkg: Optional[List[str]] = None, wheel: Optional[List[str]] = None):  # noqa D103
+        # TODO rename this and move to a subcommand for all the requirements functions
+        from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection import RequirementsToAssetCollection
 
         pkg_list = list(pkg)
         wheel_list = [os.path.abspath(w) for w in wheel]
@@ -356,8 +366,9 @@ try:
         else:
             print("AC doesn't exist")
 
+
     @comps.group(help="Singularity commands")
-    def singularity():
+    def singularity():  # noqa D103
         pass
 
     @singularity.command(help="Build Singularity Image")
@@ -385,7 +396,7 @@ try:
     @click.option('--id-workitem-filename', default=None,
                   help="Name of ID file to save workitem to. You need to enable --id-workitem for this is be active")
     @click.pass_context
-    def build(ctx: click.Context, common_input, common_input_glob, transient_input, transient_input_glob,
+    def build(ctx: click.Context, common_input, common_input_glob, transient_input, transient_input_glob,  # noqa D103
               definition_file, wait, tag, workitem_tag, name, force, image_name: str,
               id_file: str, id_filename: str, id_workitem: bool, id_workitem_failed: bool, id_workitem_filename: str):
         p: COMPSPlatform = Platform(ctx.obj['config_block'])
@@ -448,7 +459,7 @@ try:
     @click.option('--id-workitem-filename', default=None,
                   help="Name of ID file to save workitem to. You need to enable --id-workitem for this is be active")
     @click.pass_context
-    def pull(ctx: click.Context, image_url, wait, tag, workitem_tag, name, force, image_name: str, id_file: str,
+    def pull(ctx: click.Context, image_url, wait, tag, workitem_tag, name, force, image_name: str, id_file: str,  # noqa D103
              id_filename: str,
              id_workitem: bool, id_workitem_failed: bool, id_workitem_filename: str):
         p: COMPSPlatform = Platform(ctx.obj['config_block'])
@@ -481,5 +492,4 @@ try:
         sys.exit(0 if sb.succeeded else -1)
 
 except ImportError as e:
-    logger.warning(
-        f"COMPS CLI not enabled because a dependency is missing. Most likely it is either click or idmtools cli {e.args}")
+    logger.warning(f"COMPS CLI not enabled because a dependency is missing. Most likely it is either click or idmtools cli {e.args}")

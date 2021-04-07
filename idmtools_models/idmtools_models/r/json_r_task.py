@@ -1,3 +1,7 @@
+"""idmtools jsonr task.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 from dataclasses import dataclass, field
 from typing import Optional, List, Type, Union, TYPE_CHECKING
 from idmtools.assets import AssetCollection

@@ -1,3 +1,7 @@
+"""idmtools json configured task.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import json
 from dataclasses import dataclass, field, fields
 from functools import partial

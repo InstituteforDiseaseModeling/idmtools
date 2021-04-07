@@ -1,3 +1,7 @@
+"""idmtools python task.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import os
 from dataclasses import dataclass, field
 from logging import getLogger, DEBUG

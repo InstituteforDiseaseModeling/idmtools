@@ -1,3 +1,7 @@
+"""idmtools ssmt file filter tools.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import argparse
 import glob
 import json
@@ -37,6 +41,7 @@ EntityFilterFunc = Callable[[CommissionableEntity.CommissionableEntity], bool]
 
 
 def get_common_parser(app_description):
+    """Creates a get common argument parser used with file filter function."""
     parser = argparse.ArgumentParser(app_description)
     parser.add_argument("--file-pattern", nargs="+", help="File Pattern to Filter")
     parser.add_argument("--exclude-pattern", default=None, nargs="+", help="Exclude File Pattern to Filter")
@@ -58,7 +63,7 @@ def get_common_parser(app_description):
 
 def gather_files(directory: str, file_patterns: List[str], exclude_patterns: List[str] = None, assets: bool = False, prefix: str = None, filename_format_func: FilenameFormatFunction = None) -> SetOfAssets:
     """
-    Gather file_list
+    Gather file_list.
 
     Args:
         directory: Directory to gather from
@@ -69,7 +74,7 @@ def gather_files(directory: str, file_patterns: List[str], exclude_patterns: Lis
         filename_format_func: Function that can format the filename
 
     Returns:
-
+        Return files that match patterns.
     """
     from idmtools.utils.hashing import calculate_md5
     file_list = set()
@@ -114,6 +119,7 @@ def gather_files(directory: str, file_patterns: List[str], exclude_patterns: Lis
 
 def is_file_excluded(filename: str, exclude_patterns: List[str]) -> bool:
     """
+    Is file excluded by excluded patterns.
 
     Args:
         filename: File to filter
@@ -131,7 +137,7 @@ def is_file_excluded(filename: str, exclude_patterns: List[str]) -> bool:
 def gather_files_from_related(work_item: WorkItem, file_patterns: List[str], exclude_patterns: List[str], assets: bool, simulation_prefix_format_str: str, work_item_prefix_format_str: str, entity_filter_func: EntityFilterFunc,
                               filename_format_func: FilenameFormatFunction) -> SetOfAssets:  # pragma: no cover
     """
-    Gather files from different related entities
+    Gather files from different related entities.
 
     Args:
         work_item: Work item to gather from
@@ -174,7 +180,7 @@ def gather_files_from_related(work_item: WorkItem, file_patterns: List[str], exc
 def filter_experiments(assets: bool, entity_filter_func: EntityFilterFunc, exclude_patterns_compiles: List, file_patterns: List[str], futures: List[Future], pool: ThreadPoolExecutor, simulation_prefix_format_str: str, work_item: WorkItem,
                        filename_format_func: FilenameFormatFunction):  # pragma: no cover
     """
-    Filter Experiments outputs using our patterns
+    Filter Experiments outputs using our patterns.
 
     Args:
         assets: Assets to filter
@@ -185,9 +191,10 @@ def filter_experiments(assets: bool, entity_filter_func: EntityFilterFunc, exclu
         pool: Pool to execute jobs on
         simulation_prefix_format_str: Format string for prefix of Simulations
         work_item: Parent WorkItem
+        filename_format_func: Function to filter filenames
 
     Returns:
-
+        None
     """
     # Start with experiments since they are the most complex portion
     experiments: List[Experiment] = work_item.get_related_experiments()
@@ -209,7 +216,7 @@ def filter_experiments(assets: bool, entity_filter_func: EntityFilterFunc, exclu
 
 def get_simulation_prefix(parent_work_item: WorkItem, simulation: Simulation, simulation_prefix_format_str: str, experiment: Experiment = None) -> str:
     """
-    Get Simulation Prefix
+    Get Simulation Prefix.
 
     Args:
         parent_work_item: Parent workitem
@@ -230,7 +237,7 @@ def filter_experiment_assets(
         work_item: WorkItem, assets: bool, entity_filter_func: EntityFilterFunc, exclude_patterns_compiles: List, experiment: Experiment, file_patterns: List[str],
         futures: List[Future], pool: ThreadPoolExecutor, simulation_prefix_format_str: str, simulations: List[Simulation], filename_format_func: FilenameFormatFunction):  # pragma: no cover
     """
-    Filter experiment assets. This method uses the first simulation to gather experiment assets
+    Filter experiment assets. This method uses the first simulation to gather experiment assets.
 
     Args:
         work_item: Parent Workitem
@@ -244,8 +251,9 @@ def filter_experiment_assets(
         simulation_prefix_format_str: Format string for simulation
         simulations: List of simulations
         filename_format_func: Name function for filename
-    Returns:
 
+    Returns:
+        None
     """
     # If we should gather assets, use the first simulation. It means we will duplicate some work, but the set will filter out duplicated
     if assets:
@@ -265,7 +273,7 @@ def filter_experiment_assets(
 def filter_simulations_files(assets: bool, entity_filter_func: EntityFilterFunc, exclude_patterns_compiles: List, file_patterns: List[str], futures: List[Future], pool: ThreadPoolExecutor, simulation_prefix_format_str: str, work_item: WorkItem,
                              filename_format_func: FilenameFormatFunction):  # pragma: no cover
     """
-    Filter Simulations files
+    Filter Simulations files.
 
     Args:
         assets: Whether assets should be matched
@@ -279,7 +287,7 @@ def filter_simulations_files(assets: bool, entity_filter_func: EntityFilterFunc,
         filename_format_func: Filename function
 
     Returns:
-
+        None
     """
     # Here we loop through simulations directly added by user. We do not
     simulations: List[Simulation] = work_item.get_related_simulations()
@@ -289,7 +297,8 @@ def filter_simulations_files(assets: bool, entity_filter_func: EntityFilterFunc,
 def filter_simulation_list(assets: bool, entity_filter_func: EntityFilterFunc, exclude_patterns_compiles: List, file_patterns: List[str], futures: List[Future], pool: ThreadPoolExecutor, simulation_prefix_format_str: str, simulations: List[Simulation], work_item: WorkItem,
                            experiment: Experiment = None, filename_format_func: FilenameFormatFunction = None):  # pragma: no cover
     """
-    Filter simulations list. This method is used for experiments and simulations
+    Filter simulations list. This method is used for experiments and simulations.
+
     Args:
         assets: Whether assets should be matched
         entity_filter_func: Entity Filter Function
@@ -304,7 +313,7 @@ def filter_simulation_list(assets: bool, entity_filter_func: EntityFilterFunc, e
         filename_format_func: Filename function
 
     Returns:
-
+        None
     """
     for simulation in simulations:
         if entity_filter_func(simulation):
@@ -319,7 +328,7 @@ def filter_simulation_list(assets: bool, entity_filter_func: EntityFilterFunc, e
 def filter_work_items_files(assets: bool, entity_filter_func: EntityFilterFunc, exclude_patterns_compiles: List, file_patterns: List[str], futures: List[Future], pool: ThreadPoolExecutor, work_item: WorkItem, work_item_prefix_format_str: str,
                             filename_format_func: FilenameFormatFunction):  # pragma: no cover
     """
-    Filter work items files
+    Filter work items files.
 
     Args:
         assets: Whether assets should be matched
@@ -333,7 +342,7 @@ def filter_work_items_files(assets: bool, entity_filter_func: EntityFilterFunc, 
         filename_format_func: Filename function
 
     Returns:
-
+        None
     """
     # Here we loop through workitems
     work_items: List[WorkItem] = work_item.get_related_work_items()
@@ -347,16 +356,15 @@ def filter_work_items_files(assets: bool, entity_filter_func: EntityFilterFunc, 
 
 def filter_ac_files(wi: WorkItem, patterns, exclude_patterns) -> List[AssetCollectionFile]:  # pragma: no cover
     """
-    Filter Asset Collection File
+    Filter Asset Collection File.
 
     Args:
         wi: WorkItem
         patterns: File patterns
         exclude_patterns: Exclude patterns
-        filename_format_func: Filename format function
 
     Returns:
-
+        List of filters asset collection files
     """
     if logger.isEnabledFor(DEBUG):
         logger.debug('Filtering asset collections')
@@ -376,22 +384,38 @@ def filter_ac_files(wi: WorkItem, patterns, exclude_patterns) -> List[AssetColle
 
 
 def get_asset_file_path(file):
+    """
+    Get asset file path which combined the relative path and filename if relative path is set.
+
+    Otherwise we use just the filename.
+
+    Args:
+        file: Filename
+
+    Returns:
+        Filename
+    """
     return os.path.join(file.relative_path, file.file_name) if file.relative_path else file.file_name
 
 
 class DuplicateAsset(Exception):
+    """Error for when we encountered output paths that overlap."""
     doc_link: str = "platforms/comps/assetize_output.html#errors"
 
 
 def ensure_no_duplicates(ac_files, files):  # pragma: no cover
     """
-    Ensure no duplicates are in asset
+    Ensure no duplicates are in asset.
+
     Args:
         ac_files: Ac files
         files: Simulation/Experiment/Workitem files
 
     Returns:
+        None
 
+    Raises:
+        DuplicateAsset - if asset with same output path is found
     """
     dest_paths = defaultdict(int)
     for file in ac_files:
@@ -417,14 +441,14 @@ def ensure_no_duplicates(ac_files, files):  # pragma: no cover
 
 def print_results(ac_files, files):  # pragma: no cover
     """
-    Print Results
+    Print Results.
 
     Args:
         ac_files: Ac Files
         files: Files
 
     Returns:
-
+        None
     """
     all_files = []
     for file in files:
@@ -444,6 +468,23 @@ def print_results(ac_files, files):  # pragma: no cover
 
 
 def apply_custom_filters(args: argparse.Namespace):
+    """
+    Apply user defined custom filter functions.
+
+    The function does the following workflow.
+
+    1. Check if there is a pre_run_func(s) defined.
+    1b) If there are pre-run funcs, run each of those
+    2) Is there an entity_filter_func. This function allows us to filter items(Experiment/Simulations/etc) directly.
+       If not defined, we use a default function returns true.
+    3) If filename format function is defined, we set that, otherwise we use the default which just uses the original file name
+
+    Args:
+        args: argparse namespace.
+
+    Returns:
+        entity_filter_func and filename format func
+    """
     if args.pre_run_func:
         import pre_run
         for pre_run_func in args.pre_run_func:
@@ -476,6 +517,17 @@ def apply_custom_filters(args: argparse.Namespace):
 
 
 def parse_filter_args_common(args: argparse.Namespace):
+    """
+    Parse filter arguments from an argparse namespace.
+
+    We need this because we use filtering across multiple scripts.
+
+    Args:
+        args: Argparse args
+
+    Returns:
+        entity_filter_func and filename formart func
+    """
     if args.verbose:
         setup_verbose(args)
     if "**" in args.file_pattern:
@@ -495,6 +547,18 @@ def parse_filter_args_common(args: argparse.Namespace):
 
 
 def filter_files_and_assets(args: argparse.Namespace, entity_filter_func: EntityFilterFunc, wi: WorkItem, filename_format_func: FilenameFormatFunction) -> Tuple[SetOfAssets, List[AssetCollectionFile]]:
+    """
+    Filter files and assets using provided parameters.
+
+    Args:
+        args: Argparse details
+        entity_filter_func: Optional filter function for entities. This function is ran on every item. If it returns true, we return the item
+        wi: WorkItem we are running in
+        filename_format_func: Filename format function allows use to customize how we filter filenames for output.
+
+    Returns:
+        Files that matches the filter and the assets that matches the filter as well.
+    """
     files = gather_files_from_related(
         wi, file_patterns=args.file_pattern, exclude_patterns=args.exclude_pattern if args.exclude_pattern else [], assets=args.assets,
         work_item_prefix_format_str=args.work_item_prefix_format_str,

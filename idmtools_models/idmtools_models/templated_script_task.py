@@ -1,3 +1,7 @@
+"""Provides the TemplatedScriptTask.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import copy
 import inspect
 import os

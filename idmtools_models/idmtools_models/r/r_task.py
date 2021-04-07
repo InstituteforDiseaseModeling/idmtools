@@ -1,3 +1,7 @@
+"""idmtools rtask.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import os
 from dataclasses import field, dataclass
 from logging import getLogger, DEBUG
