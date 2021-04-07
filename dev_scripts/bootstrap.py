@@ -52,7 +52,7 @@ logger = getLogger("bootstrap")
 
 
 def execute(cmd: List['str'], cwd: str = base_directory, ignore_error: bool = False) -> Generator[str, None, None]:
-    """Runs a command and filter output.
+    """Runs a command and filters output.
 
     Args:
         cmd: Command to run
