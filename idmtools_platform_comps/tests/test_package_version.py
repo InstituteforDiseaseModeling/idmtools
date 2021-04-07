@@ -15,6 +15,7 @@ wheel_file_2 = os.path.join(COMMON_INPUT_PATH, 'simple_load_lib_example', 'fake_
 
 @pytest.mark.comps
 @allure.story("CLI")
+@pytest.mark.serial
 class TestPackageVersionCLI(unittest.TestCase):
 
     @classmethod
@@ -22,7 +23,7 @@ class TestPackageVersionCLI(unittest.TestCase):
         pass
 
     @allure.feature("req2ac")
-    @pytest.mark.serial
+
     # cli: idmtools comps SLURM2 req2ac --asset_tag test:123 --pkg astor~=0.7.0
     def test_create_ac_with_req2ac(self):
         # run req2ac to get ac_id
