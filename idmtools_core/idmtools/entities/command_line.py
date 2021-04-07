@@ -45,7 +45,7 @@ class CommandLine:
         self._executable = executable
 
     def add_argument(self, arg):
-        self._args.append(arg)
+        self._args.append(str(arg))
 
     def add_raw_argument(self, arg):
         """
