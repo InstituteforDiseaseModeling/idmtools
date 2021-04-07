@@ -131,7 +131,7 @@ def install_base_environment(pip_url):
     We then uninstall py-make
     We then install idm-buildtools
 
-    Lastly, we create a idmtools ini in example for developers
+    Lastly, we create an idmtools ini in example for developers
     """
     # install wheel first to benefit from binaries
     for line in execute(["pip", "install", "wheel", f"--extra-index-url={pip_url}"]):
