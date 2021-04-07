@@ -2,7 +2,7 @@ import inspect
 from functools import partial
 from inspect import signature
 from itertools import product
-from typing import Callable, Any, List, Iterable, Union, Dict
+from typing import Callable, Any, Iterable, Union, Dict
 from idmtools.entities.simulation import Simulation
 from idmtools.utils.collections import duplicate_list_of_generators
 
