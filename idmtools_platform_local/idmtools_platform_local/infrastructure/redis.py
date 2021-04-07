@@ -1,3 +1,7 @@
+"""idmtools redis service.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import os
 import platform
 from dataclasses import dataclass
@@ -11,6 +15,9 @@ logger = getLogger(__name__)
 
 @dataclass
 class RedisContainer(BaseServiceContainer):
+    """
+    Provides the redis container for local platform.
+    """
     host_data_directory: str = None
     mem_limit: str = '256m'
     mem_reservation: str = '64m'
@@ -22,11 +29,18 @@ class RedisContainer(BaseServiceContainer):
     config_prefix: str = 'redis_'
 
     def __post_init__(self):
+        """Constructor."""
         system_info = get_system_information()
         if self.run_as is None:
             self.run_as = system_info.user_group_str
 
     def get_configuration(self) -> dict:
+        """
+        Get our configuration to run redis.
+
+        Returns:
+            Redis config.
+        """
         # check if we are using the host data path or using a data volume to mount data
         if self.data_volume_name:
             logger.debug(f"Specifying Data directory using named volume {self.data_volume_name}")

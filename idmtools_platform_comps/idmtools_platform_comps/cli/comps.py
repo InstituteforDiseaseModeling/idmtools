@@ -81,7 +81,6 @@ try:
         """
         ctx.obj = dict(config_block=config_block)
 
-
     @comps.command(help="Login to COMPS")
     @click.option('--username', required=True, help="Username")
     @click.option('--password', help="Password")
@@ -307,7 +306,6 @@ try:
                 ao.fetch_error()
             sys.exit(-1)
 
-
     @comps.command(help="""
         \b
         Create ac from requirement file
@@ -339,7 +337,6 @@ try:
         ac_id = pl.run()
         print(ac_id)
 
-
     @comps.command(help="""
         \b
         Check ac existing based on requirement file
@@ -365,7 +362,6 @@ try:
             print("AC exist: ", ac.id)
         else:
             print("AC doesn't exist")
-
 
     @comps.group(help="Singularity commands")
     def singularity():  # noqa D103
