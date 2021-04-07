@@ -51,10 +51,6 @@ experiment.tags["tag1"] = 1
 # And maybe some custom Experiment Level Assets
 experiment.assets.add_directory(assets_directory=os.path.join("inputs", "python_model_with_deps", "Assets"))
 
-platform = Platform('CALCULON')
-experiment.run()
-
-# customized wait interval
-platform.wait_till_done(experiment, refresh_interval=1)
-# use system status as the exit code
-sys.exit(0 if experiment.succeeded else -1)
+with Platform('CALCULON'):
+    experiment.run(wait_until_done=True)
+    sys.exit(0 if experiment.succeeded else -1)

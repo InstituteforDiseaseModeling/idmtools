@@ -25,7 +25,9 @@ experiment = Experiment(name=os.path.split(sys.argv[0])[1], simulations=ts)
 platform = Platform('CALCULON')
 experiment.run()
 
-# customized wait interval to 1 second
+# customized wait interval to 1 second.
+# *** BE CAUTIOUS to change refresh_interval to 1 (second) ***
+# default is 5 seconds which may good enough for most of cases.
 platform.wait_till_done(experiment, refresh_interval=1)
 # use system status as the exit code
 sys.exit(0 if experiment.succeeded else -1)
