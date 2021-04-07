@@ -20,7 +20,7 @@ user_logger = getLogger('user')
 @dataclass
 class JSONConfiguredTask(ITask):
     """
-    Defines an extensible simple task that implements functionality through optional supplied use hooks
+    Defines an extensible simple task that implements functionality through optional supplied use hooks.
     """
 
     # Note: large amounts of parameters will increase size of metadata
@@ -37,6 +37,7 @@ class JSONConfiguredTask(ITask):
     command_line_argument_no_filename: bool = field(default=False)
 
     def __post_init__(self):
+        """Constructor."""
         super().__post_init__()
         if self.parameters is not None and self.envelope is not None and self.envelope in self.parameters:
             logger.debug(f'Loading parameters from envelope: {self.envelope}')
@@ -44,7 +45,7 @@ class JSONConfiguredTask(ITask):
 
     def gather_common_assets(self) -> AssetCollection:
         """
-        Gather assets common across an Experiment(Set of Simulations)
+        Gather assets common across an Experiment(Set of Simulations).
 
         Returns:
             Common AssetCollection
@@ -55,7 +56,7 @@ class JSONConfiguredTask(ITask):
 
     def gather_transient_assets(self) -> AssetCollection:
         """
-        Gather assets that are unique to this simulation/worktiem
+        Gather assets that are unique to this simulation/worktiem.
 
         Returns:
             Simulation/workitem level AssetCollection
@@ -65,7 +66,7 @@ class JSONConfiguredTask(ITask):
 
     def __dump_config(self, assets) -> None:
         """
-        Writes the configuration out to asset
+        Writes the configuration out to asset.
 
         Args:
             assets: Asset to add configuration too
@@ -83,14 +84,14 @@ class JSONConfiguredTask(ITask):
 
     def set_parameter(self, key: TJSONConfigKeyType, value: TJSONConfigValueType):
         """
-        Update a parameter. The type hinting encourages JSON supported types
+        Update a parameter. The type hinting encourages JSON supported types.
 
         Args:
             key: Config
             value:
 
         Returns:
-
+            Tags to be defined on the simulation/workitem
         """
         if logger.isEnabledFor(DEBUG):
             logger.info('Setting parameter %s to %s', key, str(value))
@@ -99,7 +100,7 @@ class JSONConfiguredTask(ITask):
 
     def get_parameter(self, key: TJSONConfigKeyType) -> TJSONConfigValueType:
         """
-        Returns a parameter value
+        Returns a parameter value.
 
         Args:
             key: Key of parameter
@@ -113,13 +114,13 @@ class JSONConfiguredTask(ITask):
 
     def update_parameters(self, values: Dict[TJSONConfigKeyType, TJSONConfigValueType]):
         """
-        Perform bulk update from another dictionary
+        Perform bulk update from another dictionary.
 
         Args:
-            values:
+            values: Values to update as dictionaryy
 
         Returns:
-
+            Values
         """
         if logger.isEnabledFor(DEBUG):
             for k, p in values.items():
@@ -130,7 +131,9 @@ class JSONConfiguredTask(ITask):
     def reload_from_simulation(self, simulation: 'Simulation', config_file_name: Optional[str] = None,
                                envelope: Optional[str] = None, **kwargs):  # noqa: F821
         """
-        Reload from Simulation. To do this, the process is
+        Reload from Simulation.
+
+        To do this, the process is
 
          1. First check for a configfile name from arguments, then tags, or the default name
          2. Load the json config file
@@ -155,13 +158,14 @@ class JSONConfiguredTask(ITask):
 
     def __find_config(self, simulation: Simulation, config_file_name: str = None) -> Dict[str, Any]:
         """
+        Used to rebuild configuration using simulation data that has been ran.
 
         Args:
-            simulation:
-            config_file_name:
+            simulation: Simulation to load from
+            config_file_name: Config file name
 
         Returns:
-
+            Config reloaded
         """
         # find the ocnfig
         if config_file_name:
@@ -204,6 +208,16 @@ class JSONConfiguredTask(ITask):
         return config
 
     def pre_creation(self, parent: Union['Simulation', 'WorkflowItem'], platform: 'IPlatform'):  # noqa: F821
+        """
+        Pre-creation. For JSONConfiguredTask, we finalize our configuration file and command line here.
+
+        Args:
+            parent: Parent of task
+            platform: Platform task is being created on
+
+        Returns:
+            None
+        """
         defaults = [x for x in fields(JSONConfiguredTask) if x.name == "config_file_name"][0].default
 
         if self.config_file_name != defaults:
@@ -225,24 +239,51 @@ class JSONConfiguredTask(ITask):
                     self.command.add_argument(self.config_file_name)
 
     def __repr__(self):
+        """String version of task Prints config filename and parameters."""
         return f"<JSONConfiguredTask config:{self.config_file_name} parameters: {self.parameters}"
 
     @staticmethod
     def set_parameter_sweep_callback(simulation: Simulation, param: str, value: Any) -> Dict[str, Any]:
+        """
+        Performs a callback with a parameter and a value. Most likely users want to use set_parameter_partial instead of this method.
+
+        Args:
+            simulation: Simulation object
+            param: Param name
+            value: Value to set
+
+        Returns:
+            Tags to add to simulation
+        """
         if not hasattr(simulation.task, 'set_parameter'):
             raise ValueError("update_task_with_set_parameter can only be used on tasks with a set_parameter")
         return simulation.task.set_parameter(param, value)
 
     @classmethod
     def set_parameter_partial(cls, parameter: str):
+        """
+        Callback to be used when sweeping with a json configured model.
+
+        Args:
+            parameter: Param name
+
+        Returns:
+            Partial setting a specific parameter
+
+        Notes:
+            - TODO Reference some examples code here
+        """
         return partial(cls.set_parameter_sweep_callback, param=parameter)
 
 
 class JSONConfiguredTaskSpecification(TaskSpecification):
+    """
+    JSONConfiguredTaskSpecification defines the plugin specs for JSONConfiguredTask.
+    """
 
     def get(self, configuration: dict) -> JSONConfiguredTask:
         """
-        Get instance of JSONConfiguredTask with configuration specified
+        Get instance of JSONConfiguredTask with configuration specified.
 
         Args:
             configuration: Configuration for configuration
@@ -254,7 +295,7 @@ class JSONConfiguredTaskSpecification(TaskSpecification):
 
     def get_description(self) -> str:
         """
-        Get description for plugin
+        Get description for plugin.
 
         Returns:
             Description of plugin
@@ -263,7 +304,7 @@ class JSONConfiguredTaskSpecification(TaskSpecification):
 
     def get_example_urls(self) -> List[str]:
         """
-        Get list of urls with examples for JSONConfiguredTask
+        Get list of urls with examples for JSONConfiguredTask.
 
         Returns:
             List of urls that point to examples relating to JSONConfiguredTask
@@ -274,7 +315,7 @@ class JSONConfiguredTaskSpecification(TaskSpecification):
 
     def get_type(self) -> Type[JSONConfiguredTask]:
         """
-        Get task type provided by plugin
+        Get task type provided by plugin.
 
         Returns:
             JSONConfiguredTask
@@ -283,7 +324,7 @@ class JSONConfiguredTaskSpecification(TaskSpecification):
 
     def get_version(self) -> str:
         """
-        Returns the version of the plugin
+        Returns the version of the plugin.
 
         Returns:
             Plugin Version

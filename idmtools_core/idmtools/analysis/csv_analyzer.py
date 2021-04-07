@@ -16,7 +16,6 @@ class CSVAnalyzer(IAnalyzer):
     Provides an analyzer for CSV output.
 
     Examples:
-
         .. _simple-csv-example:
 
         Simple Example

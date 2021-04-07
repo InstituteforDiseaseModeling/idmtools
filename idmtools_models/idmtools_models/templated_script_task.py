@@ -47,7 +47,7 @@ LINUX_DICT_TO_ENVIRONMENT = LINUX_DICT_TO_ENVIRONMENT + LINUX_BASE_WRAPPER
 @dataclass()
 class TemplatedScriptTask(ITask):
     """
-    Defines a task to run a script using a template. Best suited to shell scripts
+    Defines a task to run a script using a template. Best suited to shell scripts.
 
     Examples:
         In this example, we add modify the Python Path using TemplatedScriptTask and LINUX_PYTHON_PATH_WRAPPER
@@ -82,6 +82,7 @@ class TemplatedScriptTask(ITask):
     gather_transient_asset_hooks: List[Callable[[ITask], AssetCollection]] = field(default_factory=list)
 
     def __post_init__(self):
+        """Constructor."""
         super().__post_init__()
         if self.script_path is None and self.template_file is None:
             raise ValueError("Either script name or template file is required")
@@ -117,7 +118,8 @@ class TemplatedScriptTask(ITask):
     def _add_template_to_asset_collection(task: 'TemplatedScriptTask', asset_collection: AssetCollection) -> \
             AssetCollection:
         """
-        Add our rendered template to the asset collection
+        Add our rendered template to the asset collection.
+
         Args:
             task: Task to add
             asset_collection:Asset collection
@@ -146,7 +148,7 @@ class TemplatedScriptTask(ITask):
 
     def gather_common_assets(self) -> AssetCollection:
         """
-        Gather common(experiment-level) assets for task
+        Gather common(experiment-level) assets for task.
 
         Returns:
             AssetCollection containing common assets
@@ -159,7 +161,7 @@ class TemplatedScriptTask(ITask):
 
     def gather_transient_assets(self) -> AssetCollection:
         """
-        Gather transient(experiment-level) assets for task
+        Gather transient(experiment-level) assets for task.
 
         Returns:
             AssetCollection containing transient assets
@@ -174,13 +176,13 @@ class TemplatedScriptTask(ITask):
 
     def reload_from_simulation(self, simulation: Simulation):
         """
-        Reload a templated script task. When reloading, you will only have the rendered template available
+        Reload a templated script task. When reloading, you will only have the rendered template available.
 
         Args:
             simulation:
 
         Returns:
-
+            None
         """
         # check experiment level assets for our script
         if simulation.parent.assets:
@@ -196,7 +198,7 @@ class TemplatedScriptTask(ITask):
 
     def pre_creation(self, parent: Union[Simulation, IWorkflowItem], platform: 'IPlatform'):
         """
-        Before creating simulation, we need to set our command line
+        Before creating simulation, we need to set our command line.
 
         Args:
             parent: Parent object
@@ -232,8 +234,7 @@ class TemplatedScriptTask(ITask):
 @dataclass()
 class ScriptWrapperTask(ITask):
     """
-    Allows you to wrap a script with another script
-
+    Allows you to wrap a script with another script.
 
     See Also:
         :py:class:`idmtools_models.templated_script_task.TemplatedScriptTask`
@@ -245,6 +246,7 @@ class ScriptWrapperTask(ITask):
     task: ITask = field(default=None)
 
     def __post_init__(self):
+        """Constructor."""
         if self.template_script_task is None:
             raise ValueError("Template Script Task is required")
 
@@ -258,18 +260,21 @@ class ScriptWrapperTask(ITask):
 
     @staticmethod
     def from_dict(task_dictionary: Dict[str, Any]):
+        """Load the task from a dictionary."""
         from idmtools.core.task_factory import TaskFactory
         task_args = {k: v for k, v in task_dictionary.items() if k not in ['task_type']}
         return TaskFactory().create(task_dictionary['task_type'], **task_args)
 
     @property
     def command(self):
+        """Our task property. Again, we have to overload this because of wrapping a task."""
         cmd = copy.deepcopy(self.template_script_task.command)
         cmd.add_raw_argument(str(self.task.command))
         return cmd
 
     @command.setter
     def command(self, value: Union[str, CommandLine]):
+        """Set our command. because we are wrapping a task, we have to overload this."""
         callers = []
         with suppress(KeyError, IndexError):
             callers = inspect.stack()[1:3]
@@ -285,17 +290,25 @@ class ScriptWrapperTask(ITask):
 
     @property
     def wrapped_task(self):
+        """
+        Our task we are wrapping with a shell script.
+
+        Returns:
+            Our wrapped task
+        """
         return self.task
 
     @wrapped_task.setter
     def wrapped_task(self, value: ITask):
+        """Set our wrapped task."""
         return None if isinstance(value, property) else value
 
     def gather_common_assets(self):
         """
-        Gather all the common assets
-        Returns:
+        Gather all the common assets.
 
+        Returns:
+            Common assets(Experiment Assets)
         """
         self.common_assets.add_assets(self.template_script_task.gather_common_assets())
         self.common_assets.add_assets(self.task.gather_common_assets())
@@ -303,9 +316,10 @@ class ScriptWrapperTask(ITask):
 
     def gather_transient_assets(self) -> AssetCollection:
         """
-        Gather all the transient assets
-        Returns:
+        Gather all the transient assets.
 
+        Returns:
+            Transient Assets(Simulation level assets)
         """
         self.transient_assets.add_assets(self.template_script_task.gather_transient_assets())
         self.transient_assets.add_assets(self.task.gather_transient_assets())
@@ -313,35 +327,49 @@ class ScriptWrapperTask(ITask):
 
     def reload_from_simulation(self, simulation: Simulation):
         """
-        Reload from simulation
+        Reload from simulation.
 
         Args:
             simulation: simulation
 
         Returns:
-
+            None
         """
         pass
 
     def pre_creation(self, parent: Union[Simulation, IWorkflowItem], platform: 'IPlatform'):
         """
-        Before creation, create the true command by adding the wrapper name
+        Before creation, create the true command by adding the wrapper name.
 
+        Here we call both our wrapped task and our template_script_task pre_creation
         Args:
             parent: Parent Task
             platform: Platform Templated Task is executing on
 
         Returns:
-
+            None
         """
         self.task.pre_creation(parent, platform)
         self.template_script_task.pre_creation(parent, platform)
 
     def post_creation(self, parent: Union[Simulation, IWorkflowItem], platform: 'IPlatform'):
+        """
+        Post creation of task.
+
+        Here we call both our wrapped task and our template_script_task post_creation
+
+        Args:
+            parent: Parent of task
+            platform: Platform we are running on
+
+        Returns:
+            None
+        """
         self.task.post_creation(parent, platform)
         self.template_script_task.post_creation(parent, platform)
 
     def __getattr__(self, item):
+        """Proxy get attr to child except for task item and items not in our object."""
         if item not in self.__dict__:
             return getattr(self.task, item)
         else:
@@ -352,7 +380,7 @@ def get_script_wrapper_task(task: ITask, wrapper_script_name: str, template_cont
                             template_file: str = None, template_is_common: bool = True,
                             variables: Dict[str, Any] = None, path_sep: str = '/') -> ScriptWrapperTask:
     """
-    Convenience function that will wrap a task for you with some defaults
+    Convenience function that will wrap a task for you with some defaults.
 
     Args:
         task: Task to wrap
@@ -389,7 +417,7 @@ def get_script_wrapper_windows_task(task: ITask, wrapper_script_name: str = 'wra
                                     template_file: str = None, template_is_common: bool = True,
                                     variables: Dict[str, Any] = None) -> ScriptWrapperTask:
     """
-    Get wrapper script task for windows platforms
+    Get wrapper script task for windows platforms.
 
     The default content wraps a another task with a batch script that exports the variables to the run environment defined in variables. To modify python path, use WINDOWS_PYTHON_PATH_WRAPPER
 
@@ -419,36 +447,40 @@ def get_script_wrapper_unix_task(task: ITask, wrapper_script_name: str = 'wrappe
                                  template_file: str = None, template_is_common: bool = True,
                                  variables: Dict[str, Any] = None):
     """
-        Get wrapper script task for unix platforms
+    Get wrapper script task for unix platforms.
 
-        The default content wraps a another task with a bash script that exports the variables to the run environment defined in variables. To modify python path, you can use LINUX_PYTHON_PATH_WRAPPER
+    The default content wraps a another task with a bash script that exports the variables to the run environment defined in variables. To modify python path, you can use LINUX_PYTHON_PATH_WRAPPER
 
-        You can adapt this script to modify any pre-scripts you need or call others scripts in succession
+    You can adapt this script to modify any pre-scripts you need or call others scripts in succession
 
-        Args:
-            task: Task to wrap
-            wrapper_script_name: Wrapper script name(defaults to wrapper.sh)
-            template_content:  Template Content
-            template_file: Template File
-            template_is_common: Is the template experiment level
-            variables: Variables for template
+    Args:
+        task: Task to wrap
+        wrapper_script_name: Wrapper script name(defaults to wrapper.sh)
+        template_content:  Template Content
+        template_file: Template File
+        template_is_common: Is the template experiment level
+        variables: Variables for template
 
-        Returns:
-            ScriptWrapperTask
+    Returns:
+        ScriptWrapperTask
 
-        See Also:
-        :class:`idmtools_models.templated_script_task.TemplatedScriptTask`
-        :func:`idmtools_models.templated_script_task.get_script_wrapper_task`
-        :func:`idmtools_models.templated_script_task.get_script_wrapper_windows_task`
-        """
+    See Also:
+    :class:`idmtools_models.templated_script_task.TemplatedScriptTask`
+    :func:`idmtools_models.templated_script_task.get_script_wrapper_task`
+    :func:`idmtools_models.templated_script_task.get_script_wrapper_windows_task`
+    """
     return get_script_wrapper_task(task, wrapper_script_name, template_content, template_file, template_is_common,
                                    variables, "/")
 
 
 class TemplatedScriptTaskSpecification(TaskSpecification):
+    """
+    TemplatedScriptTaskSpecification provides the plugin specs for TemplatedScriptTask.
+    """
+
     def get(self, configuration: dict) -> TemplatedScriptTask:
         """
-        Get instance of TemplatedScriptTask with configuration
+        Get instance of TemplatedScriptTask with configuration.
 
         Args:
             configuration: configuration for TemplatedScriptTask
@@ -460,7 +492,7 @@ class TemplatedScriptTaskSpecification(TaskSpecification):
 
     def get_description(self) -> str:
         """
-        Get description of plugin
+        Get description of plugin.
 
         Returns:
             Plugin description
@@ -469,7 +501,7 @@ class TemplatedScriptTaskSpecification(TaskSpecification):
 
     def get_example_urls(self) -> List[str]:
         """
-        Get example urls related to TemplatedScriptTask
+        Get example urls related to TemplatedScriptTask.
 
         Returns:
             List of urls that have examples related to CommandTask
@@ -478,7 +510,7 @@ class TemplatedScriptTaskSpecification(TaskSpecification):
 
     def get_type(self) -> Type[TemplatedScriptTask]:
         """
-        Get task type provided by plugin
+        Get task type provided by plugin.
 
         Returns:
             TemplatedScriptTask
@@ -487,7 +519,7 @@ class TemplatedScriptTaskSpecification(TaskSpecification):
 
     def get_version(self) -> str:
         """
-        Returns the version of the plugin
+        Returns the version of the plugin.
 
         Returns:
             Plugin Version
@@ -497,9 +529,13 @@ class TemplatedScriptTaskSpecification(TaskSpecification):
 
 
 class ScriptWrapperTaskSpecification(TaskSpecification):
+    """
+    ScriptWrapperTaskSpecification defines the plugin specs for ScriptWrapperTask.
+    """
+
     def get(self, configuration: dict) -> ScriptWrapperTask:
         """
-        Get instance of ScriptWrapperTask with configuration
+        Get instance of ScriptWrapperTask with configuration.
 
         Args:
             configuration: configuration for ScriptWrapperTask
@@ -511,7 +547,7 @@ class ScriptWrapperTaskSpecification(TaskSpecification):
 
     def get_description(self) -> str:
         """
-        Get description of plugin
+        Get description of plugin.
 
         Returns:
             Plugin description
@@ -520,7 +556,7 @@ class ScriptWrapperTaskSpecification(TaskSpecification):
 
     def get_example_urls(self) -> List[str]:
         """
-        Get example urls related to ScriptWrapperTask
+        Get example urls related to ScriptWrapperTask.
 
         Returns:
             List of urls that have examples related to CommandTask
@@ -529,7 +565,7 @@ class ScriptWrapperTaskSpecification(TaskSpecification):
 
     def get_type(self) -> Type[ScriptWrapperTask]:
         """
-        Get task type provided by plugin
+        Get task type provided by plugin.
 
         Returns:
             TemplatedScriptTask
@@ -538,7 +574,7 @@ class ScriptWrapperTaskSpecification(TaskSpecification):
 
     def get_version(self) -> str:
         """
-        Returns the version of the plugin
+        Returns the version of the plugin.
 
         Returns:
             Plugin Version

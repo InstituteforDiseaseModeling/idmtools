@@ -17,10 +17,17 @@ if TYPE_CHECKING:  # pragma: no cover
 
 @dataclass
 class RTask(DockerTask):
+    """
+    Defines an RTask for idmtools. Currently only useful for local platform.
+
+    Notes:
+        - TODO rework this to be non-docker
+    """
     script_path: str = field(default=None, metadata={"md": True})
     r_path: str = field(default='Rscript', metadata={"md": True})
 
     def __post_init__(self):
+        """Constructor."""
         super().__post_init__()
         cmd_str = f'{self.r_path} ./Assets/{os.path.basename(self.script_path)}'
         if logger.isEnabledFor(DEBUG):
@@ -28,6 +35,16 @@ class RTask(DockerTask):
         self.command = CommandLine.from_string(cmd_str)
 
     def reload_from_simulation(self, simulation: Simulation, **kwargs):
+        """
+        Reload RTask from a simulation. Used when fetching an simulation to do a recreation.
+
+        Args:
+            simulation: Simulation object containing our metadata to rebuild task
+            **kwargs:
+
+        Returns:
+            None
+        """
         logger.debug("Reload from simulation")
         # check experiment level assets for items
         if simulation.parent.assets:
@@ -39,9 +56,10 @@ class RTask(DockerTask):
 
     def gather_common_assets(self) -> AssetCollection:
         """
-        Gather R Assets
-        Returns:
+        Gather R Assets.
 
+        Returns:
+            Common assets
         """
         super().gather_common_assets()
         if logger.isEnabledFor(DEBUG):
@@ -51,16 +69,16 @@ class RTask(DockerTask):
 
     def gather_transient_assets(self) -> AssetCollection:
         """
-        Gather transient assets. Generally this is the simulation level assets
+        Gather transient assets. Generally this is the simulation level assets.
 
         Returns:
-
+            Transient assets(Simulation level Assets)
         """
         return self.transient_assets
 
     def pre_creation(self, parent: Union[Simulation, IWorkflowItem], platform: 'IPlatform'):
         """
-        Called before creation of parent
+        Called before creation of parent.
 
         Args:
             parent: Parent
@@ -79,10 +97,13 @@ class RTask(DockerTask):
 
 
 class RTaskSpecification(TaskSpecification):
+    """
+    RTaskSpecification defines plugin specification for RTask.
+    """
 
     def get(self, configuration: dict) -> RTask:
         """
-        Get instance of RTask
+        Get instance of RTask.
 
         Args:
             configuration: configuration for task
@@ -94,7 +115,7 @@ class RTaskSpecification(TaskSpecification):
 
     def get_description(self) -> str:
         """
-        Returns the Description of the plugin
+        Returns the Description of the plugin.
 
         Returns:
             Plugin Description
@@ -103,7 +124,7 @@ class RTaskSpecification(TaskSpecification):
 
     def get_type(self) -> Type[RTask]:
         """
-        Get Type for Plugin
+        Get Type for Plugin.
 
         Returns:
             RTask
@@ -112,7 +133,7 @@ class RTaskSpecification(TaskSpecification):
 
     def get_version(self) -> str:
         """
-        Returns the version of the plugin
+        Returns the version of the plugin.
 
         Returns:
             Plugin Version

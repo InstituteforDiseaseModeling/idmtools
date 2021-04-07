@@ -13,24 +13,35 @@ if TYPE_CHECKING:  # pragma: no cover
 
 @dataclass
 class JSONConfiguredPythonTask(JSONConfiguredTask, PythonTask):
+    """
+    JSONConfiguredPythonTask combines JSONConfiguredTask and PythonTask.
+
+    Notes:
+        - TODO Add examples here
+
+    See Also:
+        :class:`idmtools_models.json_configured_task.JSONConfiguredTask`
+        :class:`idmtools_models.python.python_task.PythonTask`
+    """
     configfile_argument: Optional[str] = field(default="--config")
 
     def __post_init__(self):
+        """Constructor."""
         JSONConfiguredTask.__post_init__(self)
         PythonTask.__post_init__(self)
 
     def gather_common_assets(self):
         """
-        Return the common assets for a JSON Configured Task
-        a derived class
-        Returns:
+        Return the common assets for a JSON Configured Task a derived class.
 
+        Returns:
+            Assets
         """
         return PythonTask.gather_common_assets(self)
 
     def gather_transient_assets(self) -> AssetCollection:
         """
-        Get Transient assets. This should general be the config.json
+        Get Transient assets. This should general be the config.json.
 
         Returns:
             Transient assets
@@ -39,7 +50,7 @@ class JSONConfiguredPythonTask(JSONConfiguredTask, PythonTask):
 
     def reload_from_simulation(self, simulation: Simulation, **kwargs):
         """
-        Reload the task from a simulation
+        Reload the task from a simulation.
 
         Args:
             simulation: Simulation to reload from
@@ -57,7 +68,7 @@ class JSONConfiguredPythonTask(JSONConfiguredTask, PythonTask):
 
     def pre_creation(self, parent: Union[Simulation, IWorkflowItem], platform: 'IPlatform'):
         """
-        Pre-creation
+        Pre-creation.
 
         Args:
             parent: Parent of task
@@ -74,13 +85,16 @@ class JSONConfiguredPythonTask(JSONConfiguredTask, PythonTask):
 
     def post_creation(self, parent: Union[Simulation, IWorkflowItem], platform: 'IPlatform'):
         """
-        Post-creation
+        Post-creation.
+
+        For us, we proxy the underlying JSONConfiguredTask and PythonTask/
 
         Args:
             parent: Parent
             platform: Platform Python Script is being executed on
 
         Returns:
+            None
 
         See Also
             :meth:`idmtools_models.json_configured_task.JSONConfiguredTask.post_creation`
@@ -91,10 +105,13 @@ class JSONConfiguredPythonTask(JSONConfiguredTask, PythonTask):
 
 
 class JSONConfiguredPythonTaskSpecification(TaskSpecification):
+    """
+    JSONConfiguredPythonTaskSpecification provides the plugin info for JSONConfiguredPythonTask.
+    """
 
     def get(self, configuration: dict) -> JSONConfiguredPythonTask:
         """
-        Get  instance of JSONConfiguredPythonTask with configuration
+        Get  instance of JSONConfiguredPythonTask with configuration.
 
         Args:
             configuration: Configuration for task
@@ -106,7 +123,7 @@ class JSONConfiguredPythonTaskSpecification(TaskSpecification):
 
     def get_description(self) -> str:
         """
-        Get description for plugin
+        Get description for plugin.
 
         Returns:
             Plugin Description
@@ -115,7 +132,7 @@ class JSONConfiguredPythonTaskSpecification(TaskSpecification):
 
     def get_type(self) -> Type[JSONConfiguredPythonTask]:
         """
-        Get Type for Plugin
+        Get Type for Plugin.
 
         Returns:
             JSONConfiguredPythonTask
@@ -124,7 +141,7 @@ class JSONConfiguredPythonTaskSpecification(TaskSpecification):
 
     def get_version(self) -> str:
         """
-        Returns the version of the plugin
+        Returns the version of the plugin.
 
         Returns:
             Plugin Version

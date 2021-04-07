@@ -17,11 +17,20 @@ logger = getLogger(__name__)
 
 @dataclass()
 class PythonTask(ITask):
+    """
+    PythonTask makes running python scripts a bit easier through idmtools.
+
+    Notes:
+        TODO - Link examples here
+    """
     script_path: str = field(default=None, metadata={"md": True})
     python_path: str = field(default='python', metadata={"md": True})
     platform_requirements: Set[PlatformRequirements] = field(default_factory=lambda: [PlatformRequirements.PYTHON])
 
     def __post_init__(self):
+        """
+        Constructor.
+        """
         super().__post_init__()
         if os.path.exists(self.script_path):
             if self.script_path:
@@ -35,7 +44,7 @@ class PythonTask(ITask):
 
     def gather_common_assets(self) -> AssetCollection:
         """
-        Get the common assets. This should be a set of assets that are common to all tasks in an experiment
+        Get the common assets. This should be a set of assets that are common to all tasks in an experiment.
 
         Returns:
             AssetCollection
@@ -47,22 +56,22 @@ class PythonTask(ITask):
 
     def gather_transient_assets(self) -> AssetCollection:
         """
-        Gather transient assets. Generally this is the simulation level assets
+        Gather transient assets. Generally this is the simulation level assets.
 
         Returns:
-
+            Transient assets. Also known as simulation level assets.
         """
         return self.transient_assets
 
     def reload_from_simulation(self, simulation: Simulation, **kwargs):
         """
-        Reloads a python task from a simulation
+        Reloads a python task from a simulation.
 
         Args:
             simulation: Simulation to reload
 
         Returns:
-
+            None
         """
         # check experiment level assets for items
         if simulation.parent.assets:
@@ -76,7 +85,7 @@ class PythonTask(ITask):
 
     def pre_creation(self, parent: Union[Simulation, IWorkflowItem], platform: 'IPlatform'):
         """
-        Called before creation of parent
+        Called before creation of parent.
 
         Args:
             parent: Parent
@@ -88,17 +97,19 @@ class PythonTask(ITask):
         Raise:
             ValueError if script name is not provided
         """
-
         if self.script_path is None:
             raise ValueError("Script name is required")
         self.command = CommandLine.from_string(f'{self.python_path} {platform.join_path(platform.common_asset_path, os.path.basename(self.script_path))}')
 
 
 class PythonTaskSpecification(TaskSpecification):
+    """
+    PythonTaskSpecification provides the plugin info for PythonTask.
+    """
 
     def get(self, configuration: dict) -> PythonTask:
         """
-        Get instance of Python Task with specified configuration
+        Get instance of Python Task with specified configuration.
 
         Args:
             configuration: Configuration for task
@@ -110,7 +121,7 @@ class PythonTaskSpecification(TaskSpecification):
 
     def get_description(self) -> str:
         """
-        Description of the plugin
+        Description of the plugin.
 
         Returns:
             Description string
@@ -119,7 +130,7 @@ class PythonTaskSpecification(TaskSpecification):
 
     def get_example_urls(self) -> List[str]:
         """
-        Return List of urls that have examples using PythonTask
+        Return List of urls that have examples using PythonTask.
 
         Returns:
             List of urls(str) that point to examples
@@ -130,7 +141,7 @@ class PythonTaskSpecification(TaskSpecification):
 
     def get_type(self) -> Type[PythonTask]:
         """
-        Get Type for Plugin
+        Get Type for Plugin.
 
         Returns:
             PythonTask
@@ -139,7 +150,7 @@ class PythonTaskSpecification(TaskSpecification):
 
     def get_version(self) -> str:
         """
-        Returns the version of the plugin
+        Returns the version of the plugin.
 
         Returns:
             Plugin Version
