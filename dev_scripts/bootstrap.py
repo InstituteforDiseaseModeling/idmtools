@@ -127,7 +127,7 @@ def install_dev_packages(pip_url):
 def install_base_environment(pip_url):
     """Installs the base packages needed for development environments.
 
-    We install wheel first(so we can utilize it in later installs.
+    We install wheel first(so we can utilize it in later installs).
     We then uninstall py-make
     We then install idm-buildtools
 
