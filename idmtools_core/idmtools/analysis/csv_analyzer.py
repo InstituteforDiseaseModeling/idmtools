@@ -1,6 +1,6 @@
 """idmtools CSVAnalyzer.
 
-Example of a csv analyzer to concatenate csv results into one csv from your experiment simulations
+Example of a csv analyzer to concatenate csv results into one csv from your experiment's simulations.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
@@ -67,7 +67,7 @@ class CSVAnalyzer(IAnalyzer):
         """
         Map each simulation/workitem data here.
 
-        The data is a mapping of files -> content(dataframes in this case since it is csvs parsed)
+        The data is a mapping of files -> content(in this case, dataframes since it is csvs parsed).
 
         Args:
             data: Data mapping of files -> content
