@@ -298,7 +298,7 @@ class IPlatformExperimentOperations(ABC):
         """
         Refresh status for experiment object.
 
-        This should update the object directly. For experiments it is best if all simulation states are updated as well
+        This should update the object directly. For experiments it is best if all simulation states are updated as well.
 
         Args:
             experiment: Experiment to get status for
