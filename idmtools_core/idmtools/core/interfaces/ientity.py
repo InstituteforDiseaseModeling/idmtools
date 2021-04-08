@@ -65,7 +65,7 @@ class IEntity(IItem, metaclass=ABCMeta):
 
         Args:
             filename: Filename to load
-            platform: Platform object to load id from. This can be loaded from file if saved there
+            platform: Platform object to load id from. This can be loaded from file if saved there.
             **kwargs: Platform extra arguments
 
         Returns:
