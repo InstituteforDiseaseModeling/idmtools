@@ -354,7 +354,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         simulation.status = convert_comps_status(s.state)
 
     def to_entity(self, simulation: COMPSSimulation, load_task: bool = False, parent: Optional[Experiment] = None,
-                  load_parent: bool = False, load_metadata: bool = False, **kwargs) -> Simulation:
+                  load_parent: bool = False, load_metadata: bool = False, load_cli_from_workorder: bool = False, **kwargs) -> Simulation:
         """
         Convert COMPS simulation object to IDM Tools simulation object
 
@@ -364,6 +364,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             parent: Optional parent object to prevent reloads
             load_parent: Force load of parent(Beware, This could cause loading loops)
             load_metadata: Should we load metadata by default. If load task is enabled, this is also enabled
+            load_cli_from_workorder: Used with COMPS scheduling where the CLI is defined in our workorder
             **kwargs:
 
         Returns:
@@ -388,12 +389,12 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             obj.assets = self.platform._assets.to_entity(simulation.files)
 
         # should we load metadata
-        metadata = self.__load_metadata_from_simulation(simulation) if load_metadata else None
+        metadata = self.__load_metadata_from_simulation(obj) if load_metadata else None
         if load_task:
             self._load_task_from_simulation(obj, simulation, metadata)
         else:
             obj.task = None
-            self.__extract_cli(simulation, parent, obj, load_metadata)
+            self.__extract_cli(simulation, parent, obj, load_cli_from_workorder)
 
         # call task load options(load configs from files, etc)
         obj.task.reload_from_simulation(obj)
@@ -443,8 +444,8 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         if comps_sim.configuration is None:
             comps_sim.refresh(QueryCriteria().select_children('configuration'))
 
-    def __extract_cli(self, comps_sim, parent, simulation, load_metadata):
-        cli = self._detect_command_line_from_simulation(parent, comps_sim, load_metadata)
+    def __extract_cli(self, comps_sim, parent, simulation, load_cli_from_workorder):
+        cli = self._detect_command_line_from_simulation(parent, comps_sim, simulation, load_cli_from_workorder)
         # if we could not find task, set it now, otherwise rebuild the cli
         if simulation.task is None:
             simulation.task = CommandTask(CommandLine.from_string(cli))
@@ -474,13 +475,14 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         raise FileNotFoundError(f"Cannot find idmtools_metadata.json on the simulation {simulation.uid}")
 
     @staticmethod
-    def _detect_command_line_from_simulation(experiment, simulation, load_metadata):
+    def _detect_command_line_from_simulation(experiment, comps_sim, simulation, load_cli_from_workorder=False):
         """
         Detect Command Line from the Experiment/Simulation objects
         Args:
             experiment: Experiment object
-            simulation: Simulation object
-            load_metadata: Should we load metadata. we use this to determine if we should load our workorder.json
+            comps_sim: Comps sim object
+            simulation: Simulation(idmtools) object
+            load_cli_from_workorder: Should we load metadata. we use this to determine if we should load our workorder.json
 
         Returns:
             CommandLine
@@ -493,17 +495,17 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         if po.configuration is None:
             po.refresh(QueryCriteria().select_children('configuration'))
         # simulation configuration for executable?
-        if simulation.configuration and simulation.configuration.executable_path:
-            cli = f'{simulation.configuration.executable_path}'
-            if simulation.configuration.simulation_input_args:
-                cli += " " + simulation.configuration.simulation_input_args.strip()
+        if comps_sim.configuration and comps_sim.configuration.executable_path:
+            cli = f'{comps_sim.configuration.executable_path}'
+            if comps_sim.configuration.simulation_input_args:
+                cli += " " + comps_sim.configuration.simulation_input_args.strip()
         elif po.configuration and po.configuration.executable_path:
             cli = f'{po.configuration.executable_path} {po.configuration.simulation_input_args.strip()}'
         if cli is None:
             # check if we should try to load our workorder
-            if load_metadata:
+            if load_cli_from_workorder:
                 # filter for workorder
-                assets = [a.filename for a in simulation.assets if a.filename == "WorkOrder.json"]
+                assets = [a for a in simulation.assets if a.filename == "WorkOrder.json"]
                 # if assets
                 if assets:
                     asset: Asset = assets[0]
