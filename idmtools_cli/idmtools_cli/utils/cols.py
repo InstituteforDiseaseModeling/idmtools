@@ -9,7 +9,7 @@ NEWLINES = ('\n', '\r', '\r\n')
 
 def _find_unix_console_width() -> Optional[int]:
     """
-    Find the width of an Unix console where possible.
+    Find the width of a Unix console where possible.
 
     Returns:
         Width
