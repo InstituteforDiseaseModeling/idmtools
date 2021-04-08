@@ -3,8 +3,8 @@
 
 The process is to fetch the current list of tags and commits.
 We then fetch all the issues.
-We then iterate over tags to determine their start-date/end-date and filter out certain labels
-We then find issues closed between start and end dates
+We then iterate over tags to determine their start-date/end-date and filter out certain labels.
+We then find issues closed between start and end dates.
 We then grab title and issue number from ticket and create our changelog. Tickets are grouped by labels.
 """
 import glob
