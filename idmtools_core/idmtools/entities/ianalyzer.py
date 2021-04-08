@@ -113,7 +113,7 @@ class IAnalyzer(metaclass=ABCMeta):
 
 class BaseAnalyzer(IAnalyzer, metaclass=ABCMeta):
     """
-    BaseAnalyzer to allow using dtk-tools be used in the new tools.
+    BaseAnalyzer to allow using previously used dtk-tools analyzers within idmtools.
     """
 
     def __init__(self, uid=None, working_dir: Optional[str] = None, parse: bool = True, filenames: Optional[List[str]] = None):
