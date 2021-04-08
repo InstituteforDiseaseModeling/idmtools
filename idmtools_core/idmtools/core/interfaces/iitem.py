@@ -1,5 +1,5 @@
 """
-IItem is the past of all items that have ids such as AssetCollections, Experiments, etc.
+IItem is the base of all items that have ids such as AssetCollections, Experiments, etc.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
@@ -35,7 +35,7 @@ class IItem:
         """
         UID Of the object.
 
-        If not id is set, uses the hash of the object
+        If not id is set, uses the hash of the object.
 
         Returns:
             ID
