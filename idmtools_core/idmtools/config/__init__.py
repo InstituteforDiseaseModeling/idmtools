@@ -1,5 +1,5 @@
 """
-idmtools Configuration tools/Manager
+idmtools Configuration tools/Manager.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
