@@ -393,7 +393,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             self._load_task_from_simulation(obj, simulation, metadata)
         else:
             obj.task = None
-            self.__extract_cli(simulation, parent, obj)
+            self.__extract_cli(simulation, parent, obj, load_metadata)
 
         # call task load options(load configs from files, etc)
         obj.task.reload_from_simulation(obj)
@@ -443,8 +443,8 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         if comps_sim.configuration is None:
             comps_sim.refresh(QueryCriteria().select_children('configuration'))
 
-    def __extract_cli(self, comps_sim, parent, simulation):
-        cli = self._detect_command_line_from_simulation(parent, comps_sim)
+    def __extract_cli(self, comps_sim, parent, simulation, load_metadata):
+        cli = self._detect_command_line_from_simulation(parent, comps_sim, load_metadata)
         # if we could not find task, set it now, otherwise rebuild the cli
         if simulation.task is None:
             simulation.task = CommandTask(CommandLine.from_string(cli))
@@ -474,12 +474,13 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         raise FileNotFoundError(f"Cannot find idmtools_metadata.json on the simulation {simulation.uid}")
 
     @staticmethod
-    def _detect_command_line_from_simulation(experiment, simulation):
+    def _detect_command_line_from_simulation(experiment, simulation, load_metadata):
         """
         Detect Command Line from the Experiment/Simulation objects
         Args:
             experiment: Experiment object
             simulation: Simulation object
+            load_metadata: Should we load metadata. we use this to determine if we should load our workorder.json
 
         Returns:
             CommandLine
@@ -499,7 +500,19 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         elif po.configuration and po.configuration.executable_path:
             cli = f'{po.configuration.executable_path} {po.configuration.simulation_input_args.strip()}'
         if cli is None:
-            raise ValueError("Could not detect cli")
+            # check if we should try to load our workorder
+            if load_metadata:
+                # filter for workorder
+                assets = [a.filename for a in simulation.assets if a.filename == "WorkOrder.json"]
+                # if assets
+                if assets:
+                    asset: Asset = assets[0]
+                    wo = json.loads(asset.content.decode('utf-8'))
+                    cli = wo['Command']
+                else:
+                    raise ValueError("Could not detect cli")
+            else:  # if user doesn't care oabout metadata don't error
+                logger.debug("Could not load the cli from simulation. This is usually due to the use of scheduling config.")
         elif logger.isEnabledFor(DEBUG):
             logger.debug(f"Detected task CLI {cli}")
         return cli
