@@ -262,7 +262,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         """
         Returns the children for a platform object.
 
-        For example, A Comps Experiment or Simulation
+        For example, A COMPS Experiment or Simulation.
 
         The children can either be returns as native platform objects or as idmtools objects.
 
@@ -449,7 +449,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         """
         Create items (simulations, experiments, or suites) on the platform.
 
-        The function will batch the items based on type and call the self._create_batch for creation
+        The function will batch the items based on type and call the self._create_batch for creation.
 
         Args:
             items: The list of items to create.
@@ -525,7 +525,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
     def _convert_platform_item_to_entity(self, platform_item: Any, **kwargs) -> IEntity:
         """
-        Convert an Native Platform Object to an idmtools object.
+        Convert a Native Platform Object to an idmtools object.
 
         Args:
             platform_item:  Item to convert
@@ -667,7 +667,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             refresh_interval: int = 5
     ):
         """
-        Runs a loop until a timeout is met where the item's status is refreshed, then a callback is called with the items as the arguments and if the returns is true, we stop waiting.
+        Runs a loop until a timeout is met where the item's status is refreshed. A callback is then called with the items as the arguments and if the returns is true, we stop waiting.
 
         Args:
             item: Item to monitor
@@ -725,7 +725,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         """
         A callback for progress bar(when an item has children) and checking if an item has completed execution.
 
-        This is meant for mainly for aggregate types where the status is from the children
+        This is mainly meant for aggregate types where the status is from the children.
 
         Args:
             item: Item to monitor
@@ -879,7 +879,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     @property
     def common_asset_path(self):
         """
-        Where are common assets stored on the platform.
+        Return the path to common assets stored on the platform.
 
         Returns:
             Common Asset Path
@@ -889,9 +889,9 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     @common_asset_path.setter
     def common_asset_path(self, value):
         """
-        Set where are common assets stored on the platform. This path should be in defined in relation to individual items(simulations, workflow items).
+        Set path to common assets stored on the platform. This path should be in defined in relation to individual items(simulations, workflow items).
 
-        For example, on comps, we would set "Assets"
+        For example, on COMPS, we would set "Assets"
 
         Args:
             value: Path to use for common path
@@ -921,7 +921,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
     def id_from_file(self, filename: str):
         """
-        Load just the id portion of a id file.
+        Load just the id portion of an id file.
 
         Args:
             filename: Filename
