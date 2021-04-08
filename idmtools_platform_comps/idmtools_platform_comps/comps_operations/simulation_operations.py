@@ -513,6 +513,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
                     raise ValueError("Could not detect cli")
             else:  # if user doesn't care oabout metadata don't error
                 logger.debug("Could not load the cli from simulation. This is usually due to the use of scheduling config.")
+                cli = "WARNING_CouldNotLoadCLI"
         elif logger.isEnabledFor(DEBUG):
             logger.debug(f"Detected task CLI {cli}")
         return cli
