@@ -77,7 +77,7 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         """
         Creates an simulation from an IDMTools simulation object.
 
-        Also performs pre-creation and post-creation locally and on platform
+        Also performs pre-creation and post-creation locally and on platform.
 
         Args:
             simulation: Simulation to create
