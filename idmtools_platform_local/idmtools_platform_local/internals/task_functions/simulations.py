@@ -46,7 +46,7 @@ def create_simulation(experiment_id: str, tags_and_extra_details: Tuple[Dict[str
     """
     Creates the simulation.
 
-    We pass tags and extra details as tuple to make batching easier and overlap with the normal create
+    We pass tags and extra details as tuple to make batching easier and overlap with the normal create.
 
     Args:
         experiment_id: Experiment id
