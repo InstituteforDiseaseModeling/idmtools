@@ -45,7 +45,7 @@ def min_width(string, cols: int, padding=' '):
 
 def max_width(string: str, cols: int, separator='\n'):
     """
-    Returns a freshly formatted.
+    Returns a freshly formatted string.
 
     Args:
         string: string to be formatted
