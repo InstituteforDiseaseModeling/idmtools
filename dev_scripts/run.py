@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """Run a command and filter output or redirect to a log.
 
-Used by some build processes to log build steps or reduce verbosity of others
+Used by some build processes to log build steps or reduce verbosity of others.
 """
 import shutil
 import argparse
@@ -30,7 +30,7 @@ def execute(cmd, env=None):
         env: Environment dict to populate in the command subprocess
 
     Yields:
-        Lines of output from the command being ran. Stdout and stderr are combined
+        Lines of output from the command being ran. Stdout and stderr are combined.
     """
     if env is None:
         env = dict()
