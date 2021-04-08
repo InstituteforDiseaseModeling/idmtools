@@ -9,10 +9,10 @@ CORE_PATH = os.path.join(REPO_PATH, 'idmtools_core')
 
 
 def get_current_version() -> str:
-    """Find current version of core.
+    """Find current version of idmtools_core.
 
     Returns:
-        Current version of core
+        Current version of idmtools_core.
     """
     with open(os.path.join(CORE_PATH, '.bumpversion.cfg')) as vin:
         contents = vin.read()
