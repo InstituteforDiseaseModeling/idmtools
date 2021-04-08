@@ -1,5 +1,5 @@
 """
-Manages the IDM context, mostly around the platform object.
+Manages the idmtools context, mostly around the platform object.
 
 This context allows us to easily fetch what platforms we are executing on and also supported nested, multi-platform operations.
 
