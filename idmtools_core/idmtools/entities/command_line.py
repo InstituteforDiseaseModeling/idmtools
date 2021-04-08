@@ -12,7 +12,7 @@ from dataclasses import dataclass, field
 @dataclass(init=False)
 class CommandLine:
     """
-    A class to construct command line strings from executable, options, and params.
+    A class to construct command-line strings from executable, options, and params.
     """
     #: The executable portion of the command
     _executable: str = None
