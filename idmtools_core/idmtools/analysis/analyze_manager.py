@@ -1,6 +1,6 @@
 """idmtools Analyzer manager.
 
-AnalyzerManager is the "Driver" of analysis. Analysis is mostly a map reduce item
+AnalyzerManager is the "driver" of analysis. Analysis is mostly a map reduce operation.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
@@ -59,7 +59,7 @@ class AnalyzeManager(CacheEnabled):
 
     class TimeOutException(Exception):
         """
-        TimeOutException is raised when the analysis time out.
+        TimeOutException is raised when the analysis times out.
         """
         pass
 
