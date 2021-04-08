@@ -1,7 +1,7 @@
 """Define our platform specific specifications.
 
 This is a specific specification to illuminate a command CLI between platforms for interacting with
-experiment/simulations
+experiment/simulations.
 """
 #
 from abc import ABC, abstractmethod
@@ -83,7 +83,7 @@ class PlatformCLISpecification(PluginSpecification, ABC):
     @get_platform_cli_spec
     def get(self, configuration: dict) -> IPlatformCLI:
         """
-        Factor that should return a new platform using the passed in configuration.
+        Factor that should return a new platform using the passed-in configuration.
 
         Args:
             configuration:
