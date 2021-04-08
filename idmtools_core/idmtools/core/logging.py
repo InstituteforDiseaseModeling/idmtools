@@ -218,7 +218,7 @@ def setup_user_logger(console: bool):
     Setup the user logger. This logger is meant for user output only.
 
     Args:
-        console: Is Console enabled. If so, we don't install a user logger
+        console: Is Console enabled. If so, we don't install a user logger.
 
     Returns:
         None
