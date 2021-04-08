@@ -1,7 +1,7 @@
 """idmtools core package.
 
 This init installs a system exception hook for idmtools.
-It also ensures the configuration is loaded
+It also ensures the configuration is loaded.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
