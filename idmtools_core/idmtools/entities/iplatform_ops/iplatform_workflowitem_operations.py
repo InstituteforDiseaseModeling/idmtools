@@ -52,7 +52,7 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
             **kwargs:
 
         Returns:
-            List of tuples containing the create object and id of item that was created
+            List of tuples containing the create object and id of item that was created.
         """
         return batch_create_items(workflow_items, create_func=self.create, display_progress=display_progress,
                                   progress_description="Creating WorkItems", unit="workitem", **kwargs)
@@ -94,7 +94,7 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
         """
         Creates an workflow item from an IDMTools IWorkflowItem object.
 
-        Also performs pre-creation and post-creation locally and on platform
+        Also performs pre-creation and post-creation locally and on platform.
 
         Args:
             workflow_item: Suite to create
@@ -139,7 +139,7 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
         """
         Trigger right before commissioning experiment on platform.
 
-        This ensures that the item is created. It also ensures that the children(simulations) have also been created
+        This ensures that the item is created. It also ensures that the children(simulations) have also been created.
 
         Args:
             workflow_item: Experiment to commission
