@@ -47,7 +47,7 @@ class AddAnalyzer(IAnalyzer):
         """
         Initialize our analyzer before running it.
 
-        We use this to create our output directory
+        We use this to create our output directory.
 
         Returns:
             None
