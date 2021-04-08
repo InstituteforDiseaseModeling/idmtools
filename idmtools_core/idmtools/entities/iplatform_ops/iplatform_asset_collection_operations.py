@@ -63,7 +63,7 @@ class IPlatformAssetCollectionOperations(CacheEnabled, ABC):
         """
         Creates an AssetCollection from an IDMTools AssetCollection object.
 
-        Also performs pre-creation and post-creation locally and on platform
+        Also performs pre-creation and post-creation locally and on platform.
 
         Args:
             asset_collection: AssetCollection to create
