@@ -172,7 +172,7 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         """
         Trigger right before commissioning experiment on platform.
 
-        This ensures that the item is created. It also ensures that the children(simulations) have also been created
+        This ensures that the item is created. It also ensures that the children(simulations) have also been created.
 
         Args:
             simulation: Experiment to commission
