@@ -59,7 +59,7 @@ class Asset:
         Raises:
             ValueError - If absolute path and content are both provided. You can only provide one.
                          If absolute path is set and is a directory. Only file paths are supported.
-                         If absolute path, filename, checksum, and content is not set
+                         If absolute path, filename, checksum, and content is not set.
             FileNotFoundError - If absolute_path doesn't exist
         """
         # Cache of our asset key
@@ -99,7 +99,7 @@ class Asset:
         Returns checksum of object.
 
         This will return None unless the user has provided checksum or called calculate checksum to avoid computation. If you need to guarantee a
-        checksum value, call calculate_checksum beforehand
+        checksum value, call calculate_checksum beforehand.
 
         Returns:
             Checksum
