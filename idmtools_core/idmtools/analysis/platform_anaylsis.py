@@ -107,7 +107,7 @@ class PlatformAnalysis:
 
     def _prep_analyze(self):
         """
-        Pre for analysis.
+        Prepare for analysis.
 
         Returns:
             None
@@ -211,7 +211,7 @@ class PlatformAnalysis:
 
     def get_work_item(self):
         """
-        Get work item using to run analysis job on server.
+        Get work item being using to run analysis job on server.
 
         Returns:
             Workflow item
