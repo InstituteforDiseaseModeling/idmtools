@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 import argparse
+import os
+import sys
 from COMPS import Client  # noqa: I900
 from COMPS.CredentialPrompt import CredentialPrompt  # noqa: I900
 
@@ -31,9 +33,12 @@ if __name__ == '__main__':
 
     parser.add_argument('--comps_url', default='https://comps2.idmod.org', help='comps url')
     parser.add_argument('--username', help='entry username')
-    parser.add_argument('--password', help='entry password')
+    parser.add_argument('--password', default=os.getenv("COMPS_PASS", None), help='entry password')
 
     args = parser.parse_args()
+    if args.password is None:
+        print("Password is required either through COMPS_PASS environment var or through --password")
+        sys.exit(-1)
 
     compshost = args.comps_url
 
