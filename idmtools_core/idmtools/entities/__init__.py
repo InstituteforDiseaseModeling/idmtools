@@ -1,5 +1,5 @@
 """
-Entities is the core entities used to build experiments or used as abstracts for those classes
+Entities is the core entities used to build experiments or used as abstracts for those classes.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
