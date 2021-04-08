@@ -100,7 +100,7 @@ class CommandLine:
 
     def add_option(self, option, value):
         """
-        Add a commandline option.
+        Add a command-line option.
 
         Args:
             option: Option to add
