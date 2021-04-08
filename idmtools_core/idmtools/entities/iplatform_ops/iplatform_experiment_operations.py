@@ -81,7 +81,7 @@ class IPlatformExperimentOperations(ABC):
         """
         Creates an experiment from an IDMTools simulation object.
 
-        Also performs local/platform pre and post creation events
+        Also performs local/platform pre and post creation events.
 
         Args:
             experiment: Experiment to create
@@ -192,7 +192,7 @@ class IPlatformExperimentOperations(ABC):
         """
         Trigger right before commissioning experiment on platform.
 
-        This ensures that the item is created. It also ensures that the children(simulations) have also been created
+        This ensures that the item is created. It also ensures that the children(simulations) have also been created.
 
         Args:
             experiment: Experiment to commission
