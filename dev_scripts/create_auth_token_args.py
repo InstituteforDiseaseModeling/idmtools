@@ -13,7 +13,7 @@ __comps_client_version = 10
 
 
 class StaticCredentialPrompt(CredentialPrompt):
-    """Allows us to statically define username/password for COMPS Prompt at RunTime."""
+    """Allows us to statically define username/password for COMPS prompt at RunTime."""
     def __init__(self, comps_url, username, password):
         """Creates our Credential Prompt.
 
