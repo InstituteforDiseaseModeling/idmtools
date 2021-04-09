@@ -1,2 +1,2 @@
 tasks:
-  - init: make setup-dev 
+  - init: make setup-dev-no-docker

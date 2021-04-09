@@ -99,5 +99,4 @@ You can request a feature but opening a ticket on the repo or by emailing [idmto
 
 [![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/InstituteforDiseaseModeling/idmtools)
 
-
 See [DEVELOPMENT_README.md](DEVELOPMENT_README.md)
