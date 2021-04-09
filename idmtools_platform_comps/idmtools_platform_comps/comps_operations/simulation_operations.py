@@ -421,8 +421,8 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
 
         Args:
             simulation: Simulation to populate with task
-            parent: Experiment object
-            comps_sim: Comps sim object
+            comps_sim: Experiment object
+            metadata: Metadata loaded to be used in the task object
 
         Returns:
             None
@@ -505,10 +505,15 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             # check if we should try to load our workorder
             if load_cli_from_workorder:
                 # filter for workorder
-                assets = [a for a in simulation.assets if a.filename == "WorkOrder.json"]
+                files = comps_sim.files
+                workorder_obj = None
+                for a in simulation.assets:
+                    if getattr(a, '_platform_object', None) and isinstance(a._platform_object, SimulationFile) and a._platform_object.file_type == "WorkOrder":
+                        workorder_obj = a
+                        break
                 # if assets
-                if assets:
-                    asset: Asset = assets[0]
+                if workorder_obj:
+                    asset: Asset = workorder_obj
                     wo = json.loads(asset.content.decode('utf-8'))
                     cli = wo['Command']
                 else:
