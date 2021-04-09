@@ -209,7 +209,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
     @run_in_temp_dir
     def test_analyzer_with_scheduling_experiment(self):
         # files to download
-        filenames = ['outputs\\results.xlsx', 'outputs\\results.json', 'WorkOrder.json']
+        filenames = ['outputs/results.xlsx', 'outputs/results.json', 'WorkOrder.json']
         output_folder = "output_test_analyzer_with_scheduling_experiment"
         # Initialize the analyser class with the path of the output files to download
         analyzers = [DownloadAnalyzer(filenames=filenames, output_path=output_folder)]
