@@ -505,7 +505,6 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             # check if we should try to load our workorder
             if load_cli_from_workorder:
                 # filter for workorder
-                files = comps_sim.files
                 workorder_obj = None
                 for a in simulation.assets:
                     if getattr(a, '_platform_object', None) and isinstance(a._platform_object, SimulationFile) and a._platform_object.file_type == "WorkOrder":
