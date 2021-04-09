@@ -155,3 +155,17 @@ class TestCompsCLI(unittest.TestCase):
             self.assertTrue(result.exit_code == 0)
             self.assertTrue(os.path.exists(pwd.joinpath("singularity.id")))
             self.assertFalse(os.path.exists(pwd.joinpath("builder.singularity.id")))
+
+    @run_in_temp_dir
+    @allure.feature("Download")
+    def test_download_cli(self):
+        # idmtools comps SLURMStage  download --experiment acd2f035-b098-eb11-a2c4-f0921c167864 --name test_download --output-path outputs
+        result = run_command('comps', 'SLURM2', 'download', '--experiment', 'acd2f035-b098-eb11-a2c4-f0921c167864',
+                             '--name', 'test_downlad1', '--output-path', 'output', '--pattern', '**/*.json', '--pattern', '**/*.png', '--pattern', '**/*.xlsx')
+
+        self.assertTrue(result.exit_code == 0)
+        # verify download files correctly
+        path, dirs, files = next(os.walk(os.path.join("output")))
+        for dir in dirs:
+            p, d, f = next(os.walk(os.path.join('output', dir, 'outputs')))
+            self.assertEqual(set(f), {'results.json', 'results.xlsx', 'sim.png'})
