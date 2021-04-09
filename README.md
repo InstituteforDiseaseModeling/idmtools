@@ -1,6 +1,3 @@
-[![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/InstituteforDiseaseModeling/idmtools)
-
-
 # Packages Status
 ![Staging: idmtools-core](https://github.com/InstituteforDiseaseModeling/idmtools/workflows/Staging:%20idmtools-core/badge.svg?branch=dev)
 ![Staging: idmtools-cli](https://github.com/InstituteforDiseaseModeling/idmtools/workflows/Staging:%20idmtools-cli/badge.svg?branch=dev)
@@ -99,5 +96,8 @@ You can report an issue directly on GitHub or by emailing [idmtools-issue@idmod.
 You can request a feature but opening a ticket on the repo or by emailing [idmtools-feature@idmod.org](mailto:idmtools-feature@idmod.org)
 
 # Development Documentation
+
+[![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/InstituteforDiseaseModeling/idmtools)
+
 
 See [DEVELOPMENT_README.md](DEVELOPMENT_README.md)
