@@ -124,6 +124,7 @@ class TestWorkOrder(ITestWithPersistence):
         self.assertDictEqual(s1, s2)
 
     @pytest.mark.timeout(60)
+    @pytest.mark.serial
     def test_wrapper_script_execute_comps(self):
         """
         To test wrapper task with WorkOrder.json. Comps will use Executable command from WorkOrder.json instead of

@@ -163,6 +163,8 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
             AssetCollection
         """
         ac = AssetCollection()
+        # set the platform/original object
+        ac.platform = self.platform
         # we support comps simulations files and experiments as asset collections
         # only true asset collections have ids
         if isinstance(asset_collection, COMPSAssetCollection):
@@ -185,6 +187,7 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
                     a = Asset(filename=asset.friendly_name, relative_path=asset.path_from_root, persisted=True)
                 else:
                     a = Asset(filename=asset.file_name, checksum=asset.md5_checksum)
+                    a._platform_object = asset
                 if isinstance(asset_collection, COMPSAssetCollection):
                     a.relative_path = asset.relative_path
                 a.persisted = True
@@ -205,6 +208,8 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
 
         """
         asset = Asset(filename=asset_collection.file_name, checksum=asset_collection.md5_checksum)
+        # set original object for quick access again later
+        asset._platform_object = asset_collection
         asset.is_simulation_file = True
         asset.persisted = True
         asset.length = asset_collection.length
