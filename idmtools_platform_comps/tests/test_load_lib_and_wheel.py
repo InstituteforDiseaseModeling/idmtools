@@ -106,6 +106,7 @@ class TestLoadLibWheel(ITestWithPersistence):
 
     @pytest.mark.long
     @pytest.mark.comps
+    @pytest.mark.serial
     def test_exp_with_load_zipp_lib(self):
         # ------------------------------------------------------
         # First load 'zipp' package (note: comps does not have 'zipp' package)
