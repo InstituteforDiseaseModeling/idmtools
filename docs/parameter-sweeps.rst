@@ -74,6 +74,16 @@ For cross sweeping, let's say again you have parameters a, b, c and d, e, f that
 
 For Python models, we also support them using a JSONConfiguredPythonTask. In the future we will support additional configured tasks for Python and R models.
 
+Add sweep definition
+^^^^^^^^^^^^^^^^^^^^
+
+You can use the following two different methods for adding a sweep definition to a builder object:
+
+- add_sweep_definition
+- add_multiple_parameter_sweep_definition
+
+Generally add_sweep_definition is used; however, in scenarios where you need to add multiple parameters to the sweep definition you use add_multiple_parameter_sweep_definiton - as seen in `idmtools.examples.python_model.multiple_parameter_sweeping.py`.
+
 Creating sweeps without builders
 --------------------------------
 You can also create sweeps without using builders. Like this example:
