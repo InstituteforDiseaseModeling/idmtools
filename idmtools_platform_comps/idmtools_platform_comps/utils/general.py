@@ -225,3 +225,27 @@ def get_asset_for_comps_item(platform: IPlatform, item: IEntity, files: List[str
                 else:
                     ret[file_path] = get_file_from_collection(platform, collection_id, normalized_path)
     return ret
+
+
+def update_item(platform: IPlatform, item_id: str, item_type: ItemType, tags: dict = None, name: str = None):
+    """
+    Util function to update existing COMPS experiment/simulation/workitem's tags or
+    For example, you can add/update simulation's tag once its post-process is done to mark the simulation with
+    more meanful text with tag/name
+    Args:
+        platform: Platform
+        item_id: experiment/simulation/workitem id
+        item_type: The type of the object to be retrieved
+        tags: tags dict for update
+        name: name of experiment/simulation/workitem
+    Returns:
+
+    """
+    comps_item = platform.get_item(item_id, item_type, raw=True)
+    current_tags = comps_item.tags
+    if tags is not None:
+        current_tags.update(tags)
+        comps_item.set_tags(current_tags)
+    if name is not None:
+        comps_item.name = name
+    comps_item.save()
