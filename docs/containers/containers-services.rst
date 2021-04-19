@@ -12,9 +12,8 @@ Container Builder Service
 -------------------------
 
 The container builder service in |IT_s| allows you to create a Singularity Image File (SIF), 
-the Singularity container file to run in your HPC environment.
-
-For more in-depth information about the container builder service, see :doc:`containers-builder-service`.
+the Singularity container file to run in your HPC environment. For more in-depth information 
+about the container builder service, see :doc:`containers-builder-service`.
 
 Running Simulations using Containers
 ------------------------------------
