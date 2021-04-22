@@ -82,7 +82,10 @@ You can use the following two different methods for adding a sweep definition to
 - add_sweep_definition
 - add_multiple_parameter_sweep_definition
 
-Generally add_sweep_definition is used; however, in scenarios where you need to add multiple parameters to the sweep definition you use add_multiple_parameter_sweep_definiton - as seen in `idmtools.examples.python_model.multiple_parameter_sweeping.py`.
+Generally add_sweep_definition is used; however, in scenarios where you need to add multiple parameters to the sweep definition you use add_multiple_parameter_sweep_definiton - as seen in `idmtools.examples.python_model.multiple_parameter_sweeping.py`. More specifically, 
+add_multiple_parameter_sweep_definition is used for sweeping with the same definition callback that takes multiple parameters, where 
+the parameters can be a list of arguments or a list of keyword arguments. The sweep function will do cross-product sweeps between 
+the parameters.
 
 Creating sweeps without builders
 --------------------------------
