@@ -8,7 +8,7 @@ to try and reproduce your environment and utilities. You just need to share your
 container for others to run on their own HPC. 
 
 "A container is a software package that contains everything the software needs to run. 
-This includes the executable program as well as system tools, libraries, and settings.", 
+This includes the executable program as well as system tools, libraries, and settings", 
 as quoted from techterms.com (https://techterms.com/definition/container). The conceptual 
 components of containers are the same regardless of the specific container technology, such 
 as Singularity and Docker.

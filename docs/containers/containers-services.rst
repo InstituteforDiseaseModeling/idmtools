@@ -4,8 +4,8 @@ Services on |COMPS_s| with containers
 
 When using |IT_s| and containers on |COMPS_s| you can use the following two options:
 
-* Container Builder Service
-* Running Simulations using Containers
+* Container builder service
+* Running simulations using containers
 
 
 Container Builder Service
