@@ -153,10 +153,11 @@ class SimulationBuilder:
 
         """
         remaining_parameters = self._extract_remaining_parameters(function)
-
+        if len(args) > 0 and len(kwargs) > 0:
+            raise ValueError("Currently in multi-argument sweep definitions, you have to supply either a arguments or keyword arguments, but not both.")
         if len(args) > 0:
             values = args
-            if isinstance(values, tuple) and len(values) == 1 and isinstance(values[0], dict):
+            if isinstance(values, (list, tuple)) and len(values) == 1 and isinstance(values[0], dict):
                 values = values[0]
         elif len(kwargs) > 0:
             values = kwargs
@@ -164,7 +165,7 @@ class SimulationBuilder:
             raise ValueError("This method expects either a list of lists or a dictionary that defines the sweeps")
 
         if len(remaining_parameters) <= 1:
-            raise ValueError("This method expects either a list of lists or a dictionary that defines the sweeps")
+            raise ValueError("This method expects either a list of lists or a dictionary that defines the sweeps. In addition, currently we do not support over-riding default values for parameters")
 
         if isinstance(values, (list, tuple)):
             if len(values) == len(remaining_parameters):
