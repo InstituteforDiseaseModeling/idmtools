@@ -16,7 +16,6 @@ as Singularity and Docker.
 For additional overview and conceptual information about containers, see the following:
 
 * Containers (https://www.ibm.com/cloud/learn/containers)
-* What is container technology? (https://www.techradar.com/news/what-is-container-technology)
 * Understanding Linux containers (https://www.redhat.com/en/topics/containers)
 * Containers and Dockers for Data Scientist (https://medium.com/ai-for-real/containers-and-dockers-for-data-scientist-c9000fb69478)
 
@@ -42,6 +41,7 @@ https://en.wikipedia.org/wiki/Singularity_(software).
 
 For additional overview and conceptual information about Singularity, see the following:
 
+* Introduction to Singularity (https://sylabs.io/guides/3.7/user-guide/introduction.html)
 * About Singularity (https://singularity.lbl.gov/about)
 * Singularity (https://singularity.lbl.gov/)
 
