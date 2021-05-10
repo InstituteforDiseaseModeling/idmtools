@@ -84,7 +84,8 @@ class CommandLine:
         Returns:
             None
         """
-        self._args.append(arg)
+        self._args.append(str(arg))
+
 
     def add_raw_argument(self, arg):
         """
@@ -96,7 +97,7 @@ class CommandLine:
         Returns:
             None
         """
-        self._raw_args.append(arg)
+        self._raw_args.append(str(arg))
 
     def add_option(self, option, value):
         """
@@ -109,7 +110,7 @@ class CommandLine:
         Returns:
             None
         """
-        self._options[option] = value
+        self._options[option] = str(value)
 
     @property
     def options(self):
