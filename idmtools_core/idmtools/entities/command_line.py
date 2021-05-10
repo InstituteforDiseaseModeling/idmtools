@@ -86,7 +86,6 @@ class CommandLine:
         """
         self._args.append(str(arg))
 
-
     def add_raw_argument(self, arg):
         """
         Add an argument that won't be quote on format.
