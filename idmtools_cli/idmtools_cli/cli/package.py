@@ -1,3 +1,4 @@
+"""Define our package group CLI command."""
 import os
 from logging import getLogger
 import click
@@ -9,6 +10,7 @@ user_logger = getLogger('user')
 
 @cli.group(short_help="Contains commands related to package versions")
 def package():
+    """Package group cli command."""
     pass
 
 
@@ -16,8 +18,8 @@ def package():
 @click.option('--name', required=True, type=str, help="package name")
 def latest_version(name: Optional[str]):
     """
-    \b
-    Display the latest version of a package
+    Display the latest version of a package.
+
     Args:
         name: package name
     """
@@ -31,8 +33,8 @@ def latest_version(name: Optional[str]):
 @click.option('--base_version', required=True, default=None, type=str, help="package version")
 def compatible_version(name: Optional[str], base_version: Optional[str]):
     """
-    \b
-    Display the latest compatible version of a package
+    Display the latest compatible version of a package.
+
     Args:
         name: package name
         base_version: package version
@@ -47,8 +49,8 @@ def compatible_version(name: Optional[str], base_version: Optional[str]):
 @click.option('--all/--no-all', type=bool, default=False, help="package version")
 def list_versions(name: Optional[str], all: Optional[bool]):
     """
-    \b
-    Display all package versions
+    Display all package versions.
+
     Args:
         name: package name
         all: True/False - return all or only released versions
@@ -64,9 +66,10 @@ def list_versions(name: Optional[str], all: Optional[bool]):
 @click.option('--wheel', multiple=True, help="Local wheel file")
 def updated_requirements(requirement: str = None, pkg: Optional[List[str]] = None, wheel: Optional[List[str]] = None):
     """
-    \b
-    Build Updated_Requirements from requirement file
+    Build Updated_Requirements from requirement file.
+
     Args:
+        requirement: Path to requirement file
         pkg: package name (along with version)
         wheel: package wheel file
     """
@@ -87,9 +90,10 @@ def updated_requirements(requirement: str = None, pkg: Optional[List[str]] = Non
 @click.option('--wheel', multiple=True, help="Local wheel file")
 def checksum(requirement: str = None, pkg: Optional[List[str]] = None, wheel: Optional[List[str]] = None):
     """
-    \b
-    Construct checksum from requirement file
+    Construct checksum from requirement file.
+
     Args:
+        requirement: path to requirement file
         pkg: package name (along with version)
         wheel: package wheel file
     """

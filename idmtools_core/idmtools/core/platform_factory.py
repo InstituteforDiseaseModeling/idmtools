@@ -1,3 +1,10 @@
+"""
+Manages the creation of our platforms.
+
+The Platform allows us to lookup a platform via its plugin name, "COMPS" or via configuration aliases defined in a platform plugins, such as CALCULON.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import json
 import os
 from contextlib import contextmanager
@@ -17,6 +24,16 @@ user_logger = getLogger('user')
 
 @contextmanager
 def platform(*args, **kwds):
+    """
+    Utility function to create platform.
+
+    Args:
+        *args: Arguments to pass to platform
+        **kwds: Keyword args to pass to platform
+
+    Returns:
+        Platform created.
+    """
     logger.debug(f'Acquiring platform context with options: {str(*args)}')
     try:
         # check if we are already in a platform context and if so add to stack
@@ -30,6 +47,9 @@ def platform(*args, **kwds):
 
 
 class Platform:
+    """
+    Platform Factory.
+    """
 
     def __new__(cls, block, missing_ok: bool = None, **kwargs):
         """
@@ -88,8 +108,7 @@ class Platform:
                              f"Supported platforms are {', '.join(cls._platforms.keys())}")
 
     @classmethod
-    def _create_from_block(cls, block: str, missing_ok: bool = False, default_missing: Dict[str, Any] = None,
-                           **kwargs) -> 'IPlatform':
+    def _create_from_block(cls, block: str, missing_ok: bool = False, default_missing: Dict[str, Any] = None, **kwargs) -> 'IPlatform':
         """
         Retrieve section entries from the INI configuration file by giving block.
 
@@ -101,7 +120,6 @@ class Platform:
         Returns:
             A dictionary with entries from the block.
         """
-
         # Read block details
         platform_type = None
         is_alias = False

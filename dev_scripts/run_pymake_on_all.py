@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+"""Utility script to parallelize pymake calls across multiple packages."""
 from shutil import which
 import argparse
 import os

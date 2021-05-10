@@ -1,3 +1,10 @@
+"""
+Utils for platform operations.
+
+Here we have mostly utilities to handle batch operations which tend to overlap across different item types.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 from concurrent.futures import as_completed, Future
 from concurrent.futures.process import ProcessPoolExecutor
 from concurrent.futures.thread import ThreadPoolExecutor
@@ -17,14 +24,17 @@ EXECUTOR = None
 
 def batch_items(items: Union[Iterable, Generator], batch_size=16):
     """
-    Batch items
+    Batch items.
 
     Args:
-        items:
-        batch_size:
+        items: Items to batch
+        batch_size: Size of the batch
 
     Returns:
+        Generator
 
+    Raises:
+        StopIteration
     """
     for item_chunk in chunked(items, batch_size):
         logger.info('created chunk')
@@ -34,7 +44,7 @@ def batch_items(items: Union[Iterable, Generator], batch_size=16):
 
 def item_batch_worker_thread(create_func: Callable, items: Union[List], **kwargs) -> List:
     """
-    Default batch worker thread function. It just calls create on each item
+    Default batch worker thread function. It just calls create on each item.
 
     Args:
         create_func: Create function for item
@@ -57,7 +67,7 @@ def batch_create_items(items: Union[Iterable, Generator], batch_worker_thread_fu
                        create_func: Callable[..., Any] = None, display_progress: bool = True,
                        progress_description: str = "Commissioning items", unit: str = None, **kwargs):
     """
-    Batch create items. You must specify either batch_worker_thread_func or create_func
+    Batch create items. You must specify either batch_worker_thread_func or create_func.
 
     Args:
         items: Items to create
@@ -69,7 +79,7 @@ def batch_create_items(items: Union[Iterable, Generator], batch_worker_thread_fu
         **kwargs:
 
     Returns:
-
+        Batches crated results
     """
     global EXECUTOR
     from idmtools.config import IdmConfigParser
@@ -148,14 +158,14 @@ def batch_create_items(items: Union[Iterable, Generator], batch_worker_thread_fu
 
 def show_progress_of_batch(progress_bar: 'tqdm', futures: List[Future]) -> List:  # noqa: F821
     """
-    Show progress bar for batch
+    Show progress bar for batch.
 
     Args:
         progress_bar: Progress bar
         futures: List of futures that are still running/queued
 
     Returns:
-
+        Returns results
     """
     results = []
     for future in as_completed(futures):

@@ -1,3 +1,8 @@
+"""
+TaskSpecification provided definition for the experiment plugin specification, hooks, and plugin manager.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 # Define our model specific specifications
 import typing
 from abc import ABC
@@ -19,17 +24,21 @@ logger = getLogger(__name__)
 
 
 class TaskSpecification(PluginSpecification, ABC):
+    """
+    TaskSpecification is spec for Task plugins.
+    """
 
     @classmethod
     def get_name(cls, strip_all: bool = True) -> str:
         """
         Get name of plugin. By default we remove the PlatformSpecification portion.
+
         Args:
             strip_all: When true, TaskSpecification and TaskSpec is stripped from name. When false only
             Specification and Spec is Stripped
 
         Returns:
-
+            Name of plugin
         """
         if strip_all:
             ret = cls.__name__.replace('TaskSpecification', '').replace("TaskSpec", '').replace('Spec', '')
@@ -52,13 +61,23 @@ class TaskSpecification(PluginSpecification, ABC):
 
     @get_task_type_spec
     def get_type(self) -> typing.Type['ITask']:  # noqa: F821
+        """
+        Get task type.
+
+        Returns:
+            Task type
+        """
         pass
 
 
 class TaskPlugins(SingletonMixin):
+    """
+    TaskPlugins acts as a registry for Task Plugins.
+    """
+
     def __init__(self, strip_all: bool = True) -> None:
         """
-        Initialize the Task Registry. When strip all is false, the full plugin name will be used for names in map
+        Initialize the Task Registry. When strip all is false, the full plugin name will be used for names in map.
 
         Args:
             strip_all: Whether to strip common parts of name from plugins in plugin map
@@ -67,7 +86,19 @@ class TaskPlugins(SingletonMixin):
                                     load_plugin_map('idmtools_task', TaskSpecification, strip_all))
 
     def get_plugins(self) -> typing.Set[TaskSpecification]:
+        """
+        Get plugins for Tasks.
+
+        Returns:
+            Plugins
+        """
         return set(self._plugins.values())
 
     def get_plugin_map(self) -> typing.Dict[str, TaskSpecification]:
+        """
+        Get a map of task plugins.
+
+        Returns:
+            Task plugin map
+        """
         return self._plugins

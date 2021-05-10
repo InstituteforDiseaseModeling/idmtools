@@ -1,3 +1,8 @@
+"""
+IPlatformSuiteOperations defines suite item operations interface.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from logging import getLogger, DEBUG
@@ -16,13 +21,16 @@ logger = getLogger(__name__)
 
 @dataclass
 class IPlatformSuiteOperations(ABC):
+    """
+    IPlatformSuiteOperations defines suite item operations interface.
+    """
     platform: 'IPlatform'  # noqa: F821
     platform_type: Type
 
     @abstractmethod
     def get(self, suite_id: UUID, **kwargs) -> Any:
         """
-        Returns the platform representation of an Suite
+        Returns the platform representation of an Suite.
 
         Args:
             suite_id: Item id of Suites
@@ -35,7 +43,7 @@ class IPlatformSuiteOperations(ABC):
 
     def batch_create(self, suites: List[Suite], display_progress: bool = True, **kwargs) -> List[Tuple[Any, UUID]]:
         """
-        Provides a method to batch create suites
+        Provides a method to batch create suites.
 
         Args:
             display_progress: Display progress bar
@@ -51,7 +59,7 @@ class IPlatformSuiteOperations(ABC):
 
     def pre_create(self, suite: Suite, **kwargs) -> NoReturn:
         """
-        Run the platform/suite post creation events
+        Run the platform/suite post creation events.
 
         Args:
             suite: Experiment to run post-creation events
@@ -69,7 +77,7 @@ class IPlatformSuiteOperations(ABC):
 
     def post_create(self, suite: Suite, **kwargs) -> NoReturn:
         """
-        Run the platform/suite post creation events
+        Run the platform/suite post creation events.
 
         Args:
             suite: Experiment to run post-creation events
@@ -86,8 +94,9 @@ class IPlatformSuiteOperations(ABC):
 
     def create(self, suite: Suite, do_pre: bool = True, do_post: bool = True, **kwargs) -> Tuple[Any, UUID]:
         """
-        Creates an simulation from an IDMTools suite object. Also performs pre-creation and post-creation
-        locally and on platform
+        Creates an simulation from an IDMTools suite object.
+
+        Also performs pre-creation and post-creation locally and on platform.
 
         Args:
             suite: Suite to create
@@ -118,7 +127,7 @@ class IPlatformSuiteOperations(ABC):
     @abstractmethod
     def platform_create(self, suite: Suite, **kwargs) -> Tuple[Any, UUID]:
         """
-        Creates an suite from an IDMTools suite object
+        Creates an suite from an IDMTools suite object.
 
         Args:
             suite: Suite to create
@@ -131,14 +140,15 @@ class IPlatformSuiteOperations(ABC):
 
     def pre_run_item(self, suite: Suite, **kwargs):
         """
-        Trigger right before commissioning experiment on platform. This ensures that the item is created. It also
-            ensures that the children(simulations) have also been created
+        Trigger right before commissioning experiment on platform.
+
+        This ensures that the item is created. It also ensures that the children(simulations) have also been created.
 
         Args:
             suite: Experiment to commission
 
         Returns:
-
+            None
         """
         # ensure the item is created before running
         # TODO what status are valid here? Create only?
@@ -164,19 +174,19 @@ class IPlatformSuiteOperations(ABC):
             suite: Experiment just commissioned
 
         Returns:
-
+            None
         """
         suite.status = EntityStatus.RUNNING
 
     def run_item(self, suite: Suite, **kwargs):
         """
-        Called during commissioning of an item. This should create the remote resource
+        Called during commissioning of an item. This should create the remote resource.
 
         Args:
-            workflow_item:
+            suite: suite to run
 
         Returns:
-
+            None
         """
         if logger.isEnabledFor(DEBUG):
             logger.debug("Calling pre_run_item")
@@ -190,26 +200,27 @@ class IPlatformSuiteOperations(ABC):
 
     def platform_run_item(self, suite: Suite, **kwargs):
         """
-        Called during commissioning of an item. This should perform what is needed to commission job on platform
+        Called during commissioning of an item. This should perform what is needed to commission job on platform.
 
         Args:
             suite:
 
         Returns:
-
+            None
         """
         pass
 
     @abstractmethod
     def get_parent(self, suite: Any, **kwargs) -> Any:
         """
-        Returns the parent of item. If the platform doesn't support parents, you should throw a TopLevelItem error
+        Returns the parent of item. If the platform doesn't support parents, you should throw a TopLevelItem error.
 
         Args:
             suite:
             **kwargs:
 
         Returns:
+            Parent of suite
 
         Raise:
             TopLevelItem
@@ -219,7 +230,7 @@ class IPlatformSuiteOperations(ABC):
     @abstractmethod
     def get_children(self, suite: Any, **kwargs) -> List[Any]:
         """
-        Returns the children of an suite object
+        Returns the children of an suite object.
 
         Args:
             suite: Suite object
@@ -232,7 +243,7 @@ class IPlatformSuiteOperations(ABC):
 
     def to_entity(self, suite: Any, **kwargs) -> Suite:
         """
-        Converts the platform representation of suite to idmtools representation
+        Converts the platform representation of suite to idmtools representation.
 
         Args:
             suite:Platform suite object
@@ -245,18 +256,20 @@ class IPlatformSuiteOperations(ABC):
     @abstractmethod
     def refresh_status(self, experiment: Suite, **kwargs):
         """
-        Refresh status of suite
+        Refresh status of suite.
+
         Args:
             experiment:
 
         Returns:
-
+            None
         """
         pass
 
     def get_assets(self, suite: Suite, files: List[str], **kwargs) -> Dict[str, Dict[str, Dict[str, bytearray]]]:
         """
-        Fetch assets for suite
+        Fetch assets for suite.
+
         Args:
             suite: suite to get assets for
             files: Files to load

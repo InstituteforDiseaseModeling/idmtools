@@ -1,3 +1,8 @@
+"""
+Defines the CommandLine class that represents our remote command line to be executed.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import re
 import shlex
 from typing import TypeVar, Dict, Any, List
@@ -7,8 +12,8 @@ from dataclasses import dataclass, field
 @dataclass(init=False)
 class CommandLine:
     """
-        A class to construct command line strings from executable, options, and params
-        """
+    A class to construct command-line strings from executable, options, and params.
+    """
     #: The executable portion of the command
     _executable: str = None
     #: Options for the command
@@ -21,6 +26,16 @@ class CommandLine:
     is_windows: bool = field(default=False)
 
     def __init__(self, executable=None, *args, is_windows: bool = False, raw_args: List[Any] = None, **kwargs):
+        """
+        Initialize CommandLine.
+
+        Args:
+            executable: Executable
+            *args: Additional Arguments
+            is_windows: is the command for windows
+            raw_args: Any raw arguments
+            **kwargs: Keyword arguments
+        """
         # If there is a space in executable, we probably need to split it
         self._executable = executable
         self._options = kwargs or {}
@@ -38,32 +53,73 @@ class CommandLine:
 
     @property
     def executable(self) -> str:
+        """
+        Return executable as string.
+
+        Returns:
+            Executable
+        """
         return self._executable.replace('/', "\\") if self.is_windows else self._executable
 
     @executable.setter
     def executable(self, executable):
+        """
+        Set the executable portion of the command line.
+
+        Args:
+            executable: Executable
+
+        Returns:
+            None
+        """
         self._executable = executable
 
     def add_argument(self, arg):
+        """
+        Add argument.
+
+        Args:
+            arg: Argument string
+
+        Returns:
+            None
+        """
         self._args.append(str(arg))
+
 
     def add_raw_argument(self, arg):
         """
-        Add an argument that won't be quote on format
+        Add an argument that won't be quote on format.
 
         Args:
             arg:arg
 
         Returns:
-
+            None
         """
         self._raw_args.append(str(arg))
 
     def add_option(self, option, value):
+        """
+        Add a command-line option.
+
+        Args:
+            option: Option to add
+            value: Value of option
+
+        Returns:
+            None
+        """
         self._options[option] = str(value)
 
     @property
     def options(self):
+        """
+        Options as a string.
+
+        Returns:
+            Options string
+        """
         options = []
         for k, v in self._options.items():
             # Handles spaces
@@ -81,13 +137,13 @@ class CommandLine:
     @staticmethod
     def __quote_windows(s):
         """
-        Quote a parameter for windows command line
+        Quote a parameter for windows command line.
 
         Args:
-            s:
+            s: String to quote
 
         Returns:
-
+            Quoted string
         """
         n = s.replace('"', '\\"')
         if re.search(r'(["\s])', s):
@@ -96,29 +152,62 @@ class CommandLine:
 
     @property
     def arguments(self):
+        """
+        The CommandLine arguments.
+
+        Returns:
+            Arguments as string
+        """
         quote_fn = self.__quote_windows if self.is_windows else self.__quote_linux
         qargs = ' '.join([quote_fn(s) for s in self._args if s])
         qargs += ' ' + self.raw_arguments
         return qargs
 
     def __quote_linux(self, s):
+        """
+        Quote linux.
+
+        Args:
+            s: String to quote
+
+        Returns:
+            Quotes string
+        """
         return shlex.quote(s)
 
     @property
     def raw_arguments(self):
+        """
+        Raw arguments(arguments not to be parsed).
+
+        Returns:
+            Raw arguments as a string
+        """
         return ' '.join(self._raw_args)
 
     @property
     def cmd(self):
+        """
+        Converts command to string.
+
+        Returns:
+            Command as string
+        """
         return ' '.join(filter(None, [self._executable.strip() if self._executable else None, self.options.strip(), self.arguments.strip()]))
 
     def __str__(self):
+        """
+        String representation of command.
+
+        Returns:
+            String of command
+        """
         return self.cmd
 
     @staticmethod
     def from_string(command: str, as_raw_args: bool = False) -> 'CommandLine':
         """
-        Creates a command line object from string
+        Creates a command line object from string.
 
         Args:
             command: Command

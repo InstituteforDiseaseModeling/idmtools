@@ -1,11 +1,21 @@
+"""
+idmtools arm builder definition.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import copy
 import collections
 from enum import Enum
 from itertools import product
+from typing import Tuple, List, Callable, Iterable, Any
+
 from idmtools.builders import SimulationBuilder
 
 
 class ArmType(Enum):
+    """
+    ArmTypes.
+    """
     cross = 0
     pair = 1
 
@@ -15,7 +25,14 @@ class SweepArm:
     Class that represents a parameter arm.
     """
 
-    def __init__(self, type=ArmType.cross, funcs=None):
+    def __init__(self, type=ArmType.cross, funcs: List[Tuple[Callable, Iterable]] = None):
+        """
+        Constructor.
+
+        Args:
+            type: Type of Arm(Cross or Pair)
+            funcs: Functions to add as sweeps
+        """
         if funcs is None:
             funcs = []
         self.sweep_functions = []
@@ -24,7 +41,17 @@ class SweepArm:
         for func, values in funcs:
             self.add_sweep_definition(func, values)
 
-    def add_sweep_definition(self, func: 'Callable', values: 'Iterable[Any]'):  # noqa F821
+    def add_sweep_definition(self, func: Callable, values: Iterable[Any]):  # noqa F821
+        """
+        Add Sweep definition.
+
+        Args:
+            func: Sweep callback
+            values: Values to Sweep
+
+        Returns:
+            None
+        """
         self.sweep_functions.append((func, values if isinstance(values, collections.abc.Iterable) and not (
             isinstance(values, str)) else [values]))
 
@@ -32,10 +59,22 @@ class SweepArm:
             self.adjust_values_length()
 
     def get_max_values_count(self):
+        """
+        Get the max values count from different sweep functions.
+
+        Returns:
+            Max values
+        """
         cnts = [len(values) for _, values in self.sweep_functions]
         return max(cnts)
 
     def adjust_values_length(self):
+        """
+        Adjust values length.
+
+        Returns:
+            None
+        """
         if self.type != ArmType.pair:
             return
 
@@ -132,17 +171,38 @@ class ArmSimulationBuilder(SimulationBuilder):
     """
 
     def __init__(self):
+        """
+        Constructor.
+        """
         super().__init__()
         self.arms = []
         self.sweep_definitions = []
 
     def add_arm(self, arm):
+        """
+        Add arm sweep definition.
+
+        Args:
+            arm: Arm to add
+
+        Returns:
+            None
+        """
         arm_list = arm if isinstance(arm, collections.abc.Iterable) else [arm]
         for a in arm_list:
             self.arms.append(a)
             self._apply(a)
 
     def _apply(self, arm):
+        """
+        Apply our arm.
+
+        Args:
+            arm: Arm to apply
+
+        Returns:
+            None
+        """
         self.sweeps = []
         for func, values in arm.sweep_functions:
             self.add_sweep_definition(func, values)
@@ -153,4 +213,10 @@ class ArmSimulationBuilder(SimulationBuilder):
             self.sweep_definitions.extend(zip(*self.sweeps))
 
     def __iter__(self):
+        """
+        Iterator for the simulations defined.
+
+        Returns:
+            Iterator
+        """
         yield from self.sweep_definitions

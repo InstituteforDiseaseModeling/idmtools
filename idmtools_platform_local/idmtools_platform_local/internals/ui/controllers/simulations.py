@@ -1,3 +1,7 @@
+"""idmtools local platform simulations controller(API).
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import logging
 import signal
 import os
@@ -23,7 +27,7 @@ logger = logging.getLogger(__name__)
 def sim_status(simulation_id: Optional[str], experiment_id: Optional[str], status: Optional[str],
                tags: Optional[List[Tuple[str, str]]], page: int = 1, per_page: int = 20) -> Tuple[Dict, int]:
     """
-    List of statuses for simulation(s) with the ability to filter by id, experiment_id, status, and tags
+    List of statuses for simulation(s) with the ability to filter by id, experiment_id, status, and tags.
 
     Args:
         simulation_id (Optional[str]): Optional Id of simulation
@@ -73,7 +77,9 @@ idx_parser.add_argument('tags', action='append', default=None, help="Tags to fil
 
 
 class Simulations(Resource):
+    """Simulation API controller."""
     def get(self, id=None):
+        """Get simulation."""
         args = idx_parser.parse_args()
         args['simulation_id'] = id
 
@@ -88,6 +94,7 @@ class Simulations(Resource):
         return result, 200, {'X-Total': total, 'X-Per-Page': args.per_page}
 
     def put(self, id):
+        """Update simulation."""
         data = request.json
         # at moment, only allow status to be updated(ie canceled'
         # later, we may support resuming but we will need to include more data in the db to do this

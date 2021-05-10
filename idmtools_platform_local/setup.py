@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-"""The setup script for the idmtools_platform_local module, which provides ability to run models locally using docker
-containers to idmtools."""
+"""The setup script for the idmtools_platform_local module, which provides ability to run models locally using docker containers to idmtools."""
 import sys
 
 from setuptools import setup, find_packages

@@ -1,3 +1,7 @@
+"""idmtools comps workflow item operations.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import json
 import typing
 from dataclasses import dataclass, field
@@ -24,6 +28,7 @@ user_logger = getLogger('user')
 
 @dataclass
 class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
+    """Provides IWorkflowItem COMPSPlatform."""
     platform: 'COMPSPlatform'  # noqa F821
     platform_type: Type = field(default=COMPSWorkItem)
 
@@ -31,7 +36,7 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
             query_criteria: Optional[QueryCriteria] = None, **kwargs) -> \
             COMPSWorkItem:
         """
-        Get COMPSWorkItem
+        Get COMPSWorkItem.
 
         Args:
             workflow_item_id: Item id
@@ -50,7 +55,7 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
 
     def platform_create(self, work_item: IWorkflowItem, **kwargs) -> Tuple[Any]:
         """
-        Creates an workflow_item from an IDMTools work_item object
+        Creates an workflow_item from an IDMTools work_item object.
 
         Args:
             work_item: WorkflowItem to create
@@ -114,7 +119,8 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
 
     def platform_run_item(self, work_item: IWorkflowItem, **kwargs):
         """
-        Start to rum COMPS WorkItem created from work_item
+        Start to rum COMPS WorkItem created from work_item.
+
         Args:
             work_item: workflow item
 
@@ -128,7 +134,8 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
 
     def get_parent(self, work_item: IWorkflowItem, **kwargs) -> Any:
         """
-        Returns the parent of item. If the platform doesn't support parents, you should throw a TopLevelItem error
+        Returns the parent of item. If the platform doesn't support parents, you should throw a TopLevelItem error.
+
         Args:
             work_item: COMPS WorkItem
             **kwargs: Optional arguments mainly for extensibility
@@ -142,7 +149,7 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
 
     def get_children(self, work_item: IWorkflowItem, **kwargs) -> List[Any]:
         """
-        Returns the children of an workflow_item object
+        Returns the children of an workflow_item object.
 
         Args:
             work_item: WorkflowItem object
@@ -155,24 +162,26 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
 
     def refresh_status(self, workflow_item: IWorkflowItem, **kwargs):
         """
-                Refresh status for workflow item
-                Args:
-                    work_item: Item to refresh status for
+        Refresh status for workflow item.
 
-                Returns:
-                    None
-                """
+        Args:
+            work_item: Item to refresh status for
+
+        Returns:
+            None
+        """
         wi = self.get(workflow_item.uid, columns=["id", "state"], load_children=[])
         workflow_item.status = convert_comps_workitem_status(wi.state)  # convert_COMPS_status(wi.state)
 
     def send_assets(self, workflow_item: IWorkflowItem, **kwargs):
         """
-                Add asset as WorkItemFile
-                Args:
-                    workflow_item: workflow item
+        Add asset as WorkItemFile.
 
-                Returns: None
-                """
+        Args:
+            workflow_item: workflow item
+
+        Returns: None
+        """
         # Collect asset files
         if workflow_item.assets and len(workflow_item.assets):
             if logger.isEnabledFor(DEBUG):
@@ -181,20 +190,21 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
 
     def list_assets(self, workflow_item: IWorkflowItem, **kwargs) -> List[str]:
         """
-        Get list of asset files
+        Get list of asset files.
+
         Args:
             workflow_item: workflow item
             **kwargs: Optional arguments mainly for extensibility
 
         Returns: list of assets associated with WorkItem
-
         """
         wi: COMPSWorkItem = workflow_item.get_platform_object()
         return wi.files
 
     def get_assets(self, workflow_item: IWorkflowItem, files: List[str], **kwargs) -> Dict[str, bytearray]:
         """
-        Retrieve files association with WorkItem
+        Retrieve files association with WorkItem.
+
         Args:
             workflow_item: workflow item
             files: list of file paths
@@ -208,7 +218,7 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
 
     def to_entity(self, work_item: COMPSWorkItem, **kwargs) -> IWorkflowItem:
         """
-        Converts the platform representation of workflow_item to idmtools representation
+        Converts the platform representation of workflow_item to idmtools representation.
 
         Args:
             work_item:Platform workflow_item object
@@ -216,7 +226,7 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
 
         Returns:
             IDMTools workflow item
-                """
+        """
         # Creat a workflow item
         # Eventually it would be nice to put the actual command here, but this requires fetching the work-order which is a bit to much overhead
         obj = GenericWorkItem(name=work_item.name, command="")
@@ -237,7 +247,8 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
 
     def get_related_items(self, item: IWorkflowItem, relation_type: RelationType) -> Dict[str, List[Dict[str, str]]]:
         """
-        Get related WorkItems, Suites, Experiments, Simulations and AssetCollections
+        Get related WorkItems, Suites, Experiments, Simulations and AssetCollections.
+
         Args:
             item: workflow item
             relation_type: RelationType

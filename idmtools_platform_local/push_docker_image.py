@@ -1,4 +1,4 @@
-# This is a workaround script to get docker versions working with pip versions and to automate build of those images
+"""This is a workaround script to get docker versions working with pip versions and to automate build of those images."""
 import os
 import subprocess
 import sys

@@ -1,3 +1,12 @@
+"""idmtools download experiment tools.
+
+This allow downloading experiments for local testing.
+
+Notes:
+    - We need some details around this somewhere. Maybe some documentation?
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import os
 import stat
 import sys
@@ -11,6 +20,7 @@ from idmtools.entities.simulation import Simulation
 
 
 def get_script_extension():
+    """Determine extension to write out file as."""
     if sys.platform in ["linux", "darwin"]:
         return "sh"
     else:
@@ -18,19 +28,21 @@ def get_script_extension():
 
 
 def download_asset(asset, path):
+    """Download a single asset."""
     os.makedirs(path, exist_ok=True)
     asset.download_to_path(path)
 
 
 def write_script(simulation: Simulation, path):
     """
-    Writes a shell script to execute simulation
+    Writes a shell script to execute simulation.
+
     Args:
         simulation:
         path:
 
     Returns:
-
+        None
     """
     command = str(simulation.task.command)
     sp = os.path.join(path, f"idmtools_run.{get_script_extension()}")
@@ -43,13 +55,14 @@ def write_script(simulation: Simulation, path):
 
 def write_experiment_script(experiment: Experiment, path: str):
     """
-    Write an experiment script
+    Write an experiment script.
+
     Args:
         experiment:
         path:
 
     Returns:
-
+        None
     """
     sp = os.path.join(path, f"idmtools_run.{get_script_extension()}")
 
@@ -63,14 +76,16 @@ def write_experiment_script(experiment: Experiment, path: str):
 
 def download_experiment(experiment: Experiment, destination: str):
     """
-    Downloads experiment to local directory. Usefule for troubleshooting experiments
+    Downloads experiment to local directory.
+
+    Useful for troubleshooting experiments
 
     Args:
         experiment: Experiment to download
         destination: Destionation Directory
 
     Returns:
-
+        None
     """
     asset_dir = os.path.join(destination, "Assets")
     os.makedirs(asset_dir, exist_ok=True)

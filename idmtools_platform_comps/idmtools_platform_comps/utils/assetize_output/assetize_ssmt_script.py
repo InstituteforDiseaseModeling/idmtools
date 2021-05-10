@@ -1,3 +1,9 @@
+"""idmtools ssmt script.
+
+This script is used on server side only and not meant to be ran on a local machine.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 # flake8: noqa F405 F403
 import sys
 from argparse import Namespace

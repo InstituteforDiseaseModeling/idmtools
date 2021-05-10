@@ -1,3 +1,4 @@
+"""Base click group definition."""
 import logging
 from idmtools import IdmConfigParser
 from idmtools.core.logging import setup_logging
@@ -14,10 +15,7 @@ pass_platform_cli = click.make_pass_decorator(IPlatformCLI)
 @click.group()
 @click.option('--debug/--no-debug', default=False, help="When selected, enables console level logging")
 def cli(debug):
-    """
-    Allows you to perform multiple idmtools commands
-
-    """
+    """Allows you to perform multiple idmtools commands."""
     IdmConfigParser()
     # init config by just calling config parser
     if debug:
