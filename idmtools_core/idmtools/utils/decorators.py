@@ -15,6 +15,8 @@ from logging import getLogger, DEBUG
 from typing import Callable, Union, Optional, Type
 
 logger = getLogger(__name__)
+# check if we are building docs
+IS_SPHINX_BUILD = bool(os.getenv('SPHINX_BUILD'))
 
 
 class abstractstatic(staticmethod):
@@ -225,7 +227,7 @@ class ParallelizeDecorator:
             future = self.queue.submit(func, *args, **kwargs)
             return future
 
-        return wrapper
+        return func if IS_SPHINX_BUILD else wrapper
 
     def join(self):
         """
