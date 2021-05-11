@@ -21,9 +21,8 @@ import os
 import subprocess
 import sys
 from datetime import datetime
-
 import sphinx_rtd_theme
-
+os.environ['SPHINX_BUILD'] = '1'
 if sys.platform in ["linux", "darwin"]:
     subprocess.check_output(["make", "generate-api"], cwd=os.path.dirname(os.path.abspath(__file__)))
 else:
