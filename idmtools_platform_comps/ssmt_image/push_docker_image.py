@@ -1,4 +1,7 @@
-# This is a workaround script to get docker versions working with pip versions and to automate build of those images
+"""This is a workaround script to get docker versions working with pip versions and to automate build of those images.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import os
 import subprocess
 import sys

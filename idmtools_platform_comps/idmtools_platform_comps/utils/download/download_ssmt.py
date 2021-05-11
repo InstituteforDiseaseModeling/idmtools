@@ -1,3 +1,9 @@
+"""idmtools download workitem ssmt script.
+
+This script is meant to be ran remotely on SSMT, not locally.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 # flake8: noqa F405 F403
 import sys
 import zipfile

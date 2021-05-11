@@ -1,3 +1,7 @@
+"""idmtools local platform simulation actors/queues.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import logging
 import typing
 from functools import partial
@@ -22,18 +26,19 @@ SIM_ID_LENGTH = 8
 class CreateSimulationTask(GenericActor):  # pragma: no cover
     """
     Creates a simulation.
+
     - Create the simulation folder in the experiment_id parent folder
     - Returns the UUID of the newly created simulation folder
-
     """
 
     class Meta:
+        """Actor config."""
         store_results = True
         max_retries = 0
 
     def perform(self, experiment_id: str, tags: Dict[str, Any], extra_details: Dict[str, Any]) -> str:
         """
-        Creates our simulation task
+        Creates our simulation task.
 
         Args:
             experiment_id(str): experiment id which the simulation belongs too
@@ -51,18 +56,19 @@ class CreateSimulationTask(GenericActor):  # pragma: no cover
 class CreateSimulationsTask(GenericActor):  # pragma: no cover
     """
     Creates a simulation.
+
     - Create the simulation folder in the experiment_id parent folder
     - Returns the UUID of the newly created simulation folder
-
     """
 
     class Meta:
+        """Actor config."""
         store_results = True
         max_retries = 0
 
     def perform(self, experiment_id: str, tags: Tuple[List[Dict[str, Any]], Dict[str, Any]]) -> typing.List:
         """
-        Creates our simulation task
+        Creates our simulation task.
 
         Args:
             experiment_id(str): experiment id which the simulation belongs too

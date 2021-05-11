@@ -17,7 +17,9 @@ Utilities Unique to COMPS
 -------------------------
 
 .. toctree::
+   comps/add_2ac
    comps/assetize_output
    comps/download.rst
    comps/errors.rst
+   comps/scheduling.rst
    comps/singularity_build.rst

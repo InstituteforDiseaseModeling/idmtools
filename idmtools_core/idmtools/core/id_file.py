@@ -1,3 +1,11 @@
+"""
+Utility method for writing and reading id files.
+
+ID Files allow us to reload entities like Experiment, Simulations, AssetCollections, etc from a platform through files. This can
+be enabling for workflows to chain steps together, or to self-document remote outputs in the local project directory.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import json
 from os import PathLike
 from typing import Union, Dict, TYPE_CHECKING
@@ -8,14 +16,16 @@ if TYPE_CHECKING:
 
 def read_id_file(filename: Union[str, PathLike]):
     """
-    Reads an id from an id file. An id file is in the format of
+    Reads an id from an id file.
+
+    An id file is in the format of
 
     <id>::<item_type>::<config block>::<extra args>
     Args:
         filename:
 
     Returns:
-
+        None
     """
     if isinstance(filename, PathLike):
         filename = str(filename)
@@ -38,16 +48,16 @@ def read_id_file(filename: Union[str, PathLike]):
 
 def write_id_file(filename: Union[str, PathLike], item: 'IEntity', save_platform: bool = False, platform_args: Dict = None):
     """
-    Write an item as and id file
+    Write an item as and id file.
 
     Args:
-        filename:
-        item:
-        save_platform:
-        platform_args:
+        filename: Filename to write file to
+        item: Item to write out
+        save_platform: When true, writes platform details to the file
+        platform_args: Platform arguments to write out
 
     Returns:
-
+        None
     """
     from idmtools.utils.json import IDMJSONEncoder
     if isinstance(filename, PathLike):

@@ -1,6 +1,7 @@
-####
-# This script is currently a workaround so that we can use bump2version with docker since the nightly versions
-# don't work with docker registry
+"""This script is currently a workaround so that we can use bump2version with docker since the nightly versions doesn't work with docker registry.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import argparse
 import glob
 import os
@@ -32,10 +33,10 @@ LOCAL_PACKAGE_DIR = os.path.join(BASE_DIR, 'idmtools_platform_comps/ssmt_image')
 
 def get_dependency_packages():
     """
-    Get python packages required to build image
+    Get python packages required to build image.
 
     Returns:
-
+        None
     """
     os.makedirs(os.path.abspath('.depends'), exist_ok=True)
     for root, _dirs, files in os.walk(os.path.join(LOCAL_PACKAGE_DIR, '.depends')):
@@ -48,7 +49,9 @@ def get_dependency_packages():
 
 def get_username_and_password(disable_keyring_load=False, disable_keyring_save=False):
     """
-    Try to get username. It first attempts loading from environment vars, then keyring if not disabled, then lastly prompts
+    Try to get username.
+
+    It first attempts loading from environment vars, then keyring if not disabled, then lastly prompts.
 
     Args:
         disable_keyring_load: Disable loading credentials from keyring
@@ -78,9 +81,10 @@ def get_username_and_password(disable_keyring_load=False, disable_keyring_save=F
 
 def get_latest_image_version_from_registry(username, password):
     """
-    Fetch the latest image version from repo
-    Returns:
+    Fetch the latest image version from repo.
 
+    Returns:
+        Latest version published in the registry
     """
     url = f'https://{BASE_REPO}/artifactory/api/docker/{REPO_KEY}/v2/{IMAGE_NAME}/tags/list'
     auth = HTTPBasicAuth(username=username, password=password)
@@ -107,6 +111,18 @@ def get_latest_image_version_from_registry(username, password):
 
 
 def build_image(username, password, disable_keyring_load, disable_keyring_save):
+    """
+    Run the docker build command.
+
+    Args:
+        username: Username to use with registry
+        password: Password to use with registry
+        disable_keyring_load: Disable keyring which caches passwords
+        disable_keyring_save: Disable caching password to the keyring
+
+    Returns:
+        None
+    """
     if username is None or password is None:
         username, password = get_username_and_password(disable_keyring_load, disable_keyring_save)
     get_dependency_packages()

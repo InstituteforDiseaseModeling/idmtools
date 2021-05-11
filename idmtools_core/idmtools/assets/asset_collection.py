@@ -1,3 +1,8 @@
+"""
+idmtools assets collection package.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import copy
 import os
 from dataclasses import dataclass, field
@@ -16,6 +21,8 @@ from idmtools.utils.file import scan_directory
 from idmtools.utils.filters.asset_filters import default_asset_file_filter
 from idmtools.utils.info import get_doc_base_url
 
+IGNORE_DIRECTORIES = ['.git', '.svn', '.venv', '.idea', '.Rproj.user', '$RECYCLE.BIN', '__pycache__']
+
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
 
@@ -26,7 +33,6 @@ user_logger = getLogger('user')
 class AssetCollection(IEntity):
     """
     A class that represents a collection of assets.
-
     """
 
     #: Assets for collection
@@ -60,7 +66,7 @@ class AssetCollection(IEntity):
     def from_id(cls, item_id: Union[str, UUID], platform: 'IPlatform' = None, as_copy: bool = False,  # noqa E821
                 **kwargs) -> 'AssetCollection':
         """
-        Loads a AssetCollection from id
+        Loads a AssetCollection from id.
 
         Args:
             item_id: Asset Collection ID
@@ -81,8 +87,9 @@ class AssetCollection(IEntity):
                        filters: 'TAssetFilterList' = None, filters_mode: FilterMode = FilterMode.OR,  # noqa: F821
                        relative_path: str = None) -> 'TAssetCollection':
         """
-        Fill up an :class:`AssetCollection` from the specified directory. See
-        :meth:`~AssetCollection.assets_from_directory` for arguments.
+        Fill up an :class:`AssetCollection` from the specified directory.
+
+        See :meth:`~AssetCollection.assets_from_directory` for arguments.
 
         Returns:
             A created :class:`AssetCollection` object.
@@ -94,7 +101,7 @@ class AssetCollection(IEntity):
     def assets_from_directory(assets_directory: Union[str, PathLike], recursive: bool = True, flatten: bool = False,
                               filters: 'TAssetFilterList' = None,  # noqa: F821
                               filters_mode: FilterMode = FilterMode.OR,
-                              forced_relative_path: str = None) -> List[Asset]:
+                              forced_relative_path: str = None, no_ignore: bool = False) -> List[Asset]:
         """
         Create assets for files in a given directory.
 
@@ -107,6 +114,7 @@ class AssetCollection(IEntity):
                 the collection; False filters it out. See :meth:`~idmtools.utils.filters.asset_filters`.
             filters_mode: When given multiple filters, either OR or AND the results.
             forced_relative_path: Prefix a relative path to the path created from the root directory.
+            no_ignore: Should we not ignore common directories(.git, .svn. etc) The full list is defined in IGNORE_DIRECTORIES
 
         Examples:
             For **relative_path**, given the following folder structure root/a/1,txt root/b.txt and
@@ -121,7 +129,7 @@ class AssetCollection(IEntity):
         if isinstance(assets_directory, PathLike):
             assets_directory = str(assets_directory)
         found_assets = []
-        for entry in scan_directory(assets_directory, recursive):
+        for entry in scan_directory(assets_directory, recursive, IGNORE_DIRECTORIES if not no_ignore else None):
             relative_path = os.path.relpath(os.path.dirname(entry.path), assets_directory)
             found_assets.append(Asset(absolute_path=os.path.abspath(entry.path),
                                       relative_path=None if relative_path == "." else relative_path,
@@ -152,7 +160,7 @@ class AssetCollection(IEntity):
 
     def copy(self) -> 'AssetCollection':
         """
-        Copy our Asset Collection, removing ID and tags
+        Copy our Asset Collection, removing ID and tags.
 
         Returns:
             New AssetCollection containing Assets from other AssetCollection
@@ -161,20 +169,21 @@ class AssetCollection(IEntity):
 
     def add_directory(self, assets_directory: Union[str, PathLike], recursive: bool = True, flatten: bool = False,
                       filters: 'TAssetFilterList' = None, filters_mode: FilterMode = FilterMode.OR,  # noqa: F821
-                      relative_path: str = None):
+                      relative_path: str = None, no_ignore: bool = False):
         """
         Retrieve assets from the specified directory and add them to the collection.
+
         See :meth:`~AssetCollection.assets_from_directory` for arguments.
         """
         if isinstance(assets_directory, PathLike):
             assets_directory = str(assets_directory)
-        assets = AssetCollection.assets_from_directory(assets_directory, recursive, flatten, filters, filters_mode, relative_path)
+        assets = AssetCollection.assets_from_directory(assets_directory, recursive, flatten, filters, filters_mode, relative_path, no_ignore)
         for asset in assets:
             self.add_asset(asset)
 
     def is_editable(self, error=False) -> bool:
         """
-        Checks whether Item is editable
+        Checks whether Item is editable.
 
         Args:
             error: Throw error is not
@@ -200,6 +209,9 @@ class AssetCollection(IEntity):
              If not, simply replace it.
            fail_on_deep_comparison: Fails only if deep comparison differs
            **kwargs: Arguments to pass to Asset constructor when asset is a string
+
+        Raises:
+            DuplicatedAssetError - If fail_on_duplicate is true and the asset is already part of the collection
         """
         self.is_editable(True)
         if isinstance(asset, (str, PathLike)):
@@ -217,7 +229,7 @@ class AssetCollection(IEntity):
 
     def __add__(self, other: Union[TAssetList, 'AssetCollection', Asset]) -> 'AssetCollection':
         """
-        Allows using the a + b syntax when adding AssetCollections
+        Allows using the a + b syntax when adding AssetCollections.
 
         Args:
             other: Either a list of assets, an assetcollection, or an asset
@@ -242,7 +254,7 @@ class AssetCollection(IEntity):
 
     def add_assets(self, assets: Union[TAssetList, 'AssetCollection'], fail_on_duplicate: bool = True, fail_on_deep_comparison: bool = False):
         """
-        Add assets to a collection
+        Add assets to a collection.
 
         Args:
             assets: An list of assets as either list or a collection
@@ -251,7 +263,7 @@ class AssetCollection(IEntity):
             fail_on_deep_comparison: Fail if relative path/file is same but contents differ
 
         Returns:
-
+            None
         """
         self.is_editable(True)
         for asset in assets:
@@ -259,7 +271,7 @@ class AssetCollection(IEntity):
 
     def add_or_replace_asset(self, asset: Union[Asset, str, PathLike], fail_on_deep_comparison: bool = False):
         """
-        Add or replaces an asset in a collection
+        Add or replaces an asset in a collection.
 
         Args:
             asset: Asset to add or replace
@@ -301,7 +313,7 @@ class AssetCollection(IEntity):
 
     def remove(self, **kwargs) -> NoReturn:
         """
-        Remove an asset from the AssetCollection based on keywords attributes
+        Remove an asset from the AssetCollection based on keywords attributes.
 
         Args:
             **kwargs: Filter for the asset to remove.
@@ -336,7 +348,8 @@ class AssetCollection(IEntity):
 
     def extend(self, assets: List[Asset], fail_on_duplicate: bool = True) -> NoReturn:
         """
-        Extend the collection with new assets
+        Extend the collection with new assets.
+
         Args:
             assets: Which assets to add
             fail_on_duplicate: Fail if duplicated asset is included.
@@ -347,35 +360,80 @@ class AssetCollection(IEntity):
             self.add_asset(asset, fail_on_duplicate)
 
     def clear(self):
+        """
+        Clear the asset collection.
+
+        Returns:
+            None
+        """
         self.is_editable(True)
         self.assets.clear()
 
     def set_all_persisted(self):
+        """
+        Set all persisted.
+
+        Returns:
+            None
+        """
         for a in self:
             a.persisted = True
 
     @property
     def count(self):
+        """
+        Number of assets in collections.
+
+        Returns:
+            Total assets
+        """
         return len(self.assets)
 
     @IEntity.uid.getter
     def uid(self):
+        """
+        Uid of Asset Collection.
+
+        Returns:
+            Asset Collection UID.
+        """
         if self.count == 0:
             return None
         return super().uid
 
     def __len__(self):
+        """
+        Length of the asset collection(number of assets).
+
+        Returns:
+            Total number of assets
+        """
         return len(self.assets)
 
     def __getitem__(self, index):
+        """
+        Get item from assets collection.
+
+        Args:
+            index: Index to load
+
+        Returns:
+            Asset at the index.
+        """
         return self.assets[index]
 
     def __iter__(self):
+        """
+        Allow asset collection to be iterable.
+
+        Returns:
+            Iterator of assets
+        """
         yield from self.assets
 
     def has_asset(self, absolute_path: str = None, filename: str = None, relative_path: str = None, checksum: str = None) -> bool:
         """
-        Search for asset by absolute_path or by filename
+        Search for asset by absolute_path or by filename.
 
         Args:
             absolute_path: Absolute path of source file
@@ -393,7 +451,7 @@ class AssetCollection(IEntity):
 
     def find_index_of_asset(self, other: 'Asset', deep_compare: bool = False) -> Union[int, None]:
         """
-        Finds the index of asset by path or filename
+        Finds the index of asset by path or filename.
 
         Args:
             other: Other asset
@@ -411,6 +469,18 @@ class AssetCollection(IEntity):
         return None
 
     def pre_creation(self, platform: 'IPlatform') -> None:
+        """
+        Pre-Creation hook for the asset collection.
+
+        Args:
+            platform: Platform object we are create asset collection on
+
+        Returns:
+            None
+
+        Notes:
+            TODO - Make default tags optional
+        """
         if self.tags:
             self.tags.update(get_default_tags())
         else:
@@ -418,9 +488,27 @@ class AssetCollection(IEntity):
         IItem.pre_creation(self, platform)
 
     def set_tags(self, tags: Dict[str, Any]):
+        """
+        Set the tags on the asset collection.
+
+        Args:
+            tags: Tags to set on the item
+
+        Returns:
+            None
+        """
         self.tags = tags
 
     def add_tags(self, tags: Dict[str, Any]):
+        """
+        Add tags to the Asset collection.
+
+        Args:
+            tags: Tags to add
+
+        Returns:
+            None
+        """
         self.tags.update(tags)
 
 

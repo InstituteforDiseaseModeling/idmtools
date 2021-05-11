@@ -1,3 +1,10 @@
+"""idmtools singularity build workitem.
+
+Notes:
+    - TODO add examples here.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import hashlib
 import io
 import json
@@ -35,6 +42,12 @@ user_logger = getLogger('user')
 
 @dataclass(repr=False)
 class SingularityBuildWorkItem(InputDataWorkItem):
+    """
+    Provides a wrapper to build utilizing the COMPS build server.
+
+    Notes:
+        - TODO add references to examples
+    """
     #: Path to definition file
     definition_file: Union[PathLike, str] = field(default=None)
     #: definition content. Alternative to file
@@ -78,6 +91,7 @@ class SingularityBuildWorkItem(InputDataWorkItem):
     __rendered_template: str = field(default=None)
 
     def __post_init__(self, item_name: str, asset_collection_id: UUID, asset_files: FileList, user_files: FileList, image_url: str):
+        """Constructor."""
         self.work_item_type = 'ImageBuilderWorker'
         self._image_url = None
         # Set this for now. Later it should be replace with some type of Specialized worker identifier
@@ -89,22 +103,28 @@ class SingularityBuildWorkItem(InputDataWorkItem):
             self.definition_file = str(self.definition_file)
 
     def get_container_info(self) -> Dict[str, str]:
+        """Get container info.
+
+        Notes:
+            - TODO remove this
+        """
         pass
 
     @property
     def image_url(self):
+        """Get the image url."""
         return self._image_url
 
     @image_url.setter
     def image_url(self, value: str):
         """
-        Set the image url
+        Set the image url.
 
         Args:
             value: Value to set value to
 
         Returns:
-
+            None
         """
         url_info = urlparse(value)
         if url_info.scheme == "docker":
@@ -124,12 +144,12 @@ class SingularityBuildWorkItem(InputDataWorkItem):
 
     def context_checksum(self) -> str:
         """
-        Calculate the context checksum of a singularity build
+        Calculate the context checksum of a singularity build.
 
         The context is the checksum of all the assets defined for input, the singularity definition file, and the environment variables
 
         Returns:
-
+            Conext checksum.
         """
         file_hash = hashlib.sha256()
         # ensure our template is set
@@ -151,7 +171,7 @@ class SingularityBuildWorkItem(InputDataWorkItem):
 
     def __add_file_to_context(self, contents: Union[str, bytes], file_hash):
         """
-        Add a specific file content to context checksum
+        Add a specific file content to context checksum.
 
         Args:
             contents: Contents
@@ -167,7 +187,7 @@ class SingularityBuildWorkItem(InputDataWorkItem):
 
     def render_template(self) -> Optional[str]:
         """
-        Render template. Only applies when is_template is True. When true, it renders the template using Jinja to a cache value
+        Render template. Only applies when is_template is True. When true, it renders the template using Jinja to a cache value.
 
         Returns:
             Rendered Template
@@ -195,7 +215,7 @@ class SingularityBuildWorkItem(InputDataWorkItem):
     @staticmethod
     def find_existing_container(sbi: 'SingularityBuildWorkItem', platform: 'IPlatform' = None) -> Optional[AssetCollection]:
         """
-        Find existing container
+        Find existing container.
 
         Args:
             sbi: SingularityBuildWorkItem to find existing container matching config
@@ -233,7 +253,9 @@ class SingularityBuildWorkItem(InputDataWorkItem):
 
     def __add_tags(self):
         """
-        Add default tags to the asset collection to be created
+        Add default tags to the asset collection to be created.
+
+        The most important part of this logic is the digest/run_id information we add. This is what enables the build/pull-cache through comps.
 
         Returns:
             None
@@ -278,10 +300,10 @@ class SingularityBuildWorkItem(InputDataWorkItem):
 
     def _prep_work_order_before_create(self) -> Dict[str, str]:
         """
-        Prep work order before creation
+        Prep work order before creation.
 
         Returns:
-
+            Workorder for singularity build.
         """
         self.__add_tags()
         self.load_work_order(SB_BASE_WORKER_PATH)
@@ -306,13 +328,13 @@ class SingularityBuildWorkItem(InputDataWorkItem):
 
     def pre_creation(self, platform: 'IPlatform') -> None:
         """
-        Pre-Creation item
+        Pre-Creation item.
 
         Args:
             platform: Platform object
 
         Returns:
-
+            None
         """
         if self.name is None:
             self.name = "Singularity Build"
@@ -324,9 +346,10 @@ class SingularityBuildWorkItem(InputDataWorkItem):
 
     def __add_common_assets(self):
         """
-        Add common assets which in this case is the singularity definition file
-        Returns:
+        Add common assets which in this case is the singularity definition file.
 
+        Returns:
+            None
         """
         self.render_template()
         if self.definition_file:
@@ -338,7 +361,7 @@ class SingularityBuildWorkItem(InputDataWorkItem):
 
     def __fetch_finished_asset_collection(self, platform: 'IPlatform') -> Union[AssetCollection, None]:
         """
-        Fetch the Singularity asset collection we created
+        Fetch the Singularity asset collection we created.
 
         Args:
             platform: Platform to fetch from.
@@ -358,16 +381,17 @@ class SingularityBuildWorkItem(InputDataWorkItem):
 
     def run(self, wait_until_done: bool = True, platform: 'IPlatform' = None, wait_on_done_progress: bool = True, wait_on_done: bool = True, **run_opts) -> Optional[AssetCollection]:
         """
+        Run the build.
 
         Args:
-            wait_until_done:
-            platform:
-            wait_on_done_progress:
-            wait_on_done:
-            **run_opts:
+            wait_until_done: Wait until build completes
+            platform: Platform to run on
+            wait_on_done_progress: Show progress while waiting
+            wait_on_done: Overload of wait_until_done
+            **run_opts: Extra run options
 
         Returns:
-
+            Asset collection that was created if successful
         """
         p = super()._check_for_platform_from_context(platform)
         opts = dict(wait_on_done_progress=wait_on_done_progress, wait_until_done=wait_until_done, wait_on_done=wait_on_done, platform=p, wait_progress_desc=f"Waiting for build of Singularity container: {self.name}")
@@ -390,7 +414,7 @@ class SingularityBuildWorkItem(InputDataWorkItem):
 
     def wait(self, wait_on_done_progress: bool = True, timeout: int = None, refresh_interval=None, platform: 'IPlatform' = None, wait_progress_desc: str = None) -> Optional[AssetCollection]:
         """
-        Waits on Singularity Build Work item to finish and fetches the resulting asset collection
+        Waits on Singularity Build Work item to finish and fetches the resulting asset collection.
 
         Args:
             wait_on_done_progress: When set to true, a progress bar will be shown from the item
@@ -412,6 +436,24 @@ class SingularityBuildWorkItem(InputDataWorkItem):
         return None
 
     def get_id_filename(self, prefix: str = None) -> str:
+        """
+        Determine the id filename. Mostly used when use does not provide one.
+
+        The logic is combine prefix and either
+        * definition file minus extension
+        * image url using with parts filtered out of the name.
+
+        Args:
+            prefix: Optional prefix.
+
+        Returns:
+            id file name
+
+        Raises:
+            ValueError - When the filename cannot be calculated
+        """
+        if prefix is None:
+            prefix = ''
         if self.definition_file:
             base_name = PurePath(self.definition_file).name.replace(".def", ".id")
             if prefix:
@@ -430,7 +472,7 @@ class SingularityBuildWorkItem(InputDataWorkItem):
 
     def to_id_file(self, filename: Union[str, PathLike] = None, save_platform: bool = False):
         """
-        Create an ID File
+        Create an ID File.
 
         If the filename is not provided, it will be calculate for definition files or for docker pulls
 
@@ -439,7 +481,7 @@ class SingularityBuildWorkItem(InputDataWorkItem):
             save_platform: Save Platform info to file as well
 
         Returns:
-
+            None
         """
         if filename is None:
             filename = self.get_id_filename(prefix='builder.')

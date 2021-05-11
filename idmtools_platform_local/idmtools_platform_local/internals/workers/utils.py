@@ -1,3 +1,7 @@
+"""idmtools local platform worker utils.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import os
 from logging import getLogger
 from sqlalchemy import func
@@ -11,6 +15,23 @@ logger = getLogger(__name__)
 
 def create_or_update_status(uuid, data_path=None, tags=None, status=Status.created, parent_uuid=None,
                             extra_details=None, session=None, autoclose=True, autocommit=True):
+    """
+    Update a jobs status in our db.
+
+    Args:
+        uuid: UUID to update
+        data_path: Path to data
+        tags: Tags to set
+        status: status to set
+        parent_uuid: Parent uuid
+        extra_details: Extra details
+        session: db session
+        autoclose: Auto close session
+        autocommit: Auto commit session
+
+    Returns:
+        None
+    """
     if session is None:
         session = get_session()
     job_status: JobStatus = get_or_create(session, JobStatus, ['uuid'],
@@ -36,6 +57,12 @@ def create_or_update_status(uuid, data_path=None, tags=None, status=Status.creat
 
 
 def get_host_data_bind():
+    """
+    Get our HOST_DATA_BIND configuration.
+
+    Returns:
+        HOST_DATA_BIND configuration.
+    """
     global HOST_DATA_BIND
     if HOST_DATA_BIND is None:
         data_bind = os.getenv('HOST_DATA_BIND', None)

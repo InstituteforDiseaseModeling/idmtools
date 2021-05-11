@@ -1,3 +1,7 @@
+"""idmtools download work item output.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import os
 import sys
 import zipfile
@@ -8,6 +12,8 @@ from pathlib import PurePath
 from uuid import UUID
 from COMPS.Data import WorkItem
 from tqdm import tqdm
+
+from idmtools import IdmConfigParser
 from idmtools.assets.file_list import FileList
 from idmtools.core import EntityStatus
 from idmtools.entities.iplatform import IPlatform
@@ -19,6 +25,10 @@ user_logger = getLogger('user')
 
 
 class CompressType(Enum):
+    """Defines the compression types we support.
+
+    lzma is the best balance between speed and compression ratio typically
+    """
     lzma = 'lzma'
     deflate = 'deflate'
     bz = "bz"
@@ -26,6 +36,16 @@ class CompressType(Enum):
 
 @dataclass(repr=False)
 class DownloadWorkItem(FileFilterWorkItem):
+    """
+    DownloadWorkItem provides a utility to download items through a workitem with compression.
+
+    The main advantage of this over Analyzers is the compression. This is most effective when the targets to download have many
+    items that are similar to download. For example, an experiment with 1000 simulations with similar output can greatly benefit
+    from downloading through this method.
+
+    Notes:
+        - TODO Link examples here.
+    """
     output_path: str = field(default_factory=os.getcwd)
     extract_after_download: bool = field(default=True)
     delete_after_download: bool = field(default=True)
@@ -33,6 +53,7 @@ class DownloadWorkItem(FileFilterWorkItem):
     compress_type: CompressType = field(default=None)
 
     def __post_init__(self, item_name: str, asset_collection_id: UUID, asset_files: FileList, user_files: FileList, command: str):
+        """Constructor for DownloadWorkItem."""
         self._ssmt_script = str(PurePath(__file__).parent.joinpath("download_ssmt.py"))
         if self.compress_type is None:
             if (self.extract_after_download and self.delete_after_download) or sys.platform != 'win32':
@@ -45,7 +66,7 @@ class DownloadWorkItem(FileFilterWorkItem):
 
     def _extra_command_args(self, command: str) -> str:
         """
-        Add specific additional arguments for the download command. In this case, only the zip name and compression type can be changed
+        Add specific additional arguments for the download command. In this case, only the zip name and compression type can be changed.
 
         Args:
             command: Command to append additional items to
@@ -61,7 +82,7 @@ class DownloadWorkItem(FileFilterWorkItem):
 
     def wait(self, wait_on_done_progress: bool = True, timeout: int = None, refresh_interval=None, platform: 'IPlatform' = None) -> None:
         """
-        Waits on Download WorkItem to finish. This first waits on any dependent items to finish(Experiment/Simulation/WorkItems)
+        Waits on Download WorkItem to finish. This first waits on any dependent items to finish(Experiment/Simulation/WorkItems).
 
         Args:
             wait_on_done_progress: When set to true, a progress bar will be shown from the item
@@ -84,28 +105,30 @@ class DownloadWorkItem(FileFilterWorkItem):
             if self._uid:
                 oi = po.retrieve_output_file_info([self.zip_name])
                 zip_name = PurePath(self.output_path).joinpath(self.zip_name)
-                with tqdm(total=oi[0].length, unit='B', unit_scale=True, unit_divisor=1024) as pbar:
+                with tqdm(total=oi[0].length, unit='B', unit_scale=True, unit_divisor=1024, desc="Downloading Files") as pbar:
                     self.__download_file(oi, pbar, zip_name)
                     if self.extract_after_download:
                         self.__extract_output(zip_name)
 
                 if self.delete_after_download:
                     if self.extract_after_download:
-                        user_logger.debug(f"Removing {zip_name}")
+                        if IdmConfigParser.is_output_enabled():
+                            user_logger.debug(f"Removing {zip_name}")
                         os.remove(zip_name)
-                    user_logger.debug(f'Deleting workitem {self.uid}')
+                    if IdmConfigParser.is_output_enabled():
+                        user_logger.debug(f'Deleting workitem {self.uid}')
                     po.delete()
                     self.uid = None
 
     def __extract_output(self, zip_name):
         """
-        Extra output from our zip file
+        Extra output from our zip file.
 
         Args:
             zip_name: Zip file to extract
 
         Returns:
-
+            None
         """
         if logger.isEnabledFor(DEBUG):
             logger.debug(f"Extracting {zip_name}")
@@ -114,7 +137,7 @@ class DownloadWorkItem(FileFilterWorkItem):
 
     def __download_file(self, oi, pbar, zip_name):
         """
-        Download our file tracking progress as we go
+        Download our file tracking progress as we go.
 
         Args:
             oi: Stream to download

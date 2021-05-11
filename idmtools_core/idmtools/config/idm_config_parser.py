@@ -1,3 +1,8 @@
+"""
+idmtools IdmConfig paraer, the main configuration engine for idmtools.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import copy
 import platform
 from pathlib import Path
@@ -17,6 +22,16 @@ user_logger = getLogger('user')
 
 
 def initialization(force=False):
+    """
+    Initialization decorator for configuration methods.
+
+    Args:
+        force: Force initialization
+
+    Returns:
+        Wrapper function
+    """
+
     def wrap(func):
         def wrapped_f(*args, **kwargs):
             IdmConfigParser.ensure_init(force=force)
@@ -48,17 +63,29 @@ class IdmConfigParser:
         Returns:
             An :class:`IdmConfigParser` instance.
         """
-
         if not cls._instance:
             cls._instance = super(IdmConfigParser, cls).__new__(cls)
             cls._instance._load_config_file(dir_path, file_name)
             # Only error when a user overrides the filename for idmtools.ini
             if (dir_path != "." or file_name != default_config) and not cls.found_ini():
-                raise ValueError(f"The configuration file {os.path.join(dir_path, file_name)} was not found!")
+                raise FileNotFoundError(f"The configuration file {os.path.join(dir_path, file_name)} was not found!")
+            # Call our startup plugins
+            from idmtools.registry.functions import FunctionPluginManager
+            FunctionPluginManager.instance().hook.idmtools_on_start()
         return cls._instance
 
     @classmethod
     def retrieve_dict_config_block(cls, field_type, section) -> Dict[str, Any]:
+        """
+        Retrieve dictionary config block.
+
+        Args:
+            field_type: Field type
+            section: Section to load
+
+        Returns:
+            Dictionary of the config block
+        """
         import ast
 
         inputs = copy.deepcopy(section)
@@ -96,8 +123,7 @@ class IdmConfigParser:
     @classmethod
     def _find_config(cls, dir_path: str = None, file_name: str = default_config) -> None:
         """
-        Recursively search for the INI configuration file starting from the **dir_path** provided
-        up to the root, stopping once one is found.
+        Recursively search for the INI configuration file starting from the **dir_path** provided up to the root, stopping once one is found.
 
         Args:
             dir_path: The directory to start looking for the INI configuration file.
@@ -120,8 +146,8 @@ class IdmConfigParser:
 
     @staticmethod
     def get_global_configuration_name() -> str:
-        """
-        Get Global Configuration Name
+        r"""
+        Get Global Configuration Name.
 
         Returns:
             On Windows, this returns %LOCALDATA%\\idmtools\\idmtools.ini
@@ -156,10 +182,12 @@ class IdmConfigParser:
         # init logging here as this is our most likely entry-point into an idmtools "application"
         from idmtools.core.logging import VERBOSE
 
+        # Look for the config file. First check environment vars
         if "IDMTOOLS_CONFIG_FILE" in os.environ:
             if not os.path.exists(os.environ["IDMTOOLS_CONFIG_FILE"]):
                 raise FileNotFoundError(f'Cannot for idmtools config at {os.environ["IDMTOOLS_CONFIG_FILE"]}')
             ini_file = os.environ["IDMTOOLS_CONFIG_FILE"]
+        # Try find file
         else:
             ini_file = cls._find_config(dir_path, file_name)
             # Fallback to user home directories
@@ -167,6 +195,8 @@ class IdmConfigParser:
                 global_config = cls.get_global_configuration_name()
                 if os.path.exists(global_config):
                     ini_file = global_config
+
+        # If we didn't find a file, warn the user and init logging
         if ini_file is None:
             if os.getenv("IDMTOOLS_NO_CONFIG_WARNING", "F").lower() not in TRUTHY_VALUES:
                 # We use print since logger isn't configured unless there is an override(cli)
@@ -174,6 +204,7 @@ class IdmConfigParser:
             cls._init_logging()
             return
 
+        # Load file
         cls._config_path = ini_file
         cls._config = ConfigParser()
         cls._config.read(ini_file)
@@ -207,7 +238,7 @@ class IdmConfigParser:
 
         # Do import locally to prevent load error
         from idmtools import __version__
-        if "+nightly" in __version__ and os.getenv('IDMTOOLS_HIDE_DEV_WARNING', None) is None:
+        if "+nightly" in __version__ and os.getenv('IDMTOOLS_HIDE_DEV_WARNING', None) is None and os.getenv("_IDMTOOLS_COMPLETE", None) is None:
             user_logger.warning(f"You are using a development version of idmtools, version {__version__}!")
 
     @classmethod
@@ -273,7 +304,7 @@ class IdmConfigParser:
     @classmethod
     def is_progress_bar_disabled(cls) -> bool:
         """
-        Are progress bars disabled
+        Are progress bars disabled.
 
         Returns:
             Return is progress bars should be enabled
@@ -283,7 +314,7 @@ class IdmConfigParser:
     @classmethod
     def is_output_enabled(cls) -> bool:
         """
-        Is output enabled
+        Is output enabled.
 
         Returns:
             Return if output should be disabled
@@ -311,10 +342,6 @@ class IdmConfigParser:
 
         if cls._instance is None:
             cls(dir_path, file_name)
-
-        # Call our startup plugins
-        from idmtools.registry.functions import FunctionPluginManager
-        FunctionPluginManager.instance().hook.idmtools_on_start()
 
     @classmethod
     @initialization()
@@ -359,7 +386,7 @@ class IdmConfigParser:
     @classmethod
     def display_config_block_details(cls, block):
         """
-        Display the values of a config block
+        Display the values of a config block.
 
         Args:
             block: Block to print
@@ -377,9 +404,10 @@ class IdmConfigParser:
     @initialization()
     def has_section(cls, section: str) -> bool:
         """
-        Does the config contain a section
+        Does the config contain a section.
+
         Args:
-            section:
+            section: Section to check for
 
         Returns:
             True if the section exists, False otherwise
@@ -389,6 +417,16 @@ class IdmConfigParser:
     @classmethod
     @initialization
     def has_option(cls, section: str, option: str):
+        """
+        Does the config have an option in specified section?
+
+        Args:
+            section: Section
+            option: Option
+
+        Returns:
+            True if config has option
+        """
         return cls._config.has_option(section, option, fallback=None)
 
     @classmethod

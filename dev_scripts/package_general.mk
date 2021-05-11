@@ -15,7 +15,7 @@ CLDIR=$(PDS)clean_dir.py
 PYPI_URL?=https://packages.idmod.org/api/pypi/idm-pypi-staging/
 
 help: 
-	$(PDS)get_help_from_makefile.py
+	help-from-makefile -f $(mkfile_path)
 
 clean: ## Clean most of the temp-data from the project
 	$(MAKE) -C tests clean
@@ -25,7 +25,7 @@ clean-all: clean ## Deleting package info hides plugins so we only want to do th
 	-rm -rf **/*.egg-info/
 
 lint: ## check style with flake8
-	flake8 --ignore=E501,W291 $(PACKAGE_NAME)
+	flake8 $(abspath ../$(PACKAGE_NAME))
 
 test: ## Run our tests
 	$(MAKE) -C tests $@
@@ -73,6 +73,7 @@ coverage-all: ## Generate a code-coverage report using all tests
 	$(MAKE) -C tests $@
 
 # Release related rules
+#######################
 
 dist: clean ## build our package
 	python setup.py sdist

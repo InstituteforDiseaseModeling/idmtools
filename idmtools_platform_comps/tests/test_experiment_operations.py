@@ -107,6 +107,7 @@ class TestExperimentOperations(unittest.TestCase):
             self.assertEqual(0, idm_experiment.simulations[0].assets.count)
 
     @allure.story("Assets")
+    @pytest.mark.serial
     def test_list_assets(self):
         """
         Test that the list assets with children

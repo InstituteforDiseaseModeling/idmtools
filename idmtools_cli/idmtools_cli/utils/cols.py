@@ -1,3 +1,4 @@
+"""Defines utilities for display formatting on multiple platforms."""
 from __future__ import absolute_import
 from typing import Optional
 from .formatters import max_width, min_width
@@ -8,7 +9,7 @@ NEWLINES = ('\n', '\r', '\r\n')
 
 def _find_unix_console_width() -> Optional[int]:
     """
-    Find the width of an Unix console where possible
+    Find the width of a Unix console where possible.
 
     Returns:
         Width
@@ -30,7 +31,7 @@ def _find_unix_console_width() -> Optional[int]:
 
 def _find_windows_console_width() -> int:
     """
-    Find the windows console width
+    Find the windows console width.
 
     Returns:
         Returns width of Windows Console
@@ -53,7 +54,7 @@ def _find_windows_console_width() -> int:
 
 def console_width(kwargs: dict) -> int:
     """
-    Determine Console Width
+    Determine Console Width.
 
     Args:
         kwargs: Optional args. Currently Width is supported
@@ -61,7 +62,6 @@ def console_width(kwargs: dict) -> int:
     Returns:
         Console Width
     """
-
     if sys.platform.startswith('win'):
         cons_width = _find_windows_console_width()
     else:
@@ -79,7 +79,7 @@ def console_width(kwargs: dict) -> int:
 
 def columns(*cols, **kwargs) -> str:
     """
-    Format click output in columns
+    Format click output in columns.
 
     Args:
         *cols: Colums in tuples

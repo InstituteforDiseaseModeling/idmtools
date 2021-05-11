@@ -410,8 +410,8 @@ class TestVisToolsWorkItem(unittest.TestCase):
         self.assertTrue(str(vtassetmap_dic['/' + visset_name + '/campaign.json']).endswith('/campaign.json'))
         self.assertTrue(str(vtassetmap_dic['/' + visset_name + '/config.json']).endswith('/config.json'))
         self.assertTrue(str(vtassetmap_dic['/' + visset_name + '/status.txt']).endswith('/status.txt'))
-        self.assertTrue(str(vtassetmap_dic['/' + visset_name + '/StdErr.txt']).endswith('/StdErr.txt'))
-        self.assertTrue(str(vtassetmap_dic['/' + visset_name + '/StdOut.txt']).endswith('/StdOut.txt'))
+        self.assertTrue(str(vtassetmap_dic['/' + visset_name + '/stderr.txt']).endswith('/stderr.txt'))
+        self.assertTrue(str(vtassetmap_dic['/' + visset_name + '/stdout.txt']).endswith('/stdout.txt'))
         self.assertTrue(str(vtassetmap_dic['/' + visset_name + '/' + p + '/visset.json']).endswith('/visset.json'))
         self.assertTrue(str(vtassetmap_dic['/' + visset_name + '/' + p + '/VtWorkerPrepStdErr.txt']).endswith(
             '/VtWorkerPrepStdErr.txt'))
@@ -461,10 +461,10 @@ class TestVisToolsWorkItem(unittest.TestCase):
         response = requests.get(vtassetmap_dic['/' + visset_name + '/status.txt'])
         self.assertTrue(response.status_code < 400)
 
-        response = requests.get(vtassetmap_dic['/' + visset_name + '/StdErr.txt'])
+        response = requests.get(vtassetmap_dic['/' + visset_name + '/stderr.txt'])
         self.assertTrue(response.status_code < 400)
 
-        response = requests.get(vtassetmap_dic['/' + visset_name + '/StdOut.txt'])
+        response = requests.get(vtassetmap_dic['/' + visset_name + '/stdout.txt'])
         self.assertTrue(response.status_code < 400)
 
         response = requests.get(vtassetmap_dic['/' + visset_name + '/' + p + '/visset.json'])

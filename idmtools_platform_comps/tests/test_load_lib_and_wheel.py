@@ -93,6 +93,20 @@ class TestLoadLibWheel(ITestWithPersistence):
 
     @pytest.mark.long
     @pytest.mark.comps
+    def test_requirements_to_assetcollection_ignores_platform_num_cores(self):
+        # ------------------------------------------------------
+        # First load 'zipp' package (note: comps does not have 'zipp' package)
+        # ------------------------------------------------------
+        requirements_path = os.path.join(model_path, 'requirements.txt')
+        pL = Platform('SLURM', num_cores=2)
+        rta = RequirementsToAssetCollection(platform=pL, requirements_path=requirements_path)
+        ac_id = rta.run(rerun=True)
+
+        self.assertIsNotNone(ac_id)
+
+    @pytest.mark.long
+    @pytest.mark.comps
+    @pytest.mark.serial
     def test_exp_with_load_zipp_lib(self):
         # ------------------------------------------------------
         # First load 'zipp' package (note: comps does not have 'zipp' package)
@@ -220,6 +234,7 @@ class TestLoadLibWheel(ITestWithPersistence):
     @pytest.mark.long
     @pytest.mark.comps
     @pytest.mark.smoke
+    @pytest.mark.serial
     def test_exp_with_load_zipp_lib_slurm(self):
         # ------------------------------------------------------
         # First load 'zipp' package (note: comps does not have 'zipp' package)

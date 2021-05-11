@@ -1,3 +1,8 @@
+"""
+utilities for dataclasses.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import ast
 import dataclasses
 import typing
@@ -8,8 +13,9 @@ user_logger = getLogger('user')
 
 def get_dataclass_common_fields(src, dest, exclude_none: bool = True) -> typing.Dict:
     """
-    Extracts fields from a dataclass source object who are also defined on destination object. Useful for situations
-    like nested configurations of data class options
+    Extracts fields from a dataclass source object who are also defined on destination object.
+
+    Useful for situations like nested configurations of data class options.
 
     Args:
         src: Source dataclass object
@@ -17,7 +23,7 @@ def get_dataclass_common_fields(src, dest, exclude_none: bool = True) -> typing.
         exclude_none: When true, values of None will be excluded
 
     Returns:
-
+        Dictionary of common fields between source and destination object
     """
     dest_fields = [f.name for f in dataclasses.fields(dest)]
     src_fields = dataclasses.fields(src)
@@ -30,14 +36,15 @@ def get_dataclass_common_fields(src, dest, exclude_none: bool = True) -> typing.
 
 def as_dict(src, exclude: typing.List[str] = None, exclude_private_fields: bool = True):
     """
-    Converts a dataclass to a dict while also obeys rules for exclusion
+    Converts a dataclass to a dict while also obeys rules for exclusion.
+
     Args:
         src:
         exclude: List of fields to exclude
         exclude_private_fields: Should fields that star
 
     Returns:
-
+        Data class as dict
     """
     if exclude is None:
         exclude = []
@@ -55,6 +62,16 @@ def as_dict(src, exclude: typing.List[str] = None, exclude_private_fields: bool 
 
 
 def validate_user_inputs_against_dataclass(field_type, field_value):
+    """
+    Validates user entered data against dataclass fields and types.
+
+    Args:
+        field_type: Field type
+        field_value: Fields value
+
+    Returns:
+        Validates user values
+    """
     fs_kwargs = set(field_type.keys()).intersection(set(field_value.keys()))
     for fn in fs_kwargs:
         ft = field_type[fn]
@@ -72,9 +89,10 @@ def validate_user_inputs_against_dataclass(field_type, field_value):
 
 def get_default_tags() -> typing.Dict[str, str]:
     """
-    Get common default tags. Currently this is the version of idmtools
-    Returns:
+    Get common default tags. Currently this is the version of idmtools.
 
+    Returns:
+        Default tags which is idmtools version
     """
     from idmtools import __version__
     return dict(idmtools=__version__)

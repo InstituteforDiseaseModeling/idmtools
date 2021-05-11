@@ -1,4 +1,12 @@
 #!/usr/bin/env python
+"""Generates Changelog based on github issue activity.
+
+The process is to fetch the current list of tags and commits.
+We then fetch all the issues.
+We then iterate over tags to determine their start-date/end-date and filter out certain labels.
+We then find issues closed between start and end dates.
+We then grab title and issue number from ticket and create our changelog. Tickets are grouped by labels.
+"""
 import glob
 import os
 import re
@@ -58,6 +66,15 @@ issue_types = dict()
 
 
 def get_issue_type(issue, labels):
+    """Returns the issue type based on the labels and assigns that to the issue_types map.
+
+    Args:
+        issue: Issue to identify
+        labels: Labels to evaluate
+
+    Returns:
+        None
+    """
     global issue_types
     if any([x in labels for x in ['Support']]):
         issue_types[issue] = 'Support'
