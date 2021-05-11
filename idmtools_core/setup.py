@@ -13,7 +13,7 @@ extra_require_files = dict()
 for file_prefix in ['', 'dev_', 'build_']:
     filename = f'{file_prefix}requirements'
     with open(f'{filename}.txt') as requirements_file:
-        extra_require_files[file_prefix.strip("_") if file_prefix else filename] = requirements_file.read().split("\n")
+        extra_require_files[file_prefix.strip("_") if file_prefix else filename] = [dependency for dependency in requirements_file.read().split("\n") if not dependency.startswith("--")]
 
 version = '1.6.3+nightly'
 
@@ -36,7 +36,8 @@ authors = [
     ("Mandy Izzo", "mizzo@idmod.org"),
     ("Clark Kirkman IV", "ckirkman@idmod.org"),
     ("Benoit Raybaud", "braybaud@idmod.org"),
-    ("Jen Schripsema", "jschripsema@idmod.org")
+    ("Jen Schripsema", "jschripsema@idmod.org"),
+    ("Lauren George", "lgeorge@idmod.org")
 ]
 
 # check for python 3.6
