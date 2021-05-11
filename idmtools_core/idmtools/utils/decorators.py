@@ -16,7 +16,7 @@ from typing import Callable, Union, Optional, Type
 
 logger = getLogger(__name__)
 # check if we are building docs
-IS_SPHINX_BUILD  = os.getenv('SPHINX_BUILD', '0') in ['1', 'True']
+IS_SPHINX_BUILD = os.getenv('SPHINX_BUILD', '0') in ['1', 'True']
 
 
 class abstractstatic(staticmethod):
