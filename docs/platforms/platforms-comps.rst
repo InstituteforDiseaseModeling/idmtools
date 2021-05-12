@@ -2,7 +2,7 @@
 COMPS platform
 ==============
 
-The COMPS platform allows use of the COMPS HPC. COMPS has multiple environments. Most have predefined aliases that can be used
+The |COMPS_s| platform allows use of the |COMPS_s| HPC. |COMPS_s| has multiple environments. Most have predefined aliases that can be used
 to quickly use the environments. Here are a list of predefined environments:
 
 * BELEGOST
