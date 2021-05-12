@@ -13,8 +13,9 @@ to quickly use the environments. Here are a list of predefined environments:
 * SLURM2
 * BOXY
 
-You can also see a list of aliases and configuration options using the CLI command *idmtools info plugins platform-aliases*
+You can also see a list of aliases and configuration options using the CLI command ``idmtools info plugins platform-aliases``
 
+.. command-output:: idmtools info plugins platform-aliases
 
 Utilities Unique to COMPS
 -------------------------
