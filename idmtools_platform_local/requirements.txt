@@ -2,7 +2,7 @@ backoff~=1.10.0
 click~=7.1.2
 colorama~=0.4.4
 docker>=4.3.1,<5.1.0
-dramatiq[redis, watch]~=1.10.0
+dramatiq[redis, watch]~=1.11.0
 gevent>=20.12.1,<=21.2.0
 idmtools~=1.6.3
 requests>=2.25.0
