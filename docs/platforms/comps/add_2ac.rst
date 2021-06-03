@@ -15,18 +15,18 @@ There are two primary ways of adding assets (experiment and task):
 Add assets to experiment
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-There are multiple ways of adding to experiment:
+There are multiple ways of adding to :py:class:`Experiment<idmtools.entities.experiment.Experiment>`:
 
 * Add directory to experiment/workitem::
 
     experiment.assets.add_directory(assets_directory=os.path.join("inputs", "python_model_with_deps", "Assets"))
 
-* Add list of Asset or AssetCollection to experiment::
+* Add list of :py:class:`Asset<idmtools.assets.asset.Asset>` or :py:class:`AssetCollection<idmtools.assets.asset_collection.AssetCollection>` to :py:class:`Experiment<idmtools.entities.experiment.Experiment>`::
 
     ac = AssetCollection.from_directory(assets_directory=os.path.abspath(os.path.join(COMMON_INPUT_PATH, "assets", collections")))
     experiment.add_assets(ac)
 
-* Add file as Asset to experiment::
+* Add file as asset to :py:class:`Experiment<idmtools.entities.experiment.Experiment>`::
 
     experiment.add_asset(os.path.join("inputs", "scheduling", "commandline_model.py"))
 
@@ -40,7 +40,7 @@ There are multiple ways of adding via task:
     task.common_assets.add_asset(os.path.join(INPUT_PATH, os_type, "bin", "schema.json"))
     task.transient_assets.add_asset(os.path.join(INPUT_PATH, "campaign_template.json"))
 
-* Add list of Asset or AssetCollection to task::
+* Add list of :py:class:`Asset<idmtools.assets.asset.Asset>` or :py:class:`AssetCollection<idmtools.assets.asset_collection.AssetCollection>` to task::
 
     task.common_assets.add_assets(AssetCollection.from_id_file("covasim.id"))
 
