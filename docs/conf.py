@@ -20,13 +20,22 @@ import configparser
 import os
 import subprocess
 import sys
-
 import sphinx_rtd_theme
+from datetime import datetime
+from urllib.request import urlretrieve
 
 if sys.platform in ["linux", "darwin"]:
     subprocess.check_output(["make", "generate-api"], cwd=os.path.dirname(os.path.abspath(__file__)))
 else:
     subprocess.check_output(["make.bat", "generate-api"], cwd=os.path.dirname(os.path.abspath(__file__)))
+
+# -- Copy the dependent package documentation for reuse -------------------
+
+#urlretrieve(
+#   "https://docs.idmod.org/projects/tool/en/latest/_sources/topic.rst.txt",
+#   "external/tools-topic.rst")
+
+
 # -- General configuration ------------------------------------------------
 
 # If your docs needs a minimal Sphinx version, state it here.
@@ -37,14 +46,15 @@ else:
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.imgmath',
+    'sphinx.ext.mathjax',
     'sphinx.ext.githubpages',
     'sphinx.ext.autodoc',
     'sphinxcontrib.napoleon',
     'sphinx.ext.todo',
     'plantweb.directive',
     'sphinxcontrib.programoutput',
-    'sphinx_copybutton'
+    'sphinx_copybutton',
+    'sphinxext.remoteliteralinclude'
 ]
 
 plantuml = 'plantweb'
@@ -81,7 +91,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'idmtools'
-copyright = u'2020, Bill & Melinda Gates Foundation. All rights reserved.'
+copyright = f'1999 - {datetime.today().year}, Bill & Melinda Gates Foundation. All rights reserved'
 author = u'Institute for Disease Modeling'
 
 # The version info for the project you're documenting, acts as replacement for
