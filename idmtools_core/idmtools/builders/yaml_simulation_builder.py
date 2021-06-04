@@ -1,3 +1,8 @@
+"""
+idmtools YamlSimulationBuilder definition.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 from logging import getLogger
 from typing import Union, Callable, Dict, Any
 import yaml
@@ -8,15 +13,37 @@ logger = getLogger(__name__)
 
 
 class DefaultParamFuncDict(dict):
+    """
+    Enables a function that takes a single parameter and return another function.
+
+    Notes:
+        TODO Add Example and types
+    """
+
     def __init__(self, default):
+        """
+        Initialize our DefaultParamFuncDict.
+
+        Args:
+            default: Default function to use
+        """
         super().__init__()
-        self.default = default
+        self.__default = default
 
     def __getitem__(self, item):
+        """
+        Get item from the DefaultParamFuncDict. It proxies most calls to the function we wrap.
+
+        Args:
+            item: Item to lookup
+
+        Returns:
+            None
+        """
         if item in self:
             return super().__getitem__(item)
         else:
-            return self.default(item)
+            return self.__default(item)
 
 
 class YamlSimulationBuilder(ArmSimulationBuilder):
@@ -26,14 +53,13 @@ class YamlSimulationBuilder(ArmSimulationBuilder):
     Examples:
         .. literalinclude:: ../examples/builders/yaml_builder_python.py
     """
-
     def __init__(self):
+        """Constructor."""
         super().__init__()
 
-    def add_sweeps_from_file(self, file_path, func_map: Union[Dict[str, Callable], Callable[[Any], Dict]] = None,
-                             sweep_type=ArmType.cross):
+    def add_sweeps_from_file(self, file_path, func_map: Union[Dict[str, Callable], Callable[[Any], Dict]] = None, sweep_type=ArmType.cross):
         """
-        Add sweeps from a file
+        Add sweeps from a file.
 
         Args:
             file_path: Path to file
@@ -41,9 +67,8 @@ class YamlSimulationBuilder(ArmSimulationBuilder):
             sweep_type: Type of sweep
 
         Returns:
-
+            None
         """
-
         if func_map is None:
             func_map = {}
         # if the user passing a single function, map it to all values
@@ -68,4 +93,10 @@ class YamlSimulationBuilder(ArmSimulationBuilder):
             self.add_arm(arm)
 
     def __iter__(self):
+        """
+        Iterator the sweep definitions.
+
+        Returns:
+            Iterator
+        """
         yield from self.sweep_definitions

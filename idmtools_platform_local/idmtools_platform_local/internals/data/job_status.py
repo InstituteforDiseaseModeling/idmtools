@@ -1,3 +1,9 @@
+"""idmtools local platform job status data defintion.
+
+This definition is used for both experiments and simulations.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import datetime
 import sqlalchemy
 from sqlalchemy import Enum, Column, String, DateTime, func, Index
@@ -8,7 +14,9 @@ from idmtools_platform_local.status import Status
 
 class JobStatus(Base):
     """
-    Generic status table. At moment we only have one which contains both experiments and simulations
+    Generic status table.
+
+    At moment we only have one which contains both experiments and simulations
     We do it this way to allow for more flexible support in future for non-emod-ish workflows(ie a bunch of single jobs
     instead of an experiment with sub simulations
     """
@@ -23,6 +31,7 @@ class JobStatus(Base):
     updated = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
     def to_dict(self, as_experiment=True):
+        """Convert status to dictionary."""
         result = {k: v for k, v in self.__dict__.items() if k[0] != "_"}
         if 'created' in result:
             result['created'] = str(result['created'])
@@ -40,6 +49,7 @@ class JobStatus(Base):
         return result
 
     def __str__(self):
+        """Represent as stringified dict."""
         return str(self.to_dict())
 
 

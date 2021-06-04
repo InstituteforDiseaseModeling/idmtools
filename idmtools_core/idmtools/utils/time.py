@@ -1,3 +1,10 @@
+"""
+Timestamp function.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
+
+
 def timestamp(time=None):
     """
     Return a timestamp.

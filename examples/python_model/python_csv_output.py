@@ -22,11 +22,11 @@ from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 with platform('BELEGOST'):
     # define our base task as a python model with json config
     base_task = JSONConfiguredPythonTask(
-        script_path=os.path.join("inputs", "csv_inputs", "Assets", "model.py"),
+        script_path=os.path.join("inputs", "python", "Assets", "model.py"),
         # set the default parameters to 0
         parameters=(dict(c=0)),
         # add some experiment level assets
-        common_assets=AssetCollection.from_directory(os.path.join("inputs", "csv_inputs", "Assets"))
+        common_assets=AssetCollection.from_directory(os.path.join("inputs", "python", "Assets"))
     )
 
     # create a templating object using the base task

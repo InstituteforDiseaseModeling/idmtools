@@ -1,3 +1,4 @@
+"""Defines the config cli group and commands."""
 import configparser
 import dataclasses
 import os
@@ -26,7 +27,7 @@ FIELD_BLACKLIST = ['platform_type_map', 'supported_types', 'plugin_key', 'docker
 @click.pass_context
 def config(ctx, config_path, global_config):
     """
-    Contains commands related to the creation of idmtools.ini
+    Contains commands related to the creation of idmtools.ini.
 
     With the config command, you can :
      - Generate an idmtools.ini file in the current directory
@@ -49,18 +50,38 @@ def config(ctx, config_path, global_config):
 
 
 def slugify(value):
+    """
+    Slugify the option.
+
+    This means upper-casing and replacing spaces with "-"
+
+    Args:
+        value: Item to slugify
+
+    Returns:
+        Slugified string
+    """
     value = value.upper()
     value = value.replace(" ", "_")
     return value
 
 
 def validate_block_name(context, value):
+    """
+    Validate if a block name exists, and if so, should we overwrite it.
+
+    Args:
+        context: Context object
+        value: Value to check
+
+    Returns:
+        Slugified value name
+    """
     cp = context.obj["cp"]
     value = slugify(value)
     if value in cp.sections():
         secho(f"The {value} block already exists in the selected ini file.", fg="bright_yellow")
-        click.confirm(click.style("Do you want to continue and overwrite the existing block?", fg="bright_yellow"),
-                      default=False, abort=True)
+        click.confirm(click.style("Do you want to continue and overwrite the existing block?", fg="bright_yellow"), default=False, abort=True)
 
         # Remove the block from the config parser
         del cp[value]
@@ -79,7 +100,7 @@ def validate_block_name(context, value):
 @click.pass_context
 def block(ctx, block_name, platform):
     """
-    Command to create/replace a block in the selected idmtools.ini
+    Command to create/replace a block in the selected idmtools.ini.
 
     Args:
         ctx: Context containing the path of idmtools.ini and the associated configparser

@@ -1,3 +1,8 @@
+"""
+Filtering utility.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 from uuid import UUID
 from idmtools.core import ItemType, EntityStatus
 from idmtools.core.interfaces.ientity import IEntity
@@ -5,11 +10,15 @@ from idmtools.entities.iplatform import IPlatform
 
 
 class FilterItem:
+    """
+    FilterItem provides a utility to filter items on a platform.
+    """
 
     @staticmethod
     def filter_item(platform: IPlatform, item: IEntity, skip_sims=None, max_simulations: int = None, **kwargs):
         """
         Filter simulations from Experiment or Suite, by default it filter status with Succeeded.
+
         If user wants to filter by other status, it also can be done, for example:
 
         .. code-block:: python
@@ -23,21 +32,21 @@ class FilterItem:
                 filter_item(platform, exp, tags={'Run_Number': '2'})
 
         Args:
-            platform:
-            item:
+            platform: Platform item
+            item: Item to filter
             skip_sims: list of sim ids
-            max_simulations:
+            max_simulations: Total simulations
             kwargs: extra filters
 
         Returns: list of simulation ids
         """
-
         if skip_sims is None:
             skip_sims = []
 
         def match_tags(sim: IEntity, tags=None):
             """
-            Check if simulation match tags
+            Check if simulation match tags.
+
             Args:
                 sim: simulation
                 tags: tags
@@ -78,7 +87,8 @@ class FilterItem:
     @classmethod
     def filter_item_by_id(cls, platform: IPlatform, item_id: UUID, item_type: ItemType = ItemType.EXPERIMENT, skip_sims=None, max_simulations: int = None, **kwargs):
         """
-        Filter simulations from Experiment or Suite
+        Filter simulations from Experiment or Suite.
+
         Args:
             platform: COMPSPlatform
             item_id: Experiment/Suite id

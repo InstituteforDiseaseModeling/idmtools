@@ -1,3 +1,7 @@
+"""idmtools local platform docker tasks tools.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import os
 import itertools
 import logging
@@ -11,6 +15,18 @@ logger = logging.getLogger(__name__)
 
 
 def docker_perform(command: str, experiment_uuid: str, simulation_uuid: str, container_config: dict) -> Status:
+    """
+    Run command in docker.
+
+    Args:
+        command: Command to run
+        experiment_uuid: Experiment uuid
+        simulation_uuid: Simulation uuid
+        container_config: Container config.
+
+    Returns:
+        Job status
+    """
     from idmtools_platform_local.internals.workers.utils import create_or_update_status
     container_config = container_config
     # update the config to container the volume info
@@ -51,6 +67,19 @@ def docker_perform(command: str, experiment_uuid: str, simulation_uuid: str, con
 
 
 def run_container(command, container_config, current_job, simulation_path, simulation_uuid):
+    """
+    Run our docker task.
+
+    Args:
+        command: Command to run
+        container_config: Docker container config
+        current_job: Current job
+        simulation_path: Simulation path
+        simulation_uuid: Simulation uuid
+
+    Returns:
+        Results of job(0 for success, 1 or other code for failures)
+    """
     import docker
     from idmtools_platform_local.internals.workers.utils import create_or_update_status
 

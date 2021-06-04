@@ -1,3 +1,4 @@
+"""Entrypoint for idmtools cli."""
 import os
 from typing import NoReturn
 from colorama import init as color_init
@@ -5,8 +6,9 @@ from colorama import init as color_init
 
 def main() -> NoReturn:
     """
-    This is our main run function for the CLI. It basically calls start(load cli including the plugins) and then
-    run the cli
+    This is our main run function for the CLI.
+
+    It basically calls start(load cli including the plugins) and then run the cli.
 
     Returns:
         None
@@ -14,12 +16,12 @@ def main() -> NoReturn:
     os.environ['IDMTOOLS_NO_CONFIG_WARNING'] = '1'
     from idmtools_cli.cli.entrypoint import cli
     start()
-    cli()
+    cli(auto_envvar_prefix='IDMTOOLS_CLI')
 
 
 def start() -> NoReturn:
     """
-    Loads the different components of the CLI
+    Loads the different components of the CLI.
 
     Currently this involves
 
@@ -39,6 +41,7 @@ def start() -> NoReturn:
     import idmtools_cli.cli.config_file  # noqa: F401
     import idmtools_cli.cli.system_info  # noqa: F401
     import idmtools_cli.cli.gitrepo  # noqa: F401
+    import idmtools_cli.cli.package  # noqa: F401
     platform_plugins = PlatformCLIPlugins()
     from idmtools_cli.cli.init import build_project_commands
     build_project_commands()

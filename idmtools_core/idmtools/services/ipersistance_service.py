@@ -1,3 +1,8 @@
+"""
+IPersistenceService allows caching of items locally into a diskcache db that does not expire upon deletion.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import os
 import logging
 import time
@@ -10,11 +15,20 @@ logger = logging.getLogger(__name__)
 
 
 class IPersistenceService(metaclass=ABCMeta):
+    """
+    IPersistenceService provides a persistent cache. This is useful for network heavy operations.
+    """
     cache_directory = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data")
     cache_name = None
 
     @classmethod
     def _open_cache(cls):
+        """
+        Open cache.
+
+        Returns:
+            None
+        """
         import sqlite3
         cache_directory = os.path.join(cls.cache_directory, 'disk_cache', cls.cache_name)
         # the more the cpus, the more likely we are to encounter a scaling issue. Let's try to scale with that up to
@@ -33,12 +47,30 @@ class IPersistenceService(metaclass=ABCMeta):
 
     @classmethod
     def retrieve(cls, uid):
+        """
+        Retrieve item with id <uid> from cache.
+
+        Args:
+            uid: Id to fetch
+
+        Returns:
+            Item loaded from cache
+        """
         with cls._open_cache() as cache:
             obj = cache.get(uid, retry=True)
             return obj
 
     @classmethod
     def save(cls, obj):
+        """
+        Save an item to our cache.
+
+        Args:
+            obj: Object to save.
+
+        Returns:
+            Object uid
+        """
         with cls._open_cache() as cache:
             if logger.isEnabledFor(logging.DEBUG):
                 logging.debug('Saving %s to %s', obj.uid, cls.cache_name)
@@ -48,22 +80,49 @@ class IPersistenceService(metaclass=ABCMeta):
 
     @classmethod
     def delete(cls, uid):
+        """
+        Delete at item from our cache with id <uid>.
+
+        Args:
+            uid: Id to delete
+
+        Returns:
+            None
+        """
         with cls._open_cache() as cache:
             cache.delete(uid, retry=True)
 
     @classmethod
     def clear(cls):
+        """
+        Clear our cache.
+
+        Returns:
+            None
+        """
         with cls._open_cache() as cache:
             cache.clear(retry=True)
 
     @classmethod
     def list(cls):
+        """
+        List items in our cache.
+
+        Returns:
+            List of items in our cache
+        """
         with cls._open_cache() as cache:
             _list = list(cache)
             return _list
 
     @classmethod
     def length(cls):
+        """
+        Total length of our persistence cache.
+
+        Returns:
+            Count of our cache
+        """
         with cls._open_cache() as cache:
             _len = len(cache)
             return _len

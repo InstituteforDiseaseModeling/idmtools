@@ -1,3 +1,7 @@
+"""idmtools COMPSPlatform.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 # flake8: noqa E402
 import copy
 import logging
@@ -50,7 +54,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     MAX_SUBDIRECTORY_LENGTH = 35  # avoid maxpath issues on COMPS
 
     endpoint: str = field(default="https://comps2.idmod.org", metadata={"help": "URL of the COMPS endpoint to use"})
-    environment: str = field(default="Bayesian",metadata=dict(help="Name of the COMPS environment to target", callback=environment_list))
+    environment: str = field(default="Bayesian", metadata=dict(help="Name of the COMPS environment to target", callback=environment_list))
     priority: str = field(default=COMPSPriority.Lowest.value, metadata=dict(help="Priority of the job", choices=[p.value for p in COMPSPriority]))
     simulation_root: str = field(default="$COMPS_PATH(USER)\\output", metadata=dict(help="Location of the outputs"))
     node_group: str = field(default=None, metadata=dict(help="Node group to target"))
@@ -113,3 +117,6 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         if isinstance(item, IWorkflowItem):
             return False
         return super().is_windows_platform(item)
+
+
+

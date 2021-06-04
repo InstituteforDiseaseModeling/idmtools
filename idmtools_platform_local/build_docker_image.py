@@ -1,6 +1,6 @@
-####
-# This script is currently a workaround so that we can use bump2version with docker since the nightly versions
-# don't work with docker registry
+"""
+This script is currently a workaround so that we can use bump2version with docker since the nightly versions don't work with docker registry.
+"""
 import glob
 import os
 import shutil

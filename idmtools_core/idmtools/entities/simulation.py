@@ -1,3 +1,11 @@
+"""
+Defines our Simulation object.
+
+The simulation object can be thought as a metadata object. It represents a configuration of a remote job execution metadata.
+All simulations have a task. Optionally that have assets. All simulations should belong to an Experiment.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 from dataclasses import dataclass, field, fields
 from logging import getLogger, DEBUG
 from typing import List, Union, Mapping, Any, Type, TypeVar, Dict, TYPE_CHECKING
@@ -15,7 +23,6 @@ if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
     from idmtools.entities.experiment import Experiment
 
-
 logger = getLogger(__name__)
 user_logger = getLogger('user')
 
@@ -24,6 +31,7 @@ user_logger = getLogger('user')
 class Simulation(IAssetsEnabled, INamedEntity):
     """
     Class that represents a generic simulation.
+
     This class needs to be implemented for each model type with specifics.
     """
     #: Task representing the configuration of the command to be executed
@@ -39,28 +47,52 @@ class Simulation(IAssetsEnabled, INamedEntity):
 
     @property
     def experiment(self) -> 'Experiment':  # noqa: F821
+        """
+        Get experiment parent.
+
+        Returns:
+            Parent Experiment
+        """
         return self.parent
 
     @experiment.setter
     def experiment(self, experiment: 'Experiment'):  # noqa: F821
+        """
+        Set the parent experiment.
+
+        Args:
+            experiment: Experiment to set as parent.
+
+        Returns:
+            None
+        """
         self.parent = experiment
 
     def __repr__(self):
+        """
+        String representation of simulation.
+        """
         return f"<Simulation: {self.uid} - Exp_id: {self.parent_id}>"
 
     def __hash__(self):
+        """
+        Hash of simulation(id).
+
+        Returns:
+            Hash of simulation
+        """
         return id(self.uid)
 
     def pre_creation(self, platform: 'IPlatform'):
         """
 
-        Runs before a simulation is created server side
+        Runs before a simulation is created server side.
 
         Args:
             platform: Platform the item is being executed on
 
         Returns:
-
+            None
         """
         # skip the IItem created function
         IItem.pre_creation(self, platform)
@@ -91,13 +123,13 @@ class Simulation(IAssetsEnabled, INamedEntity):
 
     def post_creation(self, platform: 'IPlatform') -> None:
         """
-        Called after a simulation is created
+        Called after a simulation is created.
 
         Args:
             platform: Platform simulation is being executed on
 
         Returns:
-
+            None
         """
         if logger.isEnabledFor(DEBUG):
             logger.debug('Calling task post creation')
@@ -133,7 +165,7 @@ class Simulation(IAssetsEnabled, INamedEntity):
     def from_task(cls, task: 'ITask', tags: Dict[str, Any] = None,  # noqa E821
                   asset_collection: AssetCollection = None):
         """
-        Create a simulation from a task
+        Create a simulation from a task.
 
         Args:
             task: Task to create from
@@ -141,22 +173,24 @@ class Simulation(IAssetsEnabled, INamedEntity):
             asset_collection: Simulation Assets
 
         Returns:
-
+            Simulation using the  parameters provided
         """
         return Simulation(task=task, tags=dict() if tags is None else tags,
                           assets=asset_collection if asset_collection else AssetCollection())
 
     def list_static_assets(self, platform: 'IPlatform' = None, **kwargs) -> List[Asset]:
         """
-        List assets that have been uploaded to a server already
+        List assets that have been uploaded to a server already.
 
         Args:
-            children: When set to true, simulation assets will be loaded as well
             platform: Optional platform to load assets list from
             **kwargs:
 
         Returns:
             List of assets
+
+        Raises:
+            ValueError - If you try to list an assets for an simulation that hasn't been created/loaded from a remote platform.
         """
         if self.id is None:
             raise ValueError("You can only list static assets on an existing experiment")
@@ -165,7 +199,8 @@ class Simulation(IAssetsEnabled, INamedEntity):
 
     def to_dict(self) -> Dict:
         """
-        Do a lightweight conversation to json
+        Do a lightweight conversation to json.
+
         Returns:
             Dict representing json of object
         """

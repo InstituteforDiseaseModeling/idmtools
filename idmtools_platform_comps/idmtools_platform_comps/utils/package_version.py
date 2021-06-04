@@ -1,10 +1,15 @@
+"""idmtools Tools to filter versions of packages for requriements for asset collections.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import functools
 import operator
 import json
+import os
 import re
 from abc import ABC
 from datetime import datetime
-from logging import getLogger
+from logging import getLogger, DEBUG
 from typing import Optional, List, Type
 from urllib import request
 import requests
@@ -12,6 +17,7 @@ from pkg_resources import parse_version
 from packaging.version import parse
 from html.parser import HTMLParser
 
+PKG_PYPI = 'https://pypi.python.org/pypi/{}/json'
 PYPI_PRODUCTION_SIMPLE = 'https://packages.idmod.org/artifactory/api/pypi/pypi-production/simple'
 
 IDM_DOCKER_PROD = 'https://packages.idmod.org/artifactory/list/docker-production'
@@ -22,17 +28,20 @@ logger = getLogger(__name__)
 
 
 class PackageHTMLParser(HTMLParser, ABC):
+    """Base Parser for our other parsers."""
     previous_tag = None
     pkg_version = None
 
     def __init__(self):
+        """Constructor."""
         super().__init__()
         self.pkg_version = set()
 
 
 class LinkHTMLParser(PackageHTMLParser):
-
+    """Parse hrefs from links."""
     def handle_starttag(self, tag, attrs):
+        """Parse links and extra hrefs."""
         self.previous_tag = tag
         if tag != 'a':
             return
@@ -44,18 +53,26 @@ class LinkHTMLParser(PackageHTMLParser):
 
 
 class LinkNameParser(PackageHTMLParser):
+    """
+    Provides parsing of packages from pypi/arfifactory.
+
+    We parse links that match versions patterns
+    """
     in_link = False
     ver_pattern = re.compile(r'^[\d\.brcdev\+nightly]+$')
 
     def handle_starttag(self, tag, attrs):
+        """Handle begin of links."""
         self.previous_tag = tag
         self.in_link = tag == "a"
 
     def handle_endtag(self, tag):
+        """End link tags."""
         if tag == "a":
             self.in_link = False
 
     def handle_data(self, data):
+        """Process links."""
         if self.in_link:
             parts = data.split("-")
             if len(parts) >= 2:
@@ -69,10 +86,12 @@ class LinkNameParser(PackageHTMLParser):
 
 def get_latest_package_version_from_pypi(pkg_name, display_all=False):
     """
-    Utility to get the latest version for a given package name
+    Utility to get the latest version for a given package name.
+
     Args:
         pkg_name: package name given
         display_all: determine if output all package releases
+
     Returns: the latest version of ven package
     """
     url = f'https://pypi.python.org/pypi/{pkg_name}/json'
@@ -94,11 +113,13 @@ def get_latest_package_version_from_pypi(pkg_name, display_all=False):
 
 def get_latest_pypi_package_version_from_artifactory(pkg_name, display_all=False, base_version: str = None):
     """
-    Utility to get the latest version for a given package name
+    Utility to get the latest version for a given package name.
+
     Args:
         pkg_name: package name given
         display_all: determine if output all package releases
         base_version: Base version
+
     Returns: the latest version of ven package
     """
     pkg_url = "/".join([PYPI_PRODUCTION_SIMPLE, pkg_name])
@@ -107,7 +128,7 @@ def get_latest_pypi_package_version_from_artifactory(pkg_name, display_all=False
 
 def get_pypi_package_versions_from_artifactory(pkg_name, display_all=False, base_version: str = None, exclude_pre_release: bool = True):
     """
-    Utility to get versions of a package in artifactory
+    Utility to get versions of a package in artifactory.
 
     Args:
         pkg_name: package name given
@@ -123,11 +144,13 @@ def get_pypi_package_versions_from_artifactory(pkg_name, display_all=False, base
 
 def get_latest_ssmt_image_version_from_artifactory(pkg_name='comps_ssmt_worker', base_version: Optional[str] = None, display_all=False):
     """
-    Utility to get the latest version for a given package name
+    Utility to get the latest version for a given package name.
+
     Args:
         pkg_name: package name given
         base_version: Optional base version. Versions above this will not be added.
         display_all: determine if output all package releases
+
     Returns: the latest version of ven package
     """
     pkg_path = IDMTOOLS_DOCKER_PROD
@@ -138,14 +161,17 @@ def get_latest_ssmt_image_version_from_artifactory(pkg_name='comps_ssmt_worker',
 
 def get_docker_manifest(image_path="idmtools/comps_ssmt_worker", repo_base=IDM_DOCKER_PROD):
     """
-    Get docker manifest from IDM Artifactory. It mimics latest even when user has no latest tag degined
+    Get docker manifest from IDM Artifactory. It mimics latest even when user has no latest tag defined.
 
     Args:
-        image_path:
-        repo_base:
+        image_path:Path of docker image we want
+        repo_base:Base of the repo
 
     Returns:
+        None
 
+    Raises:
+        ValueError - When the manifest cannot be found
     """
     if ":" not in image_path:
         image_path += ":latest"
@@ -169,10 +195,12 @@ def get_docker_manifest(image_path="idmtools/comps_ssmt_worker", repo_base=IDM_D
 
 def get_digest_from_docker_hub(repo, tag='latest'):
     """
-     repo: string, repository (e.g. 'library/fedora')
-     tag:  string, tag of the repository (e.g. 'latest')
-     """
+    Get the digest for image from docker.
 
+    Args:
+        repo: string, repository (e.g. 'library/fedora')
+        tag:  string, tag of the repository (e.g. 'latest')
+    """
     response = requests.get(
         MANIFEST_URL.format(repository=repo, tag=tag),
         json=True,
@@ -189,14 +217,45 @@ def get_digest_from_docker_hub(repo, tag='latest'):
 @functools.lru_cache(8)
 def fetch_versions_from_server(pkg_url: str, parser: Type[PackageHTMLParser] = LinkHTMLParser) -> List[str]:
     """
-    Fetch all versions from server
+    Fetch all versions from server.
 
     Args:
         pkg_url: Url to fetch
         parser: Parser tp use
-    Returns:
 
+    Returns:
+        All the releases for a package
     """
+    resp = requests.get(pkg_url)
+    if resp.status_code != 200:
+        logger.warning('Could not fetch URL')
+        return None
+
+    html_str = resp.text
+
+    parser = parser()
+    parser.feed(html_str)
+    releases = parser.pkg_version
+    releases = [v for v in releases if not v.startswith('.')]
+
+    all_releases = sorted(releases, key=parse_version, reverse=True)
+    return all_releases
+
+
+def fetch_versions_from_artifactory(pkg_name: str, parser: Type[PackageHTMLParser] = LinkHTMLParser) -> List[str]:
+    """
+    Fetch all versions from server.
+
+    Args:
+        pkg_name: Url to fetch
+        parser: Parser tp use
+
+    Returns:
+        Available releases
+    """
+    pkg_path = IDM_DOCKER_PROD
+    pkg_url = os.path.join(pkg_path, pkg_name)
+
     resp = requests.get(pkg_url)
     if resp.status_code != 200:
         logger.warning('Could not fetch URL')
@@ -216,7 +275,9 @@ def fetch_versions_from_server(pkg_url: str, parser: Type[PackageHTMLParser] = L
 @functools.lru_cache(3)
 def get_versions_from_site(pkg_url, base_version: Optional[str] = None, display_all=False, parser: Type[PackageHTMLParser] = LinkNameParser, exclude_pre_release: bool = True):
     """
-    Utility to get the the available versions for a package. The default properties filter out pre releases. You can also include a base version to only list items starting with a particular version
+    Utility to get the the available versions for a package.
+
+    The default properties filter out pre releases. You can also include a base version to only list items starting with a particular version
 
     Args:
         pkg_url: package name given
@@ -226,6 +287,9 @@ def get_versions_from_site(pkg_url, base_version: Optional[str] = None, display_
         exclude_pre_release: Exclude prerelease versions
 
     Returns: the latest version of ven package
+
+    Raises:
+        ValueError - If a latest versions cannot be determined
     """
     all_releases = fetch_versions_from_server(pkg_url, parser=parser)
     if all_releases is None:
@@ -251,7 +315,7 @@ def get_versions_from_site(pkg_url, base_version: Optional[str] = None, display_
 @functools.lru_cache(3)
 def get_latest_version_from_site(pkg_url, base_version: Optional[str] = None, display_all=False, parser: Type[PackageHTMLParser] = LinkNameParser, exclude_pre_release: bool = True):
     """
-    Utility to get the latest version for a given package name
+    Utility to get the latest version for a given package name.
 
     Args:
         pkg_url: package name given
@@ -262,13 +326,199 @@ def get_latest_version_from_site(pkg_url, base_version: Optional[str] = None, di
 
     Returns: the latest version of ven package
     """
+    if logger.isEnabledFor(DEBUG):
+        logger.debug(f"Fetching version from {pkg_url} with base {base_version}")
     release_versions = get_versions_from_site(pkg_url, base_version, display_all=display_all, parser=parser, exclude_pre_release=exclude_pre_release)
     if base_version:
         # only use the longest match latest
         version_compatible_portion = ".".join(base_version.split(".")[:2])
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f"Finding latest of matches for version {base_version} from {release_versions} using {version_compatible_portion}")
 
         for ver in release_versions:
             if ".".join(ver.split('.')[:2]) == version_compatible_portion:
                 return ver
         return None
     return release_versions[0] if release_versions else None
+
+
+def fetch_package_versions_from_pypi(pkg_name):
+    """
+    Utility to get the latest version for a given package name.
+
+    Args:
+        pkg_name: package name given
+
+    Returns: the latest version of ven package
+    """
+    url = PKG_PYPI.format(pkg_name)
+    try:
+        releases = json.loads(request.urlopen(url).read())['releases']
+    except Exception:
+        return None
+
+    return releases
+
+
+def fetch_package_versions(pkg_name, is_released=True, sort=True, display_all=False):
+    """
+    Utility to get the latest version for a given package name.
+
+    Args:
+        pkg_name: package name given
+        is_released: get released version only
+        sort: make version sorted or not
+        display_all: determine if output all package releases
+
+    Returns: the latest version of ven package
+    """
+    # First fetch versions from Artifactory
+    pkg_url = "/".join([PYPI_PRODUCTION_SIMPLE, pkg_name])
+    versions = fetch_versions_from_server(pkg_url, parser=LinkNameParser)
+
+    if versions is None:
+        versions = fetch_package_versions_from_pypi(pkg_name)
+
+    if sort:
+        versions = sorted(versions, key=parse_version, reverse=True)
+
+    if is_released:
+        versions = [ver for ver in versions if not parse(ver).is_prerelease]
+
+    if display_all:
+        print(display_all)
+
+    return versions
+
+
+def get_pkg_match_version(pkg_name, base_version=None, test='==', validate=True):
+    """
+    Utility to get the latest version for a given package name.
+
+    Args:
+        pkg_name: package name given
+        base_version: Optional base version. Versions above this will not be added.
+        test: default ==, a filter to find version
+        validate: bool, if True, will validate base_version
+    Returns: the latest version of ven package
+
+    Raises:
+        Exception - if we cannot find version
+
+    Notes:
+        - TODO - Make custom exception or use ValueError
+    """
+    # fetch sorted versions
+    versions = fetch_package_versions(pkg_name)
+
+    # Return None if given version list is None or empty
+    if not versions:
+        return None
+
+    # Return the latest version if no base_version is given
+    if base_version is None:
+        return versions[0]
+
+    # Make sure the input is valid
+    if base_version not in versions:
+        if validate:
+            # print(f"Could not find the version of '{version}'.")
+            raise Exception(f"Could not find the version of '{base_version}'.")
+
+    if test == '~=':
+        return get_latest_compatible_version(pkg_name, base_version, versions)
+
+    if test == '==':
+        return base_version
+
+    index = versions.index(base_version)
+
+    if test == '<':
+        return versions[index + 1] if index > -1 else None
+
+    if test == '<=':
+        return versions[index]
+
+    if test == '>':
+        return versions[0]
+
+    if test == '>=':
+        return versions[0]
+
+    if test == '!=':
+        return versions[0] if base_version != versions[0] else versions[1] if len(versions) > 1 else None
+
+    return base_version
+
+
+def get_latest_version(pkg_name):
+    """
+    Utility to get the latest version for a given package name.
+
+    Args:
+        pkg_name: package name given
+
+    Returns: the latest version of package
+
+    Raises:
+        Exception if package could not be found.
+
+    Notes:
+        - TODO - Make custom exception or use ValueError
+    """
+    # Get sorted package versions
+    versions = fetch_package_versions(pkg_name)
+
+    if versions is None:
+        # print(f"Could not find the version of '{version}'.")
+        raise Exception(f"Could not find the package'{pkg_name}'.")
+
+    # Pick the latest
+    return versions[0]
+
+
+def get_latest_compatible_version(pkg_name, base_version=None, versions=None, validate=True):
+    """
+    Utility to get the latest compatible version from a given version list.
+
+    Args:
+        base_version: Optional base version. Versions above this will not be added.
+        pkg_name: package name given
+        versions: user input of version list
+        validate: bool, if True, will validate base_version
+
+    Returns: the latest compatible version from versions
+
+    Raises:
+        Exception - If we cannot find version
+    Notes:
+        - TODO - Make custom exception or use ValueError
+    """
+    if versions is None:
+        versions = fetch_package_versions(pkg_name)
+
+    # Return None if given version list is None or empty
+    if not versions:
+        return None
+
+    # Return the latest version if no base_version is given
+    if base_version is None:
+        return versions[0]
+
+    # Cleanup
+    base_version = base_version.replace('+nightly', '')
+
+    # Make sure the input is valid
+    if base_version not in versions:
+        if validate:
+            # print(f"Could not find the version of '{version}'.")
+            raise Exception(f"Could not find the version of '{base_version}'.")
+
+    # Find all possible candidates
+    v_root = base_version[0: base_version.rindex('.') + 1]
+
+    # Final all candidates
+    candidates = [v for v in versions if v.startswith(v_root)]
+
+    # Pick the latest
+    return candidates[0]

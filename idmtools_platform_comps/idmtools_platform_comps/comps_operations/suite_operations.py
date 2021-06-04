@@ -1,3 +1,7 @@
+"""idmtools comps suite operations.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 from dataclasses import dataclass, field
 from typing import Any, List, Tuple, Union, Type, TYPE_CHECKING, Optional
 from uuid import UUID
@@ -11,13 +15,16 @@ if TYPE_CHECKING:  # pragma: no cover
 
 @dataclass
 class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
+    """
+    Provides Suite operation to the COMPSPlatform.
+    """
     platform: 'COMPSPlatform'  # noqa F821
     platform_type: Type = field(default=COMPSSuite)
 
     def get(self, suite_id: UUID, columns: Optional[List[str]] = None, load_children: Optional[List[str]] = None,
             query_criteria: Optional[QueryCriteria] = None, **kwargs) -> COMPSSuite:
         """
-        Get COMPS Suite
+        Get COMPS Suite.
 
         Args:
             suite_id: Suite id 
@@ -27,7 +34,7 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
             **kwargs: 
 
         Returns:
-        COMPSSuite
+            COMPSSuite
         """
         columns = columns or ["id", "name"]
         children = load_children if load_children is not None else ["tags", "configuration"]
@@ -38,7 +45,7 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
 
     def platform_create(self, suite: Suite, **kwargs) -> Tuple[COMPSSuite, UUID]:
         """
-        Create suite on COMPS
+        Create suite on COMPS.
 
         Args:
             suite: Suite to create
@@ -60,10 +67,10 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
 
     def get_parent(self, suite: COMPSSuite, **kwargs) -> Any:
         """
-        Get parent of suite. We always return None on COMPS
+        Get parent of suite. We always return None on COMPS.
 
         Args:
-            suite:
+            suite:Suite to get parent of
             **kwargs:
 
         Returns:
@@ -73,7 +80,8 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
 
     def get_children(self, suite: COMPSSuite, **kwargs) -> List[Union[COMPSExperiment, WorkItem]]:
         """
-        Get children for a suite
+        Get children for a suite.
+
         Args:
             suite: Suite to get children for
             **kwargs: Any arguments to pass on to loading functions
@@ -91,20 +99,21 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
 
     def refresh_status(self, suite: Suite, **kwargs):
         """
-        Refresh the status of a suite. On comps, this is done by refreshing all experiments
+        Refresh the status of a suite. On comps, this is done by refreshing all experiments.
+
         Args:
             suite: Suite to refresh status of
             **kwargs:
 
         Returns:
-
+            None
         """
         for experiment in suite.experiments:
             self.platform.refresh_status(experiment)
 
     def to_entity(self, suite: COMPSSuite, children: bool = True, **kwargs) -> Suite:
         """
-        Convert a COMPS Suite to an IDM Suite
+        Convert a COMPS Suite to an IDM Suite.
 
         Args:
             suite: Suite to Convert

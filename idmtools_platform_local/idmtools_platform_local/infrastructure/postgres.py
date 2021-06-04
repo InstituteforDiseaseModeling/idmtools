@@ -1,3 +1,7 @@
+"""idmtools postgres service. Used for experiment data.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import time
 from dataclasses import dataclass
 from logging import getLogger, DEBUG
@@ -13,6 +17,7 @@ logger = getLogger(__name__)
 
 @dataclass
 class PostgresContainer(BaseServiceContainer):
+    """Defines the postgres container for the local platform."""
     host_data_directory: str = None
     port: int = 5432
     mem_limit: str = '128m'
@@ -26,13 +31,14 @@ class PostgresContainer(BaseServiceContainer):
     config_prefix: str = 'postgres_'
 
     def __post_init__(self):
+        """Constructor."""
         system_info = get_system_information()
         if self.run_as is None:
             self.run_as = system_info.user_group_str
 
     def get_configuration(self) -> Dict:
         """
-        Returns the docker config for the postgres container
+        Returns the docker config for the postgres container.
 
         Returns:
             (dict) Dictionary representing the docker config for the postgres container
@@ -54,6 +60,10 @@ class PostgresContainer(BaseServiceContainer):
         return container_config
 
     def create(self, spinner=None) -> Container:
+        """Create our postgres container.
+
+        Here we create the postgres data volume before creating the container.
+        """
         self.create_postgres_volume()
         result = super().create(spinner)
         # postgres will restart once so we should watch it again
@@ -63,9 +73,10 @@ class PostgresContainer(BaseServiceContainer):
 
     def create_postgres_volume(self) -> NoReturn:
         """
-        Creates our postgres volume
-        Returns:
+        Creates our postgres volume.
 
+        Returns:
+            None
         """
         postgres_volume = self.client.volumes.list(filters=dict(name=self.data_volume_name))
         if not postgres_volume:

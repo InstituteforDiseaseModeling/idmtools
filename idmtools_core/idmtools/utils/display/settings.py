@@ -1,3 +1,8 @@
+"""
+defines views for different types if items.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 from idmtools.utils.display.displays import DictDisplaySetting, StringDisplaySetting, TableDisplay
 
 simulation_display_settings = [
