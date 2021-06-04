@@ -38,6 +38,9 @@ else:
 
 # -- General configuration ------------------------------------------------
 
+# This is the equivalent of -t in SPHINXOPTS for the RTD build
+tags.add('idmtools')
+
 # If your docs needs a minimal Sphinx version, state it here.
 #
 # needs_sphinx = '1.0'
