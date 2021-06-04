@@ -42,9 +42,9 @@ class ClimateGenerationTest(ITestWithPersistence):
         command = command_pattern.format(points_file, start_date, end_date, optional_args)
 
         wi = SSMTWorkItem(item_name=self.case_name, docker_image=docker_image, command=command)
+        # upload site_details.csv to workitem's root dir in COMPS
         wi.transient_assets.add_asset(os.path.join("climate", points_file))
-        self.platform.run_items(wi)
-        self.platform.wait_till_done(wi)
+        wi.run(wait_on_done=True)
 
         # Get the work item, related asset collection, and assets
         wi_id = wi.id
@@ -52,18 +52,17 @@ class ClimateGenerationTest(ITestWithPersistence):
         self.validate(wi_id)
 
     # ------------------------------------------
-    # test generate ERA5 climate files
+    # test generate ERA5 climate files with WorkOrder.json
     # ------------------------------------------
     @pytest.mark.comps
     @pytest.mark.long
-    @pytest.mark.skip("wait for workorder with additionalmount")
     def test_generate_era5_climate_files_wb_workolder(self):
         wi = SSMTWorkItem(item_name=self.case_name, command="anything")
+        # upload site_details.csv to workitem's root dir in COMPS
         wi.transient_assets.add_asset(os.path.join("climate", "site_details.csv"))
-        wi.related_asset_collections
+        # upload WorkOrder.json to workitem's root dir in COMPS
         wi.load_work_order(os.path.join("climate", "WorkOrder.json"))
-        self.platform.run_items(wi)
-        self.platform.wait_till_done(wi)
+        wi.run(wait_on_done=True)
 
         # Get the work item, related asset collection, and assets
         wi_id = wi.id
