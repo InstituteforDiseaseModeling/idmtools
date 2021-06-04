@@ -31,3 +31,4 @@
 .. |exe_s| replace:: Eradication.exe
 .. |linux_binary| replace:: Eradication binary
 .. |dev_install| replace:: https://github.com/InstituteforDiseaseModeling/idmtools#development-environment-setup
+.. |EMODPY_s| replace:: emodpy
