@@ -4,5 +4,6 @@ PyGithub~=1.55
 sphinx-copybutton~=0.3.1
 sphinx-rtd-theme~=0.5.2
 sphinxcontrib-napoleon~=0.7
+sphinxext.remoteliteralinclude
 sphinxcontrib-programoutput~=0.17
 sphinx~=3.5.4
