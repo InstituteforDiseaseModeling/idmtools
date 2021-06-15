@@ -1,0 +1,8 @@
+{
+  "WorkItem_Type": "DockerWorker",
+  "Execution": {
+    "ImageName": "weather-files:1.1",
+    "Command": "python /app/generate_weather_asset_collection.py site_details.csv 2010 2012 --id-ref default --node-col id --create-asset",
+    "AdditionalMounts" : [ "/shared" ]
+  }
+}
