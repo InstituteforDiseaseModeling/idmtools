@@ -1,3 +1,7 @@
+"""idmtools SSMTWorkItem. This is the base of most comps workitems.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import warnings
 from logging import getLogger, DEBUG
 from dataclasses import dataclass, field, InitVar
@@ -14,12 +18,16 @@ user_logger = getLogger(__name__)
 @dataclass
 class SSMTWorkItem(ICOMPSWorkflowItem):
     """
-    Idm SSMTWorkItem
+    Defines the SSMT WorkItem.
+
+    Notes:
+        - We have lots of workitem bases. We need to consolidate these a bit.
     """
     docker_image: str = field(default=None)
     command: InitVar[str] = None
 
     def __post_init__(self, item_name: str, asset_collection_id: UUID, asset_files: FileList, user_files: FileList, command: str):
+        """Constructor."""
         if command and not self.task:
             self.task = CommandTask(command)
         else:
@@ -30,7 +38,8 @@ class SSMTWorkItem(ICOMPSWorkflowItem):
 
     def get_base_work_order(self):
         """
-        builder basic work order
+        Builder basic work order.
+
         Returns: work order as a dictionary
         """
         base_wo = {
@@ -45,9 +54,7 @@ class SSMTWorkItem(ICOMPSWorkflowItem):
 
     def get_comps_ssmt_image_name(self):
         """
-        build comps ssmt docker image name
-        Args:
-            user_image: the image name provided by user
+        Build comps ssmt docker image name.
 
         Returns: final validated name
         """
@@ -79,12 +86,13 @@ class SSMTWorkItem(ICOMPSWorkflowItem):
 
     @property
     def command(self) -> str:
+        """Command to run."""
         return str(self.task.command)
 
     @command.setter
     def command(self, value: str):
         """
-        Alias for legacy code for assets. It will be deprecated in 1.7.0
+        Alias for legacy code for assets. It will be deprecated in 1.7.0.
 
         Returns:
             None
@@ -96,10 +104,14 @@ class SSMTWorkItem(ICOMPSWorkflowItem):
 @dataclass
 class InputDataWorkItem(ICOMPSWorkflowItem):
     """
-    Idm InputDataWorkItem
+    Idm InputDataWorkItem.
+
+    Notes:
+        - TODO add examples
     """
 
     def __post_init__(self, item_name: str, asset_collection_id: UUID, asset_files: FileList, user_files: FileList):
+        """Constructor."""
         super().__post_init__(item_name, asset_collection_id, asset_files, user_files)
         self.work_item_type = self.work_item_type or 'InputDataWorker'
 
@@ -107,9 +119,13 @@ class InputDataWorkItem(ICOMPSWorkflowItem):
 @dataclass
 class VisToolsWorkItem(ICOMPSWorkflowItem):
     """
-    Idm VisToolsWorkItem
+    Idm VisToolsWorkItem.
+
+    Notes:
+        - TODO add examples
     """
 
     def __post_init__(self, item_name: str, asset_collection_id: UUID, asset_files: FileList, user_files: FileList):
+        """Constructor."""
         super().__post_init__(item_name, asset_collection_id, asset_files, user_files)
         self.work_item_type = self.work_item_type or 'VisTools'

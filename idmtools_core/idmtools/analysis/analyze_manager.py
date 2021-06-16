@@ -1,3 +1,9 @@
+"""idmtools Analyzer manager.
+
+AnalyzerManager is the "driver" of analysis. Analysis is mostly a map reduce operation.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import os
 import sys
 import time
@@ -23,8 +29,9 @@ user_logger = getLogger('user')
 
 def pool_worker_initializer(func, analyzers, cache, platform: 'IPlatform') -> NoReturn:
     """
-    Initialize the pool worker, which allows the process pool to associate the analyzers, cache, and
-    path mapping to the function executed to retrieve data. Using an initializer improves performance.
+    Initialize the pool worker, which allows the process pool to associate the analyzers, cache, and path mapping to the function executed to retrieve data.
+
+    Using an initializer improves performance.
 
     Args:
         func: The function that the pool will call.
@@ -43,14 +50,26 @@ def pool_worker_initializer(func, analyzers, cache, platform: 'IPlatform') -> No
 
 
 class AnalyzeManager(CacheEnabled):
+    """
+    Analyzer Manager Class. This is the main driver of analysis.
+    """
     ANALYZE_TIMEOUT = 3600 * 8  # Maximum seconds before timing out - set to 8 hours
     WAIT_TIME = 1.15  # How much time to wait between check if the analysis is done
     EXCEPTION_KEY = '__EXCEPTION__'
 
     class TimeOutException(Exception):
+        """
+        TimeOutException is raised when the analysis times out.
+        """
         pass
 
     class ItemsNotReady(Exception):
+        """
+        ItemsNotReady is raised when items to be analyzed are still running.
+
+        Notes:
+            TODO - Add doc_link
+        """
         pass
 
     def __init__(self, platform: 'IPlatform' = None, configuration: dict = None,
@@ -60,7 +79,7 @@ class AnalyzeManager(CacheEnabled):
                  force_manager_working_directory: bool = False,
                  exclude_ids: List[Union[str, UUID]] = None, analyze_failed_items: bool = False):
         """
-        Initialize the AnalyzeManager
+        Initialize the AnalyzeManager.
 
         Args:
             platform (IPlatform): Platform
@@ -126,7 +145,7 @@ class AnalyzeManager(CacheEnabled):
 
     def __check_for_platform_from_context(self, platform) -> 'IPlatform':  # noqa: F821
         """
-        Try to determine platform of current object from self or current platform
+        Try to determine platform of current object from self or current platform.
 
         Args:
             platform: Passed in platform object
@@ -156,7 +175,6 @@ class AnalyzeManager(CacheEnabled):
         Returns:
             None
         """
-
         self.potential_items.extend(self.platform.flatten_item(item=item))
 
     def _get_items_to_analyze(self) -> Dict[UUID, IEntity]:
@@ -202,7 +220,7 @@ class AnalyzeManager(CacheEnabled):
             analyzer: An analyzer object (:class:`~idmtools.entities.ianalyzer.IAnalyzer`).
 
         Returns:
-
+            None
         """
         self.analyzers.append(analyzer)
 
@@ -366,12 +384,10 @@ class AnalyzeManager(CacheEnabled):
 
     def analyze(self) -> bool:
         """
-        Process the provided items with the provided analyzers. This is the main driver method of
-        :class:`AnalyzeManager`.
+        Process the provided items with the provided analyzers. This is the main driver method of :class:`AnalyzeManager`.
 
         Returns:
             True on success; False on failure/exception.
-
         """
         start_time = time.time()
 

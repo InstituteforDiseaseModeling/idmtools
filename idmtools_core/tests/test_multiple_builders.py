@@ -18,6 +18,18 @@ def param_update(simulation, param, value):
     return simulation.task.set_parameter(param, value)
 
 
+def update_command_task(simulation, a, b):
+    simulation.task.config["a"] = a
+    simulation.task.config["b"] = b
+    return {"a": a, "b": b}
+
+
+def update_command_task_with_defaults(simulation, a=1, b=2):
+    simulation.task.config["a"] = a
+    simulation.task.config["b"] = b
+    return {"a": a, "b": b}
+
+
 setA = partial(param_update, param="a")
 setB = partial(param_update, param="b")
 setC = partial(param_update, param="c")
@@ -67,6 +79,140 @@ class TestMultipleBuilders(ITestWithPersistence):
 
         # test if we have correct number of simulations
         self.assertEqual(len(simulations), 10 + 5 + 6)
+
+    def test_simulation_builder(self):
+        """Test basic simulation builder.
+
+        We also validates the full product exists after creation
+        """
+
+        def update_command_task_wrapper(key):
+            def update_command_task_a(simulation, value):
+                simulation.task.config[key] = value
+                return {key: value}
+
+            return update_command_task_a
+
+        sb = SimulationBuilder()
+        a_values = range(1, 5)
+        sb.add_sweep_definition(update_command_task_wrapper("a"), a_values)
+        b_values = ["c", "d"]
+        sb.add_sweep_definition(update_command_task_wrapper("b"), b_values)
+
+        self.__validate_a_b_sb_test(a_values, b_values, sb)
+
+    def test_simulation_builder_args(self):
+        """Test simulation builder using multiple arguments
+
+        The interesting part of this test is the call to add_multiple_parameter_sweep_definition, otherwise it is an alternate to test_simulation_builder
+        """
+        sb = SimulationBuilder()
+        a_values = range(1, 5)
+        b_values = ["c", "d"]
+        sb.add_multiple_parameter_sweep_definition(update_command_task, a_values, b_values)
+
+        self.__validate_a_b_sb_test(a_values, b_values, sb)
+
+    def test_simulation_builder_args_with_defaults(self):
+        """Test simulation builder using multiple arguments with a sweep that has defaults
+        """
+        sb = SimulationBuilder()
+        a_values = range(1, 5)
+        b_values = ["c", "d"]
+        with self.assertRaises(ValueError) as context:
+            sb.add_multiple_parameter_sweep_definition(update_command_task_with_defaults, a_values, b_values)
+        self.assertIn("In addition, currently we do not support over-riding default values for parameters", context.exception.args[0])
+
+    def test_simulation_builder_args_not_iterable_error_as_second(self):
+        """Test simulation builder using multiple arguments
+
+        here b is not iterable and throws an error
+        """
+        sb = SimulationBuilder()
+        a_values = 'c'
+        b_values = 1
+        with self.assertRaises(ValueError) as context:
+            sb.add_multiple_parameter_sweep_definition(update_command_task, a_values, b_values)
+        self.assertIn("defining a sweep across multiple parameters, they must be specified either in a Dict in the form of {{ KeyWork: Values }} where values is a list or [ Param1-Vals, Param2-Vals]", context.exception.args[0])
+
+    def test_simulation_builder_args_mismatch(self):
+        """Test simulation builder using multiple arguments that do not match the callback
+        """
+        sb = SimulationBuilder()
+        a_values = range(1, 5)
+        b_values = ["c", "d"]
+        c_values = range(1, 2)
+        with self.assertRaises(ValueError) as context:
+            sb.add_multiple_parameter_sweep_definition(update_command_task, a_values, b_values, c_values)
+        self.assertIn("2 parameters and there were 3 arguments", context.exception.args[0])
+
+    def test_simulation_builder_args_single_dict(self):
+
+        sb = SimulationBuilder()
+        a_values = range(1, 5)
+        b_values = ["c", "d"]
+        sb.add_multiple_parameter_sweep_definition(update_command_task, dict(a=a_values, b=b_values))
+        self.__validate_a_b_sb_test(a_values, b_values, sb)
+
+    def test_simulation_builder_kwargs(self):
+        """Test simulation builder using kwargs"""
+        sb = SimulationBuilder()
+        a_values = range(1, 5)
+        b_values = ["c", "d"]
+        sb.add_multiple_parameter_sweep_definition(update_command_task, **dict(a=a_values, b=b_values))
+        self.__validate_a_b_sb_test(a_values, b_values, sb)
+
+    def test_simulation_builder_kwargs_as_args(self):
+        """Test simulation builder using kwargs but as args"""
+        sb = SimulationBuilder()
+        a_values = range(1, 5)
+        b_values = ["c", "d"]
+        sb.add_multiple_parameter_sweep_definition(update_command_task, dict(a=a_values, b=b_values))
+        self.__validate_a_b_sb_test(a_values, b_values, sb)
+
+    def test_simulation_builder_kwargs_and_args_errors(self):
+        """Test simulation builder using kwargs and args throws error"""
+        sb = SimulationBuilder()
+        a_values = range(1, 5)
+        b_values = ["c", "d"]
+        with self.assertRaises(ValueError) as context:
+            sb.add_multiple_parameter_sweep_definition(update_command_task, [1 - 5], **dict(a=a_values, b=b_values, c=range(1, 2)))
+        self.assertIn("either a arguments or keyword arguments, but not both.", context.exception.args[0])
+
+    def test_simulation_builder_kwargs_mismatch_count(self):
+        """Test simulation builder using kwargs but with more arguments than parameters"""
+        sb = SimulationBuilder()
+        a_values = range(1, 5)
+        b_values = ["c", "d"]
+        with self.assertRaises(ValueError) as context:
+            sb.add_multiple_parameter_sweep_definition(update_command_task, **dict(a=a_values, b=b_values, c=range(1, 2)))
+        self.assertIn("2 parameters and there were 3 arguments", context.exception.args[0])
+
+    def test_simulation_builder_kwargs_mismatch_name(self):
+        """Test simulation builder using kwargs but with arguments that don't match parameters"""
+        sb = SimulationBuilder()
+        a_values = range(1, 5)
+        b_values = ["c", "d"]
+        with self.assertRaises(ValueError) as context:
+            sb.add_multiple_parameter_sweep_definition(update_command_task, **dict(a=a_values, b2=b_values))
+        self.assertIn("Unknown keyword parameter passed: b2", context.exception.args[0])
+
+    def __validate_a_b_sb_test(self, a_values, b_values, sb):
+        tt = TestTask()
+        tt.config = dict()
+        template_sim = TemplatedSimulations(base_task=tt)
+        template_sim.add_builder(sb)
+        simulations = list(template_sim)
+        # test if we have correct number of simulations
+        self.assertEqual(len(simulations), len(a_values) * len(b_values))
+        for a_value in a_values:
+            for b_value in b_values:
+                found = False
+                for simulation in simulations:
+                    if simulation.task.config['a'] == a_value and simulation.task.config['b'] == b_value:
+                        found = True
+                        break
+                self.assertTrue(found, msg=f'Could not find sweep pair of {a_value} and {b_value}')
 
     def test_duplicates(self):
         arm = SweepArm(type=ArmType.cross)

@@ -1,3 +1,7 @@
+"""idmtools general status.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import ntpath
 import re
 from logging import getLogger, DEBUG
@@ -25,10 +29,10 @@ clean_names_expr = re.compile(f'[{re.escape("".join(chars_to_replace))}]')
 
 def fatal_code(e: Exception) -> bool:
     """
-    Uses to determine if we should stop retrying based on request status code
+    Uses to determine if we should stop retrying based on request status code.
 
     Args:
-        e: Exeception to check
+        e: Exception to check
 
     Returns:
         True is exception is a request and status code matches 404
@@ -40,7 +44,7 @@ def fatal_code(e: Exception) -> bool:
 
 def convert_comps_status(comps_status: SimulationState) -> EntityStatus:
     """
-    Convert status from COMPS to IDMTools
+    Convert status from COMPS to IDMTools.
 
     Args:
         comps_status: Status in Comps
@@ -60,7 +64,8 @@ def convert_comps_status(comps_status: SimulationState) -> EntityStatus:
 
 def convert_comps_workitem_status(comps_status: WorkItemState) -> EntityStatus:
     """
-    Convert status from COMPS to IDMTools
+    Convert status from COMPS to IDMTools.
+
     Created = 0                # WorkItem has been saved to the database
     CommissionRequested = 5    # WorkItem is ready to be processed by the next available worker of the correct type
     Commissioned = 10          # WorkItem has been commissioned to a worker of the correct type and is beginning execution
@@ -74,6 +79,7 @@ def convert_comps_workitem_status(comps_status: WorkItemState) -> EntityStatus:
     Canceling = 120            # WorkItem is in the process of being canceled by the worker
     Succeeded = 130            # WorkItem completed successfully
     Failed = 140               # WorkItem failed
+
     Args:
         comps_status: Status in Comps
 
@@ -97,18 +103,18 @@ def convert_comps_workitem_status(comps_status: WorkItemState) -> EntityStatus:
 def clean_experiment_name(experiment_name: str) -> str:
     """
     Enforce any COMPS-specific demands on experiment names.
+
     Args:
         experiment_name: name of the experiment
     Returns:the experiment name allowed for use
     """
-
     experiment_name = clean_names_expr.sub("_", experiment_name)
     return experiment_name.encode("ascii", "ignore").decode('utf8').strip()
 
 
 def get_file_from_collection(platform: IPlatform, collection_id: UUID, file_path: str) -> bytearray:
     """
-    Retrieve a file from an asset collection
+    Retrieve a file from an asset collection.
 
     Args:
         platform: Platform object to use
@@ -140,7 +146,7 @@ def get_file_as_generator(file: Union[SimulationFile, AssetCollectionFile, Asset
                           chunk_size: int = 128, resume_byte_pos: Optional[int] = None) -> \
         Generator[bytearray, None, None]:
     """
-    Get file as a generator
+    Get file as a generator.
 
     Args:
         file: File to stream contents through a generator
@@ -148,7 +154,7 @@ def get_file_as_generator(file: Union[SimulationFile, AssetCollectionFile, Asset
         resume_byte_pos: Optional start of download
 
     Returns:
-
+        Generator for file content
     """
     if isinstance(file, OutputFileMetadata):
         url = file.url
@@ -168,12 +174,17 @@ def get_file_as_generator(file: Union[SimulationFile, AssetCollectionFile, Asset
 
 
 class Workitem(object):
+    """SimpleItem to define workitem for proxy purposes.
+
+    Notes:
+        - TODO deprecate this if possible
+    """
     pass
 
 
 def get_asset_for_comps_item(platform: IPlatform, item: IEntity, files: List[str], cache=None, load_children: List[str] = None, comps_item: Union[Experiment, Workitem, Simulation] = None) -> Dict[str, bytearray]:
     """
-    Retrieve assets from an Entity(Simulation, Experiment, WorkItem)
+    Retrieve assets from an Entity(Simulation, Experiment, WorkItem).
 
     Args:
         platform: Platform Object to use
@@ -228,18 +239,19 @@ def get_asset_for_comps_item(platform: IPlatform, item: IEntity, files: List[str
 
 
 def update_item(platform: IPlatform, item_id: str, item_type: ItemType, tags: dict = None, name: str = None):
-    """
-    Util function to update existing COMPS experiment/simulation/workitem's tags or
+    """Utility function to update existing COMPS experiment/simulation/workitem's tags.
+
     For example, you can add/update simulation's tag once its post-process is done to mark the simulation with
-    more meanful text with tag/name
+    more meaningful text with tag/name
     Args:
         platform: Platform
         item_id: experiment/simulation/workitem id
         item_type: The type of the object to be retrieved
         tags: tags dict for update
         name: name of experiment/simulation/workitem
-    Returns:
 
+    Returns:
+        None
     """
     comps_item = platform.get_item(item_id, item_type, raw=True)
     current_tags = comps_item.tags

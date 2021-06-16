@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+"""Build command for our webui."""
 import os
 import sys
 

@@ -1,3 +1,9 @@
+"""idmtools requirements to asset collection.
+
+This is the entry point for users to use RequirementsToAssetCollection tool.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import os
 import hashlib
 from dataclasses import dataclass, field
@@ -22,6 +28,12 @@ user_logger = getLogger("user")
 
 @dataclass(repr=False)
 class RequirementsToAssetCollection:
+    """
+    RequirementsToAssetCollection provides a utility to install python packages into an asset collection.
+
+    Notes:
+        - TODO - Incorporate exmaple in this docs
+    """
     #: Platform object
     platform: COMPSPlatform = field(default=None)
     #: Path to requirements file
@@ -42,9 +54,14 @@ class RequirementsToAssetCollection:
     __reserved_tag: list = field(default=None, init=False)
 
     def __post_init__(self):
+        """
+        Constructor.
+
+        Raises:
+            ValueError - if  requirements_path, pkg_list, and local_wheels are empty.
+        """
         if not any([self.requirements_path, self.pkg_list, self.local_wheels]):
-            raise ValueError(
-                "Impossible to proceed without either requirements path or package list or local wheels!")
+            raise ValueError("Impossible to proceed without either requirements path or package list or local wheels!")
 
         self.requirements_path = os.path.abspath(self.requirements_path) if self.requirements_path else None
         self.pkg_list = self.pkg_list or []
@@ -54,6 +71,8 @@ class RequirementsToAssetCollection:
     @property
     def checksum(self):
         """
+        Calculate checksum on the requirements file.
+
         Returns:
             The md5 of the requirements.
         """
@@ -66,7 +85,9 @@ class RequirementsToAssetCollection:
     @property
     def md5_tag(self):
         """
-         Returns:
+        Get unique key for our requirements + target.
+
+        Returns:
             The md5 tag.
         """
         self.init_platform()
@@ -75,6 +96,8 @@ class RequirementsToAssetCollection:
     @property
     def requirements(self):
         """
+        Requirements property. We calculate this using consolidate_requirements.
+
         Returns:
             Consolidated requirements.
         """
@@ -84,6 +107,7 @@ class RequirementsToAssetCollection:
         return self._requirements
 
     def init_platform(self):
+        """Initialize the platform."""
         if self.platform is None:
             # Try to detect platform
             from idmtools.core.context import get_current_platform
@@ -96,14 +120,21 @@ class RequirementsToAssetCollection:
 
     def run(self, rerun=False):
         """
+        Run our utility.
+
         The working logic of this utility:
             1. check if asset collection exists for given requirements, return ac id if exists
             2. create an Experiment to install the requirements on COMPS
             3. create a WorkItem to create a Asset Collection
 
         Returns: return ac id based on the requirements if Experiment and WorkItem Succeeded
-        """
 
+        Raises:
+            Exception - If an error happens on workitem
+
+        Notes:
+            - TODO The exceptions here should be rewritten to parse errors from remote system like AssetizeOutputs
+        """
         # Late validation
         self.init_platform()
 
@@ -141,9 +172,10 @@ class RequirementsToAssetCollection:
 
     def save_updated_requirements(self):
         """
-        Save consolidated requirements to a file requirements_updated.txt
-        Returns:
+        Save consolidated requirements to a file requirements_updated.txt.
 
+        Returns:
+            None
         """
         user_logger.info(
             f"Creating an updated requirements file ensuring all versions are specified at {REQUIREMENT_FILE}")
@@ -153,7 +185,8 @@ class RequirementsToAssetCollection:
 
     def retrieve_ac_by_tag(self, md5_check=None):
         """
-        Retrieve comps asset collection given ac tag
+        Retrieve comps asset collection given ac tag.
+
         Args:
             md5_check: also can use custom md5 string as search tag
         Returns: comps asset collection
@@ -178,7 +211,8 @@ class RequirementsToAssetCollection:
 
     def retrieve_ac_from_wi(self, wi):
         """
-        Retrieve ac id from file ac_info.txt saved by WI
+        Retrieve ac id from file ac_info.txt saved by WI.
+
         Args:
             wi: SSMTWorkItem (which was used to create ac from library)
         Returns: COMPS asset collection
@@ -198,13 +232,23 @@ class RequirementsToAssetCollection:
         return self.platform.get_item(ac_id_str, ItemType.ASSETCOLLECTION, raw=True)
 
     def add_wheels_to_assets(self, experiment):
+        """
+        Add wheels to assets of our experiment.
+
+        Args:
+            experiment: Experiment to add assets to
+
+        Returns:
+            None
+        """
         for whl in self.local_wheels:
             a = Asset(filename=os.path.basename(whl), absolute_path=whl)
             experiment.add_asset(a)
 
     def run_experiment_to_install_lib(self):
         """
-        Create an Experiment which will run another py script to install requirements
+        Create an Experiment which will run another py script to install requirements.
+
         Returns: Experiment created
         """
         self.save_updated_requirements()
@@ -235,7 +279,8 @@ class RequirementsToAssetCollection:
 
     def run_wi_to_create_ac(self, exp_id):
         """
-        Create an WorkItem which will run another py script to create new asset collection
+        Create an WorkItem which will run another py script to create new asset collection.
+
         Args:
             exp_id: the Experiment id (which installed requirements)
         Returns: work item created
@@ -279,7 +324,9 @@ class RequirementsToAssetCollection:
 
     def consolidate_requirements(self):
         """
-        Combine requirements and dynamic requirements (a list):
+        Combine requirements and dynamic requirements (a list).
+
+        We do the following:
           - get the latest version of package if version is not provided
           - dynamic requirements will overwrites the requirements file
 

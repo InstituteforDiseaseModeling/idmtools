@@ -1,4 +1,8 @@
 #!/usr/bin/env python
+"""Runs a commnad in all the idmtools modules in this repo.
+
+This is used in build processes to parallelize some operations.
+"""
 import argparse
 import os
 import signal
@@ -15,6 +19,18 @@ modules = ['idmtools_core', 'idmtools_cli', 'idmtools_platform_comps', 'idmtools
 
 def run_command_on_all(idm_modules: List[str], command: str, parallel: bool = False, subdir: Optional[str] = None,
                        env_override: Dict[str, str] = None):
+    """Runs a command in all the idmtools packages.
+
+    Args:
+        idm_modules: List of modules to execute against
+        command: Command to run
+        parallel: Should we run the instances in parallel mode
+        subdir: Should we use a subdirect(eg, idmtools_platform_comps/tests)
+        env_override: Any environment overides
+
+    Returns:
+        None
+    """
     processes = []
 
     if env_override is None:

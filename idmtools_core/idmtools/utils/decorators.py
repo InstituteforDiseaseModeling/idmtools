@@ -1,3 +1,8 @@
+"""
+Decorators defined for idmtools.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import datetime
 import importlib
 import importlib.util
@@ -19,6 +24,12 @@ class abstractstatic(staticmethod):
     __slots__ = ()
 
     def __init__(self, function):
+        """
+        Initialize abstractstatic.
+
+        Args:
+            function: Function to wrap as abstract
+        """
         super(abstractstatic, self).__init__(function)
         function.__isabstractmethod__ = True
 
@@ -26,6 +37,16 @@ class abstractstatic(staticmethod):
 
 
 def optional_decorator(decorator: Callable, condition: Union[bool, Callable[[], bool]]):
+    """
+    A decorator that adds a decorator only if condition is true.
+
+    Args:
+        decorator: Decorator to add
+        condition: Condition to determine. Condition can be a callable as well
+
+    Returns:
+        Optionally wrapped func.
+    """
     if callable(condition):
         condition = condition()
 
@@ -43,11 +64,24 @@ def optional_decorator(decorator: Callable, condition: Union[bool, Callable[[], 
 
 
 class SingletonMixin(object):
+    """
+    SingletonMixin defines a singleton that can be added to any class.
+
+    As a singleton, on one instance will be made per process.
+    """
     __singleton_lock = threading.Lock()
     __singleton_instance = None
 
     @classmethod
     def instance(cls):
+        """
+        Return the instance of the object.
+
+        If the instance has not been created, it will be initialized before returning.
+
+        Returns:
+            The singleton instance
+        """
         if not cls.__singleton_instance:
             with cls.__singleton_lock:
                 if not cls.__singleton_instance:
@@ -55,7 +89,16 @@ class SingletonMixin(object):
         return cls.__singleton_instance
 
 
-def cache_for(ttl=None):
+def cache_for(ttl=None) -> Callable:
+    """
+    Cache a value for a certain time period.
+
+    Args:
+        ttl: Expiration of cache
+
+    Returns:
+        Wrapper Function
+    """
     if ttl is None:
         ttl = datetime.timedelta(minutes=1)
 
@@ -84,7 +127,9 @@ def cache_for(ttl=None):
 
 def optional_yaspin_load(*yargs, **ykwargs) -> Callable:
     """
-    Adds a CLI spinner to a function if:
+    Adds a CLI spinner to a function based on conditions.
+
+    The spinner will be present if
 
     * yaspin package is present.
     * NO_SPINNER environment variable is not defined.
@@ -132,7 +177,9 @@ def optional_yaspin_load(*yargs, **ykwargs) -> Callable:
 
 class ParallelizeDecorator:
     """
-    ParallelizeDecorator allows you to easily parallelize a group of code. A simple of example would be
+    ParallelizeDecorator allows you to easily parallelize a group of code.
+
+    A simple of example would be following
 
     Examples:
         ::
@@ -150,12 +197,29 @@ class ParallelizeDecorator:
     """
 
     def __init__(self, queue=None, pool_type: Optional[Type[Executor]] = ThreadPoolExecutor):
+        """
+        Initialize our ParallelizeDecorator.
+
+        Args:
+            queue: Queue to use. If not provided, one will be created.
+            pool_type: Pool type to use. Defaults to ThreadPoolExecutor.
+        """
         if queue is None:
             self.queue = pool_type()
         else:
             self.queue = queue
 
     def parallelize(self, func):
+        """
+        Wrap a function in parallelization.
+
+        Args:
+            func: Function to wrap with parallelization
+
+        Returns:
+            Function wrapped with parallelization object
+        """
+
         @wraps(func)
         def wrapper(*args, **kwargs):
             future = self.queue.submit(func, *args, **kwargs)
@@ -164,9 +228,25 @@ class ParallelizeDecorator:
         return wrapper
 
     def join(self):
+        """
+        Join our queue.
+
+        Returns:
+            Join operation from queue
+        """
         return self.queue.join()
 
     def get_results(self, futures, ordered=False):
+        """
+        Get Results from our decorator.
+
+        Args:
+            futures: Futures to get results from
+            ordered: Do we want results in order provided or as they complete. Default is as they complete which is False.
+
+        Returns:
+            Results from all the futures.
+        """
         results = []
         if ordered:
             for f in futures:
@@ -180,4 +260,10 @@ class ParallelizeDecorator:
         return results
 
     def __del__(self):
+        """
+        Delete our queue before deleting ourselves.
+
+        Returns:
+            None
+        """
         del self.queue

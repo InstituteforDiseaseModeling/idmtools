@@ -1,3 +1,10 @@
+"""idmtools script to run on HPC to install python files.
+
+This is part of the RequirementsToAssetCollection tool. This will run on the HPC in an Experiment to install the python requirements
+as output that will be converted to an AssetCollection later.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import compileall
 import glob
 import os
@@ -17,9 +24,9 @@ INDEX_URL = 'https://packages.idmod.org/artifactory/api/pypi/pypi-production/sim
 
 def install_packages_from_requirements(python_paths=None):
     """
-    Install our packages to a local directory
+    Install our packages to a local directory.
+
     Args:
-        requirements_file: requirements file
         python_paths: system Python path
     Returns: None
     """
@@ -39,6 +46,11 @@ def install_packages_from_requirements(python_paths=None):
 
 
 def set_python_dates():
+    """
+    Set python to the same dates so we don't create pyc files with differing dates.
+
+    Pyc embed the date, so this is a workaround for that behaviour.
+    """
     print("Updating file dates")
     pool = ThreadPoolExecutor()
     date = datetime(year=2020, month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
@@ -50,6 +62,11 @@ def set_python_dates():
 
 
 def compile_all(python_paths=None):
+    """
+    Compile all the python files to pyc.
+
+    This is useful to reduce how often this happens since python will be an asset
+    """
     print("Compiling pyc files")
     if python_paths is None:
         env = dict()

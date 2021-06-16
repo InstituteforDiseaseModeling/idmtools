@@ -1,9 +1,17 @@
+"""
+Define our common enums to be used through idmtools.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 from enum import Enum
 
 TRUTHY_VALUES = ['1', 'y', 'yes', 'on', 'true', 't', 1, True]
 
 
 class EntityStatus(Enum):
+    """
+    EntityStatus provides status values for Experiment/Simulations/WorkItems.
+    """
     COMMISSIONING = 'commissioning'
     CREATED = 'created'
     RUNNING = 'running'
@@ -20,6 +28,9 @@ class FilterMode(Enum):
 
 
 class ItemType(Enum):
+    """
+    ItemTypes supported by idmtools.
+    """
     SUITE = "Suite"
     EXPERIMENT = "Experiment"
     SIMULATION = "Simulation"
@@ -27,4 +38,10 @@ class ItemType(Enum):
     ASSETCOLLECTION = "Asset Collection"
 
     def __str__(self):
+        """
+        Returns a string representation of our item type.
+
+        Returns:
+            The string version of our enum value
+        """
         return str(self.value)

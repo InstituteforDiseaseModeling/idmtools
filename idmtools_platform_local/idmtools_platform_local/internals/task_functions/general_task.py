@@ -1,3 +1,7 @@
+"""idmtools local platform task tools.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import os
 import shlex
 import stat
@@ -13,7 +17,7 @@ logger = logging.getLogger(__name__)
 def run_task(command: str, current_job: 'JobStatus', experiment_uuid: str, simulation_path: str,  # noqa: F821
              simulation_uuid: str) -> Status:
     """
-    Executes the command and record its status in the database
+    Executes the command and record its status in the database.
 
     Args:
         command: command to run
@@ -68,7 +72,8 @@ def run_task(command: str, current_job: 'JobStatus', experiment_uuid: str, simul
 
 def extract_status(experiment_uuid: str, return_code: int, simulation_uuid) -> Status:
     """
-    Extract status from a completed process
+    Extract status from a completed process.
+
     Args:
         experiment_uuid: Id of experiment(needed to update job info)
         return_code: Return Code for item
@@ -97,11 +102,21 @@ def extract_status(experiment_uuid: str, return_code: int, simulation_uuid) -> S
 
 
 def get_current_job(experiment_uuid, simulation_uuid, command):
+    """
+    Get our current job running.
+
+    Args:
+        experiment_uuid: Experiment to lookup
+        simulation_uuid: Simulation to lookup
+        command: Command we are running.
+
+    Returns:
+        Current job.
+    """
     from idmtools_platform_local.internals.data.job_status import JobStatus
     from idmtools_platform_local.internals.workers.database import get_session
     # Get the current job
-    current_job: JobStatus = get_session().query(JobStatus). \
-        filter(JobStatus.uuid == simulation_uuid, JobStatus.parent_uuid == experiment_uuid).first()
+    current_job: JobStatus = get_session().query(JobStatus).filter(JobStatus.uuid == simulation_uuid, JobStatus.parent_uuid == experiment_uuid).first()
     if current_job.extra_details is None:
         logger.warning(f'{current_job.uuid} has no extra details')
         current_job.extra_details = dict()
@@ -110,6 +125,15 @@ def get_current_job(experiment_uuid, simulation_uuid, command):
 
 
 def is_canceled(current_job):
+    """
+    Has the job been marked as canceled?
+
+    Args:
+        current_job: Job to check
+
+    Returns:
+        True if canceled, false otherwise.
+    """
     from idmtools_platform_local.internals.workers.utils import create_or_update_status
     if current_job.status == Status.canceled:
         logger.info(f'Job {current_job.uuid} has been canceled')
@@ -121,16 +145,16 @@ def is_canceled(current_job):
 
 def execute_simulation(command, experiment_uuid, simulation_uuid):
     """
-        Runs our task and updates status
+    Runs our task and updates status.
 
-        Args:
-            command: Command string to execute
-            experiment_uuid: Experiment id of task
-            simulation_uuid: Simulation id of task
+    Args:
+        command: Command string to execute
+        experiment_uuid: Experiment id of task
+        simulation_uuid: Simulation id of task
 
-        Returns:
-
-        """
+    Returns:
+        Task result
+    """
     # we only want to import this here so that clients don't need postgres/sqlalchemy packages
     current_job = get_current_job(experiment_uuid, simulation_uuid, command)
     if is_canceled(current_job):

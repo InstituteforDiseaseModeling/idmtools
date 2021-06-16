@@ -1,3 +1,8 @@
+"""
+IEntity definition. IEntity is the base of most of our Remote server entitiies like Experiment, Simulation, WorkItems, and Suites.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 from abc import ABCMeta
 from dataclasses import dataclass, field
 from os import PathLike
@@ -36,7 +41,8 @@ class IEntity(IItem, metaclass=ABCMeta):
 
     def update_tags(self, tags: dict = None) -> NoReturn:
         """
-        Shortcut to update the tags with the given dictionary
+        Shortcut to update the tags with the given dictionary.
+
         Args:
             tags: New tags
         """
@@ -44,9 +50,10 @@ class IEntity(IItem, metaclass=ABCMeta):
 
     def post_creation(self, platform: 'IPlatform') -> None:
         """
-        Post creation hook for object
-        Returns:
+        Post creation hook for object.
 
+        Returns:
+            None
         """
         self.status = EntityStatus.CREATED
         super().post_creation(platform)
@@ -54,15 +61,18 @@ class IEntity(IItem, metaclass=ABCMeta):
     @classmethod
     def from_id_file(cls, filename: Union[PathLike, str], platform: 'IPlatform' = None, **kwargs) -> 'IEntity':  # noqa E821:
         """
-        Load from a file that container the id
+        Load from a file that container the id.
 
         Args:
             filename: Filename to load
-            platform:
+            platform: Platform object to load id from. This can be loaded from file if saved there.
             **kwargs: Platform extra arguments
 
         Returns:
+            Entity loaded from id file
 
+        Raises:
+            EnvironmentError if item type is None.
         """
         item_id, item_type_in_file, platform_block, extra_args = read_id_file(filename)
 
@@ -70,7 +80,8 @@ class IEntity(IItem, metaclass=ABCMeta):
             if platform_block:
                 from idmtools.core.platform_factory import Platform
                 platform = Platform(platform_block, **kwargs)
-            platform = cls.get_current_platform_or_error(platform)
+            else:
+                platform = cls.get_current_platform_or_error()
         if cls.item_type is None:
             raise EnvironmentError("ItemType is None. This is most likely a badly derived IEntity that doesn't run set the default item type on the class")
 
@@ -79,7 +90,7 @@ class IEntity(IItem, metaclass=ABCMeta):
     @classmethod
     def from_id(cls, item_id: Union[str, UUID], platform: 'IPlatform' = None, **kwargs) -> 'IEntity':  # noqa E821
         """
-        Load an item from an id
+        Load an item from an id.
 
         Args:
             item_id: Id of item
@@ -90,7 +101,7 @@ class IEntity(IItem, metaclass=ABCMeta):
             IEntity of object
         """
         if platform is None:
-            platform = cls.get_current_platform_or_error(platform)
+            platform = cls.get_current_platform_or_error()
         if cls.item_type is None:
             raise EnvironmentError("ItemType is None. This is most likely a badly derived IEntity that doesn't run set the default item type on the class")
         return platform.get_item(item_id, cls.item_type, **kwargs)
@@ -98,9 +109,10 @@ class IEntity(IItem, metaclass=ABCMeta):
     @property
     def parent(self):
         """
-        Return parent object for item
-        Returns:
+        Return parent object for item.
 
+        Returns:
+            Parent entity if set
         """
         if not self._parent:
             if not self.parent_id:
@@ -114,12 +126,13 @@ class IEntity(IItem, metaclass=ABCMeta):
     @parent.setter
     def parent(self, parent: 'IEntity'): # noqa E821
         """
-        Sets the parent object for item
+        Sets the parent object for item.
+
         Args:
-            parent: Parent oject
+            parent: Parent object
 
         Returns:
-
+            None
         """
         if parent:
             self._parent = parent
@@ -130,7 +143,7 @@ class IEntity(IItem, metaclass=ABCMeta):
     @property
     def platform(self) -> 'IPlatform':  # noqa E821
         """
-        Get objects platform
+        Get objects platform object.
 
         Returns:
             Platform
@@ -142,13 +155,13 @@ class IEntity(IItem, metaclass=ABCMeta):
     @platform.setter
     def platform(self, platform: 'IPlatform'):  # noqa E821
         """
-        Sets object platform
+        Sets object platform.
 
         Args:
             platform: Platform to set
 
         Returns:
-
+            None
         """
         if platform:
             self.platform_id = platform.uid
@@ -158,7 +171,7 @@ class IEntity(IItem, metaclass=ABCMeta):
 
     def get_platform_object(self, force: bool = False, platform: 'IPlatform' = None, **kwargs):
         """
-        Get the platform representation of an object
+        Get the platform representation of an object.
 
         Args:
             force: Force reload of platform object
@@ -179,7 +192,9 @@ class IEntity(IItem, metaclass=ABCMeta):
     @property
     def done(self):
         """
-        Returns if a item is done. For an item to be done, it should be in either failed or succeeded state
+        Returns if a item is done.
+
+        For an item to be done, it should be in either failed or succeeded state.
 
         Returns:
             True if status is succeeded or failed
@@ -189,7 +204,7 @@ class IEntity(IItem, metaclass=ABCMeta):
     @property
     def succeeded(self):
         """
-        Returns if an item has succeeded
+        Returns if an item has succeeded.
 
         Returns:
             True if status is SUCCEEDED
@@ -199,7 +214,7 @@ class IEntity(IItem, metaclass=ABCMeta):
     @property
     def failed(self):
         """
-        Returns is a item has failed
+        Returns is a item has failed.
 
         Returns:
             True if status is failed
@@ -207,11 +222,17 @@ class IEntity(IItem, metaclass=ABCMeta):
         return self.status == EntityStatus.FAILED
 
     def __hash__(self):
+        """
+        Returns hash for object. For entities, the hash is the id.
+
+        Returns:
+            Hash id
+        """
         return id(self.uid)
 
     def _check_for_platform_from_context(self, platform) -> 'IPlatform':
         """
-        Try to determine platform of current object from self or current platform
+        Try to determine platform of current object from self or current platform.
 
         Args:
             platform: Passed in platform object
@@ -224,12 +245,21 @@ class IEntity(IItem, metaclass=ABCMeta):
         if self.platform is None:
             # check context for current platform
             if platform is None:
-                platform = self.get_current_platform_or_error(platform)
+                platform = self.get_current_platform_or_error()
             self.platform = platform
         return self.platform
 
     @staticmethod
-    def get_current_platform_or_error(platform):
+    def get_current_platform_or_error():
+        """
+        Try to fetch the current platform from context. If no platform is set, error.
+
+        Returns:
+            Platform if set
+
+        Raises:
+            NoPlatformException if no platform is set on the current context
+        """
         from idmtools.core.context import get_current_platform
         p = get_current_platform()
         if p is None:
@@ -238,7 +268,7 @@ class IEntity(IItem, metaclass=ABCMeta):
 
     def to_id_file(self, filename: Union[str, PathLike], save_platform: bool = False, platform_args: Dict = None):
         """
-        Write a id file
+        Write a id file.
 
         Args:
             filename: Filename to create
@@ -246,7 +276,7 @@ class IEntity(IItem, metaclass=ABCMeta):
             platform_args: Platform Args
 
         Returns:
-
+            None
         """
         write_id_file(filename, self, save_platform, platform_args)
 

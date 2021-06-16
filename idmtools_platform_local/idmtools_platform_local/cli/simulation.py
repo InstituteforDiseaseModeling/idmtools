@@ -1,3 +1,7 @@
+"""idmtools local platform simulation cli commands.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 from typing import Optional, Tuple, List, Dict, Any
 
 import requests
@@ -13,7 +17,9 @@ SIMULATIONS_URL = f'{API_PATH}/simulations'
 
 def prettify_simulation(simulation: Dict[str, Any]):
     """
-    Prettifies a JSON Simulation object for printing on a console. This includes
+    Prettifies a JSON Simulation object for printing on a console.
+
+    This includes
     - Making a pretty progress bar
     - URL-ifying the data paths
 
@@ -21,7 +27,7 @@ def prettify_simulation(simulation: Dict[str, Any]):
         simulation: JSON representation of the Experiment(from API)
 
     Returns:
-
+        Prettified simulation
     """
     simulation['status'] = colorize_status(simulation['status'])
     simulation['data_path'] = urlize_data_path(simulation['data_path'])
@@ -32,7 +38,7 @@ def prettify_simulation(simulation: Dict[str, Any]):
 def status(id: Optional[str], experiment_id: Optional[str], status: Optional[str],
            tags: Optional[List[Tuple[str, str]]]):
     """
-    List of statuses for simulation(s) with the ability to filter by id, experiment_id, status, and tags
+    List of statuses for simulation(s) with the ability to filter by id, experiment_id, status, and tags.
 
     Args:
         id (Optional[str]): Optional Id of simulation

@@ -1,6 +1,9 @@
+"""idmtools comps simulation operations.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 from concurrent.futures.thread import ThreadPoolExecutor
 from contextlib import suppress
-
 from threading import Lock
 import time
 import json
@@ -41,7 +44,7 @@ def comps_batch_worker(simulations: List[Simulation], interface: 'CompsPlatformS
                        num_cores: Optional[int] = None, priority: Optional[str] = None, asset_collection_id: Union[str, UUID] = None,
                        min_time_between_commissions: int = 10, **kwargs) -> List[COMPSSimulation]:
     """
-    Run batch worker
+    Run batch worker.
 
     Args:
         simulations: Batch of simulation to process
@@ -103,13 +106,14 @@ def comps_batch_worker(simulations: List[Simulation], interface: 'CompsPlatformS
 
 @dataclass
 class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
+    """Provides simuilation operations to COMPSPlatform."""
     platform: 'COMPSPlatform'  # noqa F821
     platform_type: Type = field(default=COMPSSimulation)
 
     def get(self, simulation_id: UUID, columns: Optional[List[str]] = None, load_children: Optional[List[str]] = None,
             query_criteria: Optional[QueryCriteria] = None, **kwargs) -> COMPSSimulation:
         """
-        Get Simulation from Comps
+        Get Simulation from Comps.
 
         Args:
             simulation_id: ID
@@ -132,7 +136,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
     def platform_create(self, simulation: Simulation, num_cores: int = None, priority: str = None,
                         enable_platform_task_hooks: bool = True, asset_collection_id: Union[str, UUID] = None, **kwargs) -> COMPSSimulation:
         """
-        Create Simulation on COMPS
+        Create Simulation on COMPS.
 
         Args:
             simulation: Simulation to create
@@ -155,7 +159,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
     def to_comps_sim(self, simulation: Simulation, num_cores: int = None, priority: str = None,
                      config: Configuration = None, asset_collection_id: Union[str, UUID] = None, **kwargs):
         """
-        Covert IDMTools object to COMPS Object
+        Covert IDMTools object to COMPS Object.
 
         Args:
             simulation: Simulation object to convert
@@ -194,7 +198,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
                                               asset_collection_id: UUID = None, **kwargs) -> \
             Configuration:
         """
-        Get the comps configuration for a Simulation Object
+        Get the comps configuration for a Simulation Object.
 
         Args:
             simulation: Simulation
@@ -248,7 +252,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
     def batch_create(self, simulations: List[Simulation], num_cores: int = None, priority: str = None, asset_collection_id: Union[str, UUID] = None, **kwargs) -> \
             List[COMPSSimulation]:
         """
-        Perform batch creation of Simulations
+        Perform batch creation of Simulations.
 
         Args:
             simulations: Simulation to create
@@ -285,7 +289,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
 
     def get_parent(self, simulation: Any, **kwargs) -> COMPSExperiment:
         """
-        Get the parent of the simulation
+        Get the parent of the simulation.
 
         Args:
             simulation: Simulation to load parent for
@@ -297,12 +301,13 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         return self.platform._experiments.get(simulation.experiment_id, **kwargs) if simulation.experiment_id else None
 
     def platform_run_item(self, simulation: Simulation, **kwargs):
+        """For simulations, there is no running for COMPS."""
         pass
 
     def send_assets(self, simulation: Simulation, comps_sim: Optional[COMPSSimulation] = None,
                     add_metadata: bool = False, **kwargs):
         """
-        Send assets to Simulation
+        Send assets to Simulation.
 
         Args:
             simulation: Simulation to send asset for
@@ -337,7 +342,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
 
     def refresh_status(self, simulation: Simulation, additional_columns: Optional[List[str]] = None, **kwargs):
         """
-        Refresh status of a simulation
+        Refresh status of a simulation.
 
         Args:
             simulation: Simulation to refresh
@@ -345,7 +350,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             **kwargs:
 
         Returns:
-
+            None
         """
         cols = ['state']
         if additional_columns:
@@ -356,7 +361,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
     def to_entity(self, simulation: COMPSSimulation, load_task: bool = False, parent: Optional[Experiment] = None,
                   load_parent: bool = False, load_metadata: bool = False, load_cli_from_workorder: bool = False, **kwargs) -> Simulation:
         """
-        Convert COMPS simulation object to IDM Tools simulation object
+        Convert COMPS simulation object to IDM Tools simulation object.
 
         Args:
             simulation: Simulation object
@@ -402,13 +407,13 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
 
     def get_asset_collection_from_comps_simulation(self, simulation: COMPSSimulation) -> Optional[AssetCollection]:
         """
-        Get assets from COMPS Simulation
+        Get assets from COMPS Simulation.
 
         Args:
             simulation: Simulation to get assets from
 
         Returns:
-
+            Simulation Asset Collection, if any.
         """
         if simulation.configuration and simulation.configuration.asset_collection_id:
             return self.platform.get_item(simulation.configuration.asset_collection_id, ItemType.ASSETCOLLECTION)
@@ -417,7 +422,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
     def _load_task_from_simulation(self, simulation: Simulation, comps_sim: COMPSSimulation,
                                    metadata: Dict = None):
         """
-        Load task from the simulation object
+        Load task from the simulation object.
 
         Args:
             simulation: Simulation to populate with task
@@ -455,7 +460,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
     @staticmethod
     def __load_metadata_from_simulation(simulation) -> Dict[str, Any]:
         """
-        Load IDMTools metadata from a simulation
+        Load IDMTools metadata from a simulation.
 
         Args:
             simulation:
@@ -477,7 +482,8 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
     @staticmethod
     def _detect_command_line_from_simulation(experiment, comps_sim, simulation, load_cli_from_workorder=False):
         """
-        Detect Command Line from the Experiment/Simulation objects
+        Detect Command Line from the Experiment/Simulation objects.
+
         Args:
             experiment: Experiment object
             comps_sim: Comps sim object
@@ -526,7 +532,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
 
     def get_assets(self, simulation: Simulation, files: List[str], include_experiment_assets: bool = True, **kwargs) -> Dict[str, bytearray]:
         """
-        Fetch the files associated with a simulation
+        Fetch the files associated with a simulation.
 
         Args:
             simulation: Simulation
@@ -553,7 +559,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
 
     def list_assets(self, simulation: Simulation, common_assets: bool = False, **kwargs) -> List[Asset]:
         """
-        List assets for a simulation
+        List assets for a simulation.
 
         Args:
             simulation: Simulation to load data for
@@ -577,13 +583,22 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         return assets
 
     def retrieve_output_files(self, simulation: Simulation):
+        """
+        Retrieve the output files for a simulation.
+
+        Args:
+            simulation: Simulation to fetch files for
+
+        Returns:
+            List of output files for simulation
+        """
         metadata = simulation.get_platform_object().retrieve_output_file_info([])
         assets = self.platform._assets.to_entity(metadata).assets
         return assets
 
     def all_files(self, simulation: Simulation, common_assets: bool = False, outfiles: bool = True, **kwargs) -> List[Asset]:
         """
-        Returns all files for a specific simulation including experiments or non-assets
+        Returns all files for a specific simulation including experiments or non-assets.
 
         Args:
             simulation: Simulation all files

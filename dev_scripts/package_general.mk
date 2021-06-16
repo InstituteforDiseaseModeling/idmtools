@@ -25,7 +25,7 @@ clean-all: clean ## Deleting package info hides plugins so we only want to do th
 	-rm -rf **/*.egg-info/
 
 lint: ## check style with flake8
-	flake8 --ignore=E501,W291 $(PACKAGE_NAME)
+	flake8 $(abspath ../$(PACKAGE_NAME))
 
 test: ## Run our tests
 	$(MAKE) -C tests $@

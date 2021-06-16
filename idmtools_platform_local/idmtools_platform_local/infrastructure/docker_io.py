@@ -1,3 +1,7 @@
+"""idmtools docker input/output operations.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import io
 import json
 import logging
@@ -30,15 +34,17 @@ SERVICES = [PostgresContainer, RedisContainer, WorkersContainer]
 
 @dataclass
 class DockerIO:
+    """
+    Provides most of our file operations for our docker containers/local platform.
+    """
     host_data_directory: str = get_data_directory()
     _fileio_pool = ThreadPoolExecutor()
 
     def __post_init__(self):
         """
-        Acts like our constructor after dataclasses has populated our fields. Currently we use it to initialize our
-        docker client and get local system information
-        Returns:
+        Acts like our constructor after dataclasses has populated our fields.
 
+        Currently we use it to initialize our docker client and get local system information
         """
         # Make sure the host_data_dir exists
         os.makedirs(self.host_data_directory, exist_ok=True)
@@ -46,6 +52,20 @@ class DockerIO:
         self.timeout = 1
 
     def delete_files_below_level(self, directory, target_level=1, current_level=1):
+        """
+        Delete files below a certain depth in a target directory.
+
+        Args:
+            directory: Target directory
+            target_level: Depth to begin deleting. Default to 1
+            current_level: Current level. We call recursively so this should be 1 on initial call.
+
+        Returns:
+            None
+
+        Raises:
+            PermissionError - Raised if there are issues deleting a file.
+        """
         for fn in os.listdir(directory):
             file_path = os.path.join(directory, fn)
             try:
@@ -69,17 +89,18 @@ class DockerIO:
     def cleanup(self, delete_data: bool = True,
                 shallow_delete: bool = os.getenv('SHALLOW_DELETE', '0').lower() in TRUTHY_VALUES) -> NoReturn:
         """
-        Stops the running services, removes local data, and removes network. You can optionally disable the deleting
-        of local data
+        Stops the running services, removes local data, and removes network.
+
+        You can optionally disable the deleting of local data.
 
         Args:
             delete_data(bool): When true, deletes local data
             shallow_delete(bool): Deletes the data but not the container folders(redis, workers). Preferred to preserve
                 permissions and resolve docker issues
+
         Returns:
             (NoReturn)
         """
-
         try:
             if delete_data and not shallow_delete:
                 if logger.isEnabledFor(logging.DEBUG):
@@ -100,8 +121,9 @@ class DockerIO:
                           content: [str, bytes] = None,
                           dest_name: Optional[str] = None) -> bool:
         """
-        Copies a physical file or content in memory to a container. You can also choose a different name for the
-        destination file by using the dest_name option
+        Copies a physical file or content in memory to a container.
+
+        You can also choose a different name for the destination file by using the dest_name option.
 
         Args:
             container: Container to copy the file to
@@ -152,23 +174,33 @@ class DockerIO:
 
     def sync_copy(self, futures):
         """
-        Sync the copy operations queue in the io_queue. This allows us to take advantage of multi-threaded copying
-            while also making it convenient to have sync points, such as uploading the assets in parallel but pausing
-            just before sync point
+        Sync the copy operations queue in the io_queue.
+
+        This allows us to take advantage of multi-threaded copying while also making it convenient to have sync points, such as
+        uploading the assets in parallel but pausing just before sync point.
 
         Args:
-            futures:
+            futures: Futures to wait on.
 
         Returns:
-
+            Final results of copy operations.
         """
         if not isinstance(futures, list):
             futures = [futures]
         return io_queue.get_results(futures)
 
-    def copy_multiple_to_container(self, container: Container,
-                                   files: Dict[str, Dict[str, Any]],
-                                   join_on_copy: bool = True):
+    def copy_multiple_to_container(self, container: Container, files: Dict[str, Dict[str, Any]], join_on_copy: bool = True):
+        """
+        Copy multiple items to a container.
+
+        Args:
+            container: Target container
+            files: Files to copy in form target directory -> filename -> data
+            join_on_copy: Should we join the threading on copy(treat as an atomic unit)
+
+        Returns:
+            True if copy succeeded, false otherwise
+        """
         results = []
         if IdmConfigParser.is_progress_bar_disabled():
             prog_items = files.items()
@@ -188,7 +220,7 @@ class DockerIO:
     @staticmethod
     def create_archive_from_bytes(content: Union[bytes, BytesIO, BinaryIO], name: str) -> BytesIO:
         """
-        Create a tar archive from bytes. Used to copy to docker
+        Create a tar archive from bytes. Used to copy to docker.
 
         Args:
             content: Content to copy into tar
@@ -215,11 +247,10 @@ class DockerIO:
 
     def create_directory(self, dir: str) -> bool:
         """
-        Create a directory in a container
+        Create a directory in a container.
 
         Args:
             dir: Path to directory to create
-            container: Container to create directory in. Default to worker container
 
         Returns:
             (ExecResult) Result of the mkdir operation

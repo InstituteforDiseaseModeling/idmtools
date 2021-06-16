@@ -1,3 +1,12 @@
+"""
+Our Experiment class definition.
+
+Experiments can be thought of as a metadata object analogous to a folder on a filesystem. An experiment is a container that
+contains one or more simulations. Before creations, *experiment.simulations* can be either a list of a TemplatedSimulations.
+TemplatedSimulations are useful for building large numbers of similar simulations such as sweeps.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import copy
 import uuid
 from dataclasses import dataclass, field, InitVar, fields
@@ -41,6 +50,7 @@ SUPPORTED_SIM_TYPE = Union[
 class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
     """
     Class that represents a generic experiment.
+
     This class needs to be implemented for each model type with specifics.
 
     Args:
@@ -70,6 +80,15 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
     __replace_task_with_proxy: bool = field(default=True, init=False, compare=False)
 
     def __post_init__(self, simulations):
+        """
+        Initialize Experiment.
+
+        Args:
+            simulations: Simulations to initialize with
+
+        Returns:
+            None
+        """
         super().__post_init__()
         if simulations is not None and not isinstance(simulations, property):
             self.simulations = simulations
@@ -79,10 +98,37 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         self.__simulations.parent = self
 
     def post_creation(self, platform: 'IPlatform') -> None:
+        """
+        Post creation of experiments.
+
+        Args:
+            platform: Platform the experiment was created on
+
+        Returns:
+            None
+        """
         IItem.post_creation(self, platform)
 
     @property
     def status(self):
+        """
+        Get status of experiment. Experiment status is based in simulations.
+
+        The first rule to be true is used. The rules are:
+        * If simulations is a TemplatedSimulations we assume status is None if _platform_object is not set.
+        * If simulations is a TemplatedSimulations we assume status is CREATED if _platform_object is set.
+        * If simulations length is 0 or all simulations have a status of None, experiment status is none
+        * If any simulation has a running status, experiment is considered running.
+        * If any simulation has a created status and any other simulation has a FAILED or SUCCEEDED status, experiment is considered running.
+        * If any simulation has a None status and any other simulation has a FAILED or SUCCEEDED status, experiment is considered Created.
+        * If any simulation has a status of failed, experiment is considered failed.
+        * If any simulation has a status of SUCCEEDED, experiment is considered SUCCEEDED.
+        * If any simulation has a status of CREATED, experiment is considered CREATED.
+
+
+        Returns:
+            Status
+        """
         # still creating sims since we have a template. When adding new simulations, we will pre-create sim objects unless
         # the item is new
         if isinstance(self.simulations.items, TemplatedSimulations):
@@ -90,15 +136,14 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
             return status
 
         sim_statuses = set([s.status for s in self.simulations.items])
+        any_succeeded_failed = any([s in [EntityStatus.FAILED, EntityStatus.SUCCEEDED] for s in sim_statuses])
         if len(self.simulations.items) == 0 or all([s is None for s in sim_statuses]):
             status = None  # this will trigger experiment creation on a platform
         elif any([s == EntityStatus.RUNNING for s in sim_statuses]):
             status = EntityStatus.RUNNING
-        elif any([s == EntityStatus.CREATED for s in sim_statuses]) and any(
-                [s in [EntityStatus.FAILED, EntityStatus.SUCCEEDED] for s in sim_statuses]):
+        elif any([s == EntityStatus.CREATED for s in sim_statuses]) and any_succeeded_failed:
             status = EntityStatus.RUNNING
-        elif any([s is None for s in sim_statuses]) and any(
-                [s in [EntityStatus.FAILED, EntityStatus.SUCCEEDED] for s in sim_statuses]):
+        elif any([s is None for s in sim_statuses]) and any_succeeded_failed:
             status = EntityStatus.CREATED
         elif any([s == EntityStatus.FAILED for s in sim_statuses]):
             status = EntityStatus.FAILED
@@ -110,38 +155,75 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
 
     @status.setter
     def status(self, value):
+        """
+        Set status of experiment. Experiments status is an aggregate of its children so you cannot set status.
+
+        Args:
+            value: Value to set
+
+        Returns:
+            None
+
+        Notes:
+            TODO: Deprecate this
+        """
         # this method is needed because dataclasses will always try to set each field, even if not allowed to in
         # the case of Experiment.
         logger.warning('Experiment status cannot be directly altered. Status unchanged.')
 
     def __repr__(self):
+        """Experiment as string."""
         return f"<Experiment: {self.uid} - {self.name} / Sim count {len(self.simulations) if self.simulations else 0}>"
 
     @property
     def suite(self):
+        """
+        Suite the experiment belongs to.
+
+        Returns:
+            Suite
+        """
         return self.parent
 
     @suite.setter
     def suite(self, suite):
+        """
+        Set suite of the experiment.
+
+        Args:
+            suite: Suite to set
+
+        Returns:
+            None
+        """
         ids = [exp.uid for exp in suite.experiments]
         if self.uid not in ids:
             suite.experiments.append(self)
             self.parent = suite
 
     def display(self):
+        """
+        Display the experiment.
+
+        Returns:
+            None
+        """
         from idmtools.utils.display import display, experiment_table_display
         display(self, experiment_table_display)
 
     def pre_creation(self, platform: 'IPlatform', gather_assets=True) -> None:
         """
-        Experiment pre_creation callback
+        Experiment pre_creation callback.
 
         Args:
             platform: Platform experiment is being created on
             gather_assets: Determines if an experiment will try to gather the common assets or defer. It most cases, you want this enabled but when modifying existing experiments you may want to disable if there are new assets and the platform has performance hits to determine those assets
 
         Returns:
+            None
 
+        Raises:
+            ValueError - If simulations length is 0
         """
         # Gather the assets
         self.gather_assets()
@@ -190,7 +272,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
     @property
     def done(self):
         """
-        Return if an experiment has finished executing
+        Return if an experiment has finished executing.
 
         Returns:
             True if all simulations have ran, False otherwise
@@ -200,7 +282,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
     @property
     def succeeded(self) -> bool:
         """
-        Return if an experiment has succeeded. An experiment is succeeded when all simulations have succeeded
+        Return if an experiment has succeeded. An experiment is succeeded when all simulations have succeeded.
 
         Returns:
             True if all simulations have succeeded, False otherwise
@@ -219,18 +301,28 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
 
     @property
     def simulations(self) -> ExperimentParentIterator:
+        """
+        Returns the Simulations.
+
+        Returns:
+            Simulations
+        """
         return ExperimentParentIterator(self.__simulations, parent=self)
 
     @simulations.setter
     def simulations(self, simulations: Union[SUPPORTED_SIM_TYPE]):
         """
-        Set the simulations object
+        Set the simulations object.
 
         Args:
             simulations:
 
         Returns:
+            None
 
+        Raises:
+            ValueError - If simulations is a list has items that are not simulations or tasks
+                         If simulations is not a list, set, TemplatedSimulations or EntityContainer
         """
         if isinstance(simulations, (GeneratorType, TemplatedSimulations, EntityContainer)):
             self.gather_common_assets_from_task = isinstance(simulations, (GeneratorType, EntityContainer))
@@ -253,47 +345,61 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
     @property
     def simulation_count(self) -> int:
         """
-        Return the total simulations
-        Returns:
+        Return the total simulations.
 
+        Returns:
+            Length of simulations
         """
         return len(self.simulations)
 
     def refresh_simulations(self) -> NoReturn:
         """
-        Refresh the simulations from the platform
+        Refresh the simulations from the platform.
 
         Returns:
-
+            None
         """
         from idmtools.core import ItemType
         self.simulations = self.platform.get_children(self.uid, ItemType.EXPERIMENT, force=True)
 
     def refresh_simulations_status(self):
+        """
+        Refresh the simulation status.
+
+        Returns:
+            None
+        """
         self.platform.refresh_status(item=self)
 
     def pre_getstate(self):
         """
         Return default values for :meth:`~idmtools.interfaces.ientity.pickle_ignore_fields`.
+
         Call before pickling.
         """
         from idmtools.assets import AssetCollection
         return {"assets": AssetCollection(), "simulations": EntityContainer()}
 
     def gather_assets(self) -> AssetCollection():
+        """
+        Gather all our assets for our experiment.
+
+        Returns:
+            Assets
+        """
         return self.assets
 
     @classmethod
     def from_task(cls, task, name: str = None, tags: Dict[str, Any] = None, assets: AssetCollection = None,
                   gather_common_assets_from_task: bool = True) -> 'Experiment':
         """
-        Creates an Experiment with one Simulation from a task
+        Creates an Experiment with one Simulation from a task.
 
         Args:
             task: Task to use
             assets: Asset collection to use for common tasks. Defaults to gather assets from task
             name: Name of experiment
-            tags:
+            tags: Tags for the items
             gather_common_assets_from_task: Whether we should attempt to gather assets from the Task object for the
                 experiment. With large amounts of tasks, this can be expensive as we loop through all
         Returns:
@@ -313,7 +419,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
                      name: str = None,
                      assets: AssetCollection = None, tags: Dict[str, Any] = None) -> 'Experiment':
         """
-        Creates an experiment from a SimulationBuilder object(or list of builders
+        Creates an experiment from a SimulationBuilder object(or list of builders.
 
         Args:
             builders: List of builder to create experiment from
@@ -340,7 +446,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
     def from_template(cls, template: TemplatedSimulations, name: str = None, assets: AssetCollection = None,
                       tags: Dict[str, Any] = None) -> 'Experiment':
         """
-        Creates an Experiment from a TemplatedSimulation object
+        Creates an Experiment from a TemplatedSimulation object.
 
         Args:
             template: TemplatedSimulation object
@@ -361,7 +467,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
 
     def __deepcopy__(self, memo):
         """
-        Deep copy for experiments. It converts generators and templates to realized lists to allow copying
+        Deep copy for experiments. It converts generators and templates to realized lists to allow copying.
 
         Args:
             memo: The memo object used for copying
@@ -381,7 +487,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
 
     def list_static_assets(self, children: bool = False, platform: 'IPlatform' = None, **kwargs) -> List[Asset]:
         """
-        List assets that have been uploaded to a server already
+        List assets that have been uploaded to a server already.
 
         Args:
             children: When set to true, simulation assets will be loaded as well
@@ -400,7 +506,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
             wait_on_done_progress: bool = True, wait_on_done: bool = False,
             **run_opts) -> NoReturn:
         """
-        Runs an experiment on a platform
+        Runs an experiment on a platform.
 
         Args:
             wait_until_done: Whether we should wait on experiment to finish running as well. Defaults to False
@@ -431,6 +537,12 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
             self.wait(wait_on_done_progress=wait_on_done_progress)
 
     def to_dict(self):
+        """
+        Convert experiment to dictionary.
+
+        Returns:
+            Dictionary of experiment.
+        """
         result = dict()
         for f in fields(self):
             if not f.name.startswith("_") and f.name not in ['parent']:
@@ -442,10 +554,9 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
 
     # Define this here for better completion in IDEs for end users
     @classmethod
-    def from_id(cls, item_id: Union[str, uuid.UUID], platform: 'IPlatform' = None, copy_assets: bool = False,
-                **kwargs) -> 'Experiment':
+    def from_id(cls, item_id: Union[str, uuid.UUID], platform: 'IPlatform' = None, copy_assets: bool = False, **kwargs) -> 'Experiment':
         """
-        Helper function to provide better intellisense to end users
+        Helper function to provide better intellisense to end users.
 
         Args:
             item_id: Item id to load
@@ -454,7 +565,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
             **kwargs: Optional arguments to be passed on to the platform
 
         Returns:
-
+            Experiment loaded with ID
         """
         result = super().from_id(item_id, platform, **kwargs)
         if copy_assets:
@@ -463,12 +574,13 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
 
     def print(self, verbose: bool = False):
         """
-        Print summary of experiment
+        Print summary of experiment.
+
         Args:
             verbose: Verbose printing
 
         Returns:
-
+            None
         """
         user_logger.info(f"Experiment <{self.id}>")
         user_logger.info(f"Total Simulations: {self.simulation_count}")
@@ -490,18 +602,33 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
 
 
 class ExperimentSpecification(ExperimentPluginSpecification):
+    """
+    ExperimentSpecification is the spec for Experiment plugins.
+    """
 
     @get_description_impl
     def get_description(self) -> str:
+        """
+        Description of our plugin.
+
+        Returns:
+            Description
+        """
         return "Provides access to the Local Platform to IDM Tools"
 
     @get_model_impl
     def get(self, configuration: dict) -> Experiment:  # noqa: F821
         """
-        Experiment is going
+        Get experiment with configuration.
         """
         return Experiment(**configuration)
 
     @get_model_type_impl
     def get_type(self) -> Type[Experiment]:
+        """
+        Return the experiment type.
+
+        Returns:
+            Experiment type.
+        """
         return Experiment
