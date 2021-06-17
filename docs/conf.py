@@ -29,13 +29,6 @@ if sys.platform in ["linux", "darwin"]:
 else:
     subprocess.check_output(["make.bat", "generate-api"], cwd=os.path.dirname(os.path.abspath(__file__)))
 
-# -- Copy the dependent package documentation for reuse -------------------
-
-#urlretrieve(
-#   "https://docs.idmod.org/projects/tool/en/latest/_sources/topic.rst.txt",
-#   "external/tools-topic.rst")
-
-
 # -- General configuration ------------------------------------------------
 
 # This is the equivalent of -t in SPHINXOPTS for the RTD build
