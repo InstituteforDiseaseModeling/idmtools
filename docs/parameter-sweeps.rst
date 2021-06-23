@@ -165,6 +165,5 @@ include example scripts.
    :titlesonly:
    :caption: Model-specific parameter sweep information
 
-   sweeps-r
    sweeps-python
    sweeps-emod
