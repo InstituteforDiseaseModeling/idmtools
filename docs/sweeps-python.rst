@@ -10,16 +10,16 @@ For Python modelers running parameter sweeps, we have multiple examples, as desc
 python_model.python_sim
 =======================
 
-:py:class:`~python_model.python_sim`
+:py:class:`idmtools.examples.python_model.python_sim.py`
 
 .. _formatting-text:
 
 First, import some necessary system and |IT_s| packages.
 
-* :py:class:`~idmtools.entities.templated_simulation.TemplatedSimulations`: A utility that builds simulations from a template
+* :py:class:`~idmtools.entities.templated_simulation.TemplatedSimulations`: A utility that builds simulations from a template,
 * :py:class:`~idmtools.builders.simulation_builder.SimulationBuilder`: An interface to different types of sweeps. It is used in conjunction with :py:class:`~idmtools.entities.templated_simulation.TemplatedSimulations`.
 * :py:class:`~idmtools.core.platform_factory.Platform`: To specify the platform you want to run your experiment on.
-* :py:class:`~idmtools_models.python.json_python_task.JSONConfiguredPythonTask`: We want to run a task executing a Python script. We will run a task in each simulation using this object. This particular task has a json config that is generated as well. There are other python tasks with either different or no configuration formats.
+* :py:class:`~idmtools_models.python.json_python_task.JSONConfiguredPythonTask`: We want to run a task executing a Python script. We will run a task in each simulation using this object. This particular task has a JSON config that is generated as well. There are other Python tasks with either different or no configuration formats.
 
 .. code-block:: python
 
@@ -36,11 +36,11 @@ First, import some necessary system and |IT_s| packages.
     from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 
 
-We have python model defined in "model.py" which has 3 parameters: a, b, c and supports a json config from a file named "config.json". We want to sweep the parameters a for the values 0-2 and b for the values 1-3 and keep c as value 0.
+We have Python model defined in "model.py" which has 3 parameters: "a, b, c" and supports a JSON config from a file named "config.json". We want to sweep the parameters "a" for the values 0-2 and "b" for the values 1-3 and keep "c" as value 0.
 
 To accomplish this, we are going to proceed in a few high-level steps. See https://bit.ly/37DHUf0 for workflow.
 
-#. Define our base task. This task is the common configuration across all our tasks. For us, that means some basic run info like script path as well as our parameter/value we don't plan on sweeping, c.
+#. Define our base task. This task is the common configuration across all our tasks. For us, that means some basic run info like script path as well as our parameter/value we don't plan on sweeping, "c".
 
 #. Then we will define our :py:class:`~idmtools.entities.templated_simulation.TemplatedSimulations` object that will use our task to build a series of simulations.
 
@@ -52,7 +52,7 @@ To accomplish this, we are going to proceed in a few high-level steps. See https
 
 #. Lastly we will run the experiment on the platform.
 
-First, let's define our base task. Normally, you want to do set any assets/configurations you want across the all the different Simulations we are going to build for our experiment. Here we set c to 0 since we do not want to sweep it.
+First, let's define our base task. Normally, you want to do set any assets/configurations you want across the all the different simulations we are going to build for our experiment. Here we set "c" to 0 since we do not want to sweep it.
 
 .. code-block:: python
 
@@ -61,7 +61,7 @@ First, let's define our base task. Normally, you want to do set any assets/confi
 
 .. _formatting-text3:
 
-Now let's use this task to create a :py:class:`~idmtools.entities.templated_simulation.TemplatedSimulations` builder. This will build new simulations from sweep builders we will define later. We can also use it to manipulate the base_task or the base_simulation.
+Now let's use this task to create a :py:class:`~idmtools.entities.templated_simulation.TemplatedSimulations` builder. This will build new simulations from sweep builders we will define later. We can also use it to manipulate base_task or base_simulation objects.
 
 .. code-block:: python
 
@@ -69,7 +69,7 @@ Now let's use this task to create a :py:class:`~idmtools.entities.templated_simu
 
 .. _formatting-text4:
 
-We can define common metadata like tags across all the simulations using the base_simulation object.
+We can define common metadata like tags across all the simulations using base_simulation object.
 
 .. code-block:: python
 
@@ -77,9 +77,7 @@ We can define common metadata like tags across all the simulations using the bas
 
 .. _formatting-text5:
 
-Since we have our templated simulation object now, let's define our sweeps.
-
-To do that we need to use a builder:
+Since we have our templated simulation object now, let's define our sweeps. To do that we need to use a builder:
 
 .. code-block:: python
 
@@ -94,7 +92,7 @@ See https://bit.ly/314j7xS for a diagram of how simulations are built using :py:
 #. A callback function that will be called for every value in the sweep. This function will receive a simulation object and a value. You then define how to use those within the simulation. Generally, you want to pass those to your task's configuration interface. In this example, we are using :py:class:`~idmtools_models.python.json_python_task.JSONConfiguredPythonTask` which has a set_parameter function that takes a simulation, a parameter name, and a value. To pass to this function, we will use either a class wrapper or function partials.
 #. A list/generator of values
 
-Since our model uses a json config let's define a utility function that will update a single parameter at a time on the model and add that param/value pair as a tag on our simulation.
+Since our model uses a JSON config let's define a utility function that will update a single parameter at a time on the model and add that param/value pair as a tag on our simulation.
 
 .. code-block:: python
 
@@ -103,7 +101,7 @@ Since our model uses a json config let's define a utility function that will upd
         This function is called during sweeping allowing us to pass the generated sweep values to our Task Configuration
 
         We always receive a Simulation object. We know that simulations all have tasks and that for our particular set
-        of simulations they will all include JSONConfiguredPythonTask. We configure the model with calls to set_parameter
+        of simulations they will all include :py:class:`~idmtools_models.python.json_python_task.JSONConfiguredPythonTask`. We configure the model with calls to set_parameter
         to update the config. In addition, we are can return a dictionary of tags to add to the simulations so we return
         the output of the 'set_parameter' call since it returns the param/value pair we set
 
@@ -119,7 +117,7 @@ Since our model uses a json config let's define a utility function that will upd
 
 .. _formatting-text7:
 
-Let's sweep the parameter 'a' for the values 0-2. Since our utility function requires a simulation, param, and value, the sweep framework calls our function with a simulation and value. Let's use the partial function to define that we want the param value to always be "a" so we can perform our sweep.
+Let's sweep the parameter "a" for the values 0-2. Since our utility function requires a simulation, param, and value, the sweep framework calls our function with a simulation and value. Let's use the partial function to define that we want the param value to always be "a" so we can perform our sweep.
 
 .. code-block:: python
 
@@ -142,15 +140,11 @@ Now add the sweep to our builder:
 python_model.python_SEIR_sim
 ============================
 
-:py:class:`~python_model.python_SEIR_sim`
+:py:class:`idmtools.examples.python_model.python_SEIR_sim.py`
 
 .. _pythonSEIR_formatting-text1:
 
-Example Python experiment with JSON configuration
-
-In this example, we will demonstrate how to run a python experiment with JSON configuration.
-
-First, import some necessary system and idmtools packages:
+Example Python experiment with JSON configuration. In this example, we will demonstrate how to run a Python experiment with JSON configuration. First, import some necessary system and |IT_s| packages:
 
 .. code-block:: python
 
@@ -172,7 +166,7 @@ First, import some necessary system and idmtools packages:
 
 .. _pythonSEIR_formatting-text2:
 
-Define some constant string used in this example:
+Define some constant strings used in this example:
 
 .. code-block:: python
 
@@ -194,22 +188,22 @@ We have Python model defined in "SEIR_model.py" which takes several arguments li
 
 To accomplish this, we are going to proceed in a few high-level steps. See https://bit.ly/37DHUf0 for workflow
 
-#. Define our base task. This task is the common configuration across all our tasks. For us, that means some basic run info like script path as well as our arguments/value and parameter/value we don't plan on sweeping, "--duration", and most of the parameters inside "nd_template.json".
+#. Define our base task object. This task is the common configuration across all our tasks. For us, that means some basic run info like script path as well as our arguments/value and parameter/value we don't plan on sweeping, "--duration", and most of the parameters inside "nd_template.json".
 
-#. Then we will define our :py:class:`~idmtools.entities.templated_simulation.TemplatedSimulations` object that will use our task to build a series of simulations
+#. Then we will define our :py:class:`~idmtools.entities.templated_simulation.TemplatedSimulations` object that will use our task to build a series of simulations.
 
-#. Then we will define a :py:class:`~idmtools.builders.simulation_builder.SimulationBuilder` and define our sweeps. This will involve also writing some callback functions that update the each task's config or option with the sweep values
+#. Then we will define a :py:class:`~idmtools.builders.simulation_builder.SimulationBuilder` and define our sweeps. This will involve also writing some callback functions that update the each task's config or option with the sweep values.
 
 #. Then we will add our simulation builder to our :py:class:`~idmtools.entities.templated_simulation.TemplatedSimulations` object.
 
-#. We will then build our :py:class:`~idmtools.entities.experiment.Experiment` object using the TemplateSimulations as our simulations list.
+#. We will then build our :py:class:`~idmtools.entities.experiment.Experiment` object using :py:class:`~idmtools.entities.templated_simulation.TemplatedSimulations` as our simulations list.
 
-#. We will run the experiment on the platform
+#. We will run the experiment on the platform.
 
-#. Once and experiment is succeeded, we run two CSV analyzer to analyze results from the python model.
+#. Once and experiment is succeeded, we run two CSV analyzers to analyze results from the Python model.
 
 
-1. First, let's define our base task. Normally, you want to do set any assets/configurations you want across the all the different Simulations we are going to build for our experiment. Here we load config file from a template json file and rename the config_file_name (default value is config.json).
+1. First, let's define our base task. Normally, you want to do set any assets/configurations you want across the all the different simulations we are going to build for our experiment. Here we load config file from a template JSON file and rename the "config_file_name" (default value is config.json).
 
 .. code-block:: python
 
@@ -226,18 +220,19 @@ We define arguments/value for simulation duration that we don't want to sweep as
 
     task.command.add_option("--duration", 40)
 
-2. Now, let's use this task to create a TemplatedSimulation builder. This will build new simulations from sweep builders we will define later. We can also use it to manipulate the base_task or the base_simulation
+2. Now, let's use this task to create a :py:class:`~idmtools.entities.templated_simulation.TemplatedSimulations` builder. This will build new simulations from sweep builders we will define later. We can also use it to manipulate base_task or base_simulation objects.
+
 .. code-block:: python
 
     ts = TemplatedSimulations(base_task=task)
 
-We can define common metadata like tags across all the simulations using the base_simulation object
+We can define common metadata like tags across all the simulations using the base_simulation object.
 
 .. code-block:: python
 
     ts.base_simulation.tags['simulation_name_tag'] = "SEIR_Model"
 
-3. Since we have our templated simulation object now, let's define our sweeps.
+3. Since we have our :py:class:`~idmtools.entities.templated_simulation.TemplatedSimulations` object now, let's define our sweeps.
 
 To do that we need to use a builder:
 
@@ -247,15 +242,14 @@ To do that we need to use a builder:
 
 When adding sweep definitions, you need to generally provide two items.
 
-See https://bit.ly/314j7xS for a diagram of how the Simulations are built using TemplateSimulations +
+See https://bit.ly/314j7xS for a diagram of how the simulations are built using :py:class:`~idmtools.entities.templated_simulation.TemplatedSimulations` and 
+:py:class:`~idmtools.builders.simulation_builder.SimulationBuilder`.
 
-SimulationBuilders
-
-3.1. A callback function that will be called for every value in the sweep. This function will receive a Simulation object and a value. You then define how to use those within the simulation. Generally, you want to pass those to your task's configuration interface. In this example, we are using JSONConfiguredPythonTask which has a set_parameter function that takes a Simulation, a parameter name, and a value. To pass to this function, we will user either a class wrapper or function partials
+3.1. A callback function that will be called for every value in the sweep. This function will receive a :py:class:`~idmtools.entities.simulation.Simulation` object and a value. You then define how to use those within the simulation. Generally, you want to pass those to your task's configuration interface. In this example, we are using :py:class:`~idmtools_models.python.json_python_task.JSONConfiguredPythonTask` which has a set_parameter function that takes a simulation, a parameter name, and a value. To pass to this function, we will user either a class wrapper or function partials.
 
 3.2. A list/generator of values
 
-Since our models uses a json config let's define an utility function that will update a single parameter at a time on the model and add that param/value pair as a tag on our simulation.
+Since our models uses a JSON config let's define an utility function that will update a single parameter at a time on the model and add that param/value pair as a tag on our simulation.
 
 .. code-block:: python
 
@@ -278,9 +272,9 @@ Since our models uses a json config let's define an utility function that will u
         """
         return simulation.task.set_parameter(param, value)
 
-Let's sweep the parameter 'Base_Infectivity_Gaussian_Mean' for the values 0.5 and 2. Since our utility function requires a Simulation, param, and value but the sweep framework all calls our function with Simulation, value, let's use the partial function to define that we want the param value to always be "Base_Infectivity_Gaussian_Mean" so we can perform our sweep set_base_infectivity_gaussian_mean = partial(param_update, param=ConfigParameters.Base_Infectivity_Gaussian_Mean) now add the sweep to our builder builder.add_sweep_definition(set_base_infectivity_gaussian_mean, [0.5, 2]).
+Let's sweep the parameter "Base_Infectivity_Gaussian_Mean" for the values 0.5 and 2. Since our utility function requires a simulation, param, and value but the sweep framework all calls our function with simulation, value, let's use the partial function to define that we want the param value to always be "Base_Infectivity_Gaussian_Mean" so we can perform our sweep set_base_infectivity_gaussian_mean = partial(param_update, param=ConfigParameters.Base_Infectivity_Gaussian_Mean) now add the sweep to our builder builder.add_sweep_definition(set_base_infectivity_gaussian_mean, [0.5, 2]).
 
-An alternative to using partial is define a class that store the param and is callable later. let's use that technique to perform a sweep one the values 1 and 2 on parameter Base_Infectivity_Gaussian_Std_Dev.
+An alternative to using partial is define a class that store the param and is callable later. Let's use that technique to perform a sweep one the values 1 and 2 on parameter "Base_Infectivity_Gaussian_Std_Dev".
 
 First define our class. The trick here is we overload __call__ so that after we create the class, and calls to the instance will be relayed to the task in a fashion identical to the param_update function above. It is generally not best practice to define a class like this in the body of our main script so it is advised to place this in a library or at the very least the top of your file.
 
@@ -294,6 +288,7 @@ First define our class. The trick here is we overload __call__ so that after we 
             return simulation.task.set_parameter(self.param, value)
 
 Now add our sweep on a list:
+
 .. code-block:: python
 
     builder.add_sweep_definition(setParam(ConfigParameters.Base_Infectivity_Gaussian_Std_Dev), [0.3, 1])
@@ -320,35 +315,35 @@ Using the same methodologies, we can sweep on option/arguments that pass to our 
     #         return {self.option: value}
     # builder.add_sweep_definition(setOption("--population"), [1000, 4000])
 
-4. Add our builder to the template simulations
+4. Add our builder to the template simulations.
 
 .. code-block:: python
 
     ts.add_builder(builder)
 
-5. Now we can create our Experiment using our template builder
+5. Now we can create our experiment using our template builder.
 
 .. code-block:: python
 
     experiment = Experiment(name=os.path.split(sys.argv[0])[1], simulations=ts)
 
-Add our own custom tag to simulation
+Add our own custom tag to simulation.
 
 .. code-block:: python
 
     experiment.tags['experiment_name_tag'] = "SEIR_Model"
 
-And maybe some custom Experiment Level Assets
+And maybe some custom experiment level assets.
 
 .. code-block:: python
 
     experiment.assets.add_directory(assets_directory=os.path.join("inputs", "ye_seir_model", "Assets"))
 
-6. In order to run the experiment, we need to create a `Platform`.
+6. In order to run the experiment, we need to create a :py:class:`~idmtools.core.platform_factory.Platform` object.
 
-The `Platform` defines where we want to run our simulation.
+:py:class:`~idmtools.core.platform_factory.Platform` defines where we want to run our simulation.
 
-You can easily switch platforms by changing the Platform to for example 'Local'
+You can easily switch platforms by changing :py:class:`~idmtools.core.platform_factory.Platform`, for example to "Local".
 
 .. code-block:: python
 
@@ -361,7 +356,7 @@ The last step is to call run() on the ExperimentManager to run the simulations.
     platform.run_items(experiment)
     platform.wait_till_done(experiment)
 
-Check experiment status, only move to Analyzer step if experiment succeeded.
+Check experiment status, only move to analyzer step if experiment succeeded.
 
 .. code-block:: python
 
@@ -402,7 +397,7 @@ Now analyze:
 python_model.python_model_allee
 ===============================
 
-:py:class:`~python_model.python_model_allee`
+:py:class:`idmtools.examples.python_model.python_model_allee.py`
 
 In this example, we will demonstrate how to run a python experiment.
 
