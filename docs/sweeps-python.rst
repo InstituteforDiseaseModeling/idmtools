@@ -371,13 +371,13 @@ Check experiment status, only move to analyzer step if experiment succeeded.
     filenames = ['output/individual.csv']
     filenames_2 = ['output/node.csv']
 
-Initialize two analyser classes with the path of the output csv file
+Initialize two analyser classes with the path of the output csv file.
 
 .. code-block:: python
 
     analyzers = [InfectiousnessCSVAnalyzer(filenames=filenames), NodeCSVAnalyzer(filenames=filenames_2)]
 
-Specify the id Type, in this case an Experiment on |COMPS_s|
+Specify the id Type, in this case an experiment on |COMPS_s|.
 
 .. code-block:: python
 
@@ -399,13 +399,9 @@ python_model.python_model_allee
 
 :py:class:`idmtools.examples.python_model.python_model_allee.py`
 
-In this example, we will demonstrate how to run a python experiment.
+In this example, we will demonstrate how to run a Python experiment using an :term:`asset collection` on |COMPS_s|.
 
-First, import some necessary system and idmtools packages.
-- ExperimentBuilder: To create sweeps
-- ExperimentManager: To manage our experiment
-- Platform: To specify the platform you want to run your experiment on
-- PythonExperiment: We want to run an experiment executing a Python script
+First, import some necessary system and |IT_s| packages:
 
 .. code-block:: python
 
@@ -416,19 +412,16 @@ First, import some necessary system and idmtools packages.
     from idmtools.assets import AssetCollection
     from idmtools.builders import SimulationBuilder
     from idmtools.core.platform_factory import Platform
-
-In order to run the experiment, we need to create a `Platform` and an `ExperimentManager`.
-
-The `Platform` defines where we want to run our simulation.
-
-You can easily switch platforms by changing the Platform to for example 'Local' with Platform('Local'):
-
-.. code-block:: python
-
     from idmtools.entities.experiment import Experiment
     from idmtools.entities.templated_simulation import TemplatedSimulations
     from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
     from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection import RequirementsToAssetCollection
+
+In order to run the experiment, we need to create :py:class:`~idmtools.builders.simulation_builder.SimulationBuilder`, :py:class:`~idmtools.core.platform_factory.Platform`, :py:class:`~idmtools.entities.experiment.Experiment`, :py:class:`~idmtools.entities.templated_simulation.TemplatedSimulations`, and :py:class:`~idmtools_models.python.json_python_task.JSONConfiguredPythonTask` objects.
+
+In addition :py:class:`~idmtools.assets.asset_collection.AssetCollection` and :py:class:`~idmtools.idmtools_platform_comps.idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection.RequirementsToAssetCollection` objects are created for using an :term:`asset collection` on |COMPS_s|. :py:class:`~idmtools.core.platform_factory.Platform` defines where we want to run our simulation. You can easily switch platforms by changing :py:class:`~idmtools.core.platform_factory.Platform`, for example to "Local".
+
+.. code-block:: python    
 
     platform = Platform('COMPS2')
 
