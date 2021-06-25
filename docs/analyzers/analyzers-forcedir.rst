@@ -4,7 +4,7 @@ Force working directory
 
 You can force analyzers to use a specific working directory other than the default, which is the directory from which the analyzer is run. For example, if you install |IT_s| to the **\\idmtools** directory and then run one of the example analyzers from their default directory, **\\examples\\analyzers**, then the default working directory would be **\\idmtools\\examples\\analyzers**.
 
-To force a working directory, you use the **force_manager_working_directory** parameter from the :py:class:`~idmtools.analysis.analyze_manager.AnalyzeManager` class. The following python code, using the :py:class:`~idmtools.analysis.download_analyzer.DownloadAnalyzer` as an example , illustrates different ways on how to use and configure the **force_manager_working_directory** parameter and how it works and interacts with the **working_dir** parameter::
+To force a working directory, you use the :py:attr:`force_manager_working_directory` parameter from the :py:class:`~idmtools.analysis.analyze_manager.AnalyzeManager` class. The following python code, using the :py:class:`~idmtools.analysis.download_analyzer.DownloadAnalyzer` as an example , illustrates different ways on how to use and configure the :py:attr:`force_manager_working_directory` parameter and how it works and interacts with the :py:attr:`working_dir` parameter::
 
 
     from idmtools.analysis.analyze_manager import AnalyzeManager
