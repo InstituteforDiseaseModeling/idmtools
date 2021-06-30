@@ -272,9 +272,9 @@ Since our models uses a JSON config let's define an utility function that will u
         """
         return simulation.task.set_parameter(param, value)
 
-Let's sweep the parameter "Base_Infectivity_Gaussian_Mean" for the values 0.5 and 2. Since our utility function requires a simulation, param, and value but the sweep framework all calls our function with simulation, value, let's use the partial function to define that we want the param value to always be "Base_Infectivity_Gaussian_Mean" so we can perform our sweep set_base_infectivity_gaussian_mean = partial(param_update, param=ConfigParameters.Base_Infectivity_Gaussian_Mean) now add the sweep to our builder builder.add_sweep_definition(set_base_infectivity_gaussian_mean, [0.5, 2]).
+Let's sweep the parameter **Base_Infectivity_Gaussian_Mean** for the values 0.5 and 2. Since our utility function requires a simulation, param, and value but the sweep framework all calls our function with simulation, value, let's use the partial function to define that we want the param value to always be **Base_Infectivity_Gaussian_Mean** so we can perform our sweep set_base_infectivity_gaussian_mean = partial(param_update, param=ConfigParameters.Base_Infectivity_Gaussian_Mean) now add the sweep to our builder builder.add_sweep_definition(set_base_infectivity_gaussian_mean, [0.5, 2]).
 
-An alternative to using partial is define a class that store the param and is callable later. Let's use that technique to perform a sweep one the values 1 and 2 on parameter "Base_Infectivity_Gaussian_Std_Dev".
+An alternative to using partial is define a class that store the param and is callable later. Let's use that technique to perform a sweep one the values 1 and 2 on parameter **Base_Infectivity_Gaussian_Std_Dev**.
 
 First define our class. The trick here is we overload __call__ so that after we create the class, and calls to the instance will be relayed to the task in a fashion identical to the param_update function above. It is generally not best practice to define a class like this in the body of our main script so it is advised to place this in a library or at the very least the top of your file.
 
