@@ -23,13 +23,8 @@ Choosing the correct scheduling scenario will depend upon your specific research
 requirements. The following lists some of the common scenarios supported:
 
 * N cores, N processes - useful for single-threaded or MPI-enabled workloads, such as |EMOD_s|.
-* N cores, 1 node, 1 process - useful for models that want to spawn various worker
-thread (GenEpi) or have large memory usage, where the number of cores being an indicator
-of memory usage.
-* 1 node, N processes - useful for models with high migration and interprocess communication.
-By running on the same node MPI can use shared memory, as opposed to slower tcp sockets over
-multiple nodes. This may be useful for some scenarios using |EMOD_s| or
-other MPI-enabled workloads.
+* N cores, 1 node, 1 process - useful for models that want to spawn various worker thread (GenEpi) or have large memory usage, where the number of cores being an indicator of memory usage.
+* 1 node, N processes - useful for models with high migration and interprocess communication. By running on the same node MPI can use shared memory, as opposed to slower tcp sockets over multiple nodes. This may be useful for some scenarios using |EMOD_s| or other MPI-enabled workloads.
 
 
 .. _Configuration:
