@@ -116,7 +116,7 @@ jobs:
         env:
           COMPS_PASS: ${{ secrets.COMPS_PASSWORD }}
         run: |
-          python dev_scripts/create_auth_token_args.py --username $COMPS_USER
+          python dev_scripts/create_auth_token_args.py --username ${{ secrets.COMPS_USER }}
       - name: run idmtools_cli all tests
         # only run if core or cli changed
         if: steps.filter.outputs.core == 'true' ||  steps.filter.outputs.cli == 'true'

@@ -48,4 +48,4 @@ The following converted from |DT| to |IT_s| example performs analysis on simulat
                                  analyzers=analyzers)
         manager.analyze()
 
-You can quickly see this analyzer in use by running the included :py:class:`~idmtools.examples.analyzers.example_analysis_CSVAnalyzer` example class.
+You can quickly see this analyzer in use by running the included :py:class:`~idmtools.analysis.csv_analyzer.CSVAnalyzer` example class.

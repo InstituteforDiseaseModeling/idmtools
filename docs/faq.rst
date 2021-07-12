@@ -19,6 +19,6 @@ Why am I getting an "ImportError: cannot import name 'NoReturn'" error when impo
    installed somewhere and you are running with that, perhaps accidentally.
 
 How do I specify the number of cores? 
-   You can specify the ``num_cores`` parameter in
-   :py:obj:`idmtools_platform_comps.comps_platform.COMPSPlatform`. It is not an |EMOD_s|
-   configuration parameter.
+
+   You can specify the **num_cores** parameter in :py:class:`~idmtools_platform_comps.comps_platform.COMPSPlatform`.
+   It is not an |EMOD_s| configuration parameter.
