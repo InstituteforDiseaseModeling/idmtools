@@ -7,7 +7,7 @@ include $(abspath ../dev_scripts/package_general.mk)
 
 
 help: 
-	$(PDS)get_help_from_makefile.py -f ../dev_scripts/package_general.mk -f ./Makefile
+	help-from-makefile -f ../dev_scripts/package_general.mk -f ./Makefile
 
 
 clean: ## Clean most of the temp-data from the project
