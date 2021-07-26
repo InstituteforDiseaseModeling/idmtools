@@ -318,7 +318,6 @@ def exclude_logging_classes(items_to_exclude=None):
     Returns:
         None
     """
-
     rl = getLogger()
 
     for log_name, cl in rl.manager.loggerDict.items():
@@ -335,7 +334,6 @@ def exclude_logging_classes(items_to_exclude=None):
     for item in items_to_exclude:
         other_logger = getLogger(item)
         other_logger.setLevel(logging.WARN)
-
 
 
 def register_stop_logger_signal_handler(listener) -> NoReturn:
