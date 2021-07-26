@@ -115,16 +115,18 @@ class PrintHandler(logging.Handler):
 
 
 def setup_logging(level: Union[int, str] = logging.WARN, filename: str = 'idmtools.log',
-                  console: Union[str, bool] = False, file_level: str = 'DEBUG', force: bool = False) -> QueueListener:
+                  console: Union[str, bool] = False, file_level: str = 'DEBUG',
+                  enable_file_logging: Union[str, bool] = True, force: bool = False) -> QueueListener:
     """
     Set up logging.
 
     Args:
         level: Log level. Default to warning. This should be either a string that matches a log level
             from logging or an int that represent that level.
-        filename: Name of file to log messages to. If set to empty string, file logging is disabled
+        filename: Name of file to log messages to. If set to -1, file logging is disabled
         console: When set to True or the strings "1", "y", "yes", or "on", console logging will be enabled.
         file_level: Level for logging in file
+        enable_file_logging: When set to True or any of the values allowed for console, writes idmtools logging to a file
         force: Force setup, even if we have done it once
 
     Returns:
@@ -146,17 +148,21 @@ def setup_logging(level: Union[int, str] = logging.WARN, filename: str = 'idmtoo
             file_level = logging.getLevelName(file_level)
         if type(console) is str:
             console = console.lower() in TRUTHY_VALUES
+        if type(enable_file_logging) is str:
+            enable_file_logging = enable_file_logging.lower() in TRUTHY_VALUES
 
         # get a file handler
         root = logging.getLogger()
         user = logging.getLogger('user')
         # allow setting the debug of logger via environment variable
-        root.setLevel(level)
+        root.setLevel(logging.DEBUG)
         user.setLevel(logging.DEBUG)
 
         if LOGGING_NAME is None or force:
             filename = filename.strip()
             if filename == "-1":
+                filename = ""
+            if not enable_file_logging:
                 filename = ""
             file_handler = setup_handlers(level, filename, console, file_level)
 
@@ -205,7 +211,7 @@ def setup_handlers(level: int, filename, console: bool = False, file_level: int 
             format_str = '%(asctime)s.%(msecs)d %(pathname)s:%(lineno)d %(funcName)s [%(levelname)s] - %(message)s'
         formatter = logging.Formatter(format_str)
         # set the logging to either common level or the filelevel
-        file_handler = set_file_logging(file_level if file_level else level, formatter, filename)
+        file_handler = set_file_logging(file_level, formatter, filename)
 
     if console or len(filename) == 0:
         coloredlogs.install(level=level, milliseconds=True, stream=sys.stdout)
@@ -262,6 +268,7 @@ def set_file_logging(file_level: int, formatter: logging.Formatter, filename: st
     LOGGING_NAME = Queue()
     # set root the use send log messages to a queue by default
     queue_handler = IDMQueueHandler(LOGGING_NAME)
+    queue_handler.setLevel(file_level)
     logging.root.addHandler(queue_handler)
     logging.getLogger('user').addHandler(queue_handler)
     return file_handler
@@ -311,12 +318,24 @@ def exclude_logging_classes(items_to_exclude=None):
     Returns:
         None
     """
+
+    rl = getLogger()
+
+    for log_name, cl in rl.manager.loggerDict.items():
+        if log_name.startswith("COMPS"):
+            tl = cl
+            if isinstance(cl, logging.PlaceHolder):
+                tl = getLogger(log_name)
+            for idx, handler in enumerate(tl.handlers):
+                if isinstance(handler, logging.StreamHandler):
+                    tl.removeHandler(handler)
     if items_to_exclude is None:
-        items_to_exclude = ['urllib3', 'COMPS', 'paramiko', 'matplotlib']
+        items_to_exclude = ['urllib3', 'paramiko', 'matplotlib']
     # remove comps by default
     for item in items_to_exclude:
         other_logger = getLogger(item)
         other_logger.setLevel(logging.WARN)
+
 
 
 def register_stop_logger_signal_handler(listener) -> NoReturn:

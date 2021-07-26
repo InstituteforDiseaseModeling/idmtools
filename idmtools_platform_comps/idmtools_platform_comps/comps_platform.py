@@ -97,8 +97,8 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
     def _login(self):
         # ensure logging is initialized
-        from idmtools.core.logging import exclude_logging_classes
-        exclude_logging_classes()
+        #from idmtools.core.logging import exclude_logging_classes
+        #exclude_logging_classes()
         Client.login(self.endpoint)
 
     def post_setstate(self):
