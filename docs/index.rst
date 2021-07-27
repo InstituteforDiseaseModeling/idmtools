@@ -27,8 +27,6 @@ Assets can be added at any level of the process, from running a specific task, t
 a simulation, to creating a :term:`experiment`. This allows the user to create inputs based on their
 specific needs: they can be transient, or sharable across multiple simulations.
 
-Exact workflows for using |IT_s| is user-dependent, and can include any of the tasks listed below.
-
 .. To help new users get started, a series of Cookiecutter projects have been added, designed to
 .. guide modelers through necessary tasks. See :doc:`cookiecutters` for the available templates.
 
@@ -96,6 +94,7 @@ an end-to-end workflow using |EMOD_s| as the disease transmission model.
    [Output files] --> [emod-api]
 
 
+Exact workflows for using |IT_s| is user-dependent, and can include any of the tasks listed below.
 
 .. toctree::
    :maxdepth: 3
