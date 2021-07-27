@@ -150,21 +150,21 @@ The directories that should be added as source roots are
 
 1. Docker Auth issues
    
-   Idmtools currently does not prompt users for docker credentials. Because of this you must login
+   Idmtools currently does not prompt users for docker credentials. Because of this, user must login
    beforehand using `docker login docker-staging.packages.idmod.org`
-2. Docker image not found
+2. Docker image not found issue
    
-   Rerun the `pymake setup-dev` or `make setup-dev` on unix systems
+   Rerun `pymake setup-dev` or `make setup-dev` command on unix systems
 3. Dev install get stuck with cmd: `pymake setup-dev` or `python dev_scripts\bootstrap.py`
    
-   Sometime dev install command can get stuck on some packages. this most likely due to users company credential changed
-   (login username/password). this should only happen on first time after changed credentials. to overcome it, try to 
-   install issued package in the folder first, for example to install idmtools_platform_comps package directly, run:
+   Sometimes dev install command can get stuck on some packages. This most likely due to users company credential changed
+   (login username/password). This should only happen on first time after changed credentials. To overcome it, try to 
+   install issued package in the folder first, for example, to install idmtools_platform_comps package directly, run:
    `cd idmtools_platform_comps`
    `pip install -e .`
-   it may prompt to enter User (i.e: User for packages.idmod.org:), hit 'Enter' key. this should release installing the 
-   dependency packages from production artifactory or public pypi server. Once successful install once, you should not need
-   to do this step anymore
+   It may prompt to enter User (i.e: User for packages.idmod.org:), hit 'Enter' key. This should release installing the 
+   dependency packages from production artifactory or public pypi server. Once successfully installed once, user should 
+   not need to do this step anymore.
    
 # Documentation
 
