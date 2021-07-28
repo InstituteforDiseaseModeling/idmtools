@@ -5,12 +5,12 @@
 
 
 Analyzers
------------------
+---------
 * `#0778 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/778>`_ - Add support for context platforms to analyzer manager
 
 
 Bugs
-------------
+----
 * `#0637 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/637>`_ - pytest: ValueError: I/O operation on closed file, Printed at the end of tests.
 * `#0663 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/663>`_ - SSMT PlatformAnalysis can not put 2 analyzers in same file as main entry
 * `#0696 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/696>`_ - Rename num_retires to num_retries on COMPS Platform
@@ -26,14 +26,14 @@ Bugs
 
 
 Core
-------------
+----
 * `#0343 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/343>`_ - Genericize experiment_factory to work for other items
 * `#0611 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/611>`_ - Consider excluding idmtools.log and COMPS_log.log on SSMT WI submission
 * `#0737 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/737>`_ - Remove standalone builder in favor of regular python
 
 
 Developer/Test
-----------------------
+--------------
 * `#0083 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/83>`_ - Setup python linting for the Pull requests
 * `#0671 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/671>`_ - Python Linting
 * `#0735 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/735>`_ - Tag or remove local tests in idmtools-core tests
@@ -43,7 +43,7 @@ Developer/Test
 
 
 Documentation
----------------------
+-------------
 * `#0015 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/15>`_ - Add cookiecutter projects
 * `#0423 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/423>`_ - Create a clear document on what features are provided by what packages
 * `#0473 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/473>`_ - Create sweep without builder
@@ -86,7 +86,7 @@ Documentation
 
 
 Feature Request
------------------------
+---------------
 * `#0059 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/59>`_ - Chaining of Analyzers
 * `#0097 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/97>`_ - Ability to batch simulations within simulation
 * `#0704 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/704>`_ - Tthere is no way to  load custom wheel using the RequirementsToAssets utility
@@ -95,7 +95,7 @@ Feature Request
 
 
 Platforms
------------------
+---------
 * `#0277 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/277>`_ - Need way to add tags to COMPSPlatform ACs after creation
 * `#0638 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/638>`_ - Change print statement to logger in python_requirements_ac utility
 * `#0640 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/640>`_ - Better error reporting when the python_requirements_ac fails
@@ -106,7 +106,7 @@ Platforms
 
 
 User Experience
------------------------
+---------------
 * `#0760 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/760>`_ - Email for issues and feature requests
 * `#0781 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/781>`_ - Suites should support run on object
 * `#0787 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/787>`_ - idmtools should print experiment id by default in console

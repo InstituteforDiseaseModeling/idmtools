@@ -4,14 +4,14 @@
 
 
 Additional Changes
---------------------------
+------------------
 * `#1165 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1165>`_ - Support basic building of singularity images 
 * `#1315 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1315>`_ - Assets should always return paths using posix style
 * `#1321 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1321>`_ - Comps CLI should have singularity build support 
 
 
 Bugs
------------
+----
 * `#1271 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1271>`_ - COMPS SSMT Version fetch should fetch latest compatible idmtools image
 * `#1303 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1303>`_ - Fix platform object assignment on AssetCollection
 * `#1312 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1312>`_ - Update analyze_manager.py to remove iterkeys in support of diskcache 5.1.0
@@ -19,7 +19,7 @@ Bugs
 
 
 Dependencies
--------------------
+------------
 * `#1281 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1281>`_ - Update pytest requirement from ~=6.1.1 to ~=6.1.2
 * `#1287 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1287>`_ - Update allure-pytest requirement from ~=2.8.18 to ~=2.8.19
 * `#1288 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1288>`_ - Update junitparser requirement from ~=1.6.0 to ~=1.6.1
@@ -39,18 +39,18 @@ Dependencies
 
 
 Documentation
---------------------
+-------------
 * `#1279 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1279>`_ - Add examples to override config values
 * `#1285 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1285>`_ - Examples should use Calculon instead of SLURM alias
 * `#1302 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1302>`_ - cookbook link for modifying-asset-collection is wrong
 
 
 Platforms
------------------
+---------
 * `#1264 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1264>`_ - Comps CLI should have singularity build support
 
 
 User Experience
------------------------
+---------------
 * `#1170 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1170>`_ - Add progress bar to upload of Assets through new callback in pyCOMPS
 * `#1320 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1320>`_ - Add progress bar to workitems

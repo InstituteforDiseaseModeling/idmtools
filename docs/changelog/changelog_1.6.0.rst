@@ -4,7 +4,7 @@
 
 
 Bugs
-------------
+----
 * `#0300 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/300>`_ - Canceling simulations using cli's Restful api throws Internal server error (Local Platform)
 * `#0462 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/462>`_ - Redis port configuration not working (Local Platform)
 * `#0988 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/988>`_ - Fix issues with multi-threading and requests on mac in python 3.7 or lower
@@ -19,7 +19,7 @@ Bugs
 
 
 CLI
------------
+---
 * `#1167 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1167>`_ - idmtools config CLI command should have option to use global path
 * `#1237 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1237>`_ - Add ability to suppress outputs for CLI commands that might generate pipe-able output
 * `#1234 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1234>`_ - Add AssetizeOutputs as COMPS Cli command
@@ -27,12 +27,12 @@ CLI
 
 
 Configuration
----------------------
+-------------
 * `#1242 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1242>`_ - Enable loading configuration options from environment variables
 
 
 Core
-------------
+----
 * `#0571 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/571>`_ - Support multi-cores(MPI) on COMPS through num_cores
 * `#1220 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1220>`_ - Workflow items should use name
 * `#1221 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1221>`_ - Workflow items should use Assets instead of asset_collection_id
@@ -42,7 +42,7 @@ Core
 
 
 Dependencies
---------------------
+------------
 * `#1136 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1136>`_ - Remove marshmallow as a dependency
 * `#1207 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1207>`_ - Update pytest requirement from ~=6.1.0 to ~=6.1.1
 * `#1209 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1209>`_ - Update flake8 requirement from ~=3.8.3 to ~=3.8.4
@@ -57,12 +57,12 @@ Dependencies
 
 
 Documentation
----------------------
+-------------
 * `#1134 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1134>`_ - Add a copy to clipboard option to source code and command line examples in documentation
 
 
 Feature Request
------------------------
+---------------
 * `#1121 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1121>`_ - Experiment should error if no simulations are defined
 * `#1148 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1148>`_ - Support global configuration file for idmtools from user home directory/local app directory or specified using an Environment Variable
 * `#1158 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1158>`_ - Pass platform to pre_creation and post_creation methods to allow dynamic querying from platform
@@ -75,13 +75,13 @@ Feature Request
 
 
 Platforms
------------------
+---------
 * `#0230 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/230>`_ - Entities should support created_on/modified_on fields on the Local Platform
 * `#0324 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/324>`_ - Detect changes to Local Platform config
 
 
 User Experience
------------------------
+---------------
 * `#1127 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1127>`_ - IDMtools install should not include emodpy, emodapi, etc when installing with idmtools[full]
 * `#1141 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1141>`_ - Add warning when user is using a development version of idmtools
 * `#1160 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1160>`_ - get_script_wrapper_unix_task should use default template that adds assets to python path
