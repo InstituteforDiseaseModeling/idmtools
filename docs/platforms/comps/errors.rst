@@ -1,4 +1,4 @@
-COMPS Errors
+COMPS errors
 ------------
 
 The following errors mostly occur in SSMT workitems that run on |COMPS_s|:

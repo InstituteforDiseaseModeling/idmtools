@@ -16,7 +16,7 @@ Also review the class details :py:class:`~idmtools_platform_comps.utils.download
 
 You can also run this command from the CLI. For details, see :ref:`COMPS CLI reference<COMPS CLI>`
 
-Download Errors
+Download errors
 ---------------
 
 See :ref:`COMPS Errors reference<COMPS Errors>`

@@ -1,4 +1,4 @@
-COMPS Scheduling
+COMPS scheduling
 ================
 
 |IT_s| supports job scheduling on the |COMPS_s| platform, which includes support for multiple
@@ -12,7 +12,7 @@ see `Scheduling Configuration`_. `Examples`_ are provided from which you can lev
 gain a better understanding. `Scheduling Schemas`_ enumerate the available options that may be included in workorder.json.
 
 
-Scheduling Scenarios
+Scheduling scenarios
 --------------------
 
 Choosing the correct scheduling scenario will depend upon your specific research needs and
@@ -23,7 +23,7 @@ requirements. The following lists some of the common scenarios supported:
 * 1 node, N processes - useful for models with high migration and interprocess communication. By running on the same node MPI can use shared memory, as opposed to slower tcp sockets over multiple nodes. This may be useful for some scenarios using |EMOD_s| or other MPI-enabled workloads.
 
 
-Scheduling Configuration
+Scheduling configuration
 ------------------------
 
 By configuring a ``workorder.json`` file and adding it as a transient asset you can
@@ -85,7 +85,7 @@ create one using the ``add_schedule_config`` method, both methods included in th
 
 .. _Examples:
 
-Scheduling Example
+Scheduling example
 ------------------
 
 For addition information and specifics of using a workorder.json file within Python,
@@ -97,7 +97,7 @@ you can begin with the following:
 To see the list of platform alias', such as BELEGOST and CALCULON, use the following
 CLI command: ``idmtools info plugins platform-aliases``.
 
-Scheduling Schemas
+Scheduling schemas
 ------------------
 
 The following schemas, for both HPC and SLURM clusters on |COMPS_s|, list the available

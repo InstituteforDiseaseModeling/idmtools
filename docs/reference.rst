@@ -24,7 +24,7 @@ Core and job orchestration
 .. uml:: /diagrams/core.puml
 
 
-Local platform Reference
+Local platform reference
 ------------------------
 
 .. uml:: /diagrams/local.puml
@@ -37,7 +37,7 @@ Local platform Reference
 
 .. include:: /reuse/comps_note.txt
 
-Models Reference
+Models reference
 ----------------
 
 .. uml:: /diagrams/models.puml
