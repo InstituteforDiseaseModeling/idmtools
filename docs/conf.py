@@ -62,6 +62,7 @@ plantuml = 'plantweb'
 autodoc_default_options = {
     'member-order': 'bysource',
     'members': None,
+    'special-members': '__init__',
     'exclude-members': '__all__'
 }
 
