@@ -1,4 +1,5 @@
 import os
+import warnings
 from abc import ABCMeta
 from dataclasses import dataclass
 from dataclasses import fields, field
@@ -123,9 +124,8 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         # Action based on the caller
         if caller not in CALLER_LIST:
-            raise ValueError("Please use Factory to create Platform! For example: \n    platform = Platform('COMPS', **kwargs)")
-        else:
-            return super().__new__(cls)
+            warnings.warn("Please use Factory to create Platform! For example: \n    platform = Platform('COMPS', **kwargs)")
+        return super().__new__(cls)
 
     def __post_init__(self) -> NoReturn:
         """
