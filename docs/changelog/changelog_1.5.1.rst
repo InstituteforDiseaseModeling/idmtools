@@ -21,20 +21,20 @@ Feature Request
 * `#1180 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1180>`_ - Support Configuration Aliases. This provides out of the box configurations for common platform configurations. For example, COMPS environments have predefined aliases such as Calculon, Belegost, etc
 
 
- Known Issues
----------------------
+Known Issues
+-------------
 * PlatformAnalysis requires an idmtools.ini
 
 
 Upcoming breaking changes in 1.6.0
-------------------------------------------
+----------------------------------
 * Assets will no longer support both absolute_path and content. That will be mutually exclusive going forward
 * The task API **pre_creation** method has a new parameter to pass the platform object. All tasks implementing the API will need to update the pre_creation method
 * Deprecation of the *delete* function from *AssetCollection* in favor or *remove*.
 
 
 Upcoming features in the coming releases
-------------------------------------------------
+----------------------------------------
 * Ability to query the platform from task for items such as OS, supported workflows, etc
 * Utility to Asset-ize outputs within COMPS. This should make it into 1.6.0
 * HPC Container build and run utilities. Slated for next few releases
