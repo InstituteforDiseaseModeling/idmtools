@@ -17,3 +17,5 @@ Logging verbosity is controlled by configuring the parameter, **level**, with on
 | DEBUG
 
 Console logging is enabled by configuring the parameter, **console**, to "on". The **log_filename** parameter can be configured to something other than the default filename, "idmtools.log".
+
+See :ref:`Enabling/Disabling/Changing Log Level at Runtime` for an example on enabling logging/changing levels at runtime.
