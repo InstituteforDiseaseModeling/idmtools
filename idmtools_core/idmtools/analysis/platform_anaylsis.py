@@ -7,7 +7,7 @@ Platform Analysis tries to make the process of running remotely similar to local
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import re
-from typing import List, Callable, Union, Type, Optional, Dict, Any
+from typing import List, Callable, Union, Type, Dict, Any
 import inspect
 import os
 import pickle
@@ -170,7 +170,7 @@ class PlatformAnalysis:
         # Pickle the extra args
         if len(self.extra_args):
             self.additional_files.add_or_replace_asset(Asset(filename="extra_args.pkl", content=pickle.dumps(self.extra_args)))
-            command += f" --analyzer-manager-args-file extra_args.pkl"
+            command += " --analyzer-manager-args-file extra_args.pkl"
 
         # Add platform
         command += " --block {}".format(self.platform._config_block)

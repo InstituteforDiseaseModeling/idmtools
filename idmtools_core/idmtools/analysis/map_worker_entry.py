@@ -6,7 +6,6 @@ Most of these function are used either to initialize a thread or to handle excep
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import itertools
-import traceback
 from logging import getLogger, DEBUG
 from uuid import UUID
 from idmtools.core.interfaces.ientity import IEntity
@@ -14,7 +13,6 @@ from idmtools.utils.file_parser import FileParser
 from typing import NoReturn, TYPE_CHECKING, Union, Dict
 from idmtools.core.interfaces.iitem import IItem
 from idmtools.entities.ianalyzer import TAnalyzerList
-from diskcache import Cache
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
 
@@ -34,7 +32,7 @@ def map_item(item: IItem) -> NoReturn:
     # Retrieve the global variables coming from the pool initialization
 
     if logger.isEnabledFor(DEBUG):
-        logger.debug(f"Init items")
+        logger.debug(f"Init item {item.uid} in worker")
     analyzers = map_item.analyzers
     platform = map_item.platform
 

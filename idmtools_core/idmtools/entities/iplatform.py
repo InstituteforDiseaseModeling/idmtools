@@ -950,7 +950,8 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
     def get_defaults_by_type(self, default_type: Type) -> List[IPlatformDefault]:
         """
-        Returns any platform defaults for specific types
+
+        Returns any platform defaults for specific types.
 
         Args:
             default_type: Default type
@@ -959,6 +960,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             List of default of that type
         """
         return [x for x in self._platform_defaults if isinstance(x, default_type)]
+
 
 TPlatform = TypeVar("TPlatform", bound=IPlatform)
 TPlatformClass = Type[TPlatform]
