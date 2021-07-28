@@ -7,13 +7,13 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import atexit
 import logging
+import multiprocessing
 import os
 import sys
 import time
 from contextlib import suppress
 from logging import getLogger
 from logging.handlers import QueueHandler, QueueListener, RotatingFileHandler
-from multiprocessing import Queue
 from signal import SIGINT, signal, SIGTERM
 from typing import NoReturn, Union
 import coloredlogs as coloredlogs
@@ -259,7 +259,7 @@ def set_file_logging(file_level: int, formatter: logging.Formatter, filename: st
         if file_handler is None:
             raise ValueError("Could not file a valid log. Either all the files are opened or you are on a read-only filesystem. You can disable file-based logging by setting")
     # disable normal logging
-    LOGGING_NAME = Queue()
+    LOGGING_NAME = multiprocessing.Manager().Queue(-1)
     # set root the use send log messages to a queue by default
     queue_handler = IDMQueueHandler(LOGGING_NAME)
     logging.root.addHandler(queue_handler)

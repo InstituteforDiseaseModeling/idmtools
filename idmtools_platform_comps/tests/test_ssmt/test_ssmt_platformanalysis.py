@@ -14,6 +14,8 @@ from idmtools_test.utils.comps import COMPS_LOCAL_PACKAGE, CORE_LOCAL_PACKAGE, C
 from idmtools_test.utils.decorators import run_in_temp_dir
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools.core import ItemType, TRUTHY_VALUES
+
+TARGET_EXPERIMENT_ID = '9311af40-1337-ea11-a2be-f0921c167861'
 analyzer_path = os.path.join(os.path.dirname(__file__), "..", "inputs")
 sys.path.insert(0, analyzer_path)
 from simple_analyzer import SimpleAnalyzer  # noqa
@@ -52,7 +54,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
 
     # Test SimpleAnalyzer with SSMTAnalysis which analyzes python experiment's results
     def do_simple_python_analysis(self, platform):
-        experiment_id = '9311af40-1337-ea11-a2be-f0921c167861'  # comps2 exp id
+        experiment_id = TARGET_EXPERIMENT_ID  # comps2 exp id
         # experiment_id = 'de07f612-69ed-ea11-941f-0050569e0ef3'  # idmtvapp17
         extra_args = dict()
         wrapper = None
@@ -84,6 +86,19 @@ class TestPlatformAnalysis(ITestWithPersistence):
     @pytest.mark.smoke
     def test_ssmt_workitem_python_simple_analyzer_using_alias(self):
         self.do_simple_python_analysis(self.platform)
+
+    @pytest.mark.smoke
+    def test_platform_analysis_analyzer_manager_args_validation(self):
+        platform = Platform('BAYESIAN')
+        with self.assertRaises(ValueError) as cxt:
+            analysis = PlatformAnalysis(
+                platform=platform, experiment_ids=[TARGET_EXPERIMENT_ID],
+                analyzers=[SimpleAnalyzer], analyzers_args=[{'filenames': ['config.json']}],
+                analysis_name=self.case_name, tags={'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}, extra_args=dict(bad_parameter=0)
+            )
+
+            analysis.analyze(check_status=True)
+            self.assertIn('bad_parameter', cxt.exception.args[0])
 
     @run_in_temp_dir
     @pytest.mark.serial

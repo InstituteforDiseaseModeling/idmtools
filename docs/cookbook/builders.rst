@@ -5,7 +5,7 @@ Builders
 Simulation Builder
 ------------------
 
-The follow demonstrates how to build a sweep using the standard builder, :py:class:`~idmtools.builders.SimulationBuilder`
+The follow demonstrates how to build a sweep using the standard builder, :py:class:`~idmtools.builders.simulation_builder.SimulationBuilder`
 
 This example uses the following model.
 
@@ -17,13 +17,13 @@ It then builds sweeps through *Arms*
 .. literalinclude:: ../../examples/builders/simulation_builder.py
     :language: python
 
-See :py:class:`~idmtools.builders.SimulationBuilder` for more details.
+See :py:class:`~idmtools.builders.simulation_builder.SimulationBuilder` for more details.
 
 
 Arm Experiment Builder
 ----------------------
 
-The follow demonstrates how to build a sweep using :py:class:`~idmtools.builders.ArmSimulationBuilder`
+The follow demonstrates how to build a sweep using :py:class:`~idmtools.builders.arm_simulation_builder.ArmSimulationBuilder`
 
 This example uses the following model.
 
@@ -35,7 +35,7 @@ It then builds sweeps through *Arms*
 .. literalinclude:: ../../examples/builders/arm_experiment_builder_python.py
     :language: python
 
-See :py:class:`~idmtools.builders.ArmSimulationBuilder` for more details
+See :py:class:`~idmtools.builders.arm_simulation_builder.ArmSimulationBuilder` for more details
 
 Multiple argument sweep
 -----------------------

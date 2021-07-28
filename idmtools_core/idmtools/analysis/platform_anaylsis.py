@@ -18,6 +18,7 @@ from idmtools.config import IdmConfigParser
 from idmtools.entities import IAnalyzer
 from idmtools.entities.iplatform import IPlatform
 from idmtools.entities.iplatform_default import AnalyzerManagerPlatformDefault
+from idmtools.utils.info import get_help_version_url
 
 logger = getLogger(__name__)
 user_logger = getLogger('user')
@@ -26,6 +27,9 @@ user_logger = getLogger('user')
 class PlatformAnalysis:
     """
     PlatformAnalysis allows remote Analysis on the server.
+
+    See Also:
+        :py:class:`idmtools.analysis.analyze_manager.AnalyzeManager`
     """
 
     def __init__(self, platform: IPlatform, experiment_ids: List['str'], analyzers: List[Type[IAnalyzer]], analyzers_args=None, analysis_name: str = 'WorkItem Test', tags=None, additional_files: Union[FileList, AssetCollection, List[str]] = None, asset_collection_id=None,
@@ -169,6 +173,13 @@ class PlatformAnalysis:
 
         # Pickle the extra args
         if len(self.extra_args):
+            from idmtools.analysis.analyze_manager import AnalyzeManager
+            argspec = inspect.signature(AnalyzeManager.__init__)
+            for argname, value in self.extra_args.items():
+                if argname not in argspec.parameters:
+                    raise ValueError(
+                        f"AnalyzerManager does not support the argument {argname}. Valid args are {' '.join([str(s) for s in argspec.parameters.keys()])}. See {get_help_version_url('idmtools.analysis.analyze_manager.html#idmtools.analysis.analyze_manager.AnalyzeManager')} for a valid list of arguments.")
+                # TODO do type validations later
             self.additional_files.add_or_replace_asset(Asset(filename="extra_args.pkl", content=pickle.dumps(self.extra_args)))
             command += " --analyzer-manager-args-file extra_args.pkl"
 

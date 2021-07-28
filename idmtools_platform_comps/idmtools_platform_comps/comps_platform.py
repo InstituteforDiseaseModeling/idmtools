@@ -69,7 +69,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     docker_image: str = field(default=None)
 
     _platform_supports: List[PlatformRequirements] = field(default_factory=lambda: copy.deepcopy(supported_types), repr=False, init=False)
-    _platform_defaults: List[IPlatformDefault] = field(default_factory=lambda l: copy.deepcopy(PLATFORM_DEFAULTS))
+    _platform_defaults: List[IPlatformDefault] = field(default_factory=lambda: copy.deepcopy(PLATFORM_DEFAULTS))
 
     _experiments: CompsPlatformExperimentOperations = field(**op_defaults, repr=False, init=False)
     _simulations: CompsPlatformSimulationOperations = field(**op_defaults, repr=False, init=False)
