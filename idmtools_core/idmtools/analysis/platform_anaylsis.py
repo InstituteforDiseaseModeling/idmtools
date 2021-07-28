@@ -1,5 +1,5 @@
 import re
-from typing import List, Callable, Union, Type
+from typing import List, Callable, Union, Type, Optional, Dict, Any
 import inspect
 import os
 import pickle
@@ -9,6 +9,7 @@ from idmtools.assets.file_list import FileList
 from idmtools.config import IdmConfigParser
 from idmtools.entities import IAnalyzer
 from idmtools.entities.iplatform import IPlatform
+from idmtools.entities.iplatform_default import AnalyzerManagerPlatformDefault
 
 logger = getLogger(__name__)
 user_logger = getLogger('user')
@@ -18,7 +19,7 @@ class PlatformAnalysis:
 
     def __init__(self, platform: IPlatform, experiment_ids: List['str'], analyzers: List[Type[IAnalyzer]], analyzers_args=None, analysis_name: str = 'WorkItem Test', tags=None, additional_files: Union[FileList, AssetCollection, List[str]] = None, asset_collection_id=None,
                  asset_files: Union[FileList, AssetCollection, List[str]] = None, wait_till_done: bool = True,
-                 idmtools_config: str = None, pre_run_func: Callable = None, wrapper_shell_script: str = None, verbose: bool = False):
+                 idmtools_config: str = None, pre_run_func: Callable = None, wrapper_shell_script: str = None, verbose: bool = False, extra_args: Dict[str, Any] = None):
         """
 
         Args:
@@ -36,7 +37,10 @@ class PlatformAnalysis:
             pre_run_func: A function (with no arguments) to be executed before analysis starts on the remote server
             wrapper_shell_script: Optional path to a wrapper shell script. This script should redirect all arguments to command passed to it. Mostly useful for development purposes
             verbose: Enables verbose logging remotely
+            extra_args: Optional extra arguments to pass to AnalyzerManager on the server side
 
+        See Also:
+            :meth:`idmtools.analysis.analyze_manager.AnalyzeManager.__init))`
         """
         self.platform = platform
         self.experiment_ids = experiment_ids
@@ -62,6 +66,7 @@ class PlatformAnalysis:
         self.wrapper_shell_script = wrapper_shell_script
         self.shell_script_binary = "/bin/bash"
         self.verbose = verbose
+        self.extra_args = extra_args if extra_args else dict()
 
         self.validate_args()
 
@@ -109,6 +114,15 @@ class PlatformAnalysis:
         # Add all the analyzers files
         for a in self.analyzers:
             self.additional_files.add_or_replace_asset(inspect.getfile(a))
+
+        # add our extra arguments for analyzer manager
+        if 'max_workers' not in self.extra_args:
+            am_defaults: List[AnalyzerManagerPlatformDefault] = self.platform.get_defaults_by_type(AnalyzerManagerPlatformDefault)
+            if len(am_defaults):
+                if logger.isEnabledFor(DEBUG):
+                    logger.debug(f"Setting max workers to comps default of: {am_defaults[0].max_workers}")
+                self.extra_args['max_workers'] = am_defaults[0].max_workers
+
         # Create the command
         command = ''
         if self.wrapper_shell_script:
@@ -122,10 +136,17 @@ class PlatformAnalysis:
 
         if self.pre_run_func:
             command += f" --pre-run-func {self.pre_run_func.__name__}"
+
+        # Pickle the extra args
+        if len(self.extra_args):
+            self.additional_files.add_or_replace_asset(Asset(filename="extra_args.pkl", content=pickle.dumps(self.extra_args)))
+            command += f" --analyzer-manager-args-file extra_args.pkl"
+
         # Add platform
         command += " --block {}".format(self.platform._config_block)
         if self.verbose:
             command += " --verbose"
+
         return command
 
     def __pickle_analyzers(self, args_dict):
