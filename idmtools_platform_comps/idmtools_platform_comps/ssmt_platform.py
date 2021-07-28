@@ -1,5 +1,10 @@
-from dataclasses import dataclass, field
+"""define the ssmt platform.
 
+SSMT platform is the same as the COMPS platform but file access is local.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
+from dataclasses import dataclass, field
 from idmtools_platform_comps.comps_operations.asset_collection_operations import CompsPlatformAssetCollectionOperations
 from idmtools_platform_comps.comps_operations.experiment_operations import CompsPlatformExperimentOperations
 from idmtools_platform_comps.comps_operations.suite_operations import CompsPlatformSuiteOperations

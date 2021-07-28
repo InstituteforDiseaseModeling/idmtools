@@ -1,3 +1,8 @@
+"""
+Utilities to fetch info about local system such as packages installed.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import sys
 from logging import getLogger
 from typing import List, Optional
@@ -5,7 +10,13 @@ from typing import List, Optional
 logger = getLogger(__name__)
 
 
-def get_doc_base_url():
+def get_doc_base_url() -> str:
+    """
+    Get base url for documentation links.
+
+    Returns:
+        Doc base url
+    """
     return "https://institutefordiseasemodeling.github.io/idmtools/"
 
 
@@ -53,7 +64,7 @@ def get_pip_packages_10_to_current():
 
 def get_packages_from_pip():
     """
-    Attempt to load pacakges from pip.
+    Attempt to load packages from pip.
 
     Returns:
         (List[str]): A list of packages installed.
@@ -74,13 +85,13 @@ def get_packages_from_pip():
 
 def get_packages_list() -> List[str]:
     """
-    Return a list of installed packages in the current environment. Currently |IT_s| depends on pip for this
-    functionality and since it is just used for troubleshooting, errors can be ignored.
+    Return a list of installed packages in the current environment.
+
+    Currently |IT_s| depends on pip for this functionality and since it is just used for troubleshooting, errors can be ignored.
 
     Returns:
         (List[str]): A list of packages installed.
     """
-
     packages = get_packages_from_pip()
     if packages is None:  # fall back to sys modules
         packages = []
@@ -99,7 +110,7 @@ def get_packages_list() -> List[str]:
 
 def get_help_version_url(help_path, url_template: str = 'https://docs.idmod.org/projects/idmtools/en/{version}/', version: Optional[str] = None) -> str:
     """
-    Get the help url for a subject based on a version
+    Get the help url for a subject based on a version.
 
     Args:
         help_path: Path to config(minus base url). For example, configuration.html

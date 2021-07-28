@@ -12,11 +12,11 @@ When fitting models to data, it is likely that there will be numerous parameters
 pre-determined value.  Some parameters will have a range of values that are biologically plausible,
 or have been determined from previous experiments; however, selecting a particular numerical value
 to use in the model may not be feasible or realistic. Therefore, the best practice involves using a
-parameter sweep to narrow down the  range of possible values or to provide a range of outcomes for
+parameter sweep to narrow down the range of possible values or to provide a range of outcomes for
 those possible values.
 
 |IT_s| provides an automated approach to parameter sweeps. With few lines of code, it is possible to
-test the model over any range of parameter values, with any combination of parameters. 
+test the model over any range of parameter values with any combination of parameters. 
 
 .. Note that parameter sweeps are a simple method of model calibration, and there are more complex calibration algorithms available of |IT_s|.  See :doc:`calibrate` for more information on additional methods.
 
@@ -38,7 +38,7 @@ With a stochastic model (such as |EMOD_s|), it is especially important to utiliz
 not only for calibration to data or parameter selection, but to fully explore the stochasticity in
 output. Single model runs may appear to provide good fits to data, but variation will arise and
 multiple runs are necessary to determine the appropriate range of parameter values necessary to
-achieve  desired outcomes. Multiple iterations of a single set of parameter values should be run to
+achieve desired outcomes. Multiple iterations of a single set of parameter values should be run to
 determine trends in simulation output: a single simulation output could provide results that are due
 to random chance.
 
@@ -53,9 +53,11 @@ the parameter values assigned: both the constant values and those being swept.
 
 Using builders
 --------------
+
 In this release, to support parameter sweeps for models, we have the following builders to assist you:
+
     #. :py:class:`~idmtools.builders.simulation_builder.SimulationBuilder` - you set your sweep parameters in your scripts and it generates a config.json file with your sweeps for your experiment/simulations to use
-    #. :py:class:`~idmtools.builders.csv_simulation_builder.CSVExperimentBuilder` - you can use a CSV file to do your parameter sweeps
+    #. :py:class:`~idmtools.builders.csv_simulation_builder.CsvExperimentBuilder` - you can use a CSV file to do your parameter sweeps
     #. :py:class:`~idmtools.builders.yaml_simulation_builder.YamlSimulationBuilder` - you can use a Yaml file to do your parameter sweeps
     #. :py:class:`~idmtools.builders.arm_simulation_builder.ArmSimulationBuilder` for cross and pair parameters, which allows you to cross parameters, like you cross your arms.
 
@@ -73,6 +75,19 @@ For cross sweeping, let's say again you have parameters a, b, c and d, e, f that
 - c & f
 
 For Python models, we also support them using a JSONConfiguredPythonTask. In the future we will support additional configured tasks for Python and R models.
+
+Add sweep definition
+^^^^^^^^^^^^^^^^^^^^
+
+You can use the following two different methods for adding a sweep definition to a builder object:
+
+- add_sweep_definition
+- add_multiple_parameter_sweep_definition
+
+Generally add_sweep_definition is used; however, in scenarios where you need to add multiple parameters to the sweep definition you use add_multiple_parameter_sweep_definiton - as seen in `idmtools.examples.python_model.multiple_parameter_sweeping.py`. More specifically, 
+add_multiple_parameter_sweep_definition is used for sweeping with the same definition callback that takes multiple parameters, where 
+the parameters can be a list of arguments or a list of keyword arguments. The sweep function will do cross-product sweeps between 
+the parameters.
 
 Creating sweeps without builders
 --------------------------------
@@ -150,6 +165,5 @@ include example scripts.
    :titlesonly:
    :caption: Model-specific parameter sweep information
 
-   sweeps-r
    sweeps-python
    sweeps-emod

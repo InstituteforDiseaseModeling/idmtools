@@ -22,7 +22,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)
-        self.platform = Platform('COMPS2')
+        self.platform = Platform('BAYESIAN')
         self.tags = {'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}
         self.input_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "inputs")
 
@@ -63,14 +63,10 @@ class TestSSMTWorkItem(ITestWithPersistence):
         asset_files.add_asset(os.path.join(self.input_file_path, 'population_analyzer.py'))
         asset_files.add_asset(os.path.join(self.input_file_path, 'run_population_analyzer.py'))
 
-        # load local "input" folder idmtools.ini to current dir in Comps workitem
-        transient_assets = AssetCollection()
-        transient_assets.add_asset(os.path.join(self.input_file_path, "idmtools.ini"))
-
         experiment_id = "8bb8ae8f-793c-ea11-a2be-f0921c167861"  # COMPS2 exp
         # experiment_id = "18553481-1f42-ea11-941b-0050569e0ef3"  # idmtvapp17 exp
         command = "python3 Assets/run_population_analyzer.py " + experiment_id
-        wi = SSMTWorkItem(item_name=self.case_name, command=command, assets=asset_files, transient_assets=transient_assets, tags=self.tags)
+        wi = SSMTWorkItem(item_name=self.case_name, command=command, assets=asset_files, tags=self.tags)
         wi.run(wait_on_done=True)
 
         # validate output files
@@ -103,7 +99,6 @@ class TestSSMTWorkItem(ITestWithPersistence):
         transient_assets.add_asset(os.path.join(self.input_file_path, 'population_analyzer.py'))
         transient_assets.add_asset(os.path.join(self.input_file_path, 'adult_vectors_analyzer.py'))
         transient_assets.add_asset(os.path.join(self.input_file_path, 'run_multiple_analyzers.py'))
-        transient_assets.add_asset(os.path.join(self.input_file_path, 'idmtools.ini'))
 
         experiment_id = "8bb8ae8f-793c-ea11-a2be-f0921c167861"  # COMPS2 exp
         # experiment_id = "18553481-1f42-ea11-941b-0050569e0ef3"  # idmtvapp17 exp
@@ -146,12 +141,8 @@ class TestSSMTWorkItem(ITestWithPersistence):
         asset_files.add_asset(os.path.join(self.input_file_path, 'population_analyzer.py'))
         asset_files.add_asset(os.path.join(self.input_file_path, 'run_multiple_exps.py'))
 
-        # load local "input" folder idmtools.ini to current dir in Comps workitem
-        transient_assets = AssetCollection()
-        transient_assets.add_asset(os.path.join(self.input_file_path, "idmtools.ini"))
-
         command = "python3 Assets/run_multiple_exps.py " + exp_id1 + " " + exp_id2
-        wi = SSMTWorkItem(name=self.case_name, command=command, assets=asset_files, transient_assets=transient_assets, tags=self.tags)
+        wi = SSMTWorkItem(name=self.case_name, command=command, assets=asset_files, tags=self.tags)
         wi.run(wait_on_done=True)
 
         # validate output files
@@ -178,7 +169,6 @@ class TestSSMTWorkItem(ITestWithPersistence):
         transient_assets = AssetCollection()
         transient_assets.add_asset(os.path.join(self.input_file_path, 'custom_csv_analyzer.py'))
         transient_assets.add_asset(os.path.join(self.input_file_path, 'run_multiple_analyzers_single_script.py'))
-        transient_assets.add_asset(os.path.join(self.input_file_path, 'idmtools.ini'))
 
         command = "python3 run_multiple_analyzers_single_script.py " + exp_id
         wi = SSMTWorkItem(name=self.case_name, command=command, transient_assets=transient_assets, tags=self.tags)
@@ -253,14 +243,10 @@ class TestSSMTWorkItem(ITestWithPersistence):
         asset_files.add_asset(os.path.join(self.input_file_path, 'csv_analyzer.py'))
         asset_files.add_asset(os.path.join(self.input_file_path, 'run_csv_analyzer.py'))
 
-        # load local "input" folder simtools.ini to current dir in Comps workitem
-        transient_assets = AssetCollection()
-        transient_assets.add_asset(os.path.join(self.input_file_path, "idmtools.ini"))
-
         experiment_id = '9311af40-1337-ea11-a2be-f0921c167861'  # staging comps2 exp id
         # experiment_id = 'de07f612-69ed-ea11-941f-0050569e0ef3'  # idmtvapp17
         command = "python3 Assets/run_csv_analyzer.py " + experiment_id
-        wi = SSMTWorkItem(name=self.case_name, command=command, assets=asset_files, transient_assets=transient_assets, tags=self.tags)
+        wi = SSMTWorkItem(name=self.case_name, command=command, assets=asset_files, tags=self.tags)
         wi.run(wait_on_done=True)
         local_output_path = "output"
         out_filenames = ["output_csv/" + experiment_id + "/CSVAnalyzer.csv"]  # new

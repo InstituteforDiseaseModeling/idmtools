@@ -1,3 +1,8 @@
+"""
+Defines our base plugin definition and specifications.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 from dataclasses import dataclass
 from logging import getLogger
 import pluggy
@@ -11,6 +16,9 @@ logger = getLogger(__name__)
 
 @dataclass
 class ProjectTemplate:
+    """
+    Defines a ProjectTemplate that plugins can define.
+    """
     name: str
     url: Union[str, List[str]]
     description: str = None
@@ -19,13 +27,13 @@ class ProjectTemplate:
     @staticmethod
     def read_templates_from_json_stream(s) -> List['ProjectTemplate']:
         """
-        Read Project Template from stream
+        Read Project Template from stream.
 
         Args:
             s: Stream where json data resides
 
         Returns:
-
+            Templates loaded from json
         """
         import json
         data = json.loads(s.read().decode())
@@ -46,8 +54,7 @@ class PluginSpecification:
     @classmethod
     def get_name(cls, strip_all: bool = True) -> str:
         """
-        Get the name of the plugin. Although it can be overridden, the best practice is to use the class
-        name as the plugin name.
+        Get the name of the plugin. Although it can be overridden, the best practice is to use the class name as the plugin name.
 
         Returns:
             The name of the plugin as a string.
@@ -69,15 +76,16 @@ class PluginSpecification:
 
     def get_project_templates(self) -> List[ProjectTemplate]:
         """
-        Returns a list of project templates related to the a plugin
-        Returns:
+        Returns a list of project templates related to the a plugin.
 
+        Returns:
+            List of project templates
         """
         return list()
 
     def get_example_urls(self) -> List[str]:
         """
-        Returns a list of URLs that a series of Examples for plugin can be downloaded from
+        Returns a list of URLs that a series of Examples for plugin can be downloaded from.
 
         Returns:
             List of urls
@@ -86,10 +94,10 @@ class PluginSpecification:
 
     def get_help_urls(self) -> Dict[str, str]:
         """
-        Returns a dictionary of topics and links to help
+        Returns a dictionary of topics and links to help.
 
         Returns:
-
+            Dict of help urls
         """
         return dict()
 
@@ -98,7 +106,7 @@ class PluginSpecification:
                         repo_base_url: str = 'https://github.com/InstituteforDiseaseModeling/idmtools/tree/',
                         nightly_branch: str = 'dev'):
         """
-        Build a url using version
+        Build a url using version.
 
         Here we assume the tag will exist for that specific version
         Args:
@@ -113,9 +121,9 @@ class PluginSpecification:
 
     def get_version(self) -> str:
         """
-        Returns the version of the plugin
+        Returns the version of the plugin.
 
         Returns:
-
+            Version for the plugin
         """
         return None

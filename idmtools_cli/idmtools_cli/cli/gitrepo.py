@@ -1,7 +1,7 @@
+"""Define the gitrepo group cli command."""
 import os
 import json
 from logging import getLogger
-
 import click
 from click import secho
 from colorama import Fore
@@ -15,6 +15,7 @@ user_logger = getLogger('user')
 
 @cli.group(short_help="Contains commands related to examples download")
 def gitrepo():
+    """Contains command to download examples."""
     pass
 
 
@@ -22,8 +23,8 @@ def gitrepo():
 @click.option('--raw', default=False, type=bool, help="Files in detail")
 def view(raw: Optional[bool]):
     """
-    \b
-    Display all idmtools available examples
+    Display all idmtools available examples.
+
     Args:
         raw: True/False - display results in details or simplified format
     """
@@ -32,8 +33,8 @@ def view(raw: Optional[bool]):
 
 def list_examples(raw: bool):
     """
-    \b
-    Display all idmtools available examples
+    Display all idmtools available examples.
+
     Args:
         raw: True/False - display results in details or simplified format
     """
@@ -51,12 +52,14 @@ def list_examples(raw: bool):
 # alias under examples
 @cli.group(help="Display a list of examples organized by plugin type")
 def examples():
+    """Examples group command. alias for gitrepo command."""
     pass
 
 
 @examples.command(name='list', help="List examples available")
 @click.option('--raw', default=False, type=bool, help="Files in detail")
 def list_m(raw: Optional[bool]):
+    """Alternate path for gitrepo."""
     list_examples(raw)
 
 
@@ -65,8 +68,8 @@ def list_m(raw: Optional[bool]):
 @click.option('--page', default=1, help="Pagination")
 def repos(owner: Optional[str], page: Optional[int]):
     """
-    \b
-    Display all public repos of the owner
+    Display all public repos of the owner.
+
     Args:
         owner: Repo owner
         page: Result pagination
@@ -87,8 +90,8 @@ def repos(owner: Optional[str], page: Optional[int]):
 @click.option('--repo', default=REPO_NAME, help="Repo name")
 def releases(owner: Optional[str], repo: Optional[str]):
     """
-    \b
-    Display all the releases of the repo
+    Display all the releases of the repo.
+
     Args:
         owner: Repo owner
         repo: Repo name
@@ -109,8 +112,8 @@ def releases(owner: Optional[str], repo: Optional[str]):
 @click.option('--raw', default=False, type=bool, help="Display files in detail")
 def peep(url: Optional[str], raw: Optional[bool]):
     """
-    \b
-    Display all current files/dirs of the repo folder (not recursive)
+    Display all current files/dirs of the repo folder (not recursive).
+
     Args:
         url: GitHub repo files url (required)
         raw: Display details or not
@@ -142,8 +145,8 @@ def peep(url: Optional[str], raw: Optional[bool]):
 @click.option('--output', default='./', help="Files download destination")
 def download(type: Optional[str], url: Optional[str], output: Optional[str]):
     """
-    \b
-    Download files from GitHub repo to user location
+    Download files from GitHub repo to user location.
+
     Args:
         type: Object type (COMPSPlatform, PythonTask, etc)
         url: GitHub repo files url
@@ -160,8 +163,8 @@ def download(type: Optional[str], url: Optional[str], output: Optional[str]):
 @click.option('--output', default='./', help="Files download destination")
 def download_alias(type: Optional[str], url: Optional[List[str]], output: Optional[str]):
     """
-    \b
-    Download examples from specified location
+    Download examples from specified location.
+
     Args:
         type: Object type (COMPSPlatform, PythonTask, etc)
         url: GitHub repo files url
@@ -174,14 +177,15 @@ def download_alias(type: Optional[str], url: Optional[List[str]], output: Option
 
 def download_github_repo(output, urls: List[str], example_types: List[str] = None):
     """
+    Download github repo.
 
     Args:
-        output:
-        urls:
-        example_types:
+        output: Output folder
+        urls: Urls to download
+        example_types: List of example types to download
 
     Returns:
-
+        None
     """
     total = 0
     if example_types:
@@ -205,12 +209,13 @@ def download_github_repo(output, urls: List[str], example_types: List[str] = Non
 
 def get_examples_by_types(example_types: List[str]) -> List[str]:
     """
+    Get examples from Plugins.
 
     Args:
-        example_types:
+        example_types: List of types(plugins) to pull examples from
 
     Returns:
-
+        List of strings to download
     """
     items = get_plugins_examples()
     result = []
@@ -224,13 +229,15 @@ def get_examples_by_types(example_types: List[str]) -> List[str]:
 
 def download_file(option: int, url: str, output: str):
     """
-    Use GitRepo utility to download files
+    Use GitRepo utility to download files.
+
     Args:
         option: file index
         url: file url
         output: local folder to save files
 
-    Returns: file count
+    Returns:
+        file count
     """
     # Display file information
     click.echo(f"\nDownloading Files {option if option else ''}: '{url}'")
@@ -245,19 +252,20 @@ def download_file(option: int, url: str, output: str):
 
 def get_plugins_examples():
     """
-    Collect all idmtools files
+    Collect all idmtools files.
 
-    Returns: files urls as dict
+    Returns:
+        files urls as dict
+
+    Notes:
+        test_examples = {
+         'TestA': 'https://github.com/dustin/py-github/tree/master/github/data',
+         'TestB': 'https://github.com/dustin/py-github/tree/master/github',
+         'TestC': 'https://github.com/dustin/py-github/tree/master/github/__init__.py',
+         'TestD': ['https://github.com/dustin/py-github/tree/master/github',
+                   'https://github.com/dustin/py-github/tree/master/github/data']
+        }
     """
-    # test_examples = {
-    #     'TestA': 'https://github.com/dustin/py-github/tree/master/github/data',
-    #     'TestB': 'https://github.com/dustin/py-github/tree/master/github',
-    #     'TestC': 'https://github.com/dustin/py-github/tree/master/github/__init__.py',
-    #     'TestD': ['https://github.com/dustin/py-github/tree/master/github',
-    #               'https://github.com/dustin/py-github/tree/master/github/data']
-    # }
-    # return test_examples
-
     # Collect all idmtools examples
     plugin_map = MasterPluginRegistry().get_plugin_map()
 
@@ -275,7 +283,8 @@ def get_plugins_examples():
 
 def choice(urls: list = None):
     """
-    Take urls as user selection or prompt user for file selections
+    Take urls as user selection or prompt user for file selections.
+
     Args:
         urls: user provided files
 
@@ -334,7 +343,8 @@ def choice(urls: list = None):
 
 def validate(user_input: object, choice_set: set):
     """
-    Validate user_input against num_set
+    Validate user_input against num_set.
+
     Args:
         user_input: user input
         choice_set: test against this set
@@ -360,7 +370,8 @@ def validate(user_input: object, choice_set: set):
 
 def remove_duplicated_files(user_selected: list, file_dict: dict):
     """
-    Removed duplicated files
+    Removed duplicated files.
+
     Args:
         user_selected: user selection
         file_dict: all files

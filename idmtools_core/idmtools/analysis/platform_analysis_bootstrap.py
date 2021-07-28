@@ -1,6 +1,9 @@
 """
 This script is executed as entrypoint in the docker SSMT worker.
+
 Its role is to collect the experiment ids and analyzers and run the analysis.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import argparse
 import os

@@ -1,3 +1,8 @@
+"""
+PlatformSpecification provided definition for the platform plugin specification, hooks, and plugin manager.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 # Define our platform specific specifications
 import typing
 from abc import ABC
@@ -20,16 +25,20 @@ logger = getLogger(__name__)
 
 
 class PlatformSpecification(PluginSpecification, ABC):
+    """
+    PlatformSpecification for Platform Plugins.
+    """
 
     @classmethod
     def get_name(cls, strip_all: bool = True) -> str:
         """
         Get name of plugin. By default we remove the PlatformSpecification portion.
+
         Args:
             strip_all: When true, PlatformSpecification is stripped from name. When false only Specification is Stripped
 
         Returns:
-
+            Name of plugin
         """
         if strip_all:
             ret = cls.__name__.replace("PlatformSpecification", '')
@@ -43,6 +52,7 @@ class PlatformSpecification(PluginSpecification, ABC):
         Example configuration for the platform. This is useful in help or error messages.
 
         Returns:
+            Example configuration
         """
         raise NotImplementedError("Plugin did not implement example_configuration")
 
@@ -61,6 +71,9 @@ class PlatformSpecification(PluginSpecification, ABC):
 
     @get_platform_type_spec
     def get_type(self) -> typing.Type['IPlatform']:
+        """
+        Get type of the Platform type.
+        """
         pass
 
     def get_configuration_aliases(self) -> typing.Dict[str, typing.Dict]:
@@ -75,9 +88,13 @@ class PlatformSpecification(PluginSpecification, ABC):
 
 
 class PlatformPlugins(SingletonMixin):
+    """
+    PlatformPlugin registry.
+    """
+
     def __init__(self, strip_all: bool = True) -> None:
         """
-        Initialize the Platform Registry. When strip all is false, the full plugin name will be used for names in map
+        Initialize the Platform Registry. When strip all is false, the full plugin name will be used for names in map.
 
         Args:
             strip_all: Whether to strip common parts of name from plugins in plugin map
@@ -94,10 +111,28 @@ class PlatformPlugins(SingletonMixin):
                 self._aliases[alias.upper()] = (spec, details)
 
     def get_plugins(self) -> typing.Set[PlatformSpecification]:
+        """
+        Get platform plugins.
+
+        Returns:
+            Platform plugins
+        """
         return set(self._plugins.values())
 
     def get_aliases(self) -> typing.Dict[str, typing.Tuple[PlatformSpecification, typing.Dict]]:
+        """
+        Get Platform Configuration Aliases for Platform Plugin.
+
+        Returns:
+            Platform CConfiguration Aliases
+        """
         return self._aliases
 
     def get_plugin_map(self) -> typing.Dict[str, PlatformSpecification]:
+        """
+        Get plugin map for Platform Plugins.
+
+        Returns:
+            Plugin map
+        """
         return self._plugins

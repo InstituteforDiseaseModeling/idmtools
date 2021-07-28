@@ -1,3 +1,7 @@
+"""idmtools local platform database configuration.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import logging
 import os
 from multiprocessing import cpu_count
@@ -19,6 +23,7 @@ default_url = "postgresql+psycopg2://idmtools:idmtools@idmtools_postgres/idmtool
 
 
 def create_db(engine):  # pragma: no cover
+    """Create our db if it doesn't exist."""
     from idmtools_platform_local.internals.data import Base
     logger.info("Creating database schema")
 
@@ -33,6 +38,7 @@ def create_db(engine):  # pragma: no cover
 
 
 def get_session() -> Session:  # pragma: no cover
+    """Get our DB session."""
     global session_factory
     if session_factory is None:
         logger.debug('Connecting to postgres with URI %s', os.getenv('SQLALCHEMY_DATABASE_URI', default_url))
@@ -43,14 +49,17 @@ def get_session() -> Session:  # pragma: no cover
 
 
 def get_db() -> Engine:  # pragma: no cover
+    """Get our db connection."""
     global engine
     if engine is None:
-        engine = create_engine(os.getenv('SQLALCHEMY_DATABASE_URI', default_url), echo=SQLALCHEMY_ECHO,
-                               pool_size=cpu_count())
+        engine = create_engine(os.getenv('SQLALCHEMY_DATABASE_URI', default_url), echo=SQLALCHEMY_ECHO, pool_size=cpu_count())
     return engine
 
 
 def reset_db():  # pragma: no cover
+    """
+    Restart postgres db connection.
+    """
     global engine
     logger.debug("Resetting db")
     engine = None
@@ -58,6 +67,18 @@ def reset_db():  # pragma: no cover
 
 
 def get_or_create(session: Session, model, filter_args: List[str], **model_args):  # pragma: no cover
+    """
+    Get or create our model.
+
+    Args:
+        session: db session
+        model: model to get/create
+        filter_args: filters to look for item with
+        **model_args: model args for creating
+
+    Returns:
+        Instance
+    """
     instance = session.query(model).filter_by(**{k: v for k, v in model_args.items() if k in filter_args}).first()
     if instance:
         return instance

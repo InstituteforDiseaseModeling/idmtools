@@ -55,4 +55,4 @@ The following python code and comments, from the :py:class:`~idmtools.analysis.c
         # NOTE: If running twice with different filename, the output files will collide
         results.to_csv(os.path.join("output_csv", self.__class__.__name__ + '.csv'))
 
-You can quickly see this analyzer in use by running the included :py:class:`~idmtools.examples.analyzers.example_analysis_CSVAnalyzer` example class.
+You can quickly see this analyzer in use by running the included :py:class:`~idmtools.analysis.csv_analyzer.CSVAnalyzer` example class.

@@ -1,3 +1,7 @@
+"""idmtools local platform simulation operations.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import os
 from collections import defaultdict
 from dataclasses import dataclass
@@ -29,13 +33,16 @@ user_logger = getLogger('user')
 
 @dataclass
 class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
-
+    """
+    Provides Simulation Operations to the Local Platform.
+    """
     platform: 'LocalPlatform'  # noqa F821
     platform_type: type = SimulationDict
 
     def get(self, simulation_id: UUID, **kwargs) -> Dict:
         """
-        Fetch simulation with specified id
+        Fetch simulation with specified id.
+
         Args:
             simulation_id: simulation id
             **kwargs:
@@ -47,7 +54,7 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
 
     def platform_create(self, simulation: Simulation, **kwargs) -> Dict:
         """
-        Create a simulation object
+        Create a simulation object.
 
         Args:
             simulation: Simulation to create
@@ -133,19 +140,20 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
     @staticmethod
     def __create_simulation_metadata(simulation: Simulation):
         """
+        Encode simulation data to metadata.
 
         Args:
-            simulation:
+            simulation: Simulation to encode.
 
         Returns:
-
+            IDM Metadata.
         """
         extra_details = dict(metadata=json.loads(json.dumps(simulation.to_dict(), cls=IDMJSONEncoder)))
         return extra_details
 
     def get_parent(self, simulation: SimulationDict, **kwargs) -> ExperimentDict:
         """
-        Get the parent of a simulation, aka its experiment
+        Get the parent of a simulation, aka its experiment.
 
         Args:
             simulation: Simulation to get parent from
@@ -158,25 +166,26 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
 
     def platform_run_item(self, simulation: Simulation, **kwargs):
         """
-        On the local platform, simulations are ran by queue and commissioned through create
+        On the local platform, simulations are ran by queue and commissioned through create.
+
         Args:
             simulation:
 
         Returns:
-
+            None
         """
         pass
 
     def send_assets(self, simulation: Simulation, worker: Container = None, **kwargs):
         """
-        Transfer assets to local sim folder for simulation
+        Transfer assets to local sim folder for simulation.
 
         Args:
             simulation: Simulation object
             worker: docker worker containers. Useful in batches
 
         Returns:
-
+            None
         """
         # Go through all the assets
         path = "/".join(["/data", simulation.experiment.uid, simulation.uid])
@@ -188,20 +197,20 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
 
     def refresh_status(self, simulation: Simulation, **kwargs):
         """
-        Refresh status of a sim
+        Refresh status of a sim.
 
         Args:
             simulation:
 
         Returns:
-
+            None
         """
         latest = self.get(simulation.uid)
         simulation.status = local_status_to_common(latest['status'])
 
     def get_assets(self, simulation: Simulation, files: List[str], **kwargs) -> Dict[str, bytearray]:
         """
-        Get assets for a specific simulation
+        Get assets for a specific simulation.
 
         Args:
             simulation: Simulation object to fetch files for
@@ -235,7 +244,7 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
     @staticmethod
     def __get_simulation_path(platform: 'LocalPlatform', simulation: Simulation) -> str:
         """
-        Returns the full simulation path on disk
+        Returns the full simulation path on disk.
 
         Args:
             platform: Platform object(with config)
@@ -249,13 +258,13 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
 
     def list_assets(self, simulation: Simulation, **kwargs) -> List[Asset]:
         """
-        List assets for a sim
+        List assets for a sim.
 
         Args:
             simulation: Simulation object
 
         Returns:
-
+            List of assets
         """
         assets = []
         sim_path = self.__get_simulation_path(self.platform, simulation)
@@ -273,7 +282,7 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
     def to_entity(self, local_sim: Dict, load_task: bool = False, parent: Optional[Experiment] = None, **kwargs) -> \
             Simulation:
         """
-        Convert a sim dict object to an ISimulation
+        Convert a sim dict object to an ISimulation.
 
         Args:
             local_sim: simulation to convert
@@ -329,7 +338,8 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
     @staticmethod
     def __convert_json_assets_to_assets(asset: Dict, simulation_path: str, asset_collection: AssetCollection):
         """
-        Convert JSON Assets from Metadata to IDM Metadata
+        Convert JSON Assets from Metadata to IDM Metadata.
+
         Args:
             asset: Asset dict
             simulation_path: Path to simulation files
@@ -337,7 +347,6 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
 
         Returns:
             None. It modifies the passed in asset_collection
-
         """
         args = dict()
         if 'absolute_path' in asset:
@@ -353,16 +362,16 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
 
     def _retrieve_output_files(self, job_id_path: str, paths: Union[List[str], Set[str]]) -> List[bytes]:
         """
-        Retrieves output files
+        Retrieves output files.
+
         Args:
             job_id_path: For experiments, this should just be the id. For simulations, the path should be
             experiment_id/simulation id
             paths:
 
         Returns:
-
+            List of output file content
         """
-
         byte_arrs = []
 
         for path in paths:
@@ -376,7 +385,8 @@ class LocalPlatformSimulationOperations(IPlatformSimulationOperations):
 
     def _assets_to_copy_multiple_list(self, path, assets):
         """
-        Batch copies a set of items assets to a grouped by path
+        Batch copies a set of items assets to a grouped by path.
+
         Args:
             path: Target path
             assets: Assets to copy

@@ -1,3 +1,10 @@
+"""idmtools assetize output work item.
+
+Notes:
+    - TODO add example heres
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 from pathlib import PurePath
 from uuid import UUID
 from dataclasses import dataclass, field
@@ -12,28 +19,47 @@ from idmtools_platform_comps.utils.file_filter_workitem import FileFilterWorkIte
 
 @dataclass(repr=False)
 class AssetizeOutput(FileFilterWorkItem):
+    """
+    AssetizeOutput allows creating assets from previously ran items in COMPS.
+
+    Notes:
+        - TODO link examples here.
+    """
     # Dictionary of tags to apply to the results asset collection
     asset_tags: Dict[str, str] = field(default_factory=dict)
     #: The asset collection created by Assetize
     asset_collection: AssetCollection = field(default=None)
 
     def __post_init__(self, item_name: str, asset_collection_id: UUID, asset_files: FileList, user_files: FileList, command: str):
+        """Constructor AssetizeOutput init."""
         self._ssmt_script = str(PurePath(__file__).parent.joinpath("assetize_ssmt_script.py"))
         super().__post_init__(item_name, asset_collection_id, asset_files, user_files, command)
 
     def _extra_command_args(self, command: str):
+        """Add our tags to the command."""
         for name, value in self.asset_tags.items():
             command += f' --asset-tag "{name}={value}"'
         return command
 
     def _filter_workitem_pre_creation(self, platform):
+        """
+        Callback to allow for pre-creation calls.
+
+        In our case, we check if tags exist. If no tags exists, we use our defalts ones.
+
+        Args:
+            platform: Platform we are creating on.
+
+        Returns:
+            None
+        """
         super(AssetizeOutput, self)._filter_workitem_pre_creation(platform)
         if len(self.asset_tags) == 0:
             self.__generate_tags()
 
     def __generate_tags(self):
         """
-        Add the defaults tags to the WorkItem
+        Add the defaults tags to the WorkItem.
 
         Returns:
             None
@@ -49,10 +75,10 @@ class AssetizeOutput(FileFilterWorkItem):
 
     def run(self, wait_until_done: bool = False, platform: 'IPlatform' = None, wait_on_done_progress: bool = True, wait_on_done: bool = True, **run_opts) -> Union[AssetCollection, None]:
         """
-        Run the AssetizeOutput
+        Run the AssetizeOutput.
 
         Args:
-            wait_until_done: Wait until Done will wait for the workitem to complet
+            wait_until_done: Wait until Done will wait for the workitem to complete
             platform: Platform Object
             wait_on_done_progress: When set to true, a progress bar will be shown from the item
             wait_on_done: Wait for item to be done. This will first wait on any dependencies
@@ -68,7 +94,7 @@ class AssetizeOutput(FileFilterWorkItem):
 
     def wait(self, wait_on_done_progress: bool = True, timeout: int = None, refresh_interval=None, platform: 'IPlatform' = None) -> Union[AssetCollection, None]:
         """
-        Waits on Assetize Workitem to finish. This first waits on any dependent items to finish(Experiment/Simulation/WorkItems)
+        Waits on Assetize Workitem to finish. This first waits on any dependent items to finish(Experiment/Simulation/WorkItems).
 
         Args:
             wait_on_done_progress: When set to true, a progress bar will be shown from the item

@@ -1,3 +1,10 @@
+"""
+We define our map entry items here for analysis framework.
+
+Most of these function are used either to initialize a thread or to handle exceptions while executing.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import itertools
 import traceback
 from logging import getLogger, DEBUG
@@ -38,6 +45,7 @@ def map_item(item: IItem) -> NoReturn:
 
 def _get_mapped_data_for_item(item: IEntity, analyzers: TAnalyzerList, platform: 'IPlatform') -> Dict[Union[str, UUID], Dict]:
     """
+    Get mapped data from an item.
 
     Args:
         item: The :class:`~idmtools.entities.iitem.IItem` object to call analyzer

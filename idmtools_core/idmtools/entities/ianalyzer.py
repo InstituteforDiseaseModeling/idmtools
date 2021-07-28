@@ -1,3 +1,8 @@
+"""
+Defines our IAnalyzer interface used as base of all other analyzers.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 from abc import ABCMeta, abstractmethod
 from logging import getLogger
 from typing import Any, NoReturn, List, TypeVar, Dict, Optional, Union, TYPE_CHECKING
@@ -8,17 +13,21 @@ if TYPE_CHECKING:
     from idmtools.entities.simulation import Simulation
 
 logger = getLogger(__name__)
+# Items that we support analysis on
+ANALYZABLE_ITEM = Union['IWorkflowItem', 'Simulation']
+# The item type we pass to analysis
+ANALYSIS_ITEM_MAP_DATA_TYPE = Dict[str, Any]
+# The datatype if the reduce input
+ANALYSIS_REDUCE_DATA_TYPE = Dict[ANALYZABLE_ITEM, Any]
 
 
 class IAnalyzer(metaclass=ABCMeta):
     """
-    An abstract base class carrying the lowest level analyzer interfaces called by
-     :class:`~idmtools.managers.experiment_manager.ExperimentManager`.
+    An abstract base class carrying the lowest level analyzer interfaces called by :class:`~idmtools.managers.experiment_manager.ExperimentManager`.
     """
 
     @abstractmethod
-    def __init__(self, uid=None, working_dir: Optional[str] = None, parse: bool = True,
-                 filenames: Optional[List[str]] = None):
+    def __init__(self, uid=None, working_dir: Optional[str] = None, parse: bool = True, filenames: Optional[List[str]] = None):
         """
         A constructor.
 
@@ -57,7 +66,7 @@ class IAnalyzer(metaclass=ABCMeta):
         """
         pass
 
-    def filter(self, item: Union['IWorkflowItem', 'Simulation']) -> bool:
+    def filter(self, item: ANALYZABLE_ITEM) -> bool:
         """
         Decide whether the analyzer should process a simulation.
 
@@ -70,7 +79,7 @@ class IAnalyzer(metaclass=ABCMeta):
         return True
 
     @abstractmethod
-    def map(self, data: Dict[str, Any], item: Union['IWorkflowItem', 'Simulation']) -> Any:
+    def map(self, data: ANALYSIS_ITEM_MAP_DATA_TYPE, item: ANALYZABLE_ITEM) -> Any:
         """
         In parallel for each simulation, consume raw data from filenames and emit selected data.
 
@@ -84,7 +93,7 @@ class IAnalyzer(metaclass=ABCMeta):
         return None
 
     @abstractmethod
-    def reduce(self, all_data: Dict[Union['IWorkflowItem', 'Simulation'], Any]) -> Any:
+    def reduce(self, all_data: ANALYSIS_REDUCE_DATA_TYPE) -> Any:
         """
         Combine the :meth:`map` data for a set of items into an aggregate result.
 
@@ -103,8 +112,21 @@ class IAnalyzer(metaclass=ABCMeta):
 # Alias IAnalyzer for computability with old code but print a deprecation warning
 
 class BaseAnalyzer(IAnalyzer, metaclass=ABCMeta):
-    def __init__(self, uid=None, working_dir: Optional[str] = None, parse: bool = True,
-                 filenames: Optional[List[str]] = None):
+    """
+    BaseAnalyzer to allow using previously used dtk-tools analyzers within idmtools.
+    """
+
+    def __init__(self, uid=None, working_dir: Optional[str] = None, parse: bool = True, filenames: Optional[List[str]] = None):
+        """
+        Constructor for Base Analyzer.
+
+        Args:
+            uid: The unique id identifying this analyzer.
+            working_dir: A working directory to place files.
+            parse: True to leverage the :class:`OutputParser`; False to get the raw
+                data in the :meth:`select_simulation_data`.
+            filenames: The files for the analyzer to download.
+        """
         logger.warning('Base analyzer name will soon be deprecated in favor of IAnalyzer')
         super().__init__(uid, working_dir, parse, filenames)
 
