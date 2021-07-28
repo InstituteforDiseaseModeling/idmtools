@@ -3,7 +3,7 @@
 =====
 
 
-1.3.0 - Bugs
+Bugs
 ------------
 * `#0921 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/921>`_ - PlatformAnalysis requires login before execution
 * `#0937 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/937>`_ - RequirementsToAssetCollection fail with Max length
@@ -12,7 +12,7 @@
 * `#0984 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/984>`_ - Make idmtools_metadata.json default to off
 
 
-1.3.0 - Documentation
+Documentation
 ---------------------
 * `#0481 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/481>`_ - Overview of the local platform
 * `#0483 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/483>`_ - Monitoring local experiments
@@ -22,22 +22,22 @@
 * `#0969 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/969>`_ - Create base documentation for creating a new platform plugin
 
 
-1.3.0 - Feature Request
+Feature Request
 -----------------------
 * `#0830 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/830>`_ - Support for python 3.8
 * `#0924 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/924>`_ - YamlSimulationBuilder should accept a single function to be mapped to all values
 
 
-1.3.0 - Models
+Models
 --------------
 * `#0834 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/834>`_ - Add a COVASIM example with idmtools
 
 
-1.3.0 - Platforms
+Platforms
 -----------------
 * `#0852 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/852>`_ - Add emodpy to SSMT image
 
 
-1.3.0 - User Experience
+User Experience
 -----------------------
 * `#0682 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/682>`_ - Support full query criteria on COMPS items

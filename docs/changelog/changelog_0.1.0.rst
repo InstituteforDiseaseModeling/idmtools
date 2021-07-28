@@ -4,12 +4,12 @@
 =====
 
 
-0.1.0 - Analyzers
+Analyzers
 -----------------
 * `#0060 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/60>`_ - Analyzer base class
 
 
-0.1.0 - Bugs
+Bugs
 ------------
 * `#0095 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/95>`_ - idmtools is not working for python 3.6
 * `#0096 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/96>`_ - pytest (and pytest-runner) should be installed by setup 
@@ -32,20 +32,20 @@
 * `#0206 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/206>`_ - test_python_simulation.py failed for all local test in windows
 
 
-0.1.0 - CLI
+CLI
 -----------
 * `#0007 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/7>`_ - Command line functions definition
 * `#0118 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/118>`_ - Add the printing of children in the EntityContainer
 
 
-0.1.0 - Configuration
+Configuration
 ---------------------
 * `#0047 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/47>`_ - Configuration file read on a per-folder basis
 * `#0048 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/48>`_ - Validation for the configuration file
 * `#0049 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/49>`_ - Configuration file is setting correct parameters in platform
 
 
-0.1.0 - Core
+Core
 ------------
 * `#0006 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/6>`_ - Service catalog
 * `#0014 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/14>`_ - Package organization and pre-requisites
@@ -60,20 +60,20 @@
 * `#0180 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/180>`_ - switch prettytable for tabulate
 
 
-0.1.0 - Documentation
+Documentation
 ---------------------
 * `#0004 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/4>`_ - Notebooks exploration for examples
 * `#0085 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/85>`_ - Setup Sphinx and GitHub pages for the docs
 * `#0090 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/90>`_ - "Development installation steps" missing some steps
 
 
-0.1.0 - Models
+Models
 --------------
 * `#0008 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/8>`_ - Which models support out of the box?
 * `#0136 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/136>`_ - Create an envelope argument for the PythonSimulation 
 
 
-0.1.0 - Platforms
+Platforms
 -----------------
 * `#0068 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/68>`_ - [Local Runner] Simulation status monitoring
 * `#0069 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/69>`_ - [Local Runner] Database

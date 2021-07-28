@@ -3,7 +3,7 @@
 =====
 
 
-1.0.0 - Analyzers
+Analyzers
 -----------------
 * `#0034 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/34>`_ - Create the Plotting step 
 * `#0057 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/57>`_ - Output files retrieval
@@ -23,7 +23,7 @@
 * `#0619 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/619>`_ - Ability to get exp sim object ids in analyzers
 
 
-1.0.0 - Bugs
+Bugs
 ------------
 * `#0124 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/124>`_ - Can not run tests\test_python_simulation.py from console
 * `#0125 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/125>`_ - relative_path for AssetCollection does not work
@@ -89,7 +89,7 @@
 * `#0667 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/667>`_ - analyzer_manager could stuck on _run_and_wait_for_reducing
 
 
-1.0.0 - CLI
+CLI
 -----------
 * `#0009 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/9>`_ - Boilerplate command
 * `#0118 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/118>`_ - Add the printing of children in the EntityContainer
@@ -101,14 +101,14 @@
 * `#0252 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/252>`_ - Add --debug to cli main level
 
 
-1.0.0 - Configuration
+Configuration
 ---------------------
 * `#0248 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/248>`_ - Logging needs to support user configuration through the idmtools.ini
 * `#0392 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/392>`_ - Improve IdmConfigParser: make decorator for ensure_ini() method...
 * `#0597 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/597>`_ - Platform should not be case sensitive.
 
 
-1.0.0 - Core
+Core
 ------------
 * `#0032 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/32>`_ - Create NextPointAlgorithm Step
 * `#0042 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/42>`_ - Stabilize the IStep object
@@ -157,12 +157,12 @@
 * `#0681 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/681>`_ - idmtools should have way to query comps with filter
 
 
-1.0.0 - Developer/Test
+Developer/Test
 ----------------------
 * `#0631 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/631>`_ - Ensure setup.py is consistent throughout
 
 
-1.0.0 - Documentation
+Documentation
 ---------------------
 * `#0100 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/100>`_ - Installation steps documented for users
 * `#0312 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/312>`_ - idmtools: there is a typo in README
@@ -176,7 +176,7 @@
 * `#0632 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/632>`_ - Update idmtools_core setup.py to remove model emod from idm install
 
 
-1.0.0 - Feature Request
+Feature Request
 -----------------------
 * `#0061 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/61>`_ - Built-in DownloadAnalyzer
 * `#0064 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/64>`_ - Support of CSV files
@@ -186,7 +186,7 @@
 * `#0603 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/603>`_ - Implement install custom requirement libs to asset collection with WorkItem
 
 
-1.0.0 - Models
+Models
 --------------
 * `#0021 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/21>`_ - Python model
 * `#0024 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/24>`_ - R Model support
@@ -203,7 +203,7 @@
 * `#0535 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/535>`_ - Create DockerTask
 
 
-1.0.0 - Platforms
+Platforms
 -----------------
 * `#0025 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/25>`_ - LOCAL Platform
 * `#0027 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/27>`_ - SSMT Platform
@@ -244,6 +244,6 @@
 * `#0677 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/677>`_ - ssmt: refresh_status returns None
 
 
-1.0.0 - User Experience
+User Experience
 -----------------------
 * `#0457 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/457>`_ - Option to analyze failed simulations

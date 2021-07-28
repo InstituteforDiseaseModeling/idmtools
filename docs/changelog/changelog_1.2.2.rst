@@ -4,7 +4,7 @@
 =====
 
 
-1.2.2 - Dependencies
+Dependencies
 --------------------
 * `#0929 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/929>`_ - Update psycopg2-binary requirement from ~=2.8.4 to ~=2.8.5
 * `#0930 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/930>`_ - Bump pandas from 0.24.2 to 1.0.5

@@ -3,7 +3,7 @@
 =====
 
 
-1.6.1 - Bugs
+Bugs
 ------------
 * `#0300 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/300>`_ - Canceling simulations using cli's Restful api throws Internal server error (Local Platform)
 * `#0462 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/462>`_ - Redis port configuration not working (Local Platform)
@@ -18,7 +18,7 @@
 * `#1244 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1244>`_ - Logging should fall back to console if the log file cannot be opened
 
 
-1.6.1 - CLI
+CLI
 -----------
 * `#1167 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1167>`_ - idmtools config CLI command should have option to use global path
 * `#1237 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1237>`_ - Add ability to suppress outputs for CLI commands that might generate pipe-able output
@@ -26,12 +26,12 @@
 * `#1236 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1236>`_ - Add COMPS Login command to CLI
 
 
-1.6.1 - Configuration
+Configuration
 ---------------------
 * `#1242 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1242>`_ - Enable loading configuration options from environment variables
 
 
-1.6.1 - Core
+Core
 ------------
 * `#0571 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/571>`_ - Support multi-cores(MPI) on COMPS through num_cores
 * `#1220 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1220>`_ - Workflow items should use name
@@ -41,7 +41,7 @@
 * `#1224 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1224>`_ - Support creating AssetCollection from list of file paths
 
 
-1.6.1 - Dependencies
+Dependencies
 --------------------
 * `#1136 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1136>`_ - Remove marshmallow as a dependency
 * `#1207 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1207>`_ - Update pytest requirement from ~=6.1.0 to ~=6.1.1
@@ -56,12 +56,12 @@
 * `#1251 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1251>`_ - Update junitparser requirement from ~=1.4.1 to ~=1.4.2
 
 
-1.6.1 - Documentation
+Documentation
 ---------------------
 * `#1134 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1134>`_ - Add a copy to clipboard option to source code and command line examples in documentation
 
 
-1.6.1 - Feature Request
+Feature Request
 -----------------------
 * `#1121 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1121>`_ - Experiment should error if no simulations are defined
 * `#1148 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1148>`_ - Support global configuration file for idmtools from user home directory/local app directory or specified using an Environment Variable
@@ -74,13 +74,13 @@
 * `#1247 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1247>`_ - Add support for singularity to the local platform
 
 
-1.6.1 - Platforms
+Platforms
 -----------------
 * `#0230 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/230>`_ - Entities should support created_on/modified_on fields on the Local Platform
 * `#0324 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/324>`_ - Detect changes to Local Platform config
 
 
-1.6.1 - User Experience
+User Experience
 -----------------------
 * `#1127 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1127>`_ - IDMtools install should not include emodpy, emodapi, etc when installing with idmtools[full]
 * `#1141 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1141>`_ - Add warning when user is using a development version of idmtools
@@ -90,7 +90,7 @@
 * `#1241 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1241>`_ - Support disabling progress bars with environment variable or config
 
 
-1.6.1 - Special Notes
+Special Notes
 =====================
 * If you encounter an issue with matplotlib after install, you may need to run `pip install matplotlib --force-reinstall`
 * Workitems will require a Task starting in 1.7.0

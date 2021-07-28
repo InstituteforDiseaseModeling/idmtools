@@ -69,6 +69,9 @@ autodoc_default_options = {
 autodoc_mock_imports = ['pika',
                         'dramatiq']
 
+suppress_warnings = [
+    'autosectionlabel.changlog*',
+]
 
 napoleon_google_docstring = True
 # napoleon_numpy_docstring = True

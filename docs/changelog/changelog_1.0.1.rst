@@ -4,12 +4,12 @@
 =====
 
 
-1.0.1 - Analyzers
+Analyzers
 -----------------
 * `#0778 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/778>`_ - Add support for context platforms to analyzer manager
 
 
-1.0.1 - Bugs
+Bugs
 ------------
 * `#0637 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/637>`_ - pytest: ValueError: I/O operation on closed file, Printed at the end of tests.
 * `#0663 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/663>`_ - SSMT PlatformAnalysis can not put 2 analyzers in same file as main entry
@@ -25,14 +25,14 @@
 * `#0791 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/791>`_ - Missing asset file with RequirementsToAssetCollection
 
 
-1.0.1 - Core
+Core
 ------------
 * `#0343 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/343>`_ - Genericize experiment_factory to work for other items
 * `#0611 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/611>`_ - Consider excluding idmtools.log and COMPS_log.log on SSMT WI submission
 * `#0737 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/737>`_ - Remove standalone builder in favor of regular python
 
 
-1.0.1 - Developer/Test
+Developer/Test
 ----------------------
 * `#0083 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/83>`_ - Setup python linting for the Pull requests
 * `#0671 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/671>`_ - Python Linting
@@ -42,7 +42,7 @@
 * `#0794 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/794>`_ - build idmtools_platform_local fail with idmtools_webui error
 
 
-1.0.1 - Documentation
+Documentation
 ---------------------
 * `#0015 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/15>`_ - Add cookiecutter projects
 * `#0423 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/423>`_ - Create a clear document on what features are provided by what packages
@@ -85,7 +85,7 @@
 * `#0751 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/751>`_ - Switch to apidoc generated RSTs for modules and remove from source control
 
 
-1.0.1 - Feature Request
+Feature Request
 -----------------------
 * `#0059 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/59>`_ - Chaining of Analyzers
 * `#0097 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/97>`_ - Ability to batch simulations within simulation
@@ -94,7 +94,7 @@
 * `#0786 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/786>`_ - Improve Suite support
 
 
-1.0.1 - Platforms
+Platforms
 -----------------
 * `#0277 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/277>`_ - Need way to add tags to COMPSPlatform ACs after creation
 * `#0638 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/638>`_ - Change print statement to logger in python_requirements_ac utility
@@ -105,7 +105,7 @@
 * `#0757 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/757>`_ - Set PYTHONPATH on Slurm
 
 
-1.0.1 - User Experience
+User Experience
 -----------------------
 * `#0760 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/760>`_ - Email for issues and feature requests
 * `#0781 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/781>`_ - Suites should support run on object

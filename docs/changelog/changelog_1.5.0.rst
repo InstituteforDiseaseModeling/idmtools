@@ -3,7 +3,7 @@
 =====
 
 
-1.5.0 - Bugs
+Bugs
 ------------
 * `#0459 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/459>`_ - There is no way to add simulations to existing experiment
 * `#0840 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/840>`_ - Experiment and Suite statuses not updated properly after success
@@ -22,7 +22,7 @@
 * `#1098 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1098>`_ - Add experiment id to CSVAnalyzer and TagAnalyzer
 
 
-1.5.0 - Dependencies
+Dependencies
 --------------------
 * `#1075 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1075>`_ - Update sphinx requirement from ~=3.2.0 to ~=3.2.1
 * `#1077 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1077>`_ - Update sqlalchemy requirement from ~=1.3.18 to ~=1.3.19
@@ -37,12 +37,12 @@
 * `#1108 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1108>`_ - Update pytest requirement from ~=6.0.1 to ~=6.0.2
 
 
-1.5.0 - Documentation
+Documentation
 ---------------------
 * `#1073 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1073>`_ - Update example and tests to use platform context
 
 
-1.5.0 - Feature Request
+Feature Request
 -----------------------
 * `#1064 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1064>`_ - Allow running without a idmtools.ini file
 * `#1068 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1068>`_ - COMPPlatform should allow commissioning as it goes
