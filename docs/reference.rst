@@ -24,8 +24,8 @@ Core and job orchestration
 .. uml:: /diagrams/core.puml
 
 
-Local platform
---------------
+Local platform Reference
+------------------------
 
 .. uml:: /diagrams/local.puml
 

@@ -1,6 +1,6 @@
-=========
-Platforms
-=========
+=============
+CLI Platforms
+=============
 
 |IDM_s| includes commands for managing the local platform. To see the list of commands
 type the following at a command prompt.

@@ -51,7 +51,10 @@ extensions = [
     'sphinxcontrib.programoutput',
     'sphinx_copybutton',
     'sphinxext.remoteliteralinclude',
-    'sphinx.ext.intersphinx'
+    # intersphinx to allow cross-reference
+    'sphinx.ext.intersphinx',
+    # automatic section names so linking between section is easy
+    'sphinx.ext.autosectionlabel'
 ]
 
 plantuml = 'plantweb'

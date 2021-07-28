@@ -1,7 +1,5 @@
-.. _Assetize Outputs:
-
-Assetize outputs
-================
+Assetize outputs Workitem
+=========================
 
 Assetizing outputs allows you to create an :py:class:`~idmtools.assets.asset_collection.AssetCollection`
 from the outputs of a previous :py:class:`~idmtools.entities.experiment.Experiment`,
@@ -22,7 +20,7 @@ the ".log", "StdOut.txt", "StdErr.txt", and "WorkOrder.json" files.
 
 You can see a list of files that will be assetized without assetizing them by using the **dry_run** parameter. The file list will be in the output of the workitem.
 
-See the :ref:`Cookbook <Cookbook Assetize Outputs>` for examples of assetizing outputs.
+See the :ref:`Cookbook <Assetize Outputs>` for examples of assetizing outputs.
 
 Also review the class details :py:class:`~idmtools_platform_comps.utils.assetize_output.assetize_output.AssetizeOutput`
 
@@ -31,4 +29,4 @@ You can also run this command from the CLI. For details, see :ref:`COMPS CLI ref
 Errors
 ------
 
-See :ref:`COMPS Errors reference<COMPS_Errors>`
+See :ref:`COMPS Errors reference<COMPS Errors>`
