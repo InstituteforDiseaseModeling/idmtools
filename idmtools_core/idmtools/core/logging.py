@@ -183,15 +183,16 @@ def setup_logging(level: Union[int, str] = logging.WARN, filename: str = 'idmtoo
     return None
 
 
-def setup_handlers(level: int, filename, console: bool = False, file_level: int = None):
+def setup_handlers(level: int, filename, file_level: int, console: bool = False):
     """
     Setup Handlers for Global and user Loggers.
 
     Args:
         level: Level for the common logger
         filename: Log filename. Set to "" to disable file based logging
-        console: Enable console based logging only
         file_level: File Level logging
+        console: Enable console based logging
+
 
     Returns:
         FileHandler or None
