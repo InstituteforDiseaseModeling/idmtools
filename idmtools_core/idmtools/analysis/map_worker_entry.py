@@ -1,9 +1,10 @@
 import itertools
 import traceback
 from logging import getLogger, DEBUG
+from uuid import UUID
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.utils.file_parser import FileParser
-from typing import NoReturn, TYPE_CHECKING
+from typing import NoReturn, TYPE_CHECKING, Union, Dict
 from idmtools.core.interfaces.iitem import IItem
 from idmtools.entities.ianalyzer import TAnalyzerList
 from diskcache import Cache
@@ -24,17 +25,18 @@ def map_item(item: IItem) -> NoReturn:
         None
     """
     # Retrieve the global variables coming from the pool initialization
+
+    if logger.isEnabledFor(DEBUG):
+        logger.debug(f"Init items")
     analyzers = map_item.analyzers
-    cache = map_item.cache
     platform = map_item.platform
 
     if item.platform is None:
         item.platform = platform
+    return _get_mapped_data_for_item(item, analyzers, platform)
 
-    _get_mapped_data_for_item(item, analyzers, cache, platform)
 
-
-def _get_mapped_data_for_item(item: IEntity, analyzers: TAnalyzerList, cache: Cache, platform: 'IPlatform') -> bool:
+def _get_mapped_data_for_item(item: IEntity, analyzers: TAnalyzerList, platform: 'IPlatform') -> Dict[Union[str, UUID], Dict]:
     """
 
     Args:
@@ -42,101 +44,52 @@ def _get_mapped_data_for_item(item: IEntity, analyzers: TAnalyzerList, cache: Ca
             :meth:`~idmtools.analysis.AddAnalyzer.map` methods on.
         analyzers: The :class:`~idmtools.analysis.IAnalyzer` items with
             :meth:`~idmtools.analysis.AddAnalyzer.map` methods to call on the provided items.
-        cache: The disk cache object to store item :meth:`~idmtools.analysis.AddAnalyzer.map`
-            results in.
         platform: A platform object to query for information.
 
     Returns:
         False if an exception occurred; else True (succeeded).
 
     """
-    # determine which analyzers (and by extension, which filenames) are applicable to this item
-    # ensure item has a platform
-    item.platform = platform
     try:
+        # determine which analyzers (and by extension, which filenames) are applicable to this item
+        # ensure item has a platform
+        item.platform = platform
         analyzers_to_use = [a for a in analyzers if a.filter(item)]
         analyzer_uids = [a.uid for a in analyzers]
-    except Exception:
-        analyzer_uids = [a.uid for a in analyzers]
-        _set_exception(step="Item filtering",
-                       info={"Item": item, "Analyzers": ", ".join(analyzer_uids)},
-                       cache=cache)
 
-    filenames = set(itertools.chain(*(a.filenames for a in analyzers_to_use)))
+        filenames = set(itertools.chain(*(a.filenames for a in analyzers_to_use)))
 
-    if logger.isEnabledFor(DEBUG):
-        logger.debug(f"Analyzers to use on item: {str(analyzer_uids)}")
-        logger.debug(f"Filenames to analyze: {filenames}")
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f"Analyzers to use on item: {str(analyzer_uids)}")
+            logger.debug(f"Filenames to analyze: {filenames}")
 
-    # The byte_arrays will associate filename with content
-    try:
-        file_data = platform.get_files(item, filenames)  # make sure this does NOT error when filenames is empty
-    except Exception as e:
-        logger.error(e)
-        # an error has occurred
-        analyzer_uids = [a.uid for a in analyzers]
-        _set_exception(step="data retrieval",
-                       info={"Item": item, "Analyzers": ", ".join(analyzer_uids), "Files": ", ".join(filenames)},
-                       cache=cache)
-        return False
-
-    # Selected data will be a dict with analyzer.uid: data  entries
-    selected_data = {}
-    for analyzer in analyzers_to_use:
-        # If the analyzer needs the parsed data, parse
-        if analyzer.parse:
-            logger.debug(f'Parsing content for {analyzer.uid}')
-            try:
-                data = {filename: FileParser.parse(filename, content)
-                        for filename, content in file_data.items() if filename in analyzer.filenames}
-            except Exception as e:
-                logger.error(e)
-                _set_exception(step="data parsing",
-                               info={"Item": item, "Analyzer": analyzer.uid},
-                               cache=cache)
-                return False
+        # The byte_arrays will associate filename with content
+        if len(filenames) > 0:
+            file_data = platform.get_files(item, filenames)  # make sure this does NOT error when filenames is empty
         else:
-            # If the analyzer doesnt wish to parse, give the raw data
-            data = {filename: content for filename, content in file_data.items() if filename in analyzer.filenames}
+            file_data = dict()
 
-        # run the mapping routine for this analyzer and item
-        try:
+        # Selected data will be a dict with analyzer.uid: data  entries
+        selected_data = {}
+        for analyzer in analyzers_to_use:
+            # If the analyzer needs the parsed data, parse
+            if analyzer.parse:
+                logger.debug(f'Parsing content for {analyzer.uid}')
+                data = {filename: FileParser.parse(filename, content) for filename, content in file_data.items() if filename in analyzer.filenames}
+            else:
+                # If the analyzer doesnt wish to parse, give the raw data
+                data = {filename: content for filename, content in file_data.items() if filename in analyzer.filenames}
+
+            # run the mapping routine for this analyzer and item
             logger.debug("Running map on selected data")
             selected_data[analyzer.uid] = analyzer.map(data, item)
-        except Exception as e:
-            logger.error(e)
-            _set_exception(step="data processing", info={"Item": item, "Analyzer": analyzer.uid},
-                           cache=cache)
-            return False
 
-    # Store all analyzer results for this item in the result cache
-    if logger.isEnabledFor(DEBUG):
-        logger.debug(f"Setting result to cache on {item.uid}")
-
-    cache.set(item.uid, selected_data, retry=True,)
-    logger.debug(f"Wrote Setting result to cache on {item.uid}")
-    return True
-
-
-def _set_exception(step: str, info: dict, cache: Cache) -> NoReturn:
-    """
-    Set an exception in the cache in a standardized way.
-
-    Args:
-        step: The step that encountered an error.
-        info: A dictionary for additional information to add to the message.
-        cache: The cache object in which to set the exception.
-
-    Returns:
-
-    """
-    from idmtools_core.idmtools.analysis.analyze_manager import AnalyzeManager
-    logger.debug(f"Exception in {step}")
-
-    # construct exception message including traceback
-    message = f'\nAn exception has been raised during {step}.\n'
-    for key, value in info.items():
-        message += f'- {key}: {value}\n'
-    message += f'\n{traceback.format_exc()}\n'
-
-    cache.set(AnalyzeManager.EXCEPTION_KEY, message)
+        # Store all analyzer results for this item in the result cache
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f"Setting result to cache on {item.uid}")
+        logger.debug(f"Wrote Setting result to cache on {item.uid}")
+    except Exception as e:
+        e.item = item
+        logger.error(e)
+        raise e
+    return selected_data

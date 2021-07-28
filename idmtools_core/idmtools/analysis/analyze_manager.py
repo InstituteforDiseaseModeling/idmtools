@@ -1,19 +1,19 @@
 import os
 import sys
 import time
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from logging import getLogger, DEBUG
-from multiprocessing.pool import Pool
 from typing import NoReturn, List, Dict, Tuple, Optional, Union, TYPE_CHECKING
 from uuid import UUID
+from tqdm import tqdm
 from idmtools.analysis.map_worker_entry import map_item
 from idmtools.core import NoPlatformException
-from idmtools.core.cache_enabled import CacheEnabled
 from idmtools.core.enums import EntityStatus, ItemType
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.core.logging import VERBOSE, SUCCESS
 from idmtools.entities.ianalyzer import IAnalyzer
-from idmtools.utils.command_line import animation
 from idmtools.utils.language import on_off, verbose_timedelta
+
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
 
@@ -21,7 +21,7 @@ logger = getLogger(__name__)
 user_logger = getLogger('user')
 
 
-def pool_worker_initializer(func, analyzers, cache, platform: 'IPlatform') -> NoReturn:
+def pool_worker_initializer(func, analyzers, platform: 'IPlatform') -> NoReturn:
     """
     Initialize the pool worker, which allows the process pool to associate the analyzers, cache, and
     path mapping to the function executed to retrieve data. Using an initializer improves performance.
@@ -29,20 +29,16 @@ def pool_worker_initializer(func, analyzers, cache, platform: 'IPlatform') -> No
     Args:
         func: The function that the pool will call.
         analyzers: The list of all analyzers to run.
-        cache: The cache object.
         platform: The platform to communicate with to retrieve files from.
 
     Returns:
         None
     """
-    from idmtools import IdmConfigParser
-    IdmConfigParser()
     func.analyzers = analyzers
-    func.cache = cache
     func.platform = platform
 
 
-class AnalyzeManager(CacheEnabled):
+class AnalyzeManager:
     ANALYZE_TIMEOUT = 3600 * 8  # Maximum seconds before timing out - set to 8 hours
     WAIT_TIME = 1.15  # How much time to wait between check if the analysis is done
     EXCEPTION_KEY = '__EXCEPTION__'
@@ -58,7 +54,7 @@ class AnalyzeManager(CacheEnabled):
                  analyzers: List[IAnalyzer] = None, working_dir: str = None,
                  partial_analyze_ok: bool = False, max_items: Optional[int] = None, verbose: bool = True,
                  force_manager_working_directory: bool = False,
-                 exclude_ids: List[Union[str, UUID]] = None, analyze_failed_items: bool = False):
+                 exclude_ids: List[Union[str, UUID]] = None, analyze_failed_items: bool = False, max_workers: Optional[int] = None):
         """
         Initialize the AnalyzeManager
 
@@ -74,6 +70,7 @@ class AnalyzeManager(CacheEnabled):
             force_manager_working_directory (bool, optional): [description]. Defaults to False.
             exclude_ids (List[UUID], optional): [description]. Defaults to None.
             analyze_failed_items (bool, optional): Allows analyzing of failed items. Useful when you are trying to aggregate items that have failed. Defaults to False.
+            max_workers (int, optional): Set the max workers. If not provided, falls back to the configuration item *max_threads*. If max_threads is not set in configuration, defaults to CPU count
         """
         super().__init__()
         if working_dir is None:
@@ -81,8 +78,11 @@ class AnalyzeManager(CacheEnabled):
         self.configuration = configuration or {}
         self.platform = platform
         self.__check_for_platform_from_context(platform)
-        self.max_processes = self.configuration.get('max_threads', os.cpu_count())
+        if max_workers is not None and max_workers < 1:
+            raise ValueError("max_workers must be greater or equal to one")
+        self.max_processes = max_workers if max_workers is not None else self.configuration.get('max_threads', os.cpu_count())
         logger.debug(f'AnalyzeManager set to {self.max_processes}')
+        self.continue_on_error = False
 
         self.analyze_failed_items = analyze_failed_items
 
@@ -113,8 +113,8 @@ class AnalyzeManager(CacheEnabled):
 
         # These are leaf items to be ignored in analysis. Make sure they are UUID and then prune them from analysis.
         self.exclude_ids = exclude_ids or []
-        for index, id in enumerate(self.exclude_ids):
-            self.exclude_ids[index] = id if isinstance(id, UUID) else UUID(id)
+        for index, oid in enumerate(self.exclude_ids):
+            self.exclude_ids[index] = oid if isinstance(oid, UUID) else UUID(oid)
         self.potential_items = [item for item in self.potential_items if item.uid not in self.exclude_ids]
 
         logger.debug(f"Potential items to analyze: {len(self.potential_items)}")
@@ -167,9 +167,6 @@ class AnalyzeManager(CacheEnabled):
             A list of :class:`~idmtools.entities.iitem.IItem` objects.
 
         """
-        #
-        # ck4, review this behavior with the team/Benoit for interpretation re: current behavior
-
         # First sort items by whether they can currently be analyzed
         can_analyze = {}
         cannot_analyze = {}
@@ -241,25 +238,6 @@ class AnalyzeManager(CacheEnabled):
         # make sure each analyzer in self.analyzers has a unique uid
         self._update_analyzer_uids()
 
-    def _check_exception(self) -> bool:
-        """
-        Determines if an exception has occurred in the processing of items, printing any related information.
-
-        Returns:
-            A Boolean indicating if an exception has occurred.
-
-        """
-        exception = self.cache.get(self.EXCEPTION_KEY, default=None)
-        if exception:
-            if logger.isEnabledFor(DEBUG):
-                logger.debug(exception)
-            user_logger.error('\n' + exception)
-            sys.stdout.flush()
-            ex = True
-        else:
-            ex = False
-        return ex
-
     def _print_configuration(self, n_items: int, n_processes: int) -> NoReturn:
         """
         Display some information about an ongoing analysis.
@@ -281,16 +259,15 @@ class AnalyzeManager(CacheEnabled):
             user_logger.log(VERBOSE, f' |  - {analyzer.uid} File parsing: {on_off(analyzer.parse)} / Use '
                                      f'cache: {on_off(hasattr(analyzer, "cache"))}')
             if hasattr(analyzer, 'need_dir_map'):
-                user_logger.log(VERBOSE, ' | (Directory map: {}' % on_off(analyzer.need_dir_map))
+                user_logger.log(VERBOSE, f' | (Directory map: {on_off(analyzer.need_dir_map)}')
         user_logger.log(VERBOSE, f' | Pool of {n_processes} analyzing process(es)')
 
-    def _run_and_wait_for_mapping(self, worker_pool: Pool, start_time: float) -> bool:
+    def _run_and_wait_for_mapping(self, executor) -> Tuple[Dict, bool]:
         """
         Run and manage the mapping call on each item.
 
         Args:
-            worker_pool: A pool of workers.
-            start_time: A relative time for updating the user on runtime.
+            executor: A pool of workers.
 
         Returns:
             False if an exception occurred processing **.map** on any item; otherwise True (succeeded).
@@ -300,43 +277,34 @@ class AnalyzeManager(CacheEnabled):
         n_items = len(self._items)
         logger.debug(f"Number of items for analysis: {n_items}")
         logger.debug("Mapping the items for analysis")
-        results = worker_pool.map_async(map_item, self._items.values())
+        futures = dict()
+        results = dict()
+        status = True
+        with tqdm(total=len(self._items)) as progress:
+            for i in self._items.values():
+                future = executor.submit(map_item, i)
+                future.add_done_callback(lambda p: progress.update())
+                futures[future] = i
 
-        # Wait for the item map-results to be ready
-        while not results.ready():
-            # If an exception happen, kill everything and exit
-            if self._check_exception():
-                logger.debug("Terminating workerpool")
-                worker_pool.terminate()
-                return False
+            for future in as_completed(futures.keys()):
+                if future.exception():
+                    status = False
+                    ex = future.exception()
+                    user_logger.error(ex)
+                    if not self.continue_on_error:
+                        raise ex
+                else:
+                    results[futures[future]] = future.result()
 
-            time_elapsed = time.time() - start_time
-            if self.verbose:
-                sys.stdout.write('\r {} Analyzing {}/{}... {} elapsed'
-                                 .format(next(animation), len(self.cache), n_items, verbose_timedelta(time_elapsed)))
-                sys.stdout.flush()
-
-            if time_elapsed > self.ANALYZE_TIMEOUT:
-                raise self.TimeOutException('Timeout while waiting the analysis to complete...')
-
-            time.sleep(self.WAIT_TIME)
-
-        # Verify that no simulation failed to process properly one last time.
-        # ck4, should we error out if there is a failure rather than printing and continuing?? Ask Benoit.
-        if self._check_exception():
-            logger.debug("Terminating workerpool")
-            worker_pool.terminate()
-            return False
-        status = results.successful()
         logger.debug(f"Result fetching status: : {status}")
-        return status
+        return results, status
 
-    def _run_and_wait_for_reducing(self, worker_pool: Pool) -> dict:
+    def _run_and_wait_for_reducing(self, executor, results) -> dict:
         """
         Run and manage the reduce call on the combined item results (by analyzer).
 
         Args:
-            worker_pool: A pool of workers.
+            executor: A pool of workers.
 
         Returns:
             An analyzer ID keyed dictionary of finalize results.
@@ -344,24 +312,38 @@ class AnalyzeManager(CacheEnabled):
         """
         # the keys in self.cache from map() calls are expected to be item ids. Each keyed value
         # contains analyzer_id: item_results_for_analyzer entries.
-        logger.debug("Finalizing results")
+        logger.debug("Running reduce results")
+        futures = {}
         finalize_results = {}
-        with self.cache.transact():
+        # with self.cache.transact():
+        with tqdm(total=len(self.analyzers), desc="Running Analyzer Reduces") as progress:
             for analyzer in self.analyzers:
+                logger.debug(f"Gather data for {analyzer.uid}")
                 item_data_for_analyzer = {}
-                for item_id in self.cache:
-                    logger.debug(f"Finalizing {item_id}")
-                    item = self._items[item_id]
-                    item_result = self.cache.get(item_id)
-                    item.platform = self.platform
-                    item_data_for_analyzer[item] = item_result.get(analyzer.uid, None)
-                finalize_results[analyzer.uid] = worker_pool.apply_async(analyzer.reduce, (item_data_for_analyzer, ))
+                for item, data in results.items():
+                    if analyzer.uid in data:
+                        item_data_for_analyzer[item] = data[analyzer.uid]
+                future = executor.submit(analyzer.reduce, item_data_for_analyzer)
+                future.add_done_callback(lambda p: progress.update())
+
+                logger.debug(f"Queueing {analyzer.uid}")
+                futures[future] = analyzer.uid
 
             # wait for results and clean up multiprocessing
-            worker_pool.close()
-            worker_pool.join()
+            logger.debug("Waiting for results")
+            for future in as_completed(futures.keys()):
+                if future.exception():
+                    user_logger.error(f'Reduce for Analyzer {futures[future]} failed')
+                    user_logger.exception(future.exception())
+                    user_logger.error("See log for details")
+                    if not self.continue_on_error:
+                        sys.exit(-1)
+                else:
+                    finalize_results[futures[future]] = future.result()
             if logger.isEnabledFor(DEBUG):
-                logger.debug("Finished finalizing results")
+                logger.debug("Finished reducing results")
+            for future in futures.keys():
+                future.cancel()
         return finalize_results
 
     def analyze(self) -> bool:
@@ -398,10 +380,6 @@ class AnalyzeManager(CacheEnabled):
 
         logger.info(f'Analyzing {n_items}')
 
-        # Initialize the cache
-        logger.debug("Initializing Analysis Cache")
-        self.initialize_cache(shards=n_processes * 2, eviction_policy='none')
-
         # do any platform-specific initializations
         logger.debug("Triggering per group functions")
         for analyzer in self.analyzers:
@@ -418,23 +396,23 @@ class AnalyzeManager(CacheEnabled):
             os.environ['IDMTOOLS_NO_CONFIG_WARNING'] = "1"
         else:
             no_print_config_exists = True
-        # Create the worker pool
-        worker_pool = Pool(n_processes,
-                           initializer=pool_worker_initializer,
-                           initargs=(map_item, self.analyzers, self.cache, self.platform))
 
-        map_results = self._run_and_wait_for_mapping(worker_pool=worker_pool, start_time=start_time)
-        logger.debug(f"Success: {map_results}")
-        if not map_results:
-            return map_results
+        # create worker pool
+        from idmtools import IdmConfigParser
+        try:
+            os.environ['IDMTOOLS_CONFIG_FILE'] = IdmConfigParser().get_config_path()
 
-        # At this point we have results for the individual items in self.cache.
-        # Call the analyzer reduce methods
+            executor = ProcessPoolExecutor(max_workers=n_processes, initializer=pool_worker_initializer, initargs=(map_item, self.analyzers, self.platform), )
 
-        finalize_results = self._run_and_wait_for_reducing(worker_pool=worker_pool)
+            map_results, status = self._run_and_wait_for_mapping(executor)
+            finalize_results = self._run_and_wait_for_reducing(executor, map_results)
+            executor.shutdown(True)
+        finally:
+            os.environ['NO_LOGGING_INIT'] = 'n'
+        logger.debug("Shutting down workers")
 
         for analyzer in self.analyzers:
-            analyzer.results = finalize_results[analyzer.uid].get()
+            analyzer.results = finalize_results[analyzer.uid]
 
         logger.debug("Destroying analyzers")
         for analyzer in self.analyzers:
@@ -450,5 +428,4 @@ class AnalyzeManager(CacheEnabled):
             time_str = verbose_timedelta(total_time)
             user_logger.log(SUCCESS, '\r | Analysis complete. Took {} '
                                      '(~ {:.3f} per item)'.format(time_str, total_time / n_items))
-
         return True
