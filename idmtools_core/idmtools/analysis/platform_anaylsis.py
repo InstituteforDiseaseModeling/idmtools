@@ -56,7 +56,7 @@ class PlatformAnalysis:
             extra_args: Optional extra arguments to pass to AnalyzerManager on the server side
 
         See Also:
-            :meth:`idmtools.analysis.analyze_manager.AnalyzeManager.__init))`
+            :meth:`idmtools.analysis.analyze_manager.AnalyzeManager.__init__`
         """
         self.platform = platform
         self.experiment_ids = experiment_ids
