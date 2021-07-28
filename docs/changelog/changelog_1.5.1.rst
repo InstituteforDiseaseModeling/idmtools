@@ -22,7 +22,7 @@ Feature Request
 
 
 Known Issues
--------------
+------------
 * PlatformAnalysis requires an idmtools.ini
 
 
