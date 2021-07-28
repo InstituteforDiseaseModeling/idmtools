@@ -91,7 +91,7 @@ User Experience
 
 
 Special Notes
-=====================
+=============
 * If you encounter an issue with matplotlib after install, you may need to run `pip install matplotlib --force-reinstall`
 * Workitems will require a Task starting in 1.7.0
 * Containers support on COMPS and early singularity support will be coming in 1.6.1
