@@ -304,6 +304,7 @@ instance/
 
 # Sphinx docs
 docs/_build/
+docs/external/*.rst
 
 # PyBuilder
 target/

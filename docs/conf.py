@@ -20,14 +20,20 @@ import configparser
 import os
 import subprocess
 import sys
-from datetime import datetime
 import sphinx_rtd_theme
-os.environ['SPHINX_BUILD'] = '1'
+from datetime import datetime
+
+
+
 if sys.platform in ["linux", "darwin"]:
     subprocess.check_output(["make", "generate-api"], cwd=os.path.dirname(os.path.abspath(__file__)))
 else:
     subprocess.check_output(["make.bat", "generate-api"], cwd=os.path.dirname(os.path.abspath(__file__)))
+
 # -- General configuration ------------------------------------------------
+
+# This is the equivalent of -t in SPHINXOPTS for the RTD build
+tags.add('idmtools')
 
 # If your docs needs a minimal Sphinx version, state it here.
 #
@@ -45,6 +51,7 @@ extensions = [
     'plantweb.directive',
     'sphinxcontrib.programoutput',
     'sphinx_copybutton',
+    'sphinxext.remoteliteralinclude',
     'sphinx.ext.intersphinx'
 ]
 
@@ -81,7 +88,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'idmtools'
-copyright = f'1999 - {datetime.today().year}, Bill & Melinda Gates Foundation. All rights reserved.'
+copyright = f'1999 - {datetime.today().year}, Bill & Melinda Gates Foundation. All rights reserved'
 author = u'Institute for Disease Modeling'
 
 # The version info for the project you're documenting, acts as replacement for

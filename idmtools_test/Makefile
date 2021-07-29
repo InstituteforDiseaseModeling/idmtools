@@ -7,7 +7,7 @@ PDR=$(PDS)run.py
 CLDIR=$(PDS)clean_dir.py
 CWD=$($(IPY) "import os; print(os.getcwd())")
 help:
-	$(PDS)get_help_from_makefile.py
+	help-from-makefile -f ./Makefile
 
 clean: ## Clean most of the temp-data from the project
 	$(CLDIR) --file-patterns "*.py[co],*.done,*.log,**/.coverage" \

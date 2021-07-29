@@ -5,7 +5,7 @@ PDR=$(PDS)run.py
 RM?=rm
 
 help:
-	$(PDS)get_help_from_makefile.py
+	help-from-makefile -f ./Makefile
 
 clean: ## Clean most of the temp-data from the project
 	$(RM) -rf idmtools_webui/build

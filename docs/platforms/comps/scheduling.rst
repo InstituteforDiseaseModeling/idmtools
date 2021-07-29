@@ -3,7 +3,15 @@
 Scheduling
 ==========
 
-|IT_s| supports job scheduling on the |COMPS_s| platform, which includes support for multiple scenarios depending upon the scheduling needs of your specific research needs and requirements. For example, you could schedule your simulations to run under a single process on the same node and with a specified number of cores. For more information about this and other supported scenarios, see `Scenarios`_. To use the full scheduling capabilites included within |COMPS_s| you must add the ``workorder.json`` as a transient asset. This is a one time task to complete for your project. For more information about scheduling configuration, see `Configuration`_. `Examples`_ are provided from which you can leverage to help get started and gain a better understanding. `Schemas`_ enumerate the available options that may be included in workorder.json.
+|IT_s| supports job scheduling on the |COMPS_s| platform, which includes support for multiple
+scenarios depending upon the scheduling needs of your specific research needs and requirements.
+For example, you could schedule your simulations to run under a single process on the same
+node and with a specified number of cores. For more information about this and other
+supported scenarios, see `Scenarios`_. To use the full scheduling capabilites included
+within |COMPS_s| you must add the ``workorder.json`` as a transient asset. This is a one
+time task to complete for your project. For more information about scheduling configuration,
+see `Configuration`_. `Examples`_ are provided from which you can leverage to help get started and
+gain a better understanding. `Schemas`_ enumerate the available options that may be included in workorder.json.
 
 
 .. _Scenarios:
@@ -11,7 +19,8 @@ Scheduling
 Scenarios
 ---------
 
-Choosing the correct scheduling scenario will depend upon your specific research needs and requirements. The following lists some of the common scenarios supported: 
+Choosing the correct scheduling scenario will depend upon your specific research needs and
+requirements. The following lists some of the common scenarios supported:
 
 * N cores, N processes - useful for single-threaded or MPI-enabled workloads, such as |EMOD_s|.
 * N cores, 1 node, 1 process - useful for models that want to spawn various worker thread (GenEpi) or have large memory usage, where the number of cores being an indicator of memory usage.
@@ -23,7 +32,12 @@ Choosing the correct scheduling scenario will depend upon your specific research
 Configuration
 -------------
 
-By configuring a ``workorder.json`` file and adding it as a transient asset you can take advantage of the full scheduling support provided with |COMPS_s|. Scheduling information included in the workorder.json file will take precedent over any scheduling information you may have in the idmtools.ini file or scheduling parameters passed to :py:class:`~idmtools.core.platform_factory.Platform`. The following examples shows some of the options available to include in a workorder.json file.
+By configuring a ``workorder.json`` file and adding it as a transient asset you can
+take advantage of the full scheduling support provided with |COMPS_s|. Scheduling
+information included in the workorder.json file will take precedent over any scheduling
+information you may have in the idmtools.ini file or scheduling parameters passed to
+:py:class:`~idmtools.core.platform_factory.Platform`. The following examples
+shows some of the options available to include in a workorder.json file.
 
 **Example workorder.json for HPC clusters**::
 
@@ -51,14 +65,18 @@ By configuring a ``workorder.json`` file and adding it as a transient asset you 
       }
     }
 
-In addition to including a workorder.json file you must also set and pass ``scheduling=True`` parameter when running simulations, for example::
+In addition to including a workorder.json file you must also set and pass
+**scheduling=True** parameter when running simulations, for example::
 
     experiment.run(scheduling=True)
 
 Add workorder.json as a transient asset
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To include the workorder.json file as a transient asset you can either add an existing workorder.json using the ``add_work_order`` method or dynamically create one using the ``add_schedule_config`` method, both methods included in the :py:class:`~idmtools.idmtools_platform_comps.utils.Scheduling` class.
+To include the workorder.json file as a transient asset you can either add
+an existing workorder.json using the ``add_work_order`` method or dynamically
+create one using the ``add_schedule_config`` method, both methods included in the
+:py:class:`~idmtools.idmtools_platform_comps.utils.Scheduling` class.
 
 **Add existing workorder.json**::
 
@@ -76,19 +94,22 @@ To include the workorder.json file as a transient asset you can either add an ex
 Example
 -------
 
-For addition information and specifics of using a workorder.json file within Python, you can begin with the following:
+For addition information and specifics of using a workorder.json file within Python,
+you can begin with the following:
 
 .. literalinclude:: ../../../examples/python_model/python_sim_scheduling_hpc.py
     :language: python
 
-To see the list of platform alias', such as BELEGOST and CALCULON, use the following CLI command: ``idmtools info plugins platform-aliases``.
+To see the list of platform alias', such as BELEGOST and CALCULON, use the following
+CLI command: ``idmtools info plugins platform-aliases``.
 
 .. _Schemas:
 
 Schemas
 -------
 
-The following schemas, for both HPC and SLURM clusters on |COMPS_s|, list the available options you are able to include within the workorder.json file.
+The following schemas, for both HPC and SLURM clusters on |COMPS_s|, list the available
+options you are able to include within the workorder.json file.
 
 **HPC**::
 

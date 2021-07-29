@@ -38,7 +38,7 @@ jobs:
             ${{ runner.os }}-pip-
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
         if: steps.filter.outputs.core == 'true'
-        uses: actions/setup-python@v2.1.4
+        uses: actions/setup-python@v2.2.2
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install Python dependencies
@@ -97,7 +97,7 @@ jobs:
             ${{ runner.os }}-pip-
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
         if: steps.filter.outputs.core == 'true' ||  steps.filter.outputs.cli == 'true'
-        uses: actions/setup-python@v2.1.4
+        uses: actions/setup-python@v2.2.2
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
@@ -116,7 +116,7 @@ jobs:
         env:
           COMPS_PASS: ${{ secrets.COMPS_PASSWORD }}
         run: |
-          python dev_scripts/create_auth_token_args.py --username $COMPS_USER
+          python dev_scripts/create_auth_token_args.py --username ${{ secrets.COMPS_USER }}
       - name: run idmtools_cli all tests
         # only run if core or cli changed
         if: steps.filter.outputs.core == 'true' ||  steps.filter.outputs.cli == 'true'
@@ -161,7 +161,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2.1.4
+        uses: actions/setup-python@v2.2.2
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.models == 'true'
         with:
           python-version: ${{ matrix.python-version }}
@@ -227,7 +227,7 @@ jobs:
             ${{ runner.os }}-pip-
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.comps == 'true' || steps.filter.outputs.models == 'true'
-        uses: actions/setup-python@v2.1.4
+        uses: actions/setup-python@v2.2.2
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
@@ -292,7 +292,7 @@ jobs:
             ${{ runner.os }}-pip-
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.local == 'true' || steps.filter.outputs.models == 'true'
-        uses: actions/setup-python@v2.1.4
+        uses: actions/setup-python@v2.2.2
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64

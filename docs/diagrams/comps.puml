@@ -9,6 +9,14 @@ package "idmtools-platform-comps" as comps {
     [SSMTPlatform]
 }
 
+package "COMPS" as COMPS {
+    () "pyCOMPSAPI" as pyCOMPSAPI
+}
+
+
 PlatformAPI <-down-- COMPSPlatform: COMPs\nImplementation
 PlatformAPI <-- SSMTPlatform: SSMT\nImplementation
+COMPSPlatform <--> pyCOMPSAPI
+SSMTPlatform <--> pyCOMPSAPI
+
 @enduml
