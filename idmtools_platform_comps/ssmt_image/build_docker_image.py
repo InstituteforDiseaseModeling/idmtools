@@ -1,5 +1,9 @@
 """This script is currently a workaround so that we can use bump2version with docker since the nightly versions doesn't work with docker registry.
 
+Notes:
+    If you are using this script locally, you need to set the environment variables *bamboo_UserArtifactory* and *bamboo_PasswordArtifactory*.
+    These can be set to your idm email/password
+
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import argparse
@@ -92,7 +96,8 @@ def get_latest_image_version_from_registry(username, password):
     response = requests.get(url, auth=auth)
     logger.debug(f"Return Code: {response.status_code}")
     if response.status_code != 200:
-        logger.error(response.content)
+        print(response.status_code)
+        print(response.content)
         raise Exception('Could not load images')
     else:
         images = natsorted(response.json()['tags'], reverse=True)

@@ -61,7 +61,10 @@ if __name__ == "__main__":
     if not all(analyzers):
         raise Exception("Not all analyzers could be found...\n{}".format(",".join(analyzers)))
 
-    extra_args = pickle.load(args.analyzer_manager_args_file) if args.analyzer_manager_args_file is not None else dict()
+    if args.analyzer_manager_args_file is not None:
+        logger.info(f"Loading extra AnalyzerManager args from {args.analyzer_manager_args_file}")
+        with open(args.analyzer_manager_args_file, 'rb') as pin:
+            extra_args = pickle.load(pin)
 
     # get platform
     platform = Platform(args.block)

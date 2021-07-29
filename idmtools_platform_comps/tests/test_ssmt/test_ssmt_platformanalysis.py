@@ -23,7 +23,10 @@ from csv_analyzer import CSVAnalyzer  # noqa
 from infectiousness_csv_analyzer import InfectiousnessCSVAnalyzer  # noqa
 from node_csv_analyzer import NodeCSVAnalyzer  # noqa
 
-# When enabled, ssmt tests will attempt to upload packages from local environment and install before run. You need to rebuild the the packages when code changes using pymake dist in the idmtools_core and ./idmtools_platform_comps directories
+# When enabled, ssmt tests will attempt to upload packages from local environment and install before run.
+# You need to rebuild the the packages when code changes using
+# make dist
+# in the idmtools_core and ./idmtools_platform_comps directories
 test_with_new_code = os.environ.get("TEST_WITH_PACKAGES", 'n').lower() in TRUTHY_VALUES
 
 
@@ -88,6 +91,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
         self.do_simple_python_analysis(self.platform)
 
     @pytest.mark.smoke
+    @run_in_temp_dir
     def test_platform_analysis_analyzer_manager_args_validation(self):
         platform = Platform('BAYESIAN')
         with self.assertRaises(ValueError) as cxt:
