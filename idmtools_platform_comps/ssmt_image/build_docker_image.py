@@ -59,6 +59,7 @@ def get_username_and_password(disable_keyring_load=False, disable_keyring_save=F
 
     Args:
         disable_keyring_load: Disable loading credentials from keyring
+        disable_keyring_save: Disable keyring save
 
     Returns:
         Username password
