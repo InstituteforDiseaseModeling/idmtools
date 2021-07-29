@@ -3,7 +3,7 @@ pytest
 pytest-runner~=5.3
 xmlrunner~=1.7.7
 sqlalchemy~=1.4.15
-psycopg2-binary~=2.8.6
+psycopg2-binary~=2.9.1
 flask~=1.1
 Flask-AutoIndex~=0.6.6
 flask_restful~=0.3.8
