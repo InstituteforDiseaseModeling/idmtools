@@ -198,9 +198,3 @@ class TestAnalyzeManager(unittest.TestCase):
             actual = [analyzer.working_dir for analyzer in am.analyzers]
             self.assertEqual(actual, expected[force_wd])
 
-    # does it properly return t/f for excpetions in the cache?
-    def test_check_exception(self):
-        self.analyze_manager.cache['random_key'] = 9
-        self.assertFalse(self.analyze_manager._check_exception())
-        self.analyze_manager.cache[AnalyzeManager.EXCEPTION_KEY] = 'blah'
-        self.assertTrue(self.analyze_manager._check_exception())

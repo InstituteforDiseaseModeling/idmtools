@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         os: [self-linux]
-        python-version: ['3.7.11']
+        python-version: [ '3.7.x' ]
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
@@ -57,7 +57,7 @@ jobs:
         env:
           COMPS_PASS: ${{ secrets.COMPS_PASSWORD }}
         run: |
-          python dev_scripts/create_auth_token_args.py --username ${{ secrets.COMPS_USER }}
+          python dev_scripts/create_auth_token_args.py --username "${{ secrets.COMPS_USER }}"
       - name: run idmtools_core all tests
         # only run if core changed
         if: steps.filter.outputs.core == 'true'
@@ -75,7 +75,7 @@ jobs:
     strategy:
       matrix:
         os: [ self-linux ]
-        python-version: [ '3.7' ]
+        python-version: [ '3.7.x' ]
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
@@ -116,7 +116,7 @@ jobs:
         env:
           COMPS_PASS: ${{ secrets.COMPS_PASSWORD }}
         run: |
-          python dev_scripts/create_auth_token_args.py --username ${{ secrets.COMPS_USER }}
+          python dev_scripts/create_auth_token_args.py --username "${{ secrets.COMPS_USER }}"
       - name: run idmtools_cli all tests
         # only run if core or cli changed
         if: steps.filter.outputs.core == 'true' ||  steps.filter.outputs.cli == 'true'
@@ -181,7 +181,7 @@ jobs:
         env:
           COMPS_PASS: ${{ secrets.COMPS_PASSWORD }}
         run: |
-          python dev_scripts/create_auth_token_args.py --username ${{ secrets.COMPS_USER }}
+          python dev_scripts/create_auth_token_args.py --username "${{ secrets.COMPS_USER }}"
       - name: run idmtools_models tests
         # only run if core changed
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.models == 'true'
@@ -246,7 +246,7 @@ jobs:
         env:
           COMPS_PASS: ${{ secrets.COMPS_PASSWORD }}
         run: |
-          python dev_scripts/create_auth_token_args.py --username $COMPS_USER
+          python dev_scripts/create_auth_token_args.py --username "${{ secrets.COMPS_USER }}"
       - name: run idmtools_platform_comps tests
         # only run if core, comps, or models changed
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.comps == 'true' || steps.filter.outputs.models == 'true'
@@ -310,7 +310,7 @@ jobs:
         env:
           COMPS_PASS: ${{ secrets.COMPS_PASSWORD }}
         run: |
-          python dev_scripts/create_auth_token_args.py --username ${{ secrets.COMPS_USER }}
+          python dev_scripts/create_auth_token_args.py --username "${{ secrets.COMPS_USER }}"
       - name: run idmtools_platform_local all tests
         # only run if core and comps changed
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.local == 'true' || steps.filter.outputs.models == 'true'
