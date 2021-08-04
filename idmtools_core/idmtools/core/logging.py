@@ -155,16 +155,14 @@ def setup_logging(level: Union[int, str] = logging.WARN, filename: str = 'idmtoo
         root = logging.getLogger()
         user = logging.getLogger('user')
         # allow setting the debug of logger via environment variable
-        root.setLevel(logging.DEBUG)
+        root.setLevel(level)
         user.setLevel(logging.DEBUG)
 
         if LOGGING_NAME is None or force:
             filename = filename.strip()
-            if filename == "-1":
+            if filename == "-1" or not enable_file_logging:
                 filename = ""
-            if not enable_file_logging:
-                filename = ""
-            file_handler = setup_handlers(level, filename, console, file_level)
+            file_handler = setup_handlers(level, filename, file_level, console, enable_file_logging)
 
             # see https://docs.python.org/3/library/logging.handlers.html#queuelistener
             # setup file logger handler that rotates after 10 mb of logging and keeps 5 copies
@@ -183,7 +181,7 @@ def setup_logging(level: Union[int, str] = logging.WARN, filename: str = 'idmtoo
     return None
 
 
-def setup_handlers(level: int, filename, file_level: int, console: bool = False):
+def setup_handlers(level: int, filename, file_level: int, console: bool, enable_file_logging: bool):
     """
     Setup Handlers for Global and user Loggers.
 
@@ -212,7 +210,7 @@ def setup_handlers(level: int, filename, file_level: int, console: bool = False)
             format_str = '%(asctime)s.%(msecs)d %(pathname)s:%(lineno)d %(funcName)s [%(levelname)s] - %(message)s'
         formatter = logging.Formatter(format_str)
         # set the logging to either common level or the filelevel
-        file_handler = set_file_logging(file_level, formatter, filename)
+        file_handler = set_file_logging(file_level if file_level else level, formatter, filename)
 
     if console or len(filename) == 0:
         coloredlogs.install(level=level, milliseconds=True, stream=sys.stdout)

@@ -224,9 +224,9 @@ class IdmConfigParser:
     def _init_logging(cls):
         from idmtools.core.logging import setup_logging
         # set up default log values
-        log_config = dict(level='INFO', filename='idmtools.log', console='off', file_level='DEBUG', enable_file_logging='on')
+        log_config = dict()
         # try to fetch options from config file and from environment vars
-        for key in log_config.keys():
+        for key in ('level', 'filename', 'console', 'file_level', 'enable_file_logging'):
             value = cls.get_option("logging", key, fallback=None)
             if value is not None:
                 log_config[key] = value
