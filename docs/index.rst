@@ -47,7 +47,6 @@ an end-to-end workflow using |EMOD_s| as the disease transmission model.
    }
 
 
-
    [emodpy-generic] <<emodpy-disease>>
    [emodpy-generic] --> [emodpy]
 
@@ -87,10 +86,10 @@ an end-to-end workflow using |EMOD_s| as the disease transmission model.
    [Input files] ..> [emod-api] : Inspect
 
    [EMOD Eradication.exe] <<EMOD>>
-   [Input files] --> [EMOD Eradication.exe]
+   [Input files] -> [EMOD Eradication.exe]
 
    [Output files] <<EMOD>>
-   [EMOD Eradication.exe] --> [Output files]
+   [EMOD Eradication.exe] -> [Output files]
    [Output files] --> [emod-api]
 
 
