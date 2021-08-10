@@ -2,11 +2,3 @@ idmtools~=1.6.3
 pytest
 pytest-runner~=5.3
 xmlrunner~=1.7.7
-sqlalchemy~=1.4.15
-psycopg2-binary~=2.8.6
-flask~=1.1
-Flask-AutoIndex~=0.6.6
-flask_restful~=0.3.8
-Flask-SQLAlchemy~=2.5.1
-matplotlib~=3.4.2
-numpy!=1.19.4

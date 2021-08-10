@@ -7,7 +7,7 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 import os
 import sys
 import time
-from concurrent.futures import ProcessPoolExecutor, as_completed
+from concurrent.futures import ProcessPoolExecutor, as_completed, ThreadPoolExecutor
 from logging import getLogger, DEBUG
 from typing import NoReturn, List, Dict, Tuple, Optional, Union, TYPE_CHECKING
 from uuid import UUID
@@ -73,7 +73,8 @@ class AnalyzeManager:
                  analyzers: List[IAnalyzer] = None, working_dir: str = None,
                  partial_analyze_ok: bool = False, max_items: Optional[int] = None, verbose: bool = True,
                  force_manager_working_directory: bool = False,
-                 exclude_ids: List[Union[str, UUID]] = None, analyze_failed_items: bool = False, max_workers: Optional[int] = None):
+                 exclude_ids: List[Union[str, UUID]] = None, analyze_failed_items: bool = False,
+                 max_workers: Optional[int] = None, executor_type: str = 'process'):
         """
         Initialize the AnalyzeManager.
 
@@ -90,10 +91,16 @@ class AnalyzeManager:
             exclude_ids (List[UUID], optional): [description]. Defaults to None.
             analyze_failed_items (bool, optional): Allows analyzing of failed items. Useful when you are trying to aggregate items that have failed. Defaults to False.
             max_workers (int, optional): Set the max workers. If not provided, falls back to the configuration item *max_threads*. If max_threads is not set in configuration, defaults to CPU count
+            executor_type: (str): Whether to use process or thread pooling. Process pooling is more efficient but threading might be required in some environments
         """
         super().__init__()
         if working_dir is None:
             working_dir = os.getcwd()
+        if executor_type.lower() in ['process', 'thread']:
+            self.executor_type = executor_type.lower()
+        else:
+            raise ValueError(f'{executor_type} is not a valid type for executor_type. Choose either "process" or "thread"')
+
         self.configuration = configuration or {}
         self.platform = platform
         self.__check_for_platform_from_context(platform)
@@ -418,7 +425,11 @@ class AnalyzeManager:
         try:
             os.environ['IDMTOOLS_CONFIG_FILE'] = IdmConfigParser().get_config_path()
 
-            executor = ProcessPoolExecutor(max_workers=n_processes, initializer=pool_worker_initializer, initargs=(map_item, self.analyzers, self.platform), )
+            opts = dict(max_workers=n_processes, initializer=pool_worker_initializer, initargs=(map_item, self.analyzers, self.platform), )
+            if self.executor_type == 'process':
+                executor = ProcessPoolExecutor(**opts)
+            else:
+                executor = ThreadPoolExecutor(**opts)
 
             map_results, status = self._run_and_wait_for_mapping(executor)
             finalize_results = self._run_and_wait_for_reducing(executor, map_results)

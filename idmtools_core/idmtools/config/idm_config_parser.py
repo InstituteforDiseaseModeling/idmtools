@@ -5,6 +5,7 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import copy
 import platform
+from dataclasses import fields
 from pathlib import Path
 import json
 import os
@@ -225,15 +226,15 @@ class IdmConfigParser:
 
     @classmethod
     def _init_logging(cls):
-        from idmtools.core.logging import setup_logging
+        from idmtools.core.logging import setup_logging, IdmToolsLoggingConfig
         # set up default log values
-        log_config = dict(level='INFO', filename='idmtools.log', console='off', file_level=None)
+        log_config = dict()
         # try to fetch options from config file and from environment vars
-        for key in log_config.keys():
-            value = cls.get_option("logging", key, fallback=None)
+        for field in fields(IdmToolsLoggingConfig):
+            value = cls.get_option("logging", field.name, fallback=None)
             if value is not None:
-                log_config[key] = value
-        setup_logging(**log_config)
+                log_config[field.name] = value
+        setup_logging(IdmToolsLoggingConfig(**log_config))
 
         if platform.system() == "Darwin":
             # see https://bugs.python.org/issue27126
