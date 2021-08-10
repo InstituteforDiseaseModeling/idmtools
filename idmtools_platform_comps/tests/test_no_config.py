@@ -35,6 +35,7 @@ class TestNoConfig(unittest.TestCase):
 
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
     @pytest.mark.comps
+    @pytest.mark.serial
     def test_success(self, output):
 
         IdmConfigParser.clear_instance()
