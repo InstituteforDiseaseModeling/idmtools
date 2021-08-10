@@ -22,7 +22,6 @@ import subprocess
 import sys
 import sphinx_rtd_theme
 from datetime import datetime
-from urllib.request import urlretrieve
 
 if sys.platform in ["linux", "darwin"]:
     subprocess.check_output(["make", "generate-api"], cwd=os.path.dirname(os.path.abspath(__file__)))
