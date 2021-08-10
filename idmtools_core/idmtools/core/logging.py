@@ -30,7 +30,7 @@ CRITICAL = 50
 @dataclass
 class IdmToolsLoggingConfig:
     """
-    Defines the config options available for idmtools logs
+    Defines the config options available for idmtools logs.
     """
     level: Union[str, int] = logging.WARN
     filename: Optional[str] = 'idmtools.log'
@@ -41,6 +41,9 @@ class IdmToolsLoggingConfig:
     user_log_format_str: str = '%(message)s'
 
     def __post_init__(self):
+        """
+        Validates logging config creation
+        """
         if type(self.console) is str:
             self.console = self.console.lower() in TRUTHY_VALUES
         # ensure level is a logging level
@@ -65,7 +68,6 @@ class IdmToolsLoggingConfig:
 
 
 class SafeRotatingFileHandler(RotatingFileHandler):
-
     """
     SafeRotatingFileHandler allows us to handle errors that occur during roll-over of multi-process log events.
     """
@@ -109,7 +111,10 @@ class PrintHandler(logging.Handler):
         Returns:
             None
         """
-        print(record.message)
+        try:
+            print(record.msg)
+        except:  # noqa: E722
+            pass
 
 
 def setup_logging(logging_config: IdmToolsLoggingConfig, force: bool = False) -> None:
@@ -201,7 +206,7 @@ def setup_user_logger(logging_config: IdmToolsLoggingConfig):
             getLogger('user').addHandler(handler)
 
 
-def set_file_logging(logging_config:  IdmToolsLoggingConfig, formatter: logging.Formatter):
+def set_file_logging(logging_config: IdmToolsLoggingConfig, formatter: logging.Formatter):
     """
     Set File Logging.
 
@@ -275,4 +280,3 @@ def exclude_logging_classes(items_to_exclude=None):
     for item in items_to_exclude:
         other_logger = getLogger(item)
         other_logger.setLevel(logging.WARN)
-
