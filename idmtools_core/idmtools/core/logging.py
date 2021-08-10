@@ -12,7 +12,7 @@ import time
 from contextlib import suppress
 from dataclasses import dataclass
 from logging import getLogger
-from logging.handlers import  RotatingFileHandler
+from logging.handlers import RotatingFileHandler
 from typing import Union, Optional
 import coloredlogs as coloredlogs
 from idmtools.core import TRUTHY_VALUES
