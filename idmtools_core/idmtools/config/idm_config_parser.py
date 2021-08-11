@@ -223,13 +223,7 @@ class IdmConfigParser:
     @classmethod
     def _init_logging(cls):
         from idmtools.core.logging import setup_logging
-        # set up default log values
-        log_config = dict()
-        # try to fetch options from config file and from environment vars
-        for key in ('level', 'filename', 'console', 'file_level', 'enable_file_logging'):
-            value = cls.get_option("logging", key, fallback=None)
-            if value is not None:
-                log_config[key] = value
+        log_config = cls.get_section("logging")
         setup_logging(**log_config)
 
         if platform.system() == "Darwin":
