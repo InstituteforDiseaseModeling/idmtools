@@ -162,7 +162,7 @@ def setup_logging(level: Union[int, str] = logging.WARN, filename: str = 'idmtoo
             filename = filename.strip()
             if filename == "-1" or not enable_file_logging:
                 filename = ""
-            file_handler = setup_handlers(level, filename, file_level, console, enable_file_logging)
+            file_handler = setup_handlers(level, filename, console, file_level )
 
             # see https://docs.python.org/3/library/logging.handlers.html#queuelistener
             # setup file logger handler that rotates after 10 mb of logging and keeps 5 copies
@@ -173,6 +173,9 @@ def setup_logging(level: Union[int, str] = logging.WARN, filename: str = 'idmtoo
                 LISTENER.start()
                 # register a stop signal
                 register_stop_logger_signal_handler(LISTENER)
+            # python logger creates default stream handler when no handlers are set so create null handler
+            if not file_handler and not console:
+                root.addHandler(logging.NullHandler())
         if root.isEnabledFor(logging.DEBUG):
             from idmtools import __version__
             root.debug(f"idmtools core version: {__version__}")
@@ -181,7 +184,7 @@ def setup_logging(level: Union[int, str] = logging.WARN, filename: str = 'idmtoo
     return None
 
 
-def setup_handlers(level: int, filename, file_level: int, console: bool, enable_file_logging: bool):
+def setup_handlers(level: int, filename, console: bool, file_level: int ):
     """
     Setup Handlers for Global and user Loggers.
 
@@ -319,14 +322,6 @@ def exclude_logging_classes(items_to_exclude=None):
     """
     rl = getLogger()
 
-    for log_name, cl in rl.manager.loggerDict.items():
-        if log_name.startswith("COMPS"):
-            tl = cl
-            if isinstance(cl, logging.PlaceHolder):
-                tl = getLogger(log_name)
-            for idx, handler in enumerate(tl.handlers):
-                if isinstance(handler, logging.StreamHandler):
-                    tl.removeHandler(handler)
     if items_to_exclude is None:
         items_to_exclude = ['urllib3', 'paramiko', 'matplotlib']
     # remove comps by default

@@ -11,8 +11,17 @@ from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities.iworkflow_item import IWorkflowItem
 
 HANDLERS = copy.copy(logging.getLogger().handlers)
-from COMPS import Client
+from COMPS import Client, Data
 logging.root.handlers = HANDLERS
+for log_name, cl in logging.root.manager.loggerDict.items():
+    if log_name.startswith("COMPS"):
+        tl = cl
+        if isinstance(cl, logging.PlaceHolder):
+            tl = logging.getLogger(log_name)
+        for handler in tl.handlers:
+            if isinstance(handler, logging.StreamHandler):
+                tl.removeHandler(handler)
+        tl.addHandler(logging.NullHandler())
 from dataclasses import dataclass, field
 from functools import partial
 from typing import List
@@ -96,9 +105,6 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         self._assets = CompsPlatformAssetCollectionOperations(platform=self)
 
     def _login(self):
-        # ensure logging is initialized
-        #from idmtools.core.logging import exclude_logging_classes
-        #exclude_logging_classes()
         Client.login(self.endpoint)
 
     def post_setstate(self):
