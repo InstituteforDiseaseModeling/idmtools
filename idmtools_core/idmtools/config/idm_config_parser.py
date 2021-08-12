@@ -224,7 +224,7 @@ class IdmConfigParser:
     def _init_logging(cls):
         from idmtools.core.logging import setup_logging
         log_config = dict()
-        if cls.has_section("logging"):
+        if cls.found_ini() and cls.has_section("logging"):
             log_config = cls.get_section("logging")
         setup_logging(**log_config)
 
