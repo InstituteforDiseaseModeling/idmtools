@@ -1,6 +1,6 @@
-=====================================
-Convert analyzers from |DT| to |IT_s|
-=====================================
+===========================
+Convert analyzers from |DT|
+===========================
 
 Although the use of analyzers in |DT| and |IT_s| is very similar, being aware of some of the differences may be helpful with the conversion process. For example some of the class and method names are different, as seen in the following diagram:
 
