@@ -162,7 +162,7 @@ def setup_logging(level: Union[int, str] = logging.WARN, filename: str = 'idmtoo
             filename = filename.strip()
             if filename == "-1" or not enable_file_logging:
                 filename = ""
-            file_handler = setup_handlers(level, filename, console, file_level )
+            file_handler = setup_handlers(level, filename, console, file_level)
 
             # see https://docs.python.org/3/library/logging.handlers.html#queuelistener
             # setup file logger handler that rotates after 10 mb of logging and keeps 5 copies
@@ -184,7 +184,7 @@ def setup_logging(level: Union[int, str] = logging.WARN, filename: str = 'idmtoo
     return None
 
 
-def setup_handlers(level: int, filename, console: bool, file_level: int ):
+def setup_handlers(level: int, filename, console: bool, file_level: int):
     """
     Setup Handlers for Global and user Loggers.
 
@@ -320,8 +320,6 @@ def exclude_logging_classes(items_to_exclude=None):
     Returns:
         None
     """
-    rl = getLogger()
-
     if items_to_exclude is None:
         items_to_exclude = ['urllib3', 'paramiko', 'matplotlib']
     # remove comps by default
