@@ -112,6 +112,7 @@ Exact workflows for using |IT_s| is user-dependent, and can include any of the t
    reference
    recipes_index
    cli/cli_index
+   dtkt-convert
    faq
    glossary
    changelog/changelog
