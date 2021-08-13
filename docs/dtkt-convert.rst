@@ -85,3 +85,10 @@ a predefined configuration alias, such as `Belegost`, when using the
 
 Simulation configuration
 ------------------------
+
+
+Examples
+--------
+
+For a comparison of a converted |DT| script to |IT_s| and addition information on
+converting analyzers, see :doc:`analyzers/analyzers-convert`
