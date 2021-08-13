@@ -32,7 +32,7 @@ used in |IT_s|.
     DTK-Tools
     end note
 
-    class simtools {
+    class simtools{
         [DEFAULT]
         max_threads = 1
         sims_per_threads = 1
@@ -48,14 +48,14 @@ used in |IT_s|.
     idmtools
     end note
 
-    class idmtools {
+    class idmtools{
         [COMPS]
-        type = COMPS
-        endpoint = https://comps.idmod.org
-        environment = Belegost
         priority = Lowest
         num_retries = 0
         batch_size = 10
+        endpoint = https://comps.idmod.org
+        environment = Belegost
+        type = COMPS
     }
 
     idmtools -left[hidden]-> simtools
@@ -63,6 +63,25 @@ used in |IT_s|.
 
 Platform configuration
 ----------------------
+
+In addition to using ini files for platform configuration parameters you can also
+use Python class objects, :py:class:`SetupParser` in |DT| and
+:py:class:`~idmtools.core.platform_factory.Platform` in |IT_s|. If platform configuration
+parameters are configured in an ini file and also configured in a Python class object
+then the parameters in the Python object take priority.
+
+**DTK-Tools**::
+
+    SetupParser.default_block = 'HPC'
+
+**idmtools**::
+
+    platform = Platform("Belegost")
+
+When using :py:class:`~idmtools.core.platform_factory.Platform` you can specify
+a predefined configuration alias, such as `Belegost`, when using the
+|COMPS_s| platform. To see a list of aliases, use the cli command
+*idmtools info plugins platform-aliases*.
 
 Simulation configuration
 ------------------------
