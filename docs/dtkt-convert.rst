@@ -1,7 +1,6 @@
 =========================
 Convert scripts from |DT|
 =========================
-
 Understanding some of the similarities and differences between |DT| and |IT_s|
 will help when converting scripts from |DT| to use within |IT_s|.
 
@@ -18,8 +17,7 @@ are set using the :py:class:`DTKConfigBuilder` class while in |IT_s| it's config
 through a base task object.
 
 Configuration .ini files
-------------------------
-
+========================
 Please see the following diagram which helps illustrate some of the differences
 between the required **simtools.ini** used in |DT| with the optional **idmtools.ini**
 used in |IT_s|.
@@ -62,8 +60,7 @@ used in |IT_s|.
 
 
 Platform configuration
-----------------------
-
+======================
 In addition to using ini files for platform configuration parameters you can also
 use Python class objects, :py:class:`SetupParser` in |DT| and
 :py:class:`~idmtools.core.platform_factory.Platform` in |IT_s|. If platform configuration
@@ -84,11 +81,20 @@ a predefined configuration alias, such as `Belegost`, when using the
 *idmtools info plugins platform-aliases*.
 
 Simulation configuration
-------------------------
+========================
 
 
 Examples
---------
+========
+To see applied examples of the previously described information you can see converted
+analyzer and calibration |DT| scripts in the following sections:
 
+Analyzers
+---------
 For a comparison of a converted |DT| script to |IT_s| and addition information on
-converting analyzers, see :doc:`analyzers/analyzers-convert`
+converting analyzers, see :doc:`analyzers/analyzers-convert`.
+
+Calibration
+-----------
+For a comparison of a converted calibration |DT| script to |IT_s|,
+see :doc:`analyzers/analyzers-convert`.
