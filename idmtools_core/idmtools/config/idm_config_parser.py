@@ -5,6 +5,7 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import copy
 import platform
+from dataclasses import fields
 from pathlib import Path
 import json
 import os
@@ -180,7 +181,6 @@ class IdmConfigParser:
         if dir_path is None:
             dir_path = os.getcwd()
         # init logging here as this is our most likely entry-point into an idmtools "application"
-        from idmtools.core.logging import VERBOSE
 
         # Look for the config file. First check environment vars
         if "IDMTOOLS_CONFIG_FILE" in os.environ:
@@ -201,7 +201,9 @@ class IdmConfigParser:
             if os.getenv("IDMTOOLS_NO_CONFIG_WARNING", "F").lower() not in TRUTHY_VALUES:
                 # We use print since logger isn't configured unless there is an override(cli)
                 print(f"/!\\ WARNING: File '{file_name}' Not Found! For details on how to configure idmtools, see {get_help_version_url('configuration.html')} for details on how to configure idmtools.")
-            cls._init_logging()
+            if os.getenv("NO_LOGGING_INIT", "f").lower() not in TRUTHY_VALUES:
+                cls._init_logging()
+
             return
 
         # Load file
@@ -216,21 +218,23 @@ class IdmConfigParser:
             if not cls._config.has_section(section=lowercase_version):
                 cls._config._sections[lowercase_version] = cls._config._sections[section]
 
-        cls._init_logging()
-        if IdmConfigParser.get_option("NO_PRINT_CONFIG_USED", fallback="F").lower() not in TRUTHY_VALUES and IdmConfigParser.get_option("SUPPRESS_OUTPUT", fallback="F").lower() not in TRUTHY_VALUES:
-            user_logger.log(VERBOSE, "INI File Used: {}".format(ini_file))
+        if os.getenv("NO_LOGGING_INIT", "f").lower() not in TRUTHY_VALUES:
+            cls._init_logging()
+            from idmtools.core.logging import VERBOSE
+            if IdmConfigParser.get_option("NO_PRINT_CONFIG_USED", fallback="F").lower() not in TRUTHY_VALUES and IdmConfigParser.get_option("SUPPRESS_OUTPUT", fallback="F").lower() not in TRUTHY_VALUES:
+                user_logger.log(VERBOSE, "INI File Used: {}".format(ini_file))
 
     @classmethod
     def _init_logging(cls):
-        from idmtools.core.logging import setup_logging
+        from idmtools.core.logging import setup_logging, IdmToolsLoggingConfig
         # set up default log values
-        log_config = dict(level='INFO', filename='idmtools.log', console='off', file_level=None)
+        log_config = dict()
         # try to fetch options from config file and from environment vars
-        for key in log_config.keys():
-            value = cls.get_option("logging", key, fallback=None)
+        for field in fields(IdmToolsLoggingConfig):
+            value = cls.get_option("logging", field.name, fallback=None)
             if value is not None:
-                log_config[key] = value
-        setup_logging(**log_config)
+                log_config[field.name] = value
+        setup_logging(IdmToolsLoggingConfig(**log_config))
 
         if platform.system() == "Darwin":
             # see https://bugs.python.org/issue27126
