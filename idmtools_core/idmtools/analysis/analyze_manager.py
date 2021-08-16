@@ -423,7 +423,9 @@ class AnalyzeManager:
         # create worker pool
         from idmtools import IdmConfigParser
         try:
-            os.environ['IDMTOOLS_CONFIG_FILE'] = IdmConfigParser().get_config_path()
+            config_file = IdmConfigParser().get_config_path()
+            if config_file:
+                os.environ['IDMTOOLS_CONFIG_FILE'] = config_file
 
             opts = dict(max_workers=n_processes, initializer=pool_worker_initializer, initargs=(map_item, self.analyzers, self.platform), )
             if self.executor_type == 'process':
