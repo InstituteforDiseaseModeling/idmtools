@@ -61,10 +61,10 @@ used in |IT_s|.
 
 Platform configuration
 ======================
-In addition to using ini files for platform configuration parameters you can also
+In addition to using INI files for platform configuration parameters you can also
 use Python class objects, :py:class:`SetupParser` in |DT| and
 :py:class:`~idmtools.core.platform_factory.Platform` in |IT_s|. If platform configuration
-parameters are configured in an ini file and also configured in a Python class object
+parameters are configured in an INI file and also configured in a Python class object
 then the parameters in the Python object take priority.
 
 **DTK-Tools**::
