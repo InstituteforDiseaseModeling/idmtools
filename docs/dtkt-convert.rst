@@ -116,17 +116,8 @@ when using |EMODPY_s| the :py:class:`~emodpy.emod_task.EMODTask` class is used.
     EMODTask -left[hidden]-> DTKConfigBuilder
 
 
-Examples
-========
-To see applied examples of the previously described information you can see converted
-analyzer and calibration |DT| scripts in the following sections:
-
-Analyzers
----------
-For a comparison of a converted |DT| script to |IT_s| and addition information on
-converting analyzers, see :doc:`analyzers/analyzers-convert`.
-
-Calibration
------------
-For a comparison of a converted calibration |DT| script to |IT_s|,
-see :doc:`analyzers/analyzers-convert`.
+Example
+=======
+To see an applied example of the previously described information you can see a
+converted |DT| csv analyzer to |IT_s| and addition information on
+converting analyzers here: :doc:`analyzers/analyzers-convert`.
