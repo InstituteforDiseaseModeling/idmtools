@@ -83,6 +83,38 @@ a predefined configuration alias, such as `Belegost`, when using the
 Simulation configuration
 ========================
 
+:py:class:`DTKConfigBuilder` in |DT| is used for setting the intervention parameters
+and reports for simulations run with |DT| while |IT_s| uses task objects. For example,
+when using |EMODPY_s| the :py:class:`~emodpy.emod_task.EMODTask` class is used.
+
+.. uml::
+
+    hide circle
+
+    note top of DTKConfigBuilder
+    DTK-Tools
+    end note
+
+    class DTKConfigBuilder{
+        config
+        campaign
+        demographics
+        report
+    }
+
+    note top of EMODTask
+    idmtools/emodpy
+    end note
+
+    class EMODTask{
+        task.config
+        task.campaign
+        task.demographics
+        task.reporter
+    }
+
+    EMODTask -left[hidden]-> DTKConfigBuilder
+
 
 Examples
 ========
