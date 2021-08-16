@@ -433,8 +433,10 @@ class AnalyzeManager:
 
             map_results, status = self._run_and_wait_for_mapping(executor)
             finalize_results = self._run_and_wait_for_reducing(executor, map_results)
-            executor.shutdown(True)
+
         finally:
+            # because of debug mode, we have to leave executor and let python handle the shutdown through del
+            # see https://youtrack.jetbrains.com/issue/PY-34432
             os.environ['NO_LOGGING_INIT'] = 'n'
         logger.debug("Shutting down workers")
 
