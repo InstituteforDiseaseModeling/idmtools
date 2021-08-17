@@ -19,7 +19,7 @@ if TYPE_CHECKING:  # pragma: no cover
 logger = getLogger(__name__)
 
 
-def map_item(item: IItem) -> NoReturn:
+def map_item(item: IItem) -> Dict[Union[str, UUID], Dict]:
     """
     Initialize some worker-global values; a worker process entry point for analyzer item-mapping.
 
