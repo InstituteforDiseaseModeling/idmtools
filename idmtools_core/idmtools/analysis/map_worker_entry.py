@@ -10,7 +10,7 @@ from logging import getLogger, DEBUG
 from uuid import UUID
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.utils.file_parser import FileParser
-from typing import NoReturn, TYPE_CHECKING, Union, Dict
+from typing import TYPE_CHECKING, Union, Dict
 from idmtools.core.interfaces.iitem import IItem
 from idmtools.entities.ianalyzer import TAnalyzerList
 if TYPE_CHECKING:  # pragma: no cover
