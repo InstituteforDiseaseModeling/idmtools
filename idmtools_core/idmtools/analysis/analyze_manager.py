@@ -309,12 +309,14 @@ class AnalyzeManager:
         futures = dict()
         results = dict()
         status = True
+        # create status bar and then queue our futures
         with tqdm(total=len(self._items)) as progress:
             for i in self._items.values():
                 future = executor.submit(map_item, i)
                 future.add_done_callback(lambda p: progress.update())
                 futures[future] = i
 
+            # wait on our futures to complete, catch exceptions, and aggregate results
             for future in as_completed(futures.keys()):
                 if future.exception():
                     status = False
@@ -344,8 +346,9 @@ class AnalyzeManager:
         logger.debug("Running reduce results")
         futures = {}
         finalize_results = {}
-        # with self.cache.transact():
+        # create a progress bar
         with tqdm(total=len(self.analyzers), desc="Running Analyzer Reduces") as progress:
+            # for each analyzer, queue our futures
             for analyzer in self.analyzers:
                 logger.debug(f"Gather data for {analyzer.uid}")
                 item_data_for_analyzer = {}
@@ -358,7 +361,7 @@ class AnalyzeManager:
                 logger.debug(f"Queueing {analyzer.uid}")
                 futures[future] = analyzer.uid
 
-            # wait for results and clean up multiprocessing
+            # wait on our futures, catch exceptions, and aggregate results
             logger.debug("Waiting for results")
             for future in as_completed(futures.keys()):
                 if future.exception():
@@ -425,13 +428,15 @@ class AnalyzeManager:
             no_print_config_exists = True
 
         # create worker pool
-        from idmtools import IdmConfigParser
         try:
+            # To ensure subprocesses reuse same config file, pass it through environment vars
             config_file = IdmConfigParser().get_config_path()
             if config_file:
                 os.environ['IDMTOOLS_CONFIG_FILE'] = config_file
 
+            # our options for our executor
             opts = dict(max_workers=n_processes, initializer=pool_worker_initializer, initargs=(map_item, self.analyzers, self.platform), )
+            # determine type. Most cases we want a process, but sometimes(like in Jupyter notebooks, we want to use threads)
             if self.executor_type == 'process':
                 executor = ProcessPoolExecutor(**opts)
             else:
