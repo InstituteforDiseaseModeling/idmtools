@@ -103,6 +103,8 @@ def system(copy_to_clipboard, no_format_for_gh, issue, output_filename):
         logger.debug("docker info done")
     except ImportError:
         pass
+    except Exception as e:
+        logger.error(e)
     if copy_to_clipboard:
         logger.debug("Copying to clipboard")
         output = '\n'.join(lines)
