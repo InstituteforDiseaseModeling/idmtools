@@ -12,6 +12,7 @@ from logging import getLogger, DEBUG
 from typing import NoReturn, List, Dict, Tuple, Optional, Union, TYPE_CHECKING
 from uuid import UUID
 from tqdm import tqdm
+from idmtools import IdmConfigParser
 from idmtools.analysis.map_worker_entry import map_item
 from idmtools.core import NoPlatformException
 from idmtools.core.enums import EntityStatus, ItemType
@@ -102,11 +103,14 @@ class AnalyzeManager:
             raise ValueError(f'{executor_type} is not a valid type for executor_type. Choose either "process" or "thread"')
 
         self.configuration = configuration or {}
+        # check for max workers
+        if IdmConfigParser().get_option('COMMON', 'max_workers', None):
+            self.configuration['max_workers'] = IdmConfigParser().get_option('COMMON', 'max_workers')
         self.platform = platform
         self.__check_for_platform_from_context(platform)
         if max_workers is not None and max_workers < 1:
             raise ValueError("max_workers must be greater or equal to one")
-        self.max_processes = max_workers if max_workers is not None else self.configuration.get('max_threads', os.cpu_count())
+        self.max_processes = max_workers if max_workers is not None else self.configuration.get('max_workers', os.cpu_count())
         logger.debug(f'AnalyzeManager set to {self.max_processes}')
         self.continue_on_error = False
 
