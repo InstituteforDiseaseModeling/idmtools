@@ -105,7 +105,7 @@ class AnalyzeManager:
         self.configuration = configuration or {}
         # check for max workers
         if IdmConfigParser().get_option('COMMON', 'max_workers', None):
-            self.configuration['max_workers'] = IdmConfigParser().get_option('COMMON', 'max_workers')
+            self.configuration['max_workers'] = int(IdmConfigParser().get_option('COMMON', 'max_workers'))
         self.platform = platform
         self.__check_for_platform_from_context(platform)
         if max_workers is not None and max_workers < 1:
