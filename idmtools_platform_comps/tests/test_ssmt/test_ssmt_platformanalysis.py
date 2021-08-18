@@ -192,7 +192,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
                    f"--experiment-ids {exp_id} " \
                    f"--analyzers infectiousness_csv_analyzer.InfectiousnessCSVAnalyzer,node_csv_analyzer.NodeCSVAnalyzer " \
                    f"--analyzer-manager-args-file extra_args.pkl " \
-                   f"--block COMPS2"
+                   f"--block BAYESIAN"
         if test_with_new_code:
             self.assertEqual(execution['Command'], f"/bin/bash {os.path.basename(wrapper)} {base_cmd}")
         else:
@@ -276,7 +276,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
         worker_order = json.load(open(os.path.join(file_path, "WorkOrder.json"), 'r'))
         self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
         execution = worker_order['Execution']
-        self.assertEqual(execution['Command'], f'/bin/bash {os.path.basename(wrapper)} python3 platform_analysis_bootstrap.py --experiment-ids {experiment_id} --analyzers simple_analyzer.SimpleAnalyzer --pre-run-func pre_load_func --block BAYESIAN')
+        self.assertEqual(execution['Command'], f'/bin/bash {os.path.basename(wrapper)} python3 platform_analysis_bootstrap.py --experiment-ids {experiment_id} --analyzers simple_analyzer.SimpleAnalyzer --pre-run-func pre_load_func --analyzer-manager-args-file extra_args.pkl --block BAYESIAN')
 
         with open(os.path.join(file_path, "stdout.txt"), 'r') as fin:
             stdout_contents = fin.read()
