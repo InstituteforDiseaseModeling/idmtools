@@ -6,6 +6,7 @@ import json
 from idmtools.assets import AssetCollection
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools.core.platform_factory import Platform
+from idmtools_test.utils.decorators import warn_amount_ssmt_image_decorator
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
 from idmtools.core import ItemType
@@ -29,6 +30,7 @@ class TestRExperiment(ITestWithPersistence):
     @pytest.mark.skip
     @pytest.mark.comps
     @pytest.mark.long
+    @warn_amount_ssmt_image_decorator
     def test_r_ssmt_workitem_add_ac_from_path(self):
         # Keep data separate from code in Dropbox
         dropbox_folder = get_dropbox_location()

@@ -1,3 +1,4 @@
+import functools
 import shutil
 
 import tempfile
@@ -252,5 +253,30 @@ def run_in_temp_dir(func):
                 shutil.rmtree(temp_dir)
             except:
                 pass
+
+    return wrapper
+
+
+def warn_amount_ssmt_image_decorator(func):
+    """
+    A decorator to warn developers about possible failures due to SSMT.
+
+    Args:
+        func: Function to wrap
+
+    Returns:
+        Wrapped function
+    """
+
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            print("These tests can fail due to changes to idmtools-core, idmtools-models, or idmtools-platform-comps. "
+                  "If you have changed the code in those libraries, you will need to build a new ssmt image, publish to staging,"
+                  "then update idmtools_platform_comps/tests/idmtools.ini by uncommenting the 'docker_image' options. You should"
+                  "change the value to the new version of the SSMT image. COMPS Will automatically pull the new image.")
+            raise e
 
     return wrapper

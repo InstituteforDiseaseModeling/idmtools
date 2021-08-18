@@ -8,6 +8,7 @@ from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.command_task import CommandTask
 from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
+from idmtools_test.utils.decorators import warn_amount_ssmt_image_decorator
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools.analysis.analyze_manager import AnalyzeManager
 
@@ -29,6 +30,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
     # test SSMTWorkItem with simple python script "hello.py"
     # "hello.py" will run in comps's workitem worker like running it in local:
     # python hello.py
+    @warn_amount_ssmt_image_decorator
     def test_ssmt_workitem_python(self):
         command = "python3 hello.py"
         user_files = AssetCollection()
@@ -56,6 +58,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
 
     # test using SSMTWormItem to run PopulationAnalyzer in comps's SSMT DockerWorker
     @pytest.mark.smoke
+    @warn_amount_ssmt_image_decorator
     def test_ssmt_workitem_PopulationAnalyzer(self):
         # load local ("inputs") PopulationAnalyzer.py and run_dtktools_PopulationAnalyzer.py
         # to COMPS's assets
@@ -87,6 +90,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
             self.assertEqual(execution['Command'], "python3 Assets/run_population_analyzer.py " + experiment_id)
 
     # test using SSMTWormItem to run multiple analyzers in comps's SSMT DockerWorker
+    @warn_amount_ssmt_image_decorator
     def test_ssmt_workitem_multiple_analyzers(self):
         # different way to load files to comps than above test case
 
@@ -129,6 +133,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
 
     # test using SSMTWormItem to run multiple experiments in comps's SSMT DockerWorker
     @pytest.mark.skip("need emodpy")
+    @warn_amount_ssmt_image_decorator
     def test_ssmt_workitem_multiple_experiments(self):
         exp_id1 = "4ea96af7-1549-ea11-a2be-f0921c167861"  # comps2 exp
         exp_id2 = "8bb8ae8f-793c-ea11-a2be-f0921c167861"  # comps2 exp
@@ -163,6 +168,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
             self.assertEqual(execution['Command'], "python3 Assets/run_multiple_exps.py " + exp_id1 + " " + exp_id2)
 
     @pytest.mark.comps
+    @warn_amount_ssmt_image_decorator
     def test_ssmt_seir_model_analysis_single_script(self):
         exp_id = "a980f265-995e-ea11-a2bf-f0921c167862"  # comps2 staging exp id
         # exp_id = "b2a31828-78ed-ea11-941f-0050569e0ef3"  # idmtvapp17
@@ -237,6 +243,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
         self.assertTrue(os.path.exists(os.path.join(file_path, "WorkOrder.json")))
 
     @pytest.mark.serial
+    @warn_amount_ssmt_image_decorator
     def test_csv_analyzer_analyze_work_item_output(self):
         # to COMPS's assets
         asset_files = AssetCollection()
@@ -294,6 +301,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
         self.assertIsNone(wi.tags)
         self.assertEqual(len(wi.transient_assets), 0)
 
+    @warn_amount_ssmt_image_decorator
     def test_workitem_task(self):
         command = "python3 hello.py"
         task = CommandTask(command=command, transient_assets=AssetCollection([os.path.join(self.input_file_path, "hello.py")]))
