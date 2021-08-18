@@ -12,8 +12,8 @@ jobs:
         os: [ubuntu-latest]
         python-version: [3.6, 3.7, 3.8]
     env:
-      bamboo_user: ${{ secrets.PYPI_STAGING_USERNAME }}
-      bamboo_password: ${{ secrets.PYPI_STAGING_PASSWORD }}
+      PYPI_STAGING_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
+      PYPI_STAGING_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
     if: "contains(github.event.head_commit.message, 'Run ubuntu smoke test!')"
     steps:
       - name: Check out Git repository
@@ -32,9 +32,9 @@ jobs:
           pip install dataclasses
       - name: download idmtools packages from staging jfrog
         run: |
-          pip install idmtools[full] --index-url=https://${{ env.bamboo_user }}:${{ env.bamboo_password }}@packages.idmod.org/api/pypi/pypi-staging/simple
-          pip install idmtools-test --index-url=https://${{ env.bamboo_user }}:${{ env.bamboo_password }}@packages.idmod.org/api/pypi/pypi-staging/simple
-          pip install idmtools[test] --index-url=https://${{ env.bamboo_user }}:${{ env.bamboo_password }}@packages.idmod.org/api/pypi/pypi-staging/simple
+          pip install idmtools[full] --index-url=https://${{ env.PYPI_STAGING_USERNAME }}:${{ secrets.PYPI_STAGING_PASSWORD }}@packages.idmod.org/api/pypi/pypi-staging/simple
+          pip install idmtools-test --index-url=https://${{ env.PYPI_STAGING_USERNAME }}:${{ secrets.PYPI_STAGING_PASSWORD }}@packages.idmod.org/api/pypi/pypi-staging/simple
+          pip install idmtools[test] --index-url=https://${{ env.PYPI_STAGING_USERNAME }}:${{ secrets.PYPI_STAGING_PASSWORD }}@packages.idmod.org/api/pypi/pypi-staging/simple
       - name: login to comps2
         run: |
           python dev_scripts/create_auth_token_args.py --username "${{ secrets.COMPS_USER }}"
@@ -42,7 +42,7 @@ jobs:
           COMPS_PASSWORD: ${{ secrets.COMPS_PASSWORD }}
       - name: login to docker staging
         run: |
-          echo '${{ env.bamboo_password }}' | docker login idm-docker-staging.packages.idmod.org --username ${{ env.bamboo_user }} --password-stdin
+          echo '${{ env.PYPI_STAGING_PASSWORD }}' | docker login idm-docker-staging.packages.idmod.org --username ${{ env.PYPI_STAGING_USERNAME }} --password-stdin
       - name: run idmtools_cli tests
         run: |
           cd idmtools_cli
