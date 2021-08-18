@@ -59,7 +59,7 @@ jobs:
         if: steps.filter.outputs.core == 'true'
         # Define password through env to avoid escaping issues
         env:
-          COMPS_PASSWORD: "${{ secrets.$COMPS_PASSWORD }}"
+          COMPS_PASSWORD: "${{ secrets.COMPS_PASSWORD }}"
         run: |
           python dev_scripts/create_auth_token_args.py --username "${{ secrets.COMPS_USER }}"
       - name: run idmtools_core all tests
@@ -116,7 +116,7 @@ jobs:
       - name: login to comps2
         if: steps.filter.outputs.core == 'true' ||  steps.filter.outputs.cli == 'true'
         env:
-          COMPS_PASSWORD: "${{ secrets.$COMPS_PASSWORD }}"
+          COMPS_PASSWORD: "${{ secrets.COMPS_PASSWORD }}"
         run: |
           python dev_scripts/create_auth_token_args.py --username "${{ secrets.COMPS_USER }}"
       - name: run idmtools_cli all tests
@@ -179,7 +179,7 @@ jobs:
       - name: login to comps2
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.models == 'true'
         env:
-          COMPS_PASSWORD: "${{ secrets.$COMPS_PASSWORD }}"
+          COMPS_PASSWORD: "${{ secrets.COMPS_PASSWORD }}"
         run: |
           python dev_scripts/create_auth_token_args.py --username "${{ secrets.COMPS_USER }}"
       - name: run idmtools_models tests
@@ -242,7 +242,7 @@ jobs:
       - name: login to comps2
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.comps == 'true' || steps.filter.outputs.models == 'true'
         env:
-          COMPS_PASSWORD: "${{ secrets.$COMPS_PASSWORD }}"
+          COMPS_PASSWORD: "${{ secrets.COMPS_PASSWORD }}"
         run: |
           python dev_scripts/create_auth_token_args.py --username "${{ secrets.COMPS_USER }}"
       - name: run idmtools_platform_comps tests
@@ -306,7 +306,7 @@ jobs:
       - name: login to comps2
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.comps == 'true' || steps.filter.outputs.models == 'true'
         env:
-          COMPS_PASSWORD: "${{ secrets.$COMPS_PASSWORD }}"
+          COMPS_PASSWORD: "${{ secrets.COMPS_PASSWORD }}"
         run: |
           python dev_scripts/create_auth_token_args.py --username "${{ secrets.COMPS_USER }}"
       - name: run idmtools_platform_local all tests
