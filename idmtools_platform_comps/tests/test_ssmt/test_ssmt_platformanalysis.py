@@ -15,6 +15,7 @@ from idmtools_test.utils.comps import COMPS_LOCAL_PACKAGE, CORE_LOCAL_PACKAGE, C
 from idmtools_test.utils.decorators import run_in_temp_dir, warn_amount_ssmt_image_decorator
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools.core import ItemType, TRUTHY_VALUES
+from idmtools_test.utils.utils import get_case_name
 
 TARGET_EXPERIMENT_ID = '9311af40-1337-ea11-a2be-f0921c167861'
 analyzer_path = os.path.join(os.path.dirname(__file__), "..", "inputs")
@@ -50,7 +51,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
 
     def setUp(self):
         print(self._testMethodName)
-        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
+        self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
         print(self.case_name)
         self.platform = Platform('BAYESIAN')
         self.tags = {'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}

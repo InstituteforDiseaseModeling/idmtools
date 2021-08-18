@@ -23,6 +23,7 @@ from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.common_experiments import wait_on_experiment_and_check_all_sim_status
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_platform_comps.utils.scheduling import default_add_workerorder_sweep_callback
+from idmtools_test.utils.utils import get_case_name
 
 
 @pytest.mark.comps
@@ -33,7 +34,7 @@ from idmtools_platform_comps.utils.scheduling import default_add_workerorder_swe
 @pytest.mark.serial
 class TestWorkOrder(ITestWithPersistence):
     def setUp(self) -> None:
-        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
+        self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
         print(self.case_name)
         self.platform = Platform('SlurmStage')
 

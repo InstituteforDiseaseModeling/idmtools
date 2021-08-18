@@ -16,6 +16,7 @@ from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test.utils.common_experiments import get_model1_templated_experiment
+from idmtools_test.utils.utils import get_case_name
 
 logger = getLogger()
 # Enable Caching of experiment past one session. Useful for working with problems in validating output of experiment
@@ -72,7 +73,7 @@ def setup_python_model_1(case_name, platform: str = 'COMPS2'):
 class TestExperimentOperations(unittest.TestCase):
 
     def setUp(self) -> None:
-        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
+        self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
         self.platform = Platform("COMPS2")
 
     def test_no_assets(self):

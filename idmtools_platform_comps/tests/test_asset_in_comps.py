@@ -16,6 +16,7 @@ from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.common_experiments import wait_on_experiment_and_check_all_sim_status
 from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id, get_asset_collection_by_id, \
     setup_test_with_platform_and_simple_sweep
+from idmtools_test.utils.utils import get_case_name
 
 
 @pytest.mark.comps
@@ -28,7 +29,7 @@ class TestAssetsInComps(unittest.TestCase):
     def setUp(self) -> None:
         self.base_path = os.path.abspath(os.path.join(COMMON_INPUT_PATH, "assets", "collections"))
         self.platform: COMPSPlatform = None
-        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
+        self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
         setup_test_with_platform_and_simple_sweep(self)
 
     def _run_and_test_experiment(self, experiment):

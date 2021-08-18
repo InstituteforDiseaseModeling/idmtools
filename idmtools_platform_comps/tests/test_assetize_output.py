@@ -18,6 +18,7 @@ from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.test_precreate_hooks import TEST_WITH_NEW_CODE
 from idmtools_test.utils.comps import load_library_dynamically, run_package_dists
 from idmtools_test.utils.test_task import TestTask
+from idmtools_test.utils.utils import get_case_name
 
 
 @pytest.mark.comps
@@ -25,7 +26,7 @@ from idmtools_test.utils.test_task import TestTask
 class TestAssetizeOutput(unittest.TestCase):
     def setUp(self) -> None:
         super().setUp()
-        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
+        self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
         self.platform = Platform("COMPS2")
 
     @classmethod

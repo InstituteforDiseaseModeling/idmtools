@@ -11,6 +11,7 @@ from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
 from idmtools_test.utils.decorators import warn_amount_ssmt_image_decorator
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools.analysis.analyze_manager import AnalyzeManager
+from idmtools_test.utils.utils import get_case_name
 
 
 @pytest.mark.comps
@@ -21,7 +22,7 @@ from idmtools.analysis.analyze_manager import AnalyzeManager
 class TestSSMTWorkItem(ITestWithPersistence):
 
     def setUp(self) -> None:
-        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
+        self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
         print(self.case_name)
         self.platform = Platform('BAYESIAN')
         self.tags = {'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}

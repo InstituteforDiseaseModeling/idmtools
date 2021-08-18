@@ -10,6 +10,7 @@ from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
+from idmtools_test.utils.utils import get_case_name
 
 
 @pytest.mark.comps
@@ -19,7 +20,7 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 class TestAddSimulationsToExperiment(ITestWithPersistence):
 
     def setUp(self) -> None:
-        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
+        self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
         self.platform = Platform('COMPS2')
 
     # test add TemlatedSimulations to existing experiment with extend

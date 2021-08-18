@@ -75,7 +75,7 @@ jobs:
     strategy:
       matrix:
         os: [ self-linux ]
-        python-version: [ '3.7.x' ]
+        python-version: [ '3.7.x', '3.8.x', '3.9.x', '3.10.0-rc.1' ]
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
@@ -134,7 +134,9 @@ jobs:
     strategy:
       matrix:
         os: [ self-linux ]
-        python-version: [ '3.7.x' ]
+        python-version: [ '3.7.x', '3.8.x', '3.9.x', '3.10.0-rc.1' ]
+    env:
+      IDMTOOLS_TEST_PREFIX: ${{ matrix.python-version }}
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
@@ -199,7 +201,9 @@ jobs:
     strategy:
       matrix:
         os: [ self-linux ]
-        python-version: [ '3.7.x' ]
+        python-version: [ '3.7.x', '3.8.x', '3.9.x', '3.10.0-rc.1' ]
+    env:
+      IDMTOOLS_TEST_PREFIX: ${{ matrix.python-version }}
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
@@ -267,7 +271,7 @@ jobs:
     strategy:
       matrix:
         os: [ self-docker ]
-        python-version: [ '3.7.x' ]
+        python-version: [ '3.7.x', '3.8.x', '3.9.x', '3.10.0-rc.1' ]
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2

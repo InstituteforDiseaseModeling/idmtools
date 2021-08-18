@@ -20,6 +20,7 @@ from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.common_experiments import wait_on_experiment_and_check_all_sim_status
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.shared_functions import validate_sim_tags, validate_output
+from idmtools_test.utils.utils import get_case_name
 
 setA = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="a")
 setB = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="b")
@@ -42,7 +43,7 @@ class setParam:
 @allure.suite("idmtools_platform_comps")
 class TestCOMPSSlurmExperiment(ITestWithPersistence):
     def setUp(self) -> None:
-        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
+        self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
         print(self.case_name)
         self.platform = Platform('SLURM')
 

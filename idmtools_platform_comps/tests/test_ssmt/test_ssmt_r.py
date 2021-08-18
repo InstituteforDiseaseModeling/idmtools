@@ -11,7 +11,7 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
 from idmtools.core import ItemType
 from idmtools.utils.dropbox_location import get_dropbox_location
-from idmtools_test.utils.utils import del_folder
+from idmtools_test.utils.utils import del_folder, get_case_name
 
 
 @pytest.mark.skip
@@ -24,7 +24,7 @@ class TestRExperiment(ITestWithPersistence):
 
     def setUp(self) -> None:
         self.platform = Platform('COMPS2')
-        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
+        self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
         self.input_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "inputs")
 
     @pytest.mark.skip
