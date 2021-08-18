@@ -97,8 +97,7 @@ class TestCOMPSSlurmExperiment(ITestWithPersistence):
         # ye_seir_model assets path
         assets_path = os.path.join(COMMON_INPUT_PATH, "python", "ye_seir_model", "Assets")
 
-        pl = RequirementsToAssetCollection(self.platform,
-                                           requirements_path=os.path.join(assets_path, 'requirements.txt'))
+        pl = RequirementsToAssetCollection(name=self.case_name, platform=self.platform, requirements_path=os.path.join(assets_path, 'requirements.txt'))
 
         ac_id = pl.run(rerun=False)
         pandas_assets = AssetCollection.from_id(ac_id, platform=self.platform, as_copy=True)

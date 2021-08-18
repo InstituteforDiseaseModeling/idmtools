@@ -197,7 +197,7 @@ class TestWorkOrder(ITestWithPersistence):
         Returns:
         """
         # add numpy package to cluster
-        pl = RequirementsToAssetCollection(self.platform, pkg_list=['numpy==1.19.5'])
+        pl = RequirementsToAssetCollection(name=self.case_name, platform=self.platform, pkg_list=['numpy==1.19.5'])
         ac_id = pl.run()
         # add numpy to common_assets for a task
         common_assets = AssetCollection.from_id(ac_id, as_copy=True)
@@ -384,7 +384,7 @@ class TestWorkOrder(ITestWithPersistence):
         Returns:
         """
         # add numpy package to cluster
-        pl = RequirementsToAssetCollection(self.platform, pkg_list=['numpy==1.19.5'])
+        pl = RequirementsToAssetCollection(name=self.case_name, platform=self.platform, pkg_list=['numpy==1.19.5'])
         ac_id = pl.run()
         # add numpy to common_assets for a task
         common_assets = AssetCollection.from_id(ac_id, as_copy=True)

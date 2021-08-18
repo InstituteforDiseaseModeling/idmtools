@@ -170,12 +170,12 @@ def setup_handlers(logging_config: IdmToolsLoggingConfig):
     exclude_logging_classes()
     reset_logging_handlers()
     file_handler = None
-    if len(logging_config.filename):
+    if logging_config.filename is not None and len(logging_config.filename):
         formatter = logging.Formatter(logging_config.file_log_format_str)
         # set the logging to either common level or the file-level
         file_handler = set_file_logging(logging_config, formatter)
 
-    if logging_config.console or len(logging_config.filename) == 0:
+    if logging_config.console or logging_config.filename or len(logging_config.filename) == 0:
         coloredlogs.install(level=logging_config.level, milliseconds=True, stream=sys.stdout)
     setup_user_logger(logging_config)
     return file_handler
