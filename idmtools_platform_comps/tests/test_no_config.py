@@ -18,6 +18,7 @@ class TestNoConfig(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
+        os.environ['IDMTOOLS_NO_CONFIG_WARNING'] = '0'
         cls.current_directory = os.getcwd()
         cls.temp_directory = tempfile.TemporaryDirectory()
         os.chdir(cls.temp_directory.name)
