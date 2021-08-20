@@ -115,7 +115,7 @@ class PrintHandler(logging.Handler):
 
 
 def setup_logging(level: Union[int, str] = logging.WARN, filename: str = 'idmtools.log',
-                  console: Union[str, bool] = False, file_level: str = 'DEBUG',
+                  console: Union[str, bool] = True, file_level: str = 'DEBUG',
                   enable_file_logging: Union[str, bool] = True, force: bool = False) -> QueueListener:
     """
     Set up logging.
