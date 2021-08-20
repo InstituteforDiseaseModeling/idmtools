@@ -151,12 +151,14 @@ def setup_logging(level: Union[int, str] = logging.WARN, filename: str = 'idmtoo
         if type(enable_file_logging) is str:
             enable_file_logging = enable_file_logging.lower() in TRUTHY_VALUES
 
-        # get a file handler
         root = logging.getLogger()
-        user = logging.getLogger('user')
-        # allow setting the debug of logger via environment variable
+        # allow setting the level of logger via environment variable
         root.setLevel(level)
+
+        # The user logger should always print to console, so add the handler here
+        user = logging.getLogger('user')
         user.setLevel(logging.DEBUG)
+        user.addHandler(logging.StreamHandler())
 
         if LOGGING_NAME is None or force:
             filename = filename.strip()
