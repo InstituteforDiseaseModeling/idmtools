@@ -125,5 +125,5 @@ when using |EMODPY_s| the :py:class:`~emodpy.emod_task.EMODTask` class is used.
 Example
 =======
 To see an applied example of the previously described information you can see a
-converted |DT| csv analyzer to |IT_s| and addition information on
+converted |DT| csv analyzer to |IT_s| and additional information on
 converting analyzers here: :doc:`analyzers/analyzers-convert`.
