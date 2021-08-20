@@ -217,7 +217,7 @@ def setup_handlers(level: int, filename, console: bool, file_level: int):
         # set the logging to either common level or the filelevel
         file_handler = set_file_logging(file_level if file_level else level, formatter, filename)
 
-    if console or len(filename) == 0:
+    if console:
         coloredlogs.install(level=level, milliseconds=True, stream=sys.stdout)
     setup_user_logger(console or len(filename) == 0)
     return file_handler
