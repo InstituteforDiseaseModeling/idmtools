@@ -18,10 +18,10 @@ for log_name, cl in logging.root.manager.loggerDict.items():
         tl = cl
         if isinstance(cl, logging.PlaceHolder):
             tl = logging.getLogger(log_name)
-        for handler in tl.handlers:
-            if isinstance(handler, logging.StreamHandler):
-                tl.removeHandler(handler)
-        tl.addHandler(logging.NullHandler())
+        # Simply removing the handlers isn't sufficient. We must
+        # prevent the COMPS loggers from propogating up to the root logger
+        tl.propagate = False
+
 from dataclasses import dataclass, field
 from functools import partial
 from typing import List
