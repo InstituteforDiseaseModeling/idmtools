@@ -193,8 +193,8 @@ def setup_handlers(level: int, filename, console: bool, file_level: int):
     Args:
         level: Level for the common logger
         filename: Log filename. Set to "" to disable file based logging
-        file_level: File Level logging
         console: Enable console based logging
+        file_level: File Level logging
 
 
     Returns:
