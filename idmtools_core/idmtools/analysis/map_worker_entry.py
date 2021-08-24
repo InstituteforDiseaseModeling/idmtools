@@ -27,7 +27,7 @@ def map_item(item: IItem) -> Dict[Union[str, UUID], Dict]:
         item: The item (often simulation) to process.
 
     Returns:
-        None
+        Dict[Union[str, UUID], Dict]
     """
     # Retrieve the global variables coming from the pool initialization
 
@@ -53,7 +53,7 @@ def _get_mapped_data_for_item(item: IEntity, analyzers: TAnalyzerList, platform:
         platform: A platform object to query for information.
 
     Returns:
-        False if an exception occurred; else True (succeeded).
+        Dict[Union[str, UUID], Dict] - Array mapping file data to from UUID/string to contents
 
     """
     try:

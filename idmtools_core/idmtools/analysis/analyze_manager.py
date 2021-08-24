@@ -7,7 +7,7 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 import os
 import sys
 import time
-from concurrent.futures import ProcessPoolExecutor, as_completed, ThreadPoolExecutor
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 from logging import getLogger, DEBUG
 from typing import NoReturn, List, Dict, Tuple, Optional, Union, TYPE_CHECKING
 from uuid import UUID
@@ -435,7 +435,7 @@ class AnalyzeManager:
                 os.environ['IDMTOOLS_CONFIG_FILE'] = config_file
 
             # our options for our executor
-            opts = dict(max_workers=n_processes, initializer=pool_worker_initializer, initargs=(map_item, self.analyzers, self.platform), )
+            opts = dict(max_workers=n_processes, initializer=pool_worker_initializer, initargs=(map_item, self.analyzers, self.platform))
             # determine type. Most cases we want a process, but sometimes(like in Jupyter notebooks, we want to use threads)
             if self.executor_type == 'process':
                 executor = ProcessPoolExecutor(**opts)

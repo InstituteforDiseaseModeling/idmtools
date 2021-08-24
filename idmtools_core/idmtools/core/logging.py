@@ -8,6 +8,7 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 import logging
 import os
 import sys
+import threading
 import time
 from contextlib import suppress
 from dataclasses import dataclass
@@ -20,6 +21,7 @@ from idmtools.core import TRUTHY_VALUES
 
 LOGGING_STARTED = False
 LOGGING_FILE_STARTED = False
+LOGGING_FILE_HANDLER = None
 
 VERBOSE = 15
 NOTICE = 25
@@ -39,11 +41,15 @@ class IdmToolsLoggingConfig:
     force: bool = False
     file_log_format_str: str = None
     user_log_format_str: str = '%(message)s'
+    use_colored_logs: bool = True
 
     def __post_init__(self):
         """
         Validates logging config creation
         """
+        if isinstance(self.use_colored_logs, str):
+            self.use_colored_logs = self.use_colored_logs.lower() in TRUTHY_VALUES
+
         if type(self.console) is str:
             self.console = self.console.lower() in TRUTHY_VALUES
         # ensure level is a logging level
@@ -96,6 +102,42 @@ class SafeRotatingFileHandler(RotatingFileHandler):
                 time.sleep(0.08)
 
 
+class MultiProcessSafeRotatingFileHandler(SafeRotatingFileHandler):
+    """
+    Multi-process safe logger
+    """
+
+    def __init__(self, filename, mode='a', maxBytes=0, backupCount=0, encoding=None, delay=False):
+        """
+        See RotatingFileHandler for full details on arguments
+
+        Args:
+            filename:
+            mode:
+            maxBytes:
+            backupCount:
+            encoding:
+            delay:
+        """
+        super().__init__(filename, mode=mode, maxBytes=maxBytes, backupCount=backupCount, encoding=encoding, delay=delay)
+        self.lock = threading.Lock()
+
+    def handle(self, record: logging.LogRecord) -> None:
+        """
+        Thread safe logger
+        Args:
+            record: Record to handle
+
+        Returns:
+
+        """
+        self.lock.acquire()
+        try:
+            super(MultiProcessSafeRotatingFileHandler, self).handle(record)
+        finally:
+            self.lock.release()
+
+
 class PrintHandler(logging.Handler):
     """
     A simple print handler. Used in cases where logging fails.
@@ -131,7 +173,7 @@ def setup_logging(logging_config: IdmToolsLoggingConfig, force: bool = False) ->
     See Also:
         For logging levels, see https://coloredlogs.readthedocs.io/en/latest/api.html#id26
     """
-    global LOGGING_STARTED, LOGGING_FILE_STARTED
+    global LOGGING_STARTED, LOGGING_FILE_STARTED, LOGGING_FILE_HANDLER
     if not LOGGING_STARTED or force:
         logging.addLevelName(15, 'VERBOSE')
         logging.addLevelName(25, 'NOTICE')
@@ -145,9 +187,14 @@ def setup_logging(logging_config: IdmToolsLoggingConfig, force: bool = False) ->
         user.setLevel(logging.DEBUG)
 
         if not LOGGING_FILE_STARTED or force:
-            file_handler = setup_handlers(logging_config)
-            if file_handler:
+            # reset logging and remove all handlers and delete our current handler
+            if LOGGING_FILE_HANDLER is not None:
+                reset_logging_handlers()
+                del LOGGING_FILE_HANDLER
+            LOGGING_FILE_HANDLER = setup_handlers(logging_config)
+            if LOGGING_FILE_HANDLER:
                 LOGGING_FILE_STARTED = True
+        setup_user_logger(logging_config)
 
         if root.isEnabledFor(logging.DEBUG):
             from idmtools import __version__
@@ -170,14 +217,18 @@ def setup_handlers(logging_config: IdmToolsLoggingConfig):
     exclude_logging_classes()
     reset_logging_handlers()
     file_handler = None
-    if logging_config.filename is not None and len(logging_config.filename):
+    if logging_config.filename:
         formatter = logging.Formatter(logging_config.file_log_format_str)
         # set the logging to either common level or the file-level
         file_handler = set_file_logging(logging_config, formatter)
 
-    if logging_config.console or logging_config.filename is None or len(logging_config.filename) == 0:
-        coloredlogs.install(level=logging_config.level, milliseconds=True, stream=sys.stdout)
-    setup_user_logger(logging_config)
+    if logging_config.console or not logging_config.filename:
+        if logging_config.use_colored_logs:
+            coloredlogs.install(level=logging_config.level, milliseconds=True, stream=sys.stdout)
+        else:
+            # Mainly for test/local platform
+            print_handler = PrintHandler(level=logging_config.level)
+            getLogger().addHandler(print_handler)
     return file_handler
 
 
@@ -191,19 +242,16 @@ def setup_user_logger(logging_config: IdmToolsLoggingConfig):
     Returns:
         None
     """
-    if logging_config.console or logging_config.filename:
-        from idmtools import IdmConfigParser
-        # should we do colored log output. We only should if
-        # 1. Console has been set in config/environment
-        # 2. USE_PRINT_OUTPUT is not enabled
-        if not logging_config.console and IdmConfigParser.get_option("Logging", "USER_PRINT", fallback="F").lower() not in TRUTHY_VALUES:
-            # install colored logs for user logger only
-            coloredlogs.install(logger=getLogger('user'), level=logging.DEBUG, fmt='%(message)s', stream=sys.stdout)
-        elif not logging_config.console:  # This is mainly for test and local platform
-            handler = PrintHandler(level=logging.DEBUG)
-            # should everything be printed using the print logger or filename was set to be empty. This means log
-            # everything to the screen without color
-            getLogger('user').addHandler(handler)
+    # check if we should use console
+    if logging_config.console and logging_config.use_colored_logs in TRUTHY_VALUES:
+        coloredlogs.install(logger=getLogger('user'), level=logging.DEBUG, fmt='%(message)s', stream=sys.stdout)
+    else:  # no matter if console is set, we should fallback to print handler here
+        formatter = logging.Formatter(fmt='%(message)s')
+        handler = PrintHandler(level=logging.DEBUG)
+        handler.setFormatter(formatter)
+        # should everything be printed using the print logger or filename was set to be empty. This means log
+        # everything to the screen without color
+        getLogger('user').addHandler(handler)
 
 
 def set_file_logging(logging_config: IdmToolsLoggingConfig, formatter: logging.Formatter):
@@ -221,7 +269,7 @@ def set_file_logging(logging_config: IdmToolsLoggingConfig, formatter: logging.F
     if file_handler is None:
         # We had an issue creating file handler, so let's try using default name + pids
         for i in range(64):  # We go to 64. This is a reasonable max id for any computer we might actually run item.
-            file_handler = create_file_handler(logging_config.filename, formatter, f"idmtools.{i}.log")
+            file_handler = create_file_handler(logging_config.filename, formatter, f"{logging_config.file_level}.{i}.log")
             if file_handler:
                 break
         if file_handler is None:
@@ -243,7 +291,7 @@ def create_file_handler(file_level, formatter: logging.Formatter, filename: str)
         SafeRotatingFileHandler with properties provided
     """
     try:
-        file_handler = SafeRotatingFileHandler(filename, maxBytes=(2 ** 20) * 10, backupCount=5)
+        file_handler = MultiProcessSafeRotatingFileHandler(filename, maxBytes=(2 ** 20) * 10, backupCount=5)
         file_handler.setLevel(file_level)
         file_handler.setFormatter(formatter)
     except PermissionError:

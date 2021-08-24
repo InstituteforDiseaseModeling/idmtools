@@ -3,7 +3,7 @@ import os
 import unittest
 import pytest
 from click.testing import CliRunner
-os.environ['IDMTOOLS_LOGGING_USER_PRINT'] = '1'
+os.environ['IDMTOOLS_LOGGING_USE_COLORED_LOGS'] = 'f'
 os.environ['IDMTOOLS_HIDE_DEV_WARNING'] = '1'
 from idmtools_cli.cli.gitrepo import gitrepo, get_plugins_examples, validate
 from idmtools_test.utils.cli import get_subcommands_from_help_result, run_command

@@ -1,9 +1,9 @@
 import allure
 import io
 import os
-import tempfile
 import unittest.mock
 import pytest
+from idmtools_test.utils.decorators import run_in_temp_dir
 from idmtools.config import IdmConfigParser
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
@@ -18,17 +18,21 @@ class TestNoConfig(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        os.environ['IDMTOOLS_NO_CONFIG_WARNING'] = '0'
         cls.current_directory = os.getcwd()
-        cls.temp_directory = tempfile.TemporaryDirectory()
-        os.chdir(cls.temp_directory.name)
+
+    def setUp(self) -> None:
+        os.environ['IDMTOOLS_LOGGING_USE_COLORED_LOGS'] = 'f'
+        os.environ['IDMTOOLS_NO_CONFIG_WARNING'] = '0'
 
     @classmethod
     def tearDownClass(cls) -> None:
         try:
-            del os.environ['IDMTOOLS_ERROR_NO_CONFIG']
-            # try to cleanup but be ok with failures
-            cls.temp_directory.cleanup()
+            if 'IDMTOOLS_ERROR_NO_CONFIG' in os.environ:
+                del os.environ['IDMTOOLS_ERROR_NO_CONFIG']
+            if 'IDMTOOLS_NO_CONFIG_WARNING' in os.environ:
+                del os.environ['IDMTOOLS_NO_CONFIG_WARNING']
+            if 'IDMTOOLS_LOGGING_USE_COLORED_LOGS' in os.environ:
+                del os.environ['IDMTOOLS_LOGGING_USE_COLORED_LOGS']
         except:
             pass
         os.chdir(cls.current_directory)
@@ -37,8 +41,8 @@ class TestNoConfig(unittest.TestCase):
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
     @pytest.mark.comps
     @pytest.mark.serial
+    @run_in_temp_dir
     def test_success(self, output):
-
         IdmConfigParser.clear_instance()
         sim_root_dir = os.path.join('$COMPS_PATH(USER)', 'output')
         plat_obj = Platform('COMPS',
@@ -60,6 +64,7 @@ class TestNoConfig(unittest.TestCase):
 
     @pytest.mark.comps
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
+    @run_in_temp_dir
     def test_failure(self, output):
         IdmConfigParser.clear_instance()
         sim_root_dir = os.path.join('$COMPS_PATH(USER)', 'output')
@@ -80,9 +85,9 @@ class TestNoConfig(unittest.TestCase):
 
     @pytest.mark.comps
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
+    @run_in_temp_dir
     def test_env_success(self, output):
         sim_root_dir = os.path.join('$COMPS_PATH(USER)', 'output')
-        os.environ['IDMTOOLS_NO_CONFIG_WARNING'] = '0'
         IdmConfigParser.clear_instance()
         plat_obj = Platform('COMPS',
                             endpoint='https://comps2.idmod.org',

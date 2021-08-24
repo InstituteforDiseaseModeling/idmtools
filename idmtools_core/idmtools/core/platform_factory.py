@@ -127,9 +127,9 @@ class Platform:
             section = IdmConfigParser.get_section(block)
             if not section and missing_ok:
                 # its possible our logger is not setup
-                from idmtools.core.logging import setup_logging, LISTENER
-                if not LISTENER:
-                    setup_logging()
+                from idmtools.core.logging import setup_logging, LOGGING_STARTED, IdmToolsLoggingConfig
+                if not LOGGING_STARTED:
+                    setup_logging(IdmToolsLoggingConfig())
         except ValueError as e:
             if logger.isEnabledFor(DEBUG):
                 logger.debug(f"Checking aliases for {block.upper()}")
