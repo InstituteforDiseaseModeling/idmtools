@@ -73,10 +73,40 @@ class IdmToolsLoggingConfig:
                 self.file_log_format_str = '%(asctime)s.%(msecs)d %(pathname)s:%(lineno)d %(funcName)s [%(levelname)s] - %(message)s'
 
 
-class SafeRotatingFileHandler(RotatingFileHandler):
+class MultiProcessSafeRotatingFileHandler(RotatingFileHandler):
     """
-    SafeRotatingFileHandler allows us to handle errors that occur during roll-over of multi-process log events.
+    Multi-process safe logger
     """
+
+    def __init__(self, filename, mode='a', maxBytes=0, backupCount=0, encoding=None, delay=False):
+        """
+        See RotatingFileHandler for full details on arguments
+
+        Args:
+            filename:
+            mode:
+            maxBytes:
+            backupCount:
+            encoding:
+            delay:
+        """
+        super().__init__(filename, mode=mode, maxBytes=maxBytes, backupCount=backupCount, encoding=encoding, delay=delay)
+        self.logger_lock = threading.Lock()
+
+    def handle(self, record: logging.LogRecord) -> None:
+        """
+        Thread safe logger
+        Args:
+            record: Record to handle
+
+        Returns:
+
+        """
+        self.logger_lock.acquire()
+        try:
+            super(MultiProcessSafeRotatingFileHandler, self).handle(record)
+        finally:
+            self.logger_lock.release()
 
     def doRollover(self) -> None:
         """
@@ -100,42 +130,6 @@ class SafeRotatingFileHandler(RotatingFileHandler):
                     self.baseFilename += f".{os.getpid()}"
                     attempts = 0
                 time.sleep(0.08)
-
-
-class MultiProcessSafeRotatingFileHandler(SafeRotatingFileHandler):
-    """
-    Multi-process safe logger
-    """
-
-    def __init__(self, filename, mode='a', maxBytes=0, backupCount=0, encoding=None, delay=False):
-        """
-        See RotatingFileHandler for full details on arguments
-
-        Args:
-            filename:
-            mode:
-            maxBytes:
-            backupCount:
-            encoding:
-            delay:
-        """
-        super().__init__(filename, mode=mode, maxBytes=maxBytes, backupCount=backupCount, encoding=encoding, delay=delay)
-        self.lock = threading.Lock()
-
-    def handle(self, record: logging.LogRecord) -> None:
-        """
-        Thread safe logger
-        Args:
-            record: Record to handle
-
-        Returns:
-
-        """
-        self.lock.acquire()
-        try:
-            super(MultiProcessSafeRotatingFileHandler, self).handle(record)
-        finally:
-            self.lock.release()
 
 
 class PrintHandler(logging.Handler):
@@ -280,7 +274,7 @@ def set_file_logging(logging_config: IdmToolsLoggingConfig, formatter: logging.F
 
 def create_file_handler(file_level, formatter: logging.Formatter, filename: str):
     """
-    Create a SafeRotatingFileHandler for idmtools.log.
+    Create a MultiProcessSafeRotatingFileHandler for idmtools.log.
 
     Args:
         file_level: Level to log to file
@@ -323,7 +317,7 @@ def exclude_logging_classes(items_to_exclude=None):
         None
     """
     if items_to_exclude is None:
-        items_to_exclude = ['urllib3', 'paramiko', 'matplotlib']
+        items_to_exclude = ['urllib3', 'paramiko', 'matplotlib', 'COMPS']
     # remove comps by default
     for item in items_to_exclude:
         other_logger = getLogger(item)

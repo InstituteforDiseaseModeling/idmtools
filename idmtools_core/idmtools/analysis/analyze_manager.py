@@ -103,8 +103,10 @@ class AnalyzeManager:
             raise ValueError(f'{executor_type} is not a valid type for executor_type. Choose either "process" or "thread"')
 
         self.configuration = configuration or {}
-        # check for max workers
-        if IdmConfigParser().get_option('COMMON', 'max_workers', None):
+        # check for max workers on platform, then in common
+        if hasattr(platform, 'max_workers'):
+            self.configuration['max_workers'] = int(self.platform.max_workers)
+        elif IdmConfigParser().get_option('COMMON', 'max_workers', None):
             self.configuration['max_workers'] = int(IdmConfigParser().get_option('COMMON', 'max_workers'))
         self.platform = platform
         self.__check_for_platform_from_context(platform)
