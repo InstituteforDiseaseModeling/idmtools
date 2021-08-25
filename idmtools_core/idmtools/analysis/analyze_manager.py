@@ -464,6 +464,8 @@ class AnalyzeManager:
             del os.environ['IDMTOOLS_NO_PRINT_CONFIG_USED']
             del os.environ['IDMTOOLS_HIDE_DEV_WARNING']
             del os.environ['IDMTOOLS_NO_CONFIG_WARNING']
+        if 'IDMTOOLS_CONFIG_FILE' in os.environ:
+            del os.environ['IDMTOOLS_CONFIG_FILE']
 
         if self.verbose:
             total_time = time.time() - start_time

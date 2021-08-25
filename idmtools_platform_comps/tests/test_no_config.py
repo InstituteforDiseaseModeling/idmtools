@@ -1,3 +1,5 @@
+from logging import getLogger
+
 import allure
 import io
 import os
@@ -7,6 +9,8 @@ from idmtools_test.utils.decorators import run_in_temp_dir
 from idmtools.config import IdmConfigParser
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
+
+logger = getLogger(__name__)
 
 
 @pytest.mark.smoke
@@ -21,8 +25,11 @@ class TestNoConfig(unittest.TestCase):
         cls.current_directory = os.getcwd()
 
     def setUp(self) -> None:
-        os.environ['IDMTOOLS_LOGGING_USE_COLORED_LOGS'] = 'f'
+        if 'IDMTOOLS_CONFIG_FILE' in os.environ:
+            del os.environ['IDMTOOLS_CONFIG_FILE']
+        os.environ['IDMTOOLS_ERROR_NO_CONFIG'] = 't'
         os.environ['IDMTOOLS_NO_CONFIG_WARNING'] = '0'
+        IdmConfigParser.clear_instance()
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -31,8 +38,6 @@ class TestNoConfig(unittest.TestCase):
                 del os.environ['IDMTOOLS_ERROR_NO_CONFIG']
             if 'IDMTOOLS_NO_CONFIG_WARNING' in os.environ:
                 del os.environ['IDMTOOLS_NO_CONFIG_WARNING']
-            if 'IDMTOOLS_LOGGING_USE_COLORED_LOGS' in os.environ:
-                del os.environ['IDMTOOLS_LOGGING_USE_COLORED_LOGS']
         except:
             pass
         os.chdir(cls.current_directory)
@@ -43,7 +48,8 @@ class TestNoConfig(unittest.TestCase):
     @pytest.mark.serial
     @run_in_temp_dir
     def test_success(self, output):
-        IdmConfigParser.clear_instance()
+        logger.info(f'Current Directory: {os.getcwd()}')
+        logger.info(f'Current idmtools file: {IdmConfigParser.get_config_path()}')
         sim_root_dir = os.path.join('$COMPS_PATH(USER)', 'output')
         plat_obj = Platform('COMPS',
                             endpoint='https://comps2.idmod.org',
@@ -66,7 +72,7 @@ class TestNoConfig(unittest.TestCase):
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
     @run_in_temp_dir
     def test_failure(self, output):
-        IdmConfigParser.clear_instance()
+        logger.info(f'Current Directory: {os.getcwd()}')
         sim_root_dir = os.path.join('$COMPS_PATH(USER)', 'output')
         with self.assertRaises(ValueError) as a:
             plat_obj = Platform('COMPS',
@@ -87,8 +93,8 @@ class TestNoConfig(unittest.TestCase):
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
     @run_in_temp_dir
     def test_env_success(self, output):
+        logger.info(f'Current Directory: {os.getcwd()}')
         sim_root_dir = os.path.join('$COMPS_PATH(USER)', 'output')
-        IdmConfigParser.clear_instance()
         plat_obj = Platform('COMPS',
                             endpoint='https://comps2.idmod.org',
                             environment='Bayesian',

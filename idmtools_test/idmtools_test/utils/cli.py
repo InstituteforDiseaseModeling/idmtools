@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict
 
 from click.testing import CliRunner, Result
 
@@ -19,7 +19,9 @@ def striped_cli_output_lines(result):
     return list(filter(lambda x: len(x), map(str.strip, result.output.split('\n'))))
 
 
-def invoke_command(*args, start_command=None, mix_stderr: bool = True):
+def invoke_command(*args, start_command=None, mix_stderr: bool = True, env: Dict[str, str] = None):
+    if env is None:
+        env = dict()
     if start_command is None:
         start_command = []
     from idmtools_cli.main import start
@@ -31,9 +33,9 @@ def invoke_command(*args, start_command=None, mix_stderr: bool = True):
     return result
 
 
-def run_command(*args: str, start_command: List[str] = None, base_command: str = None, mix_stderr: bool = True) -> Result:
+def run_command(*args: str, start_command: List[str] = None, base_command: str = None, mix_stderr: bool = True, env: Dict[str, str] = None) -> Result:
     if start_command is None:
         start_command = []
     if base_command:
         start_command.append(base_command)
-    return invoke_command(*args, start_command=start_command, mix_stderr=mix_stderr)
+    return invoke_command(*args, start_command=start_command, mix_stderr=mix_stderr, env=env)

@@ -42,6 +42,8 @@ class IdmToolsLoggingConfig:
     file_log_format_str: str = None
     user_log_format_str: str = '%(message)s'
     use_colored_logs: bool = True
+    #: Disables user output. This should only be used in certain situations like CLI's that output JSON
+    disable_user_output: bool = False
 
     def __post_init__(self):
         """
@@ -188,7 +190,8 @@ def setup_logging(logging_config: IdmToolsLoggingConfig, force: bool = False) ->
             LOGGING_FILE_HANDLER = setup_handlers(logging_config)
             if LOGGING_FILE_HANDLER:
                 LOGGING_FILE_STARTED = True
-        setup_user_logger(logging_config)
+        if not logging_config.disable_user_output:
+            setup_user_logger(logging_config)
 
         if root.isEnabledFor(logging.DEBUG):
             from idmtools import __version__
@@ -216,7 +219,8 @@ def setup_handlers(logging_config: IdmToolsLoggingConfig):
         # set the logging to either common level or the file-level
         file_handler = set_file_logging(logging_config, formatter)
 
-    if logging_config.console or not logging_config.filename:
+    # If user output is not disabled and console is enabled
+    if not logging_config.disable_user_output and logging_config.console:
         if logging_config.use_colored_logs:
             coloredlogs.install(level=logging_config.level, milliseconds=True, stream=sys.stdout)
         else:
@@ -238,10 +242,10 @@ def setup_user_logger(logging_config: IdmToolsLoggingConfig):
     """
     # check if we should use console
     if logging_config.console and logging_config.use_colored_logs in TRUTHY_VALUES:
-        coloredlogs.install(logger=getLogger('user'), level=logging.DEBUG, fmt='%(message)s', stream=sys.stdout)
+        coloredlogs.install(logger=getLogger('user'), level=VERBOSE, fmt='%(message)s', stream=sys.stdout)
     else:  # no matter if console is set, we should fallback to print handler here
         formatter = logging.Formatter(fmt='%(message)s')
-        handler = PrintHandler(level=logging.DEBUG)
+        handler = PrintHandler(level=VERBOSE)
         handler.setFormatter(formatter)
         # should everything be printed using the print logger or filename was set to be empty. This means log
         # everything to the screen without color
@@ -254,7 +258,7 @@ def set_file_logging(logging_config: IdmToolsLoggingConfig, formatter: logging.F
 
     Args:
         logging_config: Logging config object.
-        formatter:  Formater obj
+        formatter:  Formatter obj
 
     Returns:
         Return File handler

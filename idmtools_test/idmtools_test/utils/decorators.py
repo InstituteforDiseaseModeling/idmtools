@@ -8,6 +8,7 @@ import platform
 import time
 import unittest
 from functools import wraps
+from logging import getLogger
 from typing import Callable, Union, Any, Optional
 import pytest
 from idmtools import IdmConfigParser
@@ -25,6 +26,7 @@ from idmtools_test.utils.utils import is_global_configuration_enabled
 # test-docker run any tests that depend on docker locally(Mostly local runn)
 # test-all runs all tests
 
+logger = getLogger(__name__)
 
 linux_only = unittest.skipIf(
     not platform.system() in ["Linux", "Darwin"], 'No Tests that are meant for linux'
@@ -245,6 +247,7 @@ def run_in_temp_dir(func):
         current_dir = os.getcwd()
         temp_dir = tempfile.mkdtemp()
         try:
+            logger.debug(f"Running function in: {temp_dir}")
             os.chdir(temp_dir)
             func(*args, **kwargs)
         finally:
@@ -273,10 +276,12 @@ def warn_amount_ssmt_image_decorator(func):
         try:
             return func(*args, **kwargs)
         except Exception as e:
-            print("These tests can fail due to changes to idmtools-core, idmtools-models, or idmtools-platform-comps. "
-                  "If you have changed the code in those libraries, you will need to build a new ssmt image, publish to staging,"
-                  "then update idmtools_platform_comps/tests/idmtools.ini by uncommenting the 'docker_image' options. You should"
-                  "change the value to the new version of the SSMT image. COMPS Will automatically pull the new image.")
+            logger.error(
+                "These tests can fail due to changes to idmtools-core, idmtools-models, or idmtools-platform-comps. "
+                "If you have changed the code in those libraries, you will need to build a new ssmt image, publish to staging,"
+                "then update idmtools_platform_comps/tests/idmtools.ini by uncommenting the 'docker_image' options. You should"
+                "change the value to the new version of the SSMT image. COMPS Will automatically pull the new image."
+            )
             raise e
 
     return wrapper

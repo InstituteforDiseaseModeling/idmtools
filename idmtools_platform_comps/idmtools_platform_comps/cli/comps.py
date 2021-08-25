@@ -88,7 +88,7 @@ try:
     def login(ctx: click.Context, username, password):  # noqa D103
         from COMPS import Client
         from idmtools.core.logging import SUCCESS
-        os.environ['IDMTOOLS_SUPPRESS_OUTPUT'] = '1'
+        os.environ['IDMTOOLS_LOGGING_DISABLE_USER_OUTPUT'] = '1'
         if password:
             user_logger.warning("Password the password via the command line is considered insecure")
         else:
@@ -149,7 +149,7 @@ try:
                 "the item will be deleted before the output can be fetched.")
 
         if json:
-            os.environ['IDMTOOLS_SUPPRESS_OUTPUT'] = '1'
+            os.environ['IDMTOOLS_LOGGING_DISABLE_USER_OUTPUT'] = '1'
             os.environ['IDMTOOLS_DISABLE_PROGRESS_BAR'] = '1'
 
         p: COMPSPlatform = Platform(ctx.obj['config_block'])
@@ -243,7 +243,7 @@ try:
             user_logger.error("--id-filename is required when filename is not provided")
             sys.exit(-1)
         if json:
-            os.environ['IDMTOOLS_SUPPRESS_OUTPUT'] = '1'
+            os.environ['IDMTOOLS_LOGGING_DISABLE_USER_OUTPUT'] = '1'
             os.environ['IDMTOOLS_DISABLE_PROGRESS_BAR'] = '1'
 
         p: COMPSPlatform = Platform(ctx.obj['config_block'])
