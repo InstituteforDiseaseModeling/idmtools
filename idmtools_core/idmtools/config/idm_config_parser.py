@@ -329,7 +329,7 @@ class IdmConfigParser:
         Returns:
             Return if output should be disabled
         """
-        return not any([x.lower() in TRUTHY_VALUES for x in [IdmConfigParser.get_option('logging', "USER_OUTPUT", 't')]])
+        return any([x.lower() in TRUTHY_VALUES for x in [IdmConfigParser.get_option('logging', "USER_OUTPUT", 'on')]])
 
     @classmethod
     def ensure_init(cls, dir_path: str = '.', file_name: str = default_config, force: bool = False) -> None:
