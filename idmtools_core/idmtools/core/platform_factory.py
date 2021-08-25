@@ -12,6 +12,7 @@ from dataclasses import fields
 from logging import getLogger, DEBUG
 from typing import Dict, Any, TYPE_CHECKING
 from idmtools.config import IdmConfigParser
+from idmtools.core import TRUTHY_VALUES
 from idmtools.core.context import set_current_platform, remove_current_platform
 from idmtools.utils.entities import validate_user_inputs_against_dataclass
 
@@ -192,7 +193,8 @@ class Platform:
         # Display block info
         try:
             from idmtools.core.logging import VERBOSE
-            if IdmConfigParser.is_output_enabled():
+            # is output enabled and is showing of platform config enabled?
+            if IdmConfigParser.is_output_enabled() and IdmConfigParser.get_option(None, "SHOW_PLATFORM_CONFIG", 't').lower() in TRUTHY_VALUES:
                 if is_alias:
                     user_logger.log(VERBOSE, f"\n[{block}]")
                     user_logger.log(VERBOSE, json.dumps(section, indent=3))

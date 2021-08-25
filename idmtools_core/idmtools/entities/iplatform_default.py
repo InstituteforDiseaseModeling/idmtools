@@ -28,7 +28,7 @@ def default_cpu_count():
         Default cpu count
     """
     from idmtools import IdmConfigParser
-    return int(IdmConfigParser().get_option('COMMON', 'max_threads', os.cpu_count()))
+    return int(IdmConfigParser().get_option('COMMON', 'max_workers', os.cpu_count()))
 
 
 @dataclass

@@ -223,7 +223,11 @@ class IdmConfigParser:
             # init logging here as this is our most likely entry-point into an idmtools "application"
             cls._init_logging()
             from idmtools.core.logging import VERBOSE
-            if IdmConfigParser.get_option("NO_PRINT_CONFIG_USED", fallback="F").lower() not in TRUTHY_VALUES and IdmConfigParser.get_option("logging", "DISABLE_USER_OUTPUT", fallback="F").lower() not in TRUTHY_VALUES:
+
+            if IdmConfigParser.get_option("NO_PRINT_CONFIG_USED", fallback="F").lower() not in TRUTHY_VALUES and IdmConfigParser.get_option("logging", "USER_OUTPUT", fallback="t").lower() in TRUTHY_VALUES:
+                # let users know when they are using environment variable to local config
+                if "IDMTOOLS_CONFIG_FILE" in os.environ:
+                    user_logger.warning("idmtools config defined through 'IDMTOOLS_CONFIG_FILE' environment variable")
                 user_logger.log(VERBOSE, "INI File Used: {}".format(ini_file))
 
     @classmethod
@@ -325,7 +329,7 @@ class IdmConfigParser:
         Returns:
             Return if output should be disabled
         """
-        return not any([x.lower() in TRUTHY_VALUES for x in [IdmConfigParser.get_option('logging', "DISABLE_USER_OUTPUT", 'f')]])
+        return not any([x.lower() in TRUTHY_VALUES for x in [IdmConfigParser.get_option('logging', "USER_OUTPUT", 't')]])
 
     @classmethod
     def ensure_init(cls, dir_path: str = '.', file_name: str = default_config, force: bool = False) -> None:

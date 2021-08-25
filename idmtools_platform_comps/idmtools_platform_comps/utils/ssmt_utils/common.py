@@ -20,7 +20,7 @@ def ensure_debug_logging():
     os.environ['IDMTOOLS_LOGGING_LEVEL'] = 'DEBUG'
     os.environ['IDMTOOLS_LOGGING_CONSOLE'] = 'on'
     from idmtools.core.logging import setup_logging, IdmToolsLoggingConfig
-    setup_logging(IdmToolsLoggingConfig(level=DEBUG, console=True), force=True)
+    setup_logging(IdmToolsLoggingConfig(level=DEBUG, console=True, force=True))
     # Import idmtools here to enable logging
     from idmtools import __version__
     logger.debug(f"Using idmtools {__version__}")

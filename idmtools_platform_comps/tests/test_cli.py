@@ -26,7 +26,7 @@ class TestCompsCLI(unittest.TestCase):
         # Setup logging for cli
         os.environ['IDMTOOLS_LOGGING_USE_COLORED_LOGS'] = 'f'
         os.environ['IDMTOOLS_HIDE_DEV_WARNING'] = '1'
-        setup_logging(IdmToolsLoggingConfig(level=DEBUG), force=True)
+        setup_logging(IdmToolsLoggingConfig(level=DEBUG, force=True))
         with suppress(PermissionError):
             if os.path.exists(pwd.joinpath("singularity.id")):
                 os.remove(pwd.joinpath("singularity.id"))
@@ -41,7 +41,7 @@ class TestCompsCLI(unittest.TestCase):
         # Reset Logging
         del os.environ['IDMTOOLS_LOGGING_USE_COLORED_LOGS']
         del os.environ['IDMTOOLS_HIDE_DEV_WARNING']
-        setup_logging(IdmToolsLoggingConfig(level=DEBUG, filename='idmtools.log'), force=True)
+        setup_logging(IdmToolsLoggingConfig(level=DEBUG, filename='idmtools.log', force=True))
 
     def test_subcommands_exists(self):
         result = run_command('--help')

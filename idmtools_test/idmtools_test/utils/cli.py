@@ -27,9 +27,9 @@ def invoke_command(*args, start_command=None, mix_stderr: bool = True, env: Dict
     from idmtools_cli.main import start
     from idmtools_cli.cli.entrypoint import cli
     start()
-    runner = CliRunner(mix_stderr=mix_stderr)
+    runner = CliRunner(mix_stderr=mix_stderr, env=env)
     final_command = start_command + list(args) if len(args) else start_command
-    result = runner.invoke(cli, final_command)
+    result = runner.invoke(cli, final_command, env=env)
     return result
 
 

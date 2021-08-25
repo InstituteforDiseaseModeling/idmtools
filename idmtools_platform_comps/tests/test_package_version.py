@@ -22,8 +22,13 @@ class TestPackageVersionCLI(unittest.TestCase):
     def setUpClass(cls) -> None:
         env = dict(
             # ensure cli commands use the print logger so output is captured
-            IDMTOOLS_LOGGING_USE_COLORED_LOGS='f'
+            IDMTOOLS_LOGGING_USE_COLORED_LOGS='f',
+            # disable printing the block here
+            SHOW_PLATFORM_CONFIG='f',
+            # Hide dev warnings
+            HIDE_DEV_WARNING='t'
         )
+        # default options for cli commands
         cls.default_opts = dict(
             mix_stderr=False,
             env=env
@@ -38,7 +43,9 @@ class TestPackageVersionCLI(unittest.TestCase):
             '--pkg', 'astor~=0.7.0', **self.default_opts)
         self.assertTrue(result.exit_code == 0, msg=result.output)
         print(result.stdout)
-        ac_id = result.stdout.strip()
+        ac_id = result.stdout.strip().split("\n")
+        self.assertGreaterEqual(len(ac_id), 1, msg=f"Could not find ac_id in {ac_id}")
+        ac_id = ac_id[-1].strip()
 
         # run ac-exist to verify ac
         ac = AssetCollection.from_id(ac_id, as_copy=True)
@@ -53,7 +60,9 @@ class TestPackageVersionCLI(unittest.TestCase):
         result1 = run_command('comps', 'SLURM2', 'req2ac', '--pkg', 'astor~=0.7.0', **self.default_opts)
         self.assertTrue(result1.exit_code == 0, msg=result1.output)
         print(result1.stdout)
-        ac_id = result1.stdout.strip()
+        ac_id = result1.stdout.strip().split("\n")
+        self.assertGreaterEqual(len(ac_id), 1, msg=f"Could not find ac_id in {ac_id}")
+        ac_id = ac_id[-1].strip()
 
         # run ac-exist to verify ac
         result2 = run_command('comps', 'SLURM2', 'ac-exist', '--pkg', 'astor~=0.7.0', **self.default_opts)

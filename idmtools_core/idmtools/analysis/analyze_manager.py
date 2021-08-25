@@ -91,7 +91,7 @@ class AnalyzeManager:
             force_manager_working_directory (bool, optional): [description]. Defaults to False.
             exclude_ids (List[UUID], optional): [description]. Defaults to None.
             analyze_failed_items (bool, optional): Allows analyzing of failed items. Useful when you are trying to aggregate items that have failed. Defaults to False.
-            max_workers (int, optional): Set the max workers. If not provided, falls back to the configuration item *max_threads*. If max_threads is not set in configuration, defaults to CPU count
+            max_workers (int, optional): Set the max workers. If not provided, falls back to the configuration item *max_threads*. If max_workers is not set in configuration, defaults to CPU count
             executor_type: (str): Whether to use process or thread pooling. Process pooling is more efficient but threading might be required in some environments
         """
         super().__init__()

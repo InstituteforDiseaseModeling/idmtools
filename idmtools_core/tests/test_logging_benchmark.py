@@ -11,7 +11,7 @@ from concurrent.futures.thread import ThreadPoolExecutor
 from logging import DEBUG, getLogger
 from unittest import TestCase, skip
 
-from idmtools.core.logging import setup_logging
+from idmtools.core.logging import setup_logging, IdmToolsLoggingConfig
 from idmtools_test.utils.decorators import run_test_in_n_seconds
 
 
@@ -33,12 +33,7 @@ LOG_TESTS_TO_RUN = 50000 if getattr(sys, 'gettrace', None) is None else 5000
 class TestLoggingBenchmark(TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        cls.listener = setup_logging()
-
-    @classmethod
-    def tearDownClass(cls) -> None:
-        if cls.listener:
-            cls.listener.stop()
+        setup_logging(IdmToolsLoggingConfig())
 
     @run_test_in_n_seconds(10)
     def test_logger_threaded_performance(self):
