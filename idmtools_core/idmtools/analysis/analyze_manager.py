@@ -109,8 +109,8 @@ class AnalyzeManager:
         self.__check_for_platform_from_context(platform)
         if max_workers is None:
             # check for max workers on platform, then in common
-            if self.platform and hasattr(self.platform, '_config_block') and IdmConfigParser.get_option(platform._config_block, "max_workers", None):
-                self.configuration['max_workers'] = int(IdmConfigParser.get_option(platform._config_block, "max_workers", None))
+            if self.platform and hasattr(self.platform, '_config_block') and IdmConfigParser.get_option(self.platform._config_block, "max_workers", None):
+                self.configuration['max_workers'] = int(IdmConfigParser.get_option(self.platform._config_block, "max_workers", None))
             elif IdmConfigParser().get_option('COMMON', 'max_workers', None):
                 self.configuration['max_workers'] = int(IdmConfigParser().get_option('COMMON', 'max_workers'))
 
