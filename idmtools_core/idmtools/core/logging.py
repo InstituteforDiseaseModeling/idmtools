@@ -87,7 +87,7 @@ class IdmToolsLoggingConfig:
 
         # set default file log format str
         if self.file_log_format_str is None:
-            if self.filename == logging.DEBUG:
+            if self.file_level == logging.DEBUG:
                 # Enable detailed logging format
                 self.file_log_format_str = '%(asctime)s.%(msecs)d %(pathname)s:%(lineno)d %(funcName)s [%(levelname)s] (%(process)d,%(thread)d) - %(message)s'
             else:
