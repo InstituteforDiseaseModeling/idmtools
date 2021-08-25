@@ -1,7 +1,7 @@
 """This script is currently a workaround so that we can use bump2version with docker since the nightly versions doesn't work with docker registry.
 
 Notes:
-    If you are using this script locally, you need to set the environment variables *bamboo_UserArtifactory* and *bamboo_PasswordArtifactory*.
+    If you are using this script locally, you need to set the environment variables *PYPI_STAGING_USERNAME* and *PYPI_STAGING_PASSWORD*.
     These can be set to your idm email/password
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
@@ -64,13 +64,13 @@ def get_username_and_password(disable_keyring_load=False, disable_keyring_save=F
     Returns:
         Username password
     """
-    if 'bamboo_UserArtifactory' in os.environ:
+    if 'PYPI_STAGING_USERNAME' in os.environ:
         logger.info("Loading Credentials from environment")
-        if 'bamboo_PasswordArtifactory' not in os.environ:
+        if 'PYPI_STAGING_PASSWORD' not in os.environ:
             logger.error("When specifying username from environment variable, you must also specify password")
             sys.exit(-1)
-        username = os.environ['bamboo_UserArtifactory']
-        password = os.environ['bamboo_PasswordArtifactory']
+        username = os.environ['PYPI_STAGING_USERNAME']
+        password = os.environ['PYPI_STAGING_PASSWORD']
     elif not disable_keyring_load and keyring.get_credential(KEYRING_NAME, "username"):
         username = keyring.get_password(KEYRING_NAME, "username")
         password = keyring.get_password(KEYRING_NAME, "password")
