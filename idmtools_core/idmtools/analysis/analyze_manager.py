@@ -104,7 +104,7 @@ class AnalyzeManager:
 
         self.configuration = configuration or {}
         # check for max workers on platform, then in common
-        if hasattr(platform, 'max_workers'):
+        if platform and hasattr(platform, 'max_workers'):
             self.configuration['max_workers'] = int(platform.max_workers)
         elif IdmConfigParser().get_option('COMMON', 'max_workers', None):
             self.configuration['max_workers'] = int(IdmConfigParser().get_option('COMMON', 'max_workers'))
