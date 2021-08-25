@@ -13,7 +13,7 @@ from idmtools.core.platform_factory import Platform
 from idmtools_test.utils.common_experiments import wait_on_experiment_and_check_all_sim_status, \
     get_model1_templated_experiment
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
-from idmtools_test.utils.utils import del_folder
+from idmtools_test.utils.utils import del_folder, get_case_name
 from idmtools_test.utils.decorators import run_in_temp_dir
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
@@ -32,7 +32,7 @@ sys.path.insert(0, analyzer_path)
 class TestAnalyzeManagerPythonComps(ITestWithPersistence):
 
     def setUp(self) -> None:
-        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
+        self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
         print(self.case_name)
         self.p = Platform('COMPS2')
 

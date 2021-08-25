@@ -1,8 +1,8 @@
 .. _COMPS CLI:
 
-=====
-COMPS
-=====
+=========
+CLI COMPS
+=========
 
 The |COMPS_s| platform related commands can be accessed with either
 ``idmtools comps`` or ``comps-cli``. All comps command require a target configuration

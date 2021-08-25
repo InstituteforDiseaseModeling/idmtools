@@ -1,7 +1,6 @@
 import json
 import os
 from typing import Dict, Any, Union
-from idmtools.core.interfaces.iitem import IItem
 from idmtools.entities.ianalyzer import IAnalyzer as BaseAnalyzer
 
 import matplotlib as mpl
