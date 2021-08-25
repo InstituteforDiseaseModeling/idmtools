@@ -242,6 +242,7 @@ def setup_handlers(logging_config: IdmToolsLoggingConfig):
 
     # If user output is enabled and console is enabled
     if logging_config.user_output and logging_config.console:
+        # is colored logging enabled
         if logging_config.use_colored_logs:
             coloredlogs.install(level=logging_config.level, milliseconds=True, stream=sys.stdout)
         else:
@@ -261,16 +262,28 @@ def setup_user_logger(logging_config: IdmToolsLoggingConfig):
     Returns:
         None
     """
-    # check if we should use console
-    if logging_config.console and logging_config.use_colored_logs:
-        coloredlogs.install(logger=getLogger('user'), level=VERBOSE, fmt='%(message)s', stream=sys.stdout)
-    else:  # no matter if console is set, we should fallback to print handler here
-        formatter = logging.Formatter(fmt='%(message)s')
-        handler = PrintHandler(level=VERBOSE)
-        handler.setFormatter(formatter)
-        # should everything be printed using the print logger or filename was set to be empty. This means log
-        # everything to the screen without color
-        getLogger('user').addHandler(handler)
+    # if console is enabled, user logger will inherit from that logger
+    if not logging_config.console:
+        # is colored logs enabled? If so, make the user logger a coloredlogger
+        if logging_config.use_colored_logs:
+            coloredlogs.install(logger=getLogger('user'), level=VERBOSE, fmt='%(message)s', stream=sys.stdout)
+        else:  # fall back to a print handler
+            setup_user_print_logger()
+
+
+def setup_user_print_logger():
+    """
+    Setup a print based logger for user messages.
+
+    Returns:
+        None
+    """
+    formatter = logging.Formatter(fmt='%(message)s')
+    handler = PrintHandler(level=VERBOSE)
+    handler.setFormatter(formatter)
+    # should everything be printed using the print logger or filename was set to be empty. This means log
+    # everything to the screen without color
+    getLogger('user').addHandler(handler)
 
 
 def set_file_logging(logging_config: IdmToolsLoggingConfig, formatter: logging.Formatter):
