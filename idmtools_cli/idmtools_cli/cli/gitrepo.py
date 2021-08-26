@@ -6,6 +6,8 @@ import click
 from click import secho
 from colorama import Fore
 from typing import Optional, List
+
+from idmtools.core.logging import SUCCESS
 from idmtools_cli.cli.entrypoint import cli
 from idmtools.utils.gitrepo import GitRepo, REPO_OWNER, GITHUB_HOME, REPO_NAME
 from idmtools.registry.master_plugin_registry import MasterPluginRegistry
@@ -81,7 +83,7 @@ def repos(owner: Optional[str], page: Optional[int]):
         secho(str(ex), fg="yellow")
         exit(1)
     repos_full = [f'    - {GITHUB_HOME}/{r}' for r in repos]
-    secho(f"GitHub Owner: {gr.repo_owner}", fg="green")
+    user_logger.log(SUCCESS, f"GitHub Owner: {gr.repo_owner}")
     user_logger.info('\n'.join(repos_full))
 
 

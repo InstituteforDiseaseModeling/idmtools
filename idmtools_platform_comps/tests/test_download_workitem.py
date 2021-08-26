@@ -12,6 +12,7 @@ from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.test_precreate_hooks import TEST_WITH_NEW_CODE
 from idmtools_test.utils.comps import run_package_dists
 from idmtools_test.utils.decorators import linux_only, windows_only
+from idmtools_test.utils.utils import get_case_name
 
 
 @pytest.mark.comps
@@ -19,7 +20,7 @@ from idmtools_test.utils.decorators import linux_only, windows_only
 class TestDownloadWorkItem(unittest.TestCase):
     def setUp(self) -> None:
         super().setUp()
-        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
+        self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
         self.platform = Platform("Bayesian")
 
     @classmethod

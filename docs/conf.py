@@ -50,7 +50,10 @@ extensions = [
     'sphinxcontrib.programoutput',
     'sphinx_copybutton',
     'sphinxext.remoteliteralinclude',
-    'sphinx.ext.intersphinx'
+    # intersphinx to allow cross-reference
+    'sphinx.ext.intersphinx',
+    # automatic section names so linking between section is easy
+    'sphinx.ext.autosectionlabel'
 ]
 
 plantuml = 'plantweb'
@@ -58,12 +61,16 @@ plantuml = 'plantweb'
 autodoc_default_options = {
     'member-order': 'bysource',
     'members': None,
+    'special-members': '__init__',
     'exclude-members': '__all__'
 }
 
 autodoc_mock_imports = ['pika',
                         'dramatiq']
 
+suppress_warnings = [
+    'autosectionlabel.changlog*',
+]
 
 napoleon_google_docstring = True
 # napoleon_numpy_docstring = True

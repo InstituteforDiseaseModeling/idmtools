@@ -1,7 +1,5 @@
-.. _COMPS_Download:
-
-Download
-========
+DownloadWorkItem
+================
 
 :py:class:`~idmtools_platform_comps.utils.download.download.DownloadWorkItem` will let you
 download files using glob patterns, and also from the CLI. You can download files from one or many experiments, simulations, work items, and asset collection.
@@ -18,7 +16,7 @@ Also review the class details :py:class:`~idmtools_platform_comps.utils.download
 
 You can also run this command from the CLI. For details, see :ref:`COMPS CLI reference<COMPS CLI>`
 
-Errors
-------
+Download errors
+---------------
 
-See :ref:`COMPS Errors reference<COMPS_Errors>`
+See :ref:`COMPS Errors reference<COMPS Errors>`

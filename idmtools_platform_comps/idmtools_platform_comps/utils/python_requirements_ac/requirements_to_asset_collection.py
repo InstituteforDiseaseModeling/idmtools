@@ -32,10 +32,12 @@ class RequirementsToAssetCollection:
     RequirementsToAssetCollection provides a utility to install python packages into an asset collection.
 
     Notes:
-        - TODO - Incorporate exmaple in this docs
+        - TODO - Incorporate example in this docs
     """
     #: Platform object
     platform: COMPSPlatform = field(default=None)
+    #: Name of experiment when installing requirements
+    name: str = field(default="install custom requirements")
     #: Path to requirements file
     requirements_path: str = field(default=None)
     #: list of packages
@@ -253,9 +255,8 @@ class RequirementsToAssetCollection:
         """
         self.save_updated_requirements()
 
-        exp_name = "install custom requirements"
         task = JSONConfiguredPythonTask(script_path=os.path.join(CURRENT_DIRECTORY, MODEL_LOAD_LIB))
-        experiment = Experiment(name=exp_name, simulations=[task.to_simulation()])
+        experiment = Experiment(name=self.name, simulations=[task.to_simulation()])
         experiment.add_asset(Asset(REQUIREMENT_FILE))
         experiment.tags = self.md5_tag
 

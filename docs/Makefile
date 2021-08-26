@@ -54,19 +54,19 @@ clean:
 generate-api:
 	-rm modules.rst
 	-rm idmtools_index.rst
-	sphinx-apidoc -f -e -M -o . ../idmtools_core/idmtools
+	sphinx-apidoc -f -e -M -o . --templatedir api_templates ../idmtools_core/idmtools
 	mv modules.rst idmtools_index.rst
 
 	-rm idmtools_models_index.rst
-	sphinx-apidoc -f -e -M -o . ../idmtools_models/idmtools_models
+	sphinx-apidoc -f -e -M -o . --templatedir api_templates ../idmtools_models/idmtools_models
 	mv modules.rst idmtools_models_index.rst
 
 	-rm idmtools_platform_comps_index.rst
-	sphinx-apidoc -f -e -M -o . ../idmtools_platform_comps/idmtools_platform_comps
+	sphinx-apidoc -f -e -M -o . --templatedir api_templates ../idmtools_platform_comps/idmtools_platform_comps
 	mv modules.rst idmtools_platform_comps_index.rst
 
 	-rm idmtools_platform_local_index.rst
-	SPHINX_APIDOC_OPTIONS=members,undoc-members,show-inheritance,ignore-module-all sphinx-apidoc -f -e -M -o . ../idmtools_platform_local/idmtools_platform_local
+	SPHINX_APIDOC_OPTIONS=members,undoc-members,show-inheritance,ignore-module-all sphinx-apidoc -f -e -M -o . --templatedir api_templates  ../idmtools_platform_local/idmtools_platform_local
 	mv modules.rst idmtools_platform_local_index.rst
 	rm -rf idmtools_platform_local.internals.tasks.*.rst
 	cp idmtools_platform_local.internals.tasks.template idmtools_platform_local.internals.tasks.rst

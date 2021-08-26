@@ -11,8 +11,7 @@ from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 from idmtools_platform_comps.ssmt_work_items.comps_workitems import VisToolsWorkItem
 from idmtools_test import COMMON_INPUT_PATH
-from idmtools_test.utils.utils import del_folder
-
+from idmtools_test.utils.utils import del_folder, get_case_name
 
 DEFAULT_INPUT_PATH = os.path.join(COMMON_INPUT_PATH, "malaria_brazil_central_west_spatial")
 DEFAULT_ERADICATION_PATH = os.path.join(DEFAULT_INPUT_PATH, "Assets", "Eradication.exe")
@@ -74,7 +73,7 @@ class TestVisToolsWorkItem(unittest.TestCase):
         cls.wi.run(wait_on_done=True)
 
     def setUp(self):
-        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
+        self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
 
     # ------------------------------------------
     # test vistools workitem and outpur

@@ -9,7 +9,9 @@ The following user recipes provide specific examples on accomplishing some commo
    :titlesonly:
 
    cookbook/assets
+   cookbook/builders
    cookbook/comps/index
    cookbook/environment
    cookbook/experiments
+   cookbook/logging
    cookbook/python

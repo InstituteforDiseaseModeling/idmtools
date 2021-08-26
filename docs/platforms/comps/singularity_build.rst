@@ -1,5 +1,3 @@
-.. _Singularity Build:
-
 Singularity Build
 =================
 

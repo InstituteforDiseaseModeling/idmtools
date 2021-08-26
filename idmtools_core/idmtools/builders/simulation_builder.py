@@ -3,6 +3,7 @@ idmtools SimulationBuilder definition.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+import pandas as pd
 import inspect
 from functools import partial
 from inspect import signature
@@ -117,7 +118,7 @@ class SimulationBuilder:
             raise ValueError(f"The function {function} passed to SweepBuilder.add_sweep_definition "
                              f"needs to take a {self.SIMULATION_ATTR} argument!")
         # Retrieve all the free parameters of the signature (other than `simulation`)
-        remaining_parameters = [name for name, param in parameters.items() if name != self.SIMULATION_ATTR and param.default == inspect.Parameter.empty]
+        remaining_parameters = [name for name, param in parameters.items() if name != self.SIMULATION_ATTR and not isinstance(param.default, pd.DataFrame) and param.default == inspect.Parameter.empty]
         return remaining_parameters
 
     def add_multiple_parameter_sweep_definition(self, function: TSweepFunction, *args, **kwargs):

@@ -19,7 +19,7 @@ default_timeout: int = 30
 # Items related to internals of the local platform. Most likely you want to use the defaults
 #
 # Which work image to use
-workers_image: str = 'docker-staging.packages.idmod.org:latest'
+workers_image: str = 'idm-docker-staging.packages.idmod.org:latest'
 # Port to display UI (ie the portion after colon in default URL http://localhost:5000)
 workers_ui_port int = 5000
 # This sets the max memory for workers container

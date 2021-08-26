@@ -3,6 +3,7 @@ import os
 from functools import partial
 
 import numpy as np
+import pandas as pd
 import pytest
 
 from idmtools.builders import ArmSimulationBuilder, SweepArm, ArmType, SimulationBuilder
@@ -134,6 +135,45 @@ class TestMultipleBuilders(ITestWithPersistence):
         with self.assertRaises(ValueError) as context:
             sb.add_multiple_parameter_sweep_definition(update_command_task, a_values, b_values)
         self.assertIn("defining a sweep across multiple parameters, they must be specified either in a Dict in the form of {{ KeyWork: Values }} where values is a list or [ Param1-Vals, Param2-Vals]", context.exception.args[0])
+
+    def test_simulation_builder_args_pandas(self):
+        """
+        Test to ensure #1593 is working
+        """
+        from idmtools.entities.simulation import Simulation
+        from idmtools.entities.templated_simulation import simulation_generator
+
+        def test_pandas_callback(simulation, value, df=pd.DataFrame()):
+            return {'t': value}
+
+        sb = SimulationBuilder()
+        sb.add_sweep_definition(test_pandas_callback, range(2))
+        sims = [s for s in simulation_generator([sb], Simulation)]
+        self.assertEqual(len(sims), 2)
+        t_tags = [s.tags['t'] for s in sims]
+        self.assertIn(0, t_tags)
+        self.assertIn(1, t_tags)
+
+    def test_simulation_multiple_args_pandas(self):
+        """
+        Test to ensure #1593 is working
+        """
+        from idmtools.entities.simulation import Simulation
+        from idmtools.entities.templated_simulation import simulation_generator
+
+        def test_pandas_callback(simulation, value, value2, df=pd.DataFrame()):
+            return {'t': value, 'x': value2}
+
+        sb = SimulationBuilder()
+        sb.add_multiple_parameter_sweep_definition(test_pandas_callback, range(2), [3, 4])
+        sims = [s for s in simulation_generator([sb], Simulation)]
+        self.assertEqual(len(sims), 4)
+        t_tags = set(s.tags['t'] for s in sims)
+        self.assertIn(0, t_tags)
+        self.assertIn(1, t_tags)
+        x_tags = set(s.tags['x'] for s in sims)
+        self.assertIn(3, x_tags)
+        self.assertIn(4, x_tags)
 
     def test_simulation_builder_args_mismatch(self):
         """Test simulation builder using multiple arguments that do not match the callback

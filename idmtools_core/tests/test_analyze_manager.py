@@ -64,6 +64,10 @@ class TestAnalyzeManager(unittest.TestCase):
         self.analyze_manager.add_item(item=self.sample_experiment)
         self.assertEqual(len(self.analyze_manager.potential_items), 1)
 
+    def test_worker_override_works(self):
+        am = AnalyzeManager(self.platform, max_workers=2)
+        self.assertEqual(am.max_processes, 2)
+
     def test_can_analyze_item(self):
         self.analyze_manager.partial_analyze_ok = True
         for status in EntityStatus:
@@ -194,9 +198,3 @@ class TestAnalyzeManager(unittest.TestCase):
             actual = [analyzer.working_dir for analyzer in am.analyzers]
             self.assertEqual(actual, expected[force_wd])
 
-    # does it properly return t/f for excpetions in the cache?
-    def test_check_exception(self):
-        self.analyze_manager.cache['random_key'] = 9
-        self.assertFalse(self.analyze_manager._check_exception())
-        self.analyze_manager.cache[AnalyzeManager.EXCEPTION_KEY] = 'blah'
-        self.assertTrue(self.analyze_manager._check_exception())

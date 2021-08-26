@@ -11,7 +11,7 @@ from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_platform_comps.utils.package_version import get_latest_pypi_package_version_from_artifactory, get_versions_from_site, get_pypi_package_versions_from_artifactory
 from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection import RequirementsToAssetCollection
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
-from idmtools_test.utils.utils import del_folder
+from idmtools_test.utils.utils import del_folder, get_case_name
 
 model_path = os.path.join(os.path.dirname(__file__), "inputs", "simple_load_lib_example")
 sys.path.insert(0, model_path)
@@ -26,7 +26,7 @@ sys.path.insert(0, model_path)
 class TestLoadLibWheel(ITestWithPersistence):
 
     def setUp(self) -> None:
-        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
+        self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
         print(self.case_name)
         self.platform = Platform('COMPS2')
 
@@ -99,7 +99,7 @@ class TestLoadLibWheel(ITestWithPersistence):
         # ------------------------------------------------------
         requirements_path = os.path.join(model_path, 'requirements.txt')
         pL = Platform('SLURM', num_cores=2)
-        rta = RequirementsToAssetCollection(platform=pL, requirements_path=requirements_path)
+        rta = RequirementsToAssetCollection(name=self.case_name, platform=pL, requirements_path=requirements_path)
         ac_id = rta.run(rerun=True)
 
         self.assertIsNotNone(ac_id)
@@ -112,7 +112,7 @@ class TestLoadLibWheel(ITestWithPersistence):
         # First load 'zipp' package (note: comps does not have 'zipp' package)
         # ------------------------------------------------------
         requirements_path = os.path.join(model_path, 'requirements.txt')
-        pl = RequirementsToAssetCollection(self.platform, requirements_path=requirements_path)
+        pl = RequirementsToAssetCollection(name=self.case_name, platform=self.platform, requirements_path=requirements_path)
         ac_id = pl.run(rerun=True)
         common_assets = AssetCollection.from_id(ac_id, platform=self.platform, as_copy=True)
 
@@ -146,7 +146,7 @@ class TestLoadLibWheel(ITestWithPersistence):
         # First NOT load 'zipp' package to test negative case, (to see if zipp_file.py script will fail in comps)
         # xmlrunner==1.7.7 here is loading a unrelated package to avoid empty packages for RequirementsToAssetCollection
         # ------------------------------------------------------
-        pl = RequirementsToAssetCollection(self.platform, requirements_path="", pkg_list=["xmlrunner==1.7.7"])
+        pl = RequirementsToAssetCollection(name=self.case_name, platform=self.platform, requirements_path="", pkg_list=["xmlrunner==1.7.7"])
         ac_id = pl.run()
         common_assets = AssetCollection.from_id(ac_id, platform=self.platform, as_copy=True)
 
@@ -180,7 +180,7 @@ class TestLoadLibWheel(ITestWithPersistence):
         # ------------------------------------------------------
         requirements_path = os.path.join(model_path, 'requirements1.txt')
         local_wheels_path = [os.path.join(model_path, 'seaborn-0.7.1-py2.py3-none-any.whl')]
-        pl = RequirementsToAssetCollection(self.platform, requirements_path=requirements_path, local_wheels=local_wheels_path)
+        pl = RequirementsToAssetCollection(name=self.case_name, platform=self.platform, requirements_path=requirements_path, local_wheels=local_wheels_path)
         ac_id = pl.run()
         common_assets = AssetCollection.from_id(ac_id, platform=self.platform, as_copy=True)
 
@@ -215,7 +215,7 @@ class TestLoadLibWheel(ITestWithPersistence):
         # ------------------------------------------------------
         platform = Platform('SLURM')
         requirements_path = os.path.join(model_path, 'requirements1.txt')
-        pl = RequirementsToAssetCollection(platform, requirements_path=requirements_path)
+        pl = RequirementsToAssetCollection(name=self.case_name, platform=platform, requirements_path=requirements_path)
         ac_id = pl.run()
         common_assets = AssetCollection.from_id(ac_id, platform=platform, as_copy=True)
 
@@ -241,7 +241,7 @@ class TestLoadLibWheel(ITestWithPersistence):
         # ------------------------------------------------------
         platform = Platform('SLURM')
         requirements_path = os.path.join(model_path, 'requirements.txt')
-        pl = RequirementsToAssetCollection(platform, requirements_path=requirements_path)
+        pl = RequirementsToAssetCollection(name=self.case_name, platform=platform, requirements_path=requirements_path)
         ac_id = pl.run(rerun=True)
         common_assets = AssetCollection.from_id(ac_id, platform=platform, as_copy=True)
 
@@ -273,7 +273,7 @@ class TestLoadLibWheel(ITestWithPersistence):
         # First load custom wheel with RequirementsToAssetCollection
         # ------------------------------------------------------
         requirements_path = os.path.join(model_path, 'requirements3.txt')
-        pl = RequirementsToAssetCollection(self.platform, requirements_path=requirements_path)
+        pl = RequirementsToAssetCollection(name=self.case_name, platform=self.platform, requirements_path=requirements_path)
         ac_id = pl.run()
         common_assets = AssetCollection.from_id(ac_id, platform=self.platform, as_copy=True)
 
@@ -299,7 +299,7 @@ class TestLoadLibWheel(ITestWithPersistence):
         # First load custom wheel with RequirementsToAssetCollection
         # ------------------------------------------------------
         requirements_path = os.path.join(model_path, 'requirements3.txt')
-        pl = RequirementsToAssetCollection(self.platform, requirements_path=requirements_path)
+        pl = RequirementsToAssetCollection(name=self.case_name, platform=self.platform, requirements_path=requirements_path)
         ac_id = pl.run(rerun=False)
         self.assertIsNotNone(ac_id)
         common_assets = AssetCollection.from_id(ac_id, platform=self.platform, as_copy=True)
