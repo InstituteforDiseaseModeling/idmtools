@@ -1,5 +1,8 @@
 # Example to download files to local from COMPS with DownloadWorkItem
-# You can also run download files with idmtools cli command under current dir
+# in this example, it downloads all files from COMPS simulation's 'output' folder. you can filter specific files with
+# file_patterns, for example: file_patterns=["output/*.csv"] to only download csv files from output dir
+
+# You can also download the same files from COMPS with idmtools cli command under current dir. i.e:
 # idmtools comps CALCULON  download --experiment 7a7b7c10-f1f3-eb11-a9ed-b88303911bc1 --name example_test --output-path output_dir --pattern output\** --no-delete-after-download --extract-after-download
 
 import os
