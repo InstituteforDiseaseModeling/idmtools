@@ -5,6 +5,9 @@
 # You can also download the same files from COMPS with idmtools cli command under current dir. i.e:
 # idmtools comps CALCULON  download --experiment 7a7b7c10-f1f3-eb11-a9ed-b88303911bc1 --name example_test --output-path output_dir --pattern output\** --no-delete-after-download --extract-after-download
 
+# Note: DownloadAnalyzer is the preferred way to download files. This only advantage of DownloadWorkItem is the ability
+# to download folders or specific file patterns. It should only be used in these cases or slow network
+
 import os
 import sys
 
