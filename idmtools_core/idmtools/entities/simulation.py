@@ -7,7 +7,7 @@ All simulations have a task. Optionally that have assets. All simulations should
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 from dataclasses import dataclass, field, fields
-from logging import getLogger, DEBUG
+from logging import getLogger, DEBUG, warning
 from typing import List, Union, Mapping, Any, Type, TypeVar, Dict, TYPE_CHECKING
 from idmtools.assets import AssetCollection, Asset
 from idmtools.core import ItemType, NoTaskFound
@@ -16,6 +16,7 @@ from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
 from idmtools.core.interfaces.iitem import IItem
 from idmtools.core.interfaces.inamed_entity import INamedEntity
 from idmtools.entities.task_proxy import TaskProxy
+from idmtools.utils.filters.asset_filters import TFILE_FILTER_TYPE
 from idmtools.utils.language import get_qualified_class_name_from_obj
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -178,12 +179,31 @@ class Simulation(IAssetsEnabled, INamedEntity):
         return Simulation(task=task, tags=dict() if tags is None else tags,
                           assets=asset_collection if asset_collection else AssetCollection())
 
-    def list_static_assets(self, platform: 'IPlatform' = None, **kwargs) -> List[Asset]:
+    def list_static_assets(self, platform: 'IPlatform' = None, filters: TFILE_FILTER_TYPE = None, **kwargs) -> List[Asset]:
         """
         List assets that have been uploaded to a server already.
 
         Args:
             platform: Optional platform to load assets list from
+            filters: Filters to apply. These should be a function that takes a str and return true or false
+            **kwargs:
+
+        Returns:
+            List of assets
+
+        Raises:
+            ValueError - If you try to list an assets for an simulation that hasn't been created/loaded from a remote platform.
+        """
+        warning.warn("list_static_assets will be deprecated in 1.7.0 in favor of list_assets")
+        return self.list_assets(platform=platform, filters=filters, **kwargs)
+
+    def list_assets(self, platform: 'IPlatform' = None, filters: TFILE_FILTER_TYPE = None, **kwargs) -> List[Asset]:
+        """
+        List assets that have been uploaded to a server already.
+
+        Args:
+            platform: Optional platform to load assets list from
+            filters: Filters to apply. These should be a function that takes a str and return true or false
             **kwargs:
 
         Returns:
@@ -193,9 +213,9 @@ class Simulation(IAssetsEnabled, INamedEntity):
             ValueError - If you try to list an assets for an simulation that hasn't been created/loaded from a remote platform.
         """
         if self.id is None:
-            raise ValueError("You can only list static assets on an existing experiment")
+            raise ValueError("You can only list static assets on an existing simulations")
         p = super()._check_for_platform_from_context(platform)
-        return p._simulations.list_assets(self, **kwargs)
+        return p.list_assets(self, filters=filters, **kwargs)
 
     def to_dict(self) -> Dict:
         """
@@ -211,6 +231,22 @@ class Simulation(IAssetsEnabled, INamedEntity):
         result['_uid'] = self.uid
         result['task'] = self.task.to_dict() if self.task else None
         return result
+
+    def list_files(self, platform: 'IPlatform' = None, filters: TFILE_FILTER_TYPE = None, **kwargs) -> List[Asset]:
+        """
+        List of files(output) for Simulation.
+
+        Args:
+            platform: Optional platform to load assets list from
+            filters: Filters to apply. These should be a function that takes a str and return true or false
+            **kwargs:
+        Returns:
+            List of assets
+        """
+        if self.id is None:
+            raise ValueError("You can only list static assets on an existing simulations")
+        p = super()._check_for_platform_from_context(platform)
+        return p.list_files(self, filters=filters, **kwargs)
 
 
 # TODO Rename to T simulation once old simulation is one

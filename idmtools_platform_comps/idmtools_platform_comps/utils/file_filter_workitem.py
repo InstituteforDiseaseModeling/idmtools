@@ -60,7 +60,7 @@ class AtLeastOneItemToWatch(Exception):
 @dataclass(repr=False)
 class FileFilterWorkItem(SSMTWorkItem, ABC):
     """
-    Defines our filtering workitem base that is used by assetize outputs and download work items.
+    Defines our filtering work-item base that is used by assetize outputs and download work items.
     """
     #: List of glob patterns. See https://docs.python.org/3.7/library/glob.html for details on the patterns
     file_patterns: List[str] = field(default_factory=list)

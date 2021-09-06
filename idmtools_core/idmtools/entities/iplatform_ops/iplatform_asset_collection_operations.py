@@ -12,9 +12,11 @@ from idmtools.assets import AssetCollection
 from idmtools.core import CacheEnabled
 from idmtools.entities.iplatform_ops.utils import batch_create_items
 from idmtools.registry.functions import FunctionPluginManager
+from idmtools.utils.filters.asset_filters import TFILE_FILTER_TYPE
 
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
+    from idmtools.assets.asset import Asset
 logger = getLogger(__name__)
 
 
@@ -59,7 +61,7 @@ class IPlatformAssetCollectionOperations(CacheEnabled, ABC):
             logger.debug("Calling post_creation")
         asset_collection.post_creation(self.platform)
 
-    def create(self, asset_collection: AssetCollection, do_pre: bool = True, do_post: bool = True, **kwargs) -> Any:
+    def create(self, asset_collection: AssetCollection, do_pre: bool = True, do_post: bool = True, **kwargs) -> AssetCollection:
         """
         Creates an AssetCollection from an IDMTools AssetCollection object.
 
@@ -72,22 +74,22 @@ class IPlatformAssetCollectionOperations(CacheEnabled, ABC):
             **kwargs: Optional arguments mainly for extensibility
 
         Returns:
-            Created platform item and the UUID of said item
+            Created AssetCollection
         """
         if asset_collection.status is not None:
-            return asset_collection._platform_object
+            return asset_collection
         if do_pre:
             if logger.isEnabledFor(DEBUG):
                 logger.debug("Calling pre_create")
             self.pre_create(asset_collection, **kwargs)
         if logger.isEnabledFor(DEBUG):
             logger.debug("Calling platform_create")
-        ret = self.platform_create(asset_collection, **kwargs)
+        asset_collection._platform_object = self.platform_create(asset_collection, **kwargs)
         if do_post:
             if logger.isEnabledFor(DEBUG):
                 logger.debug("Calling post_create")
             self.post_create(asset_collection, **kwargs)
-        return ret
+        return asset_collection
 
     @abstractmethod
     def platform_create(self, asset_collection: AssetCollection, **kwargs) -> Any:
@@ -144,3 +146,35 @@ class IPlatformAssetCollectionOperations(CacheEnabled, ABC):
             IDMTools suite object
         """
         return asset_collection
+
+    def platform_list_assets(self, asset_collection: AssetCollection, filters: TFILE_FILTER_TYPE = None, **kwargs) -> List['Asset']:
+        """
+        List the assets on an asset collection.
+
+        Args:
+            asset_collection: Asset collection to list.
+            filters: Filters to apply. These should be a function that takes a str and return true or false
+            **kwargs: Extra Arguments
+
+        Returns:
+            List of Assets
+        """
+        return []
+
+    def list_assets(self, asset_collection: AssetCollection, filters: TFILE_FILTER_TYPE = None, **kwargs):
+        """
+        List the assets for an asset collection.
+
+        Args:
+            asset_collection: Asset collection to list
+            filters: Filters to apply. These should be a function that takes a str and return true or false
+            **kwargs:
+
+        Returns:
+            List of assets
+
+        Notes:
+            At the moment, we just call platform list assets. In the future, we can add extra functionality here if needed
+            to apply to all platforms.
+        """
+        return self.platform_list_assets(asset_collection, filters=filters, **kwargs)

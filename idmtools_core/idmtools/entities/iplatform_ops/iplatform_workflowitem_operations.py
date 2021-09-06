@@ -13,6 +13,7 @@ from idmtools.core import CacheEnabled, getLogger
 from idmtools.entities.iplatform_ops.utils import batch_create_items
 from idmtools.entities.iworkflow_item import IWorkflowItem
 from idmtools.registry.functions import FunctionPluginManager
+from idmtools.utils.filters.asset_filters import TFILE_FILTER_TYPE
 
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
@@ -284,14 +285,28 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
         pass
 
     @abstractmethod
-    def list_assets(self, workflow_item: IWorkflowItem, **kwargs) -> List[Asset]:
+    def list_assets(self, workflow_item: IWorkflowItem, filters: TFILE_FILTER_TYPE = None, **kwargs) -> List[Asset]:
         """
         List available assets for a workflow item.
 
         Args:
             workflow_item: workflow item to list files for
+            filters: Filters to apply. These should be a function that takes a str and return true or false
 
         Returns:
             List of filenames
+        """
+        pass
+
+    @abstractmethod
+    def list_files(self, workflow_item: IWorkflowItem, filters: TFILE_FILTER_TYPE = None, **kwargs) -> List[Asset]:
+        """
+        List available output files for a workflow item.
+
+        Args:
+            workflow_item: workflow item to list files for
+            filters: Filters to apply. These should be a function that takes a str and return true or false
+        Returns:
+            List of Assets
         """
         pass

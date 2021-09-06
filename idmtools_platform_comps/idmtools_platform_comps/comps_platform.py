@@ -8,6 +8,7 @@ import logging
 # fix for comps weird import
 from idmtools.assets.asset_collection import AssetCollection
 from idmtools.core.interfaces.ientity import IEntity
+from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_default import AnalyzerManagerPlatformDefault, IPlatformDefault
 from idmtools.entities.iworkflow_item import IWorkflowItem
 
@@ -53,7 +54,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     Represents the platform allowing to run simulations on COMPS.
     """
 
-    MAX_SUBDIRECTORY_LENGTH = 35  # avoid maxpath issues on COMPS
+    MAX_SUBDIRECTORY_LENGTH = 35  # avoid max-path issues on COMPS
 
     endpoint: str = field(default="https://comps2.idmod.org", metadata={"help": "URL of the COMPS endpoint to use"})
     environment: str = field(default="Bayesian", metadata=dict(help="Name of the COMPS environment to target", callback=environment_list))
@@ -107,19 +108,70 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     def post_setstate(self):
         self.__init_interfaces()
 
+    def get_experiment_link(self, experiment: Experiment):
+        """
+        Get a link to an experiment.
+
+        Args:
+            experiment: Experiment to generate link for
+
+        Returns:
+            Link to experiment
+        """
+        return f"{self.endpoint}/#explore/Experiments?filters=Id={experiment.uid}"
+
     def get_workitem_link(self, work_item: IWorkflowItem):
+        """
+        Get link to a workitem.
+
+        Args:
+            work_item: Workitem to link to
+
+        Returns:
+            WorkItem Link
+        """
         return f"{self.endpoint}/#explore/WorkItems?filters=Id={work_item.uid}"
 
     def get_asset_collection_link(self, asset_collection: AssetCollection):
+        """
+        Get Link to a AssetCollection
+
+        Args:
+            asset_collection: AssetCollection to get link to
+
+        Returns:
+            Link to Asset Collection
+        """
         return f"{self.endpoint}/#explore/AssetCollections?filters=Id={asset_collection.uid}"
 
     def get_username(self):
+        """
+        Get logged in username.
+
+        Returns:
+            User currently logged in.
+        """
         return Client.auth_manager()._username
 
     def is_windows_platform(self, item: IEntity = None) -> bool:
+        """
+        Is the target item on Windows?
+
+        Args:
+            item:  Item to check
+
+        Returns:
+            True if on windows
+        """
         if isinstance(item, IWorkflowItem):
             return False
         return super().is_windows_platform(item)
 
+    def follow_stdout_text(self, experiment: Experiment):
+        po = experiment.get_platform_object()
 
-
+        path = '/Experiments{0}'.format(f'{experiment.uid}')
+        authtoken = Client.auth_manager().get_auth_token()
+        kwargs = dict()
+        kwargs['headers'][authtoken[0]] = authtoken[1]
+        resp = Client.get(path)

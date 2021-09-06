@@ -4,6 +4,7 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import copy
 import os
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from itertools import tee
 from logging import getLogger, DEBUG
@@ -22,6 +23,7 @@ from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools.utils.collections import ExperimentParentIterator
+from idmtools.utils.filters.asset_filters import TFILE_FILTER_TYPE, apply_file_filters
 from idmtools.utils.info import get_doc_base_url
 from idmtools.utils.time import timestamp
 from idmtools_platform_comps.utils.general import clean_experiment_name, convert_comps_status
@@ -171,7 +173,8 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         experiment.uid = e.id
 
         # Send the assets for the experiment
-        self.send_assets(experiment)
+        ac_id = self.send_assets(experiment)
+        e.configuration._asset_collection_id = ac_id
         return e
 
     def platform_modify_experiment(self, experiment: Experiment, regather_common_assets: bool = False,
@@ -335,7 +338,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
                 spo = sim.get_platform_object()
                 spo._state = SimulationState.CommissionRequested
 
-    def send_assets(self, experiment: Experiment, **kwargs):
+    def send_assets(self, experiment: Experiment, **kwargs) -> UUID:
         """
         Send assets related to the experiment.
 
@@ -359,6 +362,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         e = COMPSExperiment.get(id=experiment.uid)
         e.configuration = Configuration(asset_collection_id=ac.id)
         e.save()
+        return ac.id
 
     def refresh_status(self, experiment: Experiment, **kwargs):
         """
@@ -446,23 +450,68 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             return self.platform.get_item(experiment.configuration.asset_collection_id, ItemType.ASSETCOLLECTION)
         return None
 
-    def platform_list_asset(self, experiment: Experiment, **kwargs) -> List[Asset]:
+    def list_assets(self, experiment: Experiment, children: bool = False, filters: TFILE_FILTER_TYPE = None, **kwargs) -> List[Asset]:
+        """
+        List available assets for a experiment.
+
+        Args:
+            experiment: Experiment to list files for
+            children: Should we load assets from children as well?
+            filters: Filters to apply. These should be a function that takes a str and return true or false
+
+        Returns:
+            List of Assets
+        """
+        ret = self.platform_list_asset(experiment, filters=filters, **kwargs)
+        if children:
+            with ThreadPoolExecutor() as pool:
+                futures = dict()
+                for sim in experiment.simulations:
+                    if sim.assets.id != experiment.assets.id:
+                        future = pool.submit(self.platform._simulations.list_assets, sim, filters=filters, **kwargs)
+                        futures[future] = sim
+
+                for future in as_completed(futures):
+                    result = future.result()
+                    ret.extend(result)
+        return ret
+
+    def platform_list_asset(self, experiment: Experiment, reload: bool = False, filters: TFILE_FILTER_TYPE = None, **kwargs) -> List[Asset]:
         """
         List assets for an experiment.
 
         Args:
             experiment: Experiment to list assets for.
+            reload: Option to reload experiment asset
+            filters: Filters to apply. These should be a function that takes a str and return true or false
             **kwargs:
 
         Returns:
             List of assets
         """
         assets = []
-        if experiment.assets is None:
+        if logger.isEnabledFor(DEBUG) and reload:
+            logger.debug(f"Reloading assets for {experiment.id}")
+
+        if experiment.assets is None or reload:
             po: COMPSExperiment = experiment.get_platform_object()
             ac = self.get_assets_from_comps_experiment(po)
             if ac:
                 assets = ac.assets
         else:
             assets = copy.deepcopy(experiment.assets.assets)
-        return assets
+        return apply_file_filters(assets, filters)
+
+    def platform_list_files(self, experiment: Experiment, filters: TFILE_FILTER_TYPE = None, **kwargs) -> List[Asset]:
+        """
+        List files for Experiment. COMPS Doesn't have Experiment level files, so we return empty list.
+
+        Args:
+            experiment: Experiment
+            filters: Filters to apply. These should be a function that takes a str and return true or false
+            **kwargs:
+
+        Returns:
+            Empty List
+        """
+        return []

@@ -5,17 +5,21 @@ The Suite object can be thought as a metadata object. It represents a container 
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
-from typing import NoReturn, Type, TYPE_CHECKING, Dict
+from typing import NoReturn, Type, TYPE_CHECKING, Dict, List
 from abc import ABC
 from dataclasses import dataclass, field, fields
+
+from idmtools.assets import Asset
 from idmtools.core.interfaces.iitem import IItem
 from idmtools.core.interfaces.inamed_entity import INamedEntity
 from idmtools.core import ItemType, EntityContainer
 from idmtools.core.interfaces.irunnable_entity import IRunnableEntity
+from idmtools.utils.filters.asset_filters import TFILE_FILTER_TYPE
 
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
     from idmtools.entities.experiment import Experiment
+    from idmtools.entities.simulation import Simulation
 
 
 @dataclass(repr=False)
@@ -122,6 +126,58 @@ class Suite(INamedEntity, ABC, IRunnableEntity):
                 result[f.name] = getattr(self, f.name)
         result['_uid'] = self.uid
         return result
+
+    def list_assets(self, children: bool = False, platform: 'IPlatform' = None, filters: TFILE_FILTER_TYPE = None, **kwargs) -> List[Asset]:
+        """
+        List assets that have been uploaded to a server already.
+
+        Args:
+            children: When set to true, simulation assets will be loaded as well
+            filters: Filters to apply. These should be a function that takes a str and return true or false
+            platform: Optional platform to load assets list from
+            **kwargs:
+
+        Returns:
+            List of assets
+        """
+        if self.id is None:
+            raise ValueError("You can only list static assets on an existing experiment")
+        p = super()._check_for_platform_from_context(platform)
+        return p.list_assets(self, children=children, filters=filters, **kwargs)
+
+    def list_files(self, platform: 'IPlatform' = None, filters: TFILE_FILTER_TYPE = None, **kwargs) -> List[Asset]:
+        """
+        List files for suite.
+
+        Args:
+            platform: Optional platform to load assets list from
+            filters: Filters to apply. These should be a function that takes a str and return true or false
+            **kwargs:
+
+        Returns:
+            List of assets
+        """
+        if self.id is None:
+            raise ValueError("You can only list static assets on an existing experiment")
+        p = super()._check_for_platform_from_context(platform)
+        return p.list_files(self, filters=filters, **kwargs)
+
+    def list_children_files(self, platform: 'IPlatform' = None, filters: TFILE_FILTER_TYPE = None, **kwargs) -> Dict['Experiment', Dict['Simulation', List[Asset]]]:
+        """
+        List Children Files.
+
+        Args:
+            platform: Optional platform to load assets list from
+            filters: Filters to apply. These should be a function that takes a str and return true or false
+            **kwargs:
+
+        Returns:
+            Dictionary of Simulation -> List of Assets
+        """
+        if self.id is None:
+            raise ValueError("You can only list static assets on an existing experiment")
+        p = super()._check_for_platform_from_context(platform)
+        return p.list_children_files(self, filters=filters, **kwargs)
 
 
 ISuiteClass = Type[Suite]

@@ -13,11 +13,14 @@ For example::
     AssetCollection.from_directory(... filters=[fname], ...)
 """
 import os
-import typing
+from typing import List, Union, Callable, TYPE_CHECKING
+from fnmatch import fnmatch
 
-if typing.TYPE_CHECKING:
-    from typing import List
+if TYPE_CHECKING:
     from idmtools.core import TAsset
+    from idmtools.assets.asset import Asset
+
+TFILE_FILTER_TYPE = Union[str, List[str], List[Callable[[str], bool]], Callable[[str], bool]]
 
 
 def default_asset_file_filter(asset: 'TAsset') -> 'bool':
@@ -86,3 +89,67 @@ def asset_in_directory(asset: 'TAsset', directories: 'List[str]', base_path: str
     if not norm_asset_absolute_path.startswith(norm_base_path):
         return False
     return any([d in norm_root for d in norm_dirs])
+
+
+def default_filter_callback(filter_str: str):
+    """
+    Default filter for file filtering.
+
+    Args:
+        filter_str: Filter string
+
+    Returns:
+        Case insensitive Glob pattern from string
+    """
+
+    def filter_callback(file_path: str):
+        return fnmatch(file_path.lower(), filter_str.lower())
+
+    return filter_callback
+
+
+def normalize_filters(filters: TFILE_FILTER_TYPE = None):
+    """
+    Normalize filters used for filter files.
+
+    Args:
+        filters: Filters to normalize
+
+    Returns:
+        Normalized filters.
+    """
+    if filters:
+        if not isinstance(filters, list):
+            filters = [filters]
+        new_filters = []
+        for filter_str in filters:
+            if isinstance(filter_str, str):
+                new_filters.append(default_filter_callback(filter_str))
+            else:
+                new_filters.append(filter_str)
+        filters = new_filters
+    else:
+        filters = []
+    return filters
+
+
+def apply_file_filters(assets: List['Asset'], filters: TFILE_FILTER_TYPE) -> List['Asset']:
+    """
+    Apply a list of filter functions to a list of assets.
+
+    Args:
+        assets: Assets to apply functions to
+        filters: List of functions
+
+    Returns:
+        List of filtered assets
+    """
+    if filters:
+        result = []
+        for file in assets:
+            for file_filter in filters:
+                if file_filter(file.short_remote_path()):
+                    result.append(file)
+        return result
+    else:
+        return assets

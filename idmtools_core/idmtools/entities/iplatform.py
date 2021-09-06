@@ -15,7 +15,7 @@ from os import PathLike
 from pathlib import PureWindowsPath, PurePath
 from itertools import groupby
 from logging import getLogger, DEBUG
-from typing import Dict, List, NoReturn, Type, TypeVar, Any, Union, Tuple, Set, Iterator, Callable, Optional
+from typing import Dict, List, NoReturn, Type, TypeVar, Any, Union, Tuple, Set, Iterator, Callable, Optional, TYPE_CHECKING
 from uuid import UUID
 from idmtools import IdmConfigParser
 from idmtools.core import CacheEnabled, UnknownItemException, EntityContainer, UnsupportedPlatformType
@@ -40,14 +40,19 @@ from idmtools.entities.suite import Suite
 from idmtools.assets.asset_collection import AssetCollection
 from idmtools.services.platforms import PlatformPersistService
 from idmtools.utils.entities import validate_user_inputs_against_dataclass
+from idmtools.utils.filters.asset_filters import TFILE_FILTER_TYPE, normalize_filters
+
+if TYPE_CHECKING:
+    from idmtools.assets.asset import Asset
+
 logger = getLogger(__name__)
 user_logger = getLogger('user')
 
-CALLER_LIST = ['_create_from_block',    # create platform through Platform Factory
-               'fetch',                 # create platform through un-pickle
-               'get',                   # create platform through platform spec' get method
-               '__newobj__',            # create platform through copy.deepcopy
-               '_main']                 # create platform through analyzer manager
+CALLER_LIST = ['_create_from_block',  # create platform through Platform Factory
+               'fetch',  # create platform through un-pickle
+               'get',  # create platform through platform spec' get method
+               '__newobj__',  # create platform through copy.deepcopy
+               '_main']  # create platform through analyzer manager
 
 # Maps an object type to a platform interface object. We use strings to use getattr. This also let's us also reduce
 # all the if else crud
@@ -64,6 +69,11 @@ STANDARD_TYPE_TO_INTERFACE = {
     IWorkflowItem: ItemType.WORKFLOW_ITEM,
     Suite: ItemType.SUITE
 }
+
+# Returns for different child file lists
+TSIMULATION_CHILDREN_FILES = Dict[Simulation, List['Asset']]
+TEXPERIMENT_CHILDREN_FILES = Dict[Experiment, TSIMULATION_CHILDREN_FILES]
+TSUITE_CHILDREN_FILES = Dict[Suite, TEXPERIMENT_CHILDREN_FILES]
 
 
 @dataclass(repr=False)
@@ -821,6 +831,78 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             timeout,
             refresh_interval
         )
+
+    def list_assets(self, item: Union[Experiment, IWorkflowItem, Suite, Simulation, AssetCollection], filters: TFILE_FILTER_TYPE = None, **kwargs) -> List['Asset']:
+        """
+        List assets(shared files) for the item.
+
+        Args:
+            item: Item to list shared files for
+            filters: Filters to apply. These should be a function that takes a str and return true or false
+            **kwargs:
+
+        Returns:
+            List of assets
+        """
+        if item.item_type not in self.platform_type_map.values():
+            raise UnsupportedPlatformType("The provided type is invalid or not supported by this platform...")
+
+        if item.item_type not in (ItemType.SIMULATION, ItemType.WORKFLOW_ITEM, ItemType.SUITE, ItemType.EXPERIMENT, ItemType.ASSETCOLLECTION):
+            raise ValueError("Only Simulation, Workflow Items, Suites, and Experiments can list files")
+
+        filters = normalize_filters(filters)
+        interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
+        ret = getattr(self, interface).list_assets(item, filters=filters, **kwargs)
+        return ret
+
+    def list_files(self, item: Union[Experiment, IWorkflowItem, Suite, Simulation], filters: TFILE_FILTER_TYPE = None, **kwargs) -> List['Asset']:
+        """
+        List files for an item.
+
+        Args:
+            item: Item to list files for.
+            filters: Filters to apply. These should be a function that takes a str and return true or false
+            **kwargs:
+
+        Returns:
+            List of files for item
+        """
+        if item.item_type not in self.platform_type_map.values():
+            raise UnsupportedPlatformType("The provided type is invalid or not supported by this platform...")
+
+        if item.item_type not in (ItemType.SIMULATION, ItemType.WORKFLOW_ITEM, ItemType.SUITE, ItemType.EXPERIMENT):
+            raise ValueError("Only Simulation, Workflow Items, Suites, and Experiments can list files")
+        filters = normalize_filters(filters)
+        interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
+        ret = getattr(self, interface).list_files(item, filters=filters, **kwargs)
+        return ret
+
+    def list_children_files(self, item: Union[Experiment, Suite], filters: TFILE_FILTER_TYPE = None, **kwargs) -> Union[TEXPERIMENT_CHILDREN_FILES, TSIMULATION_CHILDREN_FILES]:
+        """
+        Dict Children files for an item.
+
+        The return depends on item type.
+
+        For experiments, the return is in the form of Dict[Simulation, List[Asset]]
+        For suites, the return is in the form of Dict[Experiment, Dict[Simulation, List[Asset]]]
+
+        Args:
+            item: Item to list files for
+            filters: Filters to apply. These should be a function that takes a str and return true or false
+            **kwargs:
+
+        Returns:
+            hierarchical dictionary of files
+        """
+        if item.item_type not in self.platform_type_map.values():
+            raise UnsupportedPlatformType("The provided type is invalid or not supported by this platform...")
+
+        if item.item_type not in (ItemType.SUITE, ItemType.EXPERIMENT):
+            raise ValueError("Only Suites and Experiments can list children files")
+        filters = normalize_filters(filters)
+        interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
+        ret = getattr(self, interface).list_children_files(item, filters=filters, **kwargs)
+        return ret
 
     def get_related_items(self, item: IWorkflowItem, relation_type: RelationType) -> Dict[str, Dict[str, str]]:
         """

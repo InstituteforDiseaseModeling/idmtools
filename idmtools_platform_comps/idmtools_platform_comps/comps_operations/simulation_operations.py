@@ -25,6 +25,7 @@ from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
 from idmtools.entities.iplatform_ops.utils import batch_create_items
 from idmtools.entities.simulation import Simulation
+from idmtools.utils.filters.asset_filters import TFILE_FILTER_TYPE, apply_file_filters
 from idmtools.utils.json import IDMJSONEncoder
 from idmtools_platform_comps.utils.general import convert_comps_status, get_asset_for_comps_item, clean_experiment_name
 from idmtools_platform_comps.utils.scheduling import scheduled
@@ -390,8 +391,9 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         obj.uid = simulation.id
         obj.tags = simulation.tags
         obj.status = convert_comps_status(simulation.state)
-        if simulation.files:
-            obj.assets = self.platform._assets.to_entity(simulation.files)
+        # Load our assets
+        if simulation.configuration:
+            obj.assets = self.get_asset_collection_from_comps_simulation(simulation, parent=parent)
 
         # should we load metadata
         metadata = self.__load_metadata_from_simulation(obj) if load_metadata else None
@@ -401,22 +403,26 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             obj.task = None
             self.__extract_cli(simulation, parent, obj, load_cli_from_workorder)
 
+        if simulation.files:
+            obj.task.transient_assets = self.platform._assets.to_entity(simulation.files)
+
         # call task load options(load configs from files, etc)
         obj.task.reload_from_simulation(obj)
         return obj
 
-    def get_asset_collection_from_comps_simulation(self, simulation: COMPSSimulation) -> Optional[AssetCollection]:
+    def get_asset_collection_from_comps_simulation(self, simulation: COMPSSimulation, parent: Experiment) -> Optional[AssetCollection]:
         """
-        Get assets from COMPS Simulation.
+        Get assets for a comps simulation.
 
         Args:
-            simulation: Simulation to get assets from
+            simulation: Experiment to get asset collection for.
 
         Returns:
-            Simulation Asset Collection, if any.
+            AssetCollection if configuration is set and configuration.asset_collection_id is set.
         """
         if simulation.configuration and simulation.configuration.asset_collection_id:
-            return self.platform.get_item(simulation.configuration.asset_collection_id, ItemType.ASSETCOLLECTION)
+            if parent is None or parent.assets.id != simulation.configuration.asset_collection_id:
+                return self.platform.get_item(simulation.configuration.asset_collection_id, ItemType.ASSETCOLLECTION)
         return None
 
     def _load_task_from_simulation(self, simulation: Simulation, comps_sim: COMPSSimulation,
@@ -449,7 +455,19 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         if comps_sim.configuration is None:
             comps_sim.refresh(QueryCriteria().select_children('configuration'))
 
-    def __extract_cli(self, comps_sim, parent, simulation, load_cli_from_workorder):
+    def __extract_cli(self, comps_sim: COMPSSimulation, parent: Experiment, simulation: Simulation, load_cli_from_workorder):
+        """
+        Extract CLI from Simulation by also checking Experiment.
+
+        Args:
+            comps_sim: COMPS Simulation Object
+            parent: Parent of sim(Experiment)
+            simulation: IDMTools Simulation object
+            load_cli_from_workorder: Should we load command from workorder
+
+        Returns:
+            None
+        """
         cli = self._detect_command_line_from_simulation(parent, comps_sim, simulation, load_cli_from_workorder)
         # if we could not find task, set it now, otherwise rebuild the cli
         if simulation.task is None:
@@ -557,32 +575,25 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         exp_assets.update(get_asset_for_comps_item(self.platform, simulation, files, self.cache, comps_item=comps_sim))
         return exp_assets
 
-    def list_assets(self, simulation: Simulation, common_assets: bool = False, **kwargs) -> List[Asset]:
+    def list_assets(self, simulation: Simulation, filters: TFILE_FILTER_TYPE = None, **kwargs) -> List[Asset]:
         """
         List assets for a simulation.
 
         Args:
             simulation: Simulation to load data for
-            common_assets: Should we load asset files
+            filters: Filters to apply. These should be a function that takes a str and return true or false
             **kwargs:
 
         Returns:
             AssetCollection
         """
-        comps_sim: COMPSSimulation = simulation.get_platform_object(load_children=["files", "configuration"])
-        assets = []
-        # load non comps objects
-        if comps_sim.files:
-            assets = self.platform._assets.to_entity(comps_sim.files).assets
+        po = simulation.get_platform_object()
+        if po.configuration is None:
+            po: COMPSSimulation = simulation.get_platform_object(load_children=["files", "configuration"], force=True)
+        result = self.get_asset_collection_from_comps_simulation(po, simulation.parent)
+        return apply_file_filters(result.assets, filters) if result else []
 
-        if common_assets:
-            # here we are loading the simulation assets
-            sa = self.get_asset_collection_from_comps_simulation(comps_sim)
-            if sa:
-                assets.extend(sa.assets)
-        return assets
-
-    def retrieve_output_files(self, simulation: Simulation):
+    def retrieve_output_files(self, simulation: Simulation) -> List[Asset]:
         """
         Retrieve the output files for a simulation.
 
@@ -617,3 +628,28 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             ac.add_assets(self.retrieve_output_files(simulation))
 
         return ac.assets
+
+    def list_files(self, simulation: Simulation, force: bool = False, filters: TFILE_FILTER_TYPE = None, **kwargs) -> List[Asset]:
+        """
+        List of Files for a Simulation.
+
+        Args:
+            simulation: Simulation
+            force: Force reload. Avoid caching
+            filters: Filters to apply. These should be a function that takes a str and return true or false
+            **kwargs:
+        Returns:
+            List of Files
+        """
+        if getattr(simulation, '_comps_metadata', None) is None:
+            simulation._comps_metadata = dict()
+        # cache file data to limit how often we fetch. Useful for analysis
+        if force or simulation._comps_metadata.get("output_files", None) is None:
+            ac = AssetCollection()
+            ac.add_assets(self.retrieve_output_files(simulation))
+            simulation._comps_metadata['output_files'] = ac.assets
+
+        if filters:
+            return apply_file_filters(simulation._comps_metadata['output_files'], filters)
+        else:
+            return simulation._comps_metadata['output_files']

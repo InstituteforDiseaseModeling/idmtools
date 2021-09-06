@@ -18,7 +18,7 @@ from idmtools.core.interfaces.ientity import IEntity
 from idmtools.core.interfaces.iitem import IItem
 from idmtools.utils.entities import get_default_tags
 from idmtools.utils.file import scan_directory
-from idmtools.utils.filters.asset_filters import default_asset_file_filter
+from idmtools.utils.filters.asset_filters import default_asset_file_filter, TFILE_FILTER_TYPE
 from idmtools.utils.info import get_doc_base_url
 
 IGNORE_DIRECTORIES = ['.git', '.svn', '.venv', '.idea', '.Rproj.user', '$RECYCLE.BIN', '__pycache__']
@@ -83,7 +83,7 @@ class AssetCollection(IEntity):
         return AssetCollection(item) if as_copy else item
 
     @classmethod
-    def from_directory(cls, assets_directory: str, recursive: bool = True, flatten: bool = False,
+    def from_directory(cls, assets_directory: Union[str, PathLike], recursive: bool = True, flatten: bool = False,
                        filters: 'TAssetFilterList' = None, filters_mode: FilterMode = FilterMode.OR,  # noqa: F821
                        relative_path: str = None) -> 'TAssetCollection':
         """
@@ -510,6 +510,23 @@ class AssetCollection(IEntity):
             None
         """
         self.tags.update(tags)
+
+    def list_assets(self, platform: 'IPlatform' = None, filters: TFILE_FILTER_TYPE = None, **kwargs) -> List['Asset']:
+        """
+        List assets for an asset collection.
+
+        Args:
+            platform: Platform
+            filters: Filters to use
+            **kwargs: Additional arguments
+
+        Returns:
+            List of filtered assets
+        """
+        if self.id is None:
+            raise ValueError("You can only list static assets on an existing Asset Collections")
+        p = super()._check_for_platform_from_context(platform)
+        return p.list_assets(self, filters=filters, **kwargs)
 
 
 TAssetCollection = TypeVar("TAssetCollection", bound=AssetCollection)

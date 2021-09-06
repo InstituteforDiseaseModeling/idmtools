@@ -77,7 +77,7 @@ class TestPythonExperiment(ITestWithPersistence):
             range(0, 2)
         )
 
-        # second way to sweep parameter 'b' is to use class setParam which basiclly doing same thing as param_update
+        # second way to sweep parameter 'b' is to use class setParam which basically doing same thing as param_update
         # method
         builder.add_sweep_definition(
             JSONConfiguredPythonTask.set_parameter_partial("b"),
@@ -408,7 +408,7 @@ class TestPythonExperiment(ITestWithPersistence):
         ac = AssetCollection.from_directory(assets_directory=assets_path)
         items = self.platform.create_items([ac])
         self.assertEqual(len(items), 1)
-        # TODO fix return of create
+
         self.assertIsInstance(items[0], COMPSAssetCollection)
         comps_ac_id = ac.uid
         # Then get an "existing asset" to use for the experiment

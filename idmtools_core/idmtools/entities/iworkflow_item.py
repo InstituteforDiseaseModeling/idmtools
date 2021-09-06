@@ -7,15 +7,16 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 import warnings
 from abc import ABC
 from dataclasses import dataclass, field, fields, InitVar
-from typing import NoReturn, Dict, Any, TYPE_CHECKING
+from typing import NoReturn, Dict, Any, TYPE_CHECKING, List
 from uuid import UUID
-from idmtools.assets import AssetCollection
+from idmtools.assets import AssetCollection, Asset
 from idmtools.assets.file_list import FileList
 from idmtools.core import ItemType
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
 from idmtools.core.interfaces.inamed_entity import INamedEntity
 from idmtools.core.interfaces.irunnable_entity import IRunnableEntity
 from idmtools.entities.itask import ITask
+from idmtools.utils.filters.asset_filters import TFILE_FILTER_TYPE
 
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
@@ -262,3 +263,36 @@ class IWorkflowItem(IAssetsEnabled, INamedEntity, IRunnableEntity, ABC):
             None
         """
         self.transient_assets = file_list.to_asset_collection()
+
+    def list_assets(self, children: bool = False, platform: 'IPlatform' = None, filters: TFILE_FILTER_TYPE = None, **kwargs) -> List[Asset]:
+        """
+        List assets that have been uploaded to a server already.
+
+        Args:
+            children: When set to true, simulation assets will be loaded as well
+            platform: Optional platform to load assets list from
+            filters: Filters to apply. These should be a function that takes a str and return true or false
+            **kwargs:
+        Returns:
+            List of assets
+        """
+        if self.id is None:
+            raise ValueError("You can only list static assets on an existing experiment")
+        p = super()._check_for_platform_from_context(platform)
+        return p.list_assets(self, children=children, filters=filters, **kwargs)
+
+    def list_files(self, platform: 'IPlatform' = None, filters: TFILE_FILTER_TYPE = None, **kwargs) -> List[Asset]:
+        """
+        List of files(output) for Workflow Item.
+
+        Args:
+            platform: Optional platform to load assets list from
+            filters: Filters to apply. These should be a function that takes a str and return true or false
+            **kwargs:
+        Returns:
+            List of assets
+        """
+        if self.id is None:
+            raise ValueError("You can only list static assets on an existing experiment")
+        p = super()._check_for_platform_from_context(platform)
+        return p.list_files(self, filters=filters, **kwargs)
