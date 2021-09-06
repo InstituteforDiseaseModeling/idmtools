@@ -1,0 +1,35 @@
+@startuml
+
+
+
+title "SLURM Platform Experiment Workflow"
+
+actor User
+control "User Script" as us
+boundary "IDMTools Slurm Platform" as sp
+storage "File System" as fs
+component "Experiment Operations" as eo
+component "Simulation Operations" as so
+file "Experiment metadata" as em
+collections "Simulation metadata" as sm
+entity "Slurm Cluster Daemon" as scd
+
+User -> us : User runs their script
+us --> sp : User script calls slurm platform
+sp --> eo : Slurm Client validations experient.
+eo --> so : Client validated simulations.
+so --> sm : Simulation directory created, and metadata written
+sm --> fs : Simulation writes files through the file interface
+fs --> sm: File is written
+sm --> so : Return simulation creation is done
+so --> eo : Simulation returns its metadata to experiment
+eo --> em : Experiment metadata is written
+em --> fs : Writes metadata to filesystem
+fs --> em: Experiment metadata created
+em --> eo : Metadata ready. EO Created sbatch script
+eo -> scd: Sbatch script submitted to slurm. Polls scd for experiment status
+scd -> eo : Experiment is done
+eo --> sp : Returns experiment status
+sp --> us : Returns status to user
+
+@enduml
