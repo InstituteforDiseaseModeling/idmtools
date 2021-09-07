@@ -4,6 +4,7 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import os
 import sys
+import warnings
 import zipfile
 from dataclasses import dataclass, field
 from enum import Enum
@@ -35,9 +36,9 @@ class CompressType(Enum):
 
 
 @dataclass(repr=False)
-class DownloadWorkItem(FileFilterWorkItem):
+class DownloadAsZipWorkItem(FileFilterWorkItem):
     """
-    DownloadWorkItem provides a utility to download items through a workitem with compression.
+    DownloadAsZip provides a utility to download items through a work-item with compression.
 
     The main advantage of this over Analyzers is the compression. This is most effective when the targets to download have many
     items that are similar to download. For example, an experiment with 1000 simulations with similar output can greatly benefit
@@ -47,7 +48,7 @@ class DownloadWorkItem(FileFilterWorkItem):
         - TODO Link examples here.
     """
     output_path: str = field(default_factory=os.getcwd)
-    extract_after_download: bool = field(default=True)
+    extract_after_download: bool = field(default=False)
     delete_after_download: bool = field(default=True)
     zip_name: str = field(default='output.zip')
     compress_type: CompressType = field(default=None)
@@ -155,3 +156,14 @@ class DownloadWorkItem(FileFilterWorkItem):
             for chunk in get_file_as_generator(oi[0]):
                 pbar.update(len(chunk))
                 zo.write(chunk)
+
+
+@dataclass(repr=False)
+class DownloadWorkItem(DownloadAsZipWorkItem):
+    """
+    This class is to preserve compatibility with 1.6.x branch. In 1.7.0. this will be deprecated.
+    """
+
+    def __post_init__(self, item_name: str, asset_collection_id: UUID, asset_files: FileList, user_files: FileList, command: str):
+        warnings.warn("This items has been renamed to DownloadAsZipWorkItem. In 1.7.0, the old name will be discontinued")
+        super().__post_init__(item_name, asset_collection_id, asset_files, user_files, command)
