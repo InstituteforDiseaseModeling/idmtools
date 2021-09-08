@@ -137,6 +137,9 @@ class Simulation(IAssetsEnabled, INamedEntity):
             self.task.post_creation(self, self.platform)
 
         IItem.post_creation(self, platform)
+
+        [hook(self) for hook in self.task.post_sim_creation_hooks]
+
         if self.__replace_task_with_proxy or (self.parent and self.parent._Experiment__replace_task_with_proxy):
             if logger.isEnabledFor(DEBUG):
                 logger.debug('Replacing task with proxy')

@@ -46,6 +46,10 @@ class ITask(metaclass=ABCMeta):
     #: We provide hooks as list to allow more user scripting extensibility
     __pre_creation_hooks: List[TTaskHook] = field(default_factory=list)
     __post_creation_hooks: List[TTaskHook] = field(default_factory=list)
+
+    # We provide hooks as list to allow more user scripting extensibility
+    __post_sim_creation_hooks: List[Callable[['Simulation'], NoReturn]] = field(default_factory=list)
+
     # This is optional experiment assets
     # That means that users can explicitly define experiment level assets when using a Experiment builders
     #: Common(Experiment-level) assets
@@ -62,6 +66,7 @@ class ITask(metaclass=ABCMeta):
         """
         self.__pre_creation_hooks = []
         self.__post_creation_hooks = []
+        self.__post_sim_creation_hooks = []
 
     @property
     def command(self):
@@ -125,6 +130,22 @@ class ITask(metaclass=ABCMeta):
             None
         """
         self.__post_creation_hooks.append(hook)
+
+    @property
+    def post_sim_creation_hooks(self):
+        return self.__post_sim_creation_hooks
+
+    def add_post_sim_creation_hook(self, hook):
+        """
+        Called after a simulation has been created. Each hook receives a Simulation.
+
+        Args:
+            hook: Function to call on event
+
+        Returns:
+            None
+        """
+        self.__post_sim_creation_hooks.append(hook)
 
     def add_platform_requirement(self, requirement: Union[PlatformRequirements, str]) -> NoReturn:
         """
