@@ -4,6 +4,7 @@ from logging import getLogger
 from pathlib import Path
 from uuid import UUID
 import pytest
+import sys
 
 from idmtools.assets.asset_collection import AssetCollection
 from idmtools.entities import Suite
@@ -104,7 +105,10 @@ def test_list_files_experiment(suite: Suite):
     assert EXPECTED_ASSETS_PER_MODEL1_EXPERIMENT == len(experiment_assets)
     assert experiment_assets[0].filename == "model1.py"
     assert experiment_assets[0].absolute_path is None
-    assert experiment_assets[0].checksum == UUID('926ee7aa-4f29-bc94-ff99-8c5f83a6d85a')
+    if sys.platform == "win32":
+        assert experiment_assets[0].checksum == UUID('8e02e44c-5754-c79c-2b5c-9ffc5278c59c')
+    else:
+        assert experiment_assets[0].checksum == UUID('926ee7aa-4f29-bc94-ff99-8c5f83a6d85a')
     experiment_files = e.list_files()
 
     assert 0 == len(experiment_files)

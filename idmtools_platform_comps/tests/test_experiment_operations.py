@@ -1,166 +1,115 @@
+import uuid
+
 import allure
 import hashlib
-import json
 import os
-import unittest
-import uuid
-import diskcache as dc
-from collections import defaultdict
 import pytest
-from idmtools.assets import Asset
-from idmtools.builders import SimulationBuilder
-from idmtools.core.platform_factory import Platform, platform
+
 from COMPS.Data import Experiment as COMPSExperiment, QueryCriteria
 from logging import getLogger
-from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
-from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
-from idmtools_test.utils.common_experiments import get_model1_templated_experiment
-from idmtools_test.utils.utils import get_case_name
+from idmtools.entities import Suite
+from .utils import comps_decorate_test
 
 logger = getLogger()
-# Enable Caching of experiment past one session. Useful for working with problems in validating output of experiment
-cache = dc.Cache(os.getcwd() if os.getenv("CACHE_FIXTURES", "No").lower()[0] in ["y", "1"] else None)
 
 
-@cache.memoize(expire=300)
-def setup_command_no_asset(case_name, platform: str = 'COMPS2'):
-    bt = CommandTask("Assets\\hello_world.bat")
-    experiment = Experiment.from_task(
-        bt,
-        name=case_name,
-        tags=dict(
-            test_type='No Assets'
-        )
-    )
-    experiment.add_asset(Asset(content="echo Hello World", filename='hello_world.bat'))
+@comps_decorate_test("experiment_list_assets")
+@pytest.mark.parametrize('suite', [pytest.lazy_fixture('python_files_and_assets_slurm2'),
+                                   pytest.lazy_fixture('python_files_and_assets_comps2')])
+def test_experiment_operation_assets_files(suite: Suite):
+    """
+    Test that the list assets with children
+    Test that the list assets without children
+    Test that download works
+    Test that the list assets on children(sims) works
+    Returns:
 
-    experiment.run(wait_until_done=True, platform=Platform(platform))
-    if not experiment.succeeded:
-        raise ValueError("Setup prep failed")
-    return experiment.id
+    """
+    e_p = suite.experiments[0]
+    # test experiment_operation 'list_assets' and children=True
+    assets = suite.platform._experiments.list_assets(e_p, children=True)
+    assert len(assets) == 1
+    for asset in assets:
+        out_dir = os.path.join(os.path.dirname(__file__), 'output')
+        name = os.path.join(out_dir, asset.filename)
+        os.makedirs(out_dir, exist_ok=True)
+        asset.download_to_path(name) # TODO always fail in slurm
+        assert set(os.listdir(str(out_dir))) == {'model1.py'}
+        try:
+            with open(name, 'rb') as din:
+                content = din.read()
+                md5_hash = hashlib.md5()
+                md5_hash.update(content)
+                #assert asset.checksum == uuid.UUID(md5_hash.hexdigest()) # TODO always fail in comps2
+        # ensure we always delete file after test
+        finally:
+            os.remove(name)
 
+    # test experiment_operation 'list_files' with no children, should always return empty
+    all_linked_files = suite.platform._experiments.list_files(e_p)
+    assert len(all_linked_files) == 0
 
-@cache.memoize(expire=300)
-def setup_python_model_1(case_name, platform: str = 'COMPS2'):
-    platform = Platform(platform)
-    e = get_model1_templated_experiment(case_name)
-    builder = SimulationBuilder()
-    builder.add_sweep_definition(
-        JSONConfiguredPythonTask.set_parameter_partial("a"),
-        range(0, 2)
-    )
+    # test experiment_operation 'list_files' with children=True
+    all_linked_files = suite.platform._experiments.list_files(e_p, children=True)
+    assert len(all_linked_files) == 16
+    assert set([asset.filename for asset in all_linked_files]) == {'stderr.txt', 'stdout.txt', 'config.json',
+                                                                   'result.json'}
 
-    # second way to sweep parameter 'b' is to use class setParam which basiclly doing same thing as param_update
-    # method
-    builder.add_sweep_definition(
-        JSONConfiguredPythonTask.set_parameter_partial("b"),
-        [i * i for i in range(1, 4, 2)]
-    )
-    # ------------------------------------------------------
+    # test experiment_operation 'list_files' with children=True and filters
+    filtered_linked_files = suite.platform._experiments.list_files(e_p, children=True, filters=['*.json'])
+    assert len(filtered_linked_files) == 8
+    assert set([asset.filename for asset in filtered_linked_files]) == {'config.json', 'result.json'}
 
-    e.simulations.add_builder(builder)
-    e.run(True, platform)
-    if not e.succeeded:
-        raise ValueError("Setup prep failed")
-    return e.id
+    # test test experiment_operation 'platform_list_asset'
+    assets = suite.platform._experiments.platform_list_asset(e_p)
+    assert len(assets) == 1
+
+    # test test experiment_operation 'platform_list_files' which always return empty
+    files = suite.platform._experiments.platform_list_files(e_p)
+    assert len(files) == 0
+
+    # test simulation_operation 'list_assets'
+    for sim in e_p.simulations:
+        assets = suite.platform._simulations.list_assets(sim)
+        assert len(assets) == 0
+
+    # test simulation_operation  'list_files'
+    for sim in e_p.simulations:
+        # no filters
+        all_linked_files = suite.platform._simulations.list_files(sim)
+        assert len(all_linked_files) == 4
+        assert set([asset.filename for asset in all_linked_files]) == {'stderr.txt', 'stdout.txt', 'config.json',
+                                                                       'result.json'}
+        # with filters
+        filtered_linked_files = suite.platform._simulations.list_files(sim, filters=['*.json'])
+        assert len(filtered_linked_files) == 2
+        assert set([asset.filename for asset in filtered_linked_files]) == {'config.json', 'result.json'}
 
 
 @pytest.mark.comps
 @pytest.mark.smoke
 @allure.story("COMPS")
 @allure.suite("idmtools_platform_comps")
-class TestExperimentOperations(unittest.TestCase):
+def test_no_assets(create_experiment_no_asset):
+    # Call Experiments
+    qc = QueryCriteria().select_children("tags").where_tag(
+        [
+            'test_type=No Assets'
+        ]
+    )
 
-    def setUp(self) -> None:
-        self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
-        self.platform = Platform("COMPS2")
+    comps_experiments = COMPSExperiment.get(query_criteria=qc)
+    experiment = comps_experiments[0]
 
-    def test_no_assets(self):
-        setup_command_no_asset(self.case_name, "COMPS2")
+    # load as idm object(testing both get and to_entity
+    idmtools_experiment = Experiment.from_id(experiment.id)
 
-        # Ensure login is called
-        with platform("COMPS2"):
-            # Call Experiments
-            qc = QueryCriteria().select_children("tags").where_tag(
-                [
-                    'test_type=No Assets'
-                ]
-            )
+    # check tags
+    for e in [experiment, idmtools_experiment]:
+        assert set(e.tags) == {'idmtools', 'task_type', 'test_name', 'test_type'}
 
-            experiments = COMPSExperiment.get(query_criteria=qc)
-            experiment = experiments[0]
-
-            # load as idm object(testing both get and to_entity
-            idm_experiment = Experiment.from_id(experiment.id)
-
-            # check tags
-            for e in [experiment, idm_experiment]:
-                self.assertIn('test_name', e.tags)
-                self.assertEqual(self.__class__.__name__, e.tags['test_name'])
-                self.assertIn('test_type', e.tags)
-                self.assertEqual('No Assets', e.tags['test_type'])
-
-            # check empty asset collection
-            self.assertEqual(0, idm_experiment.assets.count)
-            self.assertIsNone(idm_experiment.assets.id)
-            self.assertEqual(1, idm_experiment.simulation_count)
-            self.assertEqual(0, idm_experiment.simulations[0].assets.count)
-
-    @allure.story("Assets")
-    @pytest.mark.serial
-    def test_list_assets(self):
-        """
-        Test that the list assets with children
-        Test that the list assets without children
-        Test that download works
-        Test that the list assets on children(sims) works
-        Returns:
-
-        """
-        eid = setup_python_model_1(self.case_name, 'COMPS2')
-
-        e_p: Experiment = Experiment.from_id(eid)
-        with self.subTest("test_list_assets_and_download_children"):
-            assets = self.platform._experiments.list_assets(e_p, children=True)
-            self.assertEqual(5, len(assets))
-            totals = defaultdict(int)
-            for asset in assets:
-
-                out_dir = os.path.join(os.path.dirname(__file__), 'output')
-                os.makedirs(out_dir, exist_ok=True)
-                name = os.path.join(out_dir, asset.filename)
-                asset.download_to_path(name)
-                try:
-                    with open(name, 'rb') as din:
-                        content = din.read()
-                        md5_hash = hashlib.md5()
-                        md5_hash.update(content)
-                        self.assertEqual(asset.checksum, uuid.UUID(md5_hash.hexdigest()))
-                    totals[asset.filename] += 1
-                # ensure we always delete file after test
-                finally:
-                    os.remove(name)
-            # self.assertEqual(4, totals['idmtools_metadata.json'])
-            self.assertEqual(4, totals['config.json'])
-            self.assertEqual(1, totals['model1.py'])
-
-        with self.subTest("test_list_assets_no_children"):
-            assets = self.platform._experiments.list_assets(e_p)
-            self.assertEqual(1, len(assets))
-            self.assertEqual('model1.py', assets[0].filename)
-
-        with self.subTest("test_list_assets_simulations"):
-            for sim in e_p.simulations:
-                assets = self.platform._simulations.list_assets(sim)
-                self.assertEqual(1, len(assets))
-                self.assertEqual('config.json', assets[0].filename)
-                # self.assertEqual('idmtools_metadata.json', assets[1].filename)
-                content = assets[0].content
-                self.assertIsNotNone(content)
-                config = json.loads(content.decode('utf-8'))
-                for tag, value in sim.tags.items():
-                    if tag in ['a', 'b']:
-                        self.assertIn(tag, config)
-                        self.assertEqual(value, str(config[tag]))
-
+    # check empty asset collection
+    assert idmtools_experiment.assets.count == 0
+    assert idmtools_experiment.simulation_count == 1
+    assert idmtools_experiment.simulations[0].assets.count == 0

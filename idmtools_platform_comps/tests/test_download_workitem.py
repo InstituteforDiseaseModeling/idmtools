@@ -36,7 +36,7 @@ class TestDownloadWorkItem(unittest.TestCase):
     @windows_only
     def test_default_compress_windows(self):
         di = DownloadWorkItem()
-        self.assertEqual(di.compress_type, CompressType.lzma)
+        self.assertEqual(di.compress_type, CompressType.deflate)
 
     @windows_only
     def test_default_compress_windows_no_delete(self):
@@ -50,8 +50,11 @@ class TestDownloadWorkItem(unittest.TestCase):
         try:
             dirpath = tempfile.mkdtemp()
             dl_wi = DownloadWorkItem(name=self.case_name,
-                                     related_experiments=['9311af40-1337-ea11-a2be-f0921c167861'], file_patterns=["output/*.csv"],
-                                     simulation_prefix_format_str='{simulation.tags["a"]}_{simulation.tags["b"]}', verbose=True, output_path=dirpath, delete_after_download=False, compress_type=CompressType.deflate
+                                     related_experiments=['9311af40-1337-ea11-a2be-f0921c167861'],
+                                     file_patterns=["output/*.csv"], extract_after_download=True,
+                                     simulation_prefix_format_str='{simulation.tags["a"]}_{simulation.tags["b"]}',
+                                     verbose=True, output_path=dirpath, delete_after_download=False,
+                                     compress_type=CompressType.deflate
                                      )
             dl_wi.run(wait_on_done=True, platform=self.platform)
             self.assertTrue(dl_wi.succeeded)
@@ -68,7 +71,9 @@ class TestDownloadWorkItem(unittest.TestCase):
             dirpath = tempfile.mkdtemp()
             dl_wi = DownloadWorkItem(name=self.case_name,
                                      related_experiments=[id_file], file_patterns=["output/*.csv"],
-                                     simulation_prefix_format_str='{simulation.tags["a"]}_{simulation.tags["b"]}', verbose=True, output_path=dirpath,
+                                     extract_after_download=True,
+                                     simulation_prefix_format_str='{simulation.tags["a"]}_{simulation.tags["b"]}',
+                                     verbose=True, output_path=dirpath,
                                      )
             dl_wi.run(wait_on_done=True, platform=self.platform)
             self.assertTrue(dl_wi.succeeded)
