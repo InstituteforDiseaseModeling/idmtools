@@ -159,7 +159,7 @@ class TestCompsCLI(unittest.TestCase):
             os.remove(pwd.joinpath(file))
         with self.subTest("test_container_workitem_id_not_written_when_found"):
             # hit cache and ensure file is not written
-            result = run_command('comps', 'SLURM2', 'singularity', '--name', self.case_name, 'build', '--id-workitem',
+            result = run_command('comps', 'SLURM2', 'singularity', 'build', '--id-workitem',
                                  '--common-input-glob',
                                  str(pwd.joinpath('*.txt')), str(pwd.joinpath('singularity.def')), mix_stderr=False)
             self.assertTrue(result.exit_code == 0)
