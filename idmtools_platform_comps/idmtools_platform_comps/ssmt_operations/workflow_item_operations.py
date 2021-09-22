@@ -14,6 +14,7 @@ from pathlib import Path
 
 logger = getLogger(__name__)
 
+
 @dataclass
 class SSMTPlatformWorkflowItemOperations(CompsPlatformWorkflowItemOperations):
     """SSMTPlatformWorkflowItemOperations provides IWorkflowItem actions for SSMT Platform.

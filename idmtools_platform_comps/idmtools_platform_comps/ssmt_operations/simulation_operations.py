@@ -75,4 +75,3 @@ class SSMTPlatformSimulationOperations(CompsPlatformSimulationOperations):
             with open(full_path, 'rb') as fin:
                 results[file] = fin.read()
         return results
-
