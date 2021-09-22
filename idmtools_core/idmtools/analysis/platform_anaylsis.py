@@ -183,8 +183,12 @@ class PlatformAnalysis:
             self.additional_files.add_or_replace_asset(Asset(filename="extra_args.pkl", content=pickle.dumps(self.extra_args)))
             command += " --analyzer-manager-args-file extra_args.pkl"
 
+        self.__pickle_platform_args()
+        command += " --platform_args platform_args.pkl"
+
         # Add platform
-        command += " --block {}".format(self.platform._config_block)
+        ssmt_config_block = f"{self.platform._config_block}_SSMT"
+        command += " --block {}".format(ssmt_config_block)
         if self.verbose:
             command += " --verbose"
 
@@ -219,6 +223,19 @@ class PlatformAnalysis:
             new_source.append(replace_expr.sub("", line))
 
         self.additional_files.add_or_replace_asset(Asset(filename="pre_run.py", content="\n".join(new_source)))
+
+    def __pickle_platform_args(self):
+        """
+        Pickle platform args and add as assets.
+
+        Returns:
+            None
+        """
+        # Pickle the platform args
+        platform_kwargs = self.platform._kwargs
+        platform_kwargs["missing_ok"] = self.platform._missing_ok
+        self.additional_files.add_or_replace_asset(
+            Asset(filename="platform_args.pkl", content=pickle.dumps(platform_kwargs)))
 
     def validate_args(self):
         """

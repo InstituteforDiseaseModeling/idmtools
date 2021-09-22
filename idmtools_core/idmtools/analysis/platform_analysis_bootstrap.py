@@ -66,8 +66,11 @@ if __name__ == "__main__":
         with open(args.analyzer_manager_args_file, 'rb') as pin:
             extra_args = pickle.load(pin)
 
+    # load platform args pickle file
+    platform_args = pickle.load(open(r"platform_args.pkl", 'rb'))
+
     # get platform
-    platform = Platform(args.block)
+    platform = Platform(args.block, **platform_args)
     logger.info(f"Analyzer Manager called with the following extra arguments: {extra_args}")
     am = AnalyzeManager(platform=platform, ids=experiment_ids, analyzers=analyzers, **extra_args)
     am.analyze()
