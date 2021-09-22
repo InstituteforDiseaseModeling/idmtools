@@ -3,11 +3,16 @@
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 from dataclasses import dataclass
-from typing import List, Dict
-
+from uuid import UUID
+from typing import List, Dict, Optional
 from idmtools.entities.iworkflow_item import IWorkflowItem
 from idmtools_platform_comps.comps_operations.workflow_item_operations import CompsPlatformWorkflowItemOperations
+from COMPS.Data.WorkItem import WorkItem as COMPSWorkItem
+from COMPS.Data import QueryCriteria
+from logging import getLogger, DEBUG
+from pathlib import Path
 
+logger = getLogger(__name__)
 
 @dataclass
 class SSMTPlatformWorkflowItemOperations(CompsPlatformWorkflowItemOperations):
@@ -15,6 +20,28 @@ class SSMTPlatformWorkflowItemOperations(CompsPlatformWorkflowItemOperations):
 
     In IWorkflowItem's case, we just need to change how get_assets works.
     """
+
+    def get(self, workflow_item_id: UUID, columns: Optional[List[str]] = None, load_children: Optional[List[str]] = None,
+            query_criteria: Optional[QueryCriteria] = None, **kwargs) -> \
+            COMPSWorkItem:
+        """
+        Get COMPSWorkItem.
+
+        Args:
+            workflow_item_id: Item id
+            columns: Optional columns to load. Defaults to "id", "name", "state", "environment_name", "working_directory"
+            load_children: Optional list of COMPS Children objects to load. Defaults to "Tags"
+            query_criteria: Optional QueryCriteria
+            **kwargs:
+
+        Returns:
+            COMPSWorkItem
+        """
+        columns = columns or ["id", "name", "state", "environment_name", "working_directory"]
+        if "working_directory" not in columns:
+            columns.append("working_directory")
+
+        return super().get(workflow_item_id, columns=columns, load_children=load_children, query_criteria=query_criteria)
 
     def get_assets(self, workflow_item: IWorkflowItem, files: List[str], **kwargs) -> Dict[str, bytearray]:
         """
@@ -31,4 +58,17 @@ class SSMTPlatformWorkflowItemOperations(CompsPlatformWorkflowItemOperations):
         Returns:
             Files requested
         """
-        raise NotImplementedError("Fetching files for WorkItem is not currently implemented for SSMT")
+        po: COMPSWorkItem = workflow_item.get_platform_object()
+        working_directory = po.working_directory
+        results = dict()
+        for file in files:
+            full_path = Path(working_directory).joinpath(file)
+            if not full_path.exists():
+                msg = f"Cannot find the file {file} at {full_path}"
+                logger.error(msg)
+                raise FileNotFoundError(msg)
+            if logger.isEnabledFor(DEBUG):
+                logger.debug(full_path)
+            with open(full_path, 'rb') as fin:
+                results[file] = fin.read()
+        return results
