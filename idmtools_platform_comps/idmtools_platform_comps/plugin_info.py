@@ -101,7 +101,7 @@ class COMPSPlatformSpecification(PlatformSpecification):
         return config_aliases
 
 
-class SSMTPlatformSpecification(PlatformSpecification):
+class SSMTPlatformSpecification(COMPSPlatformSpecification):
     """Provides the plugic spec for SSMTPlatform."""
 
     def __init__(self):
@@ -144,3 +144,9 @@ class SSMTPlatformSpecification(PlatformSpecification):
         """
         from idmtools_platform_comps import __version__
         return __version__
+
+    def get_configuration_aliases(self) -> Dict[str, Dict]:
+        """Provides configuration aliases that exist in COMPS."""
+        config_aliases = super().get_configuration_aliases()
+        ssmt_config_aliases = {f"{a}_SSMT": p for a, p in config_aliases.items()}
+        return ssmt_config_aliases
