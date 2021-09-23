@@ -53,9 +53,6 @@ class SSMTPlatformWorkflowItemOperations(CompsPlatformWorkflowItemOperations):
             files: Files to get
             **kwargs:
 
-        Notes:
-            - We need to implement this to optimize data usage on comps
-
         Returns:
             Files requested
         """
