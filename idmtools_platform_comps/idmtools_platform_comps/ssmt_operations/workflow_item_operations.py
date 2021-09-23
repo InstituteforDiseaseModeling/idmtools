@@ -59,13 +59,13 @@ class SSMTPlatformWorkflowItemOperations(CompsPlatformWorkflowItemOperations):
         Returns:
             Files requested
         """
+        files = [f.replace("\\", '/') for f in fils]
         po: COMPSWorkItem = workflow_item.get_platform_object()
         working_directory = po.working_directory
         results = dict()
         for file in files:
             full_path = Path(working_directory).joinpath(file)
             full_path = full_path.replace("\\", '/')
-
             if not full_path.exists():
                 msg = f"Cannot find the file {file} at {full_path}"
                 logger.error(msg)

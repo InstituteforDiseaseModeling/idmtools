@@ -60,6 +60,7 @@ class SSMTPlatformSimulationOperations(CompsPlatformSimulationOperations):
         Returns:
             Files fetched
         """
+        files = [f.replace("\\", '/') for f in fils]
         po: COMPSSimulation = simulation.get_platform_object(
             load_children=["files", "configuration", "hpc_jobs"])
         working_directory = po.hpc_jobs[0].working_directory
@@ -67,7 +68,6 @@ class SSMTPlatformSimulationOperations(CompsPlatformSimulationOperations):
         for file in files:
             full_path = Path(working_directory).joinpath(file)
             full_path = full_path.replace("\\", '/')
-
             if not full_path.exists():
                 msg = f"Cannot find the file {file} at {full_path}"
                 logger.error(msg)
