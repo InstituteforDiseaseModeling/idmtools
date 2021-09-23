@@ -184,7 +184,7 @@ class PlatformAnalysis:
             command += " --analyzer-manager-args-file extra_args.pkl"
 
         self.__pickle_platform_args()
-        command += " --platform_args platform_args.pkl"
+        command += " --platform-args platform_args.pkl"
 
         # Add platform
         ssmt_config_block = f"{self.platform._config_block}_SSMT"
