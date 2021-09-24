@@ -62,7 +62,7 @@ class SSMTPlatformWorkflowItemOperations(CompsPlatformWorkflowItemOperations):
         results = dict()
         for file in files:
             full_path = Path(working_directory).joinpath(file)
-            full_path = full_path.replace("\\", '/')
+            full_path = Path(str(full_path).replace("\\", '/'))
             if not full_path.exists():
                 msg = f"Cannot find the file {file} at {full_path}"
                 logger.error(msg)
