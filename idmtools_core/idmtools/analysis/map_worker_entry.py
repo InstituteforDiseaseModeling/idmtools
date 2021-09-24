@@ -64,6 +64,7 @@ def _get_mapped_data_for_item(item: IEntity, analyzers: TAnalyzerList, platform:
         analyzer_uids = [a.uid for a in analyzers]
 
         filenames = set(itertools.chain(*(a.filenames for a in analyzers_to_use)))
+        filenames = [f.replace("\\", '/') for f in filenames]
 
         if logger.isEnabledFor(DEBUG):
             logger.debug(f"Analyzers to use on item: {str(analyzer_uids)}")
