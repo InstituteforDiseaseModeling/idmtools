@@ -15,6 +15,7 @@ from tqdm import tqdm
 from idmtools import IdmConfigParser
 from idmtools.assets import AssetCollection, Asset
 from idmtools.entities.iplatform_ops.iplatform_asset_collection_operations import IPlatformAssetCollectionOperations
+from idmtools.utils.filters.asset_filters import TFILE_FILTER_TYPE, apply_file_filters
 from idmtools_platform_comps.utils.general import get_file_as_generator
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -197,7 +198,9 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
                     a = Asset(filename=asset.friendly_name, relative_path=asset.path_from_root, persisted=True)
                 else:
                     a = Asset(filename=asset.file_name, checksum=asset.md5_checksum)
-                    a._platform_object = asset
+                a._platform_object = asset
+                if a.relative_path and a.relative_path == ".":
+                    a.relative_path = ""
                 if isinstance(asset_collection, COMPSAssetCollection):
                     a.relative_path = asset.relative_path
                 a.persisted = True
@@ -208,22 +211,37 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
 
         return ac
 
-    def __simulation_file_to_asset(self, asset_collection: Union[SimulationFile, WorkItemFile]):
+    def __simulation_file_to_asset(self, simulation_files: Union[SimulationFile, WorkItemFile]):
         """
         Converts a Simulation File to an Asset.
 
         Args:
-            asset_collection:
+            simulation_files:
 
         Returns:
             Asset created from sim file.
         """
-        asset = Asset(filename=asset_collection.file_name, checksum=asset_collection.md5_checksum)
+        asset = Asset(filename=simulation_files.file_name, checksum=simulation_files.md5_checksum)
         # set original object for quick access again later
-        asset._platform_object = asset_collection
+        asset._platform_object = simulation_files
         asset.is_simulation_file = True
         asset.persisted = True
-        asset.length = asset_collection.length
+        asset.length = simulation_files.length
         if asset.uri:
-            asset.download_generator_hook = partial(get_file_as_generator, asset_collection)
+            asset.download_generator_hook = partial(get_file_as_generator, simulation_files)
+        asset._platform_object = simulation_files
         return asset
+
+    def platform_list_assets(self, asset_collection: AssetCollection, filters: TFILE_FILTER_TYPE = None, **kwargs) -> List['Asset']:
+        """
+        List the assets on an asset collection.
+
+        Args:
+            asset_collection: Asset collection to list.
+            filters: Filters to apply. These should be a function that takes a str and return true or false
+            **kwargs: Extra Arguments
+
+        Returns:
+            List of Assets
+        """
+        return apply_file_filters(asset_collection.assets, filters)

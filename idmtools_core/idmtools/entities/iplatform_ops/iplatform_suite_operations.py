@@ -4,17 +4,24 @@ IPlatformSuiteOperations defines suite item operations interface.
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 from abc import ABC, abstractmethod
+from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from logging import getLogger, DEBUG
 from typing import Type, Any, List, Tuple, Dict, NoReturn, TYPE_CHECKING
 from uuid import UUID
+
+from idmtools.assets import Asset, AssetCollection
 from idmtools.core.enums import EntityStatus, ItemType
 from idmtools.entities.iplatform_ops.utils import batch_create_items
 from idmtools.entities.suite import Suite
 from idmtools.registry.functions import FunctionPluginManager
+from idmtools.utils.filters.asset_filters import TFILE_FILTER_TYPE
 
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
+    from idmtools.entities.experiment import Experiment
+    from idmtools.entities.simulation import Simulation
 
 logger = getLogger(__name__)
 
@@ -284,3 +291,85 @@ class IPlatformSuiteOperations(ABC):
             e = self.platform.get_item(exp.uid, ItemType.EXPERIMENT)
             ret[str(exp.uid)] = self.platform.get_files(e, files, **kwargs)
         return ret
+
+    def list_assets(self, suite: Suite, filters: TFILE_FILTER_TYPE = None, children: bool = False, enforce_unique: bool = True, **kwargs) -> List[Asset]:
+        """
+        List available assets for a Suite.
+
+        Args:
+            suite: Experiment to list files for
+            filters: Filters to apply
+            children: Should we load assets from children as well?
+            enforce_unique: Should we only return one of each asset in the list?
+        Returns:
+            List of Assets
+        """
+        ret = self.platform_list_asset(suite, **kwargs)
+        if children:
+            for experiment in suite.experiments:
+                ret.extend(self.platform._experiments.list_assets(experiment, children=children, filters=filters, **kwargs))
+        return AssetCollection(ret).assets if enforce_unique else ret
+
+    @abstractmethod
+    def platform_list_asset(self, suite: Suite, filters: TFILE_FILTER_TYPE = None, **kwargs) -> List[Asset]:
+        """
+        Platform implementation of listing Assets on an Experiment.
+
+        Args:
+            suite: Suite to list assets for
+            filters: Filters to apply. These should be a function that takes a str and return true or false
+            **kwargs:
+
+        Returns:
+            List of assets for suites
+        """
+        pass
+
+    def list_children_files(self, suite: Suite, filters: TFILE_FILTER_TYPE = None, **kwargs) -> Dict['Experiment', Dict['Simulation', List[Asset]]]:
+        """
+        List files of children in hierarchical format for suite.
+
+        For a suite, this means returns a dictionary in the form of
+           Experiment ->
+              Simulation -> List of Files
+        Args:
+            suite: Suites to fetch child files for
+            filters: Filters to apply
+            **kwargs:
+
+        Returns:
+            Dictionary in form of Experiment -> Simulation -> List of Assets
+        """
+        ret = defaultdict(dict)
+        with ThreadPoolExecutor() as pool:
+            futures = dict()
+            if 'children' not in kwargs:
+                kwargs['children'] = True
+            for experiment in suite.experiments:
+                future = pool.submit(self.platform._experiments.list_children_files, experiment, filters=filters, **kwargs)
+                futures[future] = experiment
+            for future in as_completed(futures):
+                result = future.result()
+                ret[futures[future]] = result
+        return ret
+
+    def list_files(self, suite: Suite, filters: TFILE_FILTER_TYPE = None, children: bool = False, **kwargs) -> List[Asset]:
+        """
+        List files for a suite.
+
+        Args:
+            suite: Suite
+            filters: Filters to apply. These should be a function that takes a str and return true or false
+            children: Should we return files of children
+            **kwargs:
+
+        Returns:
+            List of files for suite, and possible the suite's children
+        """
+        result = []
+        if children:
+            child_result = self.list_children_files(suite, children=children, filters=filters, **kwargs)
+            for experiment, simulations in child_result.items():
+                for simulation, files in simulations.items():
+                    result.extend(files)
+        return result

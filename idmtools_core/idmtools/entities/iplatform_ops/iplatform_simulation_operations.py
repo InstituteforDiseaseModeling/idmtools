@@ -14,6 +14,7 @@ from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.utils import batch_create_items
 from idmtools.entities.simulation import Simulation
 from idmtools.registry.functions import FunctionPluginManager
+from idmtools.utils.filters.asset_filters import TFILE_FILTER_TYPE
 
 logger = getLogger(__name__)
 
@@ -267,13 +268,27 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         pass
 
     @abstractmethod
-    def list_assets(self, simulation: Simulation, **kwargs) -> List[Asset]:
+    def list_assets(self, simulation: Simulation, filters: TFILE_FILTER_TYPE = None, **kwargs) -> List[Asset]:
         """
         List available assets for a simulation.
 
         Args:
             simulation: Simulation of assets Assets
+            filters: Filters to apply. These should be a function that takes a str and return true or false
 
+        Returns:
+            List of filenames
+        """
+        pass
+
+    @abstractmethod
+    def list_files(self, simulation: Simulation, filters: TFILE_FILTER_TYPE = None, **kwargs) -> List[Asset]:
+        """
+        List available assets for a simulation.
+
+        Args:
+            simulation: Simulation of assets Assets
+            filters: Filters to apply. These should be a function that takes a str and return true or false
         Returns:
             List of filenames
         """

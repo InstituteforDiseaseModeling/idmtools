@@ -16,10 +16,12 @@ from idmtools.core.enums import EntityStatus, ItemType
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.utils import batch_create_items
 from idmtools.registry.functions import FunctionPluginManager
+from idmtools.utils.filters.asset_filters import TFILE_FILTER_TYPE
 
 logger = getLogger(__name__)
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
+    from idmtools.entities.simulation import Simulation
 
 
 @dataclass
@@ -325,18 +327,19 @@ class IPlatformExperimentOperations(ABC):
             ret[sim.uid] = self.platform._simulations.get_assets(sim, files, **kwargs)
         return ret
 
-    def list_assets(self, experiment: Experiment, children: bool = False, **kwargs) -> List[Asset]:
+    def list_assets(self, experiment: Experiment, children: bool = False, filters: TFILE_FILTER_TYPE = None, **kwargs) -> List[Asset]:
         """
         List available assets for a experiment.
 
         Args:
             experiment: Experiment to list files for
             children: Should we load assets from children as well?
+            filters: Filters to apply. These should be a function that takes a str and return true or false
 
         Returns:
             List of Assets
         """
-        ret = self.platform_list_asset(experiment, **kwargs)
+        ret = self.platform_list_asset(experiment, filters=filters, **kwargs)
         if children:
             with ThreadPoolExecutor() as pool:
                 futures = dict()
@@ -349,18 +352,45 @@ class IPlatformExperimentOperations(ABC):
                     ret.extend(result)
         return ret
 
-    def platform_list_asset(self, experiment: Experiment, **kwargs) -> List[Asset]:
+    def platform_list_asset(self, experiment: Experiment, filters: TFILE_FILTER_TYPE = None, **kwargs) -> List[Asset]:
         """
         List the assets on an experiment.
 
         Args:
             experiment: Experiment to list.
+            filters: Filters to apply. These should be a function that takes a str and return true or false
             **kwargs: Extra Arguments
 
         Returns:
             List of Assets
         """
         return []
+
+    def list_children_files(self, experiment: Experiment, filters: TFILE_FILTER_TYPE = None, **kwargs) -> Dict['Simulation', List['Asset']]:
+        """
+        List files from children in a hierarchical dictionary.
+
+        For experiments, this means you will get a dictionary in the form of Simulation -> List of files per sim
+
+        Args:
+            experiment: Experiment to get children for
+            filters: Filters to apply. These should be a function that takes a str and return true or false
+            **kwargs:
+
+        Returns:
+            Dictionary in the form of Simulation -> List["asset']
+        """
+        ret = dict()
+        with ThreadPoolExecutor() as pool:
+            futures = dict()
+            for sim in experiment.simulations:
+                future = pool.submit(self.platform._simulations.list_files, sim, filters=filters, **kwargs)
+                futures[future] = sim
+
+            for future in as_completed(futures):
+                result = future.result()
+                ret[futures[future]] = result
+        return ret
 
     def platform_modify_experiment(self, experiment: Experiment, regather_common_assets: bool = False, **kwargs) -> Experiment:
         """
@@ -374,3 +404,38 @@ class IPlatformExperimentOperations(ABC):
             Experiment updated
         """
         return experiment
+
+    def list_files(self, experiment: Experiment, filters: TFILE_FILTER_TYPE = None, children: bool = False, **kwargs) -> List[Asset]:
+        """
+        List available files for an experiment.
+
+        Args:
+            experiment: Experiment to list files for
+            filters: Filters to apply. These should be a function that takes a str and return true or false
+            children: Should we load assets from children as well?
+        Returns:
+            List of Assets
+        """
+        ret = self.platform_list_files(experiment, filters=filters, **kwargs)
+        if children:
+            child_files = self.list_children_files(experiment, filters=filters, **kwargs)
+            for sim, files in child_files.items():
+                ret.extend(files)
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f"Found {len(ret)} file for Experiment {experiment.id}{'' if children else 'not'} including children")
+        return ret
+
+    @abstractmethod
+    def platform_list_files(self, experiment: Experiment, filters: TFILE_FILTER_TYPE = None, **kwargs) -> List[Asset]:
+        """
+        Platform implementation of listing files for an experiment.
+
+        Args:
+            experiment: Experiment to get files for
+            filters: Filters to apply. These should be a function that takes a str and return true or false
+            **kwargs:
+
+        Returns:
+            List of filters files
+        """
+        pass

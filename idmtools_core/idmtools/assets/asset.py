@@ -9,7 +9,7 @@ import os
 from dataclasses import dataclass, field, InitVar
 from io import BytesIO
 from logging import getLogger, DEBUG
-from pathlib import PurePosixPath
+from pathlib import PurePosixPath, Path
 from typing import TypeVar, Union, List, Callable, Any, Optional, Generator, BinaryIO
 import backoff
 import requests
@@ -361,28 +361,30 @@ class Asset:
             if progress:
                 gen.close()
 
-    def download_to_path(self, dest: str, force: bool = False):
+    def download_to_path(self, dest: Union[str, Path], overwrite: bool = False, include_relative_path: bool = False):
         """
         Download an asset to path. This requires loadings the object through the platform.
 
         Args:
             dest: Path to write to. If it is a directory, the asset filename will be added to it
-            force: Force download even if file exists
+            overwrite: Force download even if file exists
+            include_relative_path: When target is a directory, when choosing filename, should we use
+                {dest}/{asset.filename} or {dest}/{asset.short_remote_path()}
 
         Returns:
             None
         """
-        if os.path.isdir(dest):
-            path = os.path.join(dest, self.short_remote_path())
-            path = path.replace("\\", os.path.sep)
-            os.makedirs(os.path.dirname(path), exist_ok=True)
+        path = Path(dest)
+        if path.is_dir() or (isinstance(dest, str) and dest.endswith("/")):
+            path = path.joinpath(self.short_remote_path() if include_relative_path else self.filename)
+            path.parent.mkdir(exist_ok=True, parents=True)
         else:
-            path = dest
+            path = Path(dest)
 
-        if not os.path.exists(path) or force:
+        if not os.path.exists(path) or overwrite:
+            if logger.isEnabledFor(DEBUG):
+                logger.debug(f"Download {self.filename} to {path}")
             with open(path, 'wb') as out:
-                if logger.isEnabledFor(DEBUG):
-                    logger.debug(f"Download {self.filename} to {path}")
                 self.__write_download_generator_to_stream(out)
 
     def calculate_checksum(self) -> str:

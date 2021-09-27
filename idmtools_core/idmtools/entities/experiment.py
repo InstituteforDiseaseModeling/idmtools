@@ -9,6 +9,7 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import copy
 import uuid
+import warnings
 from dataclasses import dataclass, field, InitVar, fields
 from logging import getLogger, DEBUG
 from types import GeneratorType
@@ -31,6 +32,7 @@ from idmtools.registry.experiment_specification import ExperimentPluginSpecifica
 from idmtools.registry.plugin_specification import get_description_impl
 from idmtools.utils.collections import ExperimentParentIterator
 from idmtools.utils.entities import get_default_tags
+from idmtools.utils.filters.asset_filters import TFILE_FILTER_TYPE
 
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
@@ -78,6 +80,15 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
     #: Enable replacing the task with a proxy to reduce the memory footprint. Useful in provisioning large sets of
     # simulations
     __replace_task_with_proxy: bool = field(default=True, init=False, compare=False)
+
+    def __hash__(self):
+        """
+        Hash of simulation(id).
+
+        Returns:
+            Hash of simulation
+        """
+        return id(self.uid)
 
     def __post_init__(self, simulations):
         """
@@ -485,22 +496,62 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         result._task_log = getLogger(__name__)
         return result
 
-    def list_static_assets(self, children: bool = False, platform: 'IPlatform' = None, **kwargs) -> List[Asset]:
+    def list_assets(self, children: bool = False, platform: 'IPlatform' = None, filters: TFILE_FILTER_TYPE = None, **kwargs) -> List[Asset]:
         """
-        List assets that have been uploaded to a server already.
+        List assets(shared files) for the experiment.
 
         Args:
             children: When set to true, simulation assets will be loaded as well
             platform: Optional platform to load assets list from
+            filters: Filters to apply. These should be a function that takes a str and return true or false
             **kwargs:
-
         Returns:
             List of assets
         """
         if self.id is None:
             raise ValueError("You can only list static assets on an existing experiment")
         p = super()._check_for_platform_from_context(platform)
-        return p._experiments.list_assets(self, children, **kwargs)
+        return p.list_assets(self, children=children, filters=filters, **kwargs)
+
+    def list_files(self, children: bool = False, platform: 'IPlatform' = None, filters: TFILE_FILTER_TYPE = None, **kwargs) -> List[Asset]:
+        """
+        List files for item.
+
+        Args:
+            children: When set to true, simulation assets will be loaded as well
+            platform: Optional platform to load assets list from
+            filters: Filters to apply. These should be a function that takes a str and return true or false
+            **kwargs:
+        Returns:
+            List of assets
+        """
+        if self.id is None:
+            raise ValueError("You can only list static assets on an existing experiment")
+        p = super()._check_for_platform_from_context(platform)
+        return p.list_files(self, children=children, filters=filters, **kwargs)
+
+    def list_children_files(self, platform: 'IPlatform' = None, filters: TFILE_FILTER_TYPE = None, **kwargs) -> Dict['Simulation', List[Asset]]:
+        """
+        List Children Files.
+
+        Args:
+            platform: Optional platform to load assets list from
+            filters: Filters to apply. These should be a function that takes a str and return true or false
+            **kwargs:
+        Returns:
+            Dictionary of Simulation -> List of Assets
+        """
+        if self.id is None:
+            raise ValueError("You can only list static assets on an existing experiment")
+        p = super()._check_for_platform_from_context(platform)
+        return p.list_children_files(self, filters=filters, **kwargs)
+
+    def list_static_assets(self, children: bool = False, platform: 'IPlatform' = None, filters: TFILE_FILTER_TYPE = None, **kwargs) -> List[Asset]:
+        """
+        Soon to be deprecated method in favor of list_assets.
+        """
+        warnings.warn("list_static_assets will be removed in 1.7.0. Use list_assets instead")
+        return self.list_assets(children=children, platform=platform, filters=filters, **kwargs)
 
     def run(self, wait_until_done: bool = False, platform: 'IPlatform' = None, regather_common_assets: bool = None,
             wait_on_done_progress: bool = True, wait_on_done: bool = False,

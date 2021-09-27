@@ -11,12 +11,13 @@ from uuid import UUID
 from COMPS.Data import QueryCriteria, WorkItem as COMPSWorkItem, WorkItemFile
 from COMPS.Data.WorkItem import RelationType, WorkerOrPluginKey
 from idmtools import IdmConfigParser
-from idmtools.assets import AssetCollection
+from idmtools.assets import AssetCollection, Asset
 from idmtools.core import ItemType
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities.generic_workitem import GenericWorkItem
 from idmtools.entities.iplatform_ops.iplatform_workflowitem_operations import IPlatformWorkflowItemOperations
 from idmtools.entities.iworkflow_item import IWorkflowItem
+from idmtools.utils.filters.asset_filters import TFILE_FILTER_TYPE, apply_file_filters
 from idmtools_platform_comps.utils.general import convert_comps_workitem_status
 
 if typing.TYPE_CHECKING:
@@ -48,8 +49,8 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         Returns:
             COMPSWorkItem
         """
-        columns = columns or ["id", "name", "state", "environment_name"]
-        load_children = load_children if load_children is not None else ["tags"]
+        columns = columns or ['name', 'id', 'asset_collection_id', 'environment_name', 'date_created', 'state']
+        load_children = load_children if load_children is not None else ["tags", "files"]
         query_criteria = query_criteria or QueryCriteria().select(columns).select_children(load_children)
         return COMPSWorkItem.get(workflow_item_id, query_criteria=query_criteria)
 
@@ -188,18 +189,18 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
                 logger.debug("Uploading assets for Workitem")
             self.platform._assets.create(workflow_item.assets)
 
-    def list_assets(self, workflow_item: IWorkflowItem, **kwargs) -> List[str]:
+    def list_assets(self, workflow_item: IWorkflowItem, filters: TFILE_FILTER_TYPE = None, **kwargs) -> List[Asset]:
         """
         Get list of asset files.
 
         Args:
             workflow_item: workflow item
+            filters: Filters to apply. These should be a function that takes a str and return true or false
             **kwargs: Optional arguments mainly for extensibility
 
         Returns: list of assets associated with WorkItem
         """
-        wi: COMPSWorkItem = workflow_item.get_platform_object()
-        return wi.files
+        return apply_file_filters(list(workflow_item.assets), filters)
 
     def get_assets(self, workflow_item: IWorkflowItem, files: List[str], **kwargs) -> Dict[str, bytearray]:
         """
@@ -265,3 +266,24 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         ret['asset_collection'] = wi.get_related_asset_collections(relation_type)
 
         return ret
+
+    def list_files(self, workflow_item: IWorkflowItem, filters: TFILE_FILTER_TYPE = None, force: bool = False, **kwargs) -> List[Asset]:
+        """
+        List files for WorkItem.
+
+        Args:
+            workflow_item: Workflow item
+            filters: Filters to apply. These should be a function that takes a str and return true or false
+            force: Force reload item
+            **kwargs:
+        Returns:
+            List of Assets
+        """
+        if getattr(workflow_item, '_comps_metadata', None) is None:
+            workflow_item._comps_metadata = dict()
+        # cache file data to limit how often we fetch. Useful for analysis
+        if force or workflow_item._comps_metadata.get("output_files", None) is None:
+            metadata = workflow_item.get_platform_object().retrieve_output_file_info([])
+            assets = self.platform._assets.to_entity(metadata).assets
+            workflow_item._comps_metadata['output_files'] = assets
+        return apply_file_filters(workflow_item._comps_metadata['output_files'], filters)

@@ -45,7 +45,7 @@ class TestCOMPSSlurmExperiment(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
         print(self.case_name)
-        self.platform = Platform('SLURM')
+        self.platform = Platform('SLURM2')
 
     @pytest.mark.long
     @allure.story("Sweeps")

@@ -6,8 +6,12 @@ from dataclasses import dataclass, field
 from typing import Any, List, Tuple, Union, Type, TYPE_CHECKING, Optional
 from uuid import UUID
 from COMPS.Data import Suite as COMPSSuite, QueryCriteria, Experiment as COMPSExperiment, WorkItem
+
+from idmtools.assets import Asset
+from idmtools.core import ItemType
 from idmtools.entities import Suite
 from idmtools.entities.iplatform_ops.iplatform_suite_operations import IPlatformSuiteOperations
+from idmtools.utils.filters.asset_filters import TFILE_FILTER_TYPE
 
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools_platform_comps.comps_platform import COMPSPlatform
@@ -92,7 +96,7 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
         cols = kwargs.get("cols")
         children = kwargs.get("children")
         cols = cols or ["id", "name", "suite_id"]
-        children = children if children is not None else ["tags"]
+        children = children if children is not None else ["tags", "configuration"]
 
         children = suite.get_experiments(query_criteria=QueryCriteria().select(cols).select_children(children))
         return children
@@ -138,5 +142,33 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
             comps_exps = suite.get_experiments()
             obj.experiments = []
             for exp in comps_exps:
-                obj.experiments.append(self.platform._experiments.to_entity(exp, parent=obj, **kwargs))
+                if exp.configuration is None:
+                    obj.experiments.append(self.platform.get_item(exp.id, ItemType.EXPERIMENT, parent=obj))
+                else:
+                    obj.experiments.append(self.platform._experiments.to_entity(exp, parent=obj, **kwargs))
         return obj
+
+    def platform_list_asset(self, suite: Suite, filters: TFILE_FILTER_TYPE = None, **kwargs) -> List[Asset]:
+        """
+        Platform List assets for Suites.
+
+        Args:
+            suite: Suite to load assets
+            filters: Filters to apply. These should be a function that takes a str and return true or false
+            **kwargs:
+        Returns:
+        """
+        return []
+
+    def platform_list_files(self, suite: Suite, filters: TFILE_FILTER_TYPE = None, **kwargs) -> List[Asset]:
+        """
+        Return list of files for Suite. COMPS Does not support Suite level output files, so always return empty list.
+
+        Args:
+            suite: Suite to list files for
+            filters: Filters to apply. These should be a function that takes a str and return true or false
+            **kwargs:
+        Returns:
+            Empty List
+        """
+        return []

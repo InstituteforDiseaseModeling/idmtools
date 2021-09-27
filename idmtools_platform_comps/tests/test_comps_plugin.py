@@ -52,7 +52,7 @@ class TestCompsPlugin(unittest.TestCase):
     @pytest.mark.comps
     @pytest.mark.smoke
     def test_comps_requirements(self):
-        with Platform("SLURM") as platform:
+        with Platform("SLURM2") as platform:
             self.assertTrue(platform.are_requirements_met(PlatformRequirements.LINUX))
             self.assertTrue(platform.are_requirements_met(PlatformRequirements.NativeBinary))
             self.assertTrue(platform.are_requirements_met(PlatformRequirements.PYTHON))

@@ -1,0 +1,15 @@
+@startuml
+
+title Slurm Platform
+
+
+package "Slurm Platform" as sp {
+    [File Operations] as fo
+    [Experiment Operations] as eo
+    [Simulation Operations] as so
+    eo <--> fo
+    so <-> fo
+}
+
+
+@enduml

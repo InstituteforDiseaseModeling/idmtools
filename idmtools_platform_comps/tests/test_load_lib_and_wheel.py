@@ -98,7 +98,7 @@ class TestLoadLibWheel(ITestWithPersistence):
         # First load 'zipp' package (note: comps does not have 'zipp' package)
         # ------------------------------------------------------
         requirements_path = os.path.join(model_path, 'requirements.txt')
-        pL = Platform('SLURM', num_cores=2)
+        pL = Platform('SLURM2', num_cores=2)
         rta = RequirementsToAssetCollection(name=self.case_name, platform=pL, requirements_path=requirements_path)
         ac_id = rta.run(rerun=True)
 
@@ -213,7 +213,7 @@ class TestLoadLibWheel(ITestWithPersistence):
         # ------------------------------------------------------
         # First load 'pytest' package (note: comps does not have 'pytest' package)
         # ------------------------------------------------------
-        platform = Platform('SLURM')
+        platform = Platform('SLURM2')
         requirements_path = os.path.join(model_path, 'requirements1.txt')
         pl = RequirementsToAssetCollection(name=self.case_name, platform=platform, requirements_path=requirements_path)
         ac_id = pl.run()
@@ -239,7 +239,7 @@ class TestLoadLibWheel(ITestWithPersistence):
         # ------------------------------------------------------
         # First load 'zipp' package (note: comps does not have 'zipp' package)
         # ------------------------------------------------------
-        platform = Platform('SLURM')
+        platform = Platform('SLURM2')
         requirements_path = os.path.join(model_path, 'requirements.txt')
         pl = RequirementsToAssetCollection(name=self.case_name, platform=platform, requirements_path=requirements_path)
         ac_id = pl.run(rerun=True)
