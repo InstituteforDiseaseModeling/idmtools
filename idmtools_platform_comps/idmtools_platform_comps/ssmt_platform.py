@@ -34,7 +34,7 @@ class SSMTPlatform(COMPSPlatform):
     def __init_interfaces(self):
         """
         Initialize intefaces
-        
+
         Returns: None
         """
         self._experiments = CompsPlatformExperimentOperations(platform=self)
