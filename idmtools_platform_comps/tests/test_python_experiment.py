@@ -108,22 +108,6 @@ class TestPythonExperiment(ITestWithPersistence):
         self.assertDictEqual(expected_exp_tags, actual_exp_tags)
         self.assertDictEqual(expected_exp_tags, actual_exp_tags)
 
-        # validate reload
-        # with self.subTest("test_sweeps_with_partial_comps_reload_with_task"):
-        #     experiment_reload = Experiment.from_id(e.uid, self.platform, load_task=True)
-        #     self.assertEqual(e.id, experiment_reload.id)
-        #     self.assertEqual(e.simulation_count, experiment_reload.simulation_count)
-        #     # get all the ids
-        #     self.assertEqual(
-        #         sorted([s.uid for s in e.simulations]),
-        #         sorted([s.uid for s in experiment_reload.simulations])
-        #     )
-        #     for sim in experiment_reload.simulations:
-        #         self.assertIsInstance(sim.task, JSONConfiguredPythonTask)
-        #         self.assertIn("a", sim.task.parameters)
-        #         self.assertIn("b", sim.task.parameters)
-        #         self.assertEqual(str(e.simulations[0].task.command), str(sim.task.command))
-
         with self.subTest("test_sweeps_with_partial_comps_reload"):
             experiment_reload = Experiment.from_id(e.uid, self.platform)
             for sim in experiment_reload.simulations:
@@ -409,12 +393,8 @@ class TestPythonExperiment(ITestWithPersistence):
         items = self.platform.create_items([ac])
         self.assertEqual(len(items), 1)
 
-        self.assertIsInstance(items[0], COMPSAssetCollection)
-        comps_ac_id = ac.uid
-        # Then get an "existing asset" to use for the experiment
-        ac: AssetCollection = self.platform.get_item(comps_ac_id, item_type=ItemType.ASSETCOLLECTION, raw=False)
-        self.assertIsInstance(ac, AssetCollection)
-        return ac
+        self.assertIsInstance(items[0], AssetCollection)
+        return items[0]
 
     @pytest.mark.smoke
     @pytest.mark.comps

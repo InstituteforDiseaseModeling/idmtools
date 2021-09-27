@@ -7,10 +7,11 @@ from pathlib import Path
 import pytest
 from COMPS.Data import QueryCriteria, Experiment as COMPSExperiment, Suite as COMPSSuite, WorkItem as COMPSWorkItem
 
-from idmtools.assets import AssetCollection
+from idmtools.assets import AssetCollection, Asset
 from idmtools.builders import SimulationBuilder
 from idmtools.core import TRUTHY_VALUES, ItemType
 from idmtools.core.platform_factory import Platform
+from idmtools.entities.command_task import CommandTask
 from idmtools.entities.generic_workitem import GenericWorkItem
 from idmtools.entities.suite import Suite
 from idmtools.entities.experiment import Experiment
@@ -266,3 +267,24 @@ def ssmt_workitem_python_hello(platform_slurm_2):
     # we just assert it is true here. Other tests cover detail functionlaity of workitems
     assert wi.succeeded
     return wi
+
+@pytest.fixture
+def create_experiment_no_asset(platform_comps2):
+    case_name = get_case_name("test_experiment_operations.py--test_no_assets")
+    existing_experiment = find_comps_experiment_by_name_less_than_n_minutes(case_name)
+    if existing_experiment:
+        return existing_experiment
+    bt = CommandTask("Assets\\hello_world.bat")
+    experiment = Experiment.from_task(
+        bt,
+        name=case_name,
+        tags=dict(
+            test_type='No Assets'
+        )
+    )
+    experiment.add_asset(Asset(content="echo Hello World", filename='hello_world.bat'))
+
+    experiment.run(wait_until_done=True, platform=platform_comps2)
+    if not experiment.succeeded:
+        raise ValueError("Setup prep failed")
+    return experiment
