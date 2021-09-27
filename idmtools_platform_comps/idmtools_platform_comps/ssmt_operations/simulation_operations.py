@@ -49,36 +49,6 @@ class SSMTPlatformSimulationOperations(CompsPlatformSimulationOperations):
 
         return super().get(simulation_id, load_children=load_children, query_criteria=query_criteria)
 
-    def get_assets_bk(self, simulation: Simulation, files: List[str], **kwargs) -> Dict[str, bytearray]:
-        """
-        Get assets for Simulation.
-
-        Args:
-            simulation: Simulation to fetch
-            files: Files to get
-            **kwargs: Any keyword arguments
-
-        Returns:
-            Files fetched
-        """
-        files = [f.replace("\\", '/') for f in files]
-        po: COMPSSimulation = simulation.get_platform_object(
-            load_children=["files", "configuration", "hpc_jobs"])
-        working_directory = po.hpc_jobs[0].working_directory
-        results = dict()
-        for file in files:
-            full_path = Path(working_directory).joinpath(file)
-            full_path = Path(str(full_path).replace("\\", '/'))
-            if not full_path.exists():
-                msg = f"Cannot find the file {file} at {full_path}"
-                logger.error(msg)
-                raise FileNotFoundError(msg)
-            if logger.isEnabledFor(DEBUG):
-                logger.debug(full_path)
-            with open(full_path, 'rb') as fin:
-                results[file] = fin.read()
-        return results
-
     def get_assets(self, simulation: Simulation, files: List[str], **kwargs) -> Dict[str, bytearray]:
         """
         Get assets for Simulation.

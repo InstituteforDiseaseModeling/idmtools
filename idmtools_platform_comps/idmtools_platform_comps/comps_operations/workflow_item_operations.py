@@ -112,6 +112,8 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
                 for item in getattr(work_item, attr_name):
                     getattr(wi, f'add_{attr_name[:-1]}')(item.id if isinstance(item, IEntity) else item, RelationType.DependsOn)
 
+        wi.save()
+
         # Set the ID back in the object
         work_item.uid = wi.id
 
