@@ -17,7 +17,8 @@ sys.path.append(os.path.dirname(__file__))
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("PlatformAnalysis bootstrap")
-    parser.add_argument("--experiment-ids", help="A comma separated list of experiments to analyze")
+    parser.add_argument("--experiment-ids", default=None, help="A comma separated list of experiments to analyze")
+    parser.add_argument("--work-item-ids", default=None, help="A comma separated list of work items to analyze")
     parser.add_argument("--analyzers", help="Commas separated list of analyzers")
     parser.add_argument("--block", help="Configuration block to use")
     parser.add_argument("--verbose", default=False, action="store_true", help="Verbose logging")
@@ -42,12 +43,20 @@ if __name__ == "__main__":
         import pre_run
         getattr(pre_run, args.pre_run_func)()
 
+    item_ids = []
     # Get the experiments, analyzers and platform
-    experiments = args.experiment_ids.split(",")
-    experiment_ids = []
-    for experiment in experiments:
-        experiment_tuple = (experiment, ItemType.EXPERIMENT)
-        experiment_ids.append(experiment_tuple)
+    if args.experiment_ids:
+        experiments = args.experiment_ids.split(",")
+        for experiment in experiments:
+            experiment_tuple = (experiment, ItemType.EXPERIMENT)
+            item_ids.append(experiment_tuple)
+
+    # Get the experiments, analyzers and platform
+    if args.work_item_ids:
+        work_items = args.work_item_ids.split(",")
+        for wi in work_items:
+            wi_tuple = (wi, ItemType.WORKFLOW_ITEM)
+            item_ids.append(wi_tuple)
 
     # load analyzer args pickle file
     analyzer_config = pickle.load(open(r"analyzer_args.pkl", 'rb'))
@@ -73,5 +82,5 @@ if __name__ == "__main__":
     # get platform
     platform = Platform(args.block, **platform_args)
     logger.info(f"Analyzer Manager called with the following extra arguments: {extra_args}")
-    am = AnalyzeManager(platform=platform, ids=experiment_ids, analyzers=analyzers, **extra_args)
+    am = AnalyzeManager(platform=platform, ids=item_ids, analyzers=analyzers, **extra_args)
     am.analyze()
