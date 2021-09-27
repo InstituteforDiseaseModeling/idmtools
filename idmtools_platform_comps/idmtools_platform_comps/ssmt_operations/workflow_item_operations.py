@@ -45,35 +45,6 @@ class SSMTPlatformWorkflowItemOperations(CompsPlatformWorkflowItemOperations):
 
         return super().get(workflow_item_id, columns=columns, load_children=load_children, query_criteria=query_criteria)
 
-    def get_assets_bk(self, workflow_item: IWorkflowItem, files: List[str], **kwargs) -> Dict[str, bytearray]:
-        """
-        Get Assets for workflow_item.
-
-        Args:
-            workflow_item: WorkflowItem
-            files: Files to get
-            **kwargs:
-
-        Returns:
-            Files requested
-        """
-        files = [f.replace("\\", '/') for f in files]
-        po: COMPSWorkItem = workflow_item.get_platform_object()
-        working_directory = po.working_directory
-        results = dict()
-        for file in files:
-            full_path = Path(working_directory).joinpath(file)
-            full_path = Path(str(full_path).replace("\\", '/'))
-            if not full_path.exists():
-                msg = f"Cannot find the file {file} at {full_path}"
-                logger.error(msg)
-                raise FileNotFoundError(msg)
-            if logger.isEnabledFor(DEBUG):
-                logger.debug(full_path)
-            with open(full_path, 'rb') as fin:
-                results[file] = fin.read()
-        return results
-
     def get_assets(self, workflow_item: IWorkflowItem, files: List[str], **kwargs) -> Dict[str, bytearray]:
         """
         Get Assets for workflow_item.
