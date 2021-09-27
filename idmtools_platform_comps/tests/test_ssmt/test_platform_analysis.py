@@ -34,7 +34,7 @@ def platform_comps2():
     Returns:
 
     """
-    return Platform('Bayesian')
+    return Platform('BAYESIAN')
 
 
 # Test PlatformAnalysis with PopulationAnalyzer for experiment id
@@ -44,7 +44,7 @@ def do_platform_analysis_experiment(platform: Platform):
     elif platform.environment.lower() == "slurmstage":
         experiment_id = 'c348452d-921c-ec11-92e0-f0921c167864'  # comps2 exp id
 
-    # Run ssmt platformanalysis with an experiment id which will run PopulationAnalyzer in COMPS docker worker
+    # Run ssmt PlatformAnalysis with an experiment id which will run PopulationAnalyzer in COMPS docker worker
     analysis = PlatformAnalysis(platform=platform, experiment_ids=[experiment_id],
                                 analyzers=[PopulationAnalyzer],
                                 analyzers_args=[{'name': ['anything']}],
@@ -88,7 +88,7 @@ def do_platform_analysis_wi(platform: Platform):
     elif platform.environment.lower() == "slurmstage":
         workitem_id = 'fe6a80b9-d31f-ec11-92e0-f0921c167864'  # comps2 exp id
 
-    # Run ssmt platformanalysis for DownloadAnalyzer in COMPS with a workitem id
+    # Run ssmt PlatformAnalysis for DownloadAnalyzer in COMPS with a workitem id
     # This will download stdout.txt and stderr.txt with original workitem_id with new workitem in comps
     analysis = PlatformAnalysis(platform=platform, work_item_ids=[workitem_id],
                                 analyzers=[DownloadAnalyzer],
