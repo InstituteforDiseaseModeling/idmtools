@@ -24,7 +24,8 @@ class SSMTPlatform(COMPSPlatform):
 
     def __post_init__(self):
         """
-        Post menthod
+        Post method after SSMTPlatform creation
+
         Returns: None
         """
         super().__post_init__()
@@ -33,6 +34,7 @@ class SSMTPlatform(COMPSPlatform):
     def __init_interfaces(self):
         """
         Initialize intefaces
+        
         Returns: None
         """
         self._experiments = CompsPlatformExperimentOperations(platform=self)
