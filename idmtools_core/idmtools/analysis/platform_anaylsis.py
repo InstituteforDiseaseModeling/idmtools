@@ -115,7 +115,9 @@ class PlatformAnalysis:
         ac.add_assets(self.asset_files)
         self.wi = SSMTWorkItem(name=self.analysis_name, command=command, tags=self.tags,
                                transient_assets=self.additional_files, assets=ac,
-                               related_experiments=self.experiment_ids)
+                               related_experiments=self.experiment_ids,
+                               related_work_items=self.work_item_ids
+                               )
 
         # Run the workitem
         self.platform.run_items(self.wi)
