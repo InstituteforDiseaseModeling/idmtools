@@ -10,7 +10,6 @@ from idmtools_platform_comps.comps_operations.simulation_operations import Comps
 from COMPS.Data.Simulation import Simulation as COMPSSimulation
 from COMPS.Data import QueryCriteria
 from logging import getLogger, DEBUG
-from pathlib import Path
 
 logger = getLogger(__name__)
 

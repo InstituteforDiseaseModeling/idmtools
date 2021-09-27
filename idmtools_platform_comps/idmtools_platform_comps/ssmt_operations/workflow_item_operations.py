@@ -11,7 +11,6 @@ from idmtools_platform_comps.comps_operations.workflow_item_operations import Co
 from COMPS.Data.WorkItem import WorkItem as COMPSWorkItem
 from COMPS.Data import QueryCriteria
 from logging import getLogger, DEBUG
-from pathlib import Path
 
 logger = getLogger(__name__)
 
