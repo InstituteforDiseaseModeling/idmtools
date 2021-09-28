@@ -221,7 +221,6 @@ def setup_logging(logging_config: IdmToolsLoggingConfig) -> None:
 
         # Show we enable user output. The only time we really should not do this is for specific CLI use cases
         # # such as json output
-        # if logging_config.user_output and not logging_config.console:
         setup_user_logger(logging_config)
 
         if root.isEnabledFor(logging.DEBUG):
