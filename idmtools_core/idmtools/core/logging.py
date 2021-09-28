@@ -8,8 +8,8 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 import logging
 import os
 import sys
-import threading
 import time
+import threading
 from contextlib import suppress
 from dataclasses import dataclass
 from logging import getLogger
@@ -17,7 +17,6 @@ from logging.handlers import RotatingFileHandler
 from typing import Union, Optional
 import coloredlogs as coloredlogs
 from idmtools.core import TRUTHY_VALUES
-
 
 LOGGING_STARTED = False
 LOGGING_FILE_STARTED = False
@@ -52,6 +51,8 @@ class IdmToolsLoggingConfig:
     use_colored_logs: bool = True
     #: Toggle user output. This should only be used in certain situations like CLI's that output JSON
     user_output: bool = True
+    #: Toggle enable file logging
+    enable_file_logging: Union[str, bool] = True
 
     def __post_init__(self):
         """
@@ -69,6 +70,9 @@ class IdmToolsLoggingConfig:
         if isinstance(self.console, str):
             self.console = self.console.lower() in TRUTHY_VALUES
 
+        if type(self.enable_file_logging) is str:
+            self.enable_file_logging = self.enable_file_logging.lower() in TRUTHY_VALUES
+
         # ensure level is a logging level
         for attr in ['level', 'file_level']:
             if isinstance(getattr(self, attr), str):
@@ -82,8 +86,12 @@ class IdmToolsLoggingConfig:
         self.filename = self.filename.strip()
 
         # disable file logging when set to -1
-        if self.filename == "-1":
+        if self.filename == "-1" or not self.enable_file_logging:
             self.filename = None
+
+        # handle special case
+        if not self.enable_file_logging and self.console is None:
+            self.console = True
 
         # set default file log format str
         if self.file_log_format_str is None:
@@ -181,6 +189,7 @@ def setup_logging(logging_config: IdmToolsLoggingConfig) -> None:
 
     Args:
         logging_config: IdmToolsLoggingConfig that defines our config
+        force: Force setup, even if we have done it once
 
     Returns:
         Returns None
@@ -189,7 +198,10 @@ def setup_logging(logging_config: IdmToolsLoggingConfig) -> None:
         For logging levels, see https://coloredlogs.readthedocs.io/en/latest/api.html#id26
     """
     global LOGGING_STARTED, LOGGING_FILE_STARTED, LOGGING_FILE_HANDLER
-    if not LOGGING_STARTED:
+    if not LOGGING_STARTED or logging_config.force:
+        # reset logging and remove all handlers and delete our current handler
+        reset_logging_handlers()
+
         logging.addLevelName(15, 'VERBOSE')
         logging.addLevelName(25, 'NOTICE')
         logging.addLevelName(35, 'SUCCESS')
@@ -201,9 +213,6 @@ def setup_logging(logging_config: IdmToolsLoggingConfig) -> None:
         root.setLevel(logging_config.level)
         user.setLevel(logging.DEBUG)
 
-        # reset logging and remove all handlers and delete our current handler
-        if logging_config.force:
-            reset_logging_handlers()
         # file logging config
         if not LOGGING_FILE_STARTED or logging_config.force:
             LOGGING_FILE_HANDLER = setup_handlers(logging_config)
@@ -211,13 +220,20 @@ def setup_logging(logging_config: IdmToolsLoggingConfig) -> None:
                 LOGGING_FILE_STARTED = True
 
         # Show we enable user output. The only time we really should not do this is for specific CLI use cases
-        # such as json output
-        if logging_config.user_output:
-            setup_user_logger(logging_config)
+        # # such as json output
+        # if logging_config.user_output and not logging_config.console:
+        setup_user_logger(logging_config)
 
         if root.isEnabledFor(logging.DEBUG):
             from idmtools import __version__
             root.debug(f"idmtools core version: {__version__}")
+
+        # python logger creates default stream handler when no handlers are set so create null handler
+        if len(root.handlers) == 0:
+            root.addHandler(logging.NullHandler())
+
+        # set logging stated
+        LOGGING_FILE_STARTED = True
 
 
 def setup_handlers(logging_config: IdmToolsLoggingConfig):
@@ -242,6 +258,7 @@ def setup_handlers(logging_config: IdmToolsLoggingConfig):
 
     # If user output is enabled and console is enabled
     if logging_config.user_output and logging_config.console:
+    # if logging_config.console:
         # is colored logging enabled? if so, add our logger
         # note: this will be used for user logging as well
         if logging_config.use_colored_logs:
@@ -263,8 +280,7 @@ def setup_user_logger(logging_config: IdmToolsLoggingConfig):
     Returns:
         None
     """
-    # if console is enabled, user logger will inherit from that logger
-    if not logging_config.console:
+    if logging_config.user_output and not logging_config.console:
         # is colored logs enabled? If so, make the user logger a coloredlogger
         if logging_config.use_colored_logs:
             coloredlogs.install(logger=getLogger('user'), level=VERBOSE, fmt='%(message)s', stream=sys.stdout)
@@ -339,7 +355,7 @@ def reset_logging_handlers():
     Returns:
         None
     """
-    global LOGGING_FILE_HANDLER, LOGGING_FILE_STARTED, LOGGING_STARTED
+    global LOGGING_STARTED, LOGGING_FILE_STARTED, LOGGING_FILE_HANDLER
 
     with suppress(KeyError):
         # Remove all handlers associated with the root logger object.
@@ -363,7 +379,7 @@ def exclude_logging_classes(items_to_exclude=None):
         None
     """
     if items_to_exclude is None:
-        items_to_exclude = ['urllib3', 'paramiko', 'matplotlib', 'COMPS']
+        items_to_exclude = ['urllib3', 'paramiko', 'matplotlib']
     # remove comps by default
     for item in items_to_exclude:
         other_logger = getLogger(item)
