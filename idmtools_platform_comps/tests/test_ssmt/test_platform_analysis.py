@@ -141,3 +141,54 @@ def test_platform_analysis_workitem(platform: Platform):
     do_platform_analysis_wi(platform)
 
 
+
+import allure
+import unittest.mock
+from idmtools_test.utils.utils import get_case_name
+from idmtools_platform_comps.comps_platform import COMPSPlatform
+from idmtools_platform_comps.ssmt_platform import SSMTPlatform
+
+@pytest.mark.comps
+@pytest.mark.serial
+class TestSSMTPlatform(unittest.TestCase):
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
+        self.platform = Platform('BAYESIAN')
+
+    def tearDown(self):
+        super().tearDown()
+
+    @allure.feature("ssmt platform")
+    def test_ssmt_platform(self):
+        ssmt_platform = Platform("BAYESIAN_SSMT")
+        self.assertTrue(isinstance(ssmt_platform, SSMTPlatform))
+        self.assertTrue(isinstance(ssmt_platform, COMPSPlatform))
+
+        comps_platform = Platform("BAYESIAN")
+        self.assertTrue(isinstance(comps_platform, COMPSPlatform))
+        self.assertFalse(isinstance(comps_platform, SSMTPlatform))
+
+    @allure.feature("ssmt platform")
+    def test_ssmt_platform_specification(self):
+        from idmtools_platform_comps.plugin_info import SSMTPlatformSpecification
+        ssmt_spec = SSMTPlatformSpecification()
+        _aliases = ssmt_spec.get_configuration_aliases()
+        self.assertIn("BAYESIAN_SSMT", _aliases)
+
+    @allure.feature("ssmt platform")
+    def test_comps_platform_pecification(self):
+        from idmtools_platform_comps.plugin_info import COMPSPlatformSpecification
+        comps_spec = COMPSPlatformSpecification()
+        _aliases = comps_spec.get_configuration_aliases()
+        self.assertNotIn("BAYESIAN_SSMT", _aliases)
+
+    @allure.feature("ssmt platform")
+    def test_platformP_ugins(self):
+        from idmtools.registry.platform_specification import PlatformPlugins
+        _platforms = PlatformPlugins().get_plugin_map()
+        _aliases = PlatformPlugins().get_aliases()
+
+        self.assertIn("SSMT", _platforms)
+        self.assertIn("BAYESIAN_SSMT", _aliases)
