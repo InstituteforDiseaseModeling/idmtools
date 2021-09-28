@@ -44,6 +44,8 @@ class IAnalyzer(metaclass=ABCMeta):
         self.uid = uid or self.__class__.__name__
         self.results = None  # Store what finalize() is returning
 
+        self.filenames = [f.replace("\\", '/') for f in self.filenames]
+
     def initialize(self) -> NoReturn:
         """
         Call once after the analyzer has been added to the :class:`~idmtools.analysis.AnalyzeManager`.

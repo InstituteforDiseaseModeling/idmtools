@@ -32,15 +32,20 @@ class PlatformAnalysis:
         :py:class:`idmtools.analysis.analyze_manager.AnalyzeManager`
     """
 
-    def __init__(self, platform: IPlatform, experiment_ids: List['str'], analyzers: List[Type[IAnalyzer]], analyzers_args=None, analysis_name: str = 'WorkItem Test', tags=None, additional_files: Union[FileList, AssetCollection, List[str]] = None, asset_collection_id=None,
+    def __init__(self, platform: IPlatform, analyzers: List[Type[IAnalyzer]],
+                 experiment_ids: List['str'] = [], work_item_ids: List['str'] = [],
+                 analyzers_args=None, analysis_name: str = 'WorkItem Test', tags=None,
+                 additional_files: Union[FileList, AssetCollection, List[str]] = None, asset_collection_id=None,
                  asset_files: Union[FileList, AssetCollection, List[str]] = None, wait_till_done: bool = True,
-                 idmtools_config: str = None, pre_run_func: Callable = None, wrapper_shell_script: str = None, verbose: bool = False, extra_args: Dict[str, Any] = None):
+                 idmtools_config: str = None, pre_run_func: Callable = None, wrapper_shell_script: str = None,
+                 verbose: bool = False, extra_args: Dict[str, Any] = None):
         """
         Initialize our platform analysis.
 
         Args:
             platform: Platform
             experiment_ids: Experiment ids
+            work_item_ids: WorkItem ids
             analyzers: Analyzers to run
             analyzers_args: Arguments for our analyzers
             analysis_name: Analysis name
@@ -59,7 +64,8 @@ class PlatformAnalysis:
             :meth:`idmtools.analysis.analyze_manager.AnalyzeManager.__init__`
         """
         self.platform = platform
-        self.experiment_ids = experiment_ids
+        self.experiment_ids = experiment_ids or []
+        self.work_item_ids = work_item_ids or []
         self.analyzers = analyzers
         self.analyzers_args = analyzers_args
         self.analysis_name = analysis_name
@@ -104,9 +110,14 @@ class PlatformAnalysis:
         logger.debug(f"Command: {command}")
         from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
 
-        ac = AssetCollection.from_id(self.asset_collection_id, platform=self.platform) if self.asset_collection_id else AssetCollection()
+        ac = AssetCollection.from_id(self.asset_collection_id,
+                                     platform=self.platform) if self.asset_collection_id else AssetCollection()
         ac.add_assets(self.asset_files)
-        self.wi = SSMTWorkItem(name=self.analysis_name, command=command, tags=self.tags, transient_assets=self.additional_files, assets=ac, related_experiments=self.experiment_ids)
+        self.wi = SSMTWorkItem(name=self.analysis_name, command=command, tags=self.tags,
+                               transient_assets=self.additional_files, assets=ac,
+                               related_experiments=self.experiment_ids,
+                               related_work_items=self.work_item_ids
+                               )
 
         # Run the workitem
         self.platform.run_items(self.wi)
@@ -151,7 +162,8 @@ class PlatformAnalysis:
 
         # add our extra arguments for analyzer manager
         if 'max_workers' not in self.extra_args:
-            am_defaults: List[AnalyzerManagerPlatformDefault] = self.platform.get_defaults_by_type(AnalyzerManagerPlatformDefault)
+            am_defaults: List[AnalyzerManagerPlatformDefault] = self.platform.get_defaults_by_type(
+                AnalyzerManagerPlatformDefault)
             if len(am_defaults):
                 if logger.isEnabledFor(DEBUG):
                     logger.debug(f"Setting max workers to comps default of: {am_defaults[0].max_workers}")
@@ -164,9 +176,14 @@ class PlatformAnalysis:
             command += f'{self.shell_script_binary} {os.path.basename(self.wrapper_shell_script)} '
         command += "python3 platform_analysis_bootstrap.py"
         # Add the experiments
-        command += f' --experiment-ids {",".join(self.experiment_ids)}'
+        if self.experiment_ids:
+            command += f' --experiment-ids {",".join(self.experiment_ids)}'
+        # Add the work items
+        if self.work_item_ids:
+            command += f' --work-item-ids {",".join(self.work_item_ids)}'
         # Add the analyzers
-        command += " --analyzers {}".format(",".join(f"{inspect.getmodulename(inspect.getfile(a))}.{a.__name__}" for a in self.analyzers))
+        command += " --analyzers {}".format(
+            ",".join(f"{inspect.getmodulename(inspect.getfile(a))}.{a.__name__}" for a in self.analyzers))
 
         if self.pre_run_func:
             command += f" --pre-run-func {self.pre_run_func.__name__}"
@@ -180,11 +197,16 @@ class PlatformAnalysis:
                     raise ValueError(
                         f"AnalyzerManager does not support the argument {argname}. Valid args are {' '.join([str(s) for s in argspec.parameters.keys()])}. See {get_help_version_url('idmtools.analysis.analyze_manager.html#idmtools.analysis.analyze_manager.AnalyzeManager')} for a valid list of arguments.")
                 # TODO do type validations later
-            self.additional_files.add_or_replace_asset(Asset(filename="extra_args.pkl", content=pickle.dumps(self.extra_args)))
+            self.additional_files.add_or_replace_asset(
+                Asset(filename="extra_args.pkl", content=pickle.dumps(self.extra_args)))
             command += " --analyzer-manager-args-file extra_args.pkl"
 
+        self.__pickle_platform_args()
+        command += " --platform-args platform_args.pkl"
+
         # Add platform
-        command += " --block {}".format(self.platform._config_block)
+        ssmt_config_block = f"{self.platform._config_block}_SSMT"
+        command += " --block {}".format(ssmt_config_block)
         if self.verbose:
             command += " --verbose"
 
@@ -219,6 +241,19 @@ class PlatformAnalysis:
             new_source.append(replace_expr.sub("", line))
 
         self.additional_files.add_or_replace_asset(Asset(filename="pre_run.py", content="\n".join(new_source)))
+
+    def __pickle_platform_args(self):
+        """
+        Pickle platform args and add as assets.
+
+        Returns:
+            None
+        """
+        # Pickle the platform args
+        platform_kwargs = self.platform._kwargs
+        platform_kwargs["missing_ok"] = self.platform._missing_ok
+        self.additional_files.add_or_replace_asset(
+            Asset(filename="platform_args.pkl", content=pickle.dumps(platform_kwargs)))
 
     def validate_args(self):
         """
