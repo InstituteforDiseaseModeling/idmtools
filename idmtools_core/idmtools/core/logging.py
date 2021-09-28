@@ -256,7 +256,6 @@ def setup_handlers(logging_config: IdmToolsLoggingConfig):
 
     # If user output is enabled and console is enabled
     if logging_config.user_output and logging_config.console:
-    # if logging_config.console:
         # is colored logging enabled? if so, add our logger
         # note: this will be used for user logging as well
         if logging_config.use_colored_logs:
