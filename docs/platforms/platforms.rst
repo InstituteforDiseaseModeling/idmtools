@@ -1,6 +1,6 @@
-=========
-Platforms
-=========
+===================
+Supported Platforms
+===================
 
 |IT_s| currently supports running on the following platforms:
 

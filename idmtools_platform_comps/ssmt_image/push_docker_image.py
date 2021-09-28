@@ -17,13 +17,13 @@ DOCKER_REPO = f'{REPO_KEY}.{BASE_REPO}'
 IMAGE_NAME = 'idmtools/comps_ssmt_worker'
 BASE_IMAGE_NAME = f'{DOCKER_REPO}/{IMAGE_NAME}'
 
-if 'bamboo_UserArtifactory' in os.environ:
-    username = os.environ['bamboo_UserArtifactory']
+if 'PYPI_STAGING_USERNAME' in os.environ:
+    username = os.environ['PYPI_STAGING_USERNAME']
 else:
     print("Username:")
     username = input('Username:')
-if 'bamboo_PasswordArtifactory' in os.environ:
-    password = os.environ['bamboo_PasswordArtifactory']
+if 'PYPI_STAGING_PASSWORD' in os.environ:
+    password = os.environ['PYPI_STAGING_PASSWORD']
 else:
     password = getpass(prompt='Password:')
 auth = HTTPBasicAuth(username=username, password=password)

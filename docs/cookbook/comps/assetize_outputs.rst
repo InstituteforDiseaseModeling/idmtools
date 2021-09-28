@@ -1,10 +1,8 @@
-.. _Cookbook Assetize Outputs:
-
 ================
 Assetize outputs
 ================
 
-For an overview of assetizing outputs, see :ref:`Assetize Outputs`.
+For an overview of assetizing outputs, see :ref:`Assetize outputs Workitem`.
 
 Excluding files from assetizing
 -------------------------------

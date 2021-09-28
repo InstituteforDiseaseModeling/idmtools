@@ -180,7 +180,8 @@ class IdmConfigParser:
         """
         if dir_path is None:
             dir_path = os.getcwd()
-        # init logging here as this is our most likely entry-point into an idmtools "application"
+
+        logger.debug(f"Looking for config file in {dir_path}")  # This log will generally only happen on recreation of config after clearing config
 
         # Look for the config file. First check environment vars
         if "IDMTOOLS_CONFIG_FILE" in os.environ:
@@ -219,9 +220,14 @@ class IdmConfigParser:
                 cls._config._sections[lowercase_version] = cls._config._sections[section]
 
         if os.getenv("NO_LOGGING_INIT", "f").lower() not in TRUTHY_VALUES:
+            # init logging here as this is our most likely entry-point into an idmtools "application"
             cls._init_logging()
             from idmtools.core.logging import VERBOSE
-            if IdmConfigParser.get_option("NO_PRINT_CONFIG_USED", fallback="F").lower() not in TRUTHY_VALUES and IdmConfigParser.get_option("SUPPRESS_OUTPUT", fallback="F").lower() not in TRUTHY_VALUES:
+
+            if IdmConfigParser.get_option("NO_PRINT_CONFIG_USED", fallback="F").lower() not in TRUTHY_VALUES and IdmConfigParser.get_option("logging", "USER_OUTPUT", fallback="t").lower() in TRUTHY_VALUES:
+                # let users know when they are using environment variable to local config
+                if "IDMTOOLS_CONFIG_FILE" in os.environ:
+                    user_logger.warning("idmtools config defined through 'IDMTOOLS_CONFIG_FILE' environment variable")
                 user_logger.log(VERBOSE, "INI File Used: {}".format(ini_file))
 
     @classmethod
@@ -323,7 +329,7 @@ class IdmConfigParser:
         Returns:
             Return if output should be disabled
         """
-        return not any([x.lower() in TRUTHY_VALUES for x in [IdmConfigParser.get_option(None, "SUPPRESS_OUTPUT", 'f')]])
+        return any([x.lower() in TRUTHY_VALUES for x in [IdmConfigParser.get_option('logging', "USER_OUTPUT", 'on')]])
 
     @classmethod
     def ensure_init(cls, dir_path: str = '.', file_name: str = default_config, force: bool = False) -> None:
@@ -451,6 +457,8 @@ class IdmConfigParser:
         Returns:
             None
         """
+        # log as verbose
+        logger.log(15, "Clearing idm config")
         cls._config = None
         cls._instance = None
         cls._config_path = None

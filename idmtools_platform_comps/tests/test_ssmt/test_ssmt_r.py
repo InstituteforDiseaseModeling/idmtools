@@ -6,11 +6,12 @@ import json
 from idmtools.assets import AssetCollection
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools.core.platform_factory import Platform
+from idmtools_test.utils.decorators import warn_amount_ssmt_image_decorator
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
 from idmtools.core import ItemType
 from idmtools.utils.dropbox_location import get_dropbox_location
-from idmtools_test.utils.utils import del_folder
+from idmtools_test.utils.utils import del_folder, get_case_name
 
 
 @pytest.mark.skip
@@ -23,12 +24,13 @@ class TestRExperiment(ITestWithPersistence):
 
     def setUp(self) -> None:
         self.platform = Platform('COMPS2')
-        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
+        self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
         self.input_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "inputs")
 
     @pytest.mark.skip
     @pytest.mark.comps
     @pytest.mark.long
+    @warn_amount_ssmt_image_decorator
     def test_r_ssmt_workitem_add_ac_from_path(self):
         # Keep data separate from code in Dropbox
         dropbox_folder = get_dropbox_location()

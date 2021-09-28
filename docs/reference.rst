@@ -37,8 +37,8 @@ Local platform
 
 .. include:: /reuse/comps_note.txt
 
-Models
-------
+Models reference
+----------------
 
 .. uml:: /diagrams/models.puml
 

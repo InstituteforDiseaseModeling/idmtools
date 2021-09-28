@@ -68,27 +68,27 @@ class IAnalyzer(metaclass=ABCMeta):
 
     def filter(self, item: ANALYZABLE_ITEM) -> bool:
         """
-        Decide whether the analyzer should process a simulation.
+        Decide whether the analyzer should process a simulation/work item.
 
         Args:
             item: An :class:`~idmtools.entities.iitem.IItem` to be considered for processing with this analyzer.
 
         Returns:
-            A Boolean indicating whether simulation should be analyzed by this analyzer.
+            A Boolean indicating whether simulation/work item should be analyzed by this analyzer.
         """
         return True
 
     @abstractmethod
     def map(self, data: ANALYSIS_ITEM_MAP_DATA_TYPE, item: ANALYZABLE_ITEM) -> Any:
         """
-        In parallel for each simulation, consume raw data from filenames and emit selected data.
+        In parallel for each simulation/work item, consume raw data from filenames and emit selected data.
 
         Args:
             data: A dictionary associating filename with content for simulation data.
             item: :class:`~idmtools.entities.iitem.IItem` object that the passed data is associated with.
 
         Returns:
-            Selected data for the given item.
+            Selected data for the given simulation/work item.
         """
         return None
 

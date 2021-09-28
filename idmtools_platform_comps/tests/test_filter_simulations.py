@@ -13,6 +13,7 @@ from idmtools.utils.filter_simulations import FilterItem
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
+from idmtools_test.utils.utils import get_case_name
 
 
 @allure.story("COMPS")
@@ -56,7 +57,7 @@ class TestSimulations(ITestWithPersistence):
         cls.experiment = cls.suite.experiments[0]
 
     def setUp(self) -> None:
-        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
+        self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
         print(self.case_name)
 
     # Filter from Experiment, self.experiment has 5 simulations includes 2 succeed sims and 3 failed sims

@@ -188,12 +188,22 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
             Modified experiment.
         """
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(
+                f"Experiment Status: {experiment.status}. "
+                f"Modifying experiment: {experiment.id}. "
+                f"Asset Editable: {experiment.assets.is_editable()}. "
+                f"Regather assets: {regather_common_assets}."
+            )
         if experiment.status is not None and experiment.assets.is_editable() and regather_common_assets:
             experiment.pre_creation(self.platform, gather_assets=regather_common_assets)
             self.send_assets(experiment)
         else:
             user_logger.warning(
-                f"Not gathering common assets again since experiment exists on platform. If you need to add additional common assets, see {get_doc_base_url()}cookbook/asset_collections.html#modifying-asset-collection")
+                f"Not gathering common assets again since experiment exists on platform. "
+                f"If you need to add additional common assets, see "
+                f"{get_doc_base_url()}cookbook/asset_collections.html#modifying-asset-collection"
+            )
         return experiment
 
     def _get_experiment_command_line(self, check_command: bool, experiment: Experiment) -> CommandLine:

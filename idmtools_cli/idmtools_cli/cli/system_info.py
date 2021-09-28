@@ -74,11 +74,14 @@ def info():
 @click.option('--output-filename', default=None, help="Output filename")
 def system(copy_to_clipboard, no_format_for_gh, issue, output_filename):
     """Provide info about your current install of idmtools."""
+    logger.debug("Building system info")
     system_info = get_system_information()
+    logger.debug("Building system info output")
     lines = [f'System Information\n{"=" * 20}']
     ordered_fields = sorted(system_info.__dict__.keys())
     [lines.append(f'{k}: {system_info.__dict__[k]}') for k in ordered_fields]
     if os.name != 'nt':
+        logger.debug("Building windows info")
         for f in ['workers', 'redis-data']:
             fname = os.path.join(system_info.data_directory, f)
             if os.path.exists(fname):
@@ -87,17 +90,24 @@ def system(copy_to_clipboard, no_format_for_gh, issue, output_filename):
                 owned_by = f'{getpwuid(s.st_uid).pw_name} UID {s.st_uid}:{s.st_gid}'
                 lines.append(f'{fname} has permissions of {oct(stat.S_IMODE(os.lstat(fname).st_mode))} '
                              f'and is owned by {owned_by}')
+        logger.debug("Windows info done")
     try:
         import docker
+        logger.debug("Building docker info")
         lines.append(f'\nDocker Information\n{"=" * 20}')
         client = docker.from_env()
         lines.append(f'Version: {client.version()}')
         docker_info = client.info()
         ordered_fields = sorted(docker_info.keys())
         [lines.append(f'{k}: {docker_info[k]}') for k in ordered_fields]
+        logger.debug("docker info done")
     except ImportError:
         pass
+    except Exception as e:
+        logger.error(e)
+        raise e
     if copy_to_clipboard:
+        logger.debug("Copying to clipboard")
         output = '\n'.join(lines)
         if not no_format_for_gh or issue:
             logger.debug('Formatting for github')
@@ -109,6 +119,7 @@ def system(copy_to_clipboard, no_format_for_gh, issue, output_filename):
         with open(output_filename, 'w') as log_out:
             log_out.writelines(lines)
     else:
+        logger.debug("Writing output")
         for line in lines:
             click.echo(line)
 

@@ -1,23 +1,19 @@
-.. _COMPS_Scheduling:
-
-Scheduling
-==========
+COMPS scheduling
+================
 
 |IT_s| supports job scheduling on the |COMPS_s| platform, which includes support for multiple
 scenarios depending upon the scheduling needs of your specific research needs and requirements.
 For example, you could schedule your simulations to run under a single process on the same
 node and with a specified number of cores. For more information about this and other
-supported scenarios, see `Scenarios`_. To use the full scheduling capabilites included
+supported scenarios, see `Scheduling Scenarios`_. To use the full scheduling capabilites included
 within |COMPS_s| you must add the ``workorder.json`` as a transient asset. This is a one
 time task to complete for your project. For more information about scheduling configuration,
-see `Configuration`_. `Examples`_ are provided from which you can leverage to help get started and
-gain a better understanding. `Schemas`_ enumerate the available options that may be included in workorder.json.
+see `Scheduling Configuration`_. `Examples`_ are provided from which you can leverage to help get started and
+gain a better understanding. `Scheduling Schemas`_ enumerate the available options that may be included in workorder.json.
 
 
-.. _Scenarios:
-
-Scenarios
----------
+Scheduling scenarios
+--------------------
 
 Choosing the correct scheduling scenario will depend upon your specific research needs and
 requirements. The following lists some of the common scenarios supported:
@@ -27,10 +23,8 @@ requirements. The following lists some of the common scenarios supported:
 * 1 node, N processes - useful for models with high migration and interprocess communication. By running on the same node MPI can use shared memory, as opposed to slower tcp sockets over multiple nodes. This may be useful for some scenarios using |EMOD_s| or other MPI-enabled workloads.
 
 
-.. _Configuration:
-
-Configuration
--------------
+Scheduling configuration
+------------------------
 
 By configuring a ``workorder.json`` file and adding it as a transient asset you can
 take advantage of the full scheduling support provided with |COMPS_s|. Scheduling
@@ -91,8 +85,8 @@ create one using the ``add_schedule_config`` method, both methods included in th
 
 .. _Examples:
 
-Example
--------
+Scheduling example
+------------------
 
 For addition information and specifics of using a workorder.json file within Python,
 you can begin with the following:
@@ -103,10 +97,8 @@ you can begin with the following:
 To see the list of platform alias', such as BELEGOST and CALCULON, use the following
 CLI command: ``idmtools info plugins platform-aliases``.
 
-.. _Schemas:
-
-Schemas
--------
+Scheduling schemas
+------------------
 
 The following schemas, for both HPC and SLURM clusters on |COMPS_s|, list the available
 options you are able to include within the workorder.json file.
