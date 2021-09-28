@@ -24,7 +24,7 @@ def platform_slurm_2():
     Returns:
 
     """
-    return Platform('SLURM2', docker_image = "docker-staging.packages.idmod.org/idmtools/comps_ssmt_worker:1.6.3.23")
+    return Platform('SLURM2')
 
 
 @pytest.fixture
@@ -34,7 +34,7 @@ def platform_comps2():
     Returns:
 
     """
-    return Platform('BAYESIAN',docker_image = "docker-staging.packages.idmod.org/idmtools/comps_ssmt_worker:1.6.3.23")
+    return Platform('BAYESIAN')
 
 
 # Test PlatformAnalysis with PopulationAnalyzer for experiment id

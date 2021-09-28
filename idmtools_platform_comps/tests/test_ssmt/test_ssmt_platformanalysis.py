@@ -53,7 +53,6 @@ class TestPlatformAnalysis(ITestWithPersistence):
         print(self._testMethodName)
         self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
         print(self.case_name)
-        #self.platform = Platform('BAYESIAN', docker_image="docker-staging.packages.idmod.org/idmtools/comps_ssmt_worker:1.6.3.23")
         self.platform = Platform('BAYESIAN')
         self.tags = {'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}
         self.input_file_path = analyzer_path
@@ -269,10 +268,6 @@ class TestPlatformAnalysis(ITestWithPersistence):
         """
         This test uploads local packages and installs them remotely before running allowing us to test change to core,
         or comps packages without needing a new docker image(mostly)
-
-        Note: this test should not have docker image tie to. and will fail with comps docker worker using python3.6
-        but there is no initializer for ProcessPoolExecutor(python3.6) in analyzer_manager as in this document
-        https://docs.python.org/3.7/library/concurrent.futures.html
         """
         wrapper = write_wrapper_script()
         experiment_id = TARGET_EXPERIMENT_ID  # comps2 exp id
