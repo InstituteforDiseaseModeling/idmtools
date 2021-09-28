@@ -189,7 +189,6 @@ def setup_logging(logging_config: IdmToolsLoggingConfig) -> None:
 
     Args:
         logging_config: IdmToolsLoggingConfig that defines our config
-        force: Force setup, even if we have done it once
 
     Returns:
         Returns None
