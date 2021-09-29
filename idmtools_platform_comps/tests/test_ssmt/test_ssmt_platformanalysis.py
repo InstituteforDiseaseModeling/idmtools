@@ -67,7 +67,9 @@ class TestPlatformAnalysis(ITestWithPersistence):
             wrapper = write_wrapper_script()
             extra_args['wrapper_shell_script'] = wrapper
             extra_args['asset_files'] = [CORE_LOCAL_PACKAGE, COMPS_LOCAL_PACKAGE]
-        analysis = PlatformAnalysis(platform=platform, experiment_ids=[experiment_id], analyzers=[SimpleAnalyzer], analyzers_args=[{'filenames': ['config.json']}], analysis_name=self.case_name, tags={'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}, **extra_args)
+        analysis = PlatformAnalysis(platform=platform, experiment_ids=[experiment_id], analyzers=[SimpleAnalyzer],
+                                    analyzers_args=[{'filenames': ['config.json']}], analysis_name=self.case_name,
+                                    tags={'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}, **extra_args)
 
         analysis.analyze(check_status=True)
         wi = analysis.get_work_item()
@@ -87,7 +89,8 @@ class TestPlatformAnalysis(ITestWithPersistence):
                    f"--experiment-ids {experiment_id} " \
                    f"--analyzers simple_analyzer.SimpleAnalyzer " \
                    f"--analyzer-manager-args-file extra_args.pkl " \
-                   f"--block {platform._config_block}"
+                   f"--platform-args platform_args.pkl " \
+                   f"--block {platform._config_block}_SSMT"
         if test_with_new_code:
             self.assertEqual(execution['Command'], f"/bin/bash {os.path.basename(wrapper)} {base_cmd}")
         else:
@@ -106,7 +109,8 @@ class TestPlatformAnalysis(ITestWithPersistence):
             analysis = PlatformAnalysis(
                 platform=platform, experiment_ids=[TARGET_EXPERIMENT_ID],
                 analyzers=[SimpleAnalyzer], analyzers_args=[{'filenames': ['config.json']}],
-                analysis_name=self.case_name, tags={'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}, extra_args=dict(bad_parameter=0)
+                analysis_name=self.case_name, tags={'idmtools': self._testMethodName, 'WorkItem type': 'Docker'},
+                extra_args=dict(bad_parameter=0)
             )
 
             analysis.analyze(check_status=True)
@@ -116,18 +120,17 @@ class TestPlatformAnalysis(ITestWithPersistence):
     @pytest.mark.serial
     @warn_amount_ssmt_image_decorator
     def test_ssmt_using_aliases(self):
-        p = Platform("BAYESIAN")
-        # check if comps has a docker image to use new images for this run. This does not effect remote system, just what image we run on
-        # We have to do this because config is coming from alias
+        # check if comps has a docker image to use new images for this run. This does not effect remote system, just
+        # what image we run on. We have to do this because config is coming from alias
         if IdmConfigParser().get_option("COMPS2", "docker_image", None):
-            p.docker_image = IdmConfigParser().get_option("COMPS2", "docker_image")
-            print(f"Setting docker image to {p.docker_image}")
-        self.do_simple_python_analysis(p)
+            self.platform.docker_image = IdmConfigParser().get_option("COMPS2", "docker_image")
+            print(f"Setting docker image to {self.platform.docker_image}")
+        self.do_simple_python_analysis(self.platform)
 
     # Test CSVAnalyzer with SSMTAnalysis which analyzes python experiment's results
     @warn_amount_ssmt_image_decorator
     def test_ssmt_workitem_python_csv_analyzer(self):
-        experiment_id = '9311af40-1337-ea11-a2be-f0921c167861'  # comps2 exp id
+        experiment_id = TARGET_EXPERIMENT_ID  # comps2 exp id
         # experiment_id = 'de07f612-69ed-ea11-941f-0050569e0ef3'  # idmtvapp17
         extra_args = dict()
         wrapper = None
@@ -135,7 +138,10 @@ class TestPlatformAnalysis(ITestWithPersistence):
             wrapper = write_wrapper_script()
             extra_args['wrapper_shell_script'] = write_wrapper_script()
             extra_args['asset_files'] = [CORE_LOCAL_PACKAGE, COMPS_LOCAL_PACKAGE]
-        analysis = PlatformAnalysis(platform=self.platform, experiment_ids=[experiment_id], analyzers=[CSVAnalyzer], analyzers_args=[{'filenames': ['output/c.csv'], 'parse': True}], analysis_name=self.case_name, tags={'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}, **extra_args)
+        analysis = PlatformAnalysis(platform=self.platform, experiment_ids=[experiment_id], analyzers=[CSVAnalyzer],
+                                    analyzers_args=[{'filenames': ['output/c.csv'], 'parse': True}],
+                                    analysis_name=self.case_name,
+                                    tags={'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}, **extra_args)
 
         analysis.analyze(check_status=True)
         wi = analysis.get_work_item()
@@ -152,7 +158,12 @@ class TestPlatformAnalysis(ITestWithPersistence):
         print(worker_order)
         self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
         execution = worker_order['Execution']
-        base_cmd = f"python3 platform_analysis_bootstrap.py --experiment-ids {experiment_id} --analyzers csv_analyzer.CSVAnalyzer --analyzer-manager-args-file extra_args.pkl --block BAYESIAN"
+        base_cmd = f"python3 platform_analysis_bootstrap.py " \
+                   f"--experiment-ids {experiment_id} " \
+                   f"--analyzers csv_analyzer.CSVAnalyzer " \
+                   f"--analyzer-manager-args-file extra_args.pkl " \
+                   f"--platform-args platform_args.pkl " \
+                   f"--block {self.platform._config_block}_SSMT"
         if test_with_new_code:
             self.assertEqual(execution['Command'], f"/bin/bash {os.path.basename(wrapper)} {base_cmd}")
         else:
@@ -171,7 +182,10 @@ class TestPlatformAnalysis(ITestWithPersistence):
             wrapper = write_wrapper_script()
             extra_args['wrapper_shell_script'] = wrapper
             extra_args['asset_files'] = [CORE_LOCAL_PACKAGE, COMPS_LOCAL_PACKAGE]
-        analysis = PlatformAnalysis(platform=self.platform, experiment_ids=[exp_id], analyzers=[InfectiousnessCSVAnalyzer, NodeCSVAnalyzer], analyzers_args=[filenames, filenames_2], analysis_name=self.case_name, tags={'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}, **extra_args)
+        analysis = PlatformAnalysis(platform=self.platform, experiment_ids=[exp_id],
+                                    analyzers=[InfectiousnessCSVAnalyzer, NodeCSVAnalyzer],
+                                    analyzers_args=[filenames, filenames_2], analysis_name=self.case_name,
+                                    tags={'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}, **extra_args)
 
         analysis.analyze(check_status=True)
         wi = analysis.get_work_item()
@@ -192,7 +206,8 @@ class TestPlatformAnalysis(ITestWithPersistence):
                    f"--experiment-ids {exp_id} " \
                    f"--analyzers infectiousness_csv_analyzer.InfectiousnessCSVAnalyzer,node_csv_analyzer.NodeCSVAnalyzer " \
                    f"--analyzer-manager-args-file extra_args.pkl " \
-                   f"--block BAYESIAN"
+                   f"--platform-args platform_args.pkl " \
+                   f"--block {self.platform._config_block}_SSMT"
         if test_with_new_code:
             self.assertEqual(execution['Command'], f"/bin/bash {os.path.basename(wrapper)} {base_cmd}")
         else:
@@ -215,7 +230,10 @@ class TestPlatformAnalysis(ITestWithPersistence):
             wrapper = write_wrapper_script()
             extra_args['wrapper_shell_script'] = wrapper
             extra_args['asset_files'] = [CORE_LOCAL_PACKAGE, COMPS_LOCAL_PACKAGE]
-        analysis = PlatformAnalysis(platform=self.platform, experiment_ids=[exp_id], analyzers=analyzers, analyzers_args=[filenames, filenames_2], analysis_name=self.case_name, tags={'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}, **extra_args)
+        platform = Platform('SlurmStage')
+        analysis = PlatformAnalysis(platform=self.platform, experiment_ids=[exp_id], analyzers=analyzers,
+                                    analyzers_args=[filenames, filenames_2], analysis_name=self.case_name,
+                                    tags={'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}, **extra_args)
 
         analysis.analyze(check_status=True)
         wi = analysis.get_work_item()
@@ -236,20 +254,23 @@ class TestPlatformAnalysis(ITestWithPersistence):
                    f"--experiment-ids {exp_id} " \
                    f"--analyzers custom_csv_analyzer.InfectiousnessCSVAnalyzer,custom_csv_analyzer.NodeCSVAnalyzer " \
                    f"--analyzer-manager-args-file extra_args.pkl " \
-                   f"--block BAYESIAN"
+                   f"--platform-args platform_args.pkl " \
+                   f"--block {self.platform._config_block}_SSMT"
         if test_with_new_code:
             self.assertEqual(execution['Command'], f"/bin/bash {os.path.basename(wrapper)} {base_cmd}")
         else:
             self.assertEqual(execution['Command'], base_cmd)
 
-    @pytest.mark.skipif(not os.path.exists(COMPS_LOCAL_PACKAGE) or not os.path.exists(CORE_LOCAL_PACKAGE), reason=f"To run this, you need both {COMPS_LOCAL_PACKAGE} and {CORE_LOCAL_PACKAGE}. You can create these files by running pymake dist in each package directory")
+    @pytest.mark.skipif(not os.path.exists(COMPS_LOCAL_PACKAGE) or not os.path.exists(CORE_LOCAL_PACKAGE),
+                        reason=f"To run this, you need both {COMPS_LOCAL_PACKAGE} and {CORE_LOCAL_PACKAGE}. "
+                               f"You can create these files by running pymake dist in each package directory")
     def test_using_newest_code(self):
         """
-        This test uploads local packages and installs them remotely before running allowing us to test change to core, or comps packages without needing a new docker image(mostly)
-
+        This test uploads local packages and installs them remotely before running allowing us to test change to core,
+        or comps packages without needing a new docker image(mostly)
         """
         wrapper = write_wrapper_script()
-        experiment_id = '9311af40-1337-ea11-a2be-f0921c167861'  # comps2 exp id
+        experiment_id = TARGET_EXPERIMENT_ID  # comps2 exp id
 
         def pre_load_func():
             print("!!!!!!!!!!!!!Preload executed!!!!!!!!!!!!!!!!!!")
@@ -260,7 +281,10 @@ class TestPlatformAnalysis(ITestWithPersistence):
 
         # load_idmtools = RequirementsToAssetCollection(local_wheels=)
         # ac_id = load_idmtools.run()
-        analysis = PlatformAnalysis(platform=self.platform, experiment_ids=[experiment_id], analyzers=[SimpleAnalyzer], analyzers_args=[{'filenames': ['config.json']}], analysis_name=self.case_name, asset_files=AssetCollection([CORE_LOCAL_PACKAGE, COMPS_LOCAL_PACKAGE]), pre_run_func=pre_load_func,
+        analysis = PlatformAnalysis(platform=self.platform, experiment_ids=[experiment_id], analyzers=[SimpleAnalyzer],
+                                    analyzers_args=[{'filenames': ['config.json']}], analysis_name=self.case_name,
+                                    asset_files=AssetCollection([CORE_LOCAL_PACKAGE, COMPS_LOCAL_PACKAGE]),
+                                    pre_run_func=pre_load_func,
                                     wrapper_shell_script=wrapper)
 
         analysis.analyze(check_status=True)
@@ -276,7 +300,14 @@ class TestPlatformAnalysis(ITestWithPersistence):
         worker_order = json.load(open(os.path.join(file_path, "WorkOrder.json"), 'r'))
         self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
         execution = worker_order['Execution']
-        self.assertEqual(execution['Command'], f'/bin/bash {os.path.basename(wrapper)} python3 platform_analysis_bootstrap.py --experiment-ids {experiment_id} --analyzers simple_analyzer.SimpleAnalyzer --pre-run-func pre_load_func --analyzer-manager-args-file extra_args.pkl --block BAYESIAN')
+        self.assertEqual(execution['Command'],
+                         f'/bin/bash {os.path.basename(wrapper)} python3 platform_analysis_bootstrap.py '
+                         f'--experiment-ids {experiment_id} '
+                         f'--analyzers simple_analyzer.SimpleAnalyzer '
+                         f'--pre-run-func pre_load_func '
+                         f'--analyzer-manager-args-file extra_args.pkl '
+                         f'--platform-args platform_args.pkl '
+                         f'--block {self.platform._config_block}_SSMT')
 
         with open(os.path.join(file_path, "stdout.txt"), 'r') as fin:
             stdout_contents = fin.read()
