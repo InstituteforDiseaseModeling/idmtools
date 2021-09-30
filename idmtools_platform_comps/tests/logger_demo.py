@@ -41,7 +41,7 @@ def check_comps_logger(full: bool = False, display=False):
         print('\n'.join(list(comps_loggers.keys())))
 
 
-def write_some_logs(fake=False, exp=False, comps=False, root=False, user=False, full=True, check=False):
+def write_some_logs(fake=False, exp=False, comps=False, root=False, user=False, full=False, check=False):
     if fake or full:
         any_logger = getLogger('any_module')
         any_logger.propagate = False
