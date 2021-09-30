@@ -58,11 +58,11 @@ class TestConfig(ITestWithPersistence):
             matched = re.search(r"write_some_logs \[CRITICAL\] \([0-9]+,[0-9]+\) - root: 5", log_file_content)
             self.assertTrue(matched)
             matched = re.search(r"write_some_logs \[DEBUG\] \([0-9]+,[0-9]+\) - root: 1", log_file_content)
-            self.assertFalse(bool(matched))  # no debug root
+            self.assertFalse(matched)  # no debug root
             matched = re.search(r"write_some_logs \[INFO\] \([0-9]+,[0-9]+\) - root: 2", log_file_content)
-            self.assertFalse(bool(matched))  # no info root
+            self.assertFalse(matched)  # no info root
             matched = re.search(r"write_some_logs \[WARNING\] \([0-9]+,[0-9]+\) - root: 3", log_file_content)
-            self.assertFalse(bool(matched))  # no warning root
+            self.assertFalse(matched)  # no warning root
             matched = re.search(r"write_some_logs \[DEBUG\] \([0-9]+,[0-9]+\) - user: 11", log_file_content)
             self.assertTrue(matched)
             matched = re.search(r"write_some_logs \[INFO\] \([0-9]+,[0-9]+\) - user: 22", log_file_content)
@@ -102,14 +102,14 @@ class TestConfig(ITestWithPersistence):
             matched = re.search(r"write_some_logs \[CRITICAL\] - root: 5", log_file_content)
             self.assertTrue(matched)
             matched = re.search(r"write_some_logs \[DEBUG\] - root: 1", log_file_content)
-            self.assertFalse(bool(matched))  # no DEBUG for root
+            self.assertFalse(matched)  # no DEBUG for root
             matched = re.search(r"write_some_logs \[INFO\] - root: 2", log_file_content)
-            self.assertFalse(bool(matched))  # no INFO for root
+            self.assertFalse(matched)  # no INFO for root
 
             matched = re.search(r"write_some_logs \[DEBUG\] - user: 11", log_file_content)
-            self.assertFalse(bool(matched))  # no DEBUG for user
+            self.assertFalse(matched)  # no DEBUG for user
             matched = re.search(r"write_some_logs \[INFO\] - user: 22", log_file_content)
-            self.assertFalse(bool(matched))  # no INFO for user
+            self.assertFalse(matched)  # no INFO for user
             matched = re.search(r"write_some_logs \[WARNING\] - user: 33", log_file_content)
             self.assertTrue(matched)
             matched = re.search(r"write_some_logs \[ERROR\] - user: 44", log_file_content)
@@ -236,7 +236,7 @@ class TestConfig(ITestWithPersistence):
 
     def validate_default_user_console_off(self, stdout):
         matched = re.search(r"user: 11", stdout)
-        self.assertFalse(bool(matched))  # should not print debug user, since user is VERBOSE now
+        self.assertFalse(matched)  # should not print debug user, since user is VERBOSE now
         matched = re.search(r"user: 22", stdout)
         self.assertTrue(matched)
         matched = re.search(r"user: 33", stdout)
@@ -248,7 +248,7 @@ class TestConfig(ITestWithPersistence):
 
     def validate_color_console(self, stdout):
         matched = re.search(r"user: 11", stdout)
-        self.assertFalse(bool(matched))  # should not print debug user, since user is VERBOSE now
+        self.assertFalse(matched)  # should not print debug user, since user is VERBOSE now
         matched = re.search(r"user: 22", stdout)
         self.assertTrue(matched)
         matched = re.search(r"33muser: 33", stdout)
