@@ -35,8 +35,6 @@ def check_comps_logger(full: bool = False, display=False):
 
             if log_name.startswith("COMPS"):
                 comps_loggers[log_name] = cl
-                # print(f'{log_name}: ', cl)
-                # print(f'\n{log_name}...')
                 check_logger(cl)
 
     if display:
