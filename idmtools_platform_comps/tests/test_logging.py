@@ -48,7 +48,7 @@ class TestConfig(ITestWithPersistence):
         IdmConfigParser(file_name=self.tempfile_ini.name)
 
         sys.stdout = mock_stdout
-        logger_demo.write_some_logs(user=True, root=True, comps=True, exp=True, full=False, check=False)
+        logger_demo.write_some_logs(user=True, root=True, comps=True, exp=True)
 
         with open(f"{self.case_name}.log", "r") as log_file_fd:
             log_file_content = log_file_fd.read()
@@ -90,7 +90,7 @@ class TestConfig(ITestWithPersistence):
         IdmConfigParser(file_name=self.tempfile_ini.name)
 
         sys.stdout = mock_stdout
-        logger_demo.write_some_logs(user=True, root=True, comps=True, exp=True, full=False, check=True)
+        logger_demo.write_some_logs(user=True, root=True, comps=True, exp=True)
 
         with open(f"{self.case_name}.log", "r") as log_file_fd:
             log_file_content = log_file_fd.read()
@@ -133,7 +133,7 @@ class TestConfig(ITestWithPersistence):
         IdmConfigParser(file_name=self.tempfile_ini.name)
 
         sys.stdout = mock_stdout
-        logger_demo.write_some_logs(user=True, root=True, comps=True, exp=True, full=False, check=False)
+        logger_demo.write_some_logs(user=True, root=True, comps=True, exp=True)
         # validate no log file generate
         self.assertFalse(os.path.exists(f"{self.case_name}.log"))
 
@@ -152,7 +152,7 @@ class TestConfig(ITestWithPersistence):
         IdmConfigParser(file_name=self.tempfile_ini.name)
 
         sys.stdout = mock_stdout
-        logger_demo.write_some_logs(user=True, root=True, comps=True, exp=True, full=False, check=False)
+        logger_demo.write_some_logs(user=True, root=True, comps=True, exp=True)
         # validate no log file generate
         self.assertFalse(os.path.exists(f"{self.case_name}.log"))
 
@@ -172,7 +172,7 @@ class TestConfig(ITestWithPersistence):
         IdmConfigParser(file_name=self.tempfile_ini.name)
 
         sys.stdout = mock_stdout
-        logger_demo.write_some_logs(user=True, root=True, comps=True, exp=True, full=False, check=False)
+        logger_demo.write_some_logs(user=True, root=True, comps=True, exp=True)
         self.assertFalse(os.path.exists(f"{self.case_name}.log"))
 
         stdout = mock_stdout.getvalue()
@@ -195,7 +195,7 @@ class TestConfig(ITestWithPersistence):
         IdmConfigParser(file_name=self.tempfile_ini.name)
 
         sys.stdout = mock_stdout
-        logger_demo.write_some_logs(user=True, root=True, full=False, check=False)
+        logger_demo.write_some_logs(user=True, root=True, comps=True, exp=True)
         self.assertFalse(os.path.exists(f"{self.case_name}.log"))
 
         stdout = mock_stdout.getvalue()
@@ -213,7 +213,7 @@ class TestConfig(ITestWithPersistence):
         self.create_temp_ini(ini_content)
         IdmConfigParser(file_name=self.tempfile_ini.name)
         sys.stdout = mock_stdout
-        logger_demo.write_some_logs(user=True, root=True, check=False)
+        logger_demo.write_some_logs(user=True, root=True, comps=True, exp=True)
         self.assertFalse(os.path.exists(f"{self.case_name}.log"))
 
         stdout = mock_stdout.getvalue()
@@ -228,7 +228,7 @@ class TestConfig(ITestWithPersistence):
         self.create_temp_ini(ini_content)
         IdmConfigParser(file_name=self.tempfile_ini.name)
         sys.stdout = mock_stdout
-        logger_demo.write_some_logs(user=True, root=True, comps=True, exp=True, full=False, check=False)
+        logger_demo.write_some_logs(user=True, root=True, comps=True, exp=True)
         self.assertFalse(os.path.exists(f"{self.case_name}.log"))
 
         stdout = mock_stdout.getvalue()
