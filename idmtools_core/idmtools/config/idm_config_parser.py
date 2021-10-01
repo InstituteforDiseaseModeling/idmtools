@@ -240,6 +240,11 @@ class IdmConfigParser:
             value = cls.get_option("logging", field.name, fallback=None)
             if value is not None:
                 log_config[field.name] = value
+
+        # handle special case
+        if log_config.get('console', None) is None:
+            log_config['console'] = None
+
         setup_logging(IdmToolsLoggingConfig(**log_config))
 
         if platform.system() == "Darwin":
