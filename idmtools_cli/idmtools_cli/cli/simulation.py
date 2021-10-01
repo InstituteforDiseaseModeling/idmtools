@@ -1,3 +1,6 @@
+"""
+Defines the CLI simulation command group.
+"""
 from typing import Optional, Tuple, List
 import click
 from idmtools_cli.iplatform_cli import IPlatformCLI
@@ -12,13 +15,12 @@ from idmtools_cli.cli.utils import tags_help, get_platform_from_config_or_name, 
 @click.pass_context
 def simulation(ctx, platform, config_block):
     """
-    Contains commands related to simulations
+    Contains commands related to simulations.
 
     Some useful examples are
 
     Get the status of simulations for the platform using the local platform defaults, you would run
     idmtools simulation --platform Local status --help
-
     """
     platform_obj = get_platform_from_config_or_name(config_block, platform)
     # create our platform object and pass it along through the context to any sub-commands
@@ -34,7 +36,7 @@ def simulation(ctx, platform, config_block):
 def status(platform_cli: IPlatformCLI, id: Optional[str], experiment_id: Optional[str],
            tags: Optional[List[Tuple[str, str]]]):
     """
-    List of statuses for simulation(s) with the ability to filter by id, experiment_id, status, and tags
+    List of statuses for simulation(s) with the ability to filter by id, experiment_id, status, and tags.
 
     For Example
     Get the status of simulations for the platform using the local platform defaults, you would run

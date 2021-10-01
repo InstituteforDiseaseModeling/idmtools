@@ -1,3 +1,7 @@
+"""idmtools local platform api config.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import logging
 import os
 from sqlite3 import OperationalError
@@ -23,6 +27,7 @@ db = None
 
 @backoff.on_exception(backoff.constant, OperationalError, max_tries=3, interval=0.2)
 def start_db(db=None):
+    """Start database for API."""
     if db is None:
         from idmtools_platform_local.internals.data import Base
         from idmtools_platform_local.internals.data.job_status import JobStatus  # noqa: F401

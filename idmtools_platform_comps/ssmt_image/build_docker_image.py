@@ -1,6 +1,11 @@
-####
-# This script is currently a workaround so that we can use bump2version with docker since the nightly versions
-# don't work with docker registry
+"""This script is currently a workaround so that we can use bump2version with docker since the nightly versions doesn't work with docker registry.
+
+Notes:
+    If you are using this script locally, you need to set the environment variables *PYPI_STAGING_USERNAME* and *PYPI_STAGING_PASSWORD*.
+    These can be set to your idm email/password
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import argparse
 import glob
 import os
@@ -32,10 +37,10 @@ LOCAL_PACKAGE_DIR = os.path.join(BASE_DIR, 'idmtools_platform_comps/ssmt_image')
 
 def get_dependency_packages():
     """
-    Get python packages required to build image
+    Get python packages required to build image.
 
     Returns:
-
+        None
     """
     os.makedirs(os.path.abspath('.depends'), exist_ok=True)
     for root, _dirs, files in os.walk(os.path.join(LOCAL_PACKAGE_DIR, '.depends')):
@@ -48,21 +53,24 @@ def get_dependency_packages():
 
 def get_username_and_password(disable_keyring_load=False, disable_keyring_save=False):
     """
-    Try to get username. It first attempts loading from environment vars, then keyring if not disabled, then lastly prompts
+    Try to get username.
+
+    It first attempts loading from environment vars, then keyring if not disabled, then lastly prompts.
 
     Args:
         disable_keyring_load: Disable loading credentials from keyring
+        disable_keyring_save: Disable keyring save
 
     Returns:
         Username password
     """
-    if 'bamboo_UserArtifactory' in os.environ:
+    if 'PYPI_STAGING_USERNAME' in os.environ:
         logger.info("Loading Credentials from environment")
-        if 'bamboo_PasswordArtifactory' not in os.environ:
+        if 'PYPI_STAGING_PASSWORD' not in os.environ:
             logger.error("When specifying username from environment variable, you must also specify password")
             sys.exit(-1)
-        username = os.environ['bamboo_UserArtifactory']
-        password = os.environ['bamboo_PasswordArtifactory']
+        username = os.environ['PYPI_STAGING_USERNAME']
+        password = os.environ['PYPI_STAGING_PASSWORD']
     elif not disable_keyring_load and keyring.get_credential(KEYRING_NAME, "username"):
         username = keyring.get_password(KEYRING_NAME, "username")
         password = keyring.get_password(KEYRING_NAME, "password")
@@ -78,9 +86,10 @@ def get_username_and_password(disable_keyring_load=False, disable_keyring_save=F
 
 def get_latest_image_version_from_registry(username, password):
     """
-    Fetch the latest image version from repo
-    Returns:
+    Fetch the latest image version from repo.
 
+    Returns:
+        Latest version published in the registry
     """
     url = f'https://{BASE_REPO}/artifactory/api/docker/{REPO_KEY}/v2/{IMAGE_NAME}/tags/list'
     auth = HTTPBasicAuth(username=username, password=password)
@@ -88,7 +97,8 @@ def get_latest_image_version_from_registry(username, password):
     response = requests.get(url, auth=auth)
     logger.debug(f"Return Code: {response.status_code}")
     if response.status_code != 200:
-        logger.error(response.content)
+        print(response.status_code)
+        print(response.content)
         raise Exception('Could not load images')
     else:
         images = natsorted(response.json()['tags'], reverse=True)
@@ -107,6 +117,18 @@ def get_latest_image_version_from_registry(username, password):
 
 
 def build_image(username, password, disable_keyring_load, disable_keyring_save):
+    """
+    Run the docker build command.
+
+    Args:
+        username: Username to use with registry
+        password: Password to use with registry
+        disable_keyring_load: Disable keyring which caches passwords
+        disable_keyring_save: Disable caching password to the keyring
+
+    Returns:
+        None
+    """
     if username is None or password is None:
         username, password = get_username_and_password(disable_keyring_load, disable_keyring_save)
     get_dependency_packages()

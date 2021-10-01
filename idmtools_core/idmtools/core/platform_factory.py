@@ -1,3 +1,10 @@
+"""
+Manages the creation of our platforms.
+
+The Platform allows us to lookup a platform via its plugin name, "COMPS" or via configuration aliases defined in a platform plugins, such as CALCULON.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import json
 import os
 from contextlib import contextmanager
@@ -5,6 +12,7 @@ from dataclasses import fields
 from logging import getLogger, DEBUG
 from typing import Dict, Any, TYPE_CHECKING
 from idmtools.config import IdmConfigParser
+from idmtools.core import TRUTHY_VALUES
 from idmtools.core.context import set_current_platform, remove_current_platform
 from idmtools.utils.entities import validate_user_inputs_against_dataclass
 
@@ -17,6 +25,16 @@ user_logger = getLogger('user')
 
 @contextmanager
 def platform(*args, **kwds):
+    """
+    Utility function to create platform.
+
+    Args:
+        *args: Arguments to pass to platform
+        **kwds: Keyword args to pass to platform
+
+    Returns:
+        Platform created.
+    """
     logger.debug(f'Acquiring platform context with options: {str(*args)}')
     try:
         # check if we are already in a platform context and if so add to stack
@@ -30,6 +48,9 @@ def platform(*args, **kwds):
 
 
 class Platform:
+    """
+    Platform Factory.
+    """
 
     def __new__(cls, block, missing_ok: bool = None, **kwargs):
         """
@@ -67,6 +88,8 @@ class Platform:
         platform = cls._create_from_block(block, missing_ok=missing_ok, **kwargs)
         set_current_platform(platform)
         platform._config_block = block
+        platform._missing_ok = missing_ok
+        platform._kwargs = kwargs
         return platform
 
     @classmethod
@@ -88,8 +111,7 @@ class Platform:
                              f"Supported platforms are {', '.join(cls._platforms.keys())}")
 
     @classmethod
-    def _create_from_block(cls, block: str, missing_ok: bool = False, default_missing: Dict[str, Any] = None,
-                           **kwargs) -> 'IPlatform':
+    def _create_from_block(cls, block: str, missing_ok: bool = False, default_missing: Dict[str, Any] = None, **kwargs) -> 'IPlatform':
         """
         Retrieve section entries from the INI configuration file by giving block.
 
@@ -101,7 +123,6 @@ class Platform:
         Returns:
             A dictionary with entries from the block.
         """
-
         # Read block details
         platform_type = None
         is_alias = False
@@ -109,9 +130,9 @@ class Platform:
             section = IdmConfigParser.get_section(block)
             if not section and missing_ok:
                 # its possible our logger is not setup
-                from idmtools.core.logging import setup_logging, LISTENER
-                if not LISTENER:
-                    setup_logging()
+                from idmtools.core.logging import setup_logging, LOGGING_STARTED, IdmToolsLoggingConfig
+                if not LOGGING_STARTED:
+                    setup_logging(IdmToolsLoggingConfig())
         except ValueError as e:
             if logger.isEnabledFor(DEBUG):
                 logger.debug(f"Checking aliases for {block.upper()}")
@@ -174,7 +195,8 @@ class Platform:
         # Display block info
         try:
             from idmtools.core.logging import VERBOSE
-            if IdmConfigParser.is_output_enabled():
+            # is output enabled and is showing of platform config enabled?
+            if IdmConfigParser.is_output_enabled() and IdmConfigParser.get_option(None, "SHOW_PLATFORM_CONFIG", 't').lower() in TRUTHY_VALUES:
                 if is_alias:
                     user_logger.log(VERBOSE, f"\n[{block}]")
                     user_logger.log(VERBOSE, json.dumps(section, indent=3))

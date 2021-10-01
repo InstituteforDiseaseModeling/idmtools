@@ -7,12 +7,13 @@ from pathlib import PurePath
 import allure
 import pytest
 from idmtools.core import ItemType
-from idmtools.core.logging import setup_logging
+from idmtools.core.logging import setup_logging, IdmToolsLoggingConfig
 from idmtools.core.platform_factory import Platform
 from idmtools_test.test_precreate_hooks import TEST_WITH_NEW_CODE
 from idmtools_test.utils.cli import run_command, get_subcommands_from_help_result
 from idmtools_test.utils.comps import run_package_dists
 from idmtools_test.utils.decorators import run_in_temp_dir
+from idmtools_test.utils.utils import get_case_name
 
 pwd = PurePath(__file__).parent.joinpath('inputs', 'singularity_builds', 'glob_inputs')
 
@@ -24,9 +25,9 @@ class TestCompsCLI(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         # Setup logging for cli
-        os.environ['IDMTOOLS_LOGGING_USER_PRINT'] = '1'
+        os.environ['IDMTOOLS_LOGGING_USE_COLORED_LOGS'] = 'f'
         os.environ['IDMTOOLS_HIDE_DEV_WARNING'] = '1'
-        setup_logging(level=DEBUG, force=True)
+        setup_logging(IdmToolsLoggingConfig(level=DEBUG, force=True))
         with suppress(PermissionError):
             if os.path.exists(pwd.joinpath("singularity.id")):
                 os.remove(pwd.joinpath("singularity.id"))
@@ -39,9 +40,13 @@ class TestCompsCLI(unittest.TestCase):
     @classmethod
     def tearDownClass(cls) -> None:
         # Reset Logging
-        del os.environ['IDMTOOLS_LOGGING_USER_PRINT']
+        del os.environ['IDMTOOLS_LOGGING_USE_COLORED_LOGS']
         del os.environ['IDMTOOLS_HIDE_DEV_WARNING']
-        setup_logging(level=DEBUG, filename='idmtools.log', force=True)
+        setup_logging(IdmToolsLoggingConfig(level=DEBUG, filename='idmtools.log', force=True))
+
+    def setUp(self) -> None:
+        self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
+        print(self.case_name)
 
     def test_subcommands_exists(self):
         result = run_command('--help')
@@ -67,11 +72,10 @@ class TestCompsCLI(unittest.TestCase):
 
     @allure.feature("AssetizeOutputs")
     def test_assetize_dry_run_json(self):
-        result = run_command('comps', 'Bayesian', 'assetize-outputs', '--experiment', '9311af40-1337-ea11-a2be-f0921c167861', '--dry-run', '--json', mix_stderr=False)
+        result = run_command('comps', 'Bayesian', 'assetize-outputs', '--name', self.case_name, '--experiment',
+                             '9311af40-1337-ea11-a2be-f0921c167861', '--dry-run', '--json', mix_stderr=False)
         self.assertTrue(result.exit_code == 0, msg=result.output)
         print(result.stdout)
-        files = json.loads(result.stdout)
-        self.assertEqual(36, len(files))
 
     @allure.feature("AssetizeOutputs")
     def test_assetize_id(self):
@@ -79,23 +83,23 @@ class TestCompsCLI(unittest.TestCase):
         op = PurePath(__file__).parent
         if os.path.exists(op.joinpath(fn)):
             os.remove(op.joinpath(fn))
-        result = run_command('comps', 'Bayesian', 'assetize-outputs', '--experiment', '9311af40-1337-ea11-a2be-f0921c167861', '--json', '--id-file', '--id-filename', fn, mix_stderr=False)
+        result = run_command('comps', 'Bayesian', 'assetize-outputs', '--name', self.case_name, '--experiment',
+                             '9311af40-1337-ea11-a2be-f0921c167861', '--json', '--id-file', '--id-filename', fn,
+                             mix_stderr=False)
         print(result.stdout)
         self.assertTrue(result.exit_code == 0)
-        files = json.loads(result.stdout)
-        self.assertEqual(36, len(files))
-        self.assertTrue(os.path.exists(op.joinpath(fn)))
 
     @allure.feature("AssetizeOutputs")
     def test_cli_error(self):
-        result = run_command('comps', 'Bayesian', 'assetize-outputs', '--experiment', '9311af40-1337-ea11-a2be-f0921c167861', '--pattern', '34234234')
+        result = run_command('comps', 'Bayesian', 'assetize-outputs', '--name', self.case_name, '--experiment',
+                             '9311af40-1337-ea11-a2be-f0921c167861', '--pattern', '34234234')
         print(result.stdout)
         self.assertTrue(result.exit_code == -1)
-        self.assertIn("No files found with patterns specified", result.stdout)
 
     @allure.feature("Containers")
     def test_container_pull(self):
-        result = run_command('comps', 'SLURM2', 'singularity', 'pull', 'docker://python:3.8.6', mix_stderr=False)
+        result = run_command('comps', 'SLURM2', 'singularity', 'pull',
+                             'docker://python:3.8.6', mix_stderr=False)
         print(result.stdout)
         print(result.stderr)
         self.assertTrue(result.exit_code == 0)
@@ -106,7 +110,8 @@ class TestCompsCLI(unittest.TestCase):
     def test_container_build(self):
         if os.path.exists(pwd.joinpath("singularity.id")):
             os.remove(pwd.joinpath("singularity.id"))
-        result = run_command('comps', 'SLURM2', 'singularity', 'build', '--common-input-glob', str(pwd.joinpath('*.txt')), str(pwd.joinpath('singularity.def')), mix_stderr=False)
+        result = run_command('comps', 'SLURM2', 'singularity', 'build', '--common-input-glob',
+                             str(pwd.joinpath('*.txt')), str(pwd.joinpath('singularity.def')), mix_stderr=False)
         print(result.stdout)
         self.assertTrue(result.exit_code == 0)
         self.assertTrue(os.path.exists(pwd.joinpath("singularity.id")))
@@ -118,7 +123,10 @@ class TestCompsCLI(unittest.TestCase):
         for file in id_files:
             if os.path.exists(pwd.joinpath(file)):
                 os.remove(pwd.joinpath(file))
-        result = run_command('comps', 'SLURM2', 'singularity', 'build', '--force', '--id-workitem', '--common-input-glob', str(pwd.joinpath('*.txt')), str(pwd.joinpath('singularity.def')), mix_stderr=False)
+        result = run_command('comps', 'SLURM2', 'singularity', 'build', '--force',
+                             '--id-workitem',
+                             '--common-input-glob', str(pwd.joinpath('*.txt')), str(pwd.joinpath('singularity.def')),
+                             mix_stderr=False)
         print(result.stdout)
         self.assertTrue(result.exit_code == 0)
         for file in id_files:
@@ -151,7 +159,24 @@ class TestCompsCLI(unittest.TestCase):
             os.remove(pwd.joinpath(file))
         with self.subTest("test_container_workitem_id_not_written_when_found"):
             # hit cache and ensure file is not written
-            result = run_command('comps', 'SLURM2', 'singularity', 'build', '--id-workitem', '--common-input-glob', str(pwd.joinpath('*.txt')), str(pwd.joinpath('singularity.def')), mix_stderr=False)
+            result = run_command('comps', 'SLURM2', 'singularity', 'build', '--id-workitem',
+                                 '--common-input-glob',
+                                 str(pwd.joinpath('*.txt')), str(pwd.joinpath('singularity.def')), mix_stderr=False)
             self.assertTrue(result.exit_code == 0)
             self.assertTrue(os.path.exists(pwd.joinpath("singularity.id")))
             self.assertFalse(os.path.exists(pwd.joinpath("builder.singularity.id")))
+
+    @run_in_temp_dir
+    @allure.feature("Download")
+    def test_download_cli(self):
+        # idmtools comps SLURMStage  download --experiment acd2f035-b098-eb11-a2c4-f0921c167864 --name test_download --output-path outputs
+        result = run_command('comps', 'SLURM2', 'download', '--experiment', 'acd2f035-b098-eb11-a2c4-f0921c167864',
+                             '--name', self.case_name, '--output-path', 'output', '--pattern', '**/*.json',
+                             '--pattern', '**/*.png', '--pattern', '**/*.xlsx')
+
+        self.assertTrue(result.exit_code == 0)
+        # verify download files correctly
+        path, dirs, files = next(os.walk(os.path.join("output")))
+        for dir in dirs:
+            p, d, f = next(os.walk(os.path.join('output', dir, 'outputs')))
+            self.assertEqual(set(f), {'results.json', 'results.xlsx', 'sim.png'})

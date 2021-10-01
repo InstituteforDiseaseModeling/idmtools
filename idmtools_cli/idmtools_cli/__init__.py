@@ -1,1 +1,2 @@
-__version__ = "1.6.3.0"
+"""iidmtools_cli version definition file."""
+__version__ = "1.6.4.0"

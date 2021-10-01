@@ -1,3 +1,7 @@
+"""idmtools local platform plugin spec.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 from typing import Type
 
 from idmtools.entities.iplatform import IPlatform
@@ -15,7 +19,7 @@ default_timeout: int = 30
 # Items related to internals of the local platform. Most likely you want to use the defaults
 #
 # Which work image to use
-workers_image: str = 'docker-staging.packages.idmod.org:latest'
+workers_image: str = 'idm-docker-staging.packages.idmod.org:latest'
 # Port to display UI (ie the portion after colon in default URL http://localhost:5000)
 workers_ui_port int = 5000
 # This sets the max memory for workers container
@@ -57,38 +61,45 @@ enable_singularity_support = False
 
 
 class LocalPlatformSpecification(PlatformSpecification):
+    """
+    Provide plugin spec for the LocalPlatform.
+    """
 
     @get_description_impl
     def get_description(self) -> str:
+        """Get plugin description."""
         return "Provides access to the Local Platform to IDM Tools"
 
     @get_platform_impl
     def get(self, **configuration) -> IPlatform:
         """
-        Build our local platform from the passed in configuration object
+        Build our local platform from the passed in configuration object.
 
-        We do our import of platform here to avoid any weir
+        We do our import of platform here to avoid any weird import issues on plugin load.
+
         Args:
-            configuration:
+            configuration: COnfiguration to use with local platform.
 
         Returns:
-
+            Local platform object created.
         """
         from idmtools_platform_local.local_platform import LocalPlatform
         return LocalPlatform(**configuration)
 
     @example_configuration_impl
     def example_configuration(self):
+        """Get our example configuration."""
         return LOCAL_PLATFORM_EXAMPLE_CONFIG
 
     @get_platform_type_impl
     def get_type(self) -> Type['LocalPlatform']:  # noqa: F821
+        """Get local platform type."""
         from idmtools_platform_local.local_platform import LocalPlatform
         return LocalPlatform
 
     def get_version(self) -> str:
         """
-        Returns the version of the plugin
+        Returns the version of the plugin.
 
         Returns:
             Plugin Version

@@ -67,8 +67,8 @@ jobs:
       - name: Build and push docker image
         working-directory: idmtools_platform_local
         env:
-          bamboo_UserArtifactory: ${{ secrets.PYPI_STAGING_USERNAME }}
-          bamboo_PasswordArtifactory: ${{ secrets.PYPI_STAGING_PASSWORD }}
+          PYPI_STAGING_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
+          PYPI_STAGING_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
         run: |
           make docker-only-proper
           python push_docker_image.py

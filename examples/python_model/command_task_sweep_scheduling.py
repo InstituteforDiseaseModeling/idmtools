@@ -14,7 +14,7 @@ from idmtools_platform_comps.utils.scheduling import default_add_workerorder_swe
 def set_value(simulation, name, value):
     fix_value = round(value, 2) if isinstance(value, float) else value
     # add argument
-    simulation.task.command.add_raw_argument(str(fix_value))
+    simulation.task.command.add_raw_argument(fix_value)
     # add tag with our value
     simulation.tags[name] = fix_value
 

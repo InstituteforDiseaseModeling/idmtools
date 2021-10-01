@@ -1,3 +1,7 @@
+"""idmtools local platform experiment task tools.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import logging
 import os
 import random
@@ -12,6 +16,16 @@ logger = logging.getLogger(__name__)
 
 @backoff.on_exception(backoff.constant, IntegrityError, max_tries=3, interval=0.02, jitter=None)
 def get_uuid_and_data_path(tags, extra_details):
+    """
+    Get a uuid and a path to write experiment data to.
+
+    Args:
+        tags: Tags to use
+        extra_details: Extra details for item.
+
+    Returns:
+        Data path and uuid
+    """
     # we only want to import this here so that clients don't need postgres/sqlalchemy packages
     from idmtools_platform_local.internals.workers.utils import create_or_update_status
     uuid = ''.join(random.choice(string.digits + string.ascii_uppercase) for _ in range(EXPERIMENT_ID_LENGTH))
@@ -26,6 +40,7 @@ def get_uuid_and_data_path(tags, extra_details):
 def create_experiment(tags: Dict[str, Any], extra_details: Dict[str, Any] = None) -> str:
     """
     Creates an experiment.
+
         - Create the folder
         - Also create the Assets folder to hold the experiments assets
         - Return the UUID of the newly created experiment
@@ -37,7 +52,6 @@ def create_experiment(tags: Dict[str, Any], extra_details: Dict[str, Any] = None
     Returns:
         (str) Id of created experiment
     """
-
     retries = 0
     data_path = None
     uuid = None

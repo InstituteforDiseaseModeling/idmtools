@@ -1,3 +1,7 @@
+"""idmtools FileFilterWorkItem is a interface for SSMT command to act on files using filters in WorkItems.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import copy
 import json
 import os
@@ -43,17 +47,21 @@ WI_PROPERTY_MAP = dict(
 DEFAULT_EXCLUDES = ["StdErr.txt", "StdOut.txt", "WorkOrder.json", "*.log"]
 
 
-# Error thrown when user tries to filter across Comps Environments
 class CrossEnvironmentFilterNotSupport(Exception):
+    """Defines cross environment error for when a user tried to filter across multiple comps environments."""
     doc_link: str = "platforms/comps/errors.html#errors"
 
 
 class AtLeastOneItemToWatch(Exception):
+    """Defines error for when there are not items being watched by FileFilterWorkItem."""
     doc_link: str = "platforms/comps/errors.html#errors"
 
 
 @dataclass(repr=False)
 class FileFilterWorkItem(SSMTWorkItem, ABC):
+    """
+    Defines our filtering workitem base that is used by assetize outputs and download work items.
+    """
     #: List of glob patterns. See https://docs.python.org/3.7/library/glob.html for details on the patterns
     file_patterns: List[str] = field(default_factory=list)
     # Exclude patterns.
@@ -82,6 +90,22 @@ class FileFilterWorkItem(SSMTWorkItem, ABC):
     _ssmt_depends: List[str] = field(default_factory=lambda: ["common.py", "file_filter.py"], repr=False)
 
     def __post_init__(self, item_name: str, asset_collection_id: UUID, asset_files: FileList, user_files: FileList, command: str):
+        """
+        Initialize the FileFilterWorkItem.
+
+        Args:
+            item_name: ItemName(Workitem)
+            asset_collection_id: Asset collection to attach to workitem
+            asset_files: Asset collections files to add
+            user_files: User files to add
+            command: Command to run
+
+        Returns:
+            None
+
+        Raises:
+            ValueError - If the ssmt script is not defined.
+        """
         if self._ssmt_script is None:
             raise ValueError("When defining a FileFilterWorkItem, you need an _ssmt_script")
         # Set command to nothing here for now. Eventually this will go away after 1.7.0
@@ -90,7 +114,7 @@ class FileFilterWorkItem(SSMTWorkItem, ABC):
 
     def create_command(self) -> str:
         """
-        Builds our command line for the SSMT Job
+        Builds our command line for the SSMT Job.
 
         Returns:
             Command string
@@ -140,14 +164,15 @@ class FileFilterWorkItem(SSMTWorkItem, ABC):
         return command
 
     def _extra_command_args(self, command: str) -> str:
+        """Add extra command arguments."""
         return command
 
     def __pickle_pre_run(self):
         """
-        Pickles the pre run functions
+        Pickles the pre run functions.
 
         Returns:
-
+            None
         """
         if self.pre_run_functions:
             source = ""
@@ -158,10 +183,10 @@ class FileFilterWorkItem(SSMTWorkItem, ABC):
 
     def __pickle_format_func(self):
         """
-        Pickle Format filename Function
+        Pickle Format filename Function.
 
         Returns:
-
+            None
         """
         if self.filename_format_function:
             new_source = self.__format_function_source(self.filename_format_function)
@@ -169,10 +194,10 @@ class FileFilterWorkItem(SSMTWorkItem, ABC):
 
     def __pickle_filter_func(self):
         """
-        Pickle Filter Function
+        Pickle Filter Function.
 
         Returns:
-
+            None
         """
         if self.entity_filter_function:
             new_source = self.__format_function_source(self.entity_filter_function)
@@ -210,13 +235,13 @@ class FileFilterWorkItem(SSMTWorkItem, ABC):
 
     def pre_creation(self, platform: IPlatform) -> None:
         """
-        Pre-Creation
+        Pre-Creation.
 
         Args:
             platform: Platform
 
         Returns:
-
+            None
         """
         self._filter_workitem_pre_creation(platform)
         if self.name is None or self.name == "idmtools workflow item":
@@ -240,6 +265,18 @@ class FileFilterWorkItem(SSMTWorkItem, ABC):
         super().pre_creation(platform)
 
     def _filter_workitem_pre_creation(self, platform):
+        """
+        Filter the workitem before creation.
+
+        Args:
+            platform: Platform
+
+        Returns:
+            None
+
+        Raises:
+            AtLeastOneItemToWatch - If there are not items we are watching, we cannot run our workitem.
+        """
         if self.total_items_watched() == 0:
             raise AtLeastOneItemToWatch("You must specify at least one item to watch")
         if len(self.file_patterns) == 0:
@@ -250,7 +287,7 @@ class FileFilterWorkItem(SSMTWorkItem, ABC):
 
     def __generate_name(self) -> str:
         """
-        Generate Automatic name for the WorkItem
+        Generate Automatic name for the WorkItem.
 
         Returns:
             Return generated name
@@ -274,7 +311,7 @@ class FileFilterWorkItem(SSMTWorkItem, ABC):
 
     def __convert_ids_to_items(self, platform):
         """
-        Convert our ids to items
+        Convert our ids to items.
 
         Args:
             platform: Platform object
@@ -282,7 +319,6 @@ class FileFilterWorkItem(SSMTWorkItem, ABC):
         Returns:
             None
         """
-
         for prop, item_type in WI_PROPERTY_MAP.items():
             new_items = []
             for item in getattr(self, prop):
@@ -299,13 +335,16 @@ class FileFilterWorkItem(SSMTWorkItem, ABC):
 
     def __ensure_all_dependencies_created_and_in_proper_env(self, platform: COMPSPlatform):
         """
-        Ensures all items we are watching
+        Ensures all items we are watching.
 
         Args:
             platform:
 
         Returns:
+            None
 
+        Raises:
+            CrossEnvironmentFilterNotSupport - If items are from multiple environemnts.
         """
         for work_prop, item_type in WI_PROPERTY_MAP.items():
             items = getattr(self, work_prop)
@@ -335,7 +374,7 @@ class FileFilterWorkItem(SSMTWorkItem, ABC):
 
     def total_items_watched(self) -> int:
         """
-        Returns the number of items watched
+        Returns the number of items watched.
 
         Returns:
             Total number of items watched
@@ -346,6 +385,20 @@ class FileFilterWorkItem(SSMTWorkItem, ABC):
         return total
 
     def run_after_by_id(self, item_id: str, item_type: ItemType, platform: COMPSPlatform = None):
+        """
+        Runs the workitem after an existing item finishes.
+
+        Args:
+            item_id: ItemId
+            item_type: ItemType
+            platform: Platform
+
+        Returns:
+            None
+
+        Raises:
+            ValueError - If item_type is not an experiment, simulation, or workflow item
+        """
         if item_type not in [ItemType.EXPERIMENT, ItemType.SIMULATION, ItemType.WORKFLOW_ITEM]:
             raise ValueError("Currently only Experiment, Simuation, and WorkFlowItems can be filtered")
         p = super()._check_for_platform_from_context(platform)
@@ -357,13 +410,19 @@ class FileFilterWorkItem(SSMTWorkItem, ABC):
 
     def from_items(self, item: Union[FilterableSSMTItem, List[FilterableSSMTItem]]):
         """
-        Add items to load assets from
+        Add items to load assets from.
 
         Args:
             item: Item or list of items to watch.
 
         Returns:
+            None
 
+        Raises:
+            ValueError - If any items specified are not an Experiment, Simulation or WorkItem
+
+        Notes:
+            We should add suite support in the future if possible. This should be done in client side by converting suite to list of experiments.
         """
         if not isinstance(item, list):
             items_to_add = [item]
@@ -381,7 +440,7 @@ class FileFilterWorkItem(SSMTWorkItem, ABC):
 
     def wait(self, wait_on_done_progress: bool = True, timeout: int = None, refresh_interval=None, platform: 'COMPSPlatform' = None) -> Union[None]:
         """
-        Waits on Filter Workitem to finish. This first waits on any dependent items to finish(Experiment/Simulation/WorkItems)
+        Waits on Filter Workitem to finish. This first waits on any dependent items to finish(Experiment/Simulation/WorkItems).
 
         Args:
             wait_on_done_progress: When set to true, a progress bar will be shown from the item
@@ -401,16 +460,15 @@ class FileFilterWorkItem(SSMTWorkItem, ABC):
 
     def _wait_on_children(self, **opts):
         """
-        Wait on children implementation
+        Wait on children implementation.
 
         Loops through the relations and ensure all are done before waiting on ourselve
         Args:
             **opts:
 
         Returns:
-
+            None
         """
-
         if logger.isEnabledFor(DEBUG):
             logger.debug("Wait on items being watched to finish running")
         for item_type in WI_PROPERTY_MAP.keys():
@@ -435,7 +493,7 @@ class FileFilterWorkItem(SSMTWorkItem, ABC):
 
     def fetch_error(self, print_error: bool = True) -> Union[Dict]:
         """
-        Fetches the error from a WorkItem
+        Fetches the error from a WorkItem.
 
         Args:
             print_error: Should error be printed. If false, error will be returned

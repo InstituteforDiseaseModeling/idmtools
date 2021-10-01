@@ -1,3 +1,8 @@
+"""
+Utilities for getting information and examples from gitrepos.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import os
 import sys
 import json
@@ -17,6 +22,9 @@ GITHUB_API_HOME = 'https://api.github.com'
 
 @dataclass
 class GitRepo:
+    """
+    GitRepo allows interaction with remote git repos, mainly for examples.
+    """
     repo_owner: str = field(default=None)
     repo_name: str = field(default=None)
     _branch: str = field(default='master', init=False, repr=False)
@@ -24,25 +32,52 @@ class GitRepo:
     _verbose: bool = field(default=False, init=False, repr=False)
 
     def __post_init__(self):
+        """
+        Initialize GitRepo.
+
+        If repo_owner or repo_name is None, the defaults REPO_OWNER and REPO_NAME
+
+        Returns:
+            None
+        """
         self.repo_owner = self.repo_owner or REPO_OWNER
         self.repo_name = self.repo_name or REPO_NAME
 
     @property
     def path(self):
+        """
+        Path property.
+
+        Returns:
+            Return path property
+        """
         return self._path
 
     @property
     def branch(self):
+        """
+        Branch property.
+
+        Returns:
+            Return branch property
+        """
         return self._branch
 
     @property
     def verbose(self):
+        """
+        Return verbose property.
+
+        Returns:
+            Return verbose property
+        """
         return self._verbose
 
     @property
     def repo_home_url(self):
         """
-        Construct repo home url
+        Construct repo home url.
+
         Returns: repo home url
         """
         return f'{GITHUB_HOME}/{self.repo_owner}/{self.repo_name}'
@@ -50,7 +85,8 @@ class GitRepo:
     @property
     def repo_example_url(self):
         """
-        Construct repo example url
+        Construct repo example url.
+
         Returns: repo example url
         """
         return f'{self.repo_home_url}/tree/{self._branch}/{self._path}'
@@ -58,14 +94,16 @@ class GitRepo:
     @property
     def api_example_url(self):
         """
-        Construct api url of the examples for download
+        Construct api url of the examples for download.
+
         Returns: api url
         """
         return f'{GITHUB_API_HOME}/repos/{self.repo_owner}/{self.repo_name}/contents/{self._path}?ref={self._branch}'
 
     def parse_url(self, url: str, branch: str = None, update: bool = True):
         """
-        Parse url for owner, repo, branch and example path
+        Parse url for owner, repo, branch and example path.
+
         Args:
             url: example url
             branch: user branch to replace the branch in url
@@ -102,7 +140,8 @@ class GitRepo:
 
     def list_public_repos(self, repo_owner: str = None, page: int = 1, raw: bool = False):
         """
-        Utility method to retrieve all public repos
+        Utility method to retrieve all public repos.
+
         Args:
             repo_owner: the owner of the repo
             page: pagination of results
@@ -130,7 +169,8 @@ class GitRepo:
 
     def list_repo_releases(self, repo_owner: str = None, repo_name: str = None, raw: bool = False):
         """
-        Utility method to retrieve all releases of the repo
+        Utility method to retrieve all releases of the repo.
+
         Args:
             repo_owner: the owner of the repo
             repo_name: the name of repo
@@ -156,7 +196,8 @@ class GitRepo:
 
     def download(self, path: str = '', output_dir: str = "./", branch: str = 'master') -> int:
         """
-        Download files with example url provided
+        Download files with example url provided.
+
         Args:
             path: local file path to the repo
             output_dir: user local folder to download files to
@@ -164,7 +205,6 @@ class GitRepo:
 
         Returns: total file count downloaded
         """
-
         if path.startswith('https://'):
             self.parse_url(path)
         else:
@@ -253,14 +293,14 @@ class GitRepo:
 
     def peep(self, path: str = '', branch: str = 'master'):
         """
-        Download files with example url provided
+        Download files with example url provided.
+
         Args:
             path: local file path to the repo
             branch: specify branch for files download from
 
         Returns: None
         """
-
         if path.startswith('https://'):
             repo_meta = self.parse_url(path, branch, False)
         else:

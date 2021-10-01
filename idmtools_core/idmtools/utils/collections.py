@@ -1,7 +1,11 @@
+"""
+utilities for collections.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import typing
 from itertools import tee
 from typing import Tuple, List, Mapping, Union, Iterable, Generator
-
 from more_itertools import take
 
 
@@ -28,15 +32,38 @@ def cut_iterable_to(obj: Iterable, to: int) -> Tuple[Union[List, Mapping], int]:
 
 
 class ExperimentParentIterator(typing.Iterator['Simulation']):  # noqa F821
+    """
+    Wraps a list of simulations with iterator that always provides parent experiment.
+    """
+
     def __init__(self, lst, parent: 'IEntity'):  # noqa F821
+        """
+        Initializes the ExperimentParentIterator.
+
+        Args:
+            lst: List of items(simulations) to iterator over
+            parent: Parent of items(Experiment)
+        """
         self.items = lst
         self.__iter = iter(self.items) if not isinstance(self.items, (typing.Iterator, Generator)) else self.items
         self.parent = parent
 
     def __iter__(self):
+        """
+        Iterator method returns self.
+
+        Returns:
+            Self
+        """
         return self
 
     def __next__(self):
+        """
+        Fetch the next items from our list.
+
+        Returns:
+            Next item from our list
+        """
         i = next(self.__iter)
         i._parent = self.parent
         if hasattr(i, 'parent_id') and self.parent.uid is not None:
@@ -44,12 +71,39 @@ class ExperimentParentIterator(typing.Iterator['Simulation']):  # noqa F821
         return i
 
     def __getitem__(self, item):
+        """
+        Get items wrapper.
+
+        Args:
+            item: Item to fetch
+
+        Returns:
+            Item from self.items
+        """
         return self.items[item]
 
     def __getattr__(self, item):
+        """
+        Get attr wrapper.
+
+        Args:
+            item: Item to get
+
+        Returns:
+            Attribute from our items
+        """
         return getattr(self.items, item)
 
     def __len__(self):
+        """
+        Returns the total simulations.
+
+        Returns:
+            Total simulations
+
+        Raises:
+            ValueError - When the underlying object is a generator, we cannot get the length of the object
+        """
         from idmtools.entities.templated_simulation import TemplatedSimulations
         if isinstance(self.items, typing.Sized):
             return len(self.items)
@@ -59,13 +113,16 @@ class ExperimentParentIterator(typing.Iterator['Simulation']):  # noqa F821
 
     def append(self, item: 'Simulation'): # noqa F821
         """
-        Adds a simulation to an object
+        Adds a simulation to an object.
 
         Args:
             item: Item to add
 
         Returns:
             None
+
+        Raises:
+            ValueError when we cannot append because the item is not a simulation or our underlying object doesn't support appending
         """
         from idmtools.entities.templated_simulation import TemplatedSimulations
         from idmtools.entities.simulation import Simulation
@@ -81,12 +138,16 @@ class ExperimentParentIterator(typing.Iterator['Simulation']):  # noqa F821
 
     def extend(self, item: Union[List['Simulation'], 'TemplatedSimulations']):  # noqa F821
         """
-        Extends object(adds
+        Extends object.
+
         Args:
-            item:
+            item: Item to extend
 
         Returns:
             None
+
+        Raises:
+            ValueError when the underlying data object doesn't supporting adding additional item
         """
         from idmtools.entities.templated_simulation import TemplatedSimulations
         if isinstance(self.items, (list, set)):
@@ -109,17 +170,45 @@ class ResetGenerator(typing.Iterator):
     """Iterator that counts upward forever."""
 
     def __init__(self, generator_init):
+        """
+        Initialize the ResetGenerator from generator_init.
+
+        Creates a copy of the generator using tee.
+
+        Args:
+            generator_init: Initialize iterator/generator to copy
+        """
         self.generator_init = generator_init
         self.generator = generator_init()
         self.generator, self.__next_gen = tee(self.generator)
 
     def __iter__(self):
+        """
+        Get iteror.
+        """
         return self
 
     def next_gen(self):
+        """
+        The original generator/iterator.
+
+        Returns:
+            original generator/iterator.
+        """
         return self.__next_gen
 
     def __next__(self):
+        """
+        Get next item.
+
+        For reset iteration, if we hit the end of our iterator/generator, we copy it and reset
+
+        Returns:
+            Next item
+
+        Raises:
+            StopIteration at the end of the iteration.
+        """
         try:
             result = next(self.generator)
         except StopIteration:
@@ -130,7 +219,8 @@ class ResetGenerator(typing.Iterator):
 
 def duplicate_list_of_generators(lst: List[Generator]):
     """
-    Copy a list of iterators using tee
+    Copy a list of iterators using tee.
+
     Args:
         lst: List of generators
 

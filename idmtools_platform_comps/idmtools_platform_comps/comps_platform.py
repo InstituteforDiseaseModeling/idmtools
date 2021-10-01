@@ -1,14 +1,22 @@
+"""idmtools COMPSPlatform.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 # flake8: noqa E402
 import copy
 import logging
 # fix for comps weird import
 from idmtools.assets.asset_collection import AssetCollection
 from idmtools.core.interfaces.ientity import IEntity
+from idmtools.entities.iplatform_default import AnalyzerManagerPlatformDefault, IPlatformDefault
 from idmtools.entities.iworkflow_item import IWorkflowItem
 
 HANDLERS = copy.copy(logging.getLogger().handlers)
+LEVEL = logging.getLogger().level
 from COMPS import Client
 logging.root.handlers = HANDLERS
+logging.getLogger().setLevel(LEVEL)
+
 from dataclasses import dataclass, field
 from functools import partial
 from typing import List
@@ -39,6 +47,7 @@ op_defaults = dict(default=None, compare=False, metadata=dict(pickle_ignore=True
 # We use this to track os. It would be nice to do that in server
 SLURM_ENVS = ['calculon', 'slurmstage', "slurmdev"]
 supported_types = [PlatformRequirements.PYTHON, PlatformRequirements.SHELL, PlatformRequirements.NativeBinary]
+PLATFORM_DEFAULTS = [AnalyzerManagerPlatformDefault(max_workers=24)]
 
 
 @dataclass(repr=False)
@@ -50,7 +59,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     MAX_SUBDIRECTORY_LENGTH = 35  # avoid maxpath issues on COMPS
 
     endpoint: str = field(default="https://comps2.idmod.org", metadata={"help": "URL of the COMPS endpoint to use"})
-    environment: str = field(default="Bayesian",metadata=dict(help="Name of the COMPS environment to target", callback=environment_list))
+    environment: str = field(default="Bayesian", metadata=dict(help="Name of the COMPS environment to target", callback=environment_list))
     priority: str = field(default=COMPSPriority.Lowest.value, metadata=dict(help="Priority of the job", choices=[p.value for p in COMPSPriority]))
     simulation_root: str = field(default="$COMPS_PATH(USER)\\output", metadata=dict(help="Location of the outputs"))
     node_group: str = field(default=None, metadata=dict(help="Node group to target"))
@@ -63,6 +72,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     docker_image: str = field(default=None)
 
     _platform_supports: List[PlatformRequirements] = field(default_factory=lambda: copy.deepcopy(supported_types), repr=False, init=False)
+    _platform_defaults: List[IPlatformDefault] = field(default_factory=lambda: copy.deepcopy(PLATFORM_DEFAULTS))
 
     _experiments: CompsPlatformExperimentOperations = field(**op_defaults, repr=False, init=False)
     _simulations: CompsPlatformSimulationOperations = field(**op_defaults, repr=False, init=False)
@@ -81,6 +91,13 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             self._platform_supports.append(PlatformRequirements.LINUX)
         else:
             self._platform_supports.append(PlatformRequirements.WINDOWS)
+
+        # remove StreanHandler from COMPS logger
+        comps_logger = logging.getLogger('COMPS')
+        for handler in comps_logger.handlers[:]:
+            if isinstance(handler, logging.StreamHandler) and not isinstance(handler, logging.FileHandler):
+                comps_logger.removeHandler(handler)
+        comps_logger.propagate = False
 
     def __init_interfaces(self):
         if not self._skip_login:

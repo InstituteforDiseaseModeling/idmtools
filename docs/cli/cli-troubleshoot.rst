@@ -18,6 +18,6 @@ To see the versions of |IT_s| and related modules, along with the plugins they p
 
 .. command-output:: idmtools version
 
-To see a list of the predefined configurations from Platform Plugins, use the command:
+To see a list of the predefined configurations from platform plugins, use the command:
 
 .. command-output:: idmtools info plugins platform-aliases

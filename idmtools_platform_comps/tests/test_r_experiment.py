@@ -10,6 +10,7 @@ from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 from idmtools.assets import AssetCollection
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
+from idmtools_test.utils.utils import get_case_name
 
 
 @pytest.mark.tasks
@@ -21,7 +22,7 @@ class TestRExperiment(ITestWithPersistence):
 
     def setUp(self) -> None:
         self.platform = Platform('COMPS2')
-        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
+        self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
         self.input_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)))
 
     def validate_common_assets(self, fpath, task):

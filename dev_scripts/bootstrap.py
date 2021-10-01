@@ -1,4 +1,17 @@
 #!/usr/bin/env python
+"""This scripts aids in setup of development environments.
+
+The script installs all the local packages
+defined by packages using development installs.
+
+It is best used
+1) After the creation of a new virtualenv
+2) Installing new packages into an existing environment
+3) Updating existing environments
+
+ To use simply run
+ python bootstrap.py
+"""
 import argparse
 import shutil
 import logging
@@ -10,20 +23,11 @@ from logging import getLogger
 from os.path import abspath, join, dirname
 from typing import List, Generator
 
+
 # on windows virtual env is not populated through pymake
 if sys.platform == "win32" and 'VIRTUAL_ENV' in os.environ:
     sys.path.insert(0, os.environ['VIRTUAL_ENV'] + "\\Lib\\site-packages")
 
-# This scripts aids in setup of development environments by installing all the local packages
-# defined by packages using development installs.
-#
-# It is best used
-# 1) After the creation of a new virtualenv
-# 2) Installing new packages into an existing environment
-# 3) Updating existing environments
-#
-# To use simply run
-# python bootstrap.py
 
 script_dir = abspath(dirname(__file__))
 base_directory = abspath(join(dirname(__file__), '..'))
@@ -48,8 +52,7 @@ logger = getLogger("bootstrap")
 
 
 def execute(cmd: List['str'], cwd: str = base_directory, ignore_error: bool = False) -> Generator[str, None, None]:
-    """
-    Runs a command and filters output
+    """Runs a command and filters output.
 
     Args:
         cmd: Command to run
@@ -72,8 +75,9 @@ def execute(cmd: List['str'], cwd: str = base_directory, ignore_error: bool = Fa
 
 
 def process_output(output_line: str):
-    """
-    Process output
+    """Process output line for display.
+
+    This function adds coloring, filters output, and strips non-ascii characters(Docker builds have some odd characters)
 
     Args:
         output_line: Output line
@@ -94,6 +98,17 @@ def process_output(output_line: str):
 
 
 def install_dev_packages(pip_url):
+    """Install the development packages.
+
+    This loops through all our idmtools packages and runs pip install -e . on each package
+    It also runs a pip install -r requirements from the  docs directory.
+
+    Args:
+        pip_url: Url to install package from
+
+    Returns:
+        None
+    """
     # loop through and install our packages
     for package, extras in packages.items():
         extras_str = f"[{','.join(extras)}]" if extras else ''
@@ -110,6 +125,14 @@ def install_dev_packages(pip_url):
 
 
 def install_base_environment(pip_url):
+    """Installs the base packages needed for development environments.
+
+    We install wheel first(so we can utilize it in later installs).
+    We then uninstall py-make
+    We then install idm-buildtools
+
+    Lastly, we create an idmtools ini in example for developers
+    """
     # install wheel first to benefit from binaries
     for line in execute(["pip", "install", "wheel", f"--extra-index-url={pip_url}"]):
         process_output(line)

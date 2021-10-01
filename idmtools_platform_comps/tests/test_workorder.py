@@ -1,5 +1,4 @@
 import json
-
 import allure
 import os
 from functools import partial
@@ -7,7 +6,6 @@ from typing import Any, Dict
 import pytest
 from idmtools.assets import Asset, AssetCollection
 from idmtools.builders import SimulationBuilder
-from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import CommandLine
 from idmtools.entities.command_task import CommandTask
@@ -15,7 +13,6 @@ from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
-from idmtools_platform_comps.ssmt_work_items.work_order import DockerWorkOrder, ExecutionDefinition
 from idmtools_platform_comps.utils.scheduling import add_work_order, add_schedule_config, \
     default_add_schedule_config_sweep_callback
 from idmtools_models.templated_script_task import TemplatedScriptTask, get_script_wrapper_unix_task, \
@@ -26,6 +23,7 @@ from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.common_experiments import wait_on_experiment_and_check_all_sim_status
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_platform_comps.utils.scheduling import default_add_workerorder_sweep_callback
+from idmtools_test.utils.utils import get_case_name
 
 
 @pytest.mark.comps
@@ -33,11 +31,12 @@ from idmtools_platform_comps.utils.scheduling import default_add_workerorder_swe
 @allure.story("COMPS")
 @allure.story("Python")
 @allure.suite("idmtools_platform_comps")
+@pytest.mark.serial
 class TestWorkOrder(ITestWithPersistence):
     def setUp(self) -> None:
-        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
+        self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
         print(self.case_name)
-        self.platform = Platform('SLURM2')
+        self.platform = Platform('SlurmStage')
 
     def test_workorder_pythontask(self):
         """
@@ -119,10 +118,11 @@ class TestWorkOrder(ITestWithPersistence):
 
         workorder_content = files['WorkOrder.json'].decode('utf-8').replace("\\\\", "\\")
         s1 = json.loads(workorder_content)
-        s2 = json.loads("{\"Command\": \"python3 Assets/commandline_model.py 10000 10 100 1234\", \"NodeGroupName\": \"idm_cd\", \"NumCores\": 1, \"NumProcesses\": 1, \"NumNodes\": 1, \"Environment\": {\"key1\": \"value1\", \"key2:\": \"value2\"}}")
+        s2 = json.loads("{\"Command\": \"python3 Assets/commandline_model.py 10000 10 100 1234\", \"NodeGroupName\": \"idm_cd\", \"NumCores\": 1, \"NumProcesses\": 1, \"NumNodes\": 1, \"Environment\": {\"key1\": \"value1\", \"key2\": \"value2\"}}")
         self.assertDictEqual(s1, s2)
 
     @pytest.mark.timeout(60)
+    @pytest.mark.serial
     def test_wrapper_script_execute_comps(self):
         """
         To test wrapper task with WorkOrder.json. Comps will use Executable command from WorkOrder.json instead of
@@ -197,7 +197,7 @@ class TestWorkOrder(ITestWithPersistence):
         Returns:
         """
         # add numpy package to cluster
-        pl = RequirementsToAssetCollection(self.platform, pkg_list=['numpy==1.19.5'])
+        pl = RequirementsToAssetCollection(name=self.case_name, platform=self.platform, pkg_list=['numpy==1.19.5'])
         ac_id = pl.run()
         # add numpy to common_assets for a task
         common_assets = AssetCollection.from_id(ac_id, as_copy=True)
@@ -236,7 +236,7 @@ class TestWorkOrder(ITestWithPersistence):
         # use dynamic WorkOrder.json which override input commandline command and arguments
         add_schedule_config(ts, command="python -c \"print('hello test')\"", node_group_name='idm_abcd', num_cores=2,
                             NumProcesses=1, NumNodes=1,
-                            Environment={"key1": "value1", "key2:": "value2"})
+                            Environment={"key1": "value1", "key2": "value2"})
 
         builder = SimulationBuilder()
 
@@ -285,7 +285,7 @@ class TestWorkOrder(ITestWithPersistence):
             partial(default_add_schedule_config_sweep_callback,
                     command="python3 Assets/commandline_model.py {pop_size} {pop_infected} {n_days} {rand_seed}",
                     node_group_name='idm_cd', num_cores=1),
-            [dict(NumProcesses=1, NumNodes=1, Environment={"key1": "value1", "key2:": "value2"})])
+            [dict(NumProcesses=1, NumNodes=1, Environment={"key1": "value1", "key2": "value2"})])
 
         ts.add_builder(sb)
 
@@ -304,7 +304,7 @@ class TestWorkOrder(ITestWithPersistence):
 
         workorder_content = files['WorkOrder.json'].decode('utf-8').replace("\\\\", "\\")
         s1 = json.loads(workorder_content)
-        s2 = json.loads("{\"Command\": \"python3 Assets/commandline_model.py 10000 10 100 1234\", \"NodeGroupName\": \"idm_cd\", \"NumCores\": 1, \"NumProcesses\": 1, \"NumNodes\": 1, \"Environment\": {\"key1\": \"value1\", \"key2:\": \"value2\"}}")
+        s2 = json.loads("{\"Command\": \"python3 Assets/commandline_model.py 10000 10 100 1234\", \"NodeGroupName\": \"idm_cd\", \"NumCores\": 1, \"NumProcesses\": 1, \"NumNodes\": 1, \"Environment\": {\"key1\": \"value1\", \"key2\": \"value2\"}}")
         self.assertDictEqual(s1, s2)
 
     @pytest.mark.timeout(60)
@@ -329,7 +329,7 @@ class TestWorkOrder(ITestWithPersistence):
 
         # upload dynamic WorkOrder.json to simulation root dir
         add_schedule_config(experiment, command="python3.6 --version", node_group_name='idm_abcd', num_cores=1,
-                            NumProcesses=1, NumNodes=1, Environment={"key1": "value1", "key2:": "value2"})
+                            NumProcesses=1, NumNodes=1, Environment={"key1": "value1", "key2": "value2"})
 
         wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform, scheduling=True)
         self.assertTrue(experiment.succeeded)
@@ -384,7 +384,7 @@ class TestWorkOrder(ITestWithPersistence):
         Returns:
         """
         # add numpy package to cluster
-        pl = RequirementsToAssetCollection(self.platform, pkg_list=['numpy==1.19.5'])
+        pl = RequirementsToAssetCollection(name=self.case_name, platform=self.platform, pkg_list=['numpy==1.19.5'])
         ac_id = pl.run()
         # add numpy to common_assets for a task
         common_assets = AssetCollection.from_id(ac_id, as_copy=True)
@@ -399,7 +399,7 @@ class TestWorkOrder(ITestWithPersistence):
         # add dynamic WorkOrder2.json to comps and change file name to WorkOrder.json
         add_schedule_config(experiment, command="python3 Assets/model.py", node_group_name='idm_abcd', num_cores=1,
                             NumProcesses=1, NumNodes=1,
-                            Environment={"key1": "value1", "key2:": "value2",
+                            Environment={"key1": "value1", "key2": "value2",
                                          "PYTHONPATH": "$PYTHONPATH:$PWD/Assets:$PWD/Assets/site-packages",
                                          "PATH": "$PATH:$PWD/Assets:$PWD/Assets/site-packages"})
 

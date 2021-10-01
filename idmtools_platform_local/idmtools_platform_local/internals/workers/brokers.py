@@ -1,3 +1,7 @@
+"""idmtools local platform redis broker config/setup.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import os
 import dramatiq
 from logging import getLogger
@@ -13,6 +17,7 @@ redis_backend: RedisBackend = None
 
 
 def setup_broker(heartbeat_timeout=60):
+    """Setup broker."""
     global redis_broker
     global redis_backend
 
@@ -33,11 +38,13 @@ def setup_broker(heartbeat_timeout=60):
 
 
 def get_brokers(heartbeat_timeout=60):
+    """Get our redis brokers."""
     setup_broker(heartbeat_timeout)
     return redis_broker, redis_backend
 
 
 def close_brokers():
+    """Close all our brokers."""
     global redis_broker
     global redis_backend
     if redis_broker:

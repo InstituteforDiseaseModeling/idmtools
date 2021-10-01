@@ -1,11 +1,14 @@
+"""
+Provides utilities for plugins.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import functools
 import inspect
 import logging
 from logging import DEBUG, getLogger
 from typing import Type, List, Any, Set, Dict
-
 import pluggy
-
 from idmtools.registry import PluginSpecification
 from idmtools.registry.plugin_specification import PLUGIN_REFERENCE_NAME
 
@@ -62,8 +65,9 @@ def load_plugin_map(entrypoint: str, spec_type: Type[PluginSpecification], strip
 
 def plugins_loader(entry_points_name: str, plugin_specification: Type[PluginSpecification]) -> Set[PluginSpecification]:
     """
-    Loads all the plugins of type :class:`~idmtools.registry.plugin_specification.PluginSpecification` from entry point name. |IT_s| also supports loading plugins
-    through a list of strings representing the paths to modules containing plugins.
+    Loads all the plugins of type :class:`~idmtools.registry.plugin_specification.PluginSpecification` from entry point name.
+
+    |IT_s| also supports loading plugins through a list of strings representing the paths to modules containing plugins.
 
     Args:
         entry_points_name: Entry point name for plugins.
@@ -95,7 +99,6 @@ def discover_plugins_from(library: Any, plugin_specification: Type[PluginSpecifi
     Returns:
         List[Type[PluginSpecification]]: List of plugins.
     """
-
     plugins = []
     # check if the item is a module
     if inspect.ismodule(library):

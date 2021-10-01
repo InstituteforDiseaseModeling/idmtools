@@ -1,3 +1,8 @@
+"""
+IRunnableEntity definition. IRunnableEntity defines items that can be ran using platform.run().
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 from dataclasses import field, dataclass
 from inspect import signature
 from logging import getLogger, DEBUG
@@ -16,6 +21,11 @@ logger = getLogger(__name__)
 
 @dataclass
 class IRunnableEntity(IEntity, metaclass=ABCMeta):
+    """
+    IRunnableEntity are items that can be ran on platforms like Experiments or WorkItems.
+
+    IRunnableEntity also add pre and post run hooks available to the IEntity class.
+    """
     __pre_run_hooks: List[runnable_hook] = field(default_factory=list, metadata={"md": True})
     __post_run_hooks: List[runnable_hook] = field(default_factory=list, metadata={"md": True})
 
@@ -27,9 +37,8 @@ class IRunnableEntity(IEntity, metaclass=ABCMeta):
             platform: Platform item is being created on
 
         Returns:
-
+            None
         """
-
         for hook in self.__pre_run_hooks:
             if logger.isEnabledFor(DEBUG):
                 logger.debug(f'Calling pre-create hook named {hook.__name__ if hasattr(hook, "__name__") else str(hook)}')
@@ -43,7 +52,7 @@ class IRunnableEntity(IEntity, metaclass=ABCMeta):
             platform: Platform item was created on
 
         Returns:
-
+            None
         """
         for hook in self.__post_run_hooks:
             if logger.isEnabledFor(DEBUG):
@@ -52,7 +61,7 @@ class IRunnableEntity(IEntity, metaclass=ABCMeta):
 
     def add_pre_run_hook(self, hook: runnable_hook):
         """
-        Adds a hook function to be called before an item is ran
+        Adds a hook function to be called before an item is ran.
 
         Args:
             hook: Hook function. This should have two arguments, the item and the platform
@@ -66,7 +75,7 @@ class IRunnableEntity(IEntity, metaclass=ABCMeta):
 
     def add_post_run_hook(self, hook: runnable_hook):
         """
-        Adds a hook function to be called after an item has ran
+        Adds a hook function to be called after an item has ran.
 
         Args:
             hook: Hook function. This should have two arguments, the item and the platform
@@ -80,7 +89,7 @@ class IRunnableEntity(IEntity, metaclass=ABCMeta):
 
     def run(self, wait_until_done: bool = False, platform: 'IPlatform' = None, wait_on_done_progress: bool = True, wait_on_done: bool = True, **run_opts) -> NoReturn:
         """
-        Runs an item
+        Runs an item.
 
         Args:
             wait_until_done: Whether we should wait on item to finish running as well. Defaults to False
@@ -98,7 +107,7 @@ class IRunnableEntity(IEntity, metaclass=ABCMeta):
 
     def wait(self, wait_on_done_progress: bool = True, timeout: int = None, refresh_interval=None, platform: 'IPlatform' = None, **kwargs):
         """
-        Wait on an item to finish running
+        Wait on an item to finish running.
 
         Args:
             wait_on_done_progress: Should we show progress as we wait?
@@ -107,7 +116,7 @@ class IRunnableEntity(IEntity, metaclass=ABCMeta):
             platform: Platform. If not specified, we try to determine this from context
 
         Returns:
-
+            None
         """
         # If done, exit
         if self.status in [EntityStatus.SUCCEEDED, EntityStatus.FAILED]:
@@ -129,7 +138,7 @@ class IRunnableEntity(IEntity, metaclass=ABCMeta):
 
     def after_done(self):
         """
-        Run after an item is done after waiting. Currently we call the on succeeded and on failure plugins
+        Run after an item is done after waiting. Currently we call the on succeeded and on failure plugins.
 
         Returns:
             Runs after an item is done after waiting

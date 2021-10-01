@@ -1,5 +1,10 @@
-from dataclasses import dataclass, field
+"""define the ssmt platform.
 
+SSMT platform is the same as the COMPS platform but file access is local.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
+from dataclasses import dataclass, field
 from idmtools_platform_comps.comps_operations.asset_collection_operations import CompsPlatformAssetCollectionOperations
 from idmtools_platform_comps.comps_operations.experiment_operations import CompsPlatformExperimentOperations
 from idmtools_platform_comps.comps_operations.suite_operations import CompsPlatformSuiteOperations
@@ -17,7 +22,21 @@ class SSMTPlatform(COMPSPlatform):
     _simulations: SSMTPlatformSimulationOperations = field(**op_defaults)
     _workflow_items: SSMTPlatformWorkflowItemOperations = field(**op_defaults)
 
+    def __post_init__(self):
+        """
+        Post method after SSMTPlatform creation
+
+        Returns: None
+        """
+        super().__post_init__()
+        self.__init_interfaces()
+
     def __init_interfaces(self):
+        """
+        Initialize intefaces
+
+        Returns: None
+        """
         self._experiments = CompsPlatformExperimentOperations(platform=self)
         self._simulations = SSMTPlatformSimulationOperations(platform=self)
         self._suites = CompsPlatformSuiteOperations(platform=self)

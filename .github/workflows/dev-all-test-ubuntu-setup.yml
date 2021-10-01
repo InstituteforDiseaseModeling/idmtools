@@ -43,7 +43,7 @@ jobs:
             ${{ runner.os }}-pip-
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
         if: steps.filter.outputs.core == 'true'
-        uses: actions/setup-python@v2.1.4
+        uses: actions/setup-python@v2.2.2
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install Python dependencies
@@ -57,8 +57,11 @@ jobs:
           make setup-dev-no-docker
       - name: login to comps2
         if: steps.filter.outputs.core == 'true'
+        # Define password through env to avoid escaping issues
+        env:
+          COMPS_PASSWORD: "${{ secrets.COMPS_PASSWORD }}"
         run: |
-          python dev_scripts/create_auth_token_args.py --username $COMPS_USER --password $COMPS_PASSWORD
+          python dev_scripts/create_auth_token_args.py --username "${{ secrets.COMPS_USER }}"
       - name: run idmtools_core all tests
         # only run if core changed
         if: steps.filter.outputs.core == 'true'
@@ -98,7 +101,7 @@ jobs:
             ${{ runner.os }}-pip-
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
         if: steps.filter.outputs.core == 'true' ||  steps.filter.outputs.cli == 'true'
-        uses: actions/setup-python@v2.1.4
+        uses: actions/setup-python@v2.2.2
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
@@ -112,8 +115,10 @@ jobs:
           make setup-dev-no-docker
       - name: login to comps2
         if: steps.filter.outputs.core == 'true' ||  steps.filter.outputs.cli == 'true'
+        env:
+          COMPS_PASSWORD: "${{ secrets.COMPS_PASSWORD }}"
         run: |
-          python dev_scripts/create_auth_token_args.py --username $COMPS_USER --password $COMPS_PASSWORD
+          python dev_scripts/create_auth_token_args.py --username "${{ secrets.COMPS_USER }}"
       - name: run idmtools_cli all tests
         # only run if core or cli changed
         if: steps.filter.outputs.core == 'true' ||  steps.filter.outputs.cli == 'true'
@@ -158,7 +163,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2.1.4
+        uses: actions/setup-python@v2.2.2
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.models == 'true'
         with:
           python-version: ${{ matrix.python-version }}
@@ -173,8 +178,10 @@ jobs:
           make setup-dev-no-docker
       - name: login to comps2
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.models == 'true'
+        env:
+          COMPS_PASSWORD: "${{ secrets.COMPS_PASSWORD }}"
         run: |
-          python dev_scripts/create_auth_token_args.py --username $COMPS_USER --password $COMPS_PASSWORD
+          python dev_scripts/create_auth_token_args.py --username "${{ secrets.COMPS_USER }}"
       - name: run idmtools_models tests
         # only run if core changed
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.models == 'true'
@@ -220,7 +227,7 @@ jobs:
             ${{ runner.os }}-pip-
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.comps == 'true' || steps.filter.outputs.models == 'true'
-        uses: actions/setup-python@v2.1.4
+        uses: actions/setup-python@v2.2.2
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
@@ -234,8 +241,10 @@ jobs:
           make setup-dev-no-docker
       - name: login to comps2
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.comps == 'true' || steps.filter.outputs.models == 'true'
+        env:
+          COMPS_PASSWORD: "${{ secrets.COMPS_PASSWORD }}"
         run: |
-          python dev_scripts/create_auth_token_args.py --username $COMPS_USER --password $COMPS_PASSWORD
+          python dev_scripts/create_auth_token_args.py --username "${{ secrets.COMPS_USER }}"
       - name: run idmtools_platform_comps tests
         # only run if core, comps, or models changed
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.comps == 'true' || steps.filter.outputs.models == 'true'
@@ -281,7 +290,7 @@ jobs:
             ${{ runner.os }}-pip-
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.comps == 'true' || steps.filter.outputs.models == 'true'
-        uses: actions/setup-python@v2.1.4
+        uses: actions/setup-python@v2.2.2
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
@@ -296,8 +305,10 @@ jobs:
           make setup-dev
       - name: login to comps2
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.comps == 'true' || steps.filter.outputs.models == 'true'
+        env:
+          COMPS_PASSWORD: "${{ secrets.COMPS_PASSWORD }}"
         run: |
-          python dev_scripts/create_auth_token_args.py --username $COMPS_USER --password $COMPS_PASSWORD
+          python dev_scripts/create_auth_token_args.py --username "${{ secrets.COMPS_USER }}"
       - name: run idmtools_platform_local all tests
         # only run if core and comps changed
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.local == 'true' || steps.filter.outputs.models == 'true'
