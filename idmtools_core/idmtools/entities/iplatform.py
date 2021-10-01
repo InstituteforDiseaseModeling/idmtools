@@ -6,6 +6,7 @@ IPlatform is responsible for all the communication to our platform and translati
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import os
+import warnings
 from abc import ABCMeta
 from dataclasses import dataclass
 from dataclasses import fields, field
@@ -24,6 +25,7 @@ from idmtools.core.interfaces.iitem import IItem
 from idmtools.core.interfaces.irunnable_entity import IRunnableEntity
 from idmtools.entities.experiment import Experiment
 from idmtools.core.id_file import read_id_file
+from idmtools.entities.iplatform_default import IPlatformDefault
 from idmtools.entities.iplatform_ops.iplatform_asset_collection_operations import IPlatformAssetCollectionOperations
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
@@ -82,6 +84,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
     supported_types: Set[ItemType] = field(default_factory=lambda: set(), repr=False, init=False)
     _platform_supports: List[PlatformRequirements] = field(default_factory=list, repr=False, init=False)
+    _platform_defaults: List[IPlatformDefault] = field(default_factory=list)
 
     _experiments: IPlatformExperimentOperations = field(default=None, repr=False, init=False, compare=False)
     _simulations: IPlatformSimulationOperations = field(default=None, repr=False, init=False, compare=False)
@@ -133,9 +136,8 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         # Action based on the caller
         if caller not in CALLER_LIST:
-            raise ValueError("Please use Factory to create Platform! For example: \n    platform = Platform('COMPS', **kwargs)")
-        else:
-            return super().__new__(cls)
+            warnings.warn("Please use Factory to create Platform! For example: \n    platform = Platform('COMPS', **kwargs)")
+        return super().__new__(cls)
 
     def __post_init__(self) -> NoReturn:
         """
@@ -945,6 +947,19 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         """
         item_id, file_item_type, platform_block, extra_args = read_id_file(id_filename)
         return self.get_item(item_id, item_type if item_type else ItemType[file_item_type.upper()])
+
+    def get_defaults_by_type(self, default_type: Type) -> List[IPlatformDefault]:
+        """
+
+        Returns any platform defaults for specific types.
+
+        Args:
+            default_type: Default type
+
+        Returns:
+            List of default of that type
+        """
+        return [x for x in self._platform_defaults if isinstance(x, default_type)]
 
 
 TPlatform = TypeVar("TPlatform", bound=IPlatform)

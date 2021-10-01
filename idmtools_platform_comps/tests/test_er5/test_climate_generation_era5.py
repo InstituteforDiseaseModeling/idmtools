@@ -10,6 +10,7 @@ from idmtools.core import ItemType
 from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
 
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
+from idmtools_test.utils.utils import get_case_name
 
 
 @pytest.mark.ssmt
@@ -17,7 +18,7 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 class ClimateGenerationTest(ITestWithPersistence):
 
     def setUp(self):
-        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
+        self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
         self.platform = Platform('BAYESIAN')
 
     # ------------------------------------------

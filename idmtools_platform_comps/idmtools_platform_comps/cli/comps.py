@@ -88,7 +88,7 @@ try:
     def login(ctx: click.Context, username, password):  # noqa D103
         from COMPS import Client
         from idmtools.core.logging import SUCCESS
-        os.environ['IDMTOOLS_SUPPRESS_OUTPUT'] = '1'
+        os.environ['IDMTOOLS_LOGGING_USER_OUTPUT'] = '0'
         if password:
             user_logger.warning("Password the password via the command line is considered insecure")
         else:
@@ -148,8 +148,9 @@ try:
                 "You are using dry-run with delete after download. This will most result in an empty file list since "
                 "the item will be deleted before the output can be fetched.")
 
+        # ensure no output is enabled when using --json
         if json:
-            os.environ['IDMTOOLS_SUPPRESS_OUTPUT'] = '1'
+            os.environ['IDMTOOLS_LOGGING_USER_OUTPUT'] = '0'
             os.environ['IDMTOOLS_DISABLE_PROGRESS_BAR'] = '1'
 
         p: COMPSPlatform = Platform(ctx.obj['config_block'])
@@ -243,7 +244,7 @@ try:
             user_logger.error("--id-filename is required when filename is not provided")
             sys.exit(-1)
         if json:
-            os.environ['IDMTOOLS_SUPPRESS_OUTPUT'] = '1'
+            os.environ['IDMTOOLS_LOGGING_USER_OUTPUT'] = '0'
             os.environ['IDMTOOLS_DISABLE_PROGRESS_BAR'] = '1'
 
         p: COMPSPlatform = Platform(ctx.obj['config_block'])

@@ -76,7 +76,7 @@ class IWorkflowItem(IAssetsEnabled, INamedEntity, IRunnableEntity, ABC):
 
         if asset_files and not isinstance(asset_files, property):
             # user property since it can convert file lists
-            self.asset_files = user_files
+            self.asset_files = asset_files
 
         if asset_collection_id and not isinstance(asset_collection_id, property):
             # user property since it will inform user of changes

@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         os: [self-linux]
-        python-version: ['3.7.x']
+        python-version: [ '3.7.x', '3.8.x', '3.9.x' ]
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
@@ -57,7 +57,7 @@ jobs:
         env:
           COMPS_PASS: ${{ secrets.COMPS_PASSWORD }}
         run: |
-          python dev_scripts/create_auth_token_args.py --username ${{ secrets.COMPS_USER }}
+          python dev_scripts/create_auth_token_args.py --username "${{ secrets.COMPS_USER }}"
       - name: run idmtools_core all tests
         # only run if core changed
         if: steps.filter.outputs.core == 'true'
@@ -75,7 +75,7 @@ jobs:
     strategy:
       matrix:
         os: [ self-linux ]
-        python-version: [ '3.7.x' ]
+        python-version: [ '3.7.x', '3.8.x', '3.9.x' ]
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
@@ -116,7 +116,7 @@ jobs:
         env:
           COMPS_PASS: ${{ secrets.COMPS_PASSWORD }}
         run: |
-          python dev_scripts/create_auth_token_args.py --username ${{ secrets.COMPS_USER }}
+          python dev_scripts/create_auth_token_args.py --username "${{ secrets.COMPS_USER }}"
       - name: run idmtools_cli all tests
         # only run if core or cli changed
         if: steps.filter.outputs.core == 'true' ||  steps.filter.outputs.cli == 'true'
@@ -134,7 +134,9 @@ jobs:
     strategy:
       matrix:
         os: [ self-linux ]
-        python-version: [ '3.7.x' ]
+        python-version: [ '3.7.x', '3.8.x', '3.9.x' ]
+    env:
+      IDMTOOLS_TEST_PREFIX: ${{ matrix.python-version }}
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
@@ -181,7 +183,7 @@ jobs:
         env:
           COMPS_PASS: ${{ secrets.COMPS_PASSWORD }}
         run: |
-          python dev_scripts/create_auth_token_args.py --username ${{ secrets.COMPS_USER }}
+          python dev_scripts/create_auth_token_args.py --username "${{ secrets.COMPS_USER }}"
       - name: run idmtools_models tests
         # only run if core changed
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.models == 'true'
@@ -193,13 +195,15 @@ jobs:
         if: failure() && (steps.filter.outputs.core == 'true' || steps.filter.outputs.models == 'true')
         with:
           name: idmtools_models_test_results
-          path: idmtools_models/tests/results/
+          path: idmtools_models/tests/reports/
   pr-test-comps-linux:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ self-linux ]
-        python-version: [ '3.7.x' ]
+        python-version: [ '3.7.x', '3.8.x', '3.9.x' ]
+    env:
+      IDMTOOLS_TEST_PREFIX: ${{ matrix.python-version }}
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
@@ -246,7 +250,7 @@ jobs:
         env:
           COMPS_PASS: ${{ secrets.COMPS_PASSWORD }}
         run: |
-          python dev_scripts/create_auth_token_args.py --username $COMPS_USER
+          python dev_scripts/create_auth_token_args.py --username "${{ secrets.COMPS_USER }}"
       - name: run idmtools_platform_comps tests
         # only run if core, comps, or models changed
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.comps == 'true' || steps.filter.outputs.models == 'true'
@@ -258,13 +262,16 @@ jobs:
         if: failure() && (steps.filter.outputs.core == 'true' || steps.filter.outputs.comps == 'true' || steps.filter.outputs.models == 'true')
         with:
           name: idmtools_platform_comps_test_results
-          path: idmtools_platform_comps/tests/results/
+          path: idmtools_platform_comps/tests/reports/
   pr-test-local-linux:
     runs-on: ${{ matrix.os }}
+    env:
+      PYPI_STAGING_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
+      PYPI_STAGING_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
     strategy:
       matrix:
         os: [ self-docker ]
-        python-version: [ '3.7.x' ]
+        python-version: [ '3.7.x', '3.8.x', '3.9.x' ]
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
@@ -310,7 +317,10 @@ jobs:
         env:
           COMPS_PASS: ${{ secrets.COMPS_PASSWORD }}
         run: |
-          python dev_scripts/create_auth_token_args.py --username ${{ secrets.COMPS_USER }}
+          python dev_scripts/create_auth_token_args.py --username "${{ secrets.COMPS_USER }}"
+      - name: login to docker staging
+        run: |
+          echo '${{ env.PYPI_STAGING_PASSWORD }}' | docker login idm-docker-staging.packages.idmod.org --username ${{ env.PYPI_STAGING_USERNAME }} --password-stdin
       - name: run idmtools_platform_local all tests
         # only run if core and comps changed
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.local == 'true' || steps.filter.outputs.models == 'true'
@@ -322,4 +332,4 @@ jobs:
         if: failure() && (steps.filter.outputs.core == 'true' || steps.filter.outputs.local == 'true' || steps.filter.outputs.models == 'true')
         with:
           name: idmtools_platform_local_test_results
-          path: idmtools_platform_local/tests/results/
+          path: idmtools_platform_local/tests/reports/

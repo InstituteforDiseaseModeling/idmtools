@@ -9,7 +9,7 @@ CLI reference
    cli-templates
    cli-simulations
    cli-experiments
-   cli-platforms
+   cli-local-platform
    cli-comps
    cli-examples
    cli-troubleshoot

@@ -5,23 +5,22 @@ We configure our logging here, manage multi-process logging, alternate logging l
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
-import atexit
 import logging
 import os
 import sys
 import time
+import threading
 from contextlib import suppress
+from dataclasses import dataclass
 from logging import getLogger
-from logging.handlers import QueueHandler, QueueListener, RotatingFileHandler
-from multiprocessing import Queue
-from signal import SIGINT, signal, SIGTERM
-from typing import NoReturn, Union
+from logging.handlers import RotatingFileHandler
+from typing import Union, Optional
 import coloredlogs as coloredlogs
 from idmtools.core import TRUTHY_VALUES
 
-LISTENER = None
-LOGGING_NAME = None
 LOGGING_STARTED = False
+LOGGING_FILE_STARTED = False
+LOGGING_FILE_HANDLER = None
 
 VERBOSE = 15
 NOTICE = 25
@@ -29,10 +28,115 @@ SUCCESS = 35
 CRITICAL = 50
 
 
-class SafeRotatingFileHandler(RotatingFileHandler):
+@dataclass
+class IdmToolsLoggingConfig:
     """
-    SafeRotatingFileHandler allows us to handle errors that occur during roll-over of multi-process log events.
+    Defines the config options available for idmtools logs.
     """
+    #: Console level
+    level: Union[str, int] = logging.WARN
+    #: Filename for idmtools logs
+    filename: Optional[str] = 'idmtools.log'
+    #: Toggle to enable/disable console logging
+    console: bool = False
+    #: File log level
+    file_level: Union[str, int] = 'DEBUG'
+    #: Should we force reload
+    force: bool = False
+    #: File format string. See https://docs.python.org/3/library/logging.html#logrecord-attributes for format vars
+    file_log_format_str: str = None
+    #: Logging format. See https://docs.python.org/3/library/logging.html#logrecord-attributes for format vars
+    user_log_format_str: str = '%(message)s'
+    #: Toggle to enable/disable coloredlogs
+    use_colored_logs: bool = True
+    #: Toggle user output. This should only be used in certain situations like CLI's that output JSON
+    user_output: bool = True
+    #: Toggle enable file logging
+    enable_file_logging: Union[str, bool] = True
+
+    def __post_init__(self):
+        """
+        Validates logging config creation.
+        """
+        # load the user input from string
+        if isinstance(self.user_output, str):
+            self.user_output = self.user_output.lower() in TRUTHY_VALUES
+
+        # load color logs from string
+        if isinstance(self.use_colored_logs, str):
+            self.use_colored_logs = self.use_colored_logs.lower() in TRUTHY_VALUES
+
+        # load console from string
+        if isinstance(self.console, str):
+            self.console = self.console.lower() in TRUTHY_VALUES
+
+        if type(self.enable_file_logging) is str:
+            self.enable_file_logging = self.enable_file_logging.lower() in TRUTHY_VALUES
+
+        # ensure level is a logging level
+        for attr in ['level', 'file_level']:
+            if isinstance(getattr(self, attr), str):
+                setattr(self, attr, logging.getLevelName(getattr(self, attr)))
+
+        # set default name is not set.
+        if self.filename is None:
+            self.filename = 'idmtools.log'
+
+        # ensure whitespace is gone
+        self.filename = self.filename.strip()
+
+        # disable file logging when set to -1
+        if self.filename == "-1" or not self.enable_file_logging:
+            self.filename = None
+
+        # handle special case
+        if not self.enable_file_logging and self.console is None:
+            self.console = True
+
+        # set default file log format str
+        if self.file_log_format_str is None:
+            if self.file_level == logging.DEBUG:
+                # Enable detailed logging format
+                self.file_log_format_str = '%(asctime)s.%(msecs)d %(pathname)s:%(lineno)d %(funcName)s [%(levelname)s] (%(process)d,%(thread)d) - %(message)s'
+            else:
+                self.file_log_format_str = '%(asctime)s.%(msecs)d %(pathname)s:%(lineno)d %(funcName)s [%(levelname)s] - %(message)s'
+
+
+class MultiProcessSafeRotatingFileHandler(RotatingFileHandler):
+    """
+    Multi-process safe logger.
+    """
+
+    def __init__(self, filename, mode='a', maxBytes=0, backupCount=0, encoding=None, delay=False):
+        """
+        See RotatingFileHandler for full details on arguments.
+
+        Args:
+            filename:Filename to use
+            mode:Mode
+            maxBytes: Max bytes
+            backupCount: Total backups
+            encoding: Encoding
+            delay: Delay
+        """
+        super().__init__(filename, mode=mode, maxBytes=maxBytes, backupCount=backupCount, encoding=encoding, delay=delay)
+        self.logger_lock = threading.Lock()
+
+    def handle(self, record: logging.LogRecord) -> None:
+        """
+        Thread safe logger.
+
+        Args:
+            record: Record to handle
+
+        Returns:
+            None
+        """
+        self.logger_lock.acquire()
+        try:
+            super(MultiProcessSafeRotatingFileHandler, self).handle(record)
+        finally:
+            self.logger_lock.release()
 
     def doRollover(self) -> None:
         """
@@ -58,44 +162,6 @@ class SafeRotatingFileHandler(RotatingFileHandler):
                 time.sleep(0.08)
 
 
-class IDMQueueListener(QueueListener):
-    """
-    IDMQueueListener provided a queue for multi-processing logging.
-    """
-
-    def dequeue(self, block):
-        """
-        Dequeue a record and return it, optionally blocking.
-
-        The base implementation uses get. You may want to override this method
-        if you want to use timeouts or work with custom queue implementations.
-        """
-        try:
-            result = self.queue.get(block)
-            return result
-        except EOFError:
-            return None
-
-
-class IDMQueueHandler(QueueHandler):
-    """
-    IDMQueueHandler provided a log handler that references a queue.
-    """
-
-    def prepare(self, record):
-        """
-        Prepare a record for queuing.
-
-        Args:
-            record: Record to queue
-
-        Returns:
-            Queue record
-        """
-        with suppress(ImportError):
-            return super().prepare(record)
-
-
 class PrintHandler(logging.Handler):
     """
     A simple print handler. Used in cases where logging fails.
@@ -111,165 +177,156 @@ class PrintHandler(logging.Handler):
         Returns:
             None
         """
-        print(record.message)
+        try:
+            print(record.msg)
+        except:  # noqa: E722
+            pass
 
 
-def setup_logging(level: Union[int, str] = logging.WARN, filename: str = 'idmtools.log',
-                  console: Union[str, bool] = False, file_level: str = 'DEBUG', force: bool = False) -> QueueListener:
+def setup_logging(logging_config: IdmToolsLoggingConfig) -> None:
     """
     Set up logging.
 
     Args:
-        level: Log level. Default to warning. This should be either a string that matches a log level
-            from logging or an int that represent that level.
-        filename: Name of file to log messages to. If set to empty string, file logging is disabled
-        console: When set to True or the strings "1", "y", "yes", or "on", console logging will be enabled.
-        file_level: Level for logging in file
-        force: Force setup, even if we have done it once
+        logging_config: IdmToolsLoggingConfig that defines our config
 
     Returns:
-        Returns the ``QueueListener`` created that writes the log messages. In advanced scenarios with
-        multi-processing, you may need to manually stop the logger.
+        Returns None
 
     See Also:
         For logging levels, see https://coloredlogs.readthedocs.io/en/latest/api.html#id26
     """
-    global LISTENER, LOGGING_NAME, LOGGING_STARTED
-    if not LOGGING_STARTED or force:
+    global LOGGING_STARTED, LOGGING_FILE_STARTED, LOGGING_FILE_HANDLER
+    if not LOGGING_STARTED or logging_config.force:
+        # reset logging and remove all handlers and delete our current handler
+        reset_logging_handlers()
+
         logging.addLevelName(15, 'VERBOSE')
         logging.addLevelName(25, 'NOTICE')
         logging.addLevelName(35, 'SUCCESS')
-
-        if type(level) is str:
-            level = logging.getLevelName(level)
-        if type(file_level) is str:
-            file_level = logging.getLevelName(file_level)
-        if type(console) is str:
-            console = console.lower() in TRUTHY_VALUES
 
         # get a file handler
         root = logging.getLogger()
         user = logging.getLogger('user')
         # allow setting the debug of logger via environment variable
-        root.setLevel(level)
+        root.setLevel(logging_config.level)
         user.setLevel(logging.DEBUG)
 
-        if LOGGING_NAME is None or force:
-            filename = filename.strip()
-            if filename == "-1":
-                filename = ""
-            file_handler = setup_handlers(level, filename, console, file_level)
+        # file logging config
+        if not LOGGING_FILE_STARTED or logging_config.force:
+            LOGGING_FILE_HANDLER = setup_handlers(logging_config)
+            if LOGGING_FILE_HANDLER:
+                LOGGING_FILE_STARTED = True
 
-            # see https://docs.python.org/3/library/logging.handlers.html#queuelistener
-            # setup file logger handler that rotates after 10 mb of logging and keeps 5 copies
+        # Show we enable user output. The only time we really should not do this is for specific CLI use cases
+        # # such as json output
+        setup_user_logger(logging_config)
 
-            # now attach a listener to the logging queue and redirect all messages to our handler
-            if (LISTENER is None and file_handler) or (force and file_handler):
-                LISTENER = IDMQueueListener(LOGGING_NAME, file_handler)
-                LISTENER.start()
-                # register a stop signal
-                register_stop_logger_signal_handler(LISTENER)
         if root.isEnabledFor(logging.DEBUG):
             from idmtools import __version__
             root.debug(f"idmtools core version: {__version__}")
-        LOGGING_STARTED = True
-        return LISTENER
-    return None
+
+        # python logger creates default stream handler when no handlers are set so create null handler
+        if len(root.handlers) == 0:
+            root.addHandler(logging.NullHandler())
+
+        # set logging stated
+        LOGGING_FILE_STARTED = True
 
 
-def setup_handlers(level: int, filename, console: bool = False, file_level: int = None):
+def setup_handlers(logging_config: IdmToolsLoggingConfig):
     """
     Setup Handlers for Global and user Loggers.
 
     Args:
-        level: Level for the common logger
-        filename: Log filename. Set to "" to disable file based logging
-        console: Enable console based logging only
-        file_level: File Level logging
+        logging_config: Logging config
 
     Returns:
         FileHandler or None
     """
-    global LOGGING_NAME
     # We only one to do this setup once per process. Having the logging_queue setup help prevent that issue
     # get a file handler
 
     exclude_logging_classes()
-    reset_logging_handlers()
     file_handler = None
-    if len(filename):
-        if level == logging.DEBUG:
-            # Enable detailed logging format
-            format_str = '%(asctime)s.%(msecs)d %(pathname)s:%(lineno)d %(funcName)s [%(levelname)s] (%(process)d,%(thread)d) - %(message)s'
-        else:
-            format_str = '%(asctime)s.%(msecs)d %(pathname)s:%(lineno)d %(funcName)s [%(levelname)s] - %(message)s'
-        formatter = logging.Formatter(format_str)
-        # set the logging to either common level or the filelevel
-        file_handler = set_file_logging(file_level if file_level else level, formatter, filename)
+    if logging_config.filename:
+        formatter = logging.Formatter(logging_config.file_log_format_str)
+        # set the logging to either common level or the file-level
+        file_handler = set_file_logging(logging_config, formatter)
 
-    if console or len(filename) == 0:
-        coloredlogs.install(level=level, milliseconds=True, stream=sys.stdout)
-    setup_user_logger(console or len(filename) == 0)
+    # If user output is enabled and console is enabled
+    if logging_config.user_output and logging_config.console:
+        # is colored logging enabled? if so, add our logger
+        # note: this will be used for user logging as well
+        if logging_config.use_colored_logs:
+            coloredlogs.install(level=logging_config.level, milliseconds=True, stream=sys.stdout)
+        else:
+            # Mainly for test/local platform
+            print_handler = PrintHandler(level=logging_config.level)
+            getLogger().addHandler(print_handler)
     return file_handler
 
 
-def setup_user_logger(console: bool):
+def setup_user_logger(logging_config: IdmToolsLoggingConfig):
     """
     Setup the user logger. This logger is meant for user output only.
 
     Args:
-        console: Is Console enabled. If so, we don't install a user logger.
+        logging_config: Logging config object.
 
     Returns:
         None
     """
-    from idmtools import IdmConfigParser
-    # should we do colored log output. We only should if
-    # 1. Console has been set in config/environment
-    # 2. USE_PRINT_OUTPUT is not enabled
-    if not console and IdmConfigParser.get_option("Logging", "USER_PRINT", fallback="F").lower() not in TRUTHY_VALUES:
-        # install colored logs for user logger only
-        coloredlogs.install(logger=getLogger('user'), level=logging.DEBUG, fmt='%(message)s', stream=sys.stdout)
-    elif not console:  # This is mainly for test and local platform
-        handler = PrintHandler(level=logging.DEBUG)
-        # should everything be printed using the print logger or filename was set to be empty. This means log everything to the screen without color
-        getLogger('user').addHandler(handler)
+    if logging_config.user_output and not logging_config.console:
+        # is colored logs enabled? If so, make the user logger a coloredlogger
+        if logging_config.use_colored_logs:
+            coloredlogs.install(logger=getLogger('user'), level=VERBOSE, fmt='%(message)s', stream=sys.stdout)
+        else:  # fall back to a print handler
+            setup_user_print_logger()
 
 
-def set_file_logging(file_level: int, formatter: logging.Formatter, filename: str):
+def setup_user_print_logger():
+    """
+    Setup a print based logger for user messages.
+
+    Returns:
+        None
+    """
+    formatter = logging.Formatter(fmt='%(message)s')
+    handler = PrintHandler(level=VERBOSE)
+    handler.setFormatter(formatter)
+    # should everything be printed using the print logger or filename was set to be empty. This means log
+    # everything to the screen without color
+    getLogger('user').addHandler(handler)
+
+
+def set_file_logging(logging_config: IdmToolsLoggingConfig, formatter: logging.Formatter):
     """
     Set File Logging.
 
     Args:
-        file_level: File Level
-        formatter: Formatter
-        filename: Log Filename
+        logging_config: Logging config object.
+        formatter:  Formatter obj
 
     Returns:
         Return File handler
     """
-    global LOGGING_NAME
-    file_handler = create_file_handler(file_level, formatter, filename)
+    file_handler = create_file_handler(logging_config.file_level, formatter, logging_config.filename)
     if file_handler is None:
-        # We had an issue creating filehandler, so let's try using default name + pids
+        # We had an issue creating file handler, so let's try using default name + pids
         for i in range(64):  # We go to 64. This is a reasonable max id for any computer we might actually run item.
-            file_handler = create_file_handler(file_level, formatter, f"idmtools.{i}.log")
+            file_handler = create_file_handler(logging_config.filename, formatter, f"{logging_config.file_level}.{i}.log")
             if file_handler:
                 break
         if file_handler is None:
             raise ValueError("Could not file a valid log. Either all the files are opened or you are on a read-only filesystem. You can disable file-based logging by setting")
-    # disable normal logging
-    LOGGING_NAME = Queue()
-    # set root the use send log messages to a queue by default
-    queue_handler = IDMQueueHandler(LOGGING_NAME)
-    logging.root.addHandler(queue_handler)
-    logging.getLogger('user').addHandler(queue_handler)
+    logging.root.addHandler(file_handler)
     return file_handler
 
 
 def create_file_handler(file_level, formatter: logging.Formatter, filename: str):
     """
-    Create a SafeRotatingFileHandler for idmtools.log.
+    Create a MultiProcessSafeRotatingFileHandler for idmtools.log.
 
     Args:
         file_level: Level to log to file
@@ -280,7 +337,7 @@ def create_file_handler(file_level, formatter: logging.Formatter, filename: str)
         SafeRotatingFileHandler with properties provided
     """
     try:
-        file_handler = SafeRotatingFileHandler(filename, maxBytes=(2 ** 20) * 10, backupCount=5)
+        file_handler = MultiProcessSafeRotatingFileHandler(filename, maxBytes=(2 ** 20) * 10, backupCount=5)
         file_handler.setLevel(file_level)
         file_handler.setFormatter(formatter)
     except PermissionError:
@@ -295,10 +352,17 @@ def reset_logging_handlers():
     Returns:
         None
     """
+    global LOGGING_STARTED, LOGGING_FILE_STARTED, LOGGING_FILE_HANDLER
+
     with suppress(KeyError):
         # Remove all handlers associated with the root logger object.
         for handler in logging.root.handlers[:]:
             logging.root.removeHandler(handler)
+    # Clean up file handler now
+    LOGGING_FILE_STARTED = False
+    LOGGING_STARTED = False
+    if LOGGING_FILE_HANDLER is not None:
+        del LOGGING_FILE_HANDLER
 
 
 def exclude_logging_classes(items_to_exclude=None):
@@ -312,33 +376,8 @@ def exclude_logging_classes(items_to_exclude=None):
         None
     """
     if items_to_exclude is None:
-        items_to_exclude = ['urllib3', 'COMPS', 'paramiko', 'matplotlib']
+        items_to_exclude = ['urllib3', 'paramiko', 'matplotlib']
     # remove comps by default
     for item in items_to_exclude:
         other_logger = getLogger(item)
         other_logger.setLevel(logging.WARN)
-
-
-def register_stop_logger_signal_handler(listener) -> NoReturn:
-    """
-    Register a signal watcher that will stop our logging gracefully in the case of queue based logging.
-
-    Args:
-        listener: The log listener object.
-
-    Returns:
-        None
-    """
-
-    def stop_logger(*args, **kwargs):
-        with suppress(Exception):
-            listener.stop()
-
-    for s in [SIGINT, SIGTERM]:
-        try:
-            signal(s, stop_logger)
-        except ValueError as ex:
-            if ex.args[0] == "signal only works in main thread":
-                pass
-
-    atexit.register(stop_logger)

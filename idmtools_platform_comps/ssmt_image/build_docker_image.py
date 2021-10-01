@@ -1,5 +1,9 @@
 """This script is currently a workaround so that we can use bump2version with docker since the nightly versions doesn't work with docker registry.
 
+Notes:
+    If you are using this script locally, you need to set the environment variables *PYPI_STAGING_USERNAME* and *PYPI_STAGING_PASSWORD*.
+    These can be set to your idm email/password
+
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import argparse
@@ -55,17 +59,18 @@ def get_username_and_password(disable_keyring_load=False, disable_keyring_save=F
 
     Args:
         disable_keyring_load: Disable loading credentials from keyring
+        disable_keyring_save: Disable keyring save
 
     Returns:
         Username password
     """
-    if 'bamboo_UserArtifactory' in os.environ:
+    if 'PYPI_STAGING_USERNAME' in os.environ:
         logger.info("Loading Credentials from environment")
-        if 'bamboo_PasswordArtifactory' not in os.environ:
+        if 'PYPI_STAGING_PASSWORD' not in os.environ:
             logger.error("When specifying username from environment variable, you must also specify password")
             sys.exit(-1)
-        username = os.environ['bamboo_UserArtifactory']
-        password = os.environ['bamboo_PasswordArtifactory']
+        username = os.environ['PYPI_STAGING_USERNAME']
+        password = os.environ['PYPI_STAGING_PASSWORD']
     elif not disable_keyring_load and keyring.get_credential(KEYRING_NAME, "username"):
         username = keyring.get_password(KEYRING_NAME, "username")
         password = keyring.get_password(KEYRING_NAME, "password")
@@ -92,7 +97,8 @@ def get_latest_image_version_from_registry(username, password):
     response = requests.get(url, auth=auth)
     logger.debug(f"Return Code: {response.status_code}")
     if response.status_code != 200:
-        logger.error(response.content)
+        print(response.status_code)
+        print(response.content)
         raise Exception('Could not load images')
     else:
         images = natsorted(response.json()['tags'], reverse=True)

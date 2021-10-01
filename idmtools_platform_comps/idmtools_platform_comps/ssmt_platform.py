@@ -22,7 +22,21 @@ class SSMTPlatform(COMPSPlatform):
     _simulations: SSMTPlatformSimulationOperations = field(**op_defaults)
     _workflow_items: SSMTPlatformWorkflowItemOperations = field(**op_defaults)
 
+    def __post_init__(self):
+        """
+        Post method after SSMTPlatform creation
+
+        Returns: None
+        """
+        super().__post_init__()
+        self.__init_interfaces()
+
     def __init_interfaces(self):
+        """
+        Initialize intefaces
+
+        Returns: None
+        """
         self._experiments = CompsPlatformExperimentOperations(platform=self)
         self._simulations = SSMTPlatformSimulationOperations(platform=self)
         self._suites = CompsPlatformSuiteOperations(platform=self)

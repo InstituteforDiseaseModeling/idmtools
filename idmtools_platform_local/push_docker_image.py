@@ -21,13 +21,13 @@ base_version = open('VERSION').read().strip()
 print("Please be sure you are logged into the docker-production.packages.idmod.org Docker Repo")
 
 # determine next version by querying artifactory
-if 'bamboo_UserArtifactory' in os.environ:
-    username = os.environ['bamboo_UserArtifactory']
+if 'PYPI_STAGING_USERNAME' in os.environ:
+    username = os.environ['PYPI_STAGING_USERNAME']
 else:
     print("Username:")
     username = input('Username:')
-if 'bamboo_PasswordArtifactory' in os.environ:
-    password = os.environ['bamboo_PasswordArtifactory']
+if 'PYPI_STAGING_PASSWORD' in os.environ:
+    password = os.environ['PYPI_STAGING_PASSWORD']
 else:
     password = getpass(prompt='Password:')
 auth = HTTPBasicAuth(username=username, password=password)

@@ -207,16 +207,20 @@ def get_asset_for_comps_item(platform: IPlatform, item: IEntity, files: List[str
     if comps_item is None:
         comps_item = item.get_platform_object(True, load_children=load_children)
 
-    all_paths = set(files)
-    assets = set(path for path in all_paths if path.lower().startswith("assets"))
-    transients = all_paths.difference(assets)
+    if len(files) == 0:
+        transients = []
+        assets = None
+    else:
+        all_paths = set(files)
+        assets = set(path for path in all_paths if path.lower().startswith("assets"))
+        transients = all_paths.difference(assets)
 
     # Create the return dict
     ret = {}
 
     # Retrieve the transient if any
     if isinstance(comps_item, (Simulation, WorkItem)):
-        if transients:
+        if transients or len(files) == 0:
             transient_files = comps_item.retrieve_output_files(paths=transients)
             ret = dict(zip(transients, transient_files))
     else:

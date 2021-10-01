@@ -3,8 +3,6 @@ import os
 import unittest
 import pytest
 from click.testing import CliRunner
-os.environ['IDMTOOLS_LOGGING_USER_PRINT'] = '1'
-os.environ['IDMTOOLS_HIDE_DEV_WARNING'] = '1'
 from idmtools_cli.cli.gitrepo import gitrepo, get_plugins_examples, validate
 from idmtools_test.utils.cli import get_subcommands_from_help_result, run_command
 
@@ -16,6 +14,21 @@ from idmtools_test.utils.cli import get_subcommands_from_help_result, run_comman
 class TestExample(unittest.TestCase):
 
     def setUp(self) -> None:
+        env = dict(
+            # ensure cli commands use the print logger so output is captured
+            IDMTOOLS_LOGGING_USE_COLORED_LOGS='f',
+            # disable printing the block here
+            SHOW_PLATFORM_CONFIG='f',
+            # Hide dev warnings
+            HIDE_DEV_WARNING='t',
+            # disable file logging
+            IDMTOOLS_LOGGING_FILENAME='-1'
+        )
+        # default options for cli commands
+        self.default_opts = dict(
+            mix_stderr=False,
+            env=env
+        )
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         print(self.case_name)
 
@@ -52,7 +65,7 @@ class TestExample(unittest.TestCase):
 
     def test_public_repos(self):
         # because of weirdness in testing, the log output even when set to stdout appears as stderr. We workaround by capturing both independently
-        result = run_command('gitrepo', 'repos', mix_stderr=False)
+        result = run_command('gitrepo', 'repos', **self.default_opts)
         # Check for special public repo
         self.assertIn('https://github.com/InstituteforDiseaseModeling/EMOD', result.stdout)
 

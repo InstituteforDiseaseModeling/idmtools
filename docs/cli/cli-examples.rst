@@ -1,6 +1,6 @@
-========
-Examples
-========
+============
+CLI Examples
+============
 
 You can use |IDM_s| CLI to download the included Python example scripts from
 GitHub to a local folder using the ``idmtools gitrepo`` command. To see the list
