@@ -14,6 +14,9 @@ from idmtools.entities.iworkflow_item import IWorkflowItem
 HANDLERS = copy.copy(logging.getLogger().handlers)
 LEVEL = logging.getLogger().level
 from COMPS import Client
+logging.root.handlers = HANDLERS
+logging.getLogger().setLevel(LEVEL)
+
 from dataclasses import dataclass, field
 from functools import partial
 from typing import List
@@ -88,10 +91,6 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             self._platform_supports.append(PlatformRequirements.LINUX)
         else:
             self._platform_supports.append(PlatformRequirements.WINDOWS)
-
-        # restore
-        logging.root.handlers = HANDLERS
-        logging.getLogger().setLevel(LEVEL)
 
         # remove StreanHandler from COMPS logger
         comps_logger = logging.getLogger('COMPS')

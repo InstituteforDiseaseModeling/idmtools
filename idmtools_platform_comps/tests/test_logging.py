@@ -17,7 +17,6 @@ class TestConfig(ITestWithPersistence):
 
     def setUp(self):
         super().setUp()
-        self.platform = Platform('BAYESIAN')
         IdmConfigParser.clear_instance()
         self.case_name = self._testMethodName
         self.tempfile_ini = None
@@ -46,6 +45,7 @@ class TestConfig(ITestWithPersistence):
         """
         self.create_temp_ini(ini_content)
         IdmConfigParser(file_name=self.tempfile_ini.name)
+        self.platform = Platform('BAYESIAN')
 
         sys.stdout = mock_stdout
         logger_demo.write_some_logs(user=True, root=True, comps=True, exp=True)
@@ -88,6 +88,7 @@ class TestConfig(ITestWithPersistence):
         """
         self.create_temp_ini(ini_content)
         IdmConfigParser(file_name=self.tempfile_ini.name)
+        self.platform = Platform('BAYESIAN')
 
         sys.stdout = mock_stdout
         logger_demo.write_some_logs(user=True, root=True, comps=True, exp=True)
@@ -131,6 +132,7 @@ class TestConfig(ITestWithPersistence):
         """
         self.create_temp_ini(ini_content)
         IdmConfigParser(file_name=self.tempfile_ini.name)
+        self.platform = Platform('BAYESIAN')
 
         sys.stdout = mock_stdout
         logger_demo.write_some_logs(user=True, root=True, comps=True, exp=True)
@@ -150,6 +152,7 @@ class TestConfig(ITestWithPersistence):
         """
         self.create_temp_ini(ini_content)
         IdmConfigParser(file_name=self.tempfile_ini.name)
+        self.platform = Platform('BAYESIAN')
 
         sys.stdout = mock_stdout
         logger_demo.write_some_logs(user=True, root=True, comps=True, exp=True)
@@ -170,6 +173,7 @@ class TestConfig(ITestWithPersistence):
         """
         self.create_temp_ini(ini_content)
         IdmConfigParser(file_name=self.tempfile_ini.name)
+        self.platform = Platform('BAYESIAN')
 
         sys.stdout = mock_stdout
         logger_demo.write_some_logs(user=True, root=True, comps=True, exp=True)
@@ -193,6 +197,7 @@ class TestConfig(ITestWithPersistence):
         """
         self.create_temp_ini(ini_content)
         IdmConfigParser(file_name=self.tempfile_ini.name)
+        self.platform = Platform('BAYESIAN')
 
         sys.stdout = mock_stdout
         logger_demo.write_some_logs(user=True, root=True, comps=True, exp=True)
@@ -212,6 +217,8 @@ class TestConfig(ITestWithPersistence):
         """
         self.create_temp_ini(ini_content)
         IdmConfigParser(file_name=self.tempfile_ini.name)
+        self.platform = Platform('BAYESIAN')
+
         sys.stdout = mock_stdout
         logger_demo.write_some_logs(user=True, root=True, comps=True, exp=True)
         self.assertFalse(os.path.exists(f"{self.case_name}.log"))
@@ -220,13 +227,15 @@ class TestConfig(ITestWithPersistence):
         self.validate_default_user_console_off(stdout)
 
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
-    def test_enable_file_logging(self, mock_stdout):
+    def test_enable_file_logging_off(self, mock_stdout):
         ini_content = f"""
         [Logging]
             enable_file_logging = off
         """
         self.create_temp_ini(ini_content)
         IdmConfigParser(file_name=self.tempfile_ini.name)
+        self.platform = Platform('BAYESIAN')
+
         sys.stdout = mock_stdout
         logger_demo.write_some_logs(user=True, root=True, comps=True, exp=True)
         self.assertFalse(os.path.exists(f"{self.case_name}.log"))
