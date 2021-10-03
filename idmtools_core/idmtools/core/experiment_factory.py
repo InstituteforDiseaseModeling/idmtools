@@ -47,9 +47,11 @@ class ExperimentFactory:
         """
         if logger.isEnabledFor(DEBUG):
             logger.debug(f"Attempting to create experiment of type {key}")
-        if key is None:
+
+        if not key:
             key = self.DEFAULT_KEY
-            logger.warning(f'No experiment type tag found, assuming type: {key}')
+        else:
+            logger.warning(f'Experiment type: {key}')
 
         if key not in self._builders:
             if not fallback:

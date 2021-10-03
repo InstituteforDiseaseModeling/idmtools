@@ -29,6 +29,7 @@ from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools.registry.experiment_specification import ExperimentPluginSpecification, get_model_impl, \
     get_model_type_impl
 from idmtools.registry.plugin_specification import get_description_impl
+from idmtools.utils.caller import get_caller
 from idmtools.utils.collections import ExperimentParentIterator
 from idmtools.utils.entities import get_default_tags
 
@@ -169,7 +170,10 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         """
         # this method is needed because dataclasses will always try to set each field, even if not allowed to in
         # the case of Experiment.
-        logger.warning('Experiment status cannot be directly altered. Status unchanged.')
+
+        caller = get_caller()
+        if caller not in ['__init__']:
+            logger.warning('Experiment status cannot be directly altered. Status unchanged.')
 
     def __repr__(self):
         """Experiment as string."""
@@ -181,7 +185,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         Suite the experiment belongs to.
 
         Returns:
-            Suite
+            Suit
         """
         return self.parent
 
