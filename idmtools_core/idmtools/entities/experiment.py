@@ -185,7 +185,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         Suite the experiment belongs to.
 
         Returns:
-            Suit
+            Suite
         """
         return self.parent
 
