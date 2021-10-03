@@ -242,7 +242,6 @@ class IPlatformExperimentOperations(ABC):
         Returns:
             None
         """
-        experiment.status = EntityStatus.RUNNING
         experiment.post_run(self.platform)
 
     def run_item(self, experiment: Experiment, **kwargs):
