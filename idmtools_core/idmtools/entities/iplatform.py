@@ -39,6 +39,7 @@ from idmtools.entities.simulation import Simulation
 from idmtools.entities.suite import Suite
 from idmtools.assets.asset_collection import AssetCollection
 from idmtools.services.platforms import PlatformPersistService
+from idmtools.utils.caller import get_caller
 from idmtools.utils.entities import validate_user_inputs_against_dataclass
 logger = getLogger(__name__)
 user_logger = getLogger('user')
@@ -98,25 +99,6 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     #: Defines the path to common assets
     _common_asset_path: str = field(default="Assets", repr=True, init=False, compare=False)
 
-    @staticmethod
-    def get_caller():
-        """
-        Trace the stack and find the caller.
-
-        Returns:
-            The direct caller.
-        """
-        import inspect
-
-        try:
-            s = inspect.stack()
-        except (IndexError, RuntimeError):
-            # in some high thread environments and under heavy load, we can get environment changes before retrieving
-            # stack in those case assume we are good
-            # We can also encounter IndexError in dynamic environments like Snakemake, jinja, etc
-            return "__newobj__"
-        return s[2][3]
-
     def __new__(cls, *args, **kwargs):
         """
         Create a new object.
@@ -132,7 +114,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             ValueError - If the platform was not created as expected.
         """
         # Check the caller
-        caller = cls.get_caller()
+        caller = get_caller()
 
         # Action based on the caller
         if caller not in CALLER_LIST:

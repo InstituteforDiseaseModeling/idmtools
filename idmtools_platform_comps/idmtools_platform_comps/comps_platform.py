@@ -5,18 +5,22 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 # flake8: noqa E402
 import copy
 import logging
+
 # fix for comps weird import
+HANDLERS = copy.copy(logging.getLogger().handlers)
+LEVEL = logging.getLogger().level
+from COMPS import Client
+
+comps_logger = logging.getLogger('COMPS')
+logging.root.handlers = HANDLERS
+logging.getLogger().setLevel(LEVEL)
+comps_logger.propagate = False
+comps_logger.handlers = [h for h in comps_logger.handlers if isinstance(h, logging.FileHandler)]
+
 from idmtools.assets.asset_collection import AssetCollection
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities.iplatform_default import AnalyzerManagerPlatformDefault, IPlatformDefault
 from idmtools.entities.iworkflow_item import IWorkflowItem
-
-HANDLERS = copy.copy(logging.getLogger().handlers)
-LEVEL = logging.getLogger().level
-from COMPS import Client
-logging.root.handlers = HANDLERS
-logging.getLogger().setLevel(LEVEL)
-
 from dataclasses import dataclass, field
 from functools import partial
 from typing import List
@@ -59,19 +63,29 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     MAX_SUBDIRECTORY_LENGTH = 35  # avoid maxpath issues on COMPS
 
     endpoint: str = field(default="https://comps2.idmod.org", metadata={"help": "URL of the COMPS endpoint to use"})
-    environment: str = field(default="Bayesian", metadata=dict(help="Name of the COMPS environment to target", callback=environment_list))
-    priority: str = field(default=COMPSPriority.Lowest.value, metadata=dict(help="Priority of the job", choices=[p.value for p in COMPSPriority]))
+    environment: str = field(default="Bayesian",
+                             metadata=dict(help="Name of the COMPS environment to target", callback=environment_list))
+    priority: str = field(default=COMPSPriority.Lowest.value,
+                          metadata=dict(help="Priority of the job", choices=[p.value for p in COMPSPriority]))
     simulation_root: str = field(default="$COMPS_PATH(USER)\\output", metadata=dict(help="Location of the outputs"))
     node_group: str = field(default=None, metadata=dict(help="Node group to target"))
-    num_retries: int = field(default=0, metadata=dict(help="How retries if the simulation fails", validate=partial(validate_range, min=0, max=10)))
-    num_cores: int = field(default=1, metadata=dict(help="How many cores per simulation", validate=partial(validate_range, min=1, max=32)))
-    max_workers: int = field(default=16, metadata=dict(help="How many processes to spawn locally", validate=partial(validate_range, min=1, max=32)))
-    batch_size: int = field(default=10, metadata=dict(help="How many simulations per batch",validate=partial(validate_range, min=1, max=100)))
-    min_time_between_commissions: int = field(default=15, metadata=dict(help="How many seconds between commission calls on an experiment. ",validate=partial(validate_range, min=10, max=300)))
-    exclusive: bool = field(default=False, metadata=dict(help="Enable exclusive mode? (one simulation per node on the cluster)"))
+    num_retries: int = field(default=0, metadata=dict(help="How retries if the simulation fails",
+                                                      validate=partial(validate_range, min=0, max=10)))
+    num_cores: int = field(default=1, metadata=dict(help="How many cores per simulation",
+                                                    validate=partial(validate_range, min=1, max=32)))
+    max_workers: int = field(default=16, metadata=dict(help="How many processes to spawn locally",
+                                                       validate=partial(validate_range, min=1, max=32)))
+    batch_size: int = field(default=10, metadata=dict(help="How many simulations per batch",
+                                                      validate=partial(validate_range, min=1, max=100)))
+    min_time_between_commissions: int = field(default=15, metadata=dict(
+        help="How many seconds between commission calls on an experiment. ",
+        validate=partial(validate_range, min=10, max=300)))
+    exclusive: bool = field(default=False,
+                            metadata=dict(help="Enable exclusive mode? (one simulation per node on the cluster)"))
     docker_image: str = field(default=None)
 
-    _platform_supports: List[PlatformRequirements] = field(default_factory=lambda: copy.deepcopy(supported_types), repr=False, init=False)
+    _platform_supports: List[PlatformRequirements] = field(default_factory=lambda: copy.deepcopy(supported_types),
+                                                           repr=False, init=False)
     _platform_defaults: List[IPlatformDefault] = field(default_factory=lambda: copy.deepcopy(PLATFORM_DEFAULTS))
 
     _experiments: CompsPlatformExperimentOperations = field(**op_defaults, repr=False, init=False)
@@ -91,13 +105,6 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             self._platform_supports.append(PlatformRequirements.LINUX)
         else:
             self._platform_supports.append(PlatformRequirements.WINDOWS)
-
-        # remove StreanHandler from COMPS logger
-        comps_logger = logging.getLogger('COMPS')
-        for handler in comps_logger.handlers[:]:
-            if isinstance(handler, logging.StreamHandler) and not isinstance(handler, logging.FileHandler):
-                comps_logger.removeHandler(handler)
-        comps_logger.propagate = False
 
     def __init_interfaces(self):
         if not self._skip_login:
@@ -130,6 +137,3 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         if isinstance(item, IWorkflowItem):
             return False
         return super().is_windows_platform(item)
-
-
-
