@@ -1,3 +1,10 @@
+"""
+Defines our IAnalyzer interface used as base of all other analyzers.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
+
+
 def get_caller():
     """
     Trace the stack and find the caller.

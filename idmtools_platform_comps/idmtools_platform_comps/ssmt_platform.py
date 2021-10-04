@@ -24,7 +24,7 @@ class SSMTPlatform(COMPSPlatform):
 
     def __post_init__(self):
         """
-        Post method after SSMTPlatform creation
+        Post method after SSMTPlatform creation.
 
         Returns: None
         """
@@ -33,7 +33,7 @@ class SSMTPlatform(COMPSPlatform):
 
     def __init_interfaces(self):
         """
-        Initialize intefaces
+        Initialize intefaces.
 
         Returns: None
         """

@@ -48,7 +48,7 @@ class IAnalyzer(metaclass=ABCMeta):
     @property
     def filenames(self):
         """
-        Returns user filenames
+        Returns user filenames.
 
         Returns:
             filenames
