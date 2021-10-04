@@ -43,6 +43,7 @@ class IAnalyzer(metaclass=ABCMeta):
         self.uid = uid or self.__class__.__name__
         self.results = None  # Store what finalize() is returning
         self._filenames = filenames or list()
+        self._filenames = [f.replace("\\", '/') for f in self._filenames]
 
     @property
     def filenames(self):
