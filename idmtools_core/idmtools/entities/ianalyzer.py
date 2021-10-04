@@ -47,10 +47,27 @@ class IAnalyzer(metaclass=ABCMeta):
 
     @property
     def filenames(self):
+        """
+        Returns user filenames
+
+        Returns:
+            filenames
+
+        """
         return self._filenames
 
     @filenames.setter
     def filenames(self, value):
+        """
+        Set the filenames property.
+
+        Args:
+            value: new filenames
+
+        Returns:
+            None
+
+        """
         self._filenames = value or list()
         self._filenames = [f.replace("\\", '/') for f in self._filenames]
 
