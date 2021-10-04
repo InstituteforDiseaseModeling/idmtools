@@ -43,8 +43,16 @@ class IAnalyzer(metaclass=ABCMeta):
         self.working_dir = working_dir
         self.uid = uid or self.__class__.__name__
         self.results = None  # Store what finalize() is returning
+        self._filenames = filenames or list()
 
-        self.filenames = [f.replace("\\", '/') for f in self.filenames]
+    @property
+    def filenames(self):
+        return self._filenames
+
+    @filenames.setter
+    def filenames(self, value):
+        self._filenames = value or list()
+        self._filenames = [f.replace("\\", '/') for f in self._filenames]
 
     def initialize(self) -> NoReturn:
         """
