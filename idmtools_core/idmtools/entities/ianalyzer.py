@@ -38,7 +38,6 @@ class IAnalyzer(metaclass=ABCMeta):
                 data in the :meth:`select_simulation_data`.
             filenames: The files for the analyzer to download.
         """
-        self.filenames = filenames or []
         self.parse = parse
         self.working_dir = working_dir
         self.uid = uid or self.__class__.__name__
