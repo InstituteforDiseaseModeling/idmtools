@@ -789,6 +789,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
                 prog = tqdm([], total=len(item.simulations), desc=wait_progress_desc if wait_progress_desc else f"Waiting on Experiment {item.name} to Finish running", unit="simulation")
                 child_attribute = 'simulations'
             elif isinstance(item, Suite):
+                item.experiments = item.platform.get_children(item_id=item.id, item_type=ItemType.SUITE)
                 prog = tqdm([], total=len(item.experiments), desc=wait_progress_desc if wait_progress_desc else f"Waiting on Suite {item.name} to Finish running", unit="experiment")
                 child_attribute = 'experiments'
             elif isinstance(item, IWorkflowItem):
