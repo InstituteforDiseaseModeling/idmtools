@@ -1,0 +1,18 @@
+Bootstrap: localimage
+From: Assets/ubuntu.sif
+
+%environment
+    # ADD our asset to path so we can add live versions
+    export PYTHONPATH=Assets/:.
+
+%post
+    cd /opt
+    git config --list > whazzup.txt
+    git clone https://github.com/amath-idm/fp_analyses.git
+
+    /usr/bin/python3 pip install -e .
+    /usr/bin/python3 setup.py develop full
+    /usr/bin/python3 -m site
+
+%runscript
+    echo Please specify a command. The default command for this container prints this message

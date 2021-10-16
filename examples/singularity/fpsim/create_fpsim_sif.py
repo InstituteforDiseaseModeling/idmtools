@@ -10,13 +10,14 @@ from idmtools_platform_comps.utils.singularity_build import SingularityBuildWork
 
 if __name__ == '__main__':
     platform = Platform("CALCULON")
-    sbi = SingularityBuildWorkItem(name="Create covasim sif with def file", definition_file="covasim_req.def", image_name="covasim_ubuntu.sif")
+    sbi = SingularityBuildWorkItem(name="Create fpsim sif with def file", definition_file="fpsim_req.def", image_name="fpsim_ubuntu.sif")
     # Try to load the ubuntu image from an id file
     pwd = PurePath(__file__).parent
     ub_base = pwd.joinpath("..", "ubuntu-20-04",)
     fp = pwd.joinpath(ub_base, "ubuntu.id")
+    print(f"The path is: {fp}")
     sbi.add_assets(AssetCollection.from_id_file(fp))
     sbi.tags = dict(covasim=None)
     sbi.run(wait_until_done=True, platform=platform)
     if sbi.succeeded:
-        sbi.asset_collection.to_id_file("covasim.id")
+        sbi.asset_collection.to_id_file("fpsim.id")
