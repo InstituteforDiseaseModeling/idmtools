@@ -6,12 +6,15 @@ From: Assets/ubuntu.sif
     export PYTHONPATH=Assets/:.
 
 %post
+    python3 -m pip install pip --upgrade
+
     cd /opt
     git config --list > whazzup.txt
-    git clone https://github.com/amath-idm/fp_analyses.git
+    git clone https://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@github.com/amath-idm/fp_analyses.git
 
-    /usr/bin/python3 pip install -e .
-    /usr/bin/python3 setup.py develop full
+    cd fp_analyses
+
+    pip install -e .
     /usr/bin/python3 -m site
 
 %runscript
