@@ -21,11 +21,11 @@ if __name__ == "__main__":
     # Create a platform to run the workitem
     platform = Platform("CALCULON")
     # create commandline input for the task
-    command = CommandLine(f"singularity exec ./Assets/covasim_ubuntu.sif python3 Assets/run_sim_sweep.py")
+    command = CommandLine(f"singularity exec ./Assets/fpsim_ubuntu.sif python3 Assets/run_sim_sweep.py")
     task = CommandTask(command=command)
     ts = TemplatedSimulations(base_task=task)
     # Add our image
-    task.common_assets.add_assets(AssetCollection.from_id_file("covasim.id"))
+    task.common_assets.add_assets(AssetCollection.from_id_file("fpsim.id"))
     sb = SimulationBuilder()
     # Add sweeps on 3 parameters. Total of 1680 simulations(6x14x21)
     sb.add_sweep_definition(partial(set_value, name="sexual_activity_20_25"), [45, 50, 55])
