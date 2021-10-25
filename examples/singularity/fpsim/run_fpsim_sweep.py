@@ -28,8 +28,8 @@ if __name__ == "__main__":
     task.common_assets.add_assets(AssetCollection.from_id_file("fpsim.id"))
     sb = SimulationBuilder()
     # Add sweeps on 3 parameters. Total of 1680 simulations(6x14x21)
-    sb.add_sweep_definition(partial(set_value, name="sexual_activity_20_25"), [45, 50, 55])
-    sb.add_sweep_definition(partial(set_value, name="fecundity_peak_25"), [75, 79, 83])
+    sb.add_sweep_definition(partial(set_value, name="sexual_activity_20_25"), [20, 50, 75])
+    sb.add_sweep_definition(partial(set_value, name="fecundity_peak_25"), [40, 79, 99])
     sb.add_sweep_definition(partial(set_value, name="rand_seed"), [1, 2])
     ts.add_builder(sb)
 
