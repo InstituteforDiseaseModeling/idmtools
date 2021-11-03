@@ -1,0 +1,20 @@
+Bootstrap: localimage
+From: Assets/ubuntu.sif
+
+%environment
+    # ADD our asset to path so we can add live versions
+    export PYTHONPATH=Assets/:.
+
+%post
+    python3 -m pip install pip --upgrade
+
+    cd /opt
+    git clone https://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@github.com/amath-idm/poliosim.git
+
+    cd poliosim
+
+    pip install -e .
+    /usr/bin/python3 -m site
+
+%runscript
+    echo Please specify a command. The default command for this container prints this message
