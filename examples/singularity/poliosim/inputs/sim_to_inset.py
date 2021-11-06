@@ -15,15 +15,18 @@ channels = [
 ]
 
 
-def create_insetchart(results, n=0):
+def create_insetchart(results, n=0, dir=None):
     sim_results = {k: results[k].values.tolist() for k in channels}
 
     sim_results['t'] = results['t']
     df = pd.DataFrame.from_dict(sim_results)
-    if n == 0:
-        df.to_csv('InsetChart.csv', index=True)
+
+    csv_name = f'InsetChart{str(n)}.csv'
+    if dir:
+        csv_full_name = f'./{dir}/{csv_name}'
     else:
-        df.to_csv('InsetChart'+str(n)+ '.csv', index=True)
+        csv_full_name = csv_name
+    df.to_csv(csv_full_name, index=True)
     return
 
 # For more poliosim timeseries, look to poliosim\tests\baseline.json
