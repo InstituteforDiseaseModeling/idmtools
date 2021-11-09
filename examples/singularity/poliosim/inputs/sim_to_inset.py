@@ -21,7 +21,10 @@ def create_insetchart(results, n=0, dir=None):
     sim_results['t'] = results['t']
     df = pd.DataFrame.from_dict(sim_results)
 
-    csv_name = f'InsetChart{str(n)}.csv'
+    if n > 0:
+        csv_name = f'InsetChart{str(n)}.csv'
+    else:
+        csv_name = f'InsetChart.csv'
     if dir:
         csv_full_name = f'./{dir}/{csv_name}'
     else:
