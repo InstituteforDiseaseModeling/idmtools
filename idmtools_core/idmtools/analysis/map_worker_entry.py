@@ -87,7 +87,7 @@ def _get_mapped_data_for_item(item: IEntity, analyzers: TAnalyzerList, platform:
                 sim.status = convert_comps_status(item.state)
 
                 # file_data = platform.get_files(item, filenames)  # make sure this does NOT error when filenames is empty
-                file_data = platform.get_files(sim, filenames, include_experiment_assets=False)
+                file_data = platform.get_files(sim, filenames)
             else:
                 file_data = platform.get_files(item, filenames)
         else:
