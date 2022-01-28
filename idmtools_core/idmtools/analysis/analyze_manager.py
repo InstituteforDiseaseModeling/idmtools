@@ -145,19 +145,21 @@ class AnalyzeManager:
         items: List[IEntity] = []
         for oid, otype in ids:
             logger.debug(f'Getting metadata for {oid} and {otype}')
-            result = self.platform.get_item(oid, otype, force=True)
+            result = self.platform.get_item(oid, otype, force=True, raw=True)
             items.append(result)
         self.potential_items: List[IEntity] = []
 
         for i in items:
-            logger.debug(f'Flattening items for {i.uid}')
+            logger.debug(f'Flattening items for {i.id}')
             self.potential_items.extend(self.platform.flatten_item(item=i))
 
         # These are leaf items to be ignored in analysis. Make sure they are UUID and then prune them from analysis.
         self.exclude_ids = exclude_ids or []
         for index, oid in enumerate(self.exclude_ids):
             self.exclude_ids[index] = oid if isinstance(oid, UUID) else UUID(oid)
-        self.potential_items = [item for item in self.potential_items if item.uid not in self.exclude_ids]
+        self.potential_items = [item for item in self.potential_items if item.id not in self.exclude_ids]
+        for item in self.potential_items:
+            item.platform = self.platform
 
         logger.debug(f"Potential items to analyze: {len(self.potential_items)}")
 
@@ -209,21 +211,24 @@ class AnalyzeManager:
 
         """
         # First sort items by whether they can currently be analyzed
+        from COMPS.Data.Simulation import SimulationState
+
+        # First sort items by whether they can currently be analyzed
         can_analyze = {}
         cannot_analyze = {}
         for item in self.potential_items:
-            if item.succeeded:
-                can_analyze[item.uid] = item
+            if item.state == SimulationState.Succeeded:
+                can_analyze[item.id] = item
             else:
-                if self.analyze_failed_items and item.status == EntityStatus.FAILED:
-                    can_analyze[item.uid] = item
+                if self.analyze_failed_items and item.state == SimulationState.FAILED:
+                    can_analyze[item.id] = item
                 else:
-                    cannot_analyze[item.uid] = item
+                    cannot_analyze[item.id] = item
 
         # now consider item limiting arguments
         if self.partial_analyze_ok:
             if self.max_items_to_analyze is not None:
-                return {item.uid: item for item in list(can_analyze.values())[0:self.max_items_to_analyze]}
+                return {item.id: item for item in list(can_analyze.values())[0:self.max_items_to_analyze]}
             return can_analyze
 
         if len(cannot_analyze) > 0:

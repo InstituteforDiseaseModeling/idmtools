@@ -538,13 +538,25 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             List of leaves
 
         """
-        children = self.get_children(item.uid, item.item_type, force=True)
-        if children is None or (isinstance(children, list) and len(children) == 0):
-            items = [item]
+        from COMPS.Data import Experiment as COMPSExperiment, Suite as COMPSSuite, QueryCriteria
+
+        if isinstance(item, COMPSSuite):
+            children = item.get_experiments()
+        elif isinstance(item, COMPSExperiment):
+            columns = ["id", "name", "state"]
+            comps_children = ["tags", "configuration"]
+            query_criteria = QueryCriteria().select(columns).select_children(comps_children)
+            children = item.get_simulations(query_criteria=query_criteria)
+            item.uid = item.id
+            for sim in children:
+                sim.experiment = item
         else:
-            items = list()
-            for child in children:
-                items += self.flatten_item(item=child)
+            children = [item]
+            return children
+
+        items = list()
+        for child in children:
+            items += self.flatten_item(item=child)
         return items
 
     def refresh_status(self, item: IEntity) -> NoReturn:

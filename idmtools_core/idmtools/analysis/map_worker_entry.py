@@ -13,6 +13,10 @@ from idmtools.utils.file_parser import FileParser
 from typing import TYPE_CHECKING, Union, Dict
 from idmtools.core.interfaces.iitem import IItem
 from idmtools.entities.ianalyzer import TAnalyzerList
+from idmtools.entities.simulation import Simulation
+from idmtools_platform_comps.utils.general import convert_comps_status
+from COMPS.Data import Simulation as COMPSSimulation
+
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
 
@@ -72,7 +76,20 @@ def _get_mapped_data_for_item(item: IEntity, analyzers: TAnalyzerList, platform:
 
         # The byte_arrays will associate filename with content
         if len(filenames) > 0:
-            file_data = platform.get_files(item, filenames)  # make sure this does NOT error when filenames is empty
+            if isinstance(item, COMPSSimulation):
+                sim = Simulation()
+                sim.uid = item.id
+                sim.platform = platform
+                sim._platform_object = item
+                sim.tags = item.tags
+                sim.parent = item.experiment        # TODO: convert to idmtools?
+                sim.experiment = item.experiment    # TODO: convert to idmtools?
+                sim.status = convert_comps_status(item.state)
+
+                # file_data = platform.get_files(item, filenames)  # make sure this does NOT error when filenames is empty
+                file_data = platform.get_files(sim, filenames, include_experiment_assets=False)
+            else:
+                file_data = platform.get_files(item, filenames)
         else:
             file_data = dict()
 
@@ -93,8 +110,8 @@ def _get_mapped_data_for_item(item: IEntity, analyzers: TAnalyzerList, platform:
 
         # Store all analyzer results for this item in the result cache
         if logger.isEnabledFor(DEBUG):
-            logger.debug(f"Setting result to cache on {item.uid}")
-        logger.debug(f"Wrote Setting result to cache on {item.uid}")
+            logger.debug(f"Setting result to cache on {item.id}")
+        logger.debug(f"Wrote Setting result to cache on {item.id}")
     except Exception as e:
         e.item = item
         logger.error(e)
