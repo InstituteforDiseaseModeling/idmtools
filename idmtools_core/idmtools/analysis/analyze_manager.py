@@ -275,7 +275,7 @@ class AnalyzeManager:
             if self.force_wd:
                 analyzer.working_dir = self.working_dir
             else:
-                analyzer.working_dir = analyzer.working_dir or self.working_dir
+                analyzer.working_dir = analyzer.working_dir if analyzer.working_dir is not None else self.working_dir
 
             if logger.isEnabledFor(DEBUG):
                 logger.debug(f"Analyzer working directory set to {analyzer.working_dir}")
