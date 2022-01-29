@@ -1,15 +1,15 @@
 # This GA can be triggered with commit message "Run prod ubuntu all test!". it install prod packages with any branch code
-name: "run-all-test-ubuntu-prod"
+name: "run-pip-prod"
 on: [ push, pull_request ]
 
 jobs:
-  run-all-test-ubuntu-prod:
+  run-pip-prod:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ ubuntu-latest ]
         python-version: [ 3.7, 3.8, 3.9 ]
-    if: "contains(github.event.head_commit.message, 'Run prod ubuntu all test!')"
+    if: "contains(github.event.head_commit.message, 'run-pip-prod!')"
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
@@ -21,10 +21,6 @@ jobs:
       - name: Install Python dependencies
         run: |
           pip install idm-buildtools flake8 wheel matplotlib --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
-      - name: Install dataclass
-        if: ${{ matrix.python-version }} == 3.6
-        run: |
-          pip install dataclasses
       - name: download idmtools packages from production jfrog
         run: |
           pip install idmtools[full] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
