@@ -8,7 +8,7 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest ]
-        python-version: [ 3.6, 3.7, 3.8 ]
+        python-version: [ 3.7, 3.8, 3.9 ]
     if: "contains(github.event.head_commit.message, 'Run prod ubuntu all test!')"
     steps:
       - name: Check out Git repository
@@ -20,7 +20,7 @@ jobs:
           architecture: x64
       - name: Install Python dependencies
         run: |
-          pip install idm-buildtools flake8 wheel pygit2 --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+          pip install idm-buildtools flake8 wheel matplotlib --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
       - name: Install dataclass
         if: ${{ matrix.python-version }} == 3.6
         run: |
@@ -34,7 +34,7 @@ jobs:
         run: |
           python dev_scripts/create_auth_token_args.py --username "${{ secrets.COMPS_USER }}"
         env:
-          COMPS_PASSWORD: ${{ secrets.COMPS_PASSWORD }}
+          COMPS_PASS: ${{ secrets.COMPS_PASSWORD }}
       - name: run idmtools_cli tests
         run: |
           cd idmtools_cli
