@@ -69,7 +69,7 @@ jobs:
         if: failure()
         with:
           name: idmtools_models_test_results
-          path: idmtools_models/tests/results/
+          path: idmtools_models/tests/reports/
       - name: run idmtools_platform_comps smoke tests
         run: |
           cd idmtools_platform_comps
@@ -79,7 +79,7 @@ jobs:
         if: failure()
         with:
           name: idmtools_platform_comps_test_results
-          path: idmtools_platform_comps/tests/results/
+          path: idmtools_platform_comps/tests/reports/
       - name: run idmtools_platform_local smoke tests
         run: |
           cd idmtools_platform_local
@@ -89,4 +89,4 @@ jobs:
         if: failure()
         with:
           name: idmtools_platform_local_test_results
-          path: idmtools_platform_local/tests/results/
+          path: idmtools_platform_local/tests/reports/
