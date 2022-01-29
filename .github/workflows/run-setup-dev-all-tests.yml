@@ -5,7 +5,7 @@ name: "run-setup-dev-all-tests"
 on: [ push, pull_request ]
 
 jobs:
-  run-all-test-ubuntu-stage:
+  run-setup-dev-all-tests:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -35,7 +35,7 @@ jobs:
         run: |
           python dev_scripts/create_auth_token_args.py --username "${{ secrets.COMPS_USER }}"
         env:
-          COMPS_PASSWORD: ${{ secrets.COMPS_PASSWORD }}
+          COMPS_PASS: ${{ secrets.COMPS_PASSWORD }}
       - name: login to docker staging
         run: |
           echo '${{ env.PYPI_STAGING_PASSWORD }}' | docker login idm-docker-staging.packages.idmod.org --username ${{ env.PYPI_STAGING_USERNAME }} --password-stdin
