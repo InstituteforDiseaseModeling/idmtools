@@ -25,7 +25,7 @@ jobs:
           architecture: x64
       - name: Install Python dependencies
         run: |
-          pip install idm-buildtools flake8 wheel pygit2 matplotlib --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+          pip install idm-buildtools flake8 wheel pygit2 matplotlib sqlalchemy --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
       - name: download idmtools packages from staging jfrog
         run: |
           pip install idmtools[full] --index-url=https://${{ secrets.PYPI_STAGING_USERNAME }}:${{ secrets.PYPI_STAGING_PASSWORD }}@packages.idmod.org/api/pypi/pypi-staging/simple
