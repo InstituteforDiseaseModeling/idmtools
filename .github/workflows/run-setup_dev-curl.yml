@@ -8,24 +8,22 @@
 #
 # Note, this test will checkout 'dev' branch
 
-name: "run-all-test-ubuntu-setup-curl"
+name: "run-setup_dev-curl"
 
 on:
   repository_dispatch:
     types: [run_setup_dev_test]
 
 jobs:
-  run-all-test-ubuntu-setup-curl:
+  run-setup_dev-curl:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python-version: [3.8]
+        python-version: [ 3.7, 3.8, 3.9 ]
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
-        with:
-          ref: dev
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
@@ -44,7 +42,7 @@ jobs:
         run: |
           python dev_scripts/create_auth_token_args.py --username "${{ secrets.COMPS_USER }}"
         env:
-          COMPS_PASSWORD: ${{ secrets.COMPS_PASSWORD }}
+          COMPS_PASS: ${{ secrets.COMPS_PASSWORD }}
       - name: run idmtools_cli tests
         run: |
           cd idmtools_cli

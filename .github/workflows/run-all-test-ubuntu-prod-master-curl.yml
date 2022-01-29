@@ -8,20 +8,20 @@
 #
 # Note, this test will checkout 'master' branch
 
-name: "run-all-test-ubuntu-prod-master-curl"
+name: "run-pip-prod-curl"
 on:
   repository_dispatch:
     # Manually trigger with above curl or Postman POST
     types: [test_master_prod]
 
 jobs:
-  run-release-build-test-curl:
+  run-pip-prod-curl:
     if: github.repository == 'InstituteforDiseaseModeling/idmtools'
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python-version: [3.6, 3.7, 3.8]
+        python-version: [3.9, 3.7, 3.8]
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
@@ -32,11 +32,7 @@ jobs:
           architecture: x64
       - name: Install Python dependencies
         run: |
-          pip install idm-buildtools flake8 wheel --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
-      - name: Install dataclass
-        if: ${{ matrix.python-version }} == 3.6
-        run: |
-          pip install dataclasses
+          pip install idm-buildtools flake8 wheel matplotlib --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
       - name: download idmtools packages from production jfrog
         run: |
           pip install idmtools[full] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
@@ -46,7 +42,7 @@ jobs:
         run: |
           python dev_scripts/create_auth_token_args.py --username "${{ secrets.COMPS_USER }}"
         env:
-          COMPS_PASSWORD: ${{ secrets.COMPS_PASSWORD }}
+          COMPS_PASS: ${{ secrets.COMPS_PASSWORD }}
       - name: run idmtools_cli tests
         run: |
           cd idmtools_cli
