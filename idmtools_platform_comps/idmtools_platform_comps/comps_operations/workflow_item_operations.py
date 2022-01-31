@@ -235,6 +235,7 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
 
         # Set its correct attributes
         obj.platform = self.platform
+        obj._platform_object = work_item
         obj.uid = work_item.id
         if work_item.asset_collection_id:
             obj.assets = AssetCollection.from_id(work_item.asset_collection_id, platform=self.platform)
