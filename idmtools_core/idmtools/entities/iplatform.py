@@ -529,7 +529,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
                 return getattr(self, interface).to_entity(platform_item, **kwargs)
         return platform_item
 
-    def flatten_item(self, item: object, raw=False) -> List[object]:  # TODO: List of sim and wi, maybe ac
+    def flatten_item(self, item: object, raw=False, ssmt=False) -> List[object]:  # TODO: List of sim and wi, maybe ac
         """
         Flatten an item: resolve the children until getting to the leaves.
 
@@ -539,6 +539,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         Args:
             item: Which item to flatten
             raw: bool
+            ssmt: bool to check if to be used in SSMTPlatform
 
         Returns:
             List of leaves
@@ -562,7 +563,10 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
                 children += self.flatten_item(item=child)
         elif isinstance(item, COMPSExperiment):
             columns = ["id", "name", "state"]
-            comps_children = ["tags", "configuration"]
+            if ssmt:
+                comps_children = ["tags", "configuration", "hpc_jobs"]
+            else:
+                comps_children = ["tags", "configuration"]
             query_criteria = QueryCriteria().select(columns).select_children(comps_children)
             children = item.get_simulations(query_criteria=query_criteria)
             item.uid = item.id

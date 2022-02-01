@@ -82,5 +82,5 @@ if __name__ == "__main__":
     # get platform
     platform = Platform(args.block, **platform_args)
     logger.info(f"Analyzer Manager called with the following extra arguments: {extra_args}")
-    am = AnalyzeManager(platform=platform, ids=item_ids, analyzers=analyzers, **extra_args)
+    am = AnalyzeManager(platform=platform, ids=item_ids, analyzers=analyzers, ssmt=True, **extra_args)
     am.analyze()

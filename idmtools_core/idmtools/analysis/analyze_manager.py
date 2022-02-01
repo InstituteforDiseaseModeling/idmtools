@@ -24,6 +24,7 @@ from idmtools.entities.simulation import Simulation
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iworkflow_item import IWorkflowItem
 from idmtools.assets.asset_collection import AssetCollection
+from idmtools.analysis.platform_anaylsis import PlatformAnalysis
 from COMPS.Data.Simulation import SimulationState
 from COMPS.Data.WorkItem import WorkItemState
 from COMPS.Data import Simulation as COMPSSimulation, WorkItem as COMPSWorkItem
@@ -82,7 +83,8 @@ class AnalyzeManager:
                  partial_analyze_ok: bool = False, max_items: Optional[int] = None, verbose: bool = True,
                  force_manager_working_directory: bool = False,
                  exclude_ids: List[Union[str, UUID]] = None, analyze_failed_items: bool = False,
-                 max_workers: Optional[int] = None, executor_type: str = 'process'):
+                 max_workers: Optional[int] = None, executor_type: str = 'process',
+                 ssmt: bool = False):
         """
         Initialize the AnalyzeManager.
 
@@ -100,6 +102,7 @@ class AnalyzeManager:
             analyze_failed_items (bool, optional): Allows analyzing of failed items. Useful when you are trying to aggregate items that have failed. Defaults to False.
             max_workers (int, optional): Set the max workers. If not provided, falls back to the configuration item *max_threads*. If max_workers is not set in configuration, defaults to CPU count
             executor_type: (str): Whether to use process or thread pooling. Process pooling is more efficient but threading might be required in some environments
+            ssmt: (str): determine if run Analysis on server
         """
         super().__init__()
         if working_dir is None:
@@ -109,6 +112,7 @@ class AnalyzeManager:
         else:
             raise ValueError(f'{executor_type} is not a valid type for executor_type. Choose either "process" or "thread"')
 
+        self.ssmt = ssmt
         self.configuration = configuration or {}
 
         # load platform from context or from passed in value
@@ -167,7 +171,7 @@ class AnalyzeManager:
 
         for i in items:
             logger.debug(f'Flattening items for {i.uid}')
-            self.potential_items.extend(self.platform.flatten_item(item=i, raw=True))
+            self.potential_items.extend(self.platform.flatten_item(item=i, raw=True, ssmt=self.ssmt))
 
         # These are leaf items to be ignored in analysis. Make sure they are UUID and then prune them from analysis.
         self.exclude_ids = exclude_ids or []
@@ -216,7 +220,7 @@ class AnalyzeManager:
         Returns:
             None
         """
-        self.potential_items.extend(self.platform.flatten_item(item=item, raw=True))
+        self.potential_items.extend(self.platform.flatten_item(item=item, raw=True, ssmt=self.ssmt))
 
     def _get_items_to_analyze(self) -> Dict[UUID, IEntity]:
         """
