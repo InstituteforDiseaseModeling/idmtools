@@ -529,7 +529,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
                 return getattr(self, interface).to_entity(platform_item, **kwargs)
         return platform_item
 
-    def flatten_item(self, item: object) -> List[object]:  # TODO: List of sim and wi, maybe ac
+    def flatten_item(self, item: object, raw=False) -> List[object]:  # TODO: List of sim and wi, maybe ac
         """
         Flatten an item: resolve the children until getting to the leaves.
 
@@ -538,11 +538,22 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         Args:
             item: Which item to flatten
+            raw: bool
 
         Returns:
             List of leaves
 
         """
+        if not raw:
+            children = self.get_children(item.uid, item.item_type, force=True)
+            if children is None or (isinstance(children, list) and len(children) == 0):
+                items = [item]
+            else:
+                items = list()
+                for child in children:
+                    items += self.flatten_item(item=child)
+            return items
+
         if isinstance(item, COMPSSuite):
             experiments = item.get_experiments()
 

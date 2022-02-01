@@ -167,7 +167,7 @@ class AnalyzeManager:
 
         for i in items:
             logger.debug(f'Flattening items for {i.uid}')
-            self.potential_items.extend(self.platform.flatten_item(item=i))
+            self.potential_items.extend(self.platform.flatten_item(item=i, raw=True))
 
         # These are leaf items to be ignored in analysis. Make sure they are UUID and then prune them from analysis.
         self.exclude_ids = exclude_ids or []
@@ -216,7 +216,7 @@ class AnalyzeManager:
         Returns:
             None
         """
-        self.potential_items.extend(self.platform.flatten_item(item=item))
+        self.potential_items.extend(self.platform.flatten_item(item=item, raw=True))
 
     def _get_items_to_analyze(self) -> Dict[UUID, IEntity]:
         """
