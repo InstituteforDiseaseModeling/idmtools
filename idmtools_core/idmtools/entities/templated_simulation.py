@@ -23,6 +23,7 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 def create_simulation(simulation_obj, groups):
+    simulations = []
     for simulation_functions in filter(None, groups):
         simulation = copy.deepcopy(simulation_obj)
         tags = {}
@@ -32,8 +33,9 @@ def create_simulation(simulation_obj, groups):
             if new_tags:
                 tags.update(new_tags)
 
-    simulation.tags.update(tags)
-    return simulation
+        simulation.tags.update(tags)
+        simulations.append(simulation)
+    return simulations
 
 
 def simulation_generator(builders, new_sim_func, additional_sims=None, batch_size=10):
@@ -54,10 +56,11 @@ def simulation_generator(builders, new_sim_func, additional_sims=None, batch_siz
         additional_sims = []
     # Then the builders
     create_simulation_fct = partial(create_simulation, new_sim_func())
-    result = pool.map(create_simulation_fct, grouper(chain(*builders), batch_size))
+    results = pool.map(create_simulation_fct, grouper(chain(*builders), batch_size))
 
-    for s in result:
-        yield s
+    for result in results:
+        for r in result:
+            yield r
 
     yield from additional_sims
 
