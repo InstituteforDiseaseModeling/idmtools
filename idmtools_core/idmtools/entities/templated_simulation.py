@@ -21,6 +21,7 @@ import multiprocessing
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.experiment import Experiment
 
+
 def create_simulation(simulation_obj, groups):
     for simulation_functions in filter(None, groups):
         simulation = copy.deepcopy(simulation_obj)
@@ -33,6 +34,7 @@ def create_simulation(simulation_obj, groups):
 
     simulation.tags.update(tags)
     return simulation
+
 
 def simulation_generator(builders, new_sim_func, additional_sims=None, batch_size=10):
     """
@@ -58,6 +60,7 @@ def simulation_generator(builders, new_sim_func, additional_sims=None, batch_siz
         yield s
 
     yield from additional_sims
+
 
 @dataclass(repr=False)
 class TemplatedSimulations:
