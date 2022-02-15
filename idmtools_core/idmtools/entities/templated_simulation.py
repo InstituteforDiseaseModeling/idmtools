@@ -16,10 +16,23 @@ from idmtools.entities.itask import ITask
 from idmtools.entities.simulation import Simulation
 from idmtools.utils.collections import ResetGenerator
 from idmtools.utils.hashing import ignore_fields_in_dataclass_on_pickle
+import multiprocessing
 
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.experiment import Experiment
 
+def create_simulation(simulation_obj, groups):
+    for simulation_functions in filter(None, groups):
+        simulation = copy.deepcopy(simulation_obj)
+        tags = {}
+
+        for func in simulation_functions:
+            new_tags = func(simulation=simulation)
+            if new_tags:
+                tags.update(new_tags)
+
+    simulation.tags.update(tags)
+    return simulation
 
 def simulation_generator(builders, new_sim_func, additional_sims=None, batch_size=10):
     """
@@ -34,24 +47,17 @@ def simulation_generator(builders, new_sim_func, additional_sims=None, batch_siz
     Returns:
         Generator for simulations in batches
     """
+    pool = multiprocessing.Pool()
     if additional_sims is None:
         additional_sims = []
     # Then the builders
-    for groups in grouper(chain(*builders), batch_size):
-        for simulation_functions in filter(None, groups):
-            simulation = new_sim_func()
-            tags = {}
+    create_simulation_fct = partial(create_simulation, new_sim_func())
+    result = pool.map(create_simulation_fct, grouper(chain(*builders), batch_size))
 
-            for func in simulation_functions:
-                new_tags = func(simulation=simulation)
-                if new_tags:
-                    tags.update(new_tags)
-
-            simulation.tags.update(tags)
-            yield simulation
+    for s in result:
+        yield s
 
     yield from additional_sims
-
 
 @dataclass(repr=False)
 class TemplatedSimulations:
