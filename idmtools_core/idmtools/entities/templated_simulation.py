@@ -29,7 +29,7 @@ def create_simulation(simulation_obj, groups):
         tags = {}
 
         for func in simulation_functions:
-            new_tags = func(simulation=simulation)
+            new_tags = func(simulation=simulation)  # func changes simulation
             if new_tags:
                 tags.update(new_tags)
 
