@@ -56,11 +56,26 @@ def simulation_generator(builders, new_sim_func, additional_sims=None, batch_siz
         additional_sims = []
     # Then the builders
     create_simulation_fct = partial(create_simulation, new_sim_func())
-    results = pool.map(create_simulation_fct, grouper(chain(*builders), batch_size))
 
-    for result in results:
-        for r in result:
-            yield r
+    try:
+        results = pool.map(create_simulation_fct, grouper(chain(*builders), batch_size))
+        for result in results:
+            for simulation in result:
+                yield simulation
+    except AttributeError:
+        # original function, in case pickling fails
+        for groups in grouper(chain(*builders), batch_size):
+            for simulation_functions in filter(None, groups):
+                simulation = new_sim_func()
+                tags = {}
+
+                for func in simulation_functions:
+                    new_tags = func(simulation=simulation)
+                    if new_tags:
+                        tags.update(new_tags)
+
+                simulation.tags.update(tags)
+                yield simulation
 
     yield from additional_sims
 
