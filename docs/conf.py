@@ -44,7 +44,7 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.githubpages',
     'sphinx.ext.autodoc',
-    'sphinxcontrib.napoleon',
+    'sphinx.ext.napoleon',
     'sphinx.ext.todo',
     'plantweb.directive',
     'sphinxcontrib.programoutput',
@@ -53,9 +53,7 @@ extensions = [
     # intersphinx to allow cross-reference
     'sphinx.ext.intersphinx',
     # automatic section names so linking between section is easy
-    'sphinx.ext.autosectionlabel',
-    # enable Python 3 annotations
-    'sphinx_autodoc_typehints'
+    'sphinx.ext.autosectionlabel'
 ]
 
 plantuml = 'plantweb'
@@ -75,6 +73,7 @@ suppress_warnings = [
 ]
 
 napoleon_google_docstring = True
+napoleon_attr_annotations = True
 # napoleon_numpy_docstring = True
 
 # Add any paths that contain templates here, relative to this directory.
