@@ -73,7 +73,6 @@ suppress_warnings = [
 ]
 
 napoleon_google_docstring = True
-napoleon_attr_annotations = True
 # napoleon_numpy_docstring = True
 
 # Add any paths that contain templates here, relative to this directory.

@@ -7,4 +7,3 @@ sphinxcontrib-napoleon~=0.7
 sphinxext.remoteliteralinclude
 sphinxcontrib-programoutput~=0.17
 sphinx~=4.4.0
-sphinx-autodoc-typehints
