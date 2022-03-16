@@ -53,7 +53,9 @@ extensions = [
     # intersphinx to allow cross-reference
     'sphinx.ext.intersphinx',
     # automatic section names so linking between section is easy
-    'sphinx.ext.autosectionlabel'
+    'sphinx.ext.autosectionlabel',
+    # enable Python 3 annotations
+    'sphinx_autodoc_typehints'
 ]
 
 plantuml = 'plantweb'
