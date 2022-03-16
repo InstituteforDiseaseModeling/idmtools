@@ -66,8 +66,7 @@ autodoc_default_options = {
 }
 
 autodoc_mock_imports = ['pika',
-                        'dramatiq',
-                        'idmtools_platform_local.infrastructure.docker_io.DockerIO']
+                        'dramatiq'
 
 suppress_warnings = [
     'autosectionlabel.*',

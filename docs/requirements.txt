@@ -6,4 +6,4 @@ sphinx-rtd-theme~=0.5.2
 sphinxcontrib-napoleon~=0.7
 sphinxext.remoteliteralinclude
 sphinxcontrib-programoutput~=0.17
-sphinx~=4.4.0
+sphinx~=3.5.4
