@@ -66,7 +66,7 @@ autodoc_default_options = {
 }
 
 autodoc_mock_imports = ['pika',
-                        'dramatiq'
+                        'dramatiq']
 
 suppress_warnings = [
     'autosectionlabel.*',
