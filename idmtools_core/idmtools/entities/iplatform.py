@@ -566,7 +566,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             if ssmt:
                 comps_children = ["tags", "configuration", "hpc_jobs"]
             else:
-                comps_children = ["tags", "configuration"]
+                comps_children = ["tags", "configuration", "hpc_jobs"]
             query_criteria = QueryCriteria().select(columns).select_children(comps_children)
             children = item.get_simulations(query_criteria=query_criteria)
             item.uid = item.id
