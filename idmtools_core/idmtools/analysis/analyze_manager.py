@@ -24,7 +24,6 @@ from idmtools.entities.simulation import Simulation
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iworkflow_item import IWorkflowItem
 from idmtools.assets.asset_collection import AssetCollection
-from idmtools.analysis.platform_anaylsis import PlatformAnalysis
 from COMPS.Data.Simulation import SimulationState
 from COMPS.Data.WorkItem import WorkItemState
 from COMPS.Data import Simulation as COMPSSimulation, WorkItem as COMPSWorkItem
