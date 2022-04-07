@@ -44,7 +44,8 @@ class ClimateGenerationTest(ITestWithPersistence):
 
         wi = SSMTWorkItem(item_name=self.case_name, docker_image=docker_image, command=command)
         # upload site_details.csv to workitem's root dir in COMPS
-        wi.transient_assets.add_asset(os.path.join("climate", points_file))
+        CURRENT_DIRECTORY = os.path.dirname(__file__)
+        wi.transient_assets.add_asset(os.path.join(CURRENT_DIRECTORY, "climate", points_file))
         wi.run(wait_on_done=True)
 
         # Get the work item, related asset collection, and assets
@@ -60,7 +61,8 @@ class ClimateGenerationTest(ITestWithPersistence):
     def test_generate_era5_climate_files_wb_workolder(self):
         wi = SSMTWorkItem(item_name=self.case_name, command="anything")
         # upload site_details.csv to workitem's root dir in COMPS
-        wi.transient_assets.add_asset(os.path.join("climate", "site_details.csv"))
+        CURRENT_DIRECTORY = os.path.dirname(__file__)
+        wi.transient_assets.add_asset(os.path.join(CURRENT_DIRECTORY, "climate", "site_details.csv"))
         # upload WorkOrder.json to workitem's root dir in COMPS
         wi.load_work_order(os.path.join("climate", "WorkOrder.json"))
         wi.run(wait_on_done=True)

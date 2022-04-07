@@ -54,6 +54,9 @@ test-python: ## Run our python tests
 test-smoke: ## Run our smoke tests
 	$(MAKE) -C tests $@
 
+test-ssmt: ## Run our ssmt tests
+	$(MAKE) -C tests $@
+
 test-report: ## Launch test report in browser
 	$(MAKE) -C tests $@
 
