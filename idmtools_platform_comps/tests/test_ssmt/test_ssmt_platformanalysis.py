@@ -309,7 +309,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
                          f'--platform-args platform_args.pkl '
                          f'--block {self.platform._config_block}_SSMT')
 
-        with open(os.path.join(file_path, "stdout.txt"), 'r') as fin:
+        with open(os.path.join(file_path, "stdout.txt"), 'r', encoding='utf-8', errors='ignore') as fin:
             stdout_contents = fin.read()
 
         self.assertIn("!!!!!!!!!!!!!Preload executed!!!!!!!!!!!!!!!!!!", stdout_contents)
