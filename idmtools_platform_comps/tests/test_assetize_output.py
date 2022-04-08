@@ -27,7 +27,7 @@ class TestAssetizeOutput(unittest.TestCase):
     def setUp(self) -> None:
         super().setUp()
         self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
-        self.platform = Platform("COMPS2")
+        self.platform = Platform("Bayesian")
 
     @classmethod
     def setUpClass(cls) -> None:
@@ -178,7 +178,7 @@ class TestAssetizeOutput(unittest.TestCase):
     def test_experiment_cross_environment_fail(self):
         ao = AssetizeOutput(name=self.case_name, related_experiments=['9311af40-1337-ea11-a2be-f0921c167861'], file_patterns=["**/a.csv"], verbose=True)
         with self.assertRaises(CrossEnvironmentFilterNotSupport) as err:
-            ac = ao.run(wait_on_done=True, platform=Platform("SLURM2"))
+            ac = ao.run(wait_on_done=True, platform=Platform("SLURMSTAGE"))
 
         self.assertEqual('You cannot filter files between environment. In this case, the Experiment 9311af40-1337-ea11-a2be-f0921c167861 is in Bayesian but you are running your workitem in SlurmStage', err.exception.args[0])
 

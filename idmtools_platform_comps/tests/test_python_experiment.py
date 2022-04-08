@@ -56,7 +56,7 @@ class TestPythonExperiment(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
         print(self.case_name)
-        self.platform = Platform('COMPS2')
+        self.platform = Platform('Bayesian')  # do not change platform to slurmstage
 
     # Test 2 ways to sweep parameters
     # First way: use partial function

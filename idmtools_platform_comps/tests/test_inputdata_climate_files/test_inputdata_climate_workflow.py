@@ -26,7 +26,7 @@ class InputDataWorkItemTests(ITestWithPersistence):
     def setUp(self):
         self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
         self.tags = {'idmtools': self._testMethodName, 'WorkItem type': 'InputData'}
-        self.p = Platform('COMPS2')
+        self.p = Platform('Bayesian')
 
     # ------------------------------------------
     # test generate inputdata climate files with comps work item

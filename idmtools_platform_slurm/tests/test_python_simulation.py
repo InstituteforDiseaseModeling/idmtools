@@ -16,7 +16,7 @@ class TestPythonSimulation(ITestWithPersistence):
 
     def test_direct_sweep_one_parameter_local(self):
 
-        platform = Platform('Slurm')
+        platform = Platform('SlurmStage')
 
         # CreateSimulationTask.broker =
 

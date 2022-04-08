@@ -12,6 +12,7 @@ from idmtools_test.utils.decorators import warn_amount_ssmt_image_decorator
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools.analysis.analyze_manager import AnalyzeManager
 from idmtools_test.utils.utils import get_case_name
+from tests.test_ssmt.get_latest_ssmt_image import get_latest_image_stage
 
 
 @pytest.mark.comps
@@ -24,7 +25,9 @@ class TestSSMTWorkItem(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
         print(self.case_name)
-        self.platform = Platform('BAYESIAN')
+        self.platform = Platform('BAYESIAN',
+                                 docker_image="idm-docker-staging.packages.idmod.org/idmtools/comps_ssmt_worker:" +
+                                              get_latest_image_stage())
         self.tags = {'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}
         self.input_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "inputs")
 
@@ -119,7 +122,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
         self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
 
         file_path = os.path.join(local_output_path, wi.id)
-        self.assertTrue(os.path.exists(os.path.join(file_path, "output", experiment_id,  "population.png")))
+        self.assertTrue(os.path.exists(os.path.join(file_path, "output", experiment_id, "population.png")))
         self.assertTrue(os.path.exists(os.path.join(file_path, "output", experiment_id, "population.json")))
         self.assertTrue(os.path.exists(os.path.join(file_path, "output", experiment_id, "adult_vectors.png")))
         self.assertTrue(os.path.exists(os.path.join(file_path, "output", experiment_id, "adult_vectors.json")))
@@ -199,7 +202,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
             print(worker_order)
             self.assertEqual(worker_order['WorkItem_Type'], "DockerWorker")
             execution = worker_order['Execution']
-            self.assertEqual(execution['Command'], "python3 run_multiple_analyzers_single_script.py "+ exp_id)
+            self.assertEqual(execution['Command'], "python3 run_multiple_analyzers_single_script.py " + exp_id)
 
     def test_get_files(self):
         wi_id = '5e2fc03d-2162-ea11-a2bf-f0921c167862'  # comps2 wi_id
@@ -305,7 +308,8 @@ class TestSSMTWorkItem(ITestWithPersistence):
     @warn_amount_ssmt_image_decorator
     def test_workitem_task(self):
         command = "python3 hello.py"
-        task = CommandTask(command=command, transient_assets=AssetCollection([os.path.join(self.input_file_path, "hello.py")]))
+        task = CommandTask(command=command,
+                           transient_assets=AssetCollection([os.path.join(self.input_file_path, "hello.py")]))
         wi = SSMTWorkItem(task=task, name=self.case_name, tags=self.tags)
         wi.run(wait_on_done=True)
         self.assertTrue(wi.succeeded)

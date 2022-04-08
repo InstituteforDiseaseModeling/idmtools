@@ -8,7 +8,7 @@ from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
-from idmtools_platform_comps.utils.package_version import get_latest_pypi_package_version_from_artifactory, get_versions_from_site, get_pypi_package_versions_from_artifactory
+from idmtools_platform_comps.utils.package_version import get_latest_pypi_package_version_from_artifactory, get_pypi_package_versions_from_artifactory
 from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection import RequirementsToAssetCollection
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.utils import del_folder, get_case_name
@@ -28,7 +28,7 @@ class TestLoadLibWheel(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
         print(self.case_name)
-        self.platform = Platform('COMPS2')
+        self.platform = Platform('SlurmStage')
 
     @pytest.mark.smoke
     def test_get_latest_package_and_get_packages(self):
@@ -98,8 +98,8 @@ class TestLoadLibWheel(ITestWithPersistence):
         # First load 'zipp' package (note: comps does not have 'zipp' package)
         # ------------------------------------------------------
         requirements_path = os.path.join(model_path, 'requirements.txt')
-        pL = Platform('SLURM', num_cores=2)
-        rta = RequirementsToAssetCollection(name=self.case_name, platform=pL, requirements_path=requirements_path)
+        # platform = Platform('SLURMSTAGE', num_cores=2)
+        rta = RequirementsToAssetCollection(name=self.case_name, platform=self.platform, requirements_path=requirements_path)
         ac_id = rta.run(rerun=True)
 
         self.assertIsNotNone(ac_id)
@@ -146,9 +146,10 @@ class TestLoadLibWheel(ITestWithPersistence):
         # First NOT load 'zipp' package to test negative case, (to see if zipp_file.py script will fail in comps)
         # xmlrunner==1.7.7 here is loading a unrelated package to avoid empty packages for RequirementsToAssetCollection
         # ------------------------------------------------------
-        pl = RequirementsToAssetCollection(name=self.case_name, platform=self.platform, requirements_path="", pkg_list=["xmlrunner==1.7.7"])
+        platform = Platform("Bayesian")
+        pl = RequirementsToAssetCollection(name=self.case_name, platform=platform, requirements_path="", pkg_list=["xmlrunner==1.7.7"])
         ac_id = pl.run()
-        common_assets = AssetCollection.from_id(ac_id, platform=self.platform, as_copy=True)
+        common_assets = AssetCollection.from_id(ac_id, platform=platform, as_copy=True)
 
         # create python task with script 'model_file.py', task is doing this in comps: "python ./Assets/model_file.py"
         script_path = os.path.join(model_path, 'zipp_file.py')
@@ -163,11 +164,11 @@ class TestLoadLibWheel(ITestWithPersistence):
         self.assertFalse(experiment.succeeded)
 
         # verify result
-        sims = self.platform.get_children_by_object(experiment)
+        sims = platform.get_children_by_object(experiment)
         local_output_path = "output"
         del_folder(local_output_path)
         out_filenames = ["StdErr.txt"]
-        self.platform.get_files_by_id(sims[0].id, ItemType.SIMULATION, out_filenames, local_output_path)
+        platform.get_files_by_id(sims[0].id, ItemType.SIMULATION, out_filenames, local_output_path)
         self.assertTrue(os.path.exists(os.path.join(local_output_path, sims[0].id, "StdErr.txt")))
         contents = Path(os.path.join(local_output_path, sims[0].id, "StdErr.txt")).read_text()
         self.assertIn("ModuleNotFoundError: No module named 'zipp'", contents)
@@ -178,11 +179,12 @@ class TestLoadLibWheel(ITestWithPersistence):
         # ------------------------------------------------------
         # First load custom wheel with RequirementsToAssetCollection
         # ------------------------------------------------------
+        platform = Platform("Bayesian")
         requirements_path = os.path.join(model_path, 'requirements1.txt')
         local_wheels_path = [os.path.join(model_path, 'seaborn-0.7.1-py2.py3-none-any.whl')]
-        pl = RequirementsToAssetCollection(name=self.case_name, platform=self.platform, requirements_path=requirements_path, local_wheels=local_wheels_path)
+        pl = RequirementsToAssetCollection(name=self.case_name, platform=platform, requirements_path=requirements_path, local_wheels=local_wheels_path)
         ac_id = pl.run()
-        common_assets = AssetCollection.from_id(ac_id, platform=self.platform, as_copy=True)
+        common_assets = AssetCollection.from_id(ac_id, platform=platform, as_copy=True)
 
         # create python task with script 'seaborn_file.py', task is doing this in comps: "python ./Assets/seaborn_file.py"
         script_path = os.path.join(model_path, 'seaborn_file.py')
@@ -200,11 +202,11 @@ class TestLoadLibWheel(ITestWithPersistence):
         self.assertTrue(experiment.succeeded)
 
         # verify result
-        sims = self.platform.get_children_by_object(experiment)
+        sims = platform.get_children_by_object(experiment)
         local_output_path = "output"
         del_folder(local_output_path)
         out_filenames = ["tips.png"]
-        self.platform.get_files_by_id(sims[0].id, ItemType.SIMULATION, out_filenames, local_output_path)
+        platform.get_files_by_id(sims[0].id, ItemType.SIMULATION, out_filenames, local_output_path)
         self.assertTrue(os.path.exists(os.path.join(local_output_path, sims[0].id, "tips.png")))
 
     @pytest.mark.long
@@ -213,11 +215,10 @@ class TestLoadLibWheel(ITestWithPersistence):
         # ------------------------------------------------------
         # First load 'pytest' package (note: comps does not have 'pytest' package)
         # ------------------------------------------------------
-        platform = Platform('SLURM')
         requirements_path = os.path.join(model_path, 'requirements1.txt')
-        pl = RequirementsToAssetCollection(name=self.case_name, platform=platform, requirements_path=requirements_path)
+        pl = RequirementsToAssetCollection(name=self.case_name, platform=self.platform, requirements_path=requirements_path)
         ac_id = pl.run()
-        common_assets = AssetCollection.from_id(ac_id, platform=platform, as_copy=True)
+        common_assets = AssetCollection.from_id(ac_id, platform=self.platform, as_copy=True)
 
         # create python task with script 'zipp_file_slurm.py', task is doing this in comps: "python ./Assets/zipp_file_slurm.py"
         script_path = os.path.join(model_path, 'model_file.py')
@@ -239,11 +240,10 @@ class TestLoadLibWheel(ITestWithPersistence):
         # ------------------------------------------------------
         # First load 'zipp' package (note: comps does not have 'zipp' package)
         # ------------------------------------------------------
-        platform = Platform('SLURM')
         requirements_path = os.path.join(model_path, 'requirements.txt')
-        pl = RequirementsToAssetCollection(name=self.case_name, platform=platform, requirements_path=requirements_path)
+        pl = RequirementsToAssetCollection(name=self.case_name, platform=self.platform, requirements_path=requirements_path)
         ac_id = pl.run(rerun=True)
-        common_assets = AssetCollection.from_id(ac_id, platform=platform, as_copy=True)
+        common_assets = AssetCollection.from_id(ac_id, platform=self.platform, as_copy=True)
 
         # create python task with script 'zipp_file_slurm.py', task is doing this in comps: "python ./Assets/zipp_file_slurm.py"
         script_path = os.path.join(model_path, 'zipp_file_slurm.py')
@@ -272,10 +272,11 @@ class TestLoadLibWheel(ITestWithPersistence):
         # ------------------------------------------------------
         # First load custom wheel with RequirementsToAssetCollection
         # ------------------------------------------------------
+        platform = Platform('Bayesian')
         requirements_path = os.path.join(model_path, 'requirements3.txt')
-        pl = RequirementsToAssetCollection(name=self.case_name, platform=self.platform, requirements_path=requirements_path)
+        pl = RequirementsToAssetCollection(name=self.case_name, platform=platform, requirements_path=requirements_path)
         ac_id = pl.run()
-        common_assets = AssetCollection.from_id(ac_id, platform=self.platform, as_copy=True)
+        common_assets = AssetCollection.from_id(ac_id, platform=platform, as_copy=True)
 
         # create python task with script 'seaborn_file.py', task is doing this in comps: "python ./Assets/seaborn_file.py"
         script_path = os.path.join(model_path, 'seaborn_file.py')
@@ -298,11 +299,12 @@ class TestLoadLibWheel(ITestWithPersistence):
         # ------------------------------------------------------
         # First load custom wheel with RequirementsToAssetCollection
         # ------------------------------------------------------
+        platform = Platform("Bayesian")
         requirements_path = os.path.join(model_path, 'requirements3.txt')
-        pl = RequirementsToAssetCollection(name=self.case_name, platform=self.platform, requirements_path=requirements_path)
+        pl = RequirementsToAssetCollection(name=self.case_name, platform=platform, requirements_path=requirements_path)
         ac_id = pl.run(rerun=False)
         self.assertIsNotNone(ac_id)
-        common_assets = AssetCollection.from_id(ac_id, platform=self.platform, as_copy=True)
+        common_assets = AssetCollection.from_id(ac_id, platform=platform, as_copy=True)
 
         # create python task with script 'seaborn_file.py', task is doing this in comps: "python ./Assets/seaborn_file.py"
         script_path = os.path.join(model_path, 'seaborn_file.py')

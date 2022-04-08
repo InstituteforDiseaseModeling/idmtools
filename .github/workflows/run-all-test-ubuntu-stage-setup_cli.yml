@@ -1,7 +1,7 @@
 # install staging packages and run all test
 # trigger by push or pull_request with commit message: "Run tests!".
 
-name: "run-setup-dev-all-tests_cli"
+name: "run-setup-dev-all-tests_except_local"
 on: [ push, pull_request ]
 
 jobs:
@@ -52,3 +52,33 @@ jobs:
         with:
           name: idmtools_cli_test_results
           path: idmtools_cli/tests/reports/
+      - name: run idmtools_core tests
+        run: |
+          cd idmtools_core
+          PARALLEL_TEST_COUNT=2 make test-all
+      - name: Upload idmtools_core all test results
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: idmtools_core_test_results
+          path: idmtools_core/tests/reports/
+      - name: run idmtools_models tests
+        run: |
+          cd idmtools_models
+          PARALLEL_TEST_COUNT=2 make test-all
+      - name: Upload idmtools_models all test results
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: idmtools_models_test_results
+          path: idmtools_models/tests/reports/
+      - name: run idmtools_platform_comps tests
+        run: |
+          cd idmtools_platform_comps
+          PARALLEL_TEST_COUNT=2 make test-all
+      - name: Upload idmtools_platform_comps test results
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: idmtools_platform_comps_test_results
+          path: idmtools_platform_comps/tests/reports/

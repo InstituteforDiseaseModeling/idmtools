@@ -34,7 +34,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
         print(self.case_name)
-        self.p = Platform('COMPS2')
+        self.p = Platform('SlurmStage')
 
     def create_experiment(self):
         pe = get_model1_templated_experiment(self.case_name)

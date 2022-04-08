@@ -21,7 +21,7 @@ class TestAddSimulationsToExperiment(ITestWithPersistence):
 
     def setUp(self) -> None:
         self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
-        self.platform = Platform('COMPS2')
+        self.platform = Platform('Bayesian')
 
     # test add TemlatedSimulations to existing experiment with extend
     @pytest.mark.smoke

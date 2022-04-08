@@ -169,7 +169,7 @@ class TestWorkOrder(ITestWithPersistence):
         experiment = Experiment.from_task(task, name=self.case_name)
         add_work_order(experiment, file_path=os.path.join(COMMON_INPUT_PATH, "scheduling", "hpc", "WorkOrder.json"))
 
-        with Platform('COMPS2') as platform:
+        with Platform('Bayesian') as platform:
             experiment.run(wait_on_done=True, scheduling=True)
             self.assertTrue(experiment.succeeded)
 
@@ -356,7 +356,7 @@ class TestWorkOrder(ITestWithPersistence):
         add_schedule_config(experiment, command="python -c \"print('hello test')\"", node_group_name='emod_abcd',
                             num_cores=1, SingleNode=False, Exclusive=False)
 
-        with Platform('COMPS2') as platform:
+        with Platform('Bayesian') as platform:
             experiment.run(wait_on_done=True, scheduling=True)
             self.assertTrue(experiment.succeeded)
 
