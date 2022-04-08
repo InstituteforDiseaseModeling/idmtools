@@ -1,31 +1,18 @@
-# This workflows will install idmtools from setup-dev then run tests with curl command
-#
-#curl command from your cmd:
-# curl -XPOST -u "username:githubPAT" -H "Accept: application/vnd.github.everest-preview+json" \
-# -H "Content-Type: application/json" \
-# --data "{\"event_type\": \"run_setup_dev_test\"}" \
-#  https://api.github.com/repos/InstituteforDiseaseModeling/idmtools/dispatches
-#
-# Note, this test will checkout 'dev' branch
-
-name: "run-all-test-ubuntu-setup-curl"
-
-on:
-  repository_dispatch:
-    types: [run_setup_dev_test]
+# This GA can be triggered with commit message "Run prod ubuntu all test!". it install prod packages with any branch code
+name: "run-pip-prod"
+on: [ push, pull_request ]
 
 jobs:
-  run-all-test-ubuntu-setup-curl:
+  run-pip-prod:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]
-        python-version: [3.8]
+        os: [ ubuntu-latest ]
+        python-version: [ 3.7, 3.8, 3.9 ]
+    if: "contains(github.event.head_commit.message, 'run-pip-prod!')"
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
-        with:
-          ref: dev
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
@@ -33,18 +20,17 @@ jobs:
           architecture: x64
       - name: Install Python dependencies
         run: |
-          pip install idm-buildtools flake8 black --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
-      - name: Run setup-dev
-        env:
-          PYPI_STAGING_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
-          PYPI_STAGING_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
+          pip install idm-buildtools flake8 wheel matplotlib --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+      - name: download idmtools packages from production jfrog
         run: |
-          make setup-dev
+          pip install idmtools[full] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+          pip install idmtools-test --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+          pip install idmtools[test] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
       - name: login to comps2
         run: |
           python dev_scripts/create_auth_token_args.py --username "${{ secrets.COMPS_USER }}"
         env:
-          COMPS_PASSWORD: ${{ secrets.COMPS_PASSWORD }}
+          COMPS_PASS: ${{ secrets.COMPS_PASSWORD }}
       - name: run idmtools_cli tests
         run: |
           cd idmtools_cli
@@ -74,7 +60,7 @@ jobs:
         if: failure()
         with:
           name: idmtools_models_test_results
-          path: idmtools_models/tests/results/
+          path: idmtools_models/tests/reports/
       - name: run idmtools_platform_comps tests
         run: |
           cd idmtools_platform_comps
@@ -84,7 +70,7 @@ jobs:
         if: failure()
         with:
           name: idmtools_platform_comps_test_results
-          path: idmtools_platform_comps/tests/results/
+          path: idmtools_platform_comps/tests/reports/
       - name: run idmtools_platform_local tests
         run: |
           cd idmtools_platform_local
@@ -94,4 +80,4 @@ jobs:
         if: failure()
         with:
           name: idmtools_platform_local_test_results
-          path: idmtools_platform_local/tests/results/
+          path: idmtools_platform_local/tests/reports/
