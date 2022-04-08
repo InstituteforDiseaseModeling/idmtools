@@ -63,7 +63,7 @@ jobs:
         if: steps.filter.outputs.core == 'true'
         run: |
           cd idmtools_core
-          make test-all
+          PARALLEL_TEST_COUNT=2 make test-all
       - name: Upload idmtools_core all test results
         uses: actions/upload-artifact@v2
         if: failure() && steps.filter.outputs.core == 'true'
@@ -189,7 +189,7 @@ jobs:
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.models == 'true'
         run: |
           cd idmtools_models
-          make test-all
+          PARALLEL_TEST_COUNT=2 make test-all
       - name: Upload idmtools_models all test results
         uses: actions/upload-artifact@v2
         if: failure() && (steps.filter.outputs.core == 'true' || steps.filter.outputs.models == 'true')
@@ -256,7 +256,7 @@ jobs:
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.comps == 'true' || steps.filter.outputs.models == 'true'
         run: |
           cd idmtools_platform_comps
-          make test-all
+          PARALLEL_TEST_COUNT=2 make test-all
       - name: Upload idmtools_platform_comps test results
         uses: actions/upload-artifact@v2
         if: failure() && (steps.filter.outputs.core == 'true' || steps.filter.outputs.comps == 'true' || steps.filter.outputs.models == 'true')
