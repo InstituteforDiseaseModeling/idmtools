@@ -11,9 +11,6 @@ jobs:
       matrix:
         os: [self-linux]
         python-version: [ '3.7.x', '3.8.x', '3.9.x' ]
-    env:
-      PYPI_STAGING_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
-      PYPI_STAGING_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
@@ -207,6 +204,8 @@ jobs:
         python-version: [ '3.7.x', '3.8.x', '3.9.x' ]
     env:
       IDMTOOLS_TEST_PREFIX: ${{ matrix.python-version }}
+      PYPI_STAGING_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
+      PYPI_STAGING_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2

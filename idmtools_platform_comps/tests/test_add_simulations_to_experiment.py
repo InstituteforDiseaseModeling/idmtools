@@ -201,3 +201,4 @@ class TestAddSimulationsToExperiment(ITestWithPersistence):
         files_retrieved = self.platform.get_files(item=experiment.simulations[0], files=files_needed)
         # We have the correct files?
         self.assertEqual(len(files_needed), len(files_retrieved))
+
