@@ -63,7 +63,6 @@ class TestSystemInfoBasics(unittest.TestCase):
                 # Check for our help string
                 self.assertIn(help_str, result.output)
 
-    @pytest.mark.skip("failed in github")
     def test_plugins_cli(self):
         """
         This test is to ensure:
@@ -77,7 +76,6 @@ class TestSystemInfoBasics(unittest.TestCase):
         self.assertIn('CLI Plugins', result.output)
         # TODO: Improve test by adding a mock CLI plugin and testing for its presence here
 
-    @pytest.mark.skip("failed in github")
     def test_plugins_platform(self):
         """
         This test is to ensure:
@@ -96,7 +94,6 @@ class TestSystemInfoBasics(unittest.TestCase):
         if any(['idmtools-platform-local' in p for p in packages]):
             self.assertIn('Local', result.output)
 
-    @pytest.mark.skip("failed in github")
     def test_tasks_plugin(self):
         """
         This test is to ensure:
@@ -126,7 +123,6 @@ class TestSystemInfoBasics(unittest.TestCase):
         # Check for our help string
         self.assertIn('Provide an output with details about your current execution platform', result.output)
 
-    @pytest.mark.skip("failed in github")
     def test_system_cli(self):
         """
         This test is to ensure:

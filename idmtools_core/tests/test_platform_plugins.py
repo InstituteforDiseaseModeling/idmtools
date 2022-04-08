@@ -8,7 +8,6 @@ from idmtools.utils.info import get_packages_from_pip
 @pytest.mark.smoke
 @allure.story("Plugins")
 @allure.suite("idmtools_core")
-@pytest.mark.skip("failed in github")
 class TestPlatformPlugins(TestCase):
     def test_get_plugins(self):
         """

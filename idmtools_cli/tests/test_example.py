@@ -59,7 +59,6 @@ class TestExample(unittest.TestCase):
         # Check that there is a --output option
         self.assertIn('--output', result.output)
 
-    @pytest.mark.skip("failed in github")
     def test_get_plugins_example_urls(self):
         examples = get_plugins_examples()
         self.assertTrue(isinstance(examples, dict))
