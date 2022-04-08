@@ -12,7 +12,7 @@ from idmtools_test.utils.decorators import warn_amount_ssmt_image_decorator
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools.analysis.analyze_manager import AnalyzeManager
 from idmtools_test.utils.utils import get_case_name
-from tests.test_ssmt.get_latest_ssmt_image import get_latest_image_stage
+from .get_latest_ssmt_image import get_latest_image_stage
 
 
 @pytest.mark.comps
