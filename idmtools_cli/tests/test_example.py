@@ -41,7 +41,7 @@ class TestExample(unittest.TestCase):
         commands = get_subcommands_from_help_result(result)
         self.assertIn('download', commands)
 
-    @pytest.mark.skip("failed in github")
+    #@pytest.mark.skip("failed in github")
     def test_example_help(self):
         result = run_command('gitrepo', '--help')
         # Check for our help string
