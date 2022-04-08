@@ -65,7 +65,7 @@ class TestExample(unittest.TestCase):
 
     def test_public_repos(self):
         # because of weirdness in testing, the log output even when set to stdout appears as stderr. We workaround by capturing both independently
-        result = run_command('gitrepo', 'repos', **self.default_opts)
+        result = run_command('gitrepo', 'repos', 'https://github.com/InstituteforDiseaseModeling/EMOD')
         # Check for special public repo
         self.assertIn('https://github.com/InstituteforDiseaseModeling/EMOD', result.stdout)
 

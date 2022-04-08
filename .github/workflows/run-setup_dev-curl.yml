@@ -1,36 +1,29 @@
-# This workflows will download idmtools nightly packages from staging artifactory then run tests with curl command
+# This workflows will install idmtools from setup-dev then run tests with curl command
 #
-# curl command from your cmd:
+#curl command from your cmd:
 # curl -XPOST -u "username:githubPAT" -H "Accept: application/vnd.github.everest-preview+json" \
 # -H "Content-Type: application/json" \
-# --data "{\"event_type\": \"test_nightly_build\"}" \
+# --data "{\"event_type\": \"run_setup_dev_test\"}" \
 #  https://api.github.com/repos/InstituteforDiseaseModeling/idmtools/dispatches
 #
 # Note, this test will checkout 'dev' branch
 
-name: "run-all-test-ubuntu-stage-dev-curl"
+name: "run-setup_dev-curl"
 
 on:
   repository_dispatch:
-    # Manually trigger with curl or Postman POST
-    types: [test_nightly_build]
+    types: [run_setup_dev_test]
 
 jobs:
-  run-all-test-ubuntu-stage-curl:
-    if: github.repository == 'InstituteforDiseaseModeling/idmtools'
+  run-setup_dev-curl:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python-version: [3.6, 3.7, 3.8]
-    env:
-      PYPI_STAGING_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
-      PYPI_STAGING_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
+        python-version: [ 3.7, 3.8, 3.9 ]
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
-        with:
-          ref: dev
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
@@ -38,25 +31,18 @@ jobs:
           architecture: x64
       - name: Install Python dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install idm-buildtools flake8 wheel --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
-      - name: Install dataclass
-        if: ${{ matrix.python-version }} == 3.6
+          pip install idm-buildtools flake8 black --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+      - name: Run setup-dev
+        env:
+          PYPI_STAGING_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
+          PYPI_STAGING_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
         run: |
-          pip install dataclasses
-      - name: download idmtools packages from staging jfrog
-        run: |
-          pip install idmtools[full] --index-url=https://${{ env.PYPI_STAGING_USERNAME }}:${{ env.PYPI_STAGING_PASSWORD }}@packages.idmod.org/api/pypi/pypi-staging/simple
-          pip install idmtools-test --index-url=https://${{ env.PYPI_STAGING_USERNAME }}:${{ env.PYPI_STAGING_PASSWORD }}@packages.idmod.org/api/pypi/pypi-staging/simple
-          pip install idmtools[test] --index-url=https://${{ env.PYPI_STAGING_USERNAME }}:${{ env.PYPI_STAGING_PASSWORD }}@packages.idmod.org/api/pypi/pypi-staging/simple
+          make setup-dev
       - name: login to comps2
         run: |
           python dev_scripts/create_auth_token_args.py --username "${{ secrets.COMPS_USER }}"
         env:
-          COMPS_PASSWORD: ${{ secrets.COMPS_PASSWORD }}
-      - name: login to docker staging
-        run: |
-          echo '${{ env.PYPI_STAGING_PASSWORD }}' | docker login idm-docker-staging.packages.idmod.org --username ${{ env.PYPI_STAGING_USERNAME }} --password-stdin
+          COMPS_PASS: ${{ secrets.COMPS_PASSWORD }}
       - name: run idmtools_cli tests
         run: |
           cd idmtools_cli
@@ -86,7 +72,7 @@ jobs:
         if: failure()
         with:
           name: idmtools_models_test_results
-          path: idmtools_models/tests/results/
+          path: idmtools_models/tests/reports/
       - name: run idmtools_platform_comps tests
         run: |
           cd idmtools_platform_comps
@@ -96,7 +82,7 @@ jobs:
         if: failure()
         with:
           name: idmtools_platform_comps_test_results
-          path: idmtools_platform_comps/tests/results/
+          path: idmtools_platform_comps/tests/reports/
       - name: run idmtools_platform_local tests
         run: |
           cd idmtools_platform_local
@@ -106,4 +92,4 @@ jobs:
         if: failure()
         with:
           name: idmtools_platform_local_test_results
-          path: idmtools_platform_local/tests/results/
+          path: idmtools_platform_local/tests/reports/
