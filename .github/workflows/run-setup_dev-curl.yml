@@ -6,7 +6,7 @@
 # --data "{\"event_type\": \"run_setup_dev_test\"}" \
 #  https://api.github.com/repos/InstituteforDiseaseModeling/idmtools/dispatches
 #
-# Note, this test will checkout 'dev' branch
+
 
 name: "run-setup_dev-curl"
 

@@ -18,6 +18,9 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
+      - name: Upgrade pip
+        run: |
+          python -m pip install --upgrade pip
       - name: Install Python dependencies
         run: |
           pip install idm-buildtools flake8 wheel matplotlib --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
