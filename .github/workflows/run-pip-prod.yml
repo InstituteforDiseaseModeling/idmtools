@@ -9,6 +9,9 @@ jobs:
       matrix:
         os: [ ubuntu-latest ]
         python-version: [ 3.7, 3.8, 3.9 ]
+    env:
+      PYPI_STAGING_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
+      PYPI_STAGING_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
     if: "contains(github.event.head_commit.message, 'run-pip-prod!')"
     steps:
       - name: Check out Git repository
