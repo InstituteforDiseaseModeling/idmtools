@@ -8,7 +8,6 @@ from idmtools.utils.info import get_packages_from_pip
 @pytest.mark.smoke
 @allure.story("Plugins")
 @allure.suite("idmtools_core")
-#@pytest.mark.skip("failed in github")
 class TestMasterPluginRegistry(TestCase):
     def test_get_plugins(self):
         """
@@ -17,7 +16,6 @@ class TestMasterPluginRegistry(TestCase):
 
         """
         packages = get_packages_from_pip()
-
         pm = MasterPluginRegistry()
         self.assertGreater(len(pm.get_plugins()), 1)
         if any(['idmtools-platform-comps' in p for p in packages]):

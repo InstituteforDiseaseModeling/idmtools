@@ -119,12 +119,11 @@ class TestPlatformAnalysis(ITestWithPersistence):
     @run_in_temp_dir
     @pytest.mark.serial
     @warn_amount_ssmt_image_decorator
-    @pytest.mark.skip("failed in github")
     def test_ssmt_using_aliases(self):
         # check if comps has a docker image to use new images for this run. This does not effect remote system, just
         # what image we run on. We have to do this because config is coming from alias
-        if IdmConfigParser().get_option("COMPS2", "docker_image", None):
-            self.platform.docker_image = IdmConfigParser().get_option("COMPS2", "docker_image")
+        if IdmConfigParser().get_option("Bayesian", "docker_image", None):
+            self.platform.docker_image = IdmConfigParser().get_option("Bayesian", "docker_image")
             print(f"Setting docker image to {self.platform.docker_image}")
         self.do_simple_python_analysis(self.platform)
 
