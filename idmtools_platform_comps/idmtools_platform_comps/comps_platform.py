@@ -5,8 +5,13 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 # flake8: noqa E402
 import copy
 import logging
+from uuid import UUID
 
 # fix for comps weird import
+from idmtools.entities import Suite
+from idmtools.entities.experiment import Experiment
+from idmtools.entities.simulation import Simulation
+
 HANDLERS = copy.copy(logging.getLogger().handlers)
 LEVEL = logging.getLogger().level
 from COMPS import Client
@@ -16,16 +21,23 @@ logging.root.handlers = HANDLERS
 logging.getLogger().setLevel(LEVEL)
 comps_logger.propagate = False
 comps_logger.handlers = [h for h in comps_logger.handlers if isinstance(h, logging.FileHandler)]
-
+from COMPS.Data import Simulation as COMPSSimulation, QueryCriteria
+from COMPS.Data import WorkItem as COMPSWorkItem
+from COMPS.Data import AssetCollection as COMPSAssetCollection
+from COMPS.Data import Experiment as COMPSExperiment
+from COMPS.Data import Suite as COMPSSuite
+from COMPS.Data.Simulation import SimulationState
+from COMPS.Data.WorkItem import WorkItemState
 from idmtools.assets.asset_collection import AssetCollection
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities.iplatform_default import AnalyzerManagerPlatformDefault, IPlatformDefault
 from idmtools.entities.iworkflow_item import IWorkflowItem
 from dataclasses import dataclass, field
+from typing import Union, Dict, Set
 from functools import partial
 from typing import List
 from enum import Enum
-from idmtools.core import CacheEnabled, ItemType
+from idmtools.core import CacheEnabled, ItemType, EntityStatus
 from idmtools.entities.iplatform import IPlatform
 from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools_platform_comps.comps_operations.asset_collection_operations import CompsPlatformAssetCollectionOperations
@@ -137,3 +149,130 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         if isinstance(item, IWorkflowItem):
             return False
         return super().is_windows_platform(item)
+
+    def validate_item_for_analysis(self, item: object, analyze_failed_items=False):
+        """
+        Check if item is valid for analysis
+
+        Args:
+            item: which item to flatten
+            analyze_failed_items: bool
+
+        Returns: bool
+        """
+        result = False
+        if isinstance(item, COMPSSimulation):
+            if item.state == SimulationState.Succeeded:
+                result = True
+            else:
+                if self.analyze_failed_items and item.state == SimulationState.Failed:
+                    result = True
+        elif isinstance(item, COMPSWorkItem):
+            if item.state == WorkItemState.Succeeded:
+                result = True
+            else:
+                if self.analyze_failed_items and item.state == WorkItemState.Failed:
+                    result = True
+        elif isinstance(item, (Simulation, IWorkflowItem)):
+            if item.succeeded:
+                result = True
+            else:
+                if self.analyze_failed_items and item.status == EntityStatus.FAILED:
+                    result = True
+
+        return result
+
+    def get_files(self, item: Union[COMPSSimulation, COMPSWorkItem, COMPSAssetCollection], files: Union[Set[str], List[str]], output: str = None, **kwargs) -> \
+            Union[Dict[str, Dict[str, bytearray]], Dict[str, bytearray]]:
+        """
+        Get files for a platform entity.
+
+        Args:
+            item: Item to fetch files for
+            files: List of file names to get
+            output: save files to
+            kwargs: Platform arguments
+
+        Returns:
+            For simulations, this returns a dictionary with filename as key and values being binary data from file or a
+            dict.
+
+            For experiments, this returns a dictionary with key as sim id and then the values as a dict of the
+            simulations described above
+        """
+        if isinstance(item, COMPSSimulation):
+            item = self._simulations.to_entity(item, parent=item.experiment)
+        elif isinstance(item, COMPSWorkItem):
+            item = self._workflow_items.to_entity(item)
+        elif isinstance(item, COMPSAssetCollection):
+            item = self._assets.to_entity(item)
+        elif isinstance(item, (Simulation, IWorkflowItem, AssetCollection)):
+            item = item
+        else:
+            raise Exception(f'Item Type: {type(item)} is not supported!')
+
+        file_data = super().get_files(item, files)
+        return file_data
+
+    def flatten_item(self, item: object, raw=False, **kwargs) -> List[object]:
+        """
+        Flatten an item: resolve the children until getting to the leaves.
+
+        For example, for an experiment, will return all the simulations.
+        For a suite, will return all the simulations contained in the suites experiments.
+
+        Args:
+            item: Which item to flatten
+            raw: bool
+            kwargs: extra parameters
+
+        Returns:
+            List of leaves
+        """
+        if not raw:
+            return super().flatten_item(item)
+
+        if isinstance(item, COMPSSuite):
+            experiments = item.get_experiments()
+            children = list()
+            for child in experiments:
+                children += self.flatten_item(item=child)
+        elif isinstance(item, COMPSExperiment):
+            columns = ["id", "name", "state"]
+            comps_children = ["tags", "configuration", "hpc_jobs"]
+            query_criteria = QueryCriteria().select(columns).select_children(comps_children)
+            children = item.get_simulations(query_criteria=query_criteria)
+            item.uid = item.id
+
+            exp = Experiment()
+            exp.uid = item.id
+            exp.platform = self
+            exp._platform_object = item
+            exp.tags = item.tags
+
+            for comps_item in children:
+                comps_item.uid = comps_item.id if isinstance(comps_item.id, UUID) else UUID(comps_item.id)
+                comps_item.experiment = exp
+                comps_item.platform = self
+        elif isinstance(item, (COMPSSimulation, COMPSWorkItem, COMPSAssetCollection)):
+            children = [item]
+
+            if isinstance(item, COMPSSimulation):
+                exp = Experiment()
+                exp.uid = item.experiment_id
+                exp.platform = self
+                item.experiment = exp
+        elif isinstance(item, Suite):
+            comps_item = item.get_platform_object()
+            comps_item.platform = self
+            children = self.flatten_item(item=comps_item)
+        elif isinstance(item, Experiment):
+            children = item.simulations.items
+        elif isinstance(item, (Simulation, IWorkflowItem, AssetCollection)):
+            children = [item]
+        else:
+            raise Exception(f'Item Type: {type(item)} is not supported!')
+
+        return children
+
+

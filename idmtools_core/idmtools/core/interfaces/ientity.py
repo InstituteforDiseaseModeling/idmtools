@@ -28,7 +28,7 @@ class IEntity(IItem, metaclass=ABCMeta):
     _platform: 'IPlatform' = field(default=None, compare=False, metadata={"pickle_ignore": False})  # noqa E821
     #: Parent id
     parent_id: UUID = field(default=None, metadata={"md": True})
-    #: Parent object: maintain in new process
+    #: Parent object
     _parent: 'IEntity' = field(default=None, compare=False, metadata={"pickle_ignore": False})
     #: Status of item
     status: EntityStatus = field(default=None, compare=False, metadata={"pickle_ignore": True})

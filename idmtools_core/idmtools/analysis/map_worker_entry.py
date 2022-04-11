@@ -13,12 +13,6 @@ from idmtools.utils.file_parser import FileParser
 from typing import TYPE_CHECKING, Union, Dict
 from idmtools.core.interfaces.iitem import IItem
 from idmtools.entities.ianalyzer import TAnalyzerList
-from idmtools.entities.simulation import Simulation
-from idmtools.entities.iworkflow_item import IWorkflowItem
-from idmtools.assets import AssetCollection
-from COMPS.Data import Simulation as COMPSSimulation
-from COMPS.Data import WorkItem as COMPSWorkItem
-from COMPS.Data import AssetCollection as COMPSAssetCollection
 
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
@@ -79,19 +73,7 @@ def _get_mapped_data_for_item(item: IEntity, analyzers: TAnalyzerList, platform:
 
         # The byte_arrays will associate filename with content
         if len(filenames) > 0:
-            if isinstance(item, COMPSSimulation):
-                sim = platform._simulations.to_entity(item, parent=item.experiment)
-                file_data = platform.get_files(sim, filenames, include_experiment_assets=False)
-            elif isinstance(item, COMPSWorkItem):
-                wi = platform._workflow_items.to_entity(item)
-                file_data = platform.get_files(wi, filenames)
-            elif isinstance(item, COMPSAssetCollection):
-                ac = platform._assets.to_entity(item)
-                file_data = platform.get_files(ac, filenames)
-            elif isinstance(item, (Simulation, IWorkflowItem, AssetCollection)):
-                file_data = platform.get_files(item, filenames)
-            else:
-                raise Exception(f'Item Type: {type(item)} is not supported!')
+            file_data = platform.get_files(item, filenames)
         else:
             file_data = dict()
 

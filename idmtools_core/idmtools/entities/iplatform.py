@@ -41,8 +41,8 @@ from idmtools.assets.asset_collection import AssetCollection
 from idmtools.services.platforms import PlatformPersistService
 from idmtools.utils.caller import get_caller
 from idmtools.utils.entities import validate_user_inputs_against_dataclass
-from COMPS.Data import Experiment as COMPSExperiment, Suite as COMPSSuite, Simulation as COMPSSimulation, \
-    WorkItem as COMPSWorkItem, AssetCollection as COMPSAssetCollection, QueryCriteria
+# from COMPS.Data import Experiment as COMPSExperiment, Suite as COMPSSuite, Simulation as COMPSSimulation, \
+#     WorkItem as COMPSWorkItem, AssetCollection as COMPSAssetCollection, QueryCriteria
 
 logger = getLogger(__name__)
 user_logger = getLogger('user')
@@ -529,7 +529,27 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
                 return getattr(self, interface).to_entity(platform_item, **kwargs)
         return platform_item
 
-    def flatten_item(self, item: object, raw=False, ssmt=False) -> List[object]:  # TODO: List of sim and wi, maybe ac
+    def validate_item_for_analysis(self, item: object, analyze_failed_items=False):
+        """
+        Check if item is valid for analysis
+
+        Args:
+            item: Which item to flatten
+            analyze_failed_items: bool
+
+        Returns: bool
+
+        """
+        result = False
+        if item.succeeded:
+            result = True
+        else:
+            if analyze_failed_items and item.status == EntityStatus.FAILED:
+                result = True
+
+        return result
+
+    def flatten_item(self, item: object, **kwargs) -> List[object]:
         """
         Flatten an item: resolve the children until getting to the leaves.
 
@@ -538,63 +558,20 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         Args:
             item: Which item to flatten
-            raw: bool
-            ssmt: bool to check if to be used in SSMTPlatform
+            kwargs: extra parameters
 
         Returns:
             List of leaves
 
         """
-        if not raw:
-            children = self.get_children(item.uid, item.item_type, force=True)
-            if children is None or (isinstance(children, list) and len(children) == 0):
-                items = [item]
-            else:
-                items = list()
-                for child in children:
-                    items += self.flatten_item(item=child)
-            return items
-
-        if isinstance(item, COMPSSuite):
-            experiments = item.get_experiments()
-
-            children = list()
-            for child in experiments:
-                children += self.flatten_item(item=child)
-        elif isinstance(item, COMPSExperiment):
-            columns = ["id", "name", "state"]
-            if ssmt:
-                comps_children = ["tags", "configuration", "hpc_jobs"]
-            else:
-                comps_children = ["tags", "configuration", "hpc_jobs"]
-            query_criteria = QueryCriteria().select(columns).select_children(comps_children)
-            children = item.get_simulations(query_criteria=query_criteria)
-            item.uid = item.id
-
-            exp = Experiment()
-            exp.uid = item.id
-            exp.platform = self
-            exp._platform_object = item
-            exp.tags = item.tags
-
-            for comps_item in children:
-                comps_item.uid = comps_item.id if isinstance(comps_item.id, UUID) else UUID(comps_item.id)
-                comps_item.experiment = exp
-                comps_item.platform = self
-        elif isinstance(item, (COMPSSimulation, COMPSWorkItem, COMPSAssetCollection)):
-            children = [item]
-        elif isinstance(item, Suite):
-            comps_item = item.get_platform_object()
-            comps_item.platform = self
-            children = self.flatten_item(item=comps_item)
-        elif isinstance(item, Experiment):
-            children = item.simulations.items
-        elif isinstance(item, (Simulation, IWorkflowItem, AssetCollection)):
-            children = [item]
+        children = self.get_children(item.uid, item.item_type, force=True)
+        if children is None or (isinstance(children, list) and len(children) == 0):
+            items = [item]
         else:
-            raise Exception(f'Item Type: {type(item)} is not supported!')
-
-        return children
+            items = list()
+            for child in children:
+                items += self.flatten_item(item=child)
+        return items
 
     def refresh_status(self, item: IEntity) -> NoReturn:
         """
@@ -619,7 +596,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             item: Item to fetch files for
             files: List of file names to get
             output: save files to
-            **kwargs: Platform arguments
+            kwargs: Platform arguments
 
         Returns:
             For simulations, this returns a dictionary with filename as key and values being binary data from file or a

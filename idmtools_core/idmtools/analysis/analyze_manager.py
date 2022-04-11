@@ -15,18 +15,11 @@ from tqdm import tqdm
 from idmtools import IdmConfigParser
 from idmtools.analysis.map_worker_entry import map_item
 from idmtools.core import NoPlatformException
-from idmtools.core.enums import EntityStatus, ItemType
+from idmtools.core.enums import ItemType
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.core.logging import VERBOSE, SUCCESS
 from idmtools.entities.ianalyzer import IAnalyzer
 from idmtools.utils.language import on_off, verbose_timedelta
-from idmtools.entities.simulation import Simulation
-from idmtools.entities.experiment import Experiment
-from idmtools.entities.iworkflow_item import IWorkflowItem
-from idmtools.assets.asset_collection import AssetCollection
-from COMPS.Data.Simulation import SimulationState
-from COMPS.Data.WorkItem import WorkItemState
-from COMPS.Data import Simulation as COMPSSimulation, WorkItem as COMPSWorkItem
 
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
@@ -82,8 +75,7 @@ class AnalyzeManager:
                  partial_analyze_ok: bool = False, max_items: Optional[int] = None, verbose: bool = True,
                  force_manager_working_directory: bool = False,
                  exclude_ids: List[Union[str, UUID]] = None, analyze_failed_items: bool = False,
-                 max_workers: Optional[int] = None, executor_type: str = 'process',
-                 ssmt: bool = False):
+                 max_workers: Optional[int] = None, executor_type: str = 'process'):
         """
         Initialize the AnalyzeManager.
 
@@ -101,7 +93,6 @@ class AnalyzeManager:
             analyze_failed_items (bool, optional): Allows analyzing of failed items. Useful when you are trying to aggregate items that have failed. Defaults to False.
             max_workers (int, optional): Set the max workers. If not provided, falls back to the configuration item *max_threads*. If max_workers is not set in configuration, defaults to CPU count
             executor_type: (str): Whether to use process or thread pooling. Process pooling is more efficient but threading might be required in some environments
-            ssmt: (str): determine if run Analysis on server
         """
         super().__init__()
         if working_dir is None:
@@ -111,7 +102,6 @@ class AnalyzeManager:
         else:
             raise ValueError(f'{executor_type} is not a valid type for executor_type. Choose either "process" or "thread"')
 
-        self.ssmt = ssmt
         self.configuration = configuration or {}
 
         # load platform from context or from passed in value
@@ -155,22 +145,15 @@ class AnalyzeManager:
         items: List[IEntity] = []
         for oid, otype in ids:
             logger.debug(f'Getting metadata for {oid} and {otype}')
-            comps_item = self.platform.get_item(oid, otype, force=True, raw=True)
-            comps_item.uid = comps_item.id if isinstance(comps_item.id, UUID) else UUID(comps_item.id)
-            comps_item.platform = self.platform
-
-            if otype == ItemType.SIMULATION:
-                exp = Experiment()
-                exp.uid = comps_item.experiment_id
-                exp.platform = self.platform
-                comps_item.experiment = exp
-
-            items.append(comps_item)
+            item = self.platform.get_item(oid, otype, force=True, raw=True)
+            item.uid = item.id if isinstance(item.id, UUID) else UUID(item.id)
+            item.platform = self.platform
+            items.append(item)
         self.potential_items: List[IEntity] = []
 
         for i in items:
             logger.debug(f'Flattening items for {i.uid}')
-            self.potential_items.extend(self.platform.flatten_item(item=i, raw=True, ssmt=self.ssmt))
+            self.potential_items.extend(self.platform.flatten_item(item=i, raw=True))
 
         # These are leaf items to be ignored in analysis. Make sure they are UUID and then prune them from analysis.
         self.exclude_ids = exclude_ids or []
@@ -219,7 +202,7 @@ class AnalyzeManager:
         Returns:
             None
         """
-        self.potential_items.extend(self.platform.flatten_item(item=item, raw=True, ssmt=self.ssmt))
+        self.potential_items.extend(self.platform.flatten_item(item=item, raw=True))
 
     def _get_items_to_analyze(self) -> Dict[UUID, IEntity]:
         """
@@ -233,31 +216,11 @@ class AnalyzeManager:
         can_analyze = {}
         cannot_analyze = {}
         for item in self.potential_items:
-
-            if isinstance(item, COMPSSimulation):
-                if item.state == SimulationState.Succeeded:
-                    can_analyze[item.uid] = item
-                else:
-                    if self.analyze_failed_items and item.state == SimulationState.Failed:
-                        can_analyze[item.uid] = item
-                    else:
-                        cannot_analyze[item.uid] = item
-            elif isinstance(item, COMPSWorkItem):
-                if item.state == WorkItemState.Succeeded:
-                    can_analyze[item.uid] = item
-                else:
-                    if self.analyze_failed_items and item.state == WorkItemState.Failed:
-                        can_analyze[item.uid] = item
-                    else:
-                        cannot_analyze[item.uid] = item
-            elif isinstance(item, (Simulation, IWorkflowItem, AssetCollection)):    # COMPS AC has no state
-                if item.succeeded:
-                    can_analyze[item.uid] = item
-                else:
-                    if self.analyze_failed_items and item.status == EntityStatus.FAILED:
-                        can_analyze[item.uid] = item
-                    else:
-                        cannot_analyze[item.uid] = item
+            valid = self.platform.validate_item_for_analysis(item, self.analyze_failed_items)
+            if valid:
+                can_analyze[item.uid] = item
+            else:
+                cannot_analyze[item.uid] = item
 
         # now consider item limiting arguments
         if self.partial_analyze_ok:
@@ -309,7 +272,7 @@ class AnalyzeManager:
             if self.force_wd:
                 analyzer.working_dir = self.working_dir
             else:
-                analyzer.working_dir = analyzer.working_dir if analyzer.working_dir is not None else self.working_dir
+                analyzer.working_dir = analyzer.working_dir or self.working_dir
 
             if logger.isEnabledFor(DEBUG):
                 logger.debug(f"Analyzer working directory set to {analyzer.working_dir}")
@@ -432,6 +395,9 @@ class AnalyzeManager:
     def analyze(self) -> bool:
         """
         Process the provided items with the provided analyzers. This is the main driver method of :class:`AnalyzeManager`.
+
+        Args:
+            kwargs: extra parameters
 
         Returns:
             True on success; False on failure/exception.

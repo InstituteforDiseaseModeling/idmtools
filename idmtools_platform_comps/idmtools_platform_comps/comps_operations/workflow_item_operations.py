@@ -224,7 +224,7 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
 
         Args:
             work_item:Platform workflow_item object
-            **kwargs: Optional arguments mainly for extensibility
+            kwargs: optional arguments mainly for extensibility
 
         Returns:
             IDMTools workflow item
