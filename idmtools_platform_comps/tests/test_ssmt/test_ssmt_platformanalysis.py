@@ -16,7 +16,7 @@ from idmtools_test.utils.decorators import run_in_temp_dir, warn_amount_ssmt_ima
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools.core import ItemType, TRUTHY_VALUES
 from idmtools_test.utils.utils import get_case_name
-from tests.test_ssmt.get_latest_ssmt_image import get_latest_image_stage
+from .get_latest_ssmt_image import get_latest_image_stage
 
 TARGET_EXPERIMENT_ID = '9311af40-1337-ea11-a2be-f0921c167861'
 analyzer_path = os.path.join(os.path.dirname(__file__), "..", "inputs")
