@@ -35,7 +35,7 @@ class InputDataWorkItemTests(ITestWithPersistence):
     @pytest.mark.comps
     @pytest.mark.long
     def test_generate_inputdata_climate_files_from_demo_file(self):
-        climate_demog = os.path.join(intermediate_dir, 'Madagascar_Comoros_2.5arcmin_demographics_overlay1.json')
+        climate_demog = os.path.join(intermediate_dir, 'Madagascar_Comoros_2.5arcmin_demographics_overlay.json')
 
         # do not use 'upload' for Mode. it won't generate demographic workitem
         data = {"Project": 'IDM-Madagascar', "ProjectRoot": "v2017", "Region": "",
