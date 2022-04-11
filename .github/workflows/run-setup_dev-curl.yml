@@ -6,7 +6,7 @@
 # --data "{\"event_type\": \"run_setup_dev_test\"}" \
 #  https://api.github.com/repos/InstituteforDiseaseModeling/idmtools/dispatches
 #
-# Note, this test will checkout 'dev' branch
+
 
 name: "run-setup_dev-curl"
 
@@ -21,6 +21,9 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         python-version: [ 3.7, 3.8, 3.9 ]
+    env:
+      PYPI_STAGING_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
+      PYPI_STAGING_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2

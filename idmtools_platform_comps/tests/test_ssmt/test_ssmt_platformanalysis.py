@@ -16,6 +16,7 @@ from idmtools_test.utils.decorators import run_in_temp_dir, warn_amount_ssmt_ima
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools.core import ItemType, TRUTHY_VALUES
 from idmtools_test.utils.utils import get_case_name
+from .get_latest_ssmt_image import get_latest_image_stage
 
 TARGET_EXPERIMENT_ID = '9311af40-1337-ea11-a2be-f0921c167861'
 analyzer_path = os.path.join(os.path.dirname(__file__), "..", "inputs")
@@ -53,7 +54,9 @@ class TestPlatformAnalysis(ITestWithPersistence):
         print(self._testMethodName)
         self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
         print(self.case_name)
-        self.platform = Platform('BAYESIAN')
+        self.platform = Platform('BAYESIAN',
+                                 docker_image="idm-docker-staging.packages.idmod.org/idmtools/comps_ssmt_worker:" +
+                                              get_latest_image_stage())
         self.tags = {'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}
         self.input_file_path = analyzer_path
 
@@ -309,7 +312,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
                          f'--platform-args platform_args.pkl '
                          f'--block {self.platform._config_block}_SSMT')
 
-        with open(os.path.join(file_path, "stdout.txt"), 'r') as fin:
+        with open(os.path.join(file_path, "stdout.txt"), 'r', encoding='utf-8', errors='ignore') as fin:
             stdout_contents = fin.read()
 
         self.assertIn("!!!!!!!!!!!!!Preload executed!!!!!!!!!!!!!!!!!!", stdout_contents)

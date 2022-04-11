@@ -28,10 +28,11 @@ REPO_KEY = 'idm-docker-staging'
 DOCKER_REPO = f'{REPO_KEY}.{BASE_REPO}'
 IMAGE_NAME = 'idmtools/comps_ssmt_worker'
 BASE_IMAGE_NAME = f'{DOCKER_REPO}/{IMAGE_NAME}'
-BASE_VERSION = open('../VERSION').read().strip()
+CURRENT_DIRECTORY = os.path.dirname(__file__)
+BASE_VERSION = open(os.path.join(CURRENT_DIRECTORY, '..', 'VERSION')).read().strip()
 
 logger.info("Please be sure you are logged into the docker-production.packages.idmod.org Docker Repo")
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+BASE_DIR = os.path.abspath(os.path.join(CURRENT_DIRECTORY, '..', '..'))
 LOCAL_PACKAGE_DIR = os.path.join(BASE_DIR, 'idmtools_platform_comps/ssmt_image')
 
 
@@ -138,6 +139,7 @@ def build_image(username, password, disable_keyring_load, disable_keyring_save):
     logger.info(f'Running: {" ".join(cmd)}')
     p = subprocess.Popen(" ".join(cmd), cwd=os.path.abspath(os.path.dirname(__file__)), shell=True)
     p.wait()
+
     if p.returncode == 0:
         logger.info("Tagging image")
         os.system(f'docker tag {DOCKER_REPO}/{IMAGE_NAME}:{version} {DOCKER_REPO}/{IMAGE_NAME}:{version[:-2]}')

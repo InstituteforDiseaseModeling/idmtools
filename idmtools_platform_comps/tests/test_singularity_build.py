@@ -8,7 +8,7 @@ from idmtools.core.platform_factory import Platform
 from idmtools_platform_comps.utils.package_version import get_docker_manifest, get_digest_from_docker_hub
 from idmtools_platform_comps.utils.singularity_build import SingularityBuildWorkItem
 from idmtools_test import COMMON_INPUT_PATH
-from idmtools_test.utils.decorators import linux_only
+from idmtools_test.utils.decorators import linux_only, windows_only
 from idmtools_test.utils.utils import get_case_name
 
 # Force test cases subject to caching to re-run
@@ -43,12 +43,13 @@ class TestSingularityBuild(unittest.TestCase):
     def test_get_dockerhub_latest(self):
         manifest = get_digest_from_docker_hub("alpine", "latest")
         self.assertIsInstance(manifest, str)
-        self.assertEqual(manifest, 'sha256:d7342993700f8cd7aba8496c2d0e57be0666e80b4c441925fc6f9361fa81d10e')
+        self.assertEqual(manifest, 'sha256:cb64bbe7fa613666c234e1090e91427314ee18ec6420e9426cf4e7f314056813')
 
+    @windows_only
     def test_get_dockerhub_version(self):
         manifest = get_digest_from_docker_hub("alpine", "3.12.1")
         self.assertIsInstance(manifest, str)
-        self.assertEqual(manifest, 'sha256:d7342993700f8cd7aba8496c2d0e57be0666e80b4c441925fc6f9361fa81d10e')
+        self.assertEqual(manifest, 'sha256:cb64bbe7fa613666c234e1090e91427314ee18ec6420e9426cf4e7f314056813')
 
     @pytest.mark.skip
     def test_get_ssmt_manifest_latest(self):
@@ -66,6 +67,7 @@ class TestSingularityBuild(unittest.TestCase):
         self.assertEqual(sbi.image_tags['digest'], 'sha256:d0fd5396c017aa2b1da9022bb9e9ce420317b2bb36c3c3b4986da13b0c9755b9')
         self.assertEqual(sbi.image_tags['image_url'], 'docker://docker-production.packages.idmod.org/idm/dtk-ubuntu-py3.7-mpich3.3-runtime:20.04.09')
 
+    @windows_only
     def test_docker_fetch_version_from_dockerhub(self):
         sbi = SingularityBuildWorkItem(name=self.case_name, force=FORCE)
         sbi.image_url = "docker://alpine:3.12.1"
@@ -73,7 +75,7 @@ class TestSingularityBuild(unittest.TestCase):
         self.assertIn("digest", sbi.image_tags)
         self.assertIn('image_name', sbi.image_tags)
         self.assertEqual(sbi.image_tags['image_name'], 'alpine_3.12.1.sif')
-        self.assertEqual(sbi.image_tags['digest'], 'sha256:d7342993700f8cd7aba8496c2d0e57be0666e80b4c441925fc6f9361fa81d10e')
+        self.assertEqual(sbi.image_tags['digest'], 'sha256:cb64bbe7fa613666c234e1090e91427314ee18ec6420e9426cf4e7f314056813')
         self.assertEqual(sbi.image_tags['image_url'], 'docker://alpine:3.12.1')
         js = sbi._prep_work_order_before_create()
         self.assertIsInstance(js, dict)

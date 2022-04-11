@@ -98,7 +98,7 @@ class TestCompsCLI(unittest.TestCase):
 
     @allure.feature("Containers")
     def test_container_pull(self):
-        result = run_command('comps', 'SLURM2', 'singularity', 'pull',
+        result = run_command('comps', 'SLURMSTAGE', 'singularity', 'pull',
                              'docker://python:3.8.6', mix_stderr=False)
         print(result.stdout)
         print(result.stderr)
@@ -110,7 +110,7 @@ class TestCompsCLI(unittest.TestCase):
     def test_container_build(self):
         if os.path.exists(pwd.joinpath("singularity.id")):
             os.remove(pwd.joinpath("singularity.id"))
-        result = run_command('comps', 'SLURM2', 'singularity', 'build', '--common-input-glob',
+        result = run_command('comps', 'SLURMSTAGE', 'singularity', 'build', '--common-input-glob',
                              str(pwd.joinpath('*.txt')), str(pwd.joinpath('singularity.def')), mix_stderr=False)
         print(result.stdout)
         self.assertTrue(result.exit_code == 0)
@@ -123,7 +123,7 @@ class TestCompsCLI(unittest.TestCase):
         for file in id_files:
             if os.path.exists(pwd.joinpath(file)):
                 os.remove(pwd.joinpath(file))
-        result = run_command('comps', 'SLURM2', 'singularity', 'build', '--force',
+        result = run_command('comps', 'SLURMSTAGE', 'singularity', 'build', '--force',
                              '--id-workitem',
                              '--common-input-glob', str(pwd.joinpath('*.txt')), str(pwd.joinpath('singularity.def')),
                              mix_stderr=False)
@@ -141,7 +141,7 @@ class TestCompsCLI(unittest.TestCase):
 
         parts = content.split("::")
         self.assertTrue(len(parts) == 3)
-        pl = Platform("SLURM2")
+        pl = Platform("SLURMSTAGE")
         wi = pl.get_item(parts[0], ItemType.WORKFLOW_ITEM)
         self.assertIn('WorkItem_Type', wi.tags.keys())
         self.assertEqual(wi.tags['WorkItem_Type'], 'ImageBuilderWorker')
@@ -159,7 +159,7 @@ class TestCompsCLI(unittest.TestCase):
             os.remove(pwd.joinpath(file))
         with self.subTest("test_container_workitem_id_not_written_when_found"):
             # hit cache and ensure file is not written
-            result = run_command('comps', 'SLURM2', 'singularity', 'build', '--id-workitem',
+            result = run_command('comps', 'SLURMSTAGE', 'singularity', 'build', '--id-workitem',
                                  '--common-input-glob',
                                  str(pwd.joinpath('*.txt')), str(pwd.joinpath('singularity.def')), mix_stderr=False)
             self.assertTrue(result.exit_code == 0)
@@ -170,7 +170,7 @@ class TestCompsCLI(unittest.TestCase):
     @allure.feature("Download")
     def test_download_cli(self):
         # idmtools comps SLURMStage  download --experiment acd2f035-b098-eb11-a2c4-f0921c167864 --name test_download --output-path outputs
-        result = run_command('comps', 'SLURM2', 'download', '--experiment', 'acd2f035-b098-eb11-a2c4-f0921c167864',
+        result = run_command('comps', 'SLURMSTAGE', 'download', '--experiment', 'acd2f035-b098-eb11-a2c4-f0921c167864',
                              '--name', self.case_name, '--output-path', 'output', '--pattern', '**/*.json',
                              '--pattern', '**/*.png', '--pattern', '**/*.xlsx')
 

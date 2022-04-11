@@ -21,7 +21,7 @@ from idmtools_test.utils.utils import get_case_name
 class TestRExperiment(ITestWithPersistence):
 
     def setUp(self) -> None:
-        self.platform = Platform('COMPS2')
+        self.platform = Platform('Bayesian')
         self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
         self.input_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)))
 
@@ -102,7 +102,6 @@ class TestRExperiment(ITestWithPersistence):
     @pytest.mark.skip
     def test_r_model_with_load_ac(self):
         # Utility does not support R libraries only Python packages at this time
-        platform = Platform('COMPS2')
 
         ac_lib_path = os.path.join(COMMON_INPUT_PATH, "r", "ncov_analysis")
 
