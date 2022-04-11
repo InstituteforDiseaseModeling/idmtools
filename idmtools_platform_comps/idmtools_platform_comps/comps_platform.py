@@ -165,19 +165,19 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             if item.state == SimulationState.Succeeded:
                 result = True
             else:
-                if self.analyze_failed_items and item.state == SimulationState.Failed:
+                if analyze_failed_items and item.state == SimulationState.Failed:
                     result = True
         elif isinstance(item, COMPSWorkItem):
             if item.state == WorkItemState.Succeeded:
                 result = True
             else:
-                if self.analyze_failed_items and item.state == WorkItemState.Failed:
+                if analyze_failed_items and item.state == WorkItemState.Failed:
                     result = True
         elif isinstance(item, (Simulation, IWorkflowItem)):
             if item.succeeded:
                 result = True
             else:
-                if self.analyze_failed_items and item.status == EntityStatus.FAILED:
+                if analyze_failed_items and item.status == EntityStatus.FAILED:
                     result = True
 
         return result
