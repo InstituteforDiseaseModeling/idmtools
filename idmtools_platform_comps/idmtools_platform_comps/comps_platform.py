@@ -211,7 +211,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         else:
             raise Exception(f'Item Type: {type(item)} is not supported!')
 
-        file_data = super().get_files(item, files)
+        file_data = super().get_files(item, files, output, **kwargs)
         return file_data
 
     def flatten_item(self, item: object, raw=False, **kwargs) -> List[object]:
