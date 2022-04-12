@@ -529,7 +529,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
     def validate_item_for_analysis(self, item: object, analyze_failed_items=False):
         """
-        Check if item is valid for analysis
+        Check if item is valid for analysis.
 
         Args:
             item: Which item to flatten
