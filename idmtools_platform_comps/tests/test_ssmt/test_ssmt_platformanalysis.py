@@ -16,6 +16,7 @@ from idmtools_test.utils.decorators import run_in_temp_dir, warn_amount_ssmt_ima
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools.core import ItemType, TRUTHY_VALUES
 from idmtools_test.utils.utils import get_case_name
+from .get_latest_ssmt_image import get_latest_image_stage
 
 TARGET_EXPERIMENT_ID = '9311af40-1337-ea11-a2be-f0921c167861'
 analyzer_path = os.path.join(os.path.dirname(__file__), "..", "inputs")
@@ -53,7 +54,9 @@ class TestPlatformAnalysis(ITestWithPersistence):
         print(self._testMethodName)
         self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
         print(self.case_name)
-        self.platform = Platform('BAYESIAN')
+        self.platform = Platform('BAYESIAN',
+                                 docker_image="idm-docker-staging.packages.idmod.org/idmtools/comps_ssmt_worker:" +
+                                              get_latest_image_stage())
         self.tags = {'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}
         self.input_file_path = analyzer_path
 
@@ -122,8 +125,8 @@ class TestPlatformAnalysis(ITestWithPersistence):
     def test_ssmt_using_aliases(self):
         # check if comps has a docker image to use new images for this run. This does not effect remote system, just
         # what image we run on. We have to do this because config is coming from alias
-        if IdmConfigParser().get_option("COMPS2", "docker_image", None):
-            self.platform.docker_image = IdmConfigParser().get_option("COMPS2", "docker_image")
+        if IdmConfigParser().get_option("Bayesian", "docker_image", None):
+            self.platform.docker_image = IdmConfigParser().get_option("Bayesian", "docker_image")
             print(f"Setting docker image to {self.platform.docker_image}")
         self.do_simple_python_analysis(self.platform)
 

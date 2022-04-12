@@ -11,6 +11,7 @@ from idmtools.core.platform_factory import Platform
 from idmtools_test.utils.decorators import warn_amount_ssmt_image_decorator
 from idmtools.core import ItemType
 from idmtools.analysis.download_analyzer import DownloadAnalyzer
+from .get_latest_ssmt_image import get_latest_image_stage
 
 analyzer_path = os.path.join(os.path.dirname(__file__), "..", "inputs")
 sys.path.insert(0, analyzer_path)
@@ -24,7 +25,8 @@ def platform_slurm_2():
     Returns:
 
     """
-    return Platform('SLURM2')
+    return Platform('SLURMSTAGE', docker_image="idm-docker-staging.packages.idmod.org/idmtools/comps_ssmt_worker:" +
+                                               get_latest_image_stage())
 
 
 @pytest.fixture
@@ -34,7 +36,7 @@ def platform_comps2():
     Returns:
 
     """
-    return Platform('BAYESIAN')
+    return Platform('BAYESIAN', docker_image="idm-docker-staging.packages.idmod.org/idmtools/comps_ssmt_worker:" + get_latest_image_stage())
 
 
 # Test PlatformAnalysis with PopulationAnalyzer for experiment id
@@ -50,7 +52,7 @@ def do_platform_analysis_experiment(platform: Platform):
                                 analyzers_args=[{'name': ['anything']}],
                                 analysis_name='test platformanalysis with experiment',
                                 tags={'idmtools': 'test_tag'},
-                                extra_args=dict(max_workers=8))
+                                extra_args={"max_workers":8})
 
     analysis.analyze(check_status=True)
     wi = analysis.get_work_item()

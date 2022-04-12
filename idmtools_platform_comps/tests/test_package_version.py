@@ -39,7 +39,7 @@ class TestPackageVersionCLI(unittest.TestCase):
         # cli: idmtools comps SLURM2 req2ac --asset_tag test:123 --pkg astor~=0.7.0
         # run req2ac to get ac_id
         result = run_command(
-            'comps', 'SLURM2', 'req2ac', '--asset_tag', 'test:123',
+            'comps', 'SLURMSTAGE', 'req2ac', '--asset_tag', 'test:123',
             '--pkg', 'astor~=0.7.0', **self.default_opts)
         self.assertTrue(result.exit_code == 0, msg=result.output)
         print(result.stdout)
@@ -57,7 +57,7 @@ class TestPackageVersionCLI(unittest.TestCase):
     def test_ac_exist_with_req2ac(self):
         # cli: idmtools comps SLURM2 ac-exist --pkg astor~=0.7.0
         # run req2ac to get ac_id
-        result1 = run_command('comps', 'SLURM2', 'req2ac', '--pkg', 'astor~=0.7.0', **self.default_opts)
+        result1 = run_command('comps', 'SLURMSTAGE', 'req2ac', '--pkg', 'astor~=0.7.0', **self.default_opts)
         self.assertTrue(result1.exit_code == 0, msg=result1.output)
         print(result1.stdout)
         ac_id = result1.stdout.strip().split("\n")
@@ -65,7 +65,7 @@ class TestPackageVersionCLI(unittest.TestCase):
         ac_id = ac_id[-1].strip()
 
         # run ac-exist to verify ac
-        result2 = run_command('comps', 'SLURM2', 'ac-exist', '--pkg', 'astor~=0.7.0', **self.default_opts)
+        result2 = run_command('comps', 'SLURMSTAGE', 'ac-exist', '--pkg', 'astor~=0.7.0', **self.default_opts)
         self.assertTrue(result2.exit_code == 0, msg=result2.output)
         print(result2.stdout)
         self.assertIn(ac_id, result2.output)
@@ -76,7 +76,7 @@ class TestPackageVersionCLI(unittest.TestCase):
     @allure.feature("req2ac")
     def test_ac_not_exist_with_req2ac(self):
         # cli: idmtools comps SLURM2 ac-exist --pkg pytest==3.0.0
-        result = run_command('comps', 'SLURM2', 'ac-exist', '--pkg', 'pytest==3.0.0', **self.default_opts)
+        result = run_command('comps', 'SLURMSTAGE', 'ac-exist', '--pkg', 'pytest==3.0.0', **self.default_opts)
         self.assertTrue(result.exit_code == 0, msg=result.output)
         self.assertIn("AC doesn't exist", result.output)
 

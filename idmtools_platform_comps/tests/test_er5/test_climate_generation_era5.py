@@ -64,7 +64,7 @@ class ClimateGenerationTest(ITestWithPersistence):
         CURRENT_DIRECTORY = os.path.dirname(__file__)
         wi.transient_assets.add_asset(os.path.join(CURRENT_DIRECTORY, "climate", "site_details.csv"))
         # upload WorkOrder.json to workitem's root dir in COMPS
-        wi.load_work_order(os.path.join("climate", "WorkOrder.json"))
+        wi.load_work_order(os.path.join(CURRENT_DIRECTORY, "climate", "WorkOrder.json"))
         wi.run(wait_on_done=True)
 
         # Get the work item, related asset collection, and assets

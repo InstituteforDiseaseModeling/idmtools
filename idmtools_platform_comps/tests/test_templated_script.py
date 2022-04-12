@@ -19,7 +19,7 @@ class TestWrapperTask(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
         print(self.case_name)
-        self.platform = Platform('COMPS2')
+        self.platform = Platform('Bayesian')
 
     def test_wrapper_task(self):
         # Define out command

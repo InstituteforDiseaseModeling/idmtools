@@ -69,18 +69,8 @@ def get_packages_from_pip():
     Returns:
         (List[str]): A list of packages installed.
     """
-    load_pip_versions = [get_pip_packages_10_to_current, get_pip_packages_6_to_9, get_pip_packages_10_to_6]
-    installed_packages_list = None
-
-    for load_pip in load_pip_versions:
-        try:
-            installed_packages = load_pip()
-            installed_packages_list = sorted(["%s==%s" % (i.key, i.version) for i in installed_packages])
-            break
-        except Exception:
-            pass
-
-    return installed_packages_list
+    import pkg_resources
+    return [str(d) for d in pkg_resources.working_set]
 
 
 def get_packages_list() -> List[str]:

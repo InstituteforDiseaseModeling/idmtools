@@ -52,20 +52,21 @@ class TestCompsPlugin(unittest.TestCase):
     @pytest.mark.comps
     @pytest.mark.smoke
     def test_comps_requirements(self):
-        with Platform("SLURM") as platform:
-            self.assertTrue(platform.are_requirements_met(PlatformRequirements.LINUX))
+        with Platform("BAYESIAN") as platform:
             self.assertTrue(platform.are_requirements_met(PlatformRequirements.NativeBinary))
             self.assertTrue(platform.are_requirements_met(PlatformRequirements.PYTHON))
-            self.assertFalse(platform.are_requirements_met(PlatformRequirements.WINDOWS))
+            self.assertTrue(platform.are_requirements_met(PlatformRequirements.WINDOWS))
+            self.assertFalse(platform.are_requirements_met(PlatformRequirements.LINUX))
+
 
     @pytest.mark.comps
     @pytest.mark.smoke
     def test_slurm_requirements(self):
-        with Platform("COMPS2") as platform:
-            self.assertFalse(platform.are_requirements_met(PlatformRequirements.LINUX))
+        with Platform("SLURMSTAGE") as platform:
+            self.assertTrue(platform.are_requirements_met(PlatformRequirements.LINUX))
             self.assertTrue(platform.are_requirements_met(PlatformRequirements.NativeBinary))
             self.assertTrue(platform.are_requirements_met(PlatformRequirements.PYTHON))
-            self.assertTrue(platform.are_requirements_met(PlatformRequirements.WINDOWS))
+            self.assertFalse(platform.are_requirements_met(PlatformRequirements.WINDOWS))
 
     @pytest.mark.comps
     @pytest.mark.serial
