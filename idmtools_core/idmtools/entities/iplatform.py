@@ -41,8 +41,6 @@ from idmtools.assets.asset_collection import AssetCollection
 from idmtools.services.platforms import PlatformPersistService
 from idmtools.utils.caller import get_caller
 from idmtools.utils.entities import validate_user_inputs_against_dataclass
-# from COMPS.Data import Experiment as COMPSExperiment, Suite as COMPSSuite, Simulation as COMPSSimulation, \
-#     WorkItem as COMPSWorkItem, AssetCollection as COMPSAssetCollection, QueryCriteria
 
 logger = getLogger(__name__)
 user_logger = getLogger('user')
