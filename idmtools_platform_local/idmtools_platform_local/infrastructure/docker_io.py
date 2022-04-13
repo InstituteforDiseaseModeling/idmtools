@@ -118,7 +118,7 @@ class DockerIO:
     @io_queue.parallelize
     def copy_to_container(self, container: Container, destination_path: str,
                           file: Optional[Union[str, bytes]] = None,
-                          content: [str, bytes] = None,
+                          # content: [str, bytes] = None,
                           dest_name: Optional[str] = None) -> bool:
         """
         Copies a physical file or content in memory to a container.
@@ -135,15 +135,16 @@ class DockerIO:
         Returns:
             (bool) True if the copy succeeds, False otherwise
         """
-        if content:
-            if isinstance(content, dict):
-                content = json.dumps(content)
-            if isinstance(content, str):
-                file = BytesIO(content.encode('utf-8'))
-            else:
-                file = content
-        if file and isinstance(file, bytes):
-            file = BytesIO(file)
+        # Removed content param because it was causing a docker_io error in the doc build
+        # if content:
+        #     if isinstance(content, dict):
+        #        content = json.dumps(content)
+        #    if isinstance(content, str):
+        #        file = BytesIO(content.encode('utf-8'))
+        #    else:
+        #        file = content
+        # if file and isinstance(file, bytes):
+        #    file = BytesIO(file)
 
         if type(file) is str:
 
