@@ -41,7 +41,7 @@ class TestAssetsInComps(unittest.TestCase):
         wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform)
 
     def test_comps_asset_to_idmtools_asset(self):
-        comps_ac: CompsAssetCollection = self.platform.get_item('2c62399b-1a31-ea11-a2be-f0921c167861',
+        comps_ac: CompsAssetCollection = self.platform.get_item('16a032ab-bcb6-ec11-92e8-f0921c167864',
                                                                 item_type=ItemType.ASSETCOLLECTION, raw=True)
         ac: AssetCollection = self.platform._assets.to_entity(comps_ac)
         self.assertIsInstance(ac, AssetCollection)
@@ -52,7 +52,7 @@ class TestAssetsInComps(unittest.TestCase):
         self.assertEqual(filenames_comps, filenames)
 
     def test_create_asset_collection_from_existing_collection(self):
-        ac = AssetCollection.from_id('2c62399b-1a31-ea11-a2be-f0921c167861')
+        ac = AssetCollection.from_id('16a032ab-bcb6-ec11-92e8-f0921c167864')
         self.assertIsInstance(ac, AssetCollection)
         new_ac = AssetCollection(ac.assets)
         new_ac.add_asset(Asset(relative_path=None, filename="test.json", content=json.dumps({"a": 9, "b": 2})))

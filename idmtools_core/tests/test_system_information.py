@@ -31,8 +31,8 @@ class TestSystemInformation(TestCase):
         self.assertGreater(len(packages), 1)
         # all the strings should be name == version
         for package in packages:
-            self.assertIn('==', package)
-            parts = package.split("==")
+            self.assertIn(' ', package)
+            parts = package.split(" ")
             self.assertIs(len(parts), 2)
 
     @unittest.mock.patch('idmtools.utils.info.get_packages_from_pip', side_effect=lambda: None)
