@@ -29,7 +29,7 @@ class IEntity(IItem, metaclass=ABCMeta):
     #: Parent id
     parent_id: UUID = field(default=None, metadata={"md": True})
     #: Parent object
-    _parent: 'IEntity' = field(default=None, compare=False, metadata={"pickle_ignore": True})
+    _parent: 'IEntity' = field(default=None, compare=False, metadata={"pickle_ignore": False})
     #: Status of item
     status: EntityStatus = field(default=None, compare=False, metadata={"pickle_ignore": True})
     #: Tags for item
