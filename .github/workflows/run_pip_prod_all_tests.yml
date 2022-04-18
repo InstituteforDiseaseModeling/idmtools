@@ -1,6 +1,9 @@
-# This GA can be triggered with commit message "Run prod ubuntu all test!". it install prod packages with any branch code
-name: "run-pip-prod"
-on: [ push, pull_request ]
+# install production packages and run all test
+# trigger by clicking button "Run Workflow".
+
+name: "run_pip_prod_all_tests"
+on:
+  workflow_dispatch:
 
 jobs:
   run-pip-prod:
@@ -12,7 +15,6 @@ jobs:
     env:
       PYPI_STAGING_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
       PYPI_STAGING_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
-    if: "contains(github.event.head_commit.message, 'run-pip-prod!')"
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
