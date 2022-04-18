@@ -1,25 +1,16 @@
-# This workflows will install idmtools from setup-dev then run tests with curl command
-#
-#curl command from your cmd:
-# curl -XPOST -u "username:githubPAT" -H "Accept: application/vnd.github.everest-preview+json" \
-# -H "Content-Type: application/json" \
-# --data "{\"event_type\": \"run_setup_dev_test\"}" \
-#  https://api.github.com/repos/InstituteforDiseaseModeling/idmtools/dispatches
-#
+# install production packages and run all test
+# trigger by clicking button "Run Workflow".
 
-
-name: "run-setup_dev-curl"
-
+name: "run_pip_prod_all_tests"
 on:
-  repository_dispatch:
-    types: [run_setup_dev_test]
+  workflow_dispatch:
 
 jobs:
-  run-setup_dev-curl:
+  run-pip-prod:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ ubuntu-latest ]
         python-version: [ 3.7, 3.8, 3.9 ]
     env:
       PYPI_STAGING_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
@@ -32,15 +23,17 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
+      - name: Upgrade pip
+        run: |
+          python -m pip install --upgrade pip
       - name: Install Python dependencies
         run: |
-          pip install idm-buildtools flake8 black --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
-      - name: Run setup-dev
-        env:
-          PYPI_STAGING_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
-          PYPI_STAGING_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
+          pip install idm-buildtools flake8 wheel matplotlib sqlalchemy --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+      - name: download idmtools packages from production jfrog
         run: |
-          make setup-dev
+          pip install idmtools[full] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+          pip install idmtools-test --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+          pip install idmtools[test] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
       - name: login to comps2
         run: |
           python dev_scripts/create_auth_token_args.py --username "${{ secrets.COMPS_USER }}"

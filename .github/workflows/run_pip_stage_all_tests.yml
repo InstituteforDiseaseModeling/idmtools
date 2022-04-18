@@ -1,20 +1,20 @@
 # install staging packages and run all test
-# trigger by push or pull_request with commit message: "Run tests!".
+# trigger by clicking button "Run Workflow".
 
-name: "run-setup-dev-all-tests"
-on: [ push, pull_request ]
+name: "run_pip_stage_all_tests"
+on:
+  workflow_dispatch:
 
 jobs:
-  run-setup-dev-all-tests:
+  run-pip_stage:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ ubuntu-latest ]
-        python-version: [3.9]
+        python-version: [ 3.9, 3.7, 3.8 ]
     env:
       PYPI_STAGING_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
       PYPI_STAGING_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
-    if: "contains(github.event.head_commit.message, 'Run tests!')"
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
@@ -28,13 +28,13 @@ jobs:
           python -m pip install --upgrade pip
       - name: Install Python dependencies
         run: |
-          pip install idm-buildtools wheel pygit2 --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
-
-      - name: install idmtools
+          pip install idm-buildtools flake8 wheel pygit2 matplotlib sqlalchemy natsort --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+      - name: download idmtools packages from staging jfrog
         run: |
-          make setup-dev
+          pip install idmtools[full] --index-url=https://${{ secrets.PYPI_STAGING_USERNAME }}:${{ secrets.PYPI_STAGING_PASSWORD }}@packages.idmod.org/api/pypi/pypi-staging/simple
+          pip install idmtools-test --index-url=https://${{ secrets.PYPI_STAGING_USERNAME }}:${{ secrets.PYPI_STAGING_PASSWORD }}@packages.idmod.org/api/pypi/pypi-staging/simple
+          pip install idmtools[test] --index-url=https://${{ secrets.PYPI_STAGING_USERNAME }}:${{ secrets.PYPI_STAGING_PASSWORD }}@packages.idmod.org/api/pypi/pypi-staging/simple
       - name: login to comps2
-
         run: |
           python dev_scripts/create_auth_token_args.py --username "${{ secrets.COMPS_USER }}"
         env:
@@ -82,6 +82,39 @@ jobs:
         with:
           name: idmtools_platform_comps_test_results
           path: idmtools_platform_comps/tests/reports/
+
+  run-local:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+        python-version: [ 3.7]
+    env:
+      PYPI_STAGING_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
+      PYPI_STAGING_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+      - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
+      - name: Install Python dependencies
+        run: |
+          pip install idm-buildtools flake8 wheel pygit2 sqlalchemy --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+      - name: Install dataclass
+        if: ${{ matrix.python-version }} == 3.6
+        run: |
+          pip install dataclasses
+      - name: download idmtools packages from staging jfrog
+        run: |
+          pip install idmtools[full] --index-url=https://${{ env.PYPI_STAGING_USERNAME }}:${{ env.PYPI_STAGING_PASSWORD }}@packages.idmod.org/api/pypi/pypi-staging/simple
+          pip install idmtools-test --index-url=https://${{ env.PYPI_STAGING_USERNAME }}:${{ env.PYPI_STAGING_PASSWORD }}@packages.idmod.org/api/pypi/pypi-staging/simple
+          pip install idmtools[test] --index-url=https://${{ env.PYPI_STAGING_USERNAME }}:${{ env.PYPI_STAGING_PASSWORD }}@packages.idmod.org/api/pypi/pypi-staging/simple
+      - name: login to docker staging
+        run: |
+          echo '${{ env.PYPI_STAGING_PASSWORD }}' | docker login idm-docker-staging.packages.idmod.org --username ${{ env.PYPI_STAGING_USERNAME }} --password-stdin
       - name: run idmtools_platform_local tests
         run: |
           cd idmtools_platform_local
