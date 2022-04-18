@@ -138,7 +138,9 @@ class SimulationBuilder:
             None. Updates the Sweeps
 
         Examples:
+
             Examples of valid functions::
+
                 # This function takes two parameters
                 def myFunction(simulation, parameter_a, parameter_b):
                     pass
@@ -148,6 +150,7 @@ class SimulationBuilder:
                     pass
 
             Calling Sweeps that take multiple parameters::
+
                 # This example references the above valid function example
                 sb = SimulationBuilder()
 

@@ -118,7 +118,7 @@ class DockerIO:
     @io_queue.parallelize
     def copy_to_container(self, container: Container, destination_path: str,
                           file: Optional[Union[str, bytes]] = None,
-                          content: [str, bytes] = None,
+                          content: Union[str, bytes] = None,
                           dest_name: Optional[str] = None) -> bool:
         """
         Copies a physical file or content in memory to a container.
@@ -130,7 +130,7 @@ class DockerIO:
             file:  Path to the file to copy
             content: Content to copy
             destination_path: Path within the container to copy the file to(should be a directory)
-            dest_name: Optional parameter for destination filename. By default the source filename is used
+            dest_name: Optional parameter for destination filename. By default, the source filename is used
 
         Returns:
             (bool) True if the copy succeeds, False otherwise
@@ -142,6 +142,7 @@ class DockerIO:
                 file = BytesIO(content.encode('utf-8'))
             else:
                 file = content
+
         if file and isinstance(file, bytes):
             file = BytesIO(file)
 
