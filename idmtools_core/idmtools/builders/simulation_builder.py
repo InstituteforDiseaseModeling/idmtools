@@ -150,7 +150,7 @@ class SimulationBuilder:
                     pass
 
             Calling Sweeps that take multiple parameters::
-            
+
                 # This example references the above valid function example
                 sb = SimulationBuilder()
 
