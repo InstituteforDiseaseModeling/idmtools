@@ -15,7 +15,7 @@ for file_prefix in ['', 'dev_', 'build_']:
     with open(f'{filename}.txt') as requirements_file:
         extra_require_files[file_prefix.strip("_") if file_prefix else filename] = [dependency for dependency in requirements_file.read().split("\n") if not dependency.startswith("--")]
 
-version = '1.6.5'
+version = '1.6.5+nightly'
 
 extras = {
     'test': extra_require_files['build'] + extra_require_files['dev'],
