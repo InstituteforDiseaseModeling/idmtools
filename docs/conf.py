@@ -44,7 +44,7 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.githubpages',
     'sphinx.ext.autodoc',
-    'sphinxcontrib.napoleon',
+    'sphinx.ext.napoleon',
     'sphinx.ext.todo',
     'plantweb.directive',
     'sphinxcontrib.programoutput',
@@ -69,7 +69,7 @@ autodoc_mock_imports = ['pika',
                         'dramatiq']
 
 suppress_warnings = [
-    'autosectionlabel.changlog*',
+    'autosectionlabel.*',
 ]
 
 napoleon_google_docstring = True

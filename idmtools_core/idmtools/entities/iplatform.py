@@ -41,14 +41,15 @@ from idmtools.assets.asset_collection import AssetCollection
 from idmtools.services.platforms import PlatformPersistService
 from idmtools.utils.caller import get_caller
 from idmtools.utils.entities import validate_user_inputs_against_dataclass
+
 logger = getLogger(__name__)
 user_logger = getLogger('user')
 
-CALLER_LIST = ['_create_from_block',    # create platform through Platform Factory
-               'fetch',                 # create platform through un-pickle
-               'get',                   # create platform through platform spec' get method
-               '__newobj__',            # create platform through copy.deepcopy
-               '_main']                 # create platform through analyzer manager
+CALLER_LIST = ['_create_from_block',  # create platform through Platform Factory
+               'fetch',  # create platform through un-pickle
+               'get',  # create platform through platform spec' get method
+               '__newobj__',  # create platform through copy.deepcopy
+               '_main']  # create platform through analyzer manager
 
 # Maps an object type to a platform interface object. We use strings to use getattr. This also let's us also reduce
 # all the if else crud
@@ -118,7 +119,8 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         # Action based on the caller
         if caller not in CALLER_LIST:
-            warnings.warn("Please use Factory to create Platform! For example: \n    platform = Platform('COMPS', **kwargs)")
+            warnings.warn(
+                "Please use Factory to create Platform! For example: \n    platform = Platform('COMPS', **kwargs)")
         return super().__new__(cls)
 
     def __post_init__(self) -> NoReturn:
@@ -183,7 +185,8 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item_type]
         return getattr(self, interface).get(item_id, **kwargs)
 
-    def get_item(self, item_id: Union[str, UUID], item_type: ItemType = None, force: bool = False, raw: bool = False, **kwargs) -> Union[Experiment, Suite, Simulation, IWorkflowItem, AssetCollection, None]:
+    def get_item(self, item_id: Union[str, UUID], item_type: ItemType = None, force: bool = False, raw: bool = False,
+                 **kwargs) -> Union[Experiment, Suite, Simulation, IWorkflowItem, AssetCollection, None]:
         """
         Retrieve an object from the platform.
 
@@ -524,7 +527,27 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
                 return getattr(self, interface).to_entity(platform_item, **kwargs)
         return platform_item
 
-    def flatten_item(self, item: IEntity) -> List[IEntity]:
+    def validate_item_for_analysis(self, item: object, analyze_failed_items=False):
+        """
+        Check if item is valid for analysis.
+
+        Args:
+            item: Which item to flatten
+            analyze_failed_items: bool
+
+        Returns: bool
+
+        """
+        result = False
+        if item.succeeded:
+            result = True
+        else:
+            if analyze_failed_items and item.status == EntityStatus.FAILED:
+                result = True
+
+        return result
+
+    def flatten_item(self, item: object, **kwargs) -> List[object]:
         """
         Flatten an item: resolve the children until getting to the leaves.
 
@@ -533,6 +556,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         Args:
             item: Which item to flatten
+            kwargs: extra parameters
 
         Returns:
             List of leaves
@@ -570,7 +594,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             item: Item to fetch files for
             files: List of file names to get
             output: save files to
-            **kwargs: Platform arguments
+            kwargs: Platform arguments
 
         Returns:
             For simulations, this returns a dictionary with filename as key and values being binary data from file or a
@@ -647,7 +671,8 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
     def __wait_till_callback(
             self, item: Union[Experiment, IWorkflowItem, Suite],
-            callback: Union[partial, Callable[[Union[Experiment, IWorkflowItem, Suite]], bool]], timeout: int = 60 * 60 * 24,
+            callback: Union[partial, Callable[[Union[Experiment, IWorkflowItem, Suite]], bool]],
+            timeout: int = 60 * 60 * 24,
             refresh_interval: int = 5
     ):
         """
@@ -705,7 +730,8 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     @staticmethod
     def __wait_until_done_progress_callback(item: Union[Experiment, IWorkflowItem], progress_bar: 'tqdm',  # noqa: F821
                                             child_attribute: str = 'simulations',
-                                            done_states: List[EntityStatus] = None, failed_warning: Dict[str, bool] = False) -> bool:
+                                            done_states: List[EntityStatus] = None,
+                                            failed_warning: Dict[str, bool] = False) -> bool:
         """
         A callback for progress bar(when an item has children) and checking if an item has completed execution.
 
@@ -761,7 +787,8 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             failed_warning['failed_warning'] = True
         return item.done
 
-    def wait_till_done_progress(self, item: IRunnableEntity, timeout: int = 60 * 60 * 24, refresh_interval: int = 5, wait_progress_desc: str = None):
+    def wait_till_done_progress(self, item: IRunnableEntity, timeout: int = 60 * 60 * 24, refresh_interval: int = 5,
+                                wait_progress_desc: str = None):
         """
         Wait on an item to complete with progress bar.
 
@@ -786,20 +813,27 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         if not IdmConfigParser.is_progress_bar_disabled():
             from tqdm import tqdm
             if isinstance(item, Experiment):
-                prog = tqdm([], total=len(item.simulations), desc=wait_progress_desc if wait_progress_desc else f"Waiting on Experiment {item.name} to Finish running", unit="simulation")
+                prog = tqdm([], total=len(item.simulations),
+                            desc=wait_progress_desc if wait_progress_desc else f"Waiting on Experiment {item.name} to Finish running",
+                            unit="simulation")
                 child_attribute = 'simulations'
             elif isinstance(item, Suite):
-                prog = tqdm([], total=len(item.experiments), desc=wait_progress_desc if wait_progress_desc else f"Waiting on Suite {item.name} to Finish running", unit="experiment")
+                prog = tqdm([], total=len(item.experiments),
+                            desc=wait_progress_desc if wait_progress_desc else f"Waiting on Suite {item.name} to Finish running",
+                            unit="experiment")
                 child_attribute = 'experiments'
             elif isinstance(item, IWorkflowItem):
-                prog = tqdm([], total=1, desc=wait_progress_desc if wait_progress_desc else f"Waiting on WorkItem {item.name}", unit="workitem")
+                prog = tqdm([], total=1,
+                            desc=wait_progress_desc if wait_progress_desc else f"Waiting on WorkItem {item.name}",
+                            unit="workitem")
         else:
             child_attribute = None
 
         failed_warning = dict(failed_warning=False)
         self.__wait_till_callback(
             item,
-            partial(self.__wait_until_done_progress_callback, progress_bar=prog, child_attribute=child_attribute, failed_warning=failed_warning),
+            partial(self.__wait_until_done_progress_callback, progress_bar=prog, child_attribute=child_attribute,
+                    failed_warning=failed_warning),
             timeout,
             refresh_interval
         )

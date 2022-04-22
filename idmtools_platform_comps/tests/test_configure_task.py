@@ -14,7 +14,7 @@ from idmtools_models.json_configured_task import JSONConfiguredTask
 @allure.suite("idmtools_platform_comps")
 class TestConfigTask(unittest.TestCase):
     def test_reload_from_simulation_task1(self):
-        with Platform("COMPS2") as p:
+        with Platform("SlurmStage") as p:
             command: str = "python -m json.tool my_config.json"
             config_file_name: str = 'my_config.json'
 

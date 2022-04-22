@@ -15,7 +15,7 @@ from tqdm import tqdm
 from idmtools import IdmConfigParser
 from idmtools.analysis.map_worker_entry import map_item
 from idmtools.core import NoPlatformException
-from idmtools.core.enums import EntityStatus, ItemType
+from idmtools.core.enums import ItemType
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.core.logging import VERBOSE, SUCCESS
 from idmtools.entities.ianalyzer import IAnalyzer
@@ -145,19 +145,23 @@ class AnalyzeManager:
         items: List[IEntity] = []
         for oid, otype in ids:
             logger.debug(f'Getting metadata for {oid} and {otype}')
-            result = self.platform.get_item(oid, otype, force=True)
-            items.append(result)
+            item = self.platform.get_item(oid, otype, force=True, raw=True)
+            item.uid = item.id if isinstance(item.id, UUID) else UUID(item.id)
+            item.platform = self.platform
+            items.append(item)
         self.potential_items: List[IEntity] = []
 
         for i in items:
             logger.debug(f'Flattening items for {i.uid}')
-            self.potential_items.extend(self.platform.flatten_item(item=i))
+            self.potential_items.extend(self.platform.flatten_item(item=i, raw=True))
 
         # These are leaf items to be ignored in analysis. Make sure they are UUID and then prune them from analysis.
         self.exclude_ids = exclude_ids or []
         for index, oid in enumerate(self.exclude_ids):
             self.exclude_ids[index] = oid if isinstance(oid, UUID) else UUID(oid)
         self.potential_items = [item for item in self.potential_items if item.uid not in self.exclude_ids]
+        for item in self.potential_items:
+            item.platform = self.platform
 
         logger.debug(f"Potential items to analyze: {len(self.potential_items)}")
 
@@ -198,7 +202,7 @@ class AnalyzeManager:
         Returns:
             None
         """
-        self.potential_items.extend(self.platform.flatten_item(item=item))
+        self.potential_items.extend(self.platform.flatten_item(item=item, raw=True))
 
     def _get_items_to_analyze(self) -> Dict[UUID, IEntity]:
         """
@@ -212,13 +216,11 @@ class AnalyzeManager:
         can_analyze = {}
         cannot_analyze = {}
         for item in self.potential_items:
-            if item.succeeded:
+            valid = self.platform.validate_item_for_analysis(item, self.analyze_failed_items)
+            if valid:
                 can_analyze[item.uid] = item
             else:
-                if self.analyze_failed_items and item.status == EntityStatus.FAILED:
-                    can_analyze[item.uid] = item
-                else:
-                    cannot_analyze[item.uid] = item
+                cannot_analyze[item.uid] = item
 
         # now consider item limiting arguments
         if self.partial_analyze_ok:
@@ -393,6 +395,9 @@ class AnalyzeManager:
     def analyze(self) -> bool:
         """
         Process the provided items with the provided analyzers. This is the main driver method of :class:`AnalyzeManager`.
+
+        Args:
+            kwargs: extra parameters
 
         Returns:
             True on success; False on failure/exception.

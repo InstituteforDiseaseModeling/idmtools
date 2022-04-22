@@ -24,7 +24,7 @@ cache = dc.Cache(os.getcwd() if os.getenv("CACHE_FIXTURES", "No").lower()[0] in 
 
 
 @cache.memoize(expire=300)
-def setup_command_no_asset(case_name, platform: str = 'COMPS2'):
+def setup_command_no_asset(case_name, platform: str = 'SlurmStage'):
     bt = CommandTask("Assets\\hello_world.bat")
     experiment = Experiment.from_task(
         bt,
@@ -42,7 +42,7 @@ def setup_command_no_asset(case_name, platform: str = 'COMPS2'):
 
 
 @cache.memoize(expire=300)
-def setup_python_model_1(case_name, platform: str = 'COMPS2'):
+def setup_python_model_1(case_name, platform: str = 'SlurmStage'):
     platform = Platform(platform)
     e = get_model1_templated_experiment(case_name)
     builder = SimulationBuilder()
@@ -74,13 +74,13 @@ class TestExperimentOperations(unittest.TestCase):
 
     def setUp(self) -> None:
         self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
-        self.platform = Platform("COMPS2")
+        self.platform = Platform("SlurmStage")
 
     def test_no_assets(self):
-        setup_command_no_asset(self.case_name, "COMPS2")
+        setup_command_no_asset(self.case_name, "SlurmStage")
 
         # Ensure login is called
-        with platform("COMPS2"):
+        with platform("SlurmStage"):
             # Call Experiments
             qc = QueryCriteria().select_children("tags").where_tag(
                 [
@@ -118,7 +118,7 @@ class TestExperimentOperations(unittest.TestCase):
         Returns:
 
         """
-        eid = setup_python_model_1(self.case_name, 'COMPS2')
+        eid = setup_python_model_1(self.case_name, 'SlurmStage')
 
         e_p: Experiment = Experiment.from_id(eid)
         with self.subTest("test_list_assets_and_download_children"):
