@@ -52,7 +52,7 @@ class TestSimulations(ITestWithPersistence):
 
     @classmethod
     def setUpClass(cls):
-        cls.platform = Platform('COMPS2')
+        cls.platform = Platform('SlurmStage')
         cls.suite = cls._run_create_test_experiments(cls)
         cls.experiment = cls.suite.experiments[0]
 

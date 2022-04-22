@@ -73,7 +73,7 @@ def create_asset_collection(file_list: SetOfAssets, ac_files: List[AssetCollecti
             else:
                 ac2.add_asset(asset_details[0])
         user_logger.info(f"Saving {new_files} totaling {humanfriendly.format_size(total_to_upload)} assets to comps")
-        asset_collection.set_tags(tags)
+        ac2.set_tags(tags)
         ac2.save()
         asset_collection = ac2
     return asset_collection
