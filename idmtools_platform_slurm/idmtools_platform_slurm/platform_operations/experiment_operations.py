@@ -7,7 +7,6 @@ from uuid import UUID, uuid4
 from idmtools.assets import Asset
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
-from idmtools.utils.filters.asset_filters import TFILE_FILTER_TYPE
 from idmtools_platform_slurm.slurm_operations import SLURM_STATES
 
 
@@ -143,13 +142,12 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         """
         raise NotImplementedError("Listing assets has not been implemented on the Slurm Platform")
 
-    def platform_list_files(self, experiment: Experiment, filters: TFILE_FILTER_TYPE = None, **kwargs) -> List[Asset]:
+    def platform_list_files(self, experiment: Experiment, **kwargs) -> List[Asset]:
         """
         List files for a platform
 
         Args:
             experiment: Experiment
-            filters: Filters for the file
             **kwargs:
 
         Returns:

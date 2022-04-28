@@ -9,7 +9,6 @@ from uuid import UUID, uuid4
 from idmtools.assets import Asset
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
-from idmtools.utils.filters.asset_filters import TFILE_FILTER_TYPE
 
 
 @dataclass
@@ -189,13 +188,12 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
         """
         pass
 
-    def list_files(self, simulation: Simulation, filters: TFILE_FILTER_TYPE = None, **kwargs) -> List[Asset]:
+    def list_files(self, simulation: Simulation, **kwargs) -> List[Asset]:
         """
         List files for simulation.
 
         Args:
             simulation:
-            filters:
             **kwargs:
 
         Returns:
