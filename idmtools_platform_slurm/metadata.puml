@@ -1,0 +1,12 @@
+@startuml
+
+title Slurm Platform Metadata Operations
+
+
+interface SlurmMetadataOperations {
+   {abstract} method save_metadata(item)
+   {abstract} method get_metadata(item)
+   {abstract} item  method get(item)
+}
+
+@enduml

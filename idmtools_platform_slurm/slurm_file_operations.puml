@@ -9,10 +9,8 @@ interface SlurmFileOperations {
    {abstract} method mk_directory(dest)
    {abstract} method link_dir(src, dest)
    {abstract} method submit_job(sjob_file_path, working_directory)
-   {abstract} method dump_metadata(obj, dest)
    {abstract} method get_batch_contents(simulation, sim_path)
    {abstract} method create_simulation_batch_file(simulation, sim_dir)
-   {abstract} method experiment_status(experiment)
 }
 
 note left of SlurmFileOperations : This abstracts all file operations to support both SSH and local
