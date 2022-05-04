@@ -4,4 +4,4 @@ The local platform allows running experiments locally using docker.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
-__version__ = "1.6.6.1"
+__version__ = "1.6.6"
