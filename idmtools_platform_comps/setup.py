@@ -54,5 +54,5 @@ comps-cli=idmtools_platform_comps.cli.comps:comps
 """,
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='1.6.5.1'
+    version='1.6.6'
 )
