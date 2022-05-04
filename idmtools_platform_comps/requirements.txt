@@ -1,4 +1,4 @@
-idmtools~=1.6.5
+idmtools~=1.6.6
 jinja2~=3.0.1
 tqdm>=4.52.0,<5
 pytest-lazy-fixture~=0.6.3
