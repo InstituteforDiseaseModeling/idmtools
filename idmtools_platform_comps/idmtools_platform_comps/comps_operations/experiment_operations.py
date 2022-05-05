@@ -409,6 +409,8 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         obj.parent = suite
         # Set the correct attributes
         obj.uid = experiment.id
+        if isinstance(obj.uid, str):
+            obj.uid = UUID(obj.uid)
         obj.comps_experiment = experiment
         # load assets first so children can access during their load
         obj.assets = self.get_assets_from_comps_experiment(experiment)

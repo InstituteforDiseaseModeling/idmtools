@@ -388,6 +388,8 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         obj.experiment = parent
         # Set its correct attributes
         obj.uid = simulation.id
+        if isinstance(obj.uid, str):
+            obj.uid = UUID(obj.uid)
         obj.tags = simulation.tags
         obj.status = convert_comps_status(simulation.state)
         if simulation.files:

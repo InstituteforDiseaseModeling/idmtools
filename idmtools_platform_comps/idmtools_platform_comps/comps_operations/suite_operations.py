@@ -127,7 +127,10 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
         obj = Suite()
 
         # Set its correct attributes
+        obj.platform = self.platform
         obj.uid = suite.id
+        if isinstance(obj.uid, str):
+            obj.uid = UUID(obj.uid)
         obj.name = suite.name
         obj.description = suite.description
         obj.tags = suite.tags

@@ -179,6 +179,8 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         # only true asset collections have ids
         if isinstance(asset_collection, COMPSAssetCollection):
             ac.uid = asset_collection.id
+            if isinstance(ac.uid, str):
+                ac.uid = UUID(ac.uid)
             ac.tags = asset_collection.tags
         elif isinstance(asset_collection, list) and len(asset_collection):
             if not isinstance(asset_collection[0], (SimulationFile, WorkItemFile)):

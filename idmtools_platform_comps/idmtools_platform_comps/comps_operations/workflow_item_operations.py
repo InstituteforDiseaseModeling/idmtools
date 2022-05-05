@@ -237,6 +237,8 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         obj.platform = self.platform
         obj._platform_object = work_item
         obj.uid = work_item.id
+        if isinstance(obj.uid, str):
+            obj.uid = UUID(obj.uid)
         if work_item.asset_collection_id:
             obj.assets = AssetCollection.from_id(work_item.asset_collection_id, platform=self.platform)
         if work_item.files:
