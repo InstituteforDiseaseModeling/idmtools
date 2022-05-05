@@ -34,6 +34,11 @@ jobs:
           password: ${{ secrets.PYPI_STAGING_PASSWORD }}
       - uses: azure/docker-login@v1
         with:
+          login-server: docker-staging.packages.idmod.org
+          username: ${{ secrets.PYPI_STAGING_USERNAME }}
+          password: ${{ secrets.PYPI_STAGING_PASSWORD }}
+      - uses: azure/docker-login@v1
+        with:
           login-server: docker-production.packages.idmod.org
           username: ${{ secrets.PYPI_STAGING_USERNAME }}
           password: ${{ secrets.PYPI_STAGING_PASSWORD }}

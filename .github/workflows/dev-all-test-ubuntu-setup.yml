@@ -328,6 +328,7 @@ jobs:
       - name: login to docker staging
         run: |
           echo '${{ env.PYPI_STAGING_PASSWORD }}' | docker login idm-docker-staging.packages.idmod.org --username ${{ env.PYPI_STAGING_USERNAME }} --password-stdin
+          echo '${{ env.PYPI_STAGING_PASSWORD }}' | docker login docker-staging.packages.idmod.org --username ${{ env.PYPI_STAGING_USERNAME }} --password-stdin
       - name: run idmtools_platform_local all tests
         # only run if core and comps changed
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.local == 'true' || steps.filter.outputs.models == 'true'
