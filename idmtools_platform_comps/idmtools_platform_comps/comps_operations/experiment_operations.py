@@ -4,7 +4,9 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import copy
 import os
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
+from functools import partial
 from itertools import tee
 from logging import getLogger, DEBUG
 from typing import List, Type, Generator, NoReturn, Optional, TYPE_CHECKING
@@ -12,6 +14,8 @@ from uuid import UUID
 from COMPS.Data import Experiment as COMPSExperiment, QueryCriteria, Configuration, Suite as COMPSSuite, \
     Simulation as COMPSSimulation
 from COMPS.Data.Simulation import SimulationState
+from tqdm import tqdm
+
 from idmtools import IdmConfigParser
 from idmtools.assets import AssetCollection, Asset
 from idmtools.core import ItemType, EntityStatus
@@ -31,7 +35,6 @@ if TYPE_CHECKING:  # pragma: no cover
 
 logger = getLogger(__name__)
 user_logger = getLogger('user')
-
 
 @dataclass
 class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
@@ -420,6 +423,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         # if we are loading the children, convert them
         if children:
             # Convert all simulations
+            obj.simulations = []
             comps_sims = experiment.get_simulations(
                 QueryCriteria().select(
                     ["id", "name", "experiment_id", "state"]
@@ -427,11 +431,8 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
                     ["tags", "files", "configuration"]
                 )
             )
-            obj.simulations = []
-            for s in comps_sims:
-                obj.simulations.append(
-                    self.platform._simulations.to_entity(s, parent=obj, **kwargs)
-                )
+            te = ThreadPoolExecutor()
+            obj.simulations = list(tqdm(te.map(partial(self.platform._simulations.to_entity, **kwargs), comps_sims), total=len(comps_sims), ))
         return obj
 
     def get_assets_from_comps_experiment(self, experiment: COMPSExperiment) -> Optional[AssetCollection]:

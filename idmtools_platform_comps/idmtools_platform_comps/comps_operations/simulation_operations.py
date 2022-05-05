@@ -375,8 +375,9 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         Returns:
             Simulation object
         """
+
         # Recreate the experiment if needed
-        if parent is None or load_parent:
+        if load_parent:
             if logger.isEnabledFor(DEBUG):
                 logger.debug(f'Loading parent {simulation.experiment_id}')
             parent = self.platform.get_item(simulation.experiment_id, item_type=ItemType.EXPERIMENT)
@@ -384,8 +385,9 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         obj = Simulation()
         obj.platform = self.platform
         obj._platform_object = simulation
-        obj.parent = parent
-        obj.experiment = parent
+        if parent:
+            obj.parent = parent
+            obj.experiment = parent
         # Set its correct attributes
         obj.uid = simulation.id
         if isinstance(obj.uid, str):
@@ -401,10 +403,11 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             self._load_task_from_simulation(obj, simulation, metadata)
         else:
             obj.task = None
-            self.__extract_cli(simulation, parent, obj, load_cli_from_workorder)
-
-        # call task load options(load configs from files, etc)
-        obj.task.reload_from_simulation(obj)
+            if parent:
+                self.__extract_cli(simulation, parent, obj, load_cli_from_workorder)
+        if obj.task is not None:
+            # call task load options(load configs from files, etc)
+            obj.task.reload_from_simulation(obj)
         return obj
 
     def get_asset_collection_from_comps_simulation(self, simulation: COMPSSimulation) -> Optional[AssetCollection]:

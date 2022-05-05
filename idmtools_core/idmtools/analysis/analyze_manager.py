@@ -18,6 +18,8 @@ from idmtools.core import NoPlatformException
 from idmtools.core.enums import ItemType
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.core.logging import VERBOSE, SUCCESS
+from idmtools.entities import Suite
+from idmtools.entities.experiment import Experiment
 from idmtools.entities.ianalyzer import IAnalyzer
 from idmtools.utils.language import on_off, verbose_timedelta
 
@@ -145,13 +147,18 @@ class AnalyzeManager:
         items: List[IEntity] = []
         for oid, otype in ids:
             logger.debug(f'Getting metadata for {oid} and {otype}')
-            item = self.platform.get_item(oid, otype, force=True, raw=True)
+            item = self.platform.get_item(oid, otype, force=True)
             items.append(item)
         self.potential_items: List[IEntity] = []
 
         for i in items:
             logger.debug(f'Flattening items for {i.uid}')
-            self.potential_items.extend(self.platform.flatten_item(item=i, raw=True))
+            if isinstance(i, Experiment):
+                self.potential_items.extend(i.simulations)
+            elif isinstance(i, Suite):
+                self.potential_items.extend(self.platform.flatten_item(item=i))
+            else:
+                self.potential_items.append(i)
 
         # These are leaf items to be ignored in analysis. Make sure they are UUID and then prune them from analysis.
         self.exclude_ids = exclude_ids or []
