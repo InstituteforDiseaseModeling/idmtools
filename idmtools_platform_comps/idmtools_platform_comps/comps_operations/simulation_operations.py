@@ -554,6 +554,10 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         if include_experiment_assets and (comps_sim.configuration is None or comps_sim.configuration.asset_collection_id is None):
             if logger.isEnabledFor(DEBUG):
                 logger.debug("Gathering assets from experiment first")
+            # We have to load the experiment manually here is it is not set.
+            if simulation.experiment is None:
+                po = simulation.get_platform_object()
+                simulation.experiment = self.platform.get_item(po.experiment_id, ItemType.EXPERIMENT)
             exp_assets = get_asset_for_comps_item(self.platform, simulation.experiment, files, self.cache, load_children=["configuration"])
             if exp_assets is None:
                 exp_assets = dict()
