@@ -108,29 +108,6 @@ class TestPythonExperiment(ITestWithPersistence):
         self.assertDictEqual(expected_exp_tags, actual_exp_tags)
         self.assertDictEqual(expected_exp_tags, actual_exp_tags)
 
-        # validate reload
-        # with self.subTest("test_sweeps_with_partial_comps_reload_with_task"):
-        #     experiment_reload = Experiment.from_id(e.uid, self.platform, load_task=True)
-        #     self.assertEqual(e.id, experiment_reload.id)
-        #     self.assertEqual(e.simulation_count, experiment_reload.simulation_count)
-        #     # get all the ids
-        #     self.assertEqual(
-        #         sorted([s.uid for s in e.simulations]),
-        #         sorted([s.uid for s in experiment_reload.simulations])
-        #     )
-        #     for sim in experiment_reload.simulations:
-        #         self.assertIsInstance(sim.task, JSONConfiguredPythonTask)
-        #         self.assertIn("a", sim.task.parameters)
-        #         self.assertIn("b", sim.task.parameters)
-        #         self.assertEqual(str(e.simulations[0].task.command), str(sim.task.command))
-
-        with self.subTest("test_sweeps_with_partial_comps_reload"):
-            experiment_reload = Experiment.from_id(e.uid, self.platform)
-            for sim in experiment_reload.simulations:
-                self.assertIsInstance(sim.task, CommandTask)
-                'python ./Assets/model1.py --config config.json'
-                self.assertEqual(str(e.simulations[0].task.command), str(sim.task.command))
-
     # Test parameter "b" set is depending on parameter "a"
     # a=[0,1,2,3,4] <--sweep parameter
     # b=[2,3,4,5,6]  <-- b = a + 2
