@@ -36,6 +36,7 @@ if TYPE_CHECKING:  # pragma: no cover
 logger = getLogger(__name__)
 user_logger = getLogger('user')
 
+
 @dataclass
 class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
     """
