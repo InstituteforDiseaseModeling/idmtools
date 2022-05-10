@@ -33,10 +33,21 @@ class JSONMetadataOperations(metadata_operations.MetadataOperations):
 
         filepath = Path(self.metadata_directory_root, *[id for id in [suite_id, exp_id, sim_id] if id is not None],
                         self.METADATA_FILENAME)
-        self._initialize_file(item=item, item_type=item_type)
+        self._initialize_file(filepath=filepath)
         return filepath
 
-    def _initialize_file(self, item: IEntity, item_type: ItemType = ItemType.SIMULATION) -> bool:
+    @staticmethod
+    def _read_metadata_file(filepath: Path) -> Dict[Any, Any]:
+        with filepath.open(mode='r') as f:
+            metadata = json.load(f)
+        return metadata
+
+    @staticmethod
+    def _write_metadata_file(filepath: Path, data: Dict[Any, Any]):
+        with filepath.open(mode='w') as f:
+            json.dump(data, f)
+
+    def _initialize_file(self, filepath: Path) -> bool:
         """
         Ensures that the directory containing a metadata file to-be exists and then creates the file with blank data
         if the file does not already exist
@@ -46,20 +57,13 @@ class JSONMetadataOperations(metadata_operations.MetadataOperations):
 
         Returns: True if the file was created and set, False if it already existed
         """
-        filepath = self._get_metadata_filepath(item=item, item_type=item_type)
         if filepath.exists():
             ret = False
         else:
             filepath.parent.mkdir(parents=True)
-            self.set(item=item, item_type=item_type, metadata={})
+            self._write_metadata_file(filepath=filepath, data={})
             ret = True
         return ret
-
-    @staticmethod
-    def _get_by_filepath(filepath: Path) -> Dict[Any, Any]:
-        with filepath.open(mode='r') as f:
-            metadata = json.load(f)
-        return metadata
 
     def get(self, item: IEntity, item_type: ItemType = ItemType.SIMULATION) -> Dict[Any, Any]:
         """
@@ -71,7 +75,7 @@ class JSONMetadataOperations(metadata_operations.MetadataOperations):
         Returns: a key/value dict of metadata from the given item
         """
         filepath = self._get_metadata_filepath(item=item, item_type=item_type)
-        return self._get_by_filepath(filepath=filepath)
+        return self._read_metadata_file(filepath=filepath)
 
     def set(self, item: IEntity, metadata: Dict[Any, Any], item_type: ItemType = ItemType.SIMULATION) -> Dict[Any, Any]:
         """
@@ -84,8 +88,7 @@ class JSONMetadataOperations(metadata_operations.MetadataOperations):
         Returns: a key/value dict of fully-updated metadata from the given item
         """
         filepath = self._get_metadata_filepath(item=item, item_type=item_type)
-        with filepath.open(mode='w') as f:
-            json.dump(metadata, f)
+        self._write_metadata_file(filepath=filepath, data=metadata)
         return metadata
 
     def update(self, item: IEntity, metadata: Dict[Any, Any], item_type: ItemType = ItemType.SIMULATION) \
@@ -102,7 +105,7 @@ class JSONMetadataOperations(metadata_operations.MetadataOperations):
         Returns: a key/value dict of fully-updated metadata from the given item
         """
         existing_metadata = self.get(item=item, item_type=item_type)
-        metadata = {**metadata, **existing_metadata}
+        metadata = {**existing_metadata, **metadata}
         return self.set(item=item, item_type=item_type, metadata=metadata)
 
     def clear(self, item: IEntity, item_type: ItemType = ItemType.SIMULATION) -> Dict[Any, Any]:
@@ -116,35 +119,22 @@ class JSONMetadataOperations(metadata_operations.MetadataOperations):
         """
         return self.set(item=item, item_type=item_type, metadata={})
 
-    def _get_all_filepaths_of_item_type(self, item_type: ItemType = ItemType.SIMULATION) -> Dict[str, Path]:
-        root = Path(self.metadata_directory_root)
-        if item_type is ItemType.SIMULATION:
-            glob = f"*/*/*/{self.METADATA_FILENAME}"
-        elif item_type is ItemType.EXPERIMENT:
-            glob = f"*/*/{self.METADATA_FILENAME}"
-        elif item_type is ItemType.SUITE:
-            glob = f"*/{self.METADATA_FILENAME}"
-        else:
-            raise metadata_operations.MetadataException(f"Unknown item type for metadata operation: {item_type}")
-        metadata_filepaths = root.glob(pattern=glob)
-        ids = [path.parent.name for path in metadata_filepaths]
-        return dict(zip(ids, metadata_filepaths))
-
-    def filter(self, filter: Dict[Any, Any], item_type: ItemType = ItemType.SIMULATION) -> List[str]:
+    def filter(self, items: List[IEntity], filter: Dict[Any, Any], item_type: ItemType = ItemType.SIMULATION) \
+            -> List[IEntity]:
         """
         Obtain all items that match the given metadata key/value pairs passed. Filters are currently expected to be
         'equal to' comparisons (key==value) with boolean operator AND between them all.
         Args:
+            items: the list of items to search through
             filter: a dict of metadata_key/value pairs for exact match searching
             item_type: the type of items to search for matches (simulation, experiment, suite, etc)
 
-        Returns: a list of matching item ids # ck4, updated this to return ids, as not sure how to make proper items
+        Returns: a list of matching items
         """
-        filepaths = self._get_all_filepaths_of_item_type(item_type=item_type)
-        item_ids = []
-        for id, filepath in filepaths.items():
-            metadata = self._get_by_filepath(filepath=filepath)
+        matches = []
+        for item in items:
+            metadata = self.get(item=item, item_type=item_type)
             filter_match = [(k in metadata) and (metadata[k] == v) for k, v in filter.items()]
             if all(filter_match):
-                item_ids.append(id)
-        return item_ids
+                matches.append(item)
+        return matches

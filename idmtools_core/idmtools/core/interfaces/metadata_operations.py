@@ -66,10 +66,12 @@ class MetadataOperations(ABC):
         pass
 
     @abstractmethod
-    def filter(self, filter: Dict[Any, Any], item_type: ItemType = ItemType.SIMULATION) -> List[IEntity]:
+    def filter(self, items: List[IEntity], filter: Dict[Any, Any], item_type: ItemType = ItemType.SIMULATION) \
+            -> List[IEntity]:
         """
         Obtain all items that match the given metadata key/value pairs passed
         Args:
+            items: the list of items to search through
             filter: a dict of metadata_key/value pairs for exact match searching
             item_type: the type of items to search for matches (simulation, experiment, suite, etc)
 
