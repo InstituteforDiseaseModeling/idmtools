@@ -45,7 +45,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         self.platform._op_client.mk_directory(exp_dir)
         # store job info in the directory
         self.platform._op_client.dump_metadata(experiment, os.path.join(exp_dir, 'experiment.json'))
-        self.send_assets(experiment, )
+        self.send_assets(experiment)
         return experiment, experiment.uid
 
     def get_children(self, experiment: Any, **kwargs) -> List[Any]:
