@@ -16,7 +16,7 @@ def run_python_version():
     return experiment
 
 
-def run_sif_version():
+def run_sif_python_version():
     command = "singularity exec ./Assets/dtk_run_rocky_py39.sif python3 --version"
     task = CommandTask(command=command)
     sif_asset_id = "b5db36a4-7ccd-ec11-a9f8-b88303911bc1"  # pre_loaded sif as assetcollection in COMPS
@@ -35,7 +35,7 @@ if __name__ == '__main__':
     suite = Suite(name='python versions')
     platform.create_items([suite])
     exp1 = run_python_version()
-    exp2 = run_sif_version()
+    exp2 = run_sif_python_version()
     # add experiment to suite
     suite.add_experiment(exp1)
     suite.add_experiment(exp2)
