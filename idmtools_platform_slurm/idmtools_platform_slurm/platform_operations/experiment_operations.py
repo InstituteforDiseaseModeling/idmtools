@@ -9,7 +9,7 @@ from idmtools_platform_slurm.slurm_operations import SLURM_STATES
 
 
 @dataclass
-class SlurmPLatformExperimentOperations(IPlatformExperimentOperations):
+class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
     platform: 'SlurmPlatform'  # noqa: F821
     platform_type: Type = Experiment
 

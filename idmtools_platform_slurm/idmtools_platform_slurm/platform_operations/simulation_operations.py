@@ -10,7 +10,7 @@ from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPla
 
 
 @dataclass
-class SlurmPLatformSimulationOperations(IPlatformSimulationOperations):
+class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
     platform: 'SlurmPlatform'  # noqa: F821
     platform_type: Type = Simulation
 
