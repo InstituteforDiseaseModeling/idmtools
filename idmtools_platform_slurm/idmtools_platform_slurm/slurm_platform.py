@@ -1,14 +1,15 @@
 from typing import Optional
 from dataclasses import dataclass, field
 from logging import getLogger
+
+from idmtools.core.interfaces.iitem import IItem
 from idmtools.entities.iplatform import IPlatform
-from idmtools_platform_slurm.platform_operations.experiment_operations import SlurmPLatformExperimentOperations
-from idmtools_platform_slurm.platform_operations.simulation_operations import SlurmPLatformSimulationOperations
+from idmtools_platform_slurm.platform_operations.experiment_operations import SlurmPlatformExperimentOperations
+from idmtools_platform_slurm.platform_operations.simulation_operations import SlurmPlatformSimulationOperations
 from idmtools_platform_slurm.slurm_operations import SlurmOperationalMode, SlurmOperations, \
     RemoteSlurmOperations, LocalSlurmOperations
 
 logger = getLogger(__name__)
-
 op_defaults = dict(default=None, compare=False, metadata={"pickle_ignore": True})
 
 
@@ -25,8 +26,8 @@ class SlurmPlatform(IPlatform):
     remote_user: Optional[str] = field(default=None)
     key_file: Optional[str] = field(default=None)
 
-    _simulations: SlurmPLatformSimulationOperations = field(**op_defaults, repr=False, init=False)
-    _experiments: SlurmPLatformExperimentOperations = field(**op_defaults, repr=False, init=False)
+    _simulations: SlurmPlatformSimulationOperations = field(**op_defaults, repr=False, init=False)
+    _experiments: SlurmPlatformExperimentOperations = field(**op_defaults, repr=False, init=False)
     _op_client: SlurmOperations = field(**op_defaults, repr=False, init=False)
 
     def __post_init__(self):
@@ -47,8 +48,8 @@ class SlurmPlatform(IPlatform):
         else:
             self._op_client = LocalSlurmOperations()
 
-        self._simulations = SlurmPLatformSimulationOperations(self)
-        self._experiments = SlurmPLatformExperimentOperations(self)
+        self._simulations = SlurmPlatformSimulationOperations(self)
+        self._experiments = SlurmPlatformExperimentOperations(self)
 
     def __has_singularity(self):
         """
