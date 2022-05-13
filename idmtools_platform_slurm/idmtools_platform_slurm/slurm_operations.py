@@ -1,20 +1,26 @@
+"""
+Here we implement the SlurmPlatform operations.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
+import os
 import copy
 import dataclasses
-import json
-import os
-import shutil
-import subprocess
-import tempfile
-from abc import ABC, abstractmethod
-from dataclasses import dataclass, is_dataclass
-from datetime import datetime
 from enum import Enum
-from io import BytesIO, StringIO
+from pathlib import Path
+from datetime import datetime
 from logging import getLogger
-from typing import Union
-from idmtools.assets import Asset
+from abc import ABC, abstractmethod
+from dataclasses import dataclass, field
+from typing import Union, Type, Any
 from paramiko import SSHClient, SFTP, AutoAddPolicy
 from idmtools.core import EntityStatus
+from idmtools.entities import Suite
+from idmtools.entities.experiment import Experiment
+from idmtools.entities.simulation import Simulation
+
+SIMULATION_SH_FILE = '_run.sh'
+EXPERIMENT_SH_FILE = 'job_submit.sh'
 
 logger = getLogger(__name__)
 
@@ -38,13 +44,13 @@ def asdict(obj, *, dict_factory=dict):
     dataclass instances. This will also look into built-in containers:
     tuples, lists, and dicts.
     """
-    if not is_dataclass(obj):
+    if not dataclasses.is_dataclass(obj):
         raise TypeError("asdict() should be called on dataclass instances")
     return _asdict_inner(obj, dict_factory)
 
 
 def _asdict_inner(obj, dict_factory):
-    if is_dataclass(obj):
+    if dataclasses.is_dataclass(obj):
         result = []
         for f in dataclasses.fields(obj):
             if 'pickle_function' in f.metadata:
@@ -119,97 +125,33 @@ class SlurmOperationalMode(Enum):
 
 
 class SlurmOperations(ABC):
+    platform: 'SlurmPlatform'  # noqa: F821
+    platform_type: Type = field(default=None)
+
     @abstractmethod
-    def copy_asset(self, asset, dest):
+    def mk_directory(self, item: Union[Suite, Experiment, Simulation] = None, dest: Union[Path, str] = None,
+                     exist_ok: bool = True) -> None:
         pass
 
     @abstractmethod
-    def download_asset(self, dest, output: Union[str, BytesIO] = None):
+    def link_dir(self, target: Union[Path, str], link: Union[Path, str]) -> None:
         pass
 
     @abstractmethod
-    def mk_directory(self, dest):
+    def get_batch_content(self, item: Union[Experiment, Simulation], **kwargs) -> str:
         pass
 
     @abstractmethod
-    def link_dir(self, src, dest):
+    def create_batch_file(self, item: Union[Experiment, Simulation], item_path: Union[Path, str] = None,
+                          **kwargs) -> None:
         pass
 
     @abstractmethod
-    def submit_job(self, job_file_path, working_directory):
+    def submit_job(self, sjob_file_path: Union[Path, str], working_directory: Union[Path, str]) -> None:
         pass
 
     @abstractmethod
-    def dump_metadata(self, object, dest):
-        pass
-
-    def get_batch_contents(self, simulation, sim_path, mail_type=None, mail_user=None, ntasks=None, qos=None,
-                           time=None, nodes=None, ntasks_per_node=None, constraint=None, gres=None, mem=None,
-                           exclusive=None, access=None, partition=None, mem_per_cpu=None, nodelist=None, exclude=None,
-                           requeue=None, modules=None, mode='SSH'):
-        """
-        See https://ubccr.freshdesk.com/support/solutions/articles/5000688140-submitting-a-slurm-job-script
-        Args:
-            simulation:
-            sim_path:
-            mail_type:
-            mail_user:
-            ntasks:stdout_.channel.recv_exit_status()
-            qos:
-            time:
-            nodes:
-            ntasks_per_node:
-            constraint:
-            gres:
-            mem:
-            exclusive:
-            access:
-            partition:
-            mem_per_cpu:
-            nodelist:
-            exclude:
-            requeue:
-            modules:
-            mode:
-
-
-        Returns:
-
-        """
-        contents = DEFAULT_SIMULATION_BATCH.format(**dict(simulation=simulation, self=self, now=str(datetime.now()),
-                                                          mode=mode, outputfile=os.path.join(sim_path, 'StdOut.txt')))
-        # contents += "#SBATCH --mail-type=ALL\n"
-        # contents += "#SBATCH --mail-user=$USER@idmod.org\n"
-        for opt in ['ntasks', 'qos', 'time', 'nodes', 'ntasks_per_node', 'constraint', 'gres', 'mem', 'account',
-                    'partition', 'mem_per_cpu', 'mail_type', 'mail_user', 'exclude']:
-            if opt in locals() and locals()[opt]:
-                contents += f'SBATCH --{opt.replace("_", "-")}=' + locals()[opt] + "\n"
-        if access:
-            contents += 'SBATCH --exclusive\n'
-
-        if requeue:
-            contents += 'SBATCH --requeue\n'
-
-        if nodelist:
-            contents += f'#SBATCH -w, --nodelist={nodelist}\n'
-
-        if modules:
-            for module in modules:
-                contents += f'module load {module}\n'
-
-        return contents
-
-    @abstractmethod
-    def create_simulation_batch_file(self, simulation, sim_dir, mail_type=None, mail_user=None, ntasks=None, qos=None,
-                                     time=None, nodes=None, ntasks_per_node=None, constraint=None, gres=None, mem=None,
-                                     exclusive=None, access=None, partition=None, mem_per_cpu=None, nodelist=None,
-                                     exclude=None,
-                                     requeue=None, modules=None):
-
-        pass
-
-    @abstractmethod
-    def experiment_status(self, experiment):
+    def entity_status(self, item: Union[Suite, Experiment, Simulation]) -> Any:
         pass
 
 
@@ -231,113 +173,211 @@ class RemoteSlurmOperations(SlurmOperations):
 
         self._file_client = self._cmd_client.open_sftp()
 
-    def copy_asset(self, asset, dest):
-        # TODO Check on windows if we have to convert EOLs on scripts and what not
-        if asset.absolute_path:
-            fn = os.path.basename(asset.absolute_path)
-            self._file_client.put(asset.absolute_path, os.path.join(dest, fn))
-        elif asset.content:
-            # TODO check pathing on windows to slurm on linux
-            self._file_client.putfo(BytesIO(asset.content), os.path.join(dest, asset.filename))
+    def mk_directory(self, item: Union[Suite, Experiment, Simulation] = None, dest: Union[Path, str] = None,
+                     exist_ok: bool = True) -> None:
+        pass
 
-    def download_asset(self, dest, output: Union[str, BytesIO] = None):
-        # TODO Support streaming these objects to avoid full memory
-        if output is None:
-            output = BytesIO()
-        if isinstance(output, str):
-            output = open(output, 'wb')
-        self._file_client.getfo(dest, output)
+    def link_dir(self, target: Union[Path, str], link: Union[Path, str]) -> None:
+        pass
 
-    def link_dir(self, src, dest):
-        self._cmd_client.exec_command(f'ln -s {src} {dest}')
+    def get_batch_content(self, item: Union[Experiment, Simulation], **kwargs) -> str:
+        pass
 
-    def mk_directory(self, dest):
-        self._file_client.mkdir(dest)
+    def create_batch_file(self, item: Union[Experiment, Simulation], item_path: Union[Path, str] = None,
+                          **kwargs) -> None:
+        pass
 
-    def dump_metadata(self, object, dest):
-        tmp_file, tmp_file_name = tempfile.mkstemp()
-        with open(tmp_file_name, 'w') as out:
-            if is_dataclass(object):
-                json.dump(asdict(object), out)
-            else:
-                json.dump(object, out)
-        self._file_client.put(tmp_file_name, dest)
-        os.remove(tmp_file_name)
+    def submit_job(self, sjob_file_path: Union[Path, str], working_directory: Union[Path, str]) -> None:
+        pass
 
-    def create_simulation_batch_file(self, simulation, sim_dir, **kwargs):
-        contents = self.get_batch_contents(simulation, sim_dir, mode='SSH', **kwargs)
-        contents += "\n"
-        contents += f"\nsrun {simulation.experiment.command.cmd}"
-
-        self._file_client.putfo(StringIO(contents), os.path.join(sim_dir, 'submit-simulation.sh'))
-
-    def submit_job(self, job_file_path, working_directory):
-        stdin_, stdout_, stderr_ = self._cmd_client.exec_command(f'cd {working_directory}; sbatch {job_file_path}')
-        logger.debug(f"SSH Output: {stdout_.readlines()}")
-        logger.debug(stdout_.channel.recv_exit_status())
-        # TODO verify result
-
-    def experiment_status(self, experiment):
-        stdin_, stdout_, stderr_ = self._cmd_client.exec_command('sacct -S1970-01-01T00:00 -n -p -oJobname,state')
-        output_lines = reversed(stdout_.readlines())
-        sids = [s.uid for s in experiment.simulations]
-        sims = {}
-        for line in output_lines:
-            line = line.split('|')
-            if line[0] in sids:
-                sims[line[0]] = line[1]
-                if len(sims) == len(sids):
-                    break
-
-        return sims
+    def entity_status(self, item: Union[Suite, Experiment, Simulation]) -> Any:
+        pass
 
 
 @dataclass
 class LocalSlurmOperations(SlurmOperations):
 
-    def experiment_status(self, experiment):
-        raise NotImplementedError("TODO")
+    def __post_init__(self):
+        pass
 
-    def link_dir(self, src, dest):
-        raise NotImplementedError("TODO")
+    def get_entity_dir(self, item: Union[Suite, Experiment, Simulation]) -> Path:
+        """
+        Get item's path.
+        Args:
+            item: Suite, Experiment, Simulation
+        Returns:
+            item file directory
+        """
+        if isinstance(item, Suite):
+            item_dir = Path(self.platform.job_directory, item.id)
+        elif isinstance(item, Experiment):
+            suite = item.parent
+            if suite is None:
+                raise RuntimeError("Experiment missing parent!")
+            suite_dir = self.get_entity_dir(suite)
+            item_dir = Path(suite_dir, item.id)
+        elif isinstance(item, Simulation):
+            exp = item.parent
+            if exp is None:
+                raise RuntimeError("Simulation missing parent!")
+            exp_dir = self.get_entity_dir(exp)
+            item_dir = Path(exp_dir, item.id)
 
-    def dump_metadata(self, object, dest):
-        if dataclasses.is_dataclass(object):
-            json.dump(dataclasses.asdict(object), dest)
+        return item_dir
+
+    def mk_directory(self, item: Union[Suite, Experiment, Simulation] = None, dest: Union[Path, str] = None,
+                     exist_ok: bool = True) -> None:
+        """
+        Make a new directory.
+        Args:
+            item: Suite/Experiment/Simulation
+            dest: the folder path
+            exist_ok: True/False
+        Returns:
+            None
+        """
+        if dest is not None:
+            target = Path(dest)
+        elif isinstance(item, (Suite, Experiment, Simulation)):
+            target = self.get_entity_dir(item)
         else:
-            json.dump(object, dest)
+            raise RuntimeError('Only support Suite/Experiment/Simulation or not None dest.')
+        os.makedirs(target, exist_ok=exist_ok)
 
-    def download_asset(self, dest, output: Union[str, BytesIO] = None):
-        # TODO Support streaming these objects to avoid full memory
-        if output is None:
-            output = BytesIO()
-        if isinstance(output, str):
-            output = open(output, 'wb')
-        with open(dest, 'rb') as out:
-            output.write(out.read())
+    # @cache
+    def link_file(self, target: Union[Path, str], link: Union[Path, str]) -> None:
+        """
+        Link files.
+        Args:
+            target: the source file path
+            link: the file path
+        Returns:
+            None
+        """
+        target = Path(target).absolute()
+        link = Path(link).absolute()
+        os.symlink(target, link)
 
-    def mk_directory(self, dest):
-        os.makedirs(dest, exist_ok=True)
+    # @cache
+    def link_dir(self, target: Union[Path, str], link: Union[Path, str]) -> None:
+        """
+        Link directory/files.
+        Args:
+            target: the source folder path.
+            link: the folder path
+        Returns:
+            None
+        """
+        target = Path(target).absolute()
+        link = Path(link).absolute()
+        os.symlink(target, link)
 
-    def copy_asset(self, asset: Asset, dest):
-        if asset.absolute_path:
-            shutil.copy(asset.absolute_path, dest)
-        elif asset.content:
-            with open(os.path.join(dest, asset.filename), 'wb') as out:
-                out.write(asset.content)
+    def get_batch_configs(self, **kwargs) -> str:
+        """
+        Build Batch for configuration part.
+        Args:
+            kwargs: dynamic parameters
+        Returns:
+            text
+        """
+        contents = ''
+        sbatch_configs = self.platform.get_slurm_configs(**kwargs)
+        for p, v in sbatch_configs.items():
+            if not v:
+                continue
+            if p == 'nodelist':
+                contents += f'#SBATCH -w, --nodelist={v}\n'
+            elif p == 'modules':
+                for module in v:
+                    contents += f'module load {module}\n'
+            else:
+                contents += f'#SBATCH --{p}={v}\n'
 
-    def create_simulation_batch_file(self, simulation, sim_dir, **kwargs):
-        contents = self.get_batch_contents(simulation, sim_dir, mode='Local', **kwargs)
+        return contents
+
+    def get_base_batch_content(self, item: Union[Experiment, Simulation], **kwargs) -> str:
+        """
+        Get base batch content.
+        Args:
+            item: the item to build batch for
+            item_path: the file path
+        Returns:
+            text
+        """
+        item_path = self.get_entity_dir(item)
+        output_file = Path(item_path, 'StdOut.txt')
+        contents = DEFAULT_SIMULATION_BATCH.format(
+            **dict(simulation=item, self=self, now=str(datetime.now()), mode=self.platform.mode,
+                   outputfile=output_file))
         contents += "\n"
-        contents += f"\nsrun {simulation.experiment.command.cmd}"
-        with open(os.path.join(sim_dir, 'submit-simulation.sh'), 'w') as out:
+        return contents
+
+    def get_batch_content(self, item: Union[Experiment, Simulation], **kwargs) -> str:
+        """
+        Get base batch content.
+        TODO: this is just a 'fake' sample, not the real one.
+        Args:
+            item: the item to build batch for
+            item_path: the file path
+        Returns:
+            None
+        """
+        item_path = self.get_entity_dir(item)
+        contents = self.get_base_batch_content(item, **kwargs)
+        contents += self.get_batch_configs(**kwargs)
+        contents += "\n"
+        if isinstance(item, Experiment):
+            pattern = f'*/{SIMULATION_SH_FILE}'
+            for filename in item_path.glob(pattern=pattern):
+                contents += f"srun {filename} &"
+                contents += "\n"
+            contents += "\n"
+            contents += "wait"
+        elif isinstance(item, Simulation):
+            contents += "\n"
+            contents += f"srun {item.task.command.cmd}"
+        return contents
+
+    def create_batch_file(self, item: Union[Experiment, Simulation], item_path: Union[Path, str] = None,
+                          **kwargs) -> None:
+        """
+        Create batch file.
+        Args:
+            item: item: the item to build batch file for
+            item_path: the file path
+        Returns:
+            None
+        """
+        if item_path is None:
+            item_path = self.get_entity_dir(item)
+        item_path = Path(item_path)
+
+        contents = self.get_batch_content(item, **kwargs)
+        if isinstance(item, Experiment):
+            sh_file = EXPERIMENT_SH_FILE
+        elif isinstance(item, Simulation):
+            sh_file = SIMULATION_SH_FILE
+
+        with open(Path(item_path, sh_file), 'w') as out:
             out.write(contents)
 
-    def submit_job(self, job_file_path, working_directory):
-        result = subprocess.check_output(['sbatch', job_file_path], cwd=working_directory)
-        print(result)
-        # TODO verify result
+    def submit_job(self, sjob_file_path: Union[Path, str], working_directory: Union[Path, str]) -> None:
+        """
+        Submit a Slurm job.
+        Args:
+            sjob_file_path: the file content
+            working_directory: the file path
+        Returns:
+            None
+        """
+        raise NotImplementedError(f"Submit job is not implemented on SlurmPlatform.")
 
-    def simulation_status(self, simulation):
-        state = subprocess.check_output(['sacct', '-S1970-01-01T00:00', f'--name={simulation.uid}', '-n', '-ostate'])
-        return SLURM_STATES[state]
+    def entity_status(self, item: Union[Suite, Experiment, Simulation]) -> Any:
+        """
+        Get item status.
+        Args:
+            item: IEntity
+        Returns:
+            item status
+        """
+        raise NotImplementedError(f"{item.__class__.__name__} is not supported on SlurmPlatform.")

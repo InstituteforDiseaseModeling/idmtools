@@ -69,3 +69,15 @@ class SlurmPLatformSimulationOperations(IPlatformSimulationOperations):
 
     def list_assets(self, simulation: Simulation) -> List[str]:
         raise NotImplementedError("Listing assets is not supported on Slurm Yet")
+
+    def platform_run_item(self, simulation: Simulation, **kwargs):
+        """
+        Called during commissioning of an item. This should create the remote resource but not upload assets.
+
+        Args:
+            simulation: Simulation to run
+
+        Returns:
+            None
+        """
+        pass
