@@ -82,6 +82,11 @@ class SlurmPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
                 if asset_file.exists():
                     asset = Asset(absolute_path=asset_file.absolute())
                     ret[file] = bytearray(asset.bytes)
+        elif isinstance(item, Experiment):
+            for sim in item.simulations:
+                ret[sim.uid] = self.get_assets(sim, files, **kwargs)
+        else:
+            raise NotImplementedError("Get assets for this item is not supported on SlurmPlatform.")
 
         return ret
 
@@ -148,3 +153,5 @@ class SlurmPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
             for asset in item.assets:
                 sim_dir = Path(exp_dir, item.id)
                 self.copy_asset(asset, sim_dir)
+        else:
+            raise NotImplementedError("Dump assets for this item is not supported on SlurmPlatform.")
