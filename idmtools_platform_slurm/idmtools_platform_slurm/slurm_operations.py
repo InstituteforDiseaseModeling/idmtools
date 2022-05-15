@@ -15,6 +15,7 @@ from dataclasses import dataclass, field
 from typing import Union, Type, Any
 from paramiko import SSHClient, SFTP, AutoAddPolicy
 from idmtools.core import EntityStatus
+from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
@@ -129,8 +130,7 @@ class SlurmOperations(ABC):
     platform_type: Type = field(default=None)
 
     @abstractmethod
-    def mk_directory(self, item: Union[Suite, Experiment, Simulation] = None, dest: Union[Path, str] = None,
-                     exist_ok: bool = True) -> None:
+    def mk_directory(self, item: IEntity) -> None:
         pass
 
     @abstractmethod
@@ -138,20 +138,19 @@ class SlurmOperations(ABC):
         pass
 
     @abstractmethod
-    def get_batch_content(self, item: Union[Experiment, Simulation], **kwargs) -> str:
+    def get_batch_content(self, item: IEntity, **kwargs) -> str:
         pass
 
     @abstractmethod
-    def create_batch_file(self, item: Union[Experiment, Simulation], item_path: Union[Path, str] = None,
-                          **kwargs) -> None:
+    def create_batch_file(self, item: IEntity, **kwargs) -> None:
         pass
 
     @abstractmethod
-    def submit_job(self, sjob_file_path: Union[Path, str], working_directory: Union[Path, str]) -> None:
+    def submit_job(self, sjob_file_path: Union[Path, str]) -> None:
         pass
 
     @abstractmethod
-    def entity_status(self, item: Union[Suite, Experiment, Simulation]) -> Any:
+    def entity_status(self, item: IEntity) -> Any:
         pass
 
 
@@ -173,24 +172,22 @@ class RemoteSlurmOperations(SlurmOperations):
 
         self._file_client = self._cmd_client.open_sftp()
 
-    def mk_directory(self, item: Union[Suite, Experiment, Simulation] = None, dest: Union[Path, str] = None,
-                     exist_ok: bool = True) -> None:
+    def mk_directory(self, item: IEntity) -> None:
         pass
 
     def link_dir(self, target: Union[Path, str], link: Union[Path, str]) -> None:
         pass
 
-    def get_batch_content(self, item: Union[Experiment, Simulation], **kwargs) -> str:
+    def get_batch_content(self, item: IEntity, **kwargs) -> str:
         pass
 
-    def create_batch_file(self, item: Union[Experiment, Simulation], item_path: Union[Path, str] = None,
-                          **kwargs) -> None:
+    def create_batch_file(self, item: IEntity, **kwargs) -> None:
         pass
 
-    def submit_job(self, sjob_file_path: Union[Path, str], working_directory: Union[Path, str]) -> None:
+    def submit_job(self, sjob_file_path: Union[Path, str]) -> None:
         pass
 
-    def entity_status(self, item: Union[Suite, Experiment, Simulation]) -> Any:
+    def entity_status(self, item: IEntity) -> Any:
         pass
 
 
@@ -274,7 +271,7 @@ class LocalSlurmOperations(SlurmOperations):
 
     def get_batch_configs(self, **kwargs) -> str:
         """
-        Build Batch for configuration part.
+        Utility: build Batch for configuration part.
         Args:
             kwargs: dynamic parameters
         Returns:
@@ -297,7 +294,8 @@ class LocalSlurmOperations(SlurmOperations):
 
     def get_base_batch_content(self, item: Union[Experiment, Simulation], **kwargs) -> str:
         """
-        Get base batch content.
+        Utility: Get base batch content.
+        TODO: may not need this
         Args:
             item: the item to build batch for
             item_path: the file path
