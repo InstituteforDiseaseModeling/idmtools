@@ -6,12 +6,12 @@ import shutil
 import subprocess
 import tempfile
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, is_dataclass
+from dataclasses import dataclass, field, is_dataclass
 from datetime import datetime
 from enum import Enum
 from io import BytesIO, StringIO
 from logging import getLogger
-from typing import Union
+from typing import Union, Type
 from idmtools.assets import Asset
 from paramiko import SSHClient, SFTP, AutoAddPolicy
 from idmtools.core import EntityStatus
@@ -118,7 +118,11 @@ class SlurmOperationalMode(Enum):
     LOCAL = 'local'
 
 
+@dataclass
 class SlurmOperations(ABC):
+    platform: 'SlurmPlatform'  # noqa: F821
+    platform_type: Type = dataclasses.field(default=None)
+
     @abstractmethod
     def copy_asset(self, asset, dest):
         pass
@@ -215,13 +219,13 @@ class SlurmOperations(ABC):
 
 @dataclass
 class RemoteSlurmOperations(SlurmOperations):
-    hostname: str
-    username: str
-    key_file: str
-    port: int = 22
+    hostname: str = field(default=None)
+    username: str = field(default=None)
+    key_file: str = field(default=None)
+    port: int = field(default=22)
 
-    _cmd_client: SSHClient = None
-    _file_client: SFTP = None
+    _cmd_client: SSHClient = field(default=None)
+    _file_client: SFTP = field(default=None)
 
     def __post_init__(self):
         self._cmd_client = SSHClient()
