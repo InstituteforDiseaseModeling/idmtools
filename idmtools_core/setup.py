@@ -15,7 +15,7 @@ for file_prefix in ['', 'dev_', 'build_']:
     with open(f'{filename}.txt') as requirements_file:
         extra_require_files[file_prefix.strip("_") if file_prefix else filename] = [dependency for dependency in requirements_file.read().split("\n") if not dependency.startswith("--")]
 
-version = '1.6.6'
+version = '1.6.6+nightly'
 
 extras = {
     'test': extra_require_files['build'] + extra_require_files['dev'],
@@ -24,7 +24,7 @@ extras = {
     'packaging': extra_require_files['build'],
     'idm': ['idmtools_platform_comps', 'idmtools_cli', 'idmtools_models'],
     # our full install include all common plugins
-    'full': ['idmtools_platform_comps', 'idmtools_platform_local', 'idmtools_cli', 'idmtools_models']
+    'full': ['idmtools_platform_comps', 'idmtools_platform_local', 'idmtools_cli', 'idmtools_models', 'idmtools_platform_slurm']
 }
 
 authors = [
