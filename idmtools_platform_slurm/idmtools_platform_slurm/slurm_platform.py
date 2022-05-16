@@ -46,7 +46,7 @@ class SlurmPlatform(IPlatform):
             self._op_client = RemoteSlurmOperations(self.remote_host, self.remote_user, self.key_file,
                                                     port=self.remote_port)
         else:
-            self._op_client = LocalSlurmOperations()
+            self._op_client = LocalSlurmOperations(platform=self)
 
         self._simulations = SlurmPlatformSimulationOperations(self)
         self._experiments = SlurmPlatformExperimentOperations(self)
