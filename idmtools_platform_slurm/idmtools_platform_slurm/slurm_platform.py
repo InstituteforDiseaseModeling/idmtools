@@ -90,8 +90,8 @@ class SlurmPlatform(IPlatform):
             if self.remote_host is None or self.remote_user is None:
                 raise ValueError("remote_host, remote_user and key_file are required configuration parameters "
                                  "when the mode is SSH")
-            self._op_client = RemoteSlurmOperations(platform=self, remote_host=self.remote_host,
-                                                    remote_user=self.remote_user, key_file=self.key_file,
+            self._op_client = RemoteSlurmOperations(platform=self, remotehost=self.remote_host,
+                                                    remoteuser=self.remote_user, key_file=self.key_file,
                                                     port=self.remote_port)
         else:
             self._op_client = LocalSlurmOperations(platform=self)
