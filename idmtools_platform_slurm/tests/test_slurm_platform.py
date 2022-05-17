@@ -12,8 +12,10 @@ from idmtools.entities.simulation import Simulation
 from idmtools_platform_slurm.slurm_operations import LocalSlurmOperations
 
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
+from idmtools_test.utils.test_task import TestTask
 
 cwd = os.path.dirname(__file__)
+
 
 @pytest.mark.smoke
 class TestPythonSimulation(ITestWithPersistence):
@@ -23,18 +25,41 @@ class TestPythonSimulation(ITestWithPersistence):
 
     def test_slurm_platform_fields(self):
         actual_field_set = self.platform.slurm_fields
-        expected_field_set = {'notification_email', 'memory_per_cpu', 'cpu_per_task', 'requeue', 'mail_type',
+        expected_field_set = {'mem_per_cpu', 'cpu_per_task', 'requeue', 'mail_type',
                               'exclusive', 'nodes', 'account', 'ntasks', 'modules', 'partition', 'mail_user',
                               'time_limit'}
         self.assertEqual(sorted(expected_field_set), sorted(actual_field_set))
 
-    def test_slurm_slurm_configs(self):
+    def test_slurm_configs_default(self):
         slurm_configs_dict = self.platform.get_slurm_configs()
         expected_config_dict = {'mail_user': None, 'account': None, 'exclusive': False, 'ntasks': 1,
-                                'partition': 'cpu_short', 'memory_per_cpu': 8192, 'modules': [], 'mail_type': None,
-                                'time_limit': None, 'notification_email': None, 'requeue': False, 'cpu_per_task': 1,
+                                'partition': 'cpu_short', 'mem_per_cpu': 8192, 'modules': [], 'mail_type': None,
+                                'time_limit': None, 'requeue': False, 'cpu_per_task': 1,
                                 'nodes': 1}
         self.assertEqual(slurm_configs_dict, expected_config_dict)
+
+    def test_slurm_configs_from_user_defined(self):
+        platform = Platform("SLURM_TEST", job_directory=".", mode="local", mail_user="test@test.com",
+                            account="test_acct", mail_type="begin", memory_per_cpu=2048, cpu_per_task=2)
+        slurm_configs_dict = platform.get_slurm_configs()
+        expected_config_dict = {'account': 'test_acct', 'cpu_per_task': 2, 'exclusive': False, 'mail_type': 'begin',
+                                'mail_user': 'test@test.com', 'mem_per_cpu': 8192, 'modules': [], 'nodes': 1,
+                                'ntasks': 1, 'partition': 'cpu_short', 'requeue': False, 'time_limit': None}
+        self.assertEqual(slurm_configs_dict, expected_config_dict)
+
+        # validate custom default config get override with Platform parameters
+        self.assertEqual(platform.job_directory, '.')
+        self.assertEqual(platform.mode.name, "LOCAL")
+        self.assertEqual(platform.mode.value, "local")
+
+    def test_localSlurmOperations_get_batch_configs(self):
+        local = LocalSlurmOperations(platform=self.platform)
+        batch_config = local.get_batch_configs()
+        self.assertIn("#SBATCH --ntasks=1", batch_config)
+        self.assertIn("#SBATCH --partition=cpu_short", batch_config)
+        self.assertIn("#SBATCH --cpu-per-task=1", batch_config)
+        self.assertIn("#SBATCH --nodes=1", batch_config)
+        self.assertIn("#SBATCH --mem-per-cpu=8192", batch_config)
 
     # suite only case
     def test_localSlurmOperations_get_suite_entity_dir(self):
@@ -131,7 +156,7 @@ class TestPythonSimulation(ITestWithPersistence):
         self.assertEqual(ex.exception.args[0], "Only support Suite/Experiment/Simulation or not None dest.")
 
     # create dirs for suite/experiment/simulations
-    def test_localSlurmOperations_make_dir_dest_suite(self):
+    def test_localSlurmOperations_make_dir_dest_simulations(self):
         local = LocalSlurmOperations(platform=self.platform)
         suite = Suite()
         experiment = Experiment()
@@ -147,7 +172,44 @@ class TestPythonSimulation(ITestWithPersistence):
         self.assertTrue(os.path.isdir(expected_dir1))
         self.assertTrue(os.path.isdir(expected_dir2))
         # delete dir after test
-        shutil.rmtree(expected_dir1)
+        shutil.rmtree(os.path.join(cwd, suite.id))
         self.assertFalse(os.path.isdir(expected_dir1))
-        shutil.rmtree(expected_dir2)
         self.assertFalse(os.path.isdir(expected_dir2))
+
+    def test_localSlurmOperations_experiment_create_batch_file(self):
+        local = LocalSlurmOperations(platform=self.platform)
+        suite = Suite()
+        experiment = Experiment(_uid=uuid4())
+        experiment.parent = suite
+        local.mk_directory(experiment)
+        local.create_batch_file(experiment)
+        # verify batch file locally
+        job_path = os.path.join(cwd, suite.id, experiment.id, "job_submit.sh")
+        self.assertTrue(os.path.exists(job_path))
+        # TODO validation job_submit.sh content
+        # with open(job_path) as f:
+        #     contents = f.readlines()
+        # # check #SBATCH --job-name=experiment.id in job_submit.sh file.
+        # if any("#SBATCH --job-name=" + experiment.id in i for i in contents):
+        #     self.assertTrue(1)
+        # else:
+        #     self.assertFalse(1)
+        # clean up suite folder
+        shutil.rmtree(os.path.join(cwd, suite.id))
+        self.assertFalse(os.path.exists(job_path))
+
+    def test_localSlurmOperations_simulation_create_batch_file(self):
+        local = LocalSlurmOperations(platform=self.platform)
+        suite = Suite()
+        experiment = Experiment(_uid=uuid4())
+        experiment.parent = suite
+        simulation = Simulation(_uid=uuid4(), task=TestTask())
+        simulation.parent = experiment
+        local.mk_directory(simulation)
+        local.create_batch_file(simulation)
+        # verify batch file locally
+        job_path = os.path.join(cwd, suite.id, experiment.id, simulation.id, "_run.sh")
+        self.assertTrue(os.path.exists(job_path))
+        # clean up suite folder
+        shutil.rmtree(os.path.join(cwd, suite.id))
+        self.assertFalse(os.path.exists(job_path))
