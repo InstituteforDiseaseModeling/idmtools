@@ -293,7 +293,7 @@ class LocalSlurmOperations(SlurmOperations):
     def get_batch_content(self, item: Union[Experiment, Simulation], **kwargs) -> str:
         """
         Get base batch content.
-        TODO: this is just a 'fake' sample, not the real one. Clinton is working on the details.
+        TODO: this is just a 'fake' sample, not the real one. Clinton is working on the details and may completely re-write the generated script.
         Args:
             item: the item to build batch for
         Returns:
@@ -333,6 +333,8 @@ class LocalSlurmOperations(SlurmOperations):
             sh_file = EXPERIMENT_SH_FILE
         elif isinstance(item, Simulation):
             sh_file = SIMULATION_SH_FILE
+        else:
+            raise NotImplementedError(f"{item.__class__.__name__} is not supported for batch creation.")
 
         with open(Path(item_path, sh_file), 'w') as out:
             out.write(contents)
