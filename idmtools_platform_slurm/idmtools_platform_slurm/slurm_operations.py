@@ -293,25 +293,6 @@ class LocalSlurmOperations(SlurmOperations):
 
         return contents
 
-    def get_base_batch_content(self, item: Union[Experiment, Simulation], **kwargs) -> str:
-        """
-        Utility: Get base batch content.
-        TODO: may not need this. Clinton is working on the details of creating batch script.
-        We can delete this if it is not needed later.
-        Args:
-            item: the item to build batch for
-            item_path: the file path
-        Returns:
-            text
-        """
-        item_path = self.get_entity_dir(item)
-        output_file = Path(item_path, 'StdOut.txt')
-        contents = DEFAULT_SIMULATION_BATCH.format(
-            **dict(simulation=item, self=self, now=str(datetime.now()), mode=self.platform.mode,
-                   outputfile=output_file))
-        contents += "\n"
-        return contents
-
     def get_batch_content(self, item: Union[Experiment, Simulation], **kwargs) -> str:
         """
         Get base batch content.
@@ -323,8 +304,7 @@ class LocalSlurmOperations(SlurmOperations):
             None
         """
         item_path = self.get_entity_dir(item)
-        contents = self.get_base_batch_content(item, **kwargs)
-        contents += self.get_batch_configs(**kwargs)
+        contents = self.get_batch_configs(**kwargs)
         contents += "\n"
         if isinstance(item, Experiment):
             pattern = f'*/{SIMULATION_SH_FILE}'
