@@ -283,6 +283,8 @@ class LocalSlurmOperations(SlurmOperations):
         for p, v in sbatch_configs.items():
             if not v:
                 continue
+
+            p = p.replace('_', '-')
             if p == 'nodelist':
                 contents += f'#SBATCH -w, --nodelist={v}\n'
             elif p == 'modules':
@@ -296,7 +298,8 @@ class LocalSlurmOperations(SlurmOperations):
     def get_base_batch_content(self, item: Union[Experiment, Simulation], **kwargs) -> str:
         """
         Utility: Get base batch content.
-        TODO: may not need this
+        TODO: may not need this. Clinton is working on the details of creating batch script.
+        We can delete this if it is not needed later.
         Args:
             item: the item to build batch for
             item_path: the file path
@@ -314,7 +317,7 @@ class LocalSlurmOperations(SlurmOperations):
     def get_batch_content(self, item: Union[Experiment, Simulation], **kwargs) -> str:
         """
         Get base batch content.
-        TODO: this is just a 'fake' sample, not the real one.
+        TODO: this is just a 'fake' sample, not the real one. Clinton is working on the details.
         Args:
             item: the item to build batch for
             item_path: the file path
