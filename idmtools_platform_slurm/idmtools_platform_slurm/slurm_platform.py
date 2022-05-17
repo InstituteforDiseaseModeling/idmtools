@@ -3,15 +3,11 @@ Here we implement the SlurmPlatform object.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
-from pathlib import Path
-from typing import Optional, Any, Dict, Union, List
+from typing import Optional, Any, Dict
 from dataclasses import dataclass, field, fields
 from logging import getLogger
 from idmtools.core import ItemType
-from idmtools.entities import Suite
-from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform import IPlatform
-from idmtools.entities.simulation import Simulation
 from idmtools_platform_slurm.platform_operations.asset_collection_operations import \
     SlurmPlatformAssetCollectionOperations
 from idmtools_platform_slurm.platform_operations.experiment_operations import SlurmPlatformExperimentOperations
