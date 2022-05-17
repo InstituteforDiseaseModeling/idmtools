@@ -285,9 +285,7 @@ class LocalSlurmOperations(SlurmOperations):
                 continue
 
             p = p.replace('_', '-')
-            if p == 'nodelist':
-                contents += f'#SBATCH -w, --nodelist={v}\n'
-            elif p == 'modules':
+            if p == 'modules':
                 for module in v:
                     contents += f'module load {module}\n'
             else:
