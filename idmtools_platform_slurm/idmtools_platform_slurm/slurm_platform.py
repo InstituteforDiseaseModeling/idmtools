@@ -47,10 +47,7 @@ class SlurmPlatform(IPlatform):
     cpu_per_task: int = field(default=1, metadata=dict(sbatch=True))
 
     # Memory per core: MB of memory
-    memory_per_cpu: int = field(default=8192, metadata=dict(sbatch=True))
-
-    # Which email to send the notifications to
-    notification_email: str = field(default=None, metadata=dict(sbatch=True))
+    mem_per_cpu: int = field(default=8192, metadata=dict(sbatch=True))
 
     # Which partition to use
     partition: str = field(default='cpu_short', metadata=dict(sbatch=True))
@@ -112,8 +109,8 @@ class SlurmPlatform(IPlatform):
     def __has_singularity(self):
         """
         Do we support singularity.
+        TODO: this is left over from existing repo. Not sure if we really need this at moment.
         Returns:
-
         """
         # TODO Full Implementation
         return False
@@ -142,83 +139,3 @@ class SlurmPlatform(IPlatform):
         config_dict = {k: getattr(self, k) for k in attrs.intersection(self.slurm_fields)}
         config_dict.update(kwargs)
         return config_dict
-
-    def get_entity_dir(self, item: Union[Suite, Experiment, Simulation]) -> Path:
-        """
-        Get item's file path
-        Args:
-            item: Suite, Experiment, Simulation
-
-        Returns: string
-            item file directory
-        """
-        item_dir = self._op_client.get_entity_dir(item)
-        return item_dir
-
-    def get_suites(self, raw=False) -> List[Any]:
-        suites = self._suites.get_suites(raw=raw)
-        return suites
-
-    def get_all_items(self, item_type: ItemType = ItemType.SIMULATION, filter=None) -> List[Any]:
-        items = self._op_client.get_all_items(item_type, filter)
-        return items
-
-    def get_metadata(self, item: Union[Suite, Experiment, Simulation]) -> Dict[str, Any]:
-        meta = self._metas.get(item)
-        return meta
-
-    def dump_metadata(self, item: Union[Suite, Experiment, Simulation], metafile: str = 'metadata.json',
-                      dest: str = None, meta: Dict = None) -> None:
-        self._metas.dump(item, metafile, dest, meta)
-
-    def load_metadata(self, item: Union[Suite, Experiment, Simulation], item_dir: str = None,
-                      metafile='metadata.json') -> Dict:
-        items = self._metas.load(item, item_dir, metafile)
-        return items
-
-    def update_metadata(self, item: Union[Suite, Experiment, Simulation], values: dict = {},
-                        metafile='metadata.json') -> None:
-        self._metas.update(item, values, metafile)
-
-    def update_item_status(self, item, status: str) -> None:
-        self._metas.update(item, {'status': status})
-
-    def update_status(self, item_id: str, item_type: ItemType, status: str) -> None:
-        item = self.get_item(item_id, item_type)
-        self.update_item_status(item, status)
-
-    def get_item_status(self, item) -> None:
-        meta = self.load_metadata(item)
-        return meta['status']
-
-    def get_status(self, item_id: str, item_type: ItemType) -> None:
-        item = self.get_item(item_id, item_type)
-        return self.get_item_status(item)
-
-    def get_all_items(self, item_type: ItemType = ItemType.SIMULATION, filter=None) -> List[Any]:
-        """
-        List all items with filter applied.
-        Args:
-            item_type: item type
-            filter: Dict
-        Returns:
-            list of items
-        """
-        suite_list = self._suites.get_suites()
-        item_list = []
-        if item_type == ItemType.SUITE:
-            item_list = suite_list
-        elif item_type == ItemType.EXPERIMENT:
-            for suite in suite_list:
-                item_list.extend(suite.experiments)
-        elif item_type == ItemType.SIMULATION:
-            for suite in suite_list:
-                for exp in suite.experiments:
-                    item_list.extend(exp.simulations.items)
-        else:
-            raise NotImplementedError(f"List items with type {item_type} is not supported on SlurmPlatform.")
-
-        if filter:
-            item_list = self._metas.filter(filter, item_type=item_type, items=item_list)
-
-        return item_list
