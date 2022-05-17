@@ -195,9 +195,6 @@ class RemoteSlurmOperations(SlurmOperations):
 @dataclass
 class LocalSlurmOperations(SlurmOperations):
 
-    def __post_init__(self):
-        pass
-
     def get_entity_dir(self, item: Union[Suite, Experiment, Simulation]) -> Path:
         """
         Get item's path.
