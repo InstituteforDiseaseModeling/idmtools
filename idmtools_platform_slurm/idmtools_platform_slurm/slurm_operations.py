@@ -299,9 +299,8 @@ class LocalSlurmOperations(SlurmOperations):
         TODO: this is just a 'fake' sample, not the real one. Clinton is working on the details.
         Args:
             item: the item to build batch for
-            item_path: the file path
         Returns:
-            None
+            text
         """
         item_path = self.get_entity_dir(item)
         contents = self.get_batch_configs(**kwargs)
