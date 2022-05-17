@@ -40,7 +40,7 @@ class SlurmPlatform(IPlatform):
     ntasks: int = field(default=1, metadata=dict(sbatch=True))
 
     # CPU # per task
-    cpu_per_task: int = field(default=1, metadata=dict(sbatch=True))
+    cpus_per_task: int = field(default=1, metadata=dict(sbatch=True))
 
     # Memory per core: MB of memory
     mem_per_cpu: int = field(default=8192, metadata=dict(sbatch=True))
@@ -49,13 +49,13 @@ class SlurmPlatform(IPlatform):
     partition: str = field(default='cpu_short', metadata=dict(sbatch=True))
 
     # Limit time on this job hrs:min:sec
-    time_limit: str = field(default=None, metadata=dict(sbatch=True))
+    time: str = field(default=None, metadata=dict(sbatch=True))
 
     # if set to something, jobs will run with the specified account in slurm
     account: str = field(default=None, metadata=dict(sbatch=True))
 
     # Allocated nodes can not be shared with other jobs/users
-    exclusive: bool = field(default=False, metadata=dict(sbatch=True))
+    exclusive: bool = field(default=True, metadata=dict(sbatch=True))
 
     # Specifies that the batch job should be eligible for requeuing
     requeue: bool = field(default=False, metadata=dict(sbatch=True))
