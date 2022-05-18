@@ -33,6 +33,25 @@
 
 Documentation is located at https://docs.idmod.org/projects/idmtools/en/latest/. 
 
+To build the documentation locally, do the following:
+
+1. Create and activate a venv.
+2. Navigate to the root directory of the repo and enter the following:
+
+    ```
+    pip install -r dev_scripts/package_requirements.txt
+    pip install -r docs/requirements.txt
+    python dev_scripts/bootstrap.py
+    cd docs
+    make html
+    ```
+3. (Optional) To automatically serve the built docs locally in your browser, enter the following from
+   the root directory:
+
+    ```
+    python dev_scripts/serve_docs.py
+    ```
+
 ## Recommended install
 
 The recommended install is to use
