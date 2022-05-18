@@ -66,26 +66,16 @@ class TestSlurmPlatform(ITestWithPersistence):
         self.assertIn("#SBATCH --nodes=1", batch_config)
         self.assertIn("#SBATCH --mem-per-cpu=8192", batch_config)
 
-    # # Test LocalSlurmOperations get_entity_dir for suite only case
-    def test_localSlurmOperations_get_suite_entity_dir(self):
+    # Test LocalSlurmOperations get_directory for suite only case
+    def test_localSlurmOperations_get_directory_suite(self):
         suite = Suite()
         local = LocalSlurmOperations(platform=self.platform)
-        actual_entity_path = local.get_entity_dir(suite)
+        actual_entity_path = local.get_directory(suite)
         expected_path = os.path.join(cwd, suite.id)
         self.assertEqual(str(actual_entity_path), expected_path)
 
-    # Test LocalSlurmOperations get_entity_dir for one experiment and suite as parent case
-    def test_localSlurmOperations_get_experiment_entity_dir(self):
-        suite = Suite()
-        experiment = Experiment()
-        experiment.parent = suite
-        local = LocalSlurmOperations(platform=self.platform)
-        actual_entity_path = local.get_entity_dir(experiment)
-        expected_path = os.path.join(cwd, suite.id, experiment.id)
-        self.assertEqual(str(actual_entity_path), expected_path)
-
-    # Test LocalSlurmOperations get_entity_dir for multiple experiments case
-    def test_localSlurmOperations_get_experiments_entity_dir(self):
+    # Test LocalSlurmOperations get_directory for multiple experiments case
+    def test_localSlurmOperations_get_directory_experiments(self):
         suite = Suite()
         exp1 = Experiment()
         exp1.parent = suite
@@ -94,40 +84,40 @@ class TestSlurmPlatform(ITestWithPersistence):
         exp3 = Experiment()
         exp3.parent = suite
         local = LocalSlurmOperations(platform=self.platform)
-        actual_suite_path = local.get_entity_dir(suite)
+        actual_suite_path = local.get_directory(suite)
         expected_suite_path = os.path.join(cwd, suite.id)
         self.assertEqual(str(actual_suite_path), expected_suite_path)
 
-        actual_exp1_path = local.get_entity_dir(exp1)
+        actual_exp1_path = local.get_directory(exp1)
         expected_exp1_path = os.path.join(cwd, suite.id, exp1.id)
         self.assertEqual(str(actual_exp1_path), expected_exp1_path)
 
-    # Test LocalSlurmOperations get_entity_dir for experiment only
-    def test__localSlurmOperations_get_experiment_no_suite_entity_dir(self):
+    # Test LocalSlurmOperations get_directory for experiment only
+    def test__localSlurmOperations_get_directory_experiment_no_suite(self):
         exp = Experiment()
         local = LocalSlurmOperations(platform=self.platform)
         with self.assertRaises(RuntimeError) as ex:
-            actual_entity_path = local.get_entity_dir(exp)
+            actual_entity_path = local.get_directory(exp)
         self.assertEqual(ex.exception.args[0], "Experiment missing parent!")
 
-    # Test LocalSlurmOperations get_entity_dir for simulation and experiment as parent
-    def test_localSlurmOperations_get_simulation_entity_dir(self):
+    # Test LocalSlurmOperations get_directory for simulation and experiment as parent
+    def test_localSlurmOperations_get_directory_simulation(self):
         suite = Suite()
         experiment = Experiment()
         experiment.parent = suite
         simulation = Simulation()
         simulation.parent = experiment
         local = LocalSlurmOperations(platform=self.platform)
-        actual_entity_path = local.get_entity_dir(simulation)
+        actual_entity_path = local.get_directory(simulation)
         expected_path = os.path.join(cwd, suite.id, experiment.id, simulation.id)
         self.assertEqual(str(actual_entity_path), expected_path)
 
-    # Test LocalSlurmOperations get_entity_dir for simulation without parent, it should throw error
+    # Test LocalSlurmOperations get_directory for simulation without parent, it should throw error
     def test_localSlurmOperations_get_simulation_no_experiment_entity_dir(self):
         simulation = Simulation()
         local = LocalSlurmOperations(platform=self.platform)
         with self.assertRaises(RuntimeError) as ex:
-            actual_entity_path = local.get_entity_dir(simulation)
+            actual_entity_path = local.get_directory(simulation)
         self.assertEqual(ex.exception.args[0], "Simulation missing parent!")
 
     # Test LocalSlurmOperations mk_directory with suite and without dest
@@ -153,7 +143,7 @@ class TestSlurmPlatform(ITestWithPersistence):
         # make sure we do not create suite id folder under dest folder in this case
         self.assertFalse(os.path.isdir(os.path.join(dest_dir, suite.id)))
 
-    # Test LocalSlurmOperations mk_directory without pass item and dest
+    # Test LocalSlurmOperations mk_directory without entity and dest
     def test_localSlurmOperations_make_dir_no_params(self):
         local = LocalSlurmOperations(platform=self.platform)
         with self.assertRaises(RuntimeError) as ex:
@@ -214,7 +204,7 @@ class TestSlurmPlatform(ITestWithPersistence):
         simulation.parent = experiment
         local.mk_directory(simulation)
         local.create_batch_file(simulation)
-        # verify batch file locally
+        # verify batch file 
         job_path = os.path.join(cwd, suite.id, experiment.id, simulation.id, "_run.sh")
         self.assertTrue(os.path.exists(job_path))
         # TODO validation _run.sh content
