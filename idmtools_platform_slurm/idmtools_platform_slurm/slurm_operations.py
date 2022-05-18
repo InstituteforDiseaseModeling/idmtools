@@ -163,7 +163,7 @@ class LocalSlurmOperations(SlurmOperations):
             target = self.get_entity_dir(item)
         else:
             raise RuntimeError('Only support Suite/Experiment/Simulation or not None dest.')
-        os.makedirs(target, exist_ok=exist_ok)
+        target.mkdir(parents=True, exist_ok=True)
 
     # @cache
     def link_file(self, target: Union[Path, str], link: Union[Path, str]) -> None:
@@ -191,7 +191,7 @@ class LocalSlurmOperations(SlurmOperations):
         """
         target = Path(target).absolute()
         link = Path(link).absolute()
-        os.symlink(target, link)
+        link.symlink_to(target)
 
     def get_batch_configs(self, **kwargs) -> str:
         """
@@ -206,20 +206,19 @@ class LocalSlurmOperations(SlurmOperations):
         for p, v in sbatch_configs.items():
             if not v:
                 continue
-
-            p = p.replace('_', '-')
+            p = p.replace('_', '-')     # re-sore original command name
             if p == 'modules':
                 for module in v:
                     contents += f'module load {module}\n'
             else:
                 contents += f'#SBATCH --{p}={v}\n'
-
         return contents
 
     def get_batch_content(self, item: Union[Experiment, Simulation], **kwargs) -> str:
         """
         Get base batch content.
-        TODO: this is just a 'fake' sample, not the real one. Clinton is working on the details and may completely re-write the generated script.
+        TODO: this is not the real script and it just shows how some utility function are available.
+        TODO: Clinton is working on the details and may completely re-write the generated script.
         Args:
             item: the item to build batch for
         Returns:
@@ -245,7 +244,7 @@ class LocalSlurmOperations(SlurmOperations):
         """
         Create batch file.
         Args:
-            item: item: the item to build batch file for
+            item: the item to build batch file for
             item_path: the file path
         Returns:
             None
@@ -262,7 +261,8 @@ class LocalSlurmOperations(SlurmOperations):
         else:
             raise NotImplementedError(f"{item.__class__.__name__} is not supported for batch creation.")
 
-        with open(Path(item_path, sh_file), 'w') as out:
+        script_path = item_path.joinpath(sh_file)
+        with script_path.open(mode='w') as out:
             out.write(contents)
 
     def submit_job(self, sjob_file_path: Union[Path, str], working_directory: Union[Path, str]) -> None:
