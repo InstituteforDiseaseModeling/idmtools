@@ -162,7 +162,7 @@ class LocalSlurmOperations(SlurmOperations):
             target = self.get_directory(item)
         else:
             raise RuntimeError('Only support Suite/Experiment/Simulation or not None dest.')
-        target.mkdir(parents=True, exist_ok=True)
+        target.mkdir(parents=True, exist_ok=exist_ok)
 
     # @cache
     def link_file(self, target: Union[Path, str], link: Union[Path, str]) -> None:

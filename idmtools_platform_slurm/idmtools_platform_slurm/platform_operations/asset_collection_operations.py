@@ -82,6 +82,8 @@ class SlurmPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
                 if asset_file.exists():
                     asset = Asset(absolute_path=asset_file.absolute())
                     ret[file] = bytearray(asset.bytes)
+                else:
+                    raise RuntimeError(f"Couldn't find asset for path '{file}'.")
         elif isinstance(item, Experiment):
             for sim in item.simulations:
                 ret[sim.id] = self.get_assets(sim, files, **kwargs)
