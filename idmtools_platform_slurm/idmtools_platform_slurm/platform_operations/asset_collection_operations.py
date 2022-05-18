@@ -33,7 +33,7 @@ class SlurmPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         Get an asset collection by id.
         Args:
             asset_collection_id: id of asset collection
-            kwargs:
+            kwargs: keyword arguments used to expand functionality.
         Returns:
             AssetCollection
         """
@@ -44,7 +44,7 @@ class SlurmPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         Create AssetCollection.
         Args:
             asset_collection: AssetCollection to create
-            kwargs:
+            kwargs: keyword arguments used to expand functionality.
         Returns:
             AssetCollection
         """
@@ -70,7 +70,7 @@ class SlurmPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         Args:
             item: Experiment/Simulation
             files: files to be retrieved
-            kwargs:
+            kwargs: keyword arguments used to expand functionality.
         Returns:
             Dict[str, bytearray]
         """
@@ -96,7 +96,7 @@ class SlurmPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         Args:
             item: Experiment/Simulation
             exclude: list of file path
-            kwargs: extra parameters
+            kwargs: keyword arguments used to expand functionality.
         Returns:
             list of Asset
         """
@@ -140,7 +140,7 @@ class SlurmPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         Dump item's assets.
         Args:
             item: Experiment/Simulation
-            kwargs: extra parameters
+            kwargs: keyword arguments used to expand functionality.
         Returns:
             None
         """

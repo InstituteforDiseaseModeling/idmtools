@@ -197,7 +197,7 @@ class LocalSlurmOperations(SlurmOperations):
         """
         Utility: build Batch for configuration part.
         Args:
-            kwargs: dynamic parameters
+            kwargs: keyword arguments used to expand functionality.
         Returns:
             text
         """
@@ -221,6 +221,7 @@ class LocalSlurmOperations(SlurmOperations):
         TODO: Clinton is working on the details and may completely re-write the generated script.
         Args:
             item: the item to build batch for
+            kwargs: keyword arguments used to expand functionality.
         Returns:
             text
         """
@@ -246,6 +247,7 @@ class LocalSlurmOperations(SlurmOperations):
         Args:
             item: the item to build batch file for
             item_path: the file path
+            kwargs: keyword arguments used to expand functionality.
         Returns:
             None
         """
