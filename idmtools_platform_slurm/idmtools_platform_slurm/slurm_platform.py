@@ -108,8 +108,7 @@ class SlurmPlatform(IPlatform):
         TODO: this is left over from existing repo. Not sure if we really need this at moment.
         Returns:
         """
-        # TODO Full Implementation
-        return False
+        raise NotImplementedError(f"This method is not implemented on SlurmPlatform yet.")
 
     def post_setstate(self):
         self.__init_interfaces()

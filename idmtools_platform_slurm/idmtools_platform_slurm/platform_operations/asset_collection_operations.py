@@ -86,7 +86,7 @@ class SlurmPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
             for sim in item.simulations:
                 ret[sim.id] = self.get_assets(sim, files, **kwargs)
         else:
-            raise NotImplementedError("Get assets for this item is not supported on SlurmPlatform.")
+            raise NotImplementedError(f"get_assets() for items of type {type(item)} is not supported on SlurmPlatform.")
 
         return ret
 
@@ -129,7 +129,8 @@ class SlurmPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
             if src.absolute_path:
                 shutil.copy(src.absolute_path, dest)
             elif src.content:
-                with open(Path(dest, src.filename), 'wb') as out:
+                dest_filepath = Path(dest, src.filename)
+                with dest_filepath.open(mode='wb') as out:
                     out.write(src.bytes)
         else:
             shutil.copy(src, dest)
@@ -154,4 +155,4 @@ class SlurmPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
                 sim_dir = Path(exp_dir, item.id)
                 self.copy_asset(asset, sim_dir)
         else:
-            raise NotImplementedError("Dump assets for this item is not supported on SlurmPlatform.")
+            raise NotImplementedError(f"dump_assets() for item of type {type(item)} is not supported on SlurmPlatform.")
