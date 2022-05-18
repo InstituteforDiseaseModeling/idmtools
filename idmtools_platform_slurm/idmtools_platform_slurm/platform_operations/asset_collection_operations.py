@@ -129,8 +129,7 @@ class SlurmPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
                 shutil.copy(src.absolute_path, dest)
             elif src.content:
                 dest_filepath = Path(dest, src.filename)
-                with dest_filepath.open(mode='wb') as out:
-                    out.write(src.bytes)
+                dest_filepath.write_bytes(src.bytes)
         else:
             shutil.copy(src, dest)
 
