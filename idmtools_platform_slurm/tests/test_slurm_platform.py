@@ -35,9 +35,9 @@ class TestSlurmPlatform(ITestWithPersistence):
     # Test platform get_slurm_configs with default config
     def test_slurm_configs_default(self):
         slurm_configs_dict = self.platform.get_slurm_configs()
-        expected_config_dict = {'mail_user': None, 'account': None, 'exclusive': True, 'ntasks': 1,
+        expected_config_dict = {'mail_user': None, 'account': None, 'exclusive': False, 'ntasks': 1,
                                 'partition': 'cpu_short', 'mem_per_cpu': 8192, 'modules': [], 'mail_type': None,
-                                'time': None, 'requeue': False, 'cpus_per_task': 1,
+                                'time': None, 'requeue': True, 'cpus_per_task': 1,
                                 'nodes': 1}
         self.assertEqual(slurm_configs_dict, expected_config_dict)
 
@@ -46,9 +46,9 @@ class TestSlurmPlatform(ITestWithPersistence):
         platform = Platform("SLURM_TEST", job_directory=".", mode="local", mail_user="test@test.com",
                             account="test_acct", mail_type="begin", mem_per_cpu=2048, cpus_per_task=2)
         slurm_configs_dict = platform.get_slurm_configs()
-        expected_config_dict = {'account': 'test_acct', 'cpus_per_task': 2, 'exclusive': True, 'mail_type': 'begin',
+        expected_config_dict = {'account': 'test_acct', 'cpus_per_task': 2, 'exclusive': False, 'mail_type': 'begin',
                                 'mail_user': 'test@test.com', 'mem_per_cpu': 2048, 'modules': [], 'nodes': 1,
-                                'ntasks': 1, 'partition': 'cpu_short', 'requeue': False, 'time': None}
+                                'ntasks': 1, 'partition': 'cpu_short', 'requeue': True, 'time': None}
         self.assertEqual(slurm_configs_dict, expected_config_dict)
 
         # validate custom default config get override with Platform parameters
@@ -172,7 +172,7 @@ class TestSlurmPlatform(ITestWithPersistence):
         self.assertFalse(os.path.isdir(expected_dir2))
 
     # Test LocalSlurmOperations create_batch_file for experiment
-    def test_localSlurmOperations_experiment_create_batch_file(self):
+    def test_localSlurmOperations_create_batch_file_experiment(self):
         local = LocalSlurmOperations(platform=self.platform)
         suite = Suite()
         experiment = Experiment(_uid=uuid4())
@@ -195,7 +195,7 @@ class TestSlurmPlatform(ITestWithPersistence):
         self.assertFalse(os.path.exists(job_path))
 
     # Test LocalSlurmOperations create_batch_file for simulation
-    def test_localSlurmOperations_simulation_create_batch_file(self):
+    def test_localSlurmOperations_create_batch_file_simulation(self):
         local = LocalSlurmOperations(platform=self.platform)
         suite = Suite()
         experiment = Experiment(_uid=uuid4())
@@ -204,10 +204,37 @@ class TestSlurmPlatform(ITestWithPersistence):
         simulation.parent = experiment
         local.mk_directory(simulation)
         local.create_batch_file(simulation)
-        # verify batch file 
+        # verify batch file
         job_path = os.path.join(cwd, suite.id, experiment.id, simulation.id, "_run.sh")
         self.assertTrue(os.path.exists(job_path))
         # TODO validation _run.sh content
         # clean up suite folder
         shutil.rmtree(os.path.join(cwd, suite.id))
         self.assertFalse(os.path.exists(job_path))
+
+    # Test LocalSlurmOperations create_batch_file with simulation and item_path
+    def test_localSlurmOperations_create_batch_file_simulation_and_item_path(self):
+        local = LocalSlurmOperations(platform=self.platform)
+        suite = Suite()
+        experiment = Experiment(_uid=uuid4())
+        experiment.parent = suite
+        simulation = Simulation(_uid=uuid4(), task=TestTask())
+        simulation.parent = experiment
+        temp_path = tempfile.mkdtemp()
+        local.mk_directory(simulation, dest=temp_path)
+        local.create_batch_file(simulation, item_path=temp_path)
+        # verify batch file
+        job_path = os.path.join(temp_path, "_run.sh")
+        self.assertTrue(os.path.exists(job_path))
+        # TODO validation _run.sh content
+
+    # Test LocalSlurmOperations create_batch_file with suite and item_path. this case will throw error
+    def test_localSlurmOperations_create_batch_file_simulation_and_item_path(self):
+        local = LocalSlurmOperations(platform=self.platform)
+        suite = Suite()
+        temp_path = tempfile.mkdtemp()
+        local.mk_directory(suite, dest=temp_path)
+        with self.assertRaises(NotImplementedError) as ex:
+            local.create_batch_file(suite, item_path=temp_path)
+        self.assertEqual(ex.exception.args[0], "Suite is not supported for batch creation.")
+
