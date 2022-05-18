@@ -1,7 +1,7 @@
 import os
 import shutil
 import tempfile
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 import pytest
 
@@ -18,7 +18,8 @@ cwd = os.path.dirname(__file__)
 
 
 @pytest.mark.smoke
-class TestPythonSimulation(ITestWithPersistence):
+@pytest.mark.serial
+class TestSlurmPlatform(ITestWithPersistence):
 
     def setUp(self) -> None:
         self.platform = Platform('SLURM_LOCAL')
