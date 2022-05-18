@@ -3,7 +3,6 @@ Here we implement the SlurmPlatform operations.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
-import os
 from enum import Enum
 from pathlib import Path
 from logging import getLogger
@@ -177,7 +176,7 @@ class LocalSlurmOperations(SlurmOperations):
         """
         target = Path(target).absolute()
         link = Path(link).absolute()
-        os.symlink(target, link)
+        link.symlink_to(target)
 
     # @cache
     def link_dir(self, target: Union[Path, str], link: Union[Path, str]) -> None:

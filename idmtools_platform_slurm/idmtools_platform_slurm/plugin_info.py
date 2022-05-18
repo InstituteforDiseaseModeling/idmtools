@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 from typing import Type, Dict
 
 from idmtools.entities.iplatform import IPlatform
@@ -67,7 +67,7 @@ class SlurmPlatformSpecification(PlatformSpecification):
         config_aliases = dict(
             SLURM_LOCAL=dict(
                 mode="local",
-                job_directory=os.getcwd()
+                job_directory=Path.cwd()
             )
         )
         return config_aliases
