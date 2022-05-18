@@ -121,7 +121,7 @@ class RemoteSlurmOperations(SlurmOperations):
 @dataclass
 class LocalSlurmOperations(SlurmOperations):
 
-    def get_entity_dir(self, item: Union[Suite, Experiment, Simulation]) -> Path:
+    def get_directory(self, item: Union[Suite, Experiment, Simulation]) -> Path:
         """
         Get item's path.
         Args:
@@ -135,13 +135,13 @@ class LocalSlurmOperations(SlurmOperations):
             suite = item.parent
             if suite is None:
                 raise RuntimeError("Experiment missing parent!")
-            suite_dir = self.get_entity_dir(suite)
+            suite_dir = self.get_directory(suite)
             item_dir = Path(suite_dir, item.id)
         elif isinstance(item, Simulation):
             exp = item.parent
             if exp is None:
                 raise RuntimeError("Simulation missing parent!")
-            exp_dir = self.get_entity_dir(exp)
+            exp_dir = self.get_directory(exp)
             item_dir = Path(exp_dir, item.id)
 
         return item_dir
@@ -160,7 +160,7 @@ class LocalSlurmOperations(SlurmOperations):
         if dest is not None:
             target = Path(dest)
         elif isinstance(item, (Suite, Experiment, Simulation)):
-            target = self.get_entity_dir(item)
+            target = self.get_directory(item)
         else:
             raise RuntimeError('Only support Suite/Experiment/Simulation or not None dest.')
         target.mkdir(parents=True, exist_ok=True)
@@ -224,7 +224,7 @@ class LocalSlurmOperations(SlurmOperations):
         Returns:
             text
         """
-        item_path = self.get_entity_dir(item)
+        item_path = self.get_directory(item)
         contents = self.get_batch_configs(**kwargs)
         contents += "\n"
         if isinstance(item, Experiment):
@@ -250,7 +250,7 @@ class LocalSlurmOperations(SlurmOperations):
             None
         """
         if item_path is None:
-            item_path = self.get_entity_dir(item)
+            item_path = self.get_directory(item)
         item_path = Path(item_path)
 
         contents = self.get_batch_content(item, **kwargs)

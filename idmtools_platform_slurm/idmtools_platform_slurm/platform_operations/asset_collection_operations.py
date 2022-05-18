@@ -60,8 +60,8 @@ class SlurmPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
             None
         """
         if common_asset_dir is None:
-            common_asset_dir = Path(self.platform._op_client.get_entity_dir(simulation.parent), 'Assets')
-        link_dir = Path(self.platform._op_client.get_entity_dir(simulation), 'Assets')
+            common_asset_dir = Path(self.platform._op_client.get_directory(simulation.parent), 'Assets')
+        link_dir = Path(self.platform._op_client.get_directory(simulation), 'Assets')
         self.platform._op_client.link_dir(common_asset_dir, link_dir)
 
     def get_assets(self, item: Union[Experiment, Simulation], files: List[str], **kwargs) -> Dict[str, bytearray]:
@@ -76,7 +76,7 @@ class SlurmPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         """
         ret = dict()
         if isinstance(item, Simulation):
-            sim_dir = self.platform._op_client.get_entity_dir(item)
+            sim_dir = self.platform._op_client.get_directory(item)
             for file in files:
                 asset_file = Path(sim_dir, file)
                 if asset_file.exists():
@@ -104,9 +104,9 @@ class SlurmPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         exclude = [f.lower() for f in exclude]
         assets = []
         if isinstance(item, Experiment):
-            assets_dir = Path(self.platform._op_client.get_entity_dir(item), 'Assets')
+            assets_dir = Path(self.platform._op_client.get_directory(item), 'Assets')
         elif isinstance(item, Simulation):
-            assets_dir = self.platform._op_client.get_entity_dir(item)
+            assets_dir = self.platform._op_client.get_directory(item)
         else:
             raise NotImplementedError("List assets for this item is not supported on SlurmPlatform.")
 
@@ -144,12 +144,12 @@ class SlurmPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
             None
         """
         if isinstance(item, Experiment):
-            exp_asset_dir = Path(self.platform._op_client.get_entity_dir(item), 'Assets')
+            exp_asset_dir = Path(self.platform._op_client.get_directory(item), 'Assets')
             self.platform._op_client.mk_directory(dest=exp_asset_dir)
             for asset in item.assets:
                 self.copy_asset(asset, exp_asset_dir)
         elif isinstance(item, Simulation):
-            exp_dir = self.platform._op_client.get_entity_dir(item.parent)
+            exp_dir = self.platform._op_client.get_directory(item.parent)
             for asset in item.assets:
                 sim_dir = Path(exp_dir, item.id)
                 self.copy_asset(asset, sim_dir)
