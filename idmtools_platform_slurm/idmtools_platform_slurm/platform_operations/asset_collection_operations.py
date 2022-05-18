@@ -100,8 +100,7 @@ class SlurmPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         Returns:
             list of Asset
         """
-        exclude = exclude or EXCLUDE_FILES
-        exclude = [f.lower() for f in exclude]
+        exclude = exclude if exclude is not None else EXCLUDE_FILES
         assets = []
         if isinstance(item, Experiment):
             assets_dir = Path(self.platform._op_client.get_directory(item), 'Assets')
@@ -111,7 +110,7 @@ class SlurmPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
             raise NotImplementedError("List assets for this item is not supported on SlurmPlatform.")
 
         for asset_file in assets_dir.iterdir():
-            if asset_file.is_file() and asset_file.name.lower() not in exclude:
+            if asset_file.is_file() and asset_file.name not in exclude:
                 asset = Asset(absolute_path=asset_file.absolute())
                 assets.append(asset)
         return assets
