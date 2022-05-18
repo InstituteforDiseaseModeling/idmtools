@@ -55,10 +55,10 @@ class SlurmPlatform(IPlatform):
     account: str = field(default=None, metadata=dict(sbatch=True))
 
     # Allocated nodes can not be shared with other jobs/users
-    exclusive: bool = field(default=True, metadata=dict(sbatch=True))
+    exclusive: bool = field(default=False, metadata=dict(sbatch=True))
 
     # Specifies that the batch job should be eligible for requeuing
-    requeue: bool = field(default=False, metadata=dict(sbatch=True))
+    requeue: bool = field(default=True, metadata=dict(sbatch=True))
 
     # modules to be load
     modules: list = field(default_factory=list, metadata=dict(sbatch=True))
