@@ -130,7 +130,6 @@ class SlurmPlatform(IPlatform):
         Returns:
             slurm config dict
         """
-        attrs = set(vars(self).keys())
-        config_dict = {k: getattr(self, k) for k in attrs.intersection(self.slurm_fields)}
+        config_dict = {k: getattr(self, k) for k in self.slurm_fields}
         config_dict.update(kwargs)
         return config_dict
