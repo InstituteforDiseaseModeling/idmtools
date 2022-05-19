@@ -142,6 +142,8 @@ class LocalSlurmOperations(SlurmOperations):
                 raise RuntimeError("Simulation missing parent!")
             exp_dir = self.get_directory(exp)
             item_dir = Path(exp_dir, item.id)
+        else:
+            raise RuntimeError(f"Get directory is not supported for {type(item)} object on SlurmPlatform")
 
         return item_dir
 
