@@ -106,8 +106,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         return is_match
 
     def _matches_requirements(self, properties, tags, metadata):
-        return self._matches_properties(properties=properties, metadata=metadata) and \
-               self._matches_tags(tags=tags, metadata=metadata)
+        return self._matches_properties(properties=properties, metadata=metadata) and self._matches_tags(tags=tags, metadata=metadata)
 
     def filter_items(self, items: List[IEntity], properties: Dict[Any, Any] = None, tags: Dict[Any, Any] = None) \
             -> List[IEntity]:
