@@ -166,7 +166,6 @@ class LocalSlurmOperations(SlurmOperations):
             raise RuntimeError('Only support Suite/Experiment/Simulation or not None dest.')
         target.mkdir(parents=True, exist_ok=exist_ok)
 
-    # @cache
     def link_file(self, target: Union[Path, str], link: Union[Path, str]) -> None:
         """
         Link files.
@@ -180,7 +179,6 @@ class LocalSlurmOperations(SlurmOperations):
         link = Path(link).absolute()
         link.symlink_to(target)
 
-    # @cache
     def link_dir(self, target: Union[Path, str], link: Union[Path, str]) -> None:
         """
         Link directory/files.
@@ -218,8 +216,8 @@ class LocalSlurmOperations(SlurmOperations):
     def get_batch_content(self, item: Union[Experiment, Simulation], **kwargs) -> str:
         """
         Get base batch content.
-        TODO: this is not the real script and it just shows how some utility function are available.
-        TODO: Clinton is working on the details and may completely re-write the generated script.
+        TODO: this is not the real script content and it just shows how some utility function are available/used.
+        TODO: Clinton is working on the details of the content and may completely re-write the generated script.
         Args:
             item: the item to build batch for
             kwargs: keyword arguments used to expand functionality.
