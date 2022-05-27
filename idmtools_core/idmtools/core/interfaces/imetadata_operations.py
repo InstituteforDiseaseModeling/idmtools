@@ -5,16 +5,16 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Any, Dict, List
-from idmtools.core.interfaces.ientity import IEntity
+from typing import Dict, List
 from idmtools.core import ItemType
+from idmtools.core.interfaces.ientity import IEntity
 
 
 @dataclass
 class IMetadataOperations(ABC):
 
     @abstractmethod
-    def get(self, item: IEntity) -> Dict[Any, Any]:
+    def get(self, item: IEntity) -> Dict:
         """
         Obtain item's metadata.
         Args:
@@ -36,7 +36,7 @@ class IMetadataOperations(ABC):
         pass
 
     @abstractmethod
-    def load(self, item: IEntity) -> Dict[Any, Any]:
+    def load(self, item: IEntity) -> Dict:
         """
         Obtain item's metadata file.
         Args:
@@ -69,7 +69,7 @@ class IMetadataOperations(ABC):
         pass
 
     @abstractmethod
-    def filter(self, item_type: ItemType, properties: Dict[Any, Any] = None) -> List[IEntity]:
+    def filter(self, item_type: ItemType, properties: Dict = None) -> List:
         """
         Obtain all items that match the given properties key/value pairs passed.
         Args:
