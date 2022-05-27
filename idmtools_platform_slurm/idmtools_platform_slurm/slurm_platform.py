@@ -8,7 +8,7 @@ from dataclasses import dataclass, field, fields
 from logging import getLogger
 from idmtools.entities.iplatform import IPlatform
 from idmtools.core import ItemType
-from idmtools.core.interfaces.json_metadata_operations import JSONMetadataOperations
+from idmtools_platform_slurm.platform_operations.json_metadata_operations import JSONMetadataOperations
 from idmtools_platform_slurm.platform_operations.asset_collection_operations import \
     SlurmPlatformAssetCollectionOperations
 from idmtools_platform_slurm.platform_operations.experiment_operations import SlurmPlatformExperimentOperations
