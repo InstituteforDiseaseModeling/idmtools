@@ -1,3 +1,8 @@
+"""
+Here we implement the Metadata operations interface.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, Dict, List

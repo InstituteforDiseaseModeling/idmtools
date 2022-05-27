@@ -1,3 +1,8 @@
+"""
+Here we implement the JSON Metadata operations.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import json
 from pathlib import Path
 from typing import Any, Dict, List, Type, Union
@@ -62,51 +67,6 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         meta = item.to_dict()
         return meta
 
-    # def get_metadata_by_filepath(self, metadata_filepath: str) -> Dict[Any, Any]:
-    #     """
-    #     Obtain the metadata for the given file.
-    #     Args:
-    #         metadata_filepath: metadata file path
-    #     Returns:
-    #          key/value dict of metadata from the given file
-    #     """
-    #     meta = self._read_from_file(metadata_filepath)
-    #     return meta
-
-    def get_children(self, item: IEntity) -> List[Dict]:
-        """
-        Fetch item's children.
-        Args:
-            item: idmtools object (Suite/Experiment)
-        Returns:
-            Lis of metadata
-        """
-        if not isinstance(item, (Suite, Experiment)):
-            raise RuntimeError(f"Get children method supports Suite and Experiment only.")
-
-        item_list = []
-        item_dir = self.platform._op_client.get_directory(item)
-        pattern = f'*/{self.metadata_filename}'
-        for meta_file in item_dir.glob(pattern=pattern):
-            meta = self.load_from_file(meta_file)
-            item_list.append(meta)
-        return item_list
-
-    # def dump_bk(self, item: Union[Suite, Experiment, Simulation], dest: Union[Path, str] = None) -> None:
-    #     """
-    #     Save item's metadata to a file.
-    #     Args:
-    #         item: the item to get metadata saved
-    #         dest: the metadata key/value pairs to add/modify on the item
-    #     Returns:
-    #         None
-    #     """
-    #     if dest is None:
-    #         item_dir = self.platform._op_client.get_directory(item)
-    #     dest = Path(item_dir, self.metadata_filename)
-    #     meta = self.get(item)
-    #     self._write_to_file(dest, meta)
-
     def dump(self, item: Union[Suite, Experiment, Simulation]) -> None:
         """
         Save item's metadata to a file.
@@ -117,8 +77,6 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         """
         if not isinstance(item, (Suite, Experiment, Simulation)):
             raise RuntimeError(f"Dump method supports Suite/Experiment/Simulation only.")
-        # item_dir = self.platform._op_client.get_directory(item)
-        # dest = Path(item_dir, self.metadata_filename)
         dest = self.get_metadata_filepath(item)
         meta = self.get(item)
         self._write_to_file(dest, meta)
@@ -133,9 +91,6 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         """
         if not isinstance(item, (Suite, Experiment, Simulation)):
             raise RuntimeError(f"Load method supports Suite/Experiment/Simulation only.")
-
-        # item_dir = self.platform._op_client.get_directory(item)
-        # meta_file = Path(item_dir, self.metadata_filename)
         meta_file = self.get_metadata_filepath(item)
         meta = self._read_from_file(meta_file)
         return meta
@@ -162,7 +117,6 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         Returns:
              None
         """
-        # item_dir = self.platform._op_client.get_directory(item)
         meta_file = self.get_metadata_filepath(item)
         self._write_to_file(meta_file, metadata)
 
@@ -175,6 +129,24 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
             None
         """
         self.set(item=item, metadata={})
+
+    def get_children(self, item: IEntity) -> List[Dict]:
+        """
+        Fetch item's children.
+        Args:
+            item: idmtools object (Suite/Experiment)
+        Returns:
+            Lis of metadata
+        """
+        if not isinstance(item, (Suite, Experiment)):
+            raise RuntimeError(f"Get children method supports Suite and Experiment only.")
+        item_list = []
+        item_dir = self.platform._op_client.get_directory(item)
+        pattern = f'*/{self.metadata_filename}'
+        for meta_file in item_dir.glob(pattern=pattern):
+            meta = self.load_from_file(meta_file)
+            item_list.append(meta)
+        return item_list
 
     def get_metadata_list(self, item_type: ItemType) -> List[Dict]:
         """
@@ -192,7 +164,6 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
             pattern = f"*/{self.metadata_filename}"
         else:
             raise RuntimeError(f"Unknown item type: {item_type}")
-
         item_list = []
         root = Path(self.platform.job_directory)
         for meta_file in root.glob(pattern=pattern):
@@ -227,7 +198,6 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         """
         if items is None:
             items = self.get_metadata_list(item_type)
-
         item_list = []
         for item in items:
             is_match = True
