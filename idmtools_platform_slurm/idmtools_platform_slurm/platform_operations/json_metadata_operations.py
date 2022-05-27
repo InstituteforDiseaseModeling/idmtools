@@ -195,6 +195,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
                items: List = None) -> List[Dict]:
         """
         Obtain all items that match the given properties key/value pairs passed.
+        The two filters are applied on item with 'AND' logical checking.
         Args:
             item_type: the type of items to search for matches (simulation, experiment, suite, etc)
             property_filter: a dict of metadata key/value pairs for exact match searching
