@@ -5,7 +5,7 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Type, Union
+from typing import Dict, List, Type, Union
 from dataclasses import dataclass, field
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.core import ItemType
@@ -52,6 +52,13 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
             json.dump(data, f, cls=IDMJSONEncoder)
 
     def get_metadata_filepath(self, item: IEntity) -> Path:
+        """
+        Retrieve item's metadata file path.
+        Args:
+            item: idmtools entity (Suite, Experiment and Simulation, etc.)
+        Returns:
+            item's metadata file path
+        """
         item_dir = self.platform._op_client.get_directory(item)
         filepath = Path(item_dir, self.metadata_filename)
         return filepath
@@ -60,7 +67,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         """
         Obtain item's metadata.
         Args:
-            item: the item to retrieve metadata from
+            item: idmtools entity (Suite, Experiment and Simulation, etc.)
         Returns:
              key/value dict of metadata from the given item
         """
@@ -71,7 +78,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         """
         Save item's metadata to a file.
         Args:
-            item: the item to get metadata saved
+            item: idmtools entity (Suite, Experiment and Simulation, etc.)
         Returns:
             None
         """
@@ -85,7 +92,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         """
         Obtain item's metadata file.
         Args:
-            item: the item to retrieve metadata from
+            item: idmtools entity (Suite, Experiment and Simulation, etc.)
         Returns:
              key/value dict of metadata from the given item
         """
@@ -112,7 +119,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         """
         Update item's metadata file.
         Args:
-            item: update the item's metadata file
+            item: idmtools entity (Suite, Experiment and Simulation, etc.)
             metadata: dict to be updated
         Returns:
              None
@@ -134,7 +141,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         """
         Fetch item's children.
         Args:
-            item: idmtools object (Suite/Experiment)
+            item: idmtools entity (Suite, Experiment)
         Returns:
             Lis of metadata
         """

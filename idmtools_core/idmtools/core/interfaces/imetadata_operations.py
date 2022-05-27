@@ -18,7 +18,7 @@ class IMetadataOperations(ABC):
         """
         Obtain item's metadata.
         Args:
-            item: the item to retrieve metadata for
+            item: idmtools entity (Suite, Experiment and Simulation, etc.)
         Returns:
             a key/value dict of metadata from the given item
         """
@@ -29,7 +29,7 @@ class IMetadataOperations(ABC):
         """
         Save item's metadata to a file.
         Args:
-            item: the item to get metadata saved
+            item: idmtools entity (Suite, Experiment and Simulation, etc.)
         Returns:
             None
         """
@@ -40,9 +40,9 @@ class IMetadataOperations(ABC):
         """
         Obtain item's metadata file.
         Args:
-            item: the item to retrieve metadata from
+            item: idmtools entity (Suite, Experiment and Simulation, etc.)
         Returns:
-             key/value dict of metadata from the given item
+             key/value dict of item's metadata file
         """
         pass
 
@@ -51,7 +51,7 @@ class IMetadataOperations(ABC):
         """
         Update item's metadata file.
         Args:
-            item: update the item's metadata file
+            item: idmtools entity (Suite, Experiment and Simulation, etc.)
         Returns:
             None
         """
@@ -62,19 +62,19 @@ class IMetadataOperations(ABC):
         """
         Clear the item's metadata file.
         Args:
-            item: clear the item's metadata file
+            item: idmtools entity (Suite, Experiment and Simulation, etc.)
         Returns:
             None
         """
         pass
 
     @abstractmethod
-    def filter(self, item_type: ItemType, properties: Dict = None) -> List:
+    def filter(self, item_type: ItemType, item_filter: Dict = None) -> List:
         """
-        Obtain all items that match the given properties key/value pairs passed.
+        Obtain all items that match the given item_filter key/value pairs passed.
         Args:
             item_type: the type of items to search for matches (simulation, experiment, suite, etc)
-            properties: a dict of metadata key/value pairs for exact match searching
+            item_filter: a dict of metadata key/value pairs for exact match searching
         Returns:
             a list of matching items
         """
