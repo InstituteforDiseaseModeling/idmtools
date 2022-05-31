@@ -75,7 +75,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         """
         if not isinstance(item, (Suite, Experiment, Simulation)):
             raise RuntimeError(f"Get method supports Suite/Experiment/Simulation only.")
-        meta = item.to_dict()
+        meta = json.loads(json.dumps(item.to_dict(), cls=IDMJSONEncoder))
         return meta
 
     def dump(self, item: Union[Suite, Experiment, Simulation]) -> None:
