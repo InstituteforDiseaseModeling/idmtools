@@ -119,7 +119,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         meta = self._read_from_file(metadata_filepath)
         return meta
 
-    def set(self, item: Union[Suite, Experiment, Simulation], metadata: Dict = {}) -> None:
+    def update(self, item: Union[Suite, Experiment, Simulation], metadata: Dict = {}) -> None:
         """
         Update item's metadata file.
         Args:
@@ -143,7 +143,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         """
         if not isinstance(item, (Suite, Experiment, Simulation)):
             raise RuntimeError(f"Clear method supports Suite/Experiment/Simulation only.")
-        self.set(item=item, metadata={})
+        self.update(item=item, metadata={})
 
     def get_children(self, item: IEntity) -> List[Dict]:
         """

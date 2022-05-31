@@ -47,7 +47,7 @@ class IMetadataOperations(ABC):
         pass
 
     @abstractmethod
-    def set(self, item: IEntity) -> None:
+    def update(self, item: IEntity) -> None:
         """
         Update item's metadata file.
         Args:
