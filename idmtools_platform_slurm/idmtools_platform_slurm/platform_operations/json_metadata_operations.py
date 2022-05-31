@@ -163,7 +163,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
             item_list.append(meta)
         return item_list
 
-    def get_metadata_list(self, item_type: ItemType) -> List[Dict]:
+    def get_all(self, item_type: ItemType) -> List[Dict]:
         """
         Obtain all the metadata for a given item type.
         Args:
@@ -213,7 +213,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
             a list of metadata matching the properties ke/value with given item type
         """
         if items is None:
-            items = self.get_metadata_list(item_type)
+            items = self.get_all(item_type)
         item_list = []
         for item in items:
             is_match = True
