@@ -59,6 +59,8 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         Returns:
             item's metadata file path
         """
+        if not isinstance(item, (Suite, Experiment, Simulation)):
+            raise RuntimeError(f"get_metadata_filepath method supports Suite/Experiment/Simulation only.")
         item_dir = self.platform._op_client.get_directory(item)
         filepath = Path(item_dir, self.metadata_filename)
         return filepath
@@ -71,6 +73,8 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         Returns:
              key/value dict of metadata from the given item
         """
+        if not isinstance(item, (Suite, Experiment, Simulation)):
+            raise RuntimeError(f"Get method supports Suite/Experiment/Simulation only.")
         meta = item.to_dict()
         return meta
 
@@ -111,7 +115,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
              key/value dict of metadata from the given filepath
         """
         if not (Path(metadata_filepath).exists()):
-            raise RuntimeError(f"Load method supports Suite/Experiment/Simulation only.")
+            raise RuntimeError(f"File not found: '{metadata_filepath}'.")
         meta = self._read_from_file(metadata_filepath)
         return meta
 
@@ -124,6 +128,8 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         Returns:
              None
         """
+        if not isinstance(item, (Suite, Experiment, Simulation)):
+            raise RuntimeError(f"Set method supports Suite/Experiment/Simulation only.")
         meta_file = self.get_metadata_filepath(item)
         self._write_to_file(meta_file, metadata)
 
@@ -135,6 +141,8 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         Returns:
             None
         """
+        if not isinstance(item, (Suite, Experiment, Simulation)):
+            raise RuntimeError(f"Clear method supports Suite/Experiment/Simulation only.")
         self.set(item=item, metadata={})
 
     def get_children(self, item: IEntity) -> List[Dict]:
