@@ -124,7 +124,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         Update or replace item's metadata file.
         Args:
             item: idmtools entity (Suite, Experiment and Simulation, etc.)
-            metadata: dict to be updated
+            metadata: dict to be updated or replaced
             override: True/False
         Returns:
              None
