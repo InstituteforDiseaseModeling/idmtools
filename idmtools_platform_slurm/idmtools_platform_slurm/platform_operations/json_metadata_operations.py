@@ -51,11 +51,11 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         with filepath.open(mode='w') as f:
             json.dump(data, f, cls=IDMJSONEncoder)
 
-    def get_metadata_filepath(self, item: IEntity) -> Path:
+    def get_metadata_filepath(self, item: Union[Suite, Experiment, Simulation]) -> Path:
         """
         Retrieve item's metadata file path.
         Args:
-            item: idmtools entity (Suite, Experiment and Simulation, etc.)
+            item: idmtools entity (Suite, Experiment and Simulation)
         Returns:
             item's metadata file path
         """
@@ -69,7 +69,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         """
         Obtain item's metadata.
         Args:
-            item: idmtools entity (Suite, Experiment and Simulation, etc.)
+            item: idmtools entity (Suite, Experiment and Simulation)
         Returns:
              key/value dict of metadata from the given item
         """
@@ -82,7 +82,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         """
         Save item's metadata to a file.
         Args:
-            item: idmtools entity (Suite, Experiment and Simulation, etc.)
+            item: idmtools entity (Suite, Experiment and Simulation)
         Returns:
             None
         """
@@ -96,7 +96,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         """
         Obtain item's metadata file.
         Args:
-            item: idmtools entity (Suite, Experiment and Simulation, etc.)
+            item: idmtools entity (Suite, Experiment and Simulation)
         Returns:
              key/value dict of metadata from the given item
         """
@@ -123,7 +123,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         """
         Update or replace item's metadata file.
         Args:
-            item: idmtools entity (Suite, Experiment and Simulation, etc.)
+            item: idmtools entity (Suite, Experiment and Simulation.)
             metadata: dict to be updated or replaced
             replace: True/False
         Returns:
@@ -138,7 +138,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         meta_file = self.get_metadata_filepath(item)
         self._write_to_file(meta_file, meta)
 
-    def clear(self, item: IEntity) -> None:
+    def clear(self, item: Union[Suite, Experiment, Simulation]) -> None:
         """
         Clear the item's metadata file.
         Args:
@@ -150,7 +150,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
             raise RuntimeError(f"Clear method supports Suite/Experiment/Simulation only.")
         self.update(item=item, metadata={}, replace=True)
 
-    def get_children(self, item: IEntity) -> List[Dict]:
+    def get_children(self, item: Union[Suite, Experiment]) -> List[Dict]:
         """
         Fetch item's children.
         Args:
