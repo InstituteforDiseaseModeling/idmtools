@@ -119,20 +119,20 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         meta = self._read_from_file(metadata_filepath)
         return meta
 
-    def update(self, item: Union[Suite, Experiment, Simulation], metadata: Dict = {}, override=True) -> None:
+    def update(self, item: Union[Suite, Experiment, Simulation], metadata: Dict = {}, replace=True) -> None:
         """
         Update or replace item's metadata file.
         Args:
             item: idmtools entity (Suite, Experiment and Simulation, etc.)
             metadata: dict to be updated or replaced
-            override: True/False
+            replace: True/False
         Returns:
              None
         """
         if not isinstance(item, (Suite, Experiment, Simulation)):
             raise RuntimeError(f"Set method supports Suite/Experiment/Simulation only.")
         meta = metadata
-        if not override:
+        if not replace:
             meta = self.load(item)
             meta.update(metadata)
         meta_file = self.get_metadata_filepath(item)
@@ -148,7 +148,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         """
         if not isinstance(item, (Suite, Experiment, Simulation)):
             raise RuntimeError(f"Clear method supports Suite/Experiment/Simulation only.")
-        self.update(item=item, metadata={}, override=True)
+        self.update(item=item, metadata={}, replace=True)
 
     def get_children(self, item: IEntity) -> List[Dict]:
         """
