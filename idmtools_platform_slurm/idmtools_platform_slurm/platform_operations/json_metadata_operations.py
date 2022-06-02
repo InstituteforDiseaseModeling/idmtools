@@ -195,13 +195,14 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
     def _match_filter(item: Dict, metadata: Dict):
         """
         Utility: verify if item match metadata.
+        Note: compare key/value if value is not None else just check key exists
         Args:
             item: dict represents metadata of Suite/Experiment/Simulation
             metadata: dict as a filter
         Returns:
             list of Dict items
         """
-        is_match = all([k in item and item[k] == v for k, v in metadata.items()])
+        is_match = all([(k in item and item[k] == v) if v is not None else k in item for k, v in metadata.items()])
         return is_match
 
     def filter(self, item_type: ItemType, property_filter: Dict = None, tag_filter: Dict = None,
