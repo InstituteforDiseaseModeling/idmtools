@@ -123,7 +123,6 @@ class JSONMetadataOperationsTest(unittest.TestCase):
             self.op.load(item=exp)
         self.assertEqual("No such file or directory", ex.exception.args[1])
 
-
     # test override metadata
     def test_update_replace_existing_metadata(self):
         _, _, simulations = self._initialize_data(self)
@@ -188,32 +187,54 @@ class JSONMetadataOperationsTest(unittest.TestCase):
             self.op.clear(item=fake_item)
         self.assertEqual("Clear method supports Suite/Experiment/Simulation only.", ex.exception.args[0])
 
-    def test_filter_for_simulations(self):
-        _, experiments, simulations = self._initialize_data(self)
+    def test_filter_for_simulation(self):
+        _, _, simulations = self._initialize_data(self)
         properties = {'_uid': simulations[0].id}
         meta_list = []
         for sim in simulations:
             meta_list.append(self.op.load(sim))
-        filtered_meta_list = self.op.filter(meta_items=meta_list, item_type=ItemType.SIMULATION, property_filter=properties)
+        filtered_meta_list = self.op.filter(meta_items=meta_list, item_type=ItemType.SIMULATION,
+                                            property_filter=properties)
         # make sure matched meta_data is the one with simulations[0].id
         self.assertEqual(filtered_meta_list[0]['_uid'], simulations[0].id)
         # make sure only one matched meta_data
         self.assertEqual(len(filtered_meta_list), 1)
 
+    def test_filter_for_simulations(self):
+        _, _, simulations = self._initialize_data(self)
+        meta_list = []
+        for sim in simulations:
+            meta_list.append(self.op.load(sim))
+        # we do not support following line, we can only do filter multiple times with same key
+        # properties = {'_uid': simulations[0].id, '_uid': simulations[1].id}
+        properties = {'_uid': simulations[0].id}
+        filtered_meta_list0 = self.op.filter(meta_items=meta_list, item_type=ItemType.SIMULATION,
+                                             property_filter=properties)
+        properties = {'_uid': simulations[1].id}
+        filtered_meta_list1 = self.op.filter(meta_items=meta_list, item_type=ItemType.SIMULATION,
+                                             property_filter=properties)
+        filtered_meta_list = filtered_meta_list0 + filtered_meta_list1
+        # make sure matched meta_data is the one with simulations[0].id
+        self.assertEqual(filtered_meta_list[0]['_uid'], simulations[0].id)
+        self.assertEqual(filtered_meta_list[1]['_uid'], simulations[1].id)
+        # make sure only one matched meta_data
+        self.assertEqual(len(filtered_meta_list), 2)
+
     def test_filter_for_experiments(self):
-        suites, experiments, _ = self._initialize_data(self)
+        _, experiments, _ = self._initialize_data(self)
         properties = {'_uid': experiments[0].id}
         meta_list = []
         for exp in experiments:
             meta_list.append(self.op.load(exp))
-        filtered_meta_list = self.op.filter(meta_items=meta_list, item_type=ItemType.EXPERIMENT, property_filter=properties)
+        filtered_meta_list = self.op.filter(meta_items=meta_list, item_type=ItemType.EXPERIMENT,
+                                            property_filter=properties)
         # make sure matched meta_data is the one with experiments[0].id
         self.assertEqual(filtered_meta_list[0]['_uid'], experiments[0].id)
         # make sure only one matched meta_data
         self.assertEqual(len(filtered_meta_list), 1)
 
     def test_filter_for_suites(self):
-        suites, experiments, _ = self._initialize_data(self)
+        suites, _, _ = self._initialize_data(self)
         properties = {'_uid': suites[0].id}
         meta_list = []
         for suite in suites:
@@ -227,79 +248,105 @@ class JSONMetadataOperationsTest(unittest.TestCase):
     def test_filter_with_tags(self):
         _, _, simulations = self._initialize_data(self)
         # let's add tag to simulations[0] first
-        self.op.update(simulations[0], metadata={'tags': {'mytag': 123}}, replace=False)
+        self.op.update(simulations[0], metadata={'tags': {'mytag': 123, "test_tag": "abc"}}, replace=False)
         properties = {'_uid': simulations[0].id}
-        tags = {'mytag': 123}
+        tags = {'mytag': 123}  # only filter one of tags
         meta_list = []
         for exp in simulations:
             meta_list.append(self.op.load(exp))
-        filtered_meta_list = self.op.filter(meta_items=meta_list, item_type=ItemType.SIMULATION, property_filter=properties, tag_filter=tags)
+        filtered_meta_list = self.op.filter(meta_items=meta_list, item_type=ItemType.SIMULATION,
+                                            property_filter=properties, tag_filter=tags)
         # make sure matched meta_data is the one with suites[0].id
         self.assertEqual(filtered_meta_list[0]['_uid'], simulations[0].id)
         # make sure matched meta_data contains tags we added
-        self.assertEqual(filtered_meta_list[0]['tags'], tags)
+        self.assertEqual(filtered_meta_list[0]['tags'], {'mytag': 123, "test_tag": "abc"})
         # make sure only one matched meta_data
         self.assertEqual(len(filtered_meta_list), 1)
-    #
-    # def test_filter_when_there_are_no_matches_but_the_metadata_key_exists(self):
-    #     _, _, simulations = self._initialize_data(self)
-    #     sim = simulations[0]
-    #     existing_metadata = self.op.get(item=sim)
-    #     existing_key = list(existing_metadata.keys())[0]
-    #     properties = {existing_key: 'definitely-not-a-preset-value'}
-    #
-    #     sims = self.op.filter(items=simulations, item_type=ItemType.SIMULATION, properties=properties)
-    #     self.assertEqual([], sorted([sim.uid for sim in sims]))
-    #
-    # def test_filter_when_requesting_non_existant_metadata_keys(self):
-    #     _, _, simulations = self._initialize_data(self, data=self.suite_data)
-    #     properties = {'definitely-not-a-metadata-ke-that-has-been-used': 'before'}
-    #     sims = self.op.filter(items=simulations, item_type=ItemType.SIMULATION, properties=properties)
-    #     self.assertEqual([], sorted([sim.uid for sim in sims]))
-    #
-    # #
-    # # filter
-    # #
-    #
-    # def test_filter_works_for_simulations(self):
-    #     properties = {'a': 1}
-    #     expected_ids = ['sim1', 'sim2', 'sim3']
-    #
-    #     uids = self.op.filter(item_type=ItemType.SIMULATION, properties=properties)
-    #     self.assertEqual(sorted(expected_ids), sorted(uids))
-    #
-    # def test_filter_works_for_experiments(self):
-    #     properties = {'2': 3, '3': 4}
-    #     expected_ids = ['exp2', 'exp3']
-    #
-    #     uids = self.op.filter(item_type=ItemType.EXPERIMENT, properties=properties)
-    #     self.assertEqual(sorted(expected_ids), sorted(uids))
-    #
-    # def test_filter_works_for_suites(self):
-    #     properties = {'meta': 'data', 'data': 'meta'}
-    #     expected_ids = ['suite1']
-    #
-    #     uids = self.op.filter(item_type=ItemType.SUITE, properties=properties)
-    #     self.assertEqual(sorted(expected_ids), sorted(uids))
-    #
-    # def test_filter_works_with_tags(self):
-    #     properties = {'a': 1}
-    #     tags = {'plant': 'pumpkin'}
-    #     expected_ids = ['sim2', 'sim3']
-    #
-    #     uids = self.op.filter(item_type=ItemType.SIMULATION, properties=properties, tags=tags)
-    #     self.assertEqual(sorted(expected_ids), sorted(uids))
-    #
-    # def test_filter_works_when_there_are_no_matches_but_the_metadata_key_exists(self):
-    #     sim = self.simulations[0]
-    #     existing_metadata = self.op.get(item=sim)
-    #     existing_key = list(existing_metadata.keys())[0]
-    #     properties = {existing_key: 'definitely-not-a-preset-value'}
-    #
-    #     uids = self.op.filter(item_type=ItemType.SIMULATION, properties=properties)
-    #     self.assertEqual([], sorted(uids))
-    #
-    # def test_filter_works_when_requesting_non_existant_metadata_keys(self):
-    #     properties = {'definitely-not-a-metadata-ke-that-has-been-used': 'before'}
-    #     uids = self.op.filter(item_type=ItemType.SIMULATION, properties=properties)
-    #     self.assertEqual([], sorted(uids))
+
+    def test_filter_when_there_are_no_matches_but_the_metadata_key_exists(self):
+        _, _, simulations = self._initialize_data(self)
+        properties = {'_uid': "sim0"}
+        meta_list = []
+        for sim in simulations:
+            meta_list.append(self.op.load(sim))
+        filtered_meta_list = self.op.filter(meta_items=meta_list, item_type=ItemType.SIMULATION,
+                                            property_filter=properties)
+        # make sure only one matched meta_data
+        self.assertEqual(len(filtered_meta_list), 0)
+
+    def test_filter_by_existing_tags_key_only(self):
+        _, _, simulations = self._initialize_data(self)
+        # let's add tag to simulations[0] first
+        self.op.update(simulations[0], metadata={'tags': {'mytag': 123}}, replace=False)
+        tags = {'mytag': None}
+        meta_list = []
+        for exp in simulations:
+            meta_list.append(self.op.load(exp))
+        filtered_meta_list = self.op.filter(meta_items=meta_list, item_type=ItemType.SIMULATION, tag_filter=tags)
+        # make sure matched meta_data is the one with suites[0].id
+        self.assertEqual(filtered_meta_list[0]['_uid'], simulations[0].id)
+        # make sure matched meta_data contains tags we added
+        self.assertEqual(filtered_meta_list[0]['tags'], {'mytag': 123})
+        # make sure only one matched meta_data
+        self.assertEqual(len(filtered_meta_list), 1)
+
+    def test_filter_with_newly_update_properties(self):
+        _, _, simulations = self._initialize_data(self)
+        # let's add properties to simulations[0] first
+        self.op.update(simulations[0], metadata={'a': 'test'}, replace=False)
+        properties = {'a': 'test'}
+        meta_list = []
+        for exp in simulations:
+            meta_list.append(self.op.load(exp))
+        filtered_meta_list = self.op.filter(meta_items=meta_list, item_type=ItemType.SIMULATION,
+                                            property_filter=properties)
+        # make sure matched meta_data is the one with suites[0].id
+        self.assertEqual(filtered_meta_list[0]['_uid'], simulations[0].id)
+        # make sure matched meta_data contains tags we added
+        self.assertEqual(filtered_meta_list[0]['a'], 'test')
+        # make sure only one matched meta_data
+        self.assertEqual(len(filtered_meta_list), 1)
+
+    def test_filter_with_non_existant_metadata_key_value(self):
+        _, _, simulations = self._initialize_data(self)
+        properties = {'some_key': 123}
+        meta_list = []
+        for sim in simulations:
+            meta_list.append(self.op.load(sim))
+        filtered_meta_list = self.op.filter(meta_items=meta_list, item_type=ItemType.SIMULATION,
+                                            property_filter=properties)
+        # make sure only one matched meta_data
+        self.assertEqual(len(filtered_meta_list), 0)
+
+    def test_filter_with_non_existant_metadata_key_only(self):
+        _, _, simulations = self._initialize_data(self)
+        properties = {'some_key': None}
+        meta_list = []
+        for sim in simulations:
+            meta_list.append(self.op.load(sim))
+        filtered_meta_list = self.op.filter(meta_items=meta_list, item_type=ItemType.SIMULATION,
+                                            property_filter=properties)
+        # make sure only one matched meta_data
+        self.assertEqual(len(filtered_meta_list), 0)
+
+    def test_filter_by_key_with_none_value(self):
+        _, _, simulations = self._initialize_data(self)
+        # let's add tag to simulations[0] first
+        self.op.update(simulations[0], metadata={'tags': {'mytag': None}}, replace=False)
+        self.op.update(simulations[1], metadata={'tags': {'mytag': None}}, replace=False)
+        self.op.update(simulations[2], metadata={'tags': {'mytag': 123}}, replace=False)
+        tags = {'mytag': None}
+        meta_list = []
+        for exp in simulations:
+            meta_list.append(self.op.load(exp))
+        filtered_meta_list = self.op.filter(meta_items=meta_list, item_type=ItemType.SIMULATION, tag_filter=tags,
+                                            ignore_none=False)
+        # make sure matched meta_data is the one with suites[0].id
+        self.assertEqual(filtered_meta_list[0]['_uid'], simulations[0].id)
+        # make sure matched meta_data is the one with suites[0].id
+        self.assertEqual(filtered_meta_list[1]['_uid'], simulations[1].id)
+        # make sure matched meta_data contains tags we added
+        self.assertEqual(filtered_meta_list[0]['tags'], {'mytag': None})
+        self.assertEqual(filtered_meta_list[1]['tags'], {'mytag': None})
+        # make sure only one matched meta_data
+        self.assertEqual(len(filtered_meta_list), 2)
