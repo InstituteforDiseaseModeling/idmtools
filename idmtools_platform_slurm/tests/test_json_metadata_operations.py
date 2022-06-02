@@ -249,6 +249,8 @@ class JSONMetadataOperationsTest(unittest.TestCase):
         _, _, simulations = self._initialize_data(self)
         # let's add tag to simulations[0] first
         self.op.update(simulations[0], metadata={'tags': {'mytag': 123, "test_tag": "abc"}}, replace=False)
+        self.op.update(simulations[1], metadata={'tags': {'mytag': 345, "test_tag": "abc"}}, replace=False)
+
         properties = {'_uid': simulations[0].id}
         tags = {'mytag': 123}  # only filter one of tags
         meta_list = []
@@ -256,7 +258,7 @@ class JSONMetadataOperationsTest(unittest.TestCase):
             meta_list.append(self.op.load(exp))
         filtered_meta_list = self.op.filter(meta_items=meta_list, item_type=ItemType.SIMULATION,
                                             property_filter=properties, tag_filter=tags)
-        # make sure matched meta_data is the one with suites[0].id
+        # make sure matched meta_data is the one with simulations[0].id
         self.assertEqual(filtered_meta_list[0]['_uid'], simulations[0].id)
         # make sure matched meta_data contains tags we added
         self.assertEqual(filtered_meta_list[0]['tags'], {'mytag': 123, "test_tag": "abc"})
@@ -274,18 +276,19 @@ class JSONMetadataOperationsTest(unittest.TestCase):
         # make sure only one matched meta_data
         self.assertEqual(len(filtered_meta_list), 0)
 
-    def test_filter_by_existing_tags_key_only(self):
+    def test_filter_by_tags_key_only(self):
         _, _, simulations = self._initialize_data(self)
         # let's add tag to simulations[0] first
         self.op.update(simulations[0], metadata={'tags': {'mytag': 123}}, replace=False)
+        self.op.update(simulations[1], metadata={'tags': {'mytag1': 123}}, replace=False)
         tags = {'mytag': None}
         meta_list = []
         for exp in simulations:
             meta_list.append(self.op.load(exp))
         filtered_meta_list = self.op.filter(meta_items=meta_list, item_type=ItemType.SIMULATION, tag_filter=tags)
-        # make sure matched meta_data is the one with suites[0].id
+        # make sure matched meta_data is the one with simulations[0].id
         self.assertEqual(filtered_meta_list[0]['_uid'], simulations[0].id)
-        # make sure matched meta_data contains tags we added
+        # make sure matched meta_data contains tag key "mytag"
         self.assertEqual(filtered_meta_list[0]['tags'], {'mytag': 123})
         # make sure only one matched meta_data
         self.assertEqual(len(filtered_meta_list), 1)
@@ -300,9 +303,9 @@ class JSONMetadataOperationsTest(unittest.TestCase):
             meta_list.append(self.op.load(exp))
         filtered_meta_list = self.op.filter(meta_items=meta_list, item_type=ItemType.SIMULATION,
                                             property_filter=properties)
-        # make sure matched meta_data is the one with suites[0].id
+        # make sure matched meta_data is the one with simulations[0].id
         self.assertEqual(filtered_meta_list[0]['_uid'], simulations[0].id)
-        # make sure matched meta_data contains tags we added
+        # make sure matched meta_data contains key/value we added
         self.assertEqual(filtered_meta_list[0]['a'], 'test')
         # make sure only one matched meta_data
         self.assertEqual(len(filtered_meta_list), 1)
@@ -315,7 +318,7 @@ class JSONMetadataOperationsTest(unittest.TestCase):
             meta_list.append(self.op.load(sim))
         filtered_meta_list = self.op.filter(meta_items=meta_list, item_type=ItemType.SIMULATION,
                                             property_filter=properties)
-        # make sure only one matched meta_data
+        # make sure nothing matched in this case
         self.assertEqual(len(filtered_meta_list), 0)
 
     def test_filter_with_non_existant_metadata_key_only(self):
@@ -326,12 +329,12 @@ class JSONMetadataOperationsTest(unittest.TestCase):
             meta_list.append(self.op.load(sim))
         filtered_meta_list = self.op.filter(meta_items=meta_list, item_type=ItemType.SIMULATION,
                                             property_filter=properties)
-        # make sure only one matched meta_data
+        # make sure nothing matched in this case
         self.assertEqual(len(filtered_meta_list), 0)
 
     def test_filter_by_key_with_none_value(self):
         _, _, simulations = self._initialize_data(self)
-        # let's add tag to simulations[0] first
+        # let's add tags to simulations
         self.op.update(simulations[0], metadata={'tags': {'mytag': None}}, replace=False)
         self.op.update(simulations[1], metadata={'tags': {'mytag': None}}, replace=False)
         self.op.update(simulations[2], metadata={'tags': {'mytag': 123}}, replace=False)
@@ -341,12 +344,12 @@ class JSONMetadataOperationsTest(unittest.TestCase):
             meta_list.append(self.op.load(exp))
         filtered_meta_list = self.op.filter(meta_items=meta_list, item_type=ItemType.SIMULATION, tag_filter=tags,
                                             ignore_none=False)
-        # make sure matched meta_data is the one with suites[0].id
+        # make sure first matched meta_data is the one with simulations[0].id
         self.assertEqual(filtered_meta_list[0]['_uid'], simulations[0].id)
-        # make sure matched meta_data is the one with suites[0].id
+        # make sure second matched meta_data is the one with simulations[1].id
         self.assertEqual(filtered_meta_list[1]['_uid'], simulations[1].id)
-        # make sure matched meta_data contains tags we added
+        # make sure matched meta_data's tags contain 'mytag' key and 'None' value
         self.assertEqual(filtered_meta_list[0]['tags'], {'mytag': None})
         self.assertEqual(filtered_meta_list[1]['tags'], {'mytag': None})
-        # make sure only one matched meta_data
+        # make sure only 2 matched meta_data
         self.assertEqual(len(filtered_meta_list), 2)
