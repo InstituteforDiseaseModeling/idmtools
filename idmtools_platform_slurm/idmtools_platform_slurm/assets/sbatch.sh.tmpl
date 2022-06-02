@@ -1,0 +1,24 @@
+#!/bin/bash
+{% if nodes is not none %}
+#SBATCH --nodes={nodes}
+{% endif %}
+{% if ntasks is not none %}
+#SBATCH --ntasks={ntasks}
+{% endif %}
+{% if ntasks_per_core is not none %}
+#SBATCH --ntasks-per-core={ntasks_per_core}
+{% endif %}
+{% if partition is not none %}
+#SBATCH --partition={partition}
+{% endif %}
+{% if max_run_time is not none %}
+#SBATCH --time={max_run_time}
+{% endif %}
+{% if mem is not none %}
+#SBATCH --mem={mem}
+{% endif %}
+#SBATCH--array=0-{njobs}%{max_running_jobs}
+
+# All submissions happen at the experiment level
+srun run_experiment.sh $SLURM_ARRAY_TASK_ID 1> stdout.txt 2> stderr.txt
+wait
