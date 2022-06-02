@@ -199,7 +199,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         Args:
             item: dict represents metadata of Suite/Experiment/Simulation
             metadata: dict as a filter
-            ignore_none: True/False
+            ignore_none: True/False (ignore None value or not)
         Returns:
             list of Dict items
         """
@@ -228,9 +228,9 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
             property_filter: a dict of metadata key/value pairs for exact match searching
             tag_filter: a dict of metadata key/value pairs for exact match searching
             meta_items: list of metadata
-            ignore_none: True/False
+            ignore_none: True/False (ignore None value or not)
         Returns:
-            a list of metadata matching the properties ke/value with given item type
+            a list of metadata matching the properties key/value with given item type
         """
         if meta_items is None:
             meta_items = self.get_all(item_type)
