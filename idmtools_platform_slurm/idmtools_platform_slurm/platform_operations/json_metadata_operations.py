@@ -192,21 +192,34 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         return item_list
 
     @staticmethod
-    def _match_filter(item: Dict, metadata: Dict):
+    def _match_filter(item: Dict, metadata: Dict, ignore_none=True):
         """
         Utility: verify if item match metadata.
         Note: compare key/value if value is not None else just check key exists
         Args:
             item: dict represents metadata of Suite/Experiment/Simulation
             metadata: dict as a filter
+            ignore_none: True/False
         Returns:
             list of Dict items
         """
-        is_match = all([(k in item and item[k] == v) if v is not None else k in item for k, v in metadata.items()])
-        return is_match
+        for k, v in metadata.items():
+            if ignore_none:
+                if v is None:
+                    is_match = k in item
+                else:
+                    is_match = k in item and item[k] == v
+            else:
+                if v is None:
+                    is_match = k in item and item[k] is None
+                else:
+                    is_match = k in item and item[k] == v
+            if not is_match:
+                return False
+        return True
 
     def filter(self, item_type: ItemType, property_filter: Dict = None, tag_filter: Dict = None,
-               meta_items: List[Dict] = None) -> List[Dict]:
+               meta_items: List[Dict] = None, ignore_none=True) -> List[Dict]:
         """
         Obtain all items that match the given properties key/value pairs passed.
         The two filters are applied on item with 'AND' logical checking.
@@ -215,6 +228,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
             property_filter: a dict of metadata key/value pairs for exact match searching
             tag_filter: a dict of metadata key/value pairs for exact match searching
             meta_items: list of metadata
+            ignore_none: True/False
         Returns:
             a list of metadata matching the properties ke/value with given item type
         """
@@ -224,9 +238,9 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         for meta in meta_items:
             is_match = True
             if property_filter:
-                is_match = self._match_filter(meta, property_filter)
+                is_match = self._match_filter(meta, property_filter, ignore_none=ignore_none)
             if tag_filter:
-                is_match = is_match and self._match_filter(meta['tags'], tag_filter)
+                is_match = is_match and self._match_filter(meta['tags'], tag_filter, ignore_none=ignore_none)
             if is_match:
                 item_list.append(meta)
         return item_list
