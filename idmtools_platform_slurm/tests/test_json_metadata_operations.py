@@ -41,7 +41,6 @@ class JSONMetadataOperationsTest(unittest.TestCase):
         return suites, experiments, simulations
 
     def setUp(self):
-        self.platform = Platform('SLURM_LOCAL')
         self.metadata_root = Path(tempfile.mkdtemp())
         self.platform = Platform('SLURM_LOCAL', job_directory=self.metadata_root)
         self.op = JSONMetadataOperations(self.platform)
@@ -225,14 +224,22 @@ class JSONMetadataOperationsTest(unittest.TestCase):
         # make sure only one matched meta_data
         self.assertEqual(len(filtered_meta_list), 1)
 
-    # def test_filter_with_tags(self):
-    #     _, _, simulations = self._initialize_data(self)
-    #     properties = {'a': 1}
-    #     tags = {'plant': 'pumpkin'}
-    #     expected_ids = ['sim2', 'sim3']
-    #
-    #     exps = self.op.filter(meta_items=simulations, item_type=ItemType.SIMULATION, tag_filter=properties, tags=tags)
-    #     self.assertEqual(sorted(expected_ids), sorted([sim.uid for sim in exps]))
+    def test_filter_with_tags(self):
+        _, _, simulations = self._initialize_data(self)
+        # let's add tag to simulations[0] first
+        self.op.update(simulations[0], metadata={'tags': {'mytag': 123}}, replace=False)
+        properties = {'_uid': simulations[0].id}
+        tags = {'mytag': 123}
+        meta_list = []
+        for exp in simulations:
+            meta_list.append(self.op.load(exp))
+        filtered_meta_list = self.op.filter(meta_items=meta_list, item_type=ItemType.SIMULATION, property_filter=properties, tag_filter=tags)
+        # make sure matched meta_data is the one with suites[0].id
+        self.assertEqual(filtered_meta_list[0]['_uid'], simulations[0].id)
+        # make sure matched meta_data contains tags we added
+        self.assertEqual(filtered_meta_list[0]['tags'], tags)
+        # make sure only one matched meta_data
+        self.assertEqual(len(filtered_meta_list), 1)
     #
     # def test_filter_when_there_are_no_matches_but_the_metadata_key_exists(self):
     #     _, _, simulations = self._initialize_data(self)
