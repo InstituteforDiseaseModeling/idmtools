@@ -205,7 +205,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         return is_match
 
     def filter(self, item_type: ItemType, property_filter: Dict = None, tag_filter: Dict = None,
-               items: List = None) -> List[Dict]:
+               meta_items: List[Dict] = None) -> List[Dict]:
         """
         Obtain all items that match the given properties key/value pairs passed.
         The two filters are applied on item with 'AND' logical checking.
@@ -213,19 +213,19 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
             item_type: the type of items to search for matches (simulation, experiment, suite, etc)
             property_filter: a dict of metadata key/value pairs for exact match searching
             tag_filter: a dict of metadata key/value pairs for exact match searching
-            items: list
+            meta_items: list of metadata
         Returns:
             a list of metadata matching the properties ke/value with given item type
         """
-        if items is None:
-            items = self.get_all(item_type)
+        if meta_items is None:
+            meta_items = self.get_all(item_type)
         item_list = []
-        for item in items:
+        for meta in meta_items:
             is_match = True
             if property_filter:
-                is_match = self._match_filter(item, property_filter)
+                is_match = self._match_filter(meta, property_filter)
             if tag_filter:
-                is_match = is_match and self._match_filter(item['tags'], tag_filter)
+                is_match = is_match and self._match_filter(meta['tags'], tag_filter)
             if is_match:
-                item_list.append(item)
+                item_list.append(meta)
         return item_list
