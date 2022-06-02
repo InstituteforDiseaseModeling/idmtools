@@ -187,6 +187,32 @@ class JSONMetadataOperationsTest(unittest.TestCase):
             self.op.clear(item=fake_item)
         self.assertEqual("Clear method supports Suite/Experiment/Simulation only.", ex.exception.args[0])
 
+    def test_get_all_for_simulations(self):
+        _, _, simulations = self._initialize_data(self)
+        meta_list = self.op.get_all(item_type=ItemType.SIMULATION)
+        self.assertEqual(len(meta_list), 3)
+
+    def test_get_all_for_experiments(self):
+        _, experiments, _ = self._initialize_data(self)
+        meta_list = self.op.get_all(item_type=ItemType.EXPERIMENT)
+        self.assertEqual(len(meta_list), 2)
+
+    def test_get_all_for_suites(self):
+        suites, _, _ = self._initialize_data(self)
+        meta_list = self.op.get_all(item_type=ItemType.SUITE)
+        self.assertEqual(len(meta_list), 1)
+
+    def tes_get_children_experiment(self):
+        _, experiments, _ = self._initialize_data(self)
+        meta_list = self.op.get_children(item=experiments)
+        self.assertEqual(len(meta_list), 3)
+
+    def tes_get_children_suite(self):
+        suites, _, _ = self._initialize_data(self)
+        meta_list = self.op.get_children(item=suites)
+        self.assertEqual(len(meta_list), 2)
+
+
     def test_filter_for_simulation(self):
         _, _, simulations = self._initialize_data(self)
         properties = {'_uid': simulations[0].id}
@@ -353,3 +379,25 @@ class JSONMetadataOperationsTest(unittest.TestCase):
         self.assertEqual(filtered_meta_list[1]['tags'], {'mytag': None})
         # make sure only 2 matched meta_data
         self.assertEqual(len(filtered_meta_list), 2)
+
+    def test_filter_for_simulations_without_meta_items(self):
+        _, _, simulations = self._initialize_data(self)
+        meta_list = []
+        for sim in simulations:
+            meta_list.append(self.op.load(sim))
+        properties = {'_uid': simulations[0].id}
+        filtered_meta_list = self.op.filter(item_type=ItemType.SIMULATION,
+                                             property_filter=properties, meta_items=None)
+        # make sure matched meta_data is the one with simulations[0].id
+        self.assertEqual(filtered_meta_list[0]['_uid'], simulations[0].id)
+        # make sure only one matched meta_data
+        self.assertEqual(len(filtered_meta_list), 1)
+
+    def test_filter_with_item_type_only(self):
+        _, _, simulations = self._initialize_data(self)
+        meta_list = []
+        for sim in simulations:
+            meta_list.append(self.op.load(sim))
+        filtered_meta_list = self.op.filter(item_type=ItemType.SIMULATION)
+        # make sure match 3 simulations
+        self.assertEqual(len(filtered_meta_list), 3)
