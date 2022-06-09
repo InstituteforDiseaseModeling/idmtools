@@ -6,9 +6,6 @@ from os import cpu_count
 from pathlib import Path
 from typing import List, Dict, Any, Tuple, Type
 from uuid import UUID, uuid4
-
-from jinja2 import Template
-
 from idmtools.assets import Asset
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
@@ -63,8 +60,6 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
         # TODO Move this to ops somehow? Maybe through assets earlier in process
         generate_simulation_script(sim_dir, simulation)
         return simulation, simulation.uid
-
-
 
     def get_parent(self, simulation: Any, **kwargs) -> Any:
         """
