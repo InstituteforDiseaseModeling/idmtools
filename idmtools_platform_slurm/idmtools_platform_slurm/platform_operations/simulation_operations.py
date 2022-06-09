@@ -12,6 +12,7 @@ from jinja2 import Template
 from idmtools.assets import Asset
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
+from idmtools_platform_slurm.assets import generate_simulation_script
 
 
 @dataclass
@@ -60,14 +61,10 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
         self.platform._op_client.link_dir(common_asset_dir, os.path.join(sim_dir, 'Assets'))
         self.send_assets(simulation, )
         # TODO Move this to ops somehow? Maybe through assets earlier in process
-        sim_script = sim_dir.joinpath("_run.sh")
-        with open(sim_script, "w") as tout:
-            with open(Path(__file__).parent.parent.joinpath("assets/_run.sh.jinja2")) as tin:
-                t = Template(tin.read())
-                tout.write(t.render(simulation=simulation))
-        # TODO Add this command to ops
-        sim_script.chmod(0o755)
+        generate_simulation_script(sim_dir, simulation)
         return simulation, simulation.uid
+
+
 
     def get_parent(self, simulation: Any, **kwargs) -> Any:
         """

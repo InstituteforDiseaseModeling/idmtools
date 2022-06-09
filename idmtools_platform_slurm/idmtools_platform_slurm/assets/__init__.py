@@ -27,7 +27,7 @@ def generate_script(platform: SlurmPlatform, experiment: Experiment, max_running
     if platform.modules:
         template_vars['modules'] = platform.modules
 
-    with open(DEFAULT_TEMPLATE_FILE) as file_:
+    with open(template) as file_:
         t = Template(file_.read())
 
     # Write our file
@@ -38,3 +38,11 @@ def generate_script(platform: SlurmPlatform, experiment: Experiment, max_running
     output_target.chmod(0o755)
 
 
+def generate_simulation_script(sim_dir, simulation):
+    sim_script = sim_dir.joinpath("_run.sh")
+    with open(sim_script, "w") as tout:
+        with open(Path(__file__).parent.parent.joinpath("assets/_run.sh.jinja2")) as tin:
+            t = Template(tin.read())
+            tout.write(t.render(simulation=simulation))
+    # TODO Add this command to ops
+    sim_script.chmod(0o755)
