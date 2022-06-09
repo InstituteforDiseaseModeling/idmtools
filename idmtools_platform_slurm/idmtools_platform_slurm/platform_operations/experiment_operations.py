@@ -1,156 +1,110 @@
-import os
-from collections import defaultdict
-from dataclasses import dataclass
-from typing import List, Any, Tuple, Type
-from uuid import UUID, uuid4
+"""
+Here we implement the SlurmPlatform experiment operations.
 
-from idmtools.assets import Asset
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
+import copy
+from pathlib import Path
+from uuid import UUID, uuid4
+from dataclasses import dataclass, field
+from typing import List, Any, Type, Dict, Optional
+from idmtools.assets import Asset, AssetCollection
+from idmtools.core import ItemType, EntityStatus
+from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
-from idmtools_platform_slurm.slurm_operations import SLURM_STATES
+from idmtools_platform_slurm.platform_operations.utils import ExperimentDict, SimulationDict
 
 
 @dataclass
 class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
-
     platform: 'SlurmPlatform'  # noqa: F821
-    platform_type: Type = Experiment
+    platform_type: Type = field(default=ExperimentDict)
 
-    def get(self, experiment_id: UUID, **kwargs) -> Any:
+    def get(self, experiment_id: UUID, **kwargs) -> Dict:
         """
         Gets an experiment from the slurm platform.
-
         Args:
             experiment_id: Id to fetch
-            **kwargs:
-
+            kwargs: keyword arguments used to expand functionality
         Returns:
             Experiment object
         """
         raise NotImplementedError("Fetching experiments has not been implemented on the Slurm Platform")
 
-    def platform_create(self, experiment: Experiment, **kwargs) -> Tuple[Experiment, UUID]:
+    def platform_create(self, experiment: Experiment, **kwargs) -> Dict:
         """
-        Creates an experiment on a platform.
-
+        Creates an experiment on Slurm Platform.
         Args:
             experiment: Experiment to creat
-            **kwargs: Any extra args
-
+            kwargs: keyword arguments used to expand functionality
         Returns:
-            Experiment and id created.
+            Experiment created.
         """
-        experiment.uid = str(uuid4())
-        exp_dir = os.path.join(self.platform.job_directory, experiment.uid)
-        self.platform._op_client.mk_directory(exp_dir)
-        # store job info in the directory
-        self.platform._op_client.dump_metadata(experiment, os.path.join(exp_dir, 'experiment.json'))
-        self.send_assets(experiment)
-        return experiment, experiment.uid
+        if not isinstance(experiment.uid, UUID):
+            experiment.uid = uuid4()
+        self.platform._op_client.mk_directory(experiment)
+        self.platform._metas.dump(experiment)
+        self.platform._assets.dump_assets(experiment)
+        self.platform._op_client.create_batch_file(experiment)
 
-    def get_children(self, experiment: Any, **kwargs) -> List[Any]:
+        meta = self.platform._metas.get(experiment)
+        return ExperimentDict(meta)
+
+    def get_children(self, slurm_experiment: Dict, parent=None, **kwargs) -> List[Any]:
         """
         Fetch children.
-
-        TODO: Use metadata to load this + statusing?
         Args:
-            experiment:
-            **kwargs:
-
+            slurm_experiment:
+            parent:
+            kwargs: keyword arguments used to expand functionality
         Returns:
-
+            List[Any]
         """
         raise NotImplementedError("Listing assets has not been implemented on the Slurm Platform")
 
-    def get_parent(self, experiment: Any, **kwargs) -> Any:
+    def get_parent(self, experiment: Experiment, **kwargs) -> Any:
         """
-        Get parent(suites).
-
-        TODO: Implement Suites then this
+        Fetches the parent of a experiment.
         Args:
             experiment: Experiment to get parent for
-            **kwargs:
-
+            kwargs: keyword arguments used to expand functionality
         Returns:
-            Parent if found
+            The Suite being the parent of this experiment.
         """
-        return None
+        raise NotImplementedError("Get parent has not been implemented on the Slurm Platform")
 
     def platform_run_item(self, experiment: Experiment, **kwargs):
         """
-        Run experiment
-
+        Run experiment.
         TODO: Write a master sbatch script that leverages list of scripts to call
-
         Args:
             experiment:
-            **kwargs:
-
-        Returns:
-
-        """
-        raise NotImplementedError("TODO")
-
-    def send_assets(self, experiment: Experiment, **kwargs):
-        """
-        Copy our experiment assets
-
-        TODO: Move logic to AssetOperations
-        Args:
-            experiment:
-            **kwargs:
-
+            kwargs: keyword arguments used to expand functionality
         Returns:
             None
         """
-        for asset in experiment.assets:
-            exp_asset_dir = os.path.join(self.platform.job_directory, experiment.uid, 'Assets')
-            self.platform._op_client.mk_directory(exp_asset_dir)
-            self.platform._op_client.copy_asset(asset, exp_asset_dir)
+        pass
+
+    def send_assets(self, experiment: Experiment, **kwargs):
+        """
+        Copy our experiment assets.
+        Replaced by self.platform._assets.dump_assets(experiment)
+        Args:
+            experiment:
+            kwargs: keyword arguments used to expand functionality
+        Returns:
+            None
+        """
+        pass
 
     def refresh_status(self, experiment: Experiment, **kwargs):
         """
         Refresh status of experiment.
-
-        TODO: Leverage the filesystem/metadata for this vs slurm
         Args:
             experiment: Experiment
-            **kwargs:
-
+            kwargs: keyword arguments used to expand functionality
         Returns:
             None
         """
-        states = defaultdict(int)
-        sim_states = self.platform._op_client.experiment_status(experiment)
-        for s in experiment.simulations:
-            if s.uid in sim_states:
-                s.status = SLURM_STATES[sim_states[s.uid]]
-            states[s.status] += 1
-
-    def list_assets(self, experiment: Experiment, **kwargs) -> List[str]:
-        """
-        List assets for an experiment.
-
-        TODO: DO this later
-
-        Args:
-            experiment: Experiment to get assets for
-            **kwargs:
-
-        Returns:
-
-        """
-        raise NotImplementedError("Listing assets has not been implemented on the Slurm Platform")
-
-    def platform_list_files(self, experiment: Experiment, **kwargs) -> List[Asset]:
-        """
-        List files for a platform
-
-        Args:
-            experiment: Experiment
-            **kwargs:
-
-        Returns:
-
-        """
-        raise NotImplementedError("Listing files has not been implemented on the Slurm Platform")
+        raise NotImplementedError("Refresh_status has not been implemented on the Slurm Platform")
