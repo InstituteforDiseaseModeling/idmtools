@@ -1,4 +1,5 @@
-from typing import Type
+from pathlib import Path
+from typing import Type, Dict
 
 from idmtools.entities.iplatform import IPlatform
 from idmtools.registry.platform_specification import example_configuration_impl, get_platform_impl, \
@@ -60,3 +61,13 @@ class SlurmPlatformSpecification(PlatformSpecification):
         """
         from idmtools_platform_slurm import __version__
         return __version__
+
+    def get_configuration_aliases(self) -> Dict[str, Dict]:
+        """Provides configuration aliases that exist in SLURM."""
+        config_aliases = dict(
+            SLURM_LOCAL=dict(
+                mode="local",
+                job_directory=str(Path.cwd())
+            )
+        )
+        return config_aliases
