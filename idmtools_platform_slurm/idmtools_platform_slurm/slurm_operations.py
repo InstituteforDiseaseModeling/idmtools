@@ -259,6 +259,7 @@ class LocalSlurmOperations(SlurmOperations):
             contents = self.get_batch_configs(**kwargs)
             contents += "\n"
             contents += f"srun {item.task.command.cmd}"
+            # TODO: we can replace the above contents by Clinton's PR #1736 with the following code!
             # with open(Path(__file__).parent.joinpath("assets/_run.sh.jinja2")) as tin:
             #     t = Template(tin.read())
             #     contents = t.render(simulation=item)
