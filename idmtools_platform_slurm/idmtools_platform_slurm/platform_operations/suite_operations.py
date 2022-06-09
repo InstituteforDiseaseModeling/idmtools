@@ -24,12 +24,12 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
 
     def get(self, suite_id: UUID, **kwargs) -> Dict:
         """
-        Get Suite.
+        Get an suite from the Slurm platform.
         Args:
             suite_id: Suite id
             kwargs: keyword arguments used to expand functionality
         Returns:
-            Suite
+            Slurm Suite object
         """
         raise NotImplementedError("Fetching suite has not been implemented on the Slurm Platform")
 
@@ -37,46 +37,39 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
         """
         Create suite on Slurm Platform.
         Args:
-            suite: Suite to create
+            suite: idmtools suite
             kwargs: keyword arguments used to expand functionality
         Returns:
-            Suite object
+            Slurm Suite object created
         """
-        # Create suite
-        # suite.uid = str(uuid4())
-        # if not Path(self.platform.job_directory, suite.id).exists():
-        # if not self.platform._op_client.get_directory(suite).exists():
-        # if not self.platform._op_client.item_exist(suite):
         if not isinstance(suite.uid, UUID):
             suite.uid = uuid4()
-        # suite.status = EntityStatus.CREATED
-        # self.platform._suites.create_entity_tree(suite)
         self.platform._op_client.mk_directory(suite)
         self.platform._metas.dump(suite)
 
         meta = self.platform._metas.get(suite)
         return SuiteDict(meta)
 
-    def get_parent(self, suite: Suite, **kwargs) -> Any:
+    def get_parent(self, suite: SuiteDict, **kwargs) -> Any:
         """
         Fetches the parent of a suite.
         Args:
-            suite: Suite to get parent of
+            suite: Slurm suite
             kwargs: keyword arguments used to expand functionality
         Returns:
             None
         """
         return None
 
-    def get_children(self, slurm_suite: Dict, parent: Suite = None, **kwargs) -> List[Experiment]:
+    def get_children(self, suite: Dict, parent: Suite = None, **kwargs) -> List[Dict]:
         """
-        Get children for a suite.
+        Fetch Slurm suite's children.
         Args:
-            slurm_suite: Suite to get children for
-            parent:
+            suite: Slurm suite
+            parent: the parent of the experiments
             kwargs: keyword arguments used to expand functionality
         Returns:
-            List Experiments that are part of the suite
+            List of Slurm experiments
         """
         raise NotImplementedError("Get children has not been implemented on the Slurm Platform")
 
@@ -84,7 +77,7 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
         """
         Refresh the status of a suite. On comps, this is done by refreshing all experiments.
         Args:
-            suite: Suite to refresh status of
+            suite: idmtools suite
             kwargs: keyword arguments used to expand functionality
         Returns:
             None

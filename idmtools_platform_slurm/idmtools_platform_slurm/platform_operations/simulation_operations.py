@@ -12,7 +12,7 @@ from idmtools.core import ItemType, EntityStatus
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
-from idmtools_platform_slurm.platform_operations.utils import SimulationDict, clean_experiment_name
+from idmtools_platform_slurm.platform_operations.utils import ExperimentDict, SimulationDict, clean_experiment_name
 from logging import getLogger, DEBUG
 
 logger = getLogger(__name__)
@@ -25,12 +25,12 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
 
     def get(self, simulation_id: UUID, **kwargs) -> Dict:
         """
-        Get our simulation.
+        Gets an simulation from the Slurm platform.
         Args:
             simulation_id: Simulation id
             kwargs: keyword arguments used to expand functionality
         Returns:
-            Simulation expected.
+            Slurm Simulation object
         """
         raise NotImplementedError("Fetching experiments has not been implemented on the Slurm Platform")
 
@@ -41,7 +41,7 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
             simulation: Simulation
             kwargs: keyword arguments used to expand functionality
         Returns:
-            Simulation created.
+            Slurm Simulation object created.
         """
         if not isinstance(simulation.uid, UUID):
             simulation.uid = uuid4()
@@ -58,11 +58,11 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
         meta = self.platform._metas.get(simulation)
         return SimulationDict(meta)
 
-    def get_parent(self, simulation: Simulation, **kwargs) -> Any:
+    def get_parent(self, simulation: SimulationDict, **kwargs) -> ExperimentDict:
         """
         Fetches the parent of a simulation.
         Args:
-            simulation: Simulation
+            simulation: Slurm Simulation
             kwargs: keyword arguments used to expand functionality
         Returns:
             The Experiment being the parent of this simulation.
@@ -73,7 +73,7 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
         """
         For simulations on slurm, we let the experiment execute with sbatch
         Args:
-            simulation: Simulation
+            simulation: idmtools Simulation
             kwargs: keyword arguments used to expand functionality
         Returns:
             None
@@ -85,7 +85,7 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
         Send assets.
         Replaced by self.platform._metas.dump(simulation)
         Args:
-            simulation: Simulation
+            simulation: idmtools Simulation
             kwargs: keyword arguments used to expand functionality
         Returns:
             None
@@ -96,7 +96,7 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
         """
         Refresh status
         Args:
-            simulation: Simulation
+            simulation: idmtools Simulation
             kwargs: keyword arguments used to expand functionality
         Returns:
             None
@@ -107,7 +107,7 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
         """
         Get assets for simulation.
         Args:
-            simulation: Simulation
+            simulation: idmtools Simulation
             files: files to be retrieved
             kwargs: keyword arguments used to expand functionality
         Returns:
@@ -119,7 +119,7 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
         """
         List assets for simulation.
         Args:
-            simulation: Simulation
+            simulation: idmtools Simulation
             kwargs: keyword arguments used to expand functionality
         Returns:
             List[Asset]
