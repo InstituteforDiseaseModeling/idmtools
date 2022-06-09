@@ -33,22 +33,26 @@ class SlurmPlatform(IPlatform):
     mail_type: Optional[str] = field(default=None, metadata=dict(sbatch=True))
 
     # send e=mail notification
+    #TODO Add Validations here from https://slurm.schedmd.com/sbatch.html#OPT_mail-type
     mail_user: Optional[str] = field(default=None, metadata=dict(sbatch=True))
 
     # How many nodes to be used
-    nodes: int = field(default=1, metadata=dict(sbatch=True))
+    nodes: Optional[int] = field(default=None, metadata=dict(sbatch=True))
 
     # Num of tasks
-    ntasks: int = field(default=1, metadata=dict(sbatch=True))
+    ntasks: Optional[int] = field(default=None, metadata=dict(sbatch=True))
 
     # CPU # per task
-    cpus_per_task: int = field(default=1, metadata=dict(sbatch=True))
+    ntasks_per_core: Optional[int] = field(default=None, metadata=dict(sbatch=True))
 
     # Memory per core: MB of memory
-    mem_per_cpu: int = field(default=8192, metadata=dict(sbatch=True))
+    mem: Optional[int] = field(default=None, metadata=dict(sbatch=True))
+
+    # Memory per core: MB of memory
+    mem_per_cpu: Optional[int] = field(default=None, metadata=dict(sbatch=True))
 
     # Which partition to use
-    partition: str = field(default='cpu_short', metadata=dict(sbatch=True))
+    partition: Optional[str] = field(default=None, metadata=dict(sbatch=True))
 
     # Limit time on this job hrs:min:sec
     time: str = field(default=None, metadata=dict(sbatch=True))
@@ -61,6 +65,9 @@ class SlurmPlatform(IPlatform):
 
     # Specifies that the batch job should be eligible for requeuing
     requeue: bool = field(default=True, metadata=dict(sbatch=True))
+
+    # Pass custom commands to sbatch generation script
+    sbatch_custom: Optional[str] = field(default=None, metadata=dict(sbatch=True))
 
     # modules to be load
     modules: list = field(default_factory=list, metadata=dict(sbatch=True))

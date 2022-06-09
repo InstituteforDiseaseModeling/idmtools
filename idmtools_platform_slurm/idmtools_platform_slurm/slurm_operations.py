@@ -56,6 +56,10 @@ class SlurmOperations(ABC):
     platform_type: Type = field(default=None)
 
     @abstractmethod
+    def get_directory(self, item: IEntity) -> Path:
+        pass
+
+    @abstractmethod
     def mk_directory(self, item: IEntity) -> None:
         pass
 
@@ -97,6 +101,9 @@ class RemoteSlurmOperations(SlurmOperations):
         self._cmd_client.connect(self.hostname, self.port, self.username, key_filename=self.key_file, compress=True)
 
         self._file_client = self._cmd_client.open_sftp()
+
+    def get_directory(self, item: IEntity) -> Path:
+        pass
 
     def mk_directory(self, item: IEntity) -> None:
         pass
@@ -205,7 +212,7 @@ class LocalSlurmOperations(SlurmOperations):
         for p, v in sbatch_configs.items():
             if not v:
                 continue
-            p = p.replace('_', '-')     # re-sore original command name
+            p = p.replace('_', '-')  # re-sore original command name
             if p == 'modules':
                 for module in v:
                     contents += f'module load {module}\n'
