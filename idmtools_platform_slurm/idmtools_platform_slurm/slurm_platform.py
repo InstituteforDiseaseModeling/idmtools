@@ -6,8 +6,9 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 from typing import Optional, Any, Dict
 from dataclasses import dataclass, field, fields
 from logging import getLogger
-from idmtools.core import ItemType
 from idmtools.entities.iplatform import IPlatform
+from idmtools.core import ItemType
+from idmtools_platform_slurm.platform_operations.json_metadata_operations import JSONMetadataOperations
 from idmtools_platform_slurm.platform_operations.asset_collection_operations import \
     SlurmPlatformAssetCollectionOperations
 from idmtools_platform_slurm.platform_operations.experiment_operations import SlurmPlatformExperimentOperations
@@ -74,6 +75,7 @@ class SlurmPlatform(IPlatform):
     _experiments: SlurmPlatformExperimentOperations = field(**op_defaults, repr=False, init=False)
     _simulations: SlurmPlatformSimulationOperations = field(**op_defaults, repr=False, init=False)
     _assets: SlurmPlatformAssetCollectionOperations = field(**op_defaults, repr=False, init=False)
+    _metas: JSONMetadataOperations = field(**op_defaults, repr=False, init=False)
     _op_client: SlurmOperations = field(**op_defaults, repr=False, init=False)
 
     # make Property available
@@ -101,14 +103,7 @@ class SlurmPlatform(IPlatform):
         self._experiments = SlurmPlatformExperimentOperations(platform=self)
         self._simulations = SlurmPlatformSimulationOperations(platform=self)
         self._assets = SlurmPlatformAssetCollectionOperations(platform=self)
-
-    def __has_singularity(self):
-        """
-        Do we support singularity.
-        TODO: this is left over from existing repo. Not sure if we really need this at moment.
-        Returns:
-        """
-        raise NotImplementedError(f"This method is not implemented on SlurmPlatform yet.")
+        self._metas = JSONMetadataOperations(platform=self)
 
     def post_setstate(self):
         self.__init_interfaces()

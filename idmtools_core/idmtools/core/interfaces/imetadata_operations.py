@@ -1,78 +1,81 @@
+"""
+Here we implement the Metadata operations interface.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Any, Dict, List
-
-from idmtools.core.interfaces.ientity import IEntity
-
+from typing import Dict, List
 from idmtools.core import ItemType
-
-
-class MetadataException(Exception):
-    pass
+from idmtools.core.interfaces.ientity import IEntity
 
 
 @dataclass
 class IMetadataOperations(ABC):
 
     @abstractmethod
-    def get(self, item: IEntity) -> Dict[Any, Any]:
+    def get(self, item: IEntity) -> Dict:
         """
-        Obtain all metadata for the given item
+        Obtain item's metadata.
         Args:
-            item: the item to retrieve metadata for
-
-        Returns: a key/value dict of metadata from the given item
+            item: idmtools entity (Suite, Experiment and Simulation, etc.)
+        Returns:
+            a key/value dict of metadata from the given item
         """
         pass
 
     @abstractmethod
-    def set(self, item: IEntity) -> None:
+    def dump(self, item: IEntity) -> None:
         """
-        Apply the given metadata to the specified item, overwriting any existing metadata key/values.
+        Save item's metadata to a file.
         Args:
-            item: the item to set metadata on
+            item: idmtools entity (Suite, Experiment and Simulation, etc.)
+        Returns:
+            None
+        """
+        pass
 
-        Returns: Nothing
+    @abstractmethod
+    def load(self, item: IEntity) -> Dict:
+        """
+        Obtain item's metadata file.
+        Args:
+            item: idmtools entity (Suite, Experiment and Simulation, etc.)
+        Returns:
+             key/value dict of item's metadata file
+        """
+        pass
+
+    @abstractmethod
+    def update(self, item: IEntity) -> None:
+        """
+        Update item's metadata file.
+        Args:
+            item: idmtools entity (Suite, Experiment and Simulation, etc.)
+        Returns:
+            None
         """
         pass
 
     @abstractmethod
     def clear(self, item: IEntity) -> None:
         """
-        Delete/empty the metadata for the given item
+        Clear the item's metadata file.
         Args:
-            item: the item to clear metadata from
-
-        Returns: Nothing
+            item: idmtools entity (Suite, Experiment and Simulation, etc.)
+        Returns:
+            None
         """
         pass
 
     @abstractmethod
-    def filter_items(self, items: List[IEntity], properties: Dict[Any, Any] = None, tags: Dict[Any, Any] = None) \
-            -> List[IEntity]:
+    def filter(self, item_type: ItemType, item_filter: Dict = None) -> List:
         """
-        Obtain all items that match the given metadata key/value pairs passed. property/tag filters are currently
-        expected to be 'equal to' comparisons (key==value) with boolean operator AND between them all.
-        Args:
-            items: the list of items to search through
-            properties: a dict of metadata_key/value pairs for exact match searching (non-tags)
-            tags: a dict of metadata_key/value pairs for exact match searching in tags
-
-        Returns: a list of matching items if items
-        """
-
-    @abstractmethod
-    def filter(self, item_type: ItemType, properties: Dict[Any, Any] = None, tags: Dict[Any, Any] = None) \
-            -> List[str]:
-        """
-        Obtain all item uids of the given type that match the given metadata key/value pairs passed property/tag.
-        property/tag filters are currently expected to be 'equal to' comparisons (key==value) with boolean operator AND
-        between them all.
+        Obtain all items that match the given item_filter key/value pairs passed.
         Args:
             item_type: the type of items to search for matches (simulation, experiment, suite, etc)
-            properties: a dict of metadata_key/value pairs for exact match searching (non-tags)
-            tags: a dict of metadata_key/value pairs for exact match searching in tags
-
-        Returns: a list of item uids
+            item_filter: a dict of metadata key/value pairs for exact match searching
+        Returns:
+            a list of matching items
         """
         pass
