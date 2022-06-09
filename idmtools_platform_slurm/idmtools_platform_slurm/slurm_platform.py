@@ -15,6 +15,7 @@ from idmtools_platform_slurm.platform_operations.experiment_operations import Sl
 from idmtools_platform_slurm.platform_operations.simulation_operations import SlurmPlatformSimulationOperations
 from idmtools_platform_slurm.slurm_operations import SlurmOperations, SlurmOperationalMode, RemoteSlurmOperations, \
     LocalSlurmOperations
+from idmtools_platform_slurm.platform_operations.suite_operations import SlurmPlatformSuiteOperations
 
 logger = getLogger(__name__)
 
@@ -72,6 +73,7 @@ class SlurmPlatform(IPlatform):
     remote_user: Optional[str] = field(default=None)
     key_file: Optional[str] = field(default=None)
 
+    _suites: SlurmPlatformSuiteOperations = field(**op_defaults, repr=False, init=False)
     _experiments: SlurmPlatformExperimentOperations = field(**op_defaults, repr=False, init=False)
     _simulations: SlurmPlatformSimulationOperations = field(**op_defaults, repr=False, init=False)
     _assets: SlurmPlatformAssetCollectionOperations = field(**op_defaults, repr=False, init=False)
@@ -100,6 +102,7 @@ class SlurmPlatform(IPlatform):
         else:
             self._op_client = LocalSlurmOperations(platform=self)
 
+        self._suites = SlurmPlatformSuiteOperations(platform=self)
         self._experiments = SlurmPlatformExperimentOperations(platform=self)
         self._simulations = SlurmPlatformSimulationOperations(platform=self)
         self._assets = SlurmPlatformAssetCollectionOperations(platform=self)
