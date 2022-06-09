@@ -9,6 +9,7 @@ from logging import getLogger
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Union, Type, Any
+from jinja2 import Template
 from paramiko import SSHClient, SFTP, AutoAddPolicy
 from idmtools.core import EntityStatus
 from idmtools.core.interfaces.ientity import IEntity
@@ -199,6 +200,19 @@ class LocalSlurmOperations(SlurmOperations):
         link = Path(link).absolute()
         link.symlink_to(target)
 
+    @staticmethod
+    def update_script_mode(script_path: Union[Path, str], mode=0o755) -> None:
+        """
+        Change file mode.
+        Args:
+            script_path: script path
+            mode: permission mode
+        Returns:
+            None
+        """
+        script_path = Path(script_path)
+        script_path.chmod(mode)
+
     def get_batch_configs(self, **kwargs) -> str:
         """
         Utility: build Batch for configuration part.
@@ -232,9 +246,9 @@ class LocalSlurmOperations(SlurmOperations):
             text
         """
         item_path = self.get_directory(item)
-        contents = self.get_batch_configs(**kwargs)
-        contents += "\n"
         if isinstance(item, Experiment):
+            contents = self.get_batch_configs(**kwargs)
+            contents += "\n"
             pattern = f'*/{SIMULATION_SH_FILE}'
             for filename in item_path.glob(pattern=pattern):
                 contents += f"srun {filename} &"
@@ -242,8 +256,12 @@ class LocalSlurmOperations(SlurmOperations):
             contents += "\n"
             contents += "wait"
         elif isinstance(item, Simulation):
+            contents = self.get_batch_configs(**kwargs)
             contents += "\n"
             contents += f"srun {item.task.command.cmd}"
+            # with open(Path(__file__).parent.joinpath("assets/_run.sh.jinja2")) as tin:
+            #     t = Template(tin.read())
+            #     contents = t.render(simulation=item)
         return contents
 
     def create_batch_file(self, item: Union[Experiment, Simulation], item_path: Union[Path, str] = None,
@@ -269,9 +287,13 @@ class LocalSlurmOperations(SlurmOperations):
         else:
             raise NotImplementedError(f"{item.__class__.__name__} is not supported for batch creation.")
 
+        # create batch file
         script_path = item_path.joinpath(sh_file)
         with script_path.open(mode='w') as out:
             out.write(contents)
+
+        # make script executable
+        self.update_script_mode(script_path)
 
     def submit_job(self, sjob_file_path: Union[Path, str], working_directory: Union[Path, str]) -> None:
         """
