@@ -3,15 +3,12 @@ Here we implement the SlurmPlatform suite operations.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
-from pathlib import Path
 from uuid import UUID, uuid4
 from dataclasses import dataclass, field
 from typing import Any, List, Type, Dict
-from idmtools.core import EntityStatus
 from idmtools.entities import Suite
-from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_suite_operations import IPlatformSuiteOperations
-from idmtools_platform_slurm.platform_operations.utils import SuiteDict, ExperimentDict
+from idmtools_platform_slurm.platform_operations.utils import SuiteDict
 
 
 @dataclass

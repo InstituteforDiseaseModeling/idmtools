@@ -3,17 +3,12 @@ Here we implement the SlurmPlatform experiment operations.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
-import copy
-from pathlib import Path
 from uuid import UUID, uuid4
 from dataclasses import dataclass, field
-from typing import List, Any, Type, Dict, Optional
-from idmtools.assets import Asset, AssetCollection
-from idmtools.core import ItemType, EntityStatus
-from idmtools.entities import Suite
+from typing import List, Type, Dict
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
-from idmtools_platform_slurm.platform_operations.utils import SuiteDict, ExperimentDict, SimulationDict
+from idmtools_platform_slurm.platform_operations.utils import SuiteDict, ExperimentDict
 
 
 @dataclass
@@ -83,6 +78,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
             None
         """
+        #: TODO Q: should we move this line to platform_create?
         self.platform._op_client.create_batch_file(experiment)
 
     def send_assets(self, experiment: Experiment, **kwargs):

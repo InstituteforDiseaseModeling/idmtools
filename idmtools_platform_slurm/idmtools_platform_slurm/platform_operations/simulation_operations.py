@@ -3,17 +3,14 @@ Here we implement the SlurmPlatform simulation operations.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
-from pathlib import Path
 from uuid import UUID, uuid4
 from dataclasses import dataclass, field
-from typing import List, Dict, Any, Type, Optional
+from typing import List, Dict, Type
 from idmtools.assets import Asset
-from idmtools.core import ItemType, EntityStatus
-from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
 from idmtools_platform_slurm.platform_operations.utils import ExperimentDict, SimulationDict, clean_experiment_name
-from logging import getLogger, DEBUG
+from logging import getLogger
 
 logger = getLogger(__name__)
 
