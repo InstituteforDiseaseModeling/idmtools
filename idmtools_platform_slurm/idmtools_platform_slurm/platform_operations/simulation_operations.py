@@ -3,8 +3,11 @@ from concurrent.futures import as_completed
 from concurrent.futures.thread import ThreadPoolExecutor
 from dataclasses import dataclass
 from os import cpu_count
+from pathlib import Path
 from typing import List, Dict, Any, Tuple, Type
 from uuid import UUID, uuid4
+
+from jinja2 import Template
 
 from idmtools.assets import Asset
 from idmtools.entities.simulation import Simulation
@@ -50,14 +53,20 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
             common_asset_dir = os.path.join(self.platform.job_directory, simulation.experiment.uid, 'Assets')
         simulation.uid = str(uuid4())
         self.platform.metadata_ops.save(simulation)
-        sim_dir = os.path.join(self.platform.job_directory, simulation.experiment.uid, simulation.uid)
+        sim_dir = Path(self.platform.job_directory, simulation.experiment.uid, simulation.uid)
         self.platform._op_client.mk_directory(sim_dir)
         # store sim info in folder
         self.platform._op_client.dump_metadata(simulation, os.path.join(sim_dir, 'simulation.json'))
         self.platform._op_client.link_dir(common_asset_dir, os.path.join(sim_dir, 'Assets'))
         self.send_assets(simulation, )
-        self.platform._op_client.create_simulation_batch_file(simulation, sim_dir, mail_type=self.platform.mail_type,
-                                                              mail_user=self.platform.mail_user)
+        # TODO Move this to ops somehow? Maybe through assets earlier in process
+        sim_script = sim_dir.joinpath("_run.sh")
+        with open(sim_script, "w") as tout:
+            with open(Path(__file__).parent.parent.joinpath("assets/_run.sh.jinja2")) as tin:
+                t = Template(tin.read())
+                tout.write(t.render(simulation=simulation))
+        # TODO Add this command to ops
+        sim_script.chmod(0o755)
         return simulation, simulation.uid
 
     def get_parent(self, simulation: Any, **kwargs) -> Any:

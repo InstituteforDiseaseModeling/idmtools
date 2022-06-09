@@ -10,6 +10,7 @@ if TYPE_CHECKING:
 
 DEFAULT_TEMPLATE_FILE = Path(__file__).parent.joinpath("sbatch.sh.jinja2")
 
+
 def generate_script(platform: SlurmPlatform, experiment: Experiment, max_running_jobs: Optional[int] = None, template: Union[Path,str] = DEFAULT_TEMPLATE_FILE, **kwargs):
     template_vars = dict(njobs=experiment.simulation_count)
     if max_running_jobs is not None:
@@ -19,7 +20,7 @@ def generate_script(platform: SlurmPlatform, experiment: Experiment, max_running
         if getattr(platform, p) is not None:
             template_vars[p] = getattr(platform, p)
 
-    # add any ovverides. We need some validation here later
+    # add any overides. We need some validation here later
     # TODO add validation for valid config options
     template_vars.update(**kwargs)
 
@@ -29,6 +30,11 @@ def generate_script(platform: SlurmPlatform, experiment: Experiment, max_running
     with open(DEFAULT_TEMPLATE_FILE) as file_:
         t = Template(file_.read())
 
-    output_target = "abc"
+    # Write our file
+    output_target = platform._op_client.get_directory(experiment).joinpath("sbatch.sh")
     with open(output_target, "w") as tout:
         tout.write(t.render(**template_vars))
+    # Make executable
+    output_target.chmod(0o755)
+
+

@@ -56,6 +56,10 @@ class SlurmOperations(ABC):
     platform_type: Type = field(default=None)
 
     @abstractmethod
+    def get_directory(self, item: Union[Suite, Experiment, Simulation]) -> Path:
+        pass
+
+    @abstractmethod
     def mk_directory(self, item: IEntity) -> None:
         pass
 
@@ -82,6 +86,8 @@ class SlurmOperations(ABC):
 
 @dataclass
 class RemoteSlurmOperations(SlurmOperations):
+
+
     hostname: str = field(default=None)
     username: str = field(default=None)
     key_file: str = field(default=None)
@@ -114,6 +120,9 @@ class RemoteSlurmOperations(SlurmOperations):
         pass
 
     def entity_status(self, item: IEntity) -> Any:
+        pass
+
+    def get_directory(self, item: Union[Suite, Experiment, Simulation]) -> Path:
         pass
 
 
