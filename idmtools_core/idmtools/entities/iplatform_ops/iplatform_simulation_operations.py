@@ -96,14 +96,14 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
                 logger.debug("Finished pre_create")
         if logger.isEnabledFor(DEBUG):
             logger.debug("Calling platform_create")
-        ret = self.platform_create(simulation, **kwargs)
+        simulation._platform_object = self.platform_create(simulation, **kwargs)
         if logger.isEnabledFor(DEBUG):
             logger.debug("Finished platform_create")
         if do_post:
             self.post_create(simulation, **kwargs)
             if logger.isEnabledFor(DEBUG):
                 logger.debug("Finished post_create")
-        return ret
+        return simulation
 
     @abstractmethod
     def platform_create(self, simulation: Simulation, **kwargs) -> Any:
