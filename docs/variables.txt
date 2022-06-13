@@ -32,3 +32,5 @@
 .. |linux_binary| replace:: Eradication binary
 .. |dev_install| replace:: https://github.com/InstituteforDiseaseModeling/idmtools#development-environment-setup
 .. |EMODPY_s| replace:: emodpy
+.. |SLURM_s| replace:: Slurm
+.. |SLURM_l| replace:: Simple Linux Utility for Resource Management (SLURM)
