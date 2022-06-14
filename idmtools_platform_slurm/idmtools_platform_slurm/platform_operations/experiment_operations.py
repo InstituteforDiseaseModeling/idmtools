@@ -3,12 +3,19 @@ Here we implement the SlurmPlatform experiment operations.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+import copy
+# from pathlib import Path
 from uuid import UUID, uuid4
 from dataclasses import dataclass, field
-from typing import List, Type, Dict
+from typing import List, Type, Dict, Optional
+from idmtools.assets import Asset, AssetCollection
+from idmtools.core import ItemType, EntityStatus
+from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
-from idmtools_platform_slurm.platform_operations.utils import SuiteDict, ExperimentDict
+from idmtools_platform_slurm.platform_operations.utils import ExperimentDict, SimulationDict, SuiteDict
+
+# METADATA_FILE = 'metadata.json'
 
 
 @dataclass
@@ -25,7 +32,22 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
             Slurm Experiment object
         """
-        raise NotImplementedError("Fetching experiments has not been implemented on the Slurm Platform")
+        # raise NotImplementedError("Fetching experiments has not been implemented on the Slurm Platform")
+
+        # root = Path(self.platform.job_directory)
+        # pattern = f'*/{experiment_id}/{METADATA_FILE}'
+        # for meta_file in root.glob(pattern=pattern):
+        #     # meta = self.platform._metas.load_metadata_bk(item_dir=meta_file.parent)
+        #     meta = self.platform._metas.load_from_file(meta_file)
+        #     return ExperimentDict(meta)
+        #
+        # raise RuntimeError(f"Not found Experiment with id '{experiment_id}'")
+
+        metas = self.platform._metas.filter(item_type=ItemType.EXPERIMENT, property_filter={'_uid': str(experiment_id)})
+        if len(metas) > 0:
+            return ExperimentDict(metas[0])
+        else:
+            raise RuntimeError(f"Not found Experiment with id '{experiment_id}'")
 
     def platform_create(self, experiment: Experiment, **kwargs) -> Dict:
         """
@@ -55,7 +77,14 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
             List of slurm simulations
         """
-        raise NotImplementedError("Listing assets has not been implemented on the Slurm Platform")
+        # raise NotImplementedError("Listing assets has not been implemented on the Slurm Platform")
+
+        sim_list = []
+        sim_meta_list = self.platform._metas.get_children(parent)
+        for meta in sim_meta_list:
+            sim = self.platform._simulations.to_entity(SimulationDict(meta), parent=parent)
+            sim_list.append(sim)
+        return sim_list
 
     def get_parent(self, experiment: ExperimentDict, **kwargs) -> SuiteDict:
         """
@@ -66,7 +95,14 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
             The Suite being the parent of this experiment.
         """
-        raise NotImplementedError("Get parent has not been implemented on the Slurm Platform")
+        # raise NotImplementedError("Get parent has not been implemented on the Slurm Platform")
+
+        if experiment.parent:
+            return experiment.parent
+        elif experiment.parent_id is None:
+            return None
+        else:
+            return self.platform._suites.get(experiment.parent_id, raw=True, **kwargs)
 
     def platform_run_item(self, experiment: Experiment, **kwargs):
         """
@@ -91,7 +127,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
             None
         """
-        pass
+        self.platform._assets.dump_assets(experiment)
 
     def refresh_status(self, experiment: Experiment, **kwargs):
         """
@@ -103,3 +139,88 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
             None
         """
         raise NotImplementedError("Refresh_status has not been implemented on the Slurm Platform")
+
+    def list_assets(self, experiment: Experiment, **kwargs) -> List[Asset]:
+        """
+        List assets for an experiment.
+        TODO: DO this later
+        Args:
+            experiment: Experiment to get assets for
+            kwargs:
+        Returns:
+            List[Asset]
+        """
+        # raise NotImplementedError("Listing assets has not been implemented on the Slurm Platform")
+
+        ret = self.platform._assets.list_assets(experiment, **kwargs)
+        return ret
+
+    def platform_list_files(self, experiment: Experiment, **kwargs) -> List[Asset]:
+        """
+        List files for a platform
+        Args:
+            experiment: Experiment
+            kwargs:
+        Returns:
+            List[Asset]
+        """
+        # raise NotImplementedError("Listing files has not been implemented on the Slurm Platform")
+
+        assets = self.list_assets(experiment, **kwargs)
+        if experiment.assets is None:
+            return assets
+        else:
+            exp_assets = copy.deepcopy(experiment.assets.assets)
+            exp_assets.extend(assets)
+        return exp_assets
+
+    def get_assets_from_slurm_experiment(self, experiment: Dict) -> AssetCollection:
+        """
+        Get assets for a comps experiment.
+
+        Args:
+            experiment: Experiment to get asset collection for.
+
+        Returns:
+            AssetCollection if configuration is set and configuration.asset_collection_id is set.
+        """
+        assets = AssetCollection()
+        for a in experiment['assets']:
+            asset = Asset(absolute_path=a["absolute_path"], filename=a["filename"], relative_path=a["relative_path"])
+            assets.add_asset(asset)
+        return assets
+
+    def to_entity(self, slurm_exp: Dict, parent: Optional[Suite] = None, children: bool = True, **kwargs) -> Experiment:
+        """
+        Convert a sim dict object to an ISimulation.
+        Args:
+            slurm_exp: simulation to convert
+            parent: optional experiment object
+            children: bool
+            kwargs:
+        Returns:
+            Experiment object
+        """
+        if parent is None:
+            parent = self.platform.get_item(slurm_exp["parent_id"], ItemType.SUITE, force=True)
+        exp = Experiment()
+        exp.platform = self.platform
+        exp._uid = UUID(slurm_exp['_uid'])
+        # suite.uid = suite_meta['id']
+        exp.name = slurm_exp['name']
+        # simulation.experiment = parent
+        # simulation.parent_id = local_sim["experiment_id"]
+        exp.parent_id = parent.id
+        exp.parent = parent
+        exp.tags = slurm_exp['tags']
+        exp._platform_object = slurm_exp
+        exp.status = EntityStatus[slurm_exp['status']] if slurm_exp['status'] else EntityStatus.CREATED
+
+        exp.assets = self.get_assets_from_slurm_experiment(slurm_exp)
+        if exp.assets is None:
+            exp.assets = AssetCollection()
+
+        if children:
+            exp.simulations = self.get_children(slurm_exp, parent=exp)
+
+        return exp

@@ -3,16 +3,21 @@ Here we implement the SlurmPlatform simulation operations.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+# from pathlib import Path
 from uuid import UUID, uuid4
 from dataclasses import dataclass, field
-from typing import List, Dict, Type
+from typing import List, Dict, Type, Optional
 from idmtools.assets import Asset
+from idmtools.core import ItemType, EntityStatus
+from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
-from idmtools_platform_slurm.platform_operations.utils import ExperimentDict, SimulationDict, clean_experiment_name
+from idmtools_platform_slurm.platform_operations.utils import SimulationDict, ExperimentDict, clean_experiment_name
 from logging import getLogger
 
 logger = getLogger(__name__)
+
+# METADATA_FILE = 'metadata.json'
 
 
 @dataclass
@@ -29,7 +34,22 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
         Returns:
             Slurm Simulation object
         """
-        raise NotImplementedError("Fetching experiments has not been implemented on the Slurm Platform")
+        # raise NotImplementedError("Fetching experiments has not been implemented on the Slurm Platform")
+
+        # root = Path(self.platform.job_directory)
+        # pattern = f'*/*/{simulation_id}/{METADATA_FILE}'
+        # for meta_file in root.glob(pattern=pattern):
+        #     # meta = self.platform._metas.load_bk(item_dir=meta_file.parent)
+        #     meta = self.platform._metas.load_from_file(meta_file)
+        #     return SimulationDict(meta)
+        #
+        # raise RuntimeError(f"Not found Simulation with id '{simulation_id}'")
+
+        metas = self.platform._metas.filter(item_type=ItemType.SIMULATION, property_filter={'_uid': str(simulation_id)})
+        if len(metas) > 0:
+            return SimulationDict(metas[0])
+        else:
+            raise RuntimeError(f"Not found Simulation with id '{simulation_id}'")
 
     def platform_create(self, simulation: Simulation, **kwargs) -> Dict:
         """
@@ -63,7 +83,15 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
         Returns:
             The Experiment being the parent of this simulation.
         """
-        raise NotImplementedError("Get parent is not supported on Slurm Yet")
+        # raise NotImplementedError("Get parent is not supported on Slurm Yet")
+
+        if simulation.parent:
+            return simulation.parent
+        elif simulation.parent_id is None:
+            return None
+        else:
+            return self.platform._experiments.get(simulation.parent_id, raw=True,
+                                                  **kwargs) if simulation.experiment_id else None
 
     def platform_run_item(self, simulation: Simulation, **kwargs):
         """
@@ -86,7 +114,7 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
         Returns:
             None
         """
-        pass
+        self.platform._metas.dump_assets(simulation, **kwargs)
 
     def refresh_status(self, simulation: Simulation, **kwargs):
         """
@@ -109,7 +137,10 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
         Returns:
             Dict[str, bytearray]
         """
-        raise NotImplementedError("Get assets has not been implemented on the Slurm Platform")
+        # raise NotImplementedError("Get assets has not been implemented on the Slurm Platform")
+
+        ret = self.platform._assets.get_assets(simulation, files, **kwargs)
+        return ret
 
     def list_assets(self, simulation: Simulation, **kwargs) -> List[Asset]:
         """
@@ -120,4 +151,35 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
         Returns:
             List[Asset]
         """
-        raise NotImplementedError("List assets has not been implemented on the Slurm Platform")
+        # raise NotImplementedError("List assets has not been implemented on the Slurm Platform")
+
+        ret = self.platform._assets.list_assets(simulation, **kwargs)
+        return ret
+
+    def to_entity(self, slurm_sim: Dict, parent: Optional[Experiment] = None, **kwargs) -> Simulation:
+        """
+        Convert a sim dict object to an ISimulation.
+
+        Args:
+            slurm_sim: simulation to convert
+            parent: optional experiment object
+            kwargs:
+        Returns:
+            Simulation object
+        """
+        if parent is None:
+            parent = self.platform.get_item(slurm_sim["parent_id"], ItemType.EXPERIMENT, force=True)
+        sim = Simulation(task=None)
+        sim.platform = self.platform
+        sim._uid = UUID(slurm_sim['_uid'])
+        # suite.uid = suite_meta['id']
+        sim.name = slurm_sim['name']
+        # simulation.experiment = parent
+        # simulation.parent_id = local_sim["experiment_id"]
+        sim.parent_id = parent.id  # may not need this
+        sim.parent = parent
+        sim.tags = slurm_sim['tags']
+        sim._platform_object = slurm_sim
+        sim.status = EntityStatus[slurm_sim['status']] if slurm_sim['status'] else EntityStatus.CREATED
+
+        return sim
