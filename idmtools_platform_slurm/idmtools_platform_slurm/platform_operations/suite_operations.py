@@ -41,7 +41,7 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
         #     meta = self.platform._metas.load_from_file(meta_file)
         #     return SuiteDict(meta)
 
-        metas = self.platform._metas.filter(item_type=ItemType.SUITE, property_filter={'_uid': str(suite_id)})
+        metas = self.platform._metas.filter(item_type=ItemType.SUITE, property_filter={'id': str(suite_id)})
         if len(metas) > 0:
             return SuiteDict(metas[0])
         else:
@@ -90,7 +90,7 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
         exp_list = []
         exp_meta_list = self.platform._metas.get_children(parent)
         for meta in exp_meta_list:
-            exp = self.platform._simulations.to_entity(ExperimentDict(meta), parent=parent)
+            exp = self.platform._experiments.to_entity(ExperimentDict(meta), parent=parent)
             exp_list.append(exp)
         return exp_list
 
@@ -118,7 +118,7 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
         """
         suite = Suite()
         suite.platform = self.platform
-        suite._uid = UUID(slurm_suite['_uid'])
+        suite._uid = UUID(slurm_suite['uid'])
         # suite.uid = suite_meta['id']
         suite.name = slurm_suite['name']
         suite.parent = None

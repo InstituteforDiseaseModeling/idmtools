@@ -45,7 +45,7 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
         #
         # raise RuntimeError(f"Not found Simulation with id '{simulation_id}'")
 
-        metas = self.platform._metas.filter(item_type=ItemType.SIMULATION, property_filter={'_uid': str(simulation_id)})
+        metas = self.platform._metas.filter(item_type=ItemType.SIMULATION, property_filter={'id': str(simulation_id)})
         if len(metas) > 0:
             return SimulationDict(metas[0])
         else:
@@ -171,7 +171,7 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
             parent = self.platform.get_item(slurm_sim["parent_id"], ItemType.EXPERIMENT, force=True)
         sim = Simulation(task=None)
         sim.platform = self.platform
-        sim._uid = UUID(slurm_sim['_uid'])
+        sim._uid = UUID(slurm_sim['uid'])
         # suite.uid = suite_meta['id']
         sim.name = slurm_sim['name']
         # simulation.experiment = parent

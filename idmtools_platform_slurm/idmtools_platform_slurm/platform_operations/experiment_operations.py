@@ -43,7 +43,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         #
         # raise RuntimeError(f"Not found Experiment with id '{experiment_id}'")
 
-        metas = self.platform._metas.filter(item_type=ItemType.EXPERIMENT, property_filter={'_uid': str(experiment_id)})
+        metas = self.platform._metas.filter(item_type=ItemType.EXPERIMENT, property_filter={'uid': str(experiment_id)})
         if len(metas) > 0:
             return ExperimentDict(metas[0])
         else:
@@ -205,7 +205,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
             parent = self.platform.get_item(slurm_exp["parent_id"], ItemType.SUITE, force=True)
         exp = Experiment()
         exp.platform = self.platform
-        exp._uid = UUID(slurm_exp['_uid'])
+        exp._uid = UUID(slurm_exp['uid'])
         # suite.uid = suite_meta['id']
         exp.name = slurm_exp['name']
         # simulation.experiment = parent
