@@ -79,7 +79,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
             None
         """
         #: TODO Q: should we move this line to platform_create?
-        self.platform._op_client.create_batch_file(experiment)
+        self.platform._op_client.create_batch_file(experiment, **kwargs)
 
     def send_assets(self, experiment: Experiment, **kwargs):
         """
