@@ -247,7 +247,7 @@ class LocalSlurmOperations(SlurmOperations):
         contents = DEFAULT_SIMULATION_BATCH
         contents += "\n"
         if isinstance(item, Experiment):
-            contents = self.get_batch_configs(**kwargs)
+            contents += self.get_batch_configs(**kwargs)
             contents += "\n"
             # consider max_running_jobs
             max_running_jobs = kwargs.get('max_running_jobs', False)
