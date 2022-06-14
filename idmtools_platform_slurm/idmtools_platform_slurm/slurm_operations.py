@@ -231,6 +231,15 @@ class LocalSlurmOperations(SlurmOperations):
                 contents += f'#SBATCH --{p}\n'
             else:
                 contents += f'#SBATCH --{p}={v}\n'
+
+        # consider max_running_jobs
+        njobs = kwargs.get('njobs', None)
+        max_running_jobs = kwargs.get('max_running_jobs', False)
+        if max_running_jobs:
+            contents += f"#SBATCH--array=0-{njobs}%{max_running_jobs}\n"
+        else:
+            contents += f"#SBATCH--array=0-{njobs}\n"
+
         return contents
 
     def get_batch_content(self, item: Union[Experiment, Simulation], **kwargs) -> str:
@@ -247,15 +256,9 @@ class LocalSlurmOperations(SlurmOperations):
         contents = DEFAULT_SIMULATION_BATCH
         contents += "\n"
         if isinstance(item, Experiment):
+            kwargs['njobs'] = item.simulation_count
             contents += self.get_batch_configs(**kwargs)
             contents += "\n"
-            # consider max_running_jobs
-            max_running_jobs = kwargs.get('max_running_jobs', False)
-            if max_running_jobs:
-                contents += f"#SBATCH--array=0-{item.simulation_count}%{max_running_jobs}\n"
-            else:
-                contents += f"#SBATCH--array=0-{item.simulation_count}\n"
-            # more configs...
             contents += "# All submissions happen at the experiment level\n"
             contents += "srun run_simulation.sh $SLURM_ARRAY_TASK_ID 1> stdout.txt 2> stderr.txt\n"
             contents += "wait\n"
