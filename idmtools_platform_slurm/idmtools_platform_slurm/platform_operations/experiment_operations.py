@@ -41,6 +41,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         self.platform._op_client.mk_directory(experiment)
         self.platform._metas.dump(experiment)
         self.platform._assets.dump_assets(experiment)
+        self.platform._op_client.create_batch_file(experiment, **kwargs)
 
         meta = self.platform._metas.get(experiment)
         return ExperimentDict(meta)
@@ -71,15 +72,13 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
     def platform_run_item(self, experiment: Experiment, **kwargs):
         """
         Run experiment.
-        TODO: Write a master sbatch script that leverages list of scripts to call
         Args:
             experiment: idmtools Experiment
             kwargs: keyword arguments used to expand functionality
         Returns:
             None
         """
-        #: TODO Q: should we move this line to platform_create?
-        self.platform._op_client.create_batch_file(experiment, **kwargs)
+        pass
 
     def send_assets(self, experiment: Experiment, **kwargs):
         """
