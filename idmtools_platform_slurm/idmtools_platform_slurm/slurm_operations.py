@@ -219,6 +219,9 @@ class LocalSlurmOperations(SlurmOperations):
             text
         """
         contents = ''
+        njobs = kwargs.pop('njobs', None)
+        max_running_jobs = kwargs.pop('max_running_jobs', False)
+        kwargs.pop('wait_on_done_progress', False)
         sbatch_configs = self.platform.get_slurm_configs(**kwargs)
         for p, v in sbatch_configs.items():
             if not v:
@@ -233,8 +236,6 @@ class LocalSlurmOperations(SlurmOperations):
                 contents += f'#SBATCH --{p}={v}\n'
 
         # consider max_running_jobs
-        njobs = kwargs.get('njobs', None)
-        max_running_jobs = kwargs.get('max_running_jobs', False)
         if max_running_jobs:
             contents += f"#SBATCH--array=0-{njobs}%{max_running_jobs}\n"
         else:
