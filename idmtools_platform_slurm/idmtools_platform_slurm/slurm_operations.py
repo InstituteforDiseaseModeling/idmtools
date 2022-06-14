@@ -256,10 +256,9 @@ class LocalSlurmOperations(SlurmOperations):
             else:
                 contents += f"#SBATCH--array=0-{item.simulation_count}\n"
             # more configs...
-            contents += "# All submissions happen at the experiment level"
-            contents += "\n"
-            contents += "srun run_simulation.sh $SLURM_ARRAY_TASK_ID 1> stdout.txt 2> stderr.txt"
-            contents += "wait"
+            contents += "# All submissions happen at the experiment level\n"
+            contents += "srun run_simulation.sh $SLURM_ARRAY_TASK_ID 1> stdout.txt 2> stderr.txt\n"
+            contents += "wait\n"
         elif isinstance(item, Simulation):
             contents += f"{item.task.command.cmd}"
         return contents
