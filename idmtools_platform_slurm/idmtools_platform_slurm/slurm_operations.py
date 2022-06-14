@@ -18,7 +18,7 @@ from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 
 SIMULATION_SH_FILE = '_run.sh'
-EXPERIMENT_SH_FILE = 'job_submit.sh'
+EXPERIMENT_SH_FILE = 'sbatch.sh'
 
 logger = getLogger(__name__)
 
@@ -40,9 +40,6 @@ SLURM_STATES = dict(
 )
 
 DEFAULT_SIMULATION_BATCH = """#!/bin/bash
-# Create by idm-tools at {now} in {mode}
-#SBATCH --job-name={simulation.uid}
-#SBATCH --output={outputfile}
 """
 
 
@@ -230,6 +227,8 @@ class LocalSlurmOperations(SlurmOperations):
             if p == 'modules':
                 for module in v:
                     contents += f'module load {module}\n'
+            elif p in ['exclusive', 'requeue'] and v:
+                contents += f'#SBATCH --{p}\n'
             else:
                 contents += f'#SBATCH --{p}={v}\n'
         return contents
@@ -245,24 +244,24 @@ class LocalSlurmOperations(SlurmOperations):
         Returns:
             text
         """
-        item_path = self.get_directory(item)
+        contents = DEFAULT_SIMULATION_BATCH
+        contents += "\n"
         if isinstance(item, Experiment):
             contents = self.get_batch_configs(**kwargs)
             contents += "\n"
-            pattern = f'*/{SIMULATION_SH_FILE}'
-            for filename in item_path.glob(pattern=pattern):
-                contents += f"srun {filename} &"
-                contents += "\n"
+            # consider max_running_jobs
+            max_running_jobs = kwargs.get('max_running_jobs', False)
+            if max_running_jobs:
+                contents += f"#SBATCH--array=0-{item.simulation_count}%{max_running_jobs}\n"
+            else:
+                contents += f"#SBATCH--array=0-{item.simulation_count}\n"
+            # more configs...
+            contents += "# All submissions happen at the experiment level"
             contents += "\n"
+            contents += "srun run_simulation.sh $SLURM_ARRAY_TASK_ID 1> stdout.txt 2> stderr.txt"
             contents += "wait"
         elif isinstance(item, Simulation):
-            contents = self.get_batch_configs(**kwargs)
-            contents += "\n"
-            contents += f"srun {item.task.command.cmd}"
-            # TODO: we can replace the above contents by Clinton's PR #1736 with the following code!
-            # with open(Path(__file__).parent.joinpath("assets/_run.sh.jinja2")) as tin:
-            #     t = Template(tin.read())
-            #     contents = t.render(simulation=item)
+            contents += f"{item.task.command.cmd}"
         return contents
 
     def create_batch_file(self, item: Union[Experiment, Simulation], item_path: Union[Path, str] = None,
