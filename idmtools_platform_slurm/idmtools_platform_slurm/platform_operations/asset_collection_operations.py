@@ -8,11 +8,14 @@ from uuid import UUID
 from pathlib import Path
 from dataclasses import field, dataclass
 from logging import getLogger
-from typing import Type, List, Dict, Union, Optional
+from typing import TYPE_CHECKING, Type, List, Dict, Union, Optional
 from idmtools.assets import AssetCollection, Asset
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.iplatform_ops.iplatform_asset_collection_operations import IPlatformAssetCollectionOperations
+
+if TYPE_CHECKING:
+    from idmtools_platform_slurm.slurm_platform import SlurmPlatform
 
 logger = getLogger(__name__)
 user_logger = getLogger("user")

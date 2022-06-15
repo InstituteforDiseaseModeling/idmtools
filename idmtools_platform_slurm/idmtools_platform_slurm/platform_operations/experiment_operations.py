@@ -4,10 +4,9 @@ Here we implement the SlurmPlatform experiment operations.
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import copy
-# from pathlib import Path
 from uuid import UUID, uuid4
 from dataclasses import dataclass, field
-from typing import List, Type, Dict, Optional
+from typing import TYPE_CHECKING, List, Type, Dict, Optional
 from idmtools.assets import Asset, AssetCollection
 from idmtools.core import ItemType, EntityStatus
 from idmtools.entities import Suite
@@ -15,7 +14,8 @@ from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
 from idmtools_platform_slurm.platform_operations.utils import ExperimentDict, SimulationDict, SuiteDict
 
-# METADATA_FILE = 'metadata.json'
+if TYPE_CHECKING:
+    from idmtools_platform_slurm.slurm_platform import SlurmPlatform
 
 
 @dataclass
@@ -32,17 +32,6 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
             Slurm Experiment object
         """
-        # raise NotImplementedError("Fetching experiments has not been implemented on the Slurm Platform")
-
-        # root = Path(self.platform.job_directory)
-        # pattern = f'*/{experiment_id}/{METADATA_FILE}'
-        # for meta_file in root.glob(pattern=pattern):
-        #     # meta = self.platform._metas.load_metadata_bk(item_dir=meta_file.parent)
-        #     meta = self.platform._metas.load_from_file(meta_file)
-        #     return ExperimentDict(meta)
-        #
-        # raise RuntimeError(f"Not found Experiment with id '{experiment_id}'")
-
         metas = self.platform._metas.filter(item_type=ItemType.EXPERIMENT, property_filter={'uid': str(experiment_id)})
         if len(metas) > 0:
             return ExperimentDict(metas[0])
@@ -68,6 +57,17 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         meta = self.platform._metas.get(experiment)
         return ExperimentDict(meta)
 
+    def platform_run_item(self, experiment: Experiment, **kwargs):
+        """
+        Run experiment.
+        Args:
+            experiment: idmtools Experiment
+            kwargs: keyword arguments used to expand functionality
+        Returns:
+            None
+        """
+        pass
+
     def get_children(self, experiment: Dict, parent=None, **kwargs) -> List[Dict]:
         """
         Fetch slurm experiment's children.
@@ -78,8 +78,6 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
             List of slurm simulations
         """
-        # raise NotImplementedError("Listing assets has not been implemented on the Slurm Platform")
-
         sim_list = []
         sim_meta_list = self.platform._metas.get_children(parent)
         for meta in sim_meta_list:
@@ -96,25 +94,12 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
             The Suite being the parent of this experiment.
         """
-        # raise NotImplementedError("Get parent has not been implemented on the Slurm Platform")
-
         if experiment.parent:
             return experiment.parent
         elif experiment.parent_id is None:
             return None
         else:
             return self.platform._suites.get(experiment.parent_id, raw=True, **kwargs)
-
-    def platform_run_item(self, experiment: Experiment, **kwargs):
-        """
-        Run experiment.
-        Args:
-            experiment: idmtools Experiment
-            kwargs: keyword arguments used to expand functionality
-        Returns:
-            None
-        """
-        pass
 
     def send_assets(self, experiment: Experiment, **kwargs):
         """
@@ -142,15 +127,12 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
     def list_assets(self, experiment: Experiment, **kwargs) -> List[Asset]:
         """
         List assets for an experiment.
-        TODO: DO this later
         Args:
             experiment: Experiment to get assets for
             kwargs:
         Returns:
             List[Asset]
         """
-        # raise NotImplementedError("Listing assets has not been implemented on the Slurm Platform")
-
         ret = self.platform._assets.list_assets(experiment, **kwargs)
         return ret
 
@@ -159,12 +141,10 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         List files for a platform
         Args:
             experiment: Experiment
-            kwargs:
+            kwargs: keyword arguments used to expand functionality
         Returns:
             List[Asset]
         """
-        # raise NotImplementedError("Listing files has not been implemented on the Slurm Platform")
-
         assets = self.list_assets(experiment, **kwargs)
         if experiment.assets is None:
             return assets
@@ -195,8 +175,8 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         Args:
             slurm_exp: simulation to convert
             parent: optional experiment object
-            children: bool
-            kwargs:
+            children: bool True/False
+            kwargs: keyword arguments used to expand functionality
         Returns:
             Experiment object
         """
@@ -205,10 +185,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         exp = Experiment()
         exp.platform = self.platform
         exp._uid = UUID(slurm_exp['uid'])
-        # suite.uid = suite_meta['id']
         exp.name = slurm_exp['name']
-        # simulation.experiment = parent
-        # simulation.parent_id = local_sim["experiment_id"]
         exp.parent_id = parent.id
         exp.parent = parent
         exp.tags = slurm_exp['tags']
@@ -223,3 +200,15 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
             exp.simulations = self.get_children(slurm_exp, parent=exp)
 
         return exp
+
+    def post_run_item(self, experiment: Experiment, **kwargs) -> None:
+        """
+        Trigger right after commissioning experiment on platform.
+        Args:
+            experiment: Experiment just commissioned
+            kwargs: keyword arguments used to expand functionality
+        Returns:
+            None
+        """
+        self.platform._metas.dump(experiment)
+        experiment.post_run(self.platform)

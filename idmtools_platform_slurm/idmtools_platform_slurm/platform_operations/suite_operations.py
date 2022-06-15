@@ -3,17 +3,17 @@ Here we implement the SlurmPlatform suite operations.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
-# from pathlib import Path
 from uuid import UUID, uuid4
 from dataclasses import dataclass, field
-from typing import Any, List, Type, Dict
+from typing import TYPE_CHECKING, Any, List, Type, Dict
 from idmtools.core import ItemType
 from idmtools.core import EntityStatus
 from idmtools.entities import Suite
 from idmtools.entities.iplatform_ops.iplatform_suite_operations import IPlatformSuiteOperations
 from idmtools_platform_slurm.platform_operations.utils import SuiteDict, ExperimentDict
 
-# METADATA_FILE = 'metadata.json'
+if TYPE_CHECKING:
+    from idmtools_platform_slurm.slurm_platform import SlurmPlatform
 
 
 @dataclass
@@ -26,21 +26,13 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
 
     def get(self, suite_id: UUID, **kwargs) -> Dict:
         """
-        Get an suite from the Slurm platform.
+        Get a suite from the Slurm platform.
         Args:
             suite_id: Suite id
             kwargs: keyword arguments used to expand functionality
         Returns:
             Slurm Suite object
         """
-        # raise NotImplementedError("Fetching suite has not been implemented on the Slurm Platform")
-
-        # suite_dir = Path(self.platform.job_directory, str(suite_id))
-        # if suite_dir.exists():
-        #     meta_file = Path(suite_dir, METADATA_FILE)
-        #     meta = self.platform._metas.load_from_file(meta_file)
-        #     return SuiteDict(meta)
-
         metas = self.platform._metas.filter(item_type=ItemType.SUITE, property_filter={'id': str(suite_id)})
         if len(metas) > 0:
             return SuiteDict(metas[0])
@@ -85,8 +77,6 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
         Returns:
             List of Slurm experiments
         """
-        # raise NotImplementedError("Get children has not been implemented on the Slurm Platform")
-
         exp_list = []
         exp_meta_list = self.platform._metas.get_children(parent)
         for meta in exp_meta_list:
@@ -110,16 +100,14 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
         Convert a sim dict object to an ISimulation.
         Args:
             slurm_suite: simulation to convert
-            parent: optional experiment object
-            children: bool
-            kwargs:
+            children: bool True/False
+            kwargs: keyword arguments used to expand functionality
         Returns:
             Suite object
         """
         suite = Suite()
         suite.platform = self.platform
         suite._uid = UUID(slurm_suite['uid'])
-        # suite.uid = suite_meta['id']
         suite.name = slurm_suite['name']
         suite.parent = None
         suite.tags = slurm_suite['tags']
@@ -129,3 +117,25 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
             suite.experiments = self.get_children(slurm_suite, parent=suite)
 
         return suite
+
+    def post_run_item(self, suite: Suite, **kwargs) -> None:
+        """
+        Trigger right after commissioning suite on platform.
+        Args:
+            suite: Experiment just commissioned
+            kwargs: keyword arguments used to expand functionality
+        Returns:
+            None
+        """
+        self.platform._metas.dump(suite)
+
+    def platform_run_item(self, suite: Suite, **kwargs):
+        """
+        Called during commissioning of an item. This should perform what is needed to commission job on platform.
+        Args:
+            suite:
+            kwargs: keyword arguments used to expand functionality
+        Returns:
+            None
+        """
+        pass
