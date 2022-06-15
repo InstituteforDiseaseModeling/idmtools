@@ -58,7 +58,7 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
         self.platform._metas.dump(simulation)
         self.platform._assets.link_common_assets(simulation)
         self.platform._assets.dump_assets(simulation)
-        self.platform._op_client.create_batch_file(simulation)
+        self.platform._op_client.create_batch_file(simulation, **kwargs)
 
         meta = self.platform._metas.get(simulation)
         return SimulationDict(meta)
