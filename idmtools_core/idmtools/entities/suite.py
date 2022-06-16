@@ -120,7 +120,6 @@ class Suite(INamedEntity, ABC, IRunnableEntity):
         for f in fields(self):
             if not f.name.startswith("_") and f.name not in ['parent']:
                 result[f.name] = getattr(self, f.name)
-        result['experiments'] = [exp.id for exp in self.experiments]
         result['_uid'] = self.uid
         return result
 
