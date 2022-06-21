@@ -41,7 +41,7 @@
 {% if sbatch_custom is not none %}
 #SBATCH {sbatch_custom}
 {% endif %}
-#SBATCH--array=0-{njobs}%{max_running_jobs}
+#SBATCH --array=0-{njobs}%{max_running_jobs}
 
 
 {% if modules is not None and len(modules) > 0 %}

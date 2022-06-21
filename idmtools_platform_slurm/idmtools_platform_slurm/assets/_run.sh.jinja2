@@ -1,3 +1,15 @@
 #!/bin/bash
 
-{simulation.task.command.cmd}
+n=0
+until [ "$n" -ge 5 ]
+do
+
+   {simulation.task.command.cmd}
+   RESULT=$?
+   if [ $RESULT -eq 0 ]; then
+      break
+   fi
+   n=$((n+1))
+   sleep 15
+done
+exit $RESULT
