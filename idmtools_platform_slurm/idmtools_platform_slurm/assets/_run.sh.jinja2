@@ -1,10 +1,10 @@
 #!/bin/bash
 
 n=0
-until [ "$n" -ge 5 ]
+until [ "$n" -ge {{retries}} ]
 do
 
-   {simulation.task.command.cmd}
+   {{simulation.task.command.cmd}}
    RESULT=$?
    if [ $RESULT -eq 0 ]; then
       break

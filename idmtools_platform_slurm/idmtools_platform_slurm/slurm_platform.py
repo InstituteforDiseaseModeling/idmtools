@@ -19,6 +19,7 @@ from idmtools_platform_slurm.slurm_operations import SlurmOperations, SlurmOpera
 logger = getLogger(__name__)
 
 op_defaults = dict(default=None, compare=False, metadata={"pickle_ignore": True})
+CONFIG_PARAMETERS = ['ntasks', 'partition', 'nodes', 'mail_type', 'mail_user', 'ntasks_per_core', 'mem_per_cpu', 'time', 'account', 'mem', 'exclusive', 'requeue', 'sbatch_custom']
 
 
 @dataclass(repr=False)
@@ -40,6 +41,9 @@ class SlurmPlatform(IPlatform):
 
     # Num of tasks
     ntasks: Optional[int] = field(default=None, metadata=dict(sbatch=True))
+
+    # Maximum of running jobs(Per experiment)
+    max_running_jobs: Optional[int] = field(default=None, metadata=dict(sbatch=True))
 
     # CPU # per task
     ntasks_per_core: Optional[int] = field(default=None, metadata=dict(sbatch=True))
@@ -64,6 +68,9 @@ class SlurmPlatform(IPlatform):
 
     # Specifies that the batch job should be eligible for requeuing
     requeue: bool = field(default=True, metadata=dict(sbatch=True))
+
+    # Default retries for jobs
+    retries: int = field(default=1, metadata=dict(sbatch=True))
 
     # Pass custom commands to sbatch generation script
     sbatch_custom: Optional[str] = field(default=None, metadata=dict(sbatch=True))

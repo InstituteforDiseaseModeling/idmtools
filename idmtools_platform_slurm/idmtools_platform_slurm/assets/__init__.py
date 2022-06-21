@@ -6,19 +6,22 @@ from jinja2 import Template
 from idmtools.entities.experiment import Experiment
 
 if TYPE_CHECKING:
-    from idmtools_platform_slurm.slurm_platform import SlurmPlatform
+    from idmtools_platform_slurm.slurm_platform import SlurmPlatform, CONFIG_PARAMETERS
 
 DEFAULT_TEMPLATE_FILE = Path(__file__).parent.joinpath("sbatch.sh.jinja2")
 
 
-def generate_script(platform: SlurmPlatform, experiment: Experiment, max_running_jobs: Optional[int] = None, template: Union[Path,str] = DEFAULT_TEMPLATE_FILE, **kwargs):
+def generate_script(platform: 'SlurmPlatform', experiment: Experiment, max_running_jobs: Optional[int] = None, template: Union[Path,str] = DEFAULT_TEMPLATE_FILE, **kwargs):
+    from idmtools_platform_slurm.slurm_platform import CONFIG_PARAMETERS
     template_vars = dict(njobs=experiment.simulation_count)
-    if max_running_jobs is not None:
-        template_vars['max_running_jobs'] = max_running_jobs
     # populate from our platform config vars
-    for p in ['ntasks', 'partition', 'nodes', 'mail_type', 'mail_user', 'ntasks_per_core', 'mem_per_cpu', 'time', 'account', 'mem', 'exclusive', 'requeue', 'sbatch_custom']:
+    for p in CONFIG_PARAMETERS:
         if getattr(platform, p) is not None:
             template_vars[p] = getattr(platform, p)
+
+    # Set default here
+    if max_running_jobs is None and platform.max_running_jobs is None:
+        template_vars['max_running_jobs'] = 1
 
     # add any overides. We need some validation here later
     # TODO add validation for valid config options
@@ -38,11 +41,16 @@ def generate_script(platform: SlurmPlatform, experiment: Experiment, max_running
     output_target.chmod(0o755)
 
 
-def generate_simulation_script(sim_dir, simulation):
+def generate_simulation_script(platform: 'SlurmPlatform', sim_dir, simulation, retries: Optional[int] = None):
     sim_script = sim_dir.joinpath("_run.sh")
     with open(sim_script, "w") as tout:
         with open(Path(__file__).parent.parent.joinpath("assets/_run.sh.jinja2")) as tin:
             t = Template(tin.read())
-            tout.write(t.render(simulation=simulation))
+            tvars = dict(
+                platform=platform,
+                simulation=simulation,
+                retries=retries if retries else platform.retries
+            )
+            tout.write(t.render(*tvars))
     # TODO Add this command to ops
     sim_script.chmod(0o755)
