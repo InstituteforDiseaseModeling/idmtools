@@ -38,7 +38,7 @@
 {% if sbatch_custom is defined and sbatch_custom is not none %}
 #SBATCH {{sbatch_custom}}
 {% endif %}
-#SBATCH --array=0-{{njobs}}%{{max_running_jobs}}
+#SBATCH --array=1-{{njobs}}%{{max_running_jobs}}
 
 
 {% if modules is defined and modules is not none and modules|length > 0 %}
