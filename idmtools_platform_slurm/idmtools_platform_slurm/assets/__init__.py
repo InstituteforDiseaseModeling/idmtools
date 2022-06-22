@@ -37,7 +37,7 @@ def generate_script(platform: 'SlurmPlatform', experiment: Experiment, max_runni
     with open(output_target, "w") as tout:
         tout.write(t.render(template_vars))
     # Make executable
-    output_target.chmod(0o755)
+    platform._op_client.update_script_mode(output_target)
 
 
 def generate_simulation_script(platform: 'SlurmPlatform', simulation, retries: Optional[int] = None):
