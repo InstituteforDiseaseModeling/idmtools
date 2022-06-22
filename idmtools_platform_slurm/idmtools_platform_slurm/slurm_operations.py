@@ -9,16 +9,13 @@ from logging import getLogger
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Union, Type, Any
-from jinja2 import Template
 from paramiko import SSHClient, SFTP, AutoAddPolicy
 from idmtools.core import EntityStatus
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
-
-SIMULATION_SH_FILE = '_run.sh'
-EXPERIMENT_SH_FILE = 'sbatch.sh'
+from idmtools_platform_slurm.assets import generate_script, generate_simulation_script
 
 logger = getLogger(__name__)
 
@@ -66,10 +63,6 @@ class SlurmOperations(ABC):
         pass
 
     @abstractmethod
-    def get_batch_content(self, item: IEntity, **kwargs) -> str:
-        pass
-
-    @abstractmethod
     def create_batch_file(self, item: IEntity, **kwargs) -> None:
         pass
 
@@ -107,9 +100,6 @@ class RemoteSlurmOperations(SlurmOperations):
         pass
 
     def link_dir(self, target: Union[Path, str], link: Union[Path, str]) -> None:
-        pass
-
-    def get_batch_content(self, item: IEntity, **kwargs) -> str:
         pass
 
     def create_batch_file(self, item: IEntity, **kwargs) -> None:
@@ -210,93 +200,21 @@ class LocalSlurmOperations(SlurmOperations):
         script_path = Path(script_path)
         script_path.chmod(mode)
 
-    def get_batch_configs(self, **kwargs) -> str:
-        """
-        Utility: build Batch for configuration part.
-        Args:
-            kwargs: keyword arguments used to expand functionality.
-        Returns:
-            text
-        """
-        contents = ''
-        njobs = kwargs.pop('njobs', None)
-        max_running_jobs = kwargs.pop('max_running_jobs', False)
-        kwargs.pop('wait_on_done_progress', False)
-        sbatch_configs = self.platform.get_slurm_configs(**kwargs)
-        for p, v in sbatch_configs.items():
-            if not v:
-                continue
-            p = p.replace('_', '-')  # re-sore original command name
-            if p == 'modules':
-                for module in v:
-                    contents += f'module load {module}\n'
-            elif p in ['exclusive', 'requeue'] and v:
-                contents += f'#SBATCH --{p}\n'
-            else:
-                contents += f'#SBATCH --{p}={v}\n'
-
-        # consider max_running_jobs
-        if max_running_jobs:
-            contents += f"#SBATCH--array=0-{njobs}%{max_running_jobs}\n"
-        else:
-            contents += f"#SBATCH--array=0-{njobs}\n"
-
-        return contents
-
-    def get_batch_content(self, item: Union[Experiment, Simulation], **kwargs) -> str:
-        """
-        Get base batch content.
-        TODO: this is not the real script content and it just shows how some utility function are available/used.
-        TODO: Clinton is working on the details of the content and may completely re-write the generated script.
-        Args:
-            item: the item to build batch for
-            kwargs: keyword arguments used to expand functionality.
-        Returns:
-            text
-        """
-        contents = DEFAULT_SIMULATION_BATCH
-        contents += "\n"
-        if isinstance(item, Experiment):
-            kwargs['njobs'] = item.simulation_count
-            contents += self.get_batch_configs(**kwargs)
-            contents += "\n"
-            contents += "# All submissions happen at the experiment level\n"
-            contents += "srun run_simulation.sh $SLURM_ARRAY_TASK_ID 1> stdout.txt 2> stderr.txt\n"
-            contents += "wait\n"
-        elif isinstance(item, Simulation):
-            contents += f"{item.task.command.cmd}"
-        return contents
-
-    def create_batch_file(self, item: Union[Experiment, Simulation], item_path: Union[Path, str] = None,
-                          **kwargs) -> None:
+    def create_batch_file(self, item: Union[Experiment, Simulation], **kwargs) -> None:
         """
         Create batch file.
         Args:
             item: the item to build batch file for
-            item_path: the file path
             kwargs: keyword arguments used to expand functionality.
         Returns:
             None
         """
-        if item_path is None:
-            item_path = self.get_directory(item)
-        item_path = Path(item_path)
-
-        contents = self.get_batch_content(item, **kwargs)
         if isinstance(item, Experiment):
-            sh_file = EXPERIMENT_SH_FILE
+            generate_script(self.platform, item)
         elif isinstance(item, Simulation):
-            sh_file = SIMULATION_SH_FILE
+            generate_simulation_script(self.platform, item)
         else:
             raise NotImplementedError(f"{item.__class__.__name__} is not supported for batch creation.")
-
-        # create batch file
-        script_path = item_path.joinpath(sh_file)
-        with script_path.open(mode='w') as out:
-            out.write(contents)
-
-        # make script executable
-        self.update_script_mode(script_path)
 
     def submit_job(self, sjob_file_path: Union[Path, str], working_directory: Union[Path, str]) -> None:
         """
