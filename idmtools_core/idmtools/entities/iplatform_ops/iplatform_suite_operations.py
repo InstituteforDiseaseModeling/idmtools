@@ -190,13 +190,13 @@ class IPlatformSuiteOperations(ABC):
         """
         if logger.isEnabledFor(DEBUG):
             logger.debug("Calling pre_run_item")
-        self.pre_run_item(suite)
+        self.pre_run_item(suite, **kwargs)
         if logger.isEnabledFor(DEBUG):
             logger.debug("Calling platform_run_item")
-        self.platform_run_item(suite)
+        self.platform_run_item(suite, **kwargs)
         if logger.isEnabledFor(DEBUG):
             logger.debug("Calling post_run_item")
-        self.post_run_item(suite)
+        self.post_run_item(suite, **kwargs)
 
     def platform_run_item(self, suite: Suite, **kwargs):
         """

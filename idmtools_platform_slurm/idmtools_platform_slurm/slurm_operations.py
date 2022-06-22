@@ -9,6 +9,7 @@ from logging import getLogger
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Union, Type, Any
+from jinja2 import Template
 from paramiko import SSHClient, SFTP, AutoAddPolicy
 from idmtools.core import EntityStatus
 from idmtools.core.interfaces.ientity import IEntity
@@ -17,7 +18,7 @@ from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 
 SIMULATION_SH_FILE = '_run.sh'
-EXPERIMENT_SH_FILE = 'job_submit.sh'
+EXPERIMENT_SH_FILE = 'sbatch.sh'
 
 logger = getLogger(__name__)
 
@@ -39,9 +40,6 @@ SLURM_STATES = dict(
 )
 
 DEFAULT_SIMULATION_BATCH = """#!/bin/bash
-# Create by idm-tools at {now} in {mode}
-#SBATCH --job-name={simulation.uid}
-#SBATCH --output={outputfile}
 """
 
 
@@ -56,7 +54,7 @@ class SlurmOperations(ABC):
     platform_type: Type = field(default=None)
 
     @abstractmethod
-    def get_directory(self, item: Union[Suite, Experiment, Simulation]) -> Path:
+    def get_directory(self, item: IEntity) -> Path:
         pass
 
     @abstractmethod
@@ -86,8 +84,6 @@ class SlurmOperations(ABC):
 
 @dataclass
 class RemoteSlurmOperations(SlurmOperations):
-
-
     hostname: str = field(default=None)
     username: str = field(default=None)
     key_file: str = field(default=None)
@@ -103,6 +99,9 @@ class RemoteSlurmOperations(SlurmOperations):
         self._cmd_client.connect(self.hostname, self.port, self.username, key_filename=self.key_file, compress=True)
 
         self._file_client = self._cmd_client.open_sftp()
+
+    def get_directory(self, item: IEntity) -> Path:
+        pass
 
     def mk_directory(self, item: IEntity) -> None:
         pass
@@ -120,9 +119,6 @@ class RemoteSlurmOperations(SlurmOperations):
         pass
 
     def entity_status(self, item: IEntity) -> Any:
-        pass
-
-    def get_directory(self, item: Union[Suite, Experiment, Simulation]) -> Path:
         pass
 
 
@@ -201,6 +197,19 @@ class LocalSlurmOperations(SlurmOperations):
         link = Path(link).absolute()
         link.symlink_to(target)
 
+    @staticmethod
+    def update_script_mode(script_path: Union[Path, str], mode=0o755) -> None:
+        """
+        Change file mode.
+        Args:
+            script_path: script path
+            mode: permission mode
+        Returns:
+            None
+        """
+        script_path = Path(script_path)
+        script_path.chmod(mode)
+
     def get_batch_configs(self, **kwargs) -> str:
         """
         Utility: build Batch for configuration part.
@@ -210,16 +219,28 @@ class LocalSlurmOperations(SlurmOperations):
             text
         """
         contents = ''
+        njobs = kwargs.pop('njobs', None)
+        max_running_jobs = kwargs.pop('max_running_jobs', False)
+        kwargs.pop('wait_on_done_progress', False)
         sbatch_configs = self.platform.get_slurm_configs(**kwargs)
         for p, v in sbatch_configs.items():
             if not v:
                 continue
-            p = p.replace('_', '-')     # re-sore original command name
+            p = p.replace('_', '-')  # re-sore original command name
             if p == 'modules':
                 for module in v:
                     contents += f'module load {module}\n'
+            elif p in ['exclusive', 'requeue'] and v:
+                contents += f'#SBATCH --{p}\n'
             else:
                 contents += f'#SBATCH --{p}={v}\n'
+
+        # consider max_running_jobs
+        if max_running_jobs:
+            contents += f"#SBATCH--array=0-{njobs}%{max_running_jobs}\n"
+        else:
+            contents += f"#SBATCH--array=0-{njobs}\n"
+
         return contents
 
     def get_batch_content(self, item: Union[Experiment, Simulation], **kwargs) -> str:
@@ -233,19 +254,17 @@ class LocalSlurmOperations(SlurmOperations):
         Returns:
             text
         """
-        item_path = self.get_directory(item)
-        contents = self.get_batch_configs(**kwargs)
+        contents = DEFAULT_SIMULATION_BATCH
         contents += "\n"
         if isinstance(item, Experiment):
-            pattern = f'*/{SIMULATION_SH_FILE}'
-            for filename in item_path.glob(pattern=pattern):
-                contents += f"srun {filename} &"
-                contents += "\n"
+            kwargs['njobs'] = item.simulation_count
+            contents += self.get_batch_configs(**kwargs)
             contents += "\n"
-            contents += "wait"
+            contents += "# All submissions happen at the experiment level\n"
+            contents += "srun run_simulation.sh $SLURM_ARRAY_TASK_ID 1> stdout.txt 2> stderr.txt\n"
+            contents += "wait\n"
         elif isinstance(item, Simulation):
-            contents += "\n"
-            contents += f"srun {item.task.command.cmd}"
+            contents += f"{item.task.command.cmd}"
         return contents
 
     def create_batch_file(self, item: Union[Experiment, Simulation], item_path: Union[Path, str] = None,
@@ -271,9 +290,13 @@ class LocalSlurmOperations(SlurmOperations):
         else:
             raise NotImplementedError(f"{item.__class__.__name__} is not supported for batch creation.")
 
+        # create batch file
         script_path = item_path.joinpath(sh_file)
         with script_path.open(mode='w') as out:
             out.write(contents)
+
+        # make script executable
+        self.update_script_mode(script_path)
 
     def submit_job(self, sjob_file_path: Union[Path, str], working_directory: Union[Path, str]) -> None:
         """
