@@ -20,7 +20,8 @@ from idmtools_platform_slurm.platform_operations.suite_operations import SlurmPl
 logger = getLogger(__name__)
 
 op_defaults = dict(default=None, compare=False, metadata={"pickle_ignore": True})
-CONFIG_PARAMETERS = ['ntasks', 'partition', 'nodes', 'mail_type', 'mail_user', 'ntasks_per_core', 'mem_per_cpu', 'time', 'account', 'mem', 'exclusive', 'requeue', 'sbatch_custom']
+CONFIG_PARAMETERS = ['ntasks', 'partition', 'nodes', 'mail_type', 'mail_user', 'ntasks_per_core', 'mem_per_cpu', 'time',
+                     'account', 'mem', 'exclusive', 'requeue', 'sbatch_custom', 'max_running_jobs']
 
 
 @dataclass(repr=False)
@@ -34,7 +35,7 @@ class SlurmPlatform(IPlatform):
     mail_type: Optional[str] = field(default=None, metadata=dict(sbatch=True))
 
     # send e=mail notification
-    #TODO Add Validations here from https://slurm.schedmd.com/sbatch.html#OPT_mail-type
+    # TODO Add Validations here from https://slurm.schedmd.com/sbatch.html#OPT_mail-type
     mail_user: Optional[str] = field(default=None, metadata=dict(sbatch=True))
 
     # How many nodes to be used
