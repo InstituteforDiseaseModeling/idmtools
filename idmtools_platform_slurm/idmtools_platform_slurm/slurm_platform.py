@@ -71,9 +71,6 @@ class SlurmPlatform(IPlatform):
     # Specifies that the batch job should be eligible for requeuing
     requeue: bool = field(default=True, metadata=dict(sbatch=True))
 
-    # Pass custom commands to sbatch generation script
-    sbatch_custom: Optional[str] = field(default=None, metadata=dict(sbatch=True))
-
     # Default retries for jobs
     retries: int = field(default=1, metadata=dict(sbatch=True))
 
