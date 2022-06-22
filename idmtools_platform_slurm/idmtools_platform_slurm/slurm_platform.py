@@ -46,6 +46,9 @@ class SlurmPlatform(IPlatform):
     # CPU # per task
     ntasks_per_core: Optional[int] = field(default=None, metadata=dict(sbatch=True))
 
+    # Maximum of running jobs(Per experiment)
+    max_running_jobs: Optional[int] = field(default=None, metadata=dict(sbatch=True))
+
     # Memory per core: MB of memory
     mem: Optional[int] = field(default=None, metadata=dict(sbatch=True))
 
