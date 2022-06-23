@@ -30,6 +30,8 @@ def generate_script(platform: 'SlurmPlatform', experiment: Experiment, max_runni
             template_vars[p] = getattr(platform, p)
 
     # Set default here
+    if max_running_jobs is not None:
+        template_vars['max_running_jobs'] = max_running_jobs
     if max_running_jobs is None and platform.max_running_jobs is None:
         template_vars['max_running_jobs'] = 1
 
