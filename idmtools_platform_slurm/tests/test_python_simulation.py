@@ -1,3 +1,4 @@
+import linecache
 import os
 import pathlib
 import shutil
@@ -17,25 +18,14 @@ from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.decorators import linux_only
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
-cwd = os.path.dirname(__file__)
-
 
 @pytest.mark.serial
 @linux_only
 class TestPythonSimulation(ITestWithPersistence):
 
-    def setUp(self) -> None:
-        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
-        self.job_directory = "DEST"
-        self.platform = Platform('SLURM_LOCAL', job_directory=self.job_directory)
-
-
-    def tearDown(self):
-        shutil.rmtree(self.job_directory)
-
-    def test_sweeping_and_local_folders_creation(self):
+    def create_experiment(self, platform=None, a=1, b=1, max_running_jobs=None, retries=None):
         task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model.py"),
-                                        parameters=(dict(c=0)))
+                                        parameters=(dict(c=0)), python_path="python3")
 
         ts = TemplatedSimulations(base_task=task)
         builder = SimulationBuilder()
@@ -43,8 +33,8 @@ class TestPythonSimulation(ITestWithPersistence):
         def param_update(simulation: Simulation, param: str, value: Any) -> Dict[str, Any]:
             return simulation.task.set_parameter(param, value)
 
-        builder.add_sweep_definition(partial(param_update, param="a"), range(3))
-        builder.add_sweep_definition(partial(param_update, param="b"), range(3))
+        builder.add_sweep_definition(partial(param_update, param="a"), range(a))
+        builder.add_sweep_definition(partial(param_update, param="b"), range(b))
         ts.add_builder(builder)
 
         # Now we can create our Experiment using our template builder
@@ -59,37 +49,72 @@ class TestPythonSimulation(ITestWithPersistence):
         suite.update_tags({'name': 'suite_tag', 'idmtools': '123'})
         # Add experiment to the suite
         suite.add_experiment(experiment)
-        # suite.run(wait_till_done=False)
-        suite.run(wait_until_done=False, wait_on_done=False, max_running_jobs=10)
-        # Verify local folders and files
-        # First verify all files under experiment
+        # self.platform.create_items([suite])
+        suite.run(platform=platform, wait_until_done=False, wait_on_done=False, max_running_jobs=max_running_jobs,
+                  retries=retries)
+        return experiment
+
+    def setUp(self) -> None:
+        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
+        self.job_directory = "DEST"
+        self.platform = Platform('SLURM_LOCAL', job_directory=self.job_directory)
+
+    # def tearDown(self):
+    #     shutil.rmtree(self.job_directory)
+
+    def test_sweeping_and_local_folders_creation(self):
+        experiment = self.create_experiment(self.platform, a=3, b=3)
+        experiment_dir = self.platform._op_client.get_directory(experiment)
         files = []
-        for (dirpath, dirnames, filenames) in os.walk(os.path.join(cwd, self.job_directory, suite.id, experiment.id)):
+        for (dirpath, dirnames, filenames) in os.walk(experiment_dir):
             files.extend(filenames)
             break
         self.assertSetEqual(set(files), set(["metadata.json", "run_simulation.sh", "sbatch.sh"]))
 
         # verify all files under simulations
-        simulations = experiment.simulations.items
-        self.assertEqual(len(simulations), 9)
+        self.assertEqual(experiment.simulation_count, 9)
         count = 0
-        for simulation in simulations:
+        for simulation in experiment.simulations:
+            simulation_dir = self.platform._op_client.get_directory(simulation)
+            asserts_dir = simulation_dir.joinpath("Assets")
             files = []
-            for (dirpath, dirnames, filenames) in os.walk(
-                    os.path.join(cwd, self.job_directory, suite.id, experiment.id, simulation.id)):
+            for (dirpath, dirnames, filenames) in os.walk(simulation_dir):
                 if dirnames == ["Assets"]:
                     # verify Assets folder under simulation is symlink and it link to experiment's Assets
-                    self.assertTrue(os.path.islink(
-                        os.path.join(cwd, self.job_directory, suite.id, experiment.id, simulation.id, "Assets")))
-                    target_link = os.readlink(
-                        os.path.join(cwd, self.job_directory, suite.id, experiment.id, simulation.id, "Assets"))
+                    self.assertTrue(os.path.islink(asserts_dir))
+                    target_link = os.readlink(asserts_dir)
                     self.assertEqual(os.path.basename(pathlib.Path(target_link).parent), experiment.id)
                     count = count + 1
                 files.extend(filenames)
-                break
             self.assertSetEqual(set(files), set(["metadata.json", "_run.sh", "config.json"]))
         self.assertEqual(count, 9)  # make sure we found total 9 symlinks for Assets folder
 
         # TODO, grab stdout.txt and stderr.txt from remote cluster and validate
         # TODO, test experiment status
         # TODO, test remote files
+
+    def test_scripts(self):
+        platform = Platform('SLURM_LOCAL', job_directory=self.job_directory, max_running_jobs=8, retries=5)
+        experiment = self.create_experiment(platform=platform, a=5, b=5)
+        experiment_dir = self.platform._op_client.get_directory(experiment)
+        # verify sbatch.sh script content in experiment level
+        with open(os.path.join(experiment_dir, 'sbatch.sh'), 'r') as fpr:
+            contents = fpr.read()
+        self.assertIn("#SBATCH --array=1-25%8", contents)  # 25=a*b=5*5, 8=max_running_jobs
+        self.assertIn("srun run_simulation.sh $SLURM_ARRAY_TASK_ID 1> stdout.txt 2> stderr.txt", contents)
+
+        # verify run_simulation.sh script content in experiment level
+        with open(os.path.join(experiment_dir, 'run_simulation.sh'), 'r') as fpr:
+            contents = fpr.read()
+        self.assertIn(
+            "JOB_DIRECTORY=$(find . -type d -maxdepth 1 -mindepth 1  | grep -v Assets | head -${SLURM_ARRAY_TASK_ID} | tail -1)",
+            contents)
+        self.assertIn("$JOB_DIRECTORY/_run.sh", contents)
+
+        # verify _run.sh script content under simulation level
+        for simulation in experiment.simulations:
+            simulation_dir = platform._op_client.get_directory(simulation)
+            asserts_dir = simulation_dir.joinpath("Assets")
+            with open(os.path.join(simulation_dir, '_run.sh'), 'r') as fpr:
+                contents = fpr.read()
+            self.assertIn("until [ \"$n\" -ge 5 ]", contents)  # 5 here is from retries=5 in platform

@@ -180,12 +180,11 @@ class TestSlurmPlatform(ITestWithPersistence):
         self.assertTrue(os.path.exists(job_path))
         # TODO validation sbatch.sh content
         with open(job_path) as f:
-            contents = f.readlines()
+            contents = f.read()
         # check srun run_simulation.sh in sbatch.sh file
-        if any("srun run_simulation.sh $SLURM_ARRAY_TASK_ID 1> stdout.txt 2> stderr.txt" in i for i in contents):
-            self.assertTrue(1)
-        else:
-            self.assertFalse(1)
+        self.assertIn(
+            "srun run_simulation.sh $SLURM_ARRAY_TASK_ID 1> stdout.txt 2> stderr.txt",
+            contents)
         # clean up suite folder
         shutil.rmtree(os.path.join(cwd, suite.id))
         self.assertFalse(os.path.exists(job_path))
