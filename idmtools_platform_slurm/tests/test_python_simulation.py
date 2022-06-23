@@ -1,56 +1,95 @@
 import os
-from idmtools.core import EntityStatus
-from operator import itemgetter
+import pathlib
+import shutil
+from functools import partial
+from typing import Any, Dict
+
+import pytest
+
 from idmtools.builders import SimulationBuilder
-from idmtools.managers import ExperimentManager
-from idmtools_models.python import PythonExperiment
 from idmtools.core.platform_factory import Platform
+from idmtools.entities import Suite
+from idmtools.entities.experiment import Experiment
+from idmtools.entities.simulation import Simulation
+from idmtools.entities.templated_simulation import TemplatedSimulations
+from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
+from idmtools_test.utils.decorators import linux_only
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
+cwd = os.path.dirname(__file__)
 
+
+@pytest.mark.serial
+@linux_only
 class TestPythonSimulation(ITestWithPersistence):
 
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
+        self.job_directory = "DEST"
+        self.platform = Platform('SLURM_LOCAL', job_directory=self.job_directory)
 
-    def test_direct_sweep_one_parameter_local(self):
 
-        platform = Platform('SlurmStage')
+    def tearDown(self):
+        shutil.rmtree(self.job_directory)
 
-        # CreateSimulationTask.broker =
+    def test_sweeping_and_local_folders_creation(self):
+        task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model.py"),
+                                        parameters=(dict(c=0)))
 
-        name = self.case_name
-        pe = PythonExperiment(name=self.case_name, model_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
-
-        pe.tags = {"idmtools": "idmtools-automation", "string_tag": "test", "number_tag": 123}
-
-        def param_a_update(simulation, value):
-            simulation.set_parameter("a", value)
-            return {"a": value}
-
+        ts = TemplatedSimulations(base_task=task)
         builder = SimulationBuilder()
-        # Sweep parameter "a"
-        builder.add_sweep_definition(param_a_update, range(0, 5))
-        pe.builder = builder
 
-        em = ExperimentManager(experiment=pe, platform=platform)
-        em.run()
-        em.wait_till_done()
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
-        # validation
-        self.assertEqual(pe.name, name)
-        self.assertEqual(pe.simulation_count, 5)
-        self.assertIsNotNone(pe.uid)
-        self.assertTrue(all([s.status == EntityStatus.SUCCEEDED for s in pe.simulations]))
-        self.assertTrue(pe.succeeded)
+        def param_update(simulation: Simulation, param: str, value: Any) -> Dict[str, Any]:
+            return simulation.task.set_parameter(param, value)
 
-        # validate tags
-        tags = []
-        for simulation in pe.simulations:
-            self.assertEqual(simulation.experiment.uid, pe.uid)
-            tags.append(simulation.tags)
-        expected_tags = [{'a': 0}, {'a': 1}, {'a': 2}, {'a': 3}, {'a': 4}]
-        sorted_tags = sorted(tags, key=itemgetter('a'))
-        sorted_expected_tags = sorted(expected_tags, key=itemgetter('a'))
-        self.assertEqual(sorted_tags, sorted_expected_tags)
+        builder.add_sweep_definition(partial(param_update, param="a"), range(3))
+        builder.add_sweep_definition(partial(param_update, param="b"), range(3))
+        ts.add_builder(builder)
+
+        # Now we can create our Experiment using our template builder
+        experiment = Experiment.from_template(ts, name=self.case_name)
+        # Add our own custom tag to simulation
+        experiment.tags["tag1"] = 1
+        # And add common assets from local dir
+        experiment.assets.add_directory(assets_directory=os.path.join(COMMON_INPUT_PATH, "python", "Assets"))
+
+        # Create suite
+        suite = Suite(name='Idm Suite')
+        suite.update_tags({'name': 'suite_tag', 'idmtools': '123'})
+        # Add experiment to the suite
+        suite.add_experiment(experiment)
+        # suite.run(wait_till_done=False)
+        suite.run(wait_until_done=False, wait_on_done=False, max_running_jobs=10)
+        # Verify local folders and files
+        # First verify all files under experiment
+        files = []
+        for (dirpath, dirnames, filenames) in os.walk(os.path.join(cwd, self.job_directory, suite.id, experiment.id)):
+            files.extend(filenames)
+            break
+        self.assertSetEqual(set(files), set(["metadata.json", "run_simulation.sh", "sbatch.sh"]))
+
+        # verify all files under simulations
+        simulations = experiment.simulations.items
+        self.assertEqual(len(simulations), 9)
+        count = 0
+        for simulation in simulations:
+            files = []
+            for (dirpath, dirnames, filenames) in os.walk(
+                    os.path.join(cwd, self.job_directory, suite.id, experiment.id, simulation.id)):
+                if dirnames == ["Assets"]:
+                    # verify Assets folder under simulation is symlink and it link to experiment's Assets
+                    self.assertTrue(os.path.islink(
+                        os.path.join(cwd, self.job_directory, suite.id, experiment.id, simulation.id, "Assets")))
+                    target_link = os.readlink(
+                        os.path.join(cwd, self.job_directory, suite.id, experiment.id, simulation.id, "Assets"))
+                    self.assertEqual(os.path.basename(pathlib.Path(target_link).parent), experiment.id)
+                    count = count + 1
+                files.extend(filenames)
+                break
+            self.assertSetEqual(set(files), set(["metadata.json", "_run.sh", "config.json"]))
+        self.assertEqual(count, 9)  # make sure we found total 9 symlinks for Assets folder
+
+        # TODO, grab stdout.txt and stderr.txt from remote cluster and validate
+        # TODO, test experiment status
+        # TODO, test remote files

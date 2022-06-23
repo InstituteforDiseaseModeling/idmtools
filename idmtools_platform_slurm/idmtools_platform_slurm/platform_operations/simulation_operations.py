@@ -1,71 +1,123 @@
-import os
-from concurrent.futures import as_completed
-from concurrent.futures.thread import ThreadPoolExecutor
-from dataclasses import dataclass
-from os import cpu_count
-from typing import List, Dict, Any, Tuple, Type
+"""
+Here we implement the SlurmPlatform simulation operations.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 from uuid import UUID, uuid4
+from dataclasses import dataclass, field
+from typing import List, Dict, Type
+from idmtools.assets import Asset
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
+from idmtools_platform_slurm.platform_operations.utils import ExperimentDict, SimulationDict, clean_experiment_name
+from logging import getLogger
+
+logger = getLogger(__name__)
 
 
 @dataclass
-class SlurmPLatformSimulationOperations(IPlatformSimulationOperations):
+class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
     platform: 'SlurmPlatform'  # noqa: F821
-    platform_type: Type = Simulation
+    platform_type: Type = field(default=SimulationDict)
 
-    def get(self, simulation_id: UUID, **kwargs) -> Any:
+    def get(self, simulation_id: UUID, **kwargs) -> Dict:
+        """
+        Gets an simulation from the Slurm platform.
+        Args:
+            simulation_id: Simulation id
+            kwargs: keyword arguments used to expand functionality
+        Returns:
+            Slurm Simulation object
+        """
         raise NotImplementedError("Fetching experiments has not been implemented on the Slurm Platform")
 
-    def platform_create(self, simulation: Simulation, common_asset_dir=None) -> Tuple[Any, UUID]:
-        if common_asset_dir is None:
-            common_asset_dir = os.path.join(self.platform.job_directory, simulation.experiment.uid, 'Assets')
-        simulation.uid = str(uuid4())
-        sim_dir = os.path.join(self.platform.job_directory, simulation.experiment.uid, simulation.uid)
-        self.platform._op_client.mk_directory(sim_dir)
-        # store sim info in folder
-        self.platform._op_client.dump_metadata(simulation, os.path.join(sim_dir, 'simulation.json'))
-        self.platform._op_client.link_dir(common_asset_dir, os.path.join(sim_dir, 'Assets'))
-        self.send_assets(simulation)
-        self.platform._op_client.create_simulation_batch_file(simulation, sim_dir, mail_type=self.platform.mail_type,
-                                                              mail_user=self.platform.mail_user)
+    def platform_create(self, simulation: Simulation, **kwargs) -> Dict:
+        """
+        Create the simulation on Slurm Platform.
+        Args:
+            simulation: Simulation
+            kwargs: keyword arguments used to expand functionality
+        Returns:
+            Slurm Simulation object created.
+        """
+        if not isinstance(simulation.uid, UUID):
+            simulation.uid = uuid4()
 
-        return simulation, simulation.uid
+        simulation.name = clean_experiment_name(simulation.experiment.name if not simulation.name else simulation.name)
 
-    def get_parent(self, simulation: Any, **kwargs) -> Any:
-        raise NotImplementedError("Listing assets is not supported on Slurm Yet")
+        self.platform._op_client.mk_directory(simulation)
+        self.platform._metas.dump(simulation)
+        self.platform._assets.link_common_assets(simulation)
+        self.platform._assets.dump_assets(simulation)
+        self.platform._op_client.create_batch_file(simulation, **kwargs)
 
-    def batch_create(self, sims: List[Simulation], **kwargs) -> List[Tuple[Any, UUID]]:
-        created = []
-        # common_asset_dir = os.path.join(self.platform.job_directory, sims[0].experiment.uid, 'Assets')
+        meta = self.platform._metas.get(simulation)
+        return SimulationDict(meta)
 
-        for simulation in sims:
-            created.append(self.create(simulation))
-        return created
+    def get_parent(self, simulation: SimulationDict, **kwargs) -> ExperimentDict:
+        """
+        Fetches the parent of a simulation.
+        Args:
+            simulation: Slurm Simulation
+            kwargs: keyword arguments used to expand functionality
+        Returns:
+            The Experiment being the parent of this simulation.
+        """
+        raise NotImplementedError("Get parent is not supported on Slurm Yet")
 
-    def run_item(self, simulation: Simulation):
-        sim_dir = os.path.join(self.platform.job_directory, simulation.experiment.uid, simulation.uid)
-        self.platform._op_client.submit_job(os.path.join(sim_dir, 'submit-simulation.sh'), sim_dir)
+    def platform_run_item(self, simulation: Simulation, **kwargs):
+        """
+        For simulations on slurm, we let the experiment execute with sbatch
+        Args:
+            simulation: idmtools Simulation
+            kwargs: keyword arguments used to expand functionality
+        Returns:
+            None
+        """
+        pass
 
-    def send_assets(self, simulation: Simulation):
-        for asset in simulation.assets:
-            sim_dir = os.path.join(self.platform.job_directory, simulation.experiment.uid, simulation.uid)
-            self.platform._op_client.copy_asset(asset, sim_dir)
+    def send_assets(self, simulation: Simulation, **kwargs):
+        """
+        Send assets.
+        Replaced by self.platform._metas.dump(simulation)
+        Args:
+            simulation: idmtools Simulation
+            kwargs: keyword arguments used to expand functionality
+        Returns:
+            None
+        """
+        pass
 
-    def refresh_status(self, simulation: Simulation):
-        raise NotImplementedError("Fetching experiments has not been implemented on the Slurm Platform")
+    def refresh_status(self, simulation: Simulation, **kwargs):
+        """
+        Refresh status
+        Args:
+            simulation: idmtools Simulation
+            kwargs: keyword arguments used to expand functionality
+        Returns:
+            None
+        """
+        raise NotImplementedError("Refresh status has not been implemented on the Slurm Platform")
 
     def get_assets(self, simulation: Simulation, files: List[str], **kwargs) -> Dict[str, bytearray]:
-        ret = dict()
-        futures = {}
-        base_path = os.path.join(self.platform.job_directory, simulation.experiment.uid, simulation.uid)
-        with ThreadPoolExecutor(max_workers=cpu_count()) as pool:
-            for file in files:
-                futures[pool.submit(self.platform._op_client.download_asset, os.path.join(file, base_path))] = file
+        """
+        Get assets for simulation.
+        Args:
+            simulation: idmtools Simulation
+            files: files to be retrieved
+            kwargs: keyword arguments used to expand functionality
+        Returns:
+            Dict[str, bytearray]
+        """
+        raise NotImplementedError("Get assets has not been implemented on the Slurm Platform")
 
-            for future in as_completed(futures):
-                ret[futures[future]] = future.result()
-        return ret
-
-    def list_assets(self, simulation: Simulation) -> List[str]:
-        raise NotImplementedError("Listing assets is not supported on Slurm Yet")
+    def list_assets(self, simulation: Simulation, **kwargs) -> List[Asset]:
+        """
+        List assets for simulation.
+        Args:
+            simulation: idmtools Simulation
+            kwargs: keyword arguments used to expand functionality
+        Returns:
+            List[Asset]
+        """
+        raise NotImplementedError("List assets has not been implemented on the Slurm Platform")
