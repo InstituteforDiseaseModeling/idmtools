@@ -210,9 +210,11 @@ class LocalSlurmOperations(SlurmOperations):
             None
         """
         if isinstance(item, Experiment):
-            generate_script(self.platform, item)
+            max_running_jobs = kwargs.get('max_running_jobs', None)
+            generate_script(self.platform, item, max_running_jobs)
         elif isinstance(item, Simulation):
-            generate_simulation_script(self.platform, item)
+            retries = kwargs.get('retries', None)
+            generate_simulation_script(self.platform, item, retries)
         else:
             raise NotImplementedError(f"{item.__class__.__name__} is not supported for batch creation.")
 
