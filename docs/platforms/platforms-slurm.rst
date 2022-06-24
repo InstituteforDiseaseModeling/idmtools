@@ -6,7 +6,7 @@ see (https://slurm.schedmd.com/quickstart.html#arch).
 For architecure and included packages information about |IT_s| and |SLURM_s|, 
 see (https://docs.idmod.org/projects/idmtools/en/latest/reference.html).
 
-.. :doc:`reference` errors out as unknown document when building sphinx local files, not sure why...
+.. :doc:`reference` errors out as unknown document when building sphinx local files, not sure why as the file exists and is in the same directory as other working referenced files, such as basis-installation...
 
 Prerequisites
 =============
@@ -26,9 +26,9 @@ Prerequisites
 
 Recommendations
 ````````````````
-* Simulation results and files should be backed up
+* sim_root should be a shared drive and mounted on all nodes in the cluster
 
-* sim_root 
+* Simulation results and files should be backed up
 
 Getting started
 ===============
@@ -56,7 +56,12 @@ Upon completion you should see the following output...::
 
     return value/output from python script example
 
-Slurm commands
-==============
-You can 
+.. note::
 
+        ``workitems`` are not supported on the |SLURM_s| platform with |IT_s|. If you've 
+        used the |COMPS_s| platform with |IT_s| you may have scripts using this object. 
+        To modify these scripts you should....
+
+
+.. include:: slurm\commands.rst
+   
