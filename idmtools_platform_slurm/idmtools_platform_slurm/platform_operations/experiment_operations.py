@@ -3,6 +3,7 @@ Here we implement the SlurmPlatform experiment operations.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+import subprocess
 from pathlib import Path
 from uuid import UUID, uuid4
 from dataclasses import dataclass, field
@@ -85,7 +86,8 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
             None
         """
-        pass
+        working_directory = self.platform._op_client.get_directory(experiment)
+        result = subprocess.run(['sbatch', 'sbatch.sh'], stdout=subprocess.PIPE, cwd=str(working_directory))
 
     def send_assets(self, experiment: Experiment, **kwargs):
         """
