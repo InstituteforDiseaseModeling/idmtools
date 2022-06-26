@@ -42,7 +42,6 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
             experiment.uid = uuid4()
         # Generate Suite/Experiment/Simulation folder structure
         self.platform._op_client.mk_directory(experiment)
-        self.platform._metas.dump(experiment)
         self.platform._assets.dump_assets(experiment)
         self.platform._op_client.create_batch_file(experiment, **kwargs)
 
@@ -86,6 +85,8 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
             None
         """
+        self.platform._metas.dump(experiment)
+
         dry_run = kwargs.get('dry_run', False)
         if not dry_run:
             working_directory = self.platform._op_client.get_directory(experiment)

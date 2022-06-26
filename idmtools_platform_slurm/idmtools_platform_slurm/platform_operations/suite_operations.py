@@ -42,10 +42,21 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
         if not isinstance(suite.uid, UUID):
             suite.uid = uuid4()
         self.platform._op_client.mk_directory(suite)
-        self.platform._metas.dump(suite)
 
         meta = self.platform._metas.get(suite)
         return SuiteDict(meta)
+
+    def platform_run_item(self, suite: Suite, **kwargs):
+        """
+        Called during commissioning of an item. This should perform what is needed to commission job on platform.
+
+        Args:
+            suite:
+
+        Returns:
+            None
+        """
+        self.platform._metas.dump(suite)
 
     def get_parent(self, suite: SuiteDict, **kwargs) -> Any:
         """
