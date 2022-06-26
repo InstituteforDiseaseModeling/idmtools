@@ -86,8 +86,10 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
             None
         """
-        working_directory = self.platform._op_client.get_directory(experiment)
-        result = subprocess.run(['sbatch', 'sbatch.sh'], stdout=subprocess.PIPE, cwd=str(working_directory))
+        dry_run = kwargs.get('dry_run', False)
+        if not dry_run:
+            working_directory = self.platform._op_client.get_directory(experiment)
+            result = subprocess.run(['sbatch', 'sbatch.sh'], stdout=subprocess.PIPE, cwd=str(working_directory))
 
     def send_assets(self, experiment: Experiment, **kwargs):
         """
