@@ -50,7 +50,6 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         if not isinstance(experiment.uid, UUID):
             experiment.uid = uuid4()
         self.platform._op_client.mk_directory(experiment)
-        self.platform._metas.dump(experiment)
         self.platform._assets.dump_assets(experiment)
         self.platform._op_client.create_batch_file(experiment, **kwargs)
 
@@ -66,7 +65,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
             None
         """
-        pass
+        self.platform._metas.dump(experiment)
 
     def get_children(self, experiment: Dict, parent=None, **kwargs) -> List[Dict]:
         """
@@ -200,15 +199,3 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
             exp.simulations = self.get_children(slurm_exp, parent=exp)
 
         return exp
-
-    def post_run_item(self, experiment: Experiment, **kwargs) -> None:
-        """
-        Trigger right after commissioning experiment on platform.
-        Args:
-            experiment: Experiment just commissioned
-            kwargs: keyword arguments used to expand functionality
-        Returns:
-            None
-        """
-        self.platform._metas.dump(experiment)
-        experiment.post_run(self.platform)

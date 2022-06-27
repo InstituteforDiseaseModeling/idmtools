@@ -162,14 +162,3 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
         sim.status = EntityStatus[slurm_sim['status']] if slurm_sim['status'] else EntityStatus.CREATED
 
         return sim
-
-    def post_run_item(self, simulation: Simulation, **kwargs) -> None:
-        """
-        Trigger right after commissioning experiment on platform.
-        Args:
-            simulation: Experiment just commissioned
-            kwargs: keyword arguments used to expand functionality
-        Returns:
-            None
-        """
-        self.platform._metas.dump(simulation)

@@ -56,6 +56,18 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
         meta = self.platform._metas.get(suite)
         return SuiteDict(meta)
 
+    def platform_run_item(self, suite: Suite, **kwargs):
+        """
+        Called during commissioning of an item. This should perform what is needed to commission job on platform.
+        Args:
+            suite:
+            kwargs: keyword arguments used to expand functionality
+        Returns:
+            None
+        """
+        # Refresh with entity ids
+        self.platform._metas.dump(suite)
+
     def get_parent(self, suite: SuiteDict, **kwargs) -> Any:
         """
         Fetches the parent of a suite.
@@ -117,25 +129,3 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
             suite.experiments = self.get_children(slurm_suite, parent=suite)
 
         return suite
-
-    def post_run_item(self, suite: Suite, **kwargs) -> None:
-        """
-        Trigger right after commissioning suite on platform.
-        Args:
-            suite: Experiment just commissioned
-            kwargs: keyword arguments used to expand functionality
-        Returns:
-            None
-        """
-        self.platform._metas.dump(suite)
-
-    def platform_run_item(self, suite: Suite, **kwargs):
-        """
-        Called during commissioning of an item. This should perform what is needed to commission job on platform.
-        Args:
-            suite:
-            kwargs: keyword arguments used to expand functionality
-        Returns:
-            None
-        """
-        pass
