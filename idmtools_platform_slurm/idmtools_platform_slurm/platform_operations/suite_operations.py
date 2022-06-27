@@ -42,6 +42,7 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
         if not isinstance(suite.uid, UUID):
             suite.uid = uuid4()
         self.platform._op_client.mk_directory(suite)
+        self.platform._metas.dump(suite)
 
         meta = self.platform._metas.get(suite)
         return SuiteDict(meta)
@@ -56,6 +57,7 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
         Returns:
             None
         """
+        # Refresh with entity ids
         self.platform._metas.dump(suite)
 
     def get_parent(self, suite: SuiteDict, **kwargs) -> Any:
