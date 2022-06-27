@@ -45,9 +45,10 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         self.platform._assets.dump_assets(experiment)
         self.platform._op_client.create_batch_file(experiment, **kwargs)
 
-        # Copy over run_simulation.sh
+        # Link file run_simulation.sh
         run_simulation_script = Path(__file__).parent.parent.joinpath('assets/run_simulation.sh')
-        self.platform._assets.copy_asset(run_simulation_script, self.platform._op_client.get_directory(experiment))
+        link_script = Path(self.platform._op_client.get_directory(experiment)).joinpath('run_simulation.sh')
+        self.platform._op_client.link_file(run_simulation_script, link_script)
 
         # Return Slurm Experiment
         meta = self.platform._metas.get(experiment)
@@ -91,6 +92,8 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         if not dry_run:
             working_directory = self.platform._op_client.get_directory(experiment)
             result = subprocess.run(['sbatch', 'sbatch.sh'], stdout=subprocess.PIPE, cwd=str(working_directory))
+            stdout = result.stdout.decode('utf-8').strip()
+            print(stdout)
 
     def send_assets(self, experiment: Experiment, **kwargs):
         """
