@@ -29,7 +29,7 @@ class TestSlurmPlatform(ITestWithPersistence):
     # Test platform slurm_fields property
     def test_slurm_platform_fields(self):
         actual_field_set = self.platform.slurm_fields
-        expected_field_set = {'mem', 'partition', 'time', 'requeue', 'mail_user', 'retries', 'ntasks', 'modules',
+        expected_field_set = {'mem', 'partition', 'time', 'requeue', 'mail_user', 'ntasks', 'modules',
                               'exclusive', 'mail_type', 'sbatch_custom', 'nodes', 'ntasks_per_core', 'account',
                               'mem_per_cpu', 'max_running_jobs'}
 
@@ -38,7 +38,7 @@ class TestSlurmPlatform(ITestWithPersistence):
     # Test platform get_slurm_configs with default config
     def test_slurm_configs_default(self):
         slurm_configs_dict = self.platform.get_slurm_configs()
-        expected_config_dict = {'retries': 1, 'mem': None, 'time': None, 'modules': [], 'mail_user': None,
+        expected_config_dict = {'mem': None, 'time': None, 'modules': [], 'mail_user': None,
                                 'exclusive': False, 'sbatch_custom': None, 'nodes': None, 'mail_type': None,
                                 'partition': None, 'account': None, 'ntasks_per_core': None, 'requeue': True,
                                 'max_running_jobs': None, 'mem_per_cpu': None, 'ntasks': None}
@@ -50,10 +50,9 @@ class TestSlurmPlatform(ITestWithPersistence):
         platform = Platform("SLURM_TEST", job_directory=".", mode="local", mail_user="test@test.com",
                             account="test_acct", mail_type="begin", mem_per_cpu=2048)
         slurm_configs_dict = platform.get_slurm_configs()
-        expected_config_dict = {'time': None, 'sbatch_custom': None, 'retries': 1, 'ntasks': None, 'nodes': None,
-                                'mail_user': 'test@test.com', 'mem': None, 'partition': None, 'account': 'test_acct',
-                                'mail_type': 'begin', 'modules': [], 'requeue': True, 'ntasks_per_core': None,
-                                'mem_per_cpu': 2048, 'max_running_jobs': None, 'exclusive': False}
+        expected_config_dict = ['account', 'exclusive', 'mail_type', 'mail_user', 'max_running_jobs', 'mem',
+                                'mem_per_cpu', 'modules', 'nodes', 'ntasks', 'ntasks_per_core', 'partition', 'requeue',
+                                'sbatch_custom', 'time']
 
         self.assertEqual(sorted(slurm_configs_dict), sorted(expected_config_dict))
 
@@ -243,7 +242,8 @@ class TestSlurmPlatform(ITestWithPersistence):
             fp.write("this is test file")
 
         # First test with filepath for target and link
-        local.link_file(target=os.path.join(temp_source_path, target_file), link=os.path.join(temp_dest_path, target_file))
+        local.link_file(target=os.path.join(temp_source_path, target_file),
+                        link=os.path.join(temp_dest_path, target_file))
         self.assertTrue(os.path.exists(os.path.join(temp_dest_path, target_file)))
         with open(os.path.join(temp_dest_path, target_file), 'r') as fpr:
             contents = fpr.read()
@@ -264,7 +264,7 @@ class TestSlurmPlatform(ITestWithPersistence):
     def test_localSlurmOperations_link_dir(self):
         local = LocalSlurmOperations(platform=self.platform)
         temp_source_path = tempfile.mkdtemp()
-        dest_path ="DEST_TEST"
+        dest_path = "DEST_TEST"
         target_file = "test.txt"
         with open(os.path.join(temp_source_path, target_file), 'w') as fp:
             fp.write("this is test file")
@@ -280,4 +280,3 @@ class TestSlurmPlatform(ITestWithPersistence):
                 path.unlink()
         if os.path.isdir(dest_path):
             pathlib.Path(dest_path).unlink()
-

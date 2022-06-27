@@ -1,4 +1,3 @@
-import linecache
 import os
 import pathlib
 import shutil
@@ -51,7 +50,9 @@ class TestPythonSimulation(ITestWithPersistence):
         suite.add_experiment(experiment)
         # self.platform.create_items([suite])
         suite.run(platform=platform, wait_until_done=False, wait_on_done=False, max_running_jobs=max_running_jobs,
-                  retries=retries)
+                  retries=retries, dry_run=True)  # dry_run for running this in user's local to test folder structure
+        print("suite_id: " + suite.id)
+        print("experiment_id: " + experiment.id)
         return experiment
 
     def setUp(self) -> None:
@@ -59,8 +60,8 @@ class TestPythonSimulation(ITestWithPersistence):
         self.job_directory = "DEST"
         self.platform = Platform('SLURM_LOCAL', job_directory=self.job_directory)
 
-    # def tearDown(self):
-    #     shutil.rmtree(self.job_directory)
+    def tearDown(self):
+        shutil.rmtree(self.job_directory)
 
     def test_sweeping_and_local_folders_creation(self):
         experiment = self.create_experiment(self.platform, a=3, b=3)
@@ -109,7 +110,8 @@ class TestPythonSimulation(ITestWithPersistence):
         self.assertIn(
             "JOB_DIRECTORY=$(find . -type d -maxdepth 1 -mindepth 1  | grep -v Assets | head -${SLURM_ARRAY_TASK_ID} | tail -1)",
             contents)
-        self.assertIn("$JOB_DIRECTORY/_run.sh", contents)
+        self.assertIn("JOB_DIRECTORY", contents)
+        self.assertIn("srun _run.sh", contents)
 
         # verify _run.sh script content under simulation level
         for simulation in experiment.simulations:
