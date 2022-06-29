@@ -1,3 +1,4 @@
+import json
 import os
 import pathlib
 import shutil
@@ -50,13 +51,14 @@ class TestPythonSimulation(ITestWithPersistence):
         suite.add_experiment(experiment)
         # self.platform.create_items([suite])
         suite.run(platform=platform, wait_until_done=False, wait_on_done=False, max_running_jobs=max_running_jobs,
-                  retries=retries, dry_run=True)  # dry_run for running this in user's local to test folder structure
+                  retries=retries, dry_run=True)  # dry_run - True for running this in user's local to test folder structure
         print("suite_id: " + suite.id)
         print("experiment_id: " + experiment.id)
         return experiment
 
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
+        #self.job_directory = "/home/schen/idm_test_dir"
         self.job_directory = "DEST"
         self.platform = Platform('SLURM_LOCAL', job_directory=self.job_directory)
 
@@ -114,9 +116,40 @@ class TestPythonSimulation(ITestWithPersistence):
         self.assertIn("srun _run.sh", contents)
 
         # verify _run.sh script content under simulation level
+        simulation_ids = []
         for simulation in experiment.simulations:
+            simulation_ids.append(simulation.id)
             simulation_dir = platform._op_client.get_directory(simulation)
             asserts_dir = simulation_dir.joinpath("Assets")
             with open(os.path.join(simulation_dir, '_run.sh'), 'r') as fpr:
                 contents = fpr.read()
             self.assertIn("until [ \"$n\" -ge 5 ]", contents)  # 5 here is from retries=5 in platform
+
+        # verify ids in metadata.json  for suite
+        suite = experiment.suite
+        suite_dir = platform._op_client.get_directory(suite)
+        with open(os.path.join(suite_dir, 'metadata.json'), 'r') as j:
+            contents = json.loads(j.read())
+            self.assertEqual(contents['_uid'], suite.id)
+            self.assertEqual(contents['experiments'][0]['parent_id'], suite.id)
+            self.assertEqual(contents['experiments'][0]['_uid'], experiment.id)
+            self.assertEqual(sorted(contents['experiments'][0]['simulations']), sorted(simulation_ids))
+
+        # verify ids in metadata.json for experiment
+        with open(os.path.join(experiment_dir, 'metadata.json'), 'r') as j:
+            contents = json.loads(j.read())
+            self.assertEqual(contents['_uid'], experiment.id)
+            self.assertEqual(contents['parent_id'], suite.id)
+            self.assertEqual(sorted(contents['simulations']), sorted(simulation_ids))
+
+        # verify ids in metadata.json for simulation, also verify sweep parameter in config.json file
+        for simulation in experiment.simulations:
+            simulation_dir = platform._op_client.get_directory(simulation)
+            with open(os.path.join(simulation_dir, 'metadata.json'), 'r') as j:
+                contents = json.loads(j.read())
+                self.assertEqual(contents['_uid'], simulation.id)
+                self.assertEqual(contents['parent_id'], experiment.id)
+                self.assertEqual(contents['task']['command'], 'python3 Assets/model.py --config config.json')
+                with open(os.path.join(simulation_dir, 'config.json'), 'r') as j:
+                    config_contents = json.loads(j.read())
+                self.assertDictEqual (contents['task']['parameters'],  config_contents)
