@@ -50,6 +50,9 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         link_script = Path(self.platform._op_client.get_directory(experiment)).joinpath('run_simulation.sh')
         self.platform._op_client.link_file(run_simulation_script, link_script)
 
+        # Make executable
+        self.platform._op_client.update_script_mode(link_script)
+
         # Return Slurm Experiment
         meta = self.platform._metas.get(experiment)
         return ExperimentDict(meta)
