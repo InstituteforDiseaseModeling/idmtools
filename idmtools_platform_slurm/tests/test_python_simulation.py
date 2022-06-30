@@ -25,8 +25,9 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 class TestPythonSimulation(ITestWithPersistence):
 
     def create_experiment(self, platform=None, a=1, b=1, max_running_jobs=None, retries=None):
-        task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model.py"),
-                                        envelope="parameters", parameters=(dict(c=0)), python_path="python3")
+        task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model3.py"),
+                                        envelope="parameters", parameters=(dict(c=0)))
+        task.python_path = "python3"
 
         ts = TemplatedSimulations(base_task=task)
         builder = SimulationBuilder()
@@ -52,7 +53,7 @@ class TestPythonSimulation(ITestWithPersistence):
         suite.add_experiment(experiment)
         # self.platform.create_items([suite])
         suite.run(platform=platform, wait_until_done=False, wait_on_done=False, max_running_jobs=max_running_jobs,
-                  retries=retries, dry_run=True)  # dry_run - True for running this in user's local to test folder structure
+                  retries=retries, dry_run=True)  # dry_run - True for running this in user's local ( for example GA) to test folder structure
         print("suite_id: " + suite.id)
         print("experiment_id: " + experiment.id)
         return experiment
@@ -150,7 +151,7 @@ class TestPythonSimulation(ITestWithPersistence):
                 contents = json.loads(j.read())
                 self.assertEqual(contents['_uid'], simulation.id)
                 self.assertEqual(contents['parent_id'], experiment.id)
-                self.assertEqual(contents['task']['command'], 'python3 Assets/model.py --config config.json')
+                self.assertEqual(contents['task']['command'], 'python3 Assets/model3.py --config config.json')
                 with open(os.path.join(simulation_dir, 'config.json'), 'r') as j:
                     config_contents = json.loads(j.read())
                 self.assertDictEqual(contents['task']['parameters'],  config_contents['parameters'])
