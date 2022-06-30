@@ -14,6 +14,7 @@ from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
+
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.decorators import linux_only
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
@@ -25,7 +26,7 @@ class TestPythonSimulation(ITestWithPersistence):
 
     def create_experiment(self, platform=None, a=1, b=1, max_running_jobs=None, retries=None):
         task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model.py"),
-                                        parameters=(dict(c=0)), python_path="python3")
+                                        envelope="parameters", parameters=(dict(c=0)), python_path="python3")
 
         ts = TemplatedSimulations(base_task=task)
         builder = SimulationBuilder()
@@ -152,4 +153,4 @@ class TestPythonSimulation(ITestWithPersistence):
                 self.assertEqual(contents['task']['command'], 'python3 Assets/model.py --config config.json')
                 with open(os.path.join(simulation_dir, 'config.json'), 'r') as j:
                     config_contents = json.loads(j.read())
-                self.assertDictEqual (contents['task']['parameters'],  config_contents)
+                self.assertDictEqual(contents['task']['parameters'],  config_contents['parameters'])
