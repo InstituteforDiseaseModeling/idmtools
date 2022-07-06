@@ -63,5 +63,8 @@ Upon completion you should see the following output...::
         To modify these scripts you should....
 
 
-.. include:: slurm\commands.rst
+.. toctree::
+
+    slurm/commands
+    slurm/cancel
    
