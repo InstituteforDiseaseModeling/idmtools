@@ -39,6 +39,10 @@ class ITask(metaclass=ABCMeta):
     """
     #: The Command to run
     command: Union[str, CommandLine] = field(default=None, metadata={"md": True})
+
+    # Default singularity sif
+    sif_path: str = field(default=None, metadata={"md": False})
+
     #: List of requirements needed by the task to run on an execution platform. This is stuff like Windows, Linux, GPU
     #  etc
     platform_requirements: Set[PlatformRequirements] = field(default_factory=set)
