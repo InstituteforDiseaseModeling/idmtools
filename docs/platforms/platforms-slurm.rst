@@ -38,13 +38,15 @@ First verify your |SLURM_s| platform is running. Then submit a job with the incl
 
 Verify |SLURM_s| platform is running
 ````````````````````````````````````
-Type the following at a command prompt to verify that |SLURM_s| platform is running::
+Type the following at a terminal session to verify that |SLURM_s| platform is running::
 
-    add simple ping/hello-world script here
+    sinfo -a
 
-You should see the following output...::
+This will list your available partitions, and status. You should see output similar to the following::
 
-    add return value/output from hello-world script
+    PARTITION AVAIL  TIMELIMIT  NODES  STATE NODELIST
+    LocalQ*      up   infinite      1   idle localhost
+
 
 Submit a job
 ````````````
@@ -58,13 +60,12 @@ Upon completion you should see the following output...::
 
 .. note::
 
-        ``workitems`` are not supported on the |SLURM_s| platform with |IT_s|. If you've 
-        used the |COMPS_s| platform with |IT_s| you may have scripts using this object. 
-        To modify these scripts you should....
-
+    ``workitems`` are not supported on the |SLURM_s| platform with |IT_s|. If you've 
+    used the |COMPS_s| platform with |IT_s| you may have scripts using this object. 
+    To modify these scripts you should....
 
 .. toctree::
+    :maxdepth: 2
 
     slurm/commands
     slurm/cancel
-   
