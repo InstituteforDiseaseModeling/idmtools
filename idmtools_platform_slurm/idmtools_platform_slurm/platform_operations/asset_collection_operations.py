@@ -153,7 +153,8 @@ class SlurmPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
 
                 # Make Eradication executable
                 if asset.filename.lower().startswith('eradication'):
-                    self.platform._op_client.update_script_mode(exp_asset_dir)
+                    erad_path = exp_asset_dir.joinpath(asset.filename)
+                    self.platform._op_client.update_script_mode(erad_path)
 
         elif isinstance(item, Simulation):
             exp_dir = self.platform._op_client.get_directory(item.parent)
