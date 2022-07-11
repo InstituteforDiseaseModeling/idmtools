@@ -55,7 +55,9 @@ class DownloadWorkItem(FileFilterWorkItem):
 
     def __post_init__(self, item_name: str, asset_collection_id: UUID, asset_files: FileList, user_files: FileList,
                       command: str):
-        """Constructor for DownloadWorkItem."""
+        """
+        Constructor for DownloadWorkItem.
+        """
 
         self._ssmt_script = str(PurePath(__file__).parent.joinpath("download_ssmt.py"))
         if self.compress_type is None:

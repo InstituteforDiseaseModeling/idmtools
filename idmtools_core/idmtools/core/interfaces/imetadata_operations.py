@@ -19,7 +19,7 @@ class IMetadataOperations(ABC):
     def get(self, item: IEntity) -> Dict:
         """
         Obtain item's metadata.
-        
+
         Args:
             item: idmtools entity (Suite, Experiment and Simulation, etc.)
         Returns:
