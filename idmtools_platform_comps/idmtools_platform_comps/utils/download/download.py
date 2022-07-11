@@ -68,8 +68,6 @@ class DownloadWorkItem(FileFilterWorkItem):
         Returns:
             None
         """
-
-
         self._ssmt_script = str(PurePath(__file__).parent.joinpath("download_ssmt.py"))
         if self.compress_type is None:
             if (self.extract_after_download and self.delete_after_download) or sys.platform != 'win32':
