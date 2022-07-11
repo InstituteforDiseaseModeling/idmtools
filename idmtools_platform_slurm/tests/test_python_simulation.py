@@ -24,7 +24,7 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 @linux_only
 class TestPythonSimulation(ITestWithPersistence):
 
-    def create_experiment(self, platform=None, a=1, b=1, max_running_jobs=None, retries=None):
+    def create_experiment(self, platform=None, a=1, b=1, max_running_jobs=None, retries=None, wait_until_done=False):
         task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model3.py"),
                                         envelope="parameters", parameters=(dict(c=0)))
         task.python_path = "python3"
@@ -52,8 +52,8 @@ class TestPythonSimulation(ITestWithPersistence):
         # Add experiment to the suite
         suite.add_experiment(experiment)
         # self.platform.create_items([suite])
-        suite.run(platform=platform, wait_until_done=False, wait_on_done=False, max_running_jobs=max_running_jobs,
-                  retries=retries, dry_run=True)  # dry_run - True for running this in user's local ( for example GA) to test folder structure
+        suite.run(platform=platform, wait_until_done=False, wait_on_done=wait_until_done, max_running_jobs=max_running_jobs,
+                  retries=retries, dry_run=True)  # dry_run - True for running this in user's local to test folder structure
         print("suite_id: " + suite.id)
         print("experiment_id: " + experiment.id)
         return experiment
@@ -106,7 +106,8 @@ class TestPythonSimulation(ITestWithPersistence):
         with open(os.path.join(experiment_dir, 'sbatch.sh'), 'r') as fpr:
             contents = fpr.read()
         self.assertIn("#SBATCH --array=1-25%8", contents)  # 25=a*b=5*5, 8=max_running_jobs
-        self.assertIn("srun run_simulation.sh $SLURM_ARRAY_TASK_ID 1> stdout.txt 2> stderr.txt", contents)
+        self.assertIn("echo $SLURM_ARRAY_JOB_ID > job_id.txt", contents)
+        self.assertIn("srun run_simulation.sh", contents)
 
         # verify run_simulation.sh script content in experiment level
         with open(os.path.join(experiment_dir, 'run_simulation.sh'), 'r') as fpr:
@@ -115,7 +116,7 @@ class TestPythonSimulation(ITestWithPersistence):
             "JOB_DIRECTORY=$(find . -type d -maxdepth 1 -mindepth 1  | grep -v Assets | head -${SLURM_ARRAY_TASK_ID} | tail -1)",
             contents)
         self.assertIn("JOB_DIRECTORY", contents)
-        self.assertIn("srun _run.sh", contents)
+        self.assertIn("bash _run.sh 1> stdout.txt 2> stderr.txt", contents)
 
         # verify _run.sh script content under simulation level
         simulation_ids = []
@@ -155,3 +156,12 @@ class TestPythonSimulation(ITestWithPersistence):
                 with open(os.path.join(simulation_dir, 'config.json'), 'r') as j:
                     config_contents = json.loads(j.read())
                 self.assertDictEqual(contents['task']['parameters'],  config_contents['parameters'])
+
+    @pytest.mark.skip("wait for status")
+    def test_std_status_jobid_files(self):
+        experiment = self.create_experiment(self.platform, a=3, b=3, wait_until_done=True)
+        experiment_dir = self.platform._op_client.get_directory(experiment)
+        self.assertTrue(os.path.exists(os.path.join(experiment_dir, "job_id.txt")))
+        job_id = open(os.path.join(experiment_dir, 'job_id.txt'), 'r').read()
+        for simulation in experiment.simulations:
+            pass

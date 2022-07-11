@@ -182,7 +182,7 @@ class TestSlurmPlatform(ITestWithPersistence):
             contents = f.read()
         # check srun run_simulation.sh in sbatch.sh file
         self.assertIn(
-            "srun run_simulation.sh $SLURM_ARRAY_TASK_ID 1> stdout.txt 2> stderr.txt",
+            "run run_simulation.sh",
             contents)
         # clean up suite folder
         shutil.rmtree(os.path.join(cwd, suite.id))
