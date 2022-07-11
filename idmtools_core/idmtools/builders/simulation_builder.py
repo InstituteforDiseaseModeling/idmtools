@@ -124,9 +124,7 @@ class SimulationBuilder:
     def add_multiple_parameter_sweep_definition(self, function: TSweepFunction, *args, **kwargs):
         """
         Add a sweep definition callback that takes multiple parameters.
-
         The sweep will be defined as a cross-product between the parameters passed.
-
 
         Args:
             function: The sweep function, which must include a **simulation** parameter (or
