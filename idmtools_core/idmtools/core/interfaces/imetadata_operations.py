@@ -19,6 +19,7 @@ class IMetadataOperations(ABC):
     def get(self, item: IEntity) -> Dict:
         """
         Obtain item's metadata.
+        
         Args:
             item: idmtools entity (Suite, Experiment and Simulation, etc.)
         Returns:
@@ -78,7 +79,7 @@ class IMetadataOperations(ABC):
     def filter(self, item_type: ItemType, item_filter: Dict = None) -> List:
         """
         Obtain all items that match the given item_filter key/value pairs passed.
-        
+
         Args:
             item_type: the type of items to search for matches (simulation, experiment, suite, etc)
             item_filter: a dict of metadata key/value pairs for exact match searching
