@@ -57,7 +57,18 @@ class DownloadWorkItem(FileFilterWorkItem):
                       command: str):
         """
         Constructor for DownloadWorkItem.
+
+        Args:
+            item_name: item name
+            asset_collection_id: AssetCollection id
+            asset_files: Asset files
+            user_files: user asset files
+            command: command
+
+        Returns:
+            None
         """
+
 
         self._ssmt_script = str(PurePath(__file__).parent.joinpath("download_ssmt.py"))
         if self.compress_type is None:
