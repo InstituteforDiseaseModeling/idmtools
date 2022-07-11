@@ -64,6 +64,9 @@ class SimulationBuilder:
                 The function can also be a partial--any Callable type will work.
             values: The list of values to call the function with.
 
+        Return:
+            None
+
         Examples:
             Examples of valid function::
 
@@ -126,17 +129,7 @@ class SimulationBuilder:
         Add a sweep definition callback that takes multiple parameters.
         The sweep will be defined as a cross-product between the parameters passed.
 
-        Args:
-            function: The sweep function, which must include a **simulation** parameter (or
-                whatever is specified in :attr:`~idmtools.builders.ExperimentBuilder.SIMULATION_ATTR`).
-            *args: List of arguments to be passed
-            **kwargs: List of keyword arguments to be passed
-
-        Returns:
-            None. Updates the Sweeps
-
         Examples:
-
             Examples of valid functions::
 
                 # This function takes two parameters
@@ -161,6 +154,14 @@ class SimulationBuilder:
                 sb.add_multiple_parameter_sweep_definition(three_param_callback, dict(parameter_a=range(1,5), parameter_b=["a", "b"], parameter_c=range(4,5))
                 # The following is equivalent
                 sb.add_multiple_parameter_sweep_definition(three_param_callback, **dict(parameter_a=range(1,5), parameter_b=["a", "b"], parameter_c=range(4,5))
+
+        Args:
+            function: function
+            args: List of arguments to be passed
+            kwargs: List of keyword arguments to be passed
+
+        Returns:
+            None
         """
         remaining_parameters = self._extract_remaining_parameters(function)
         if len(args) > 0 and len(kwargs) > 0:
