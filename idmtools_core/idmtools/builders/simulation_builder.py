@@ -161,7 +161,6 @@ class SimulationBuilder:
                 sb.add_multiple_parameter_sweep_definition(three_param_callback, dict(parameter_a=range(1,5), parameter_b=["a", "b"], parameter_c=range(4,5))
                 # The following is equivalent
                 sb.add_multiple_parameter_sweep_definition(three_param_callback, **dict(parameter_a=range(1,5), parameter_b=["a", "b"], parameter_c=range(4,5))
-
         """
         remaining_parameters = self._extract_remaining_parameters(function)
         if len(args) > 0 and len(kwargs) > 0:
