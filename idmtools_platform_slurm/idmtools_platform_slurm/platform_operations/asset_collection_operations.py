@@ -150,12 +150,6 @@ class SlurmPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
             for asset in item.assets:
                 self.platform._op_client.mk_directory(dest=exp_asset_dir.joinpath(asset.relative_path))
                 self.copy_asset(asset, exp_asset_dir.joinpath(asset.relative_path))
-
-                # Make Eradication executable
-                if asset.filename.lower().startswith('eradication'):
-                    erad_path = exp_asset_dir.joinpath(asset.filename)
-                    self.platform._op_client.update_script_mode(erad_path)
-
         elif isinstance(item, Simulation):
             exp_dir = self.platform._op_client.get_directory(item.parent)
             for asset in item.assets:
