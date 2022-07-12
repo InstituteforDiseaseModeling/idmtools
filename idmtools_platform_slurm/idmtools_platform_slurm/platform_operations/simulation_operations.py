@@ -3,6 +3,10 @@ Here we implement the SlurmPlatform simulation operations.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+import os
+import shlex
+import shutil
+from pathlib import Path
 from uuid import UUID, uuid4
 from dataclasses import dataclass, field
 from typing import List, Dict, Type
@@ -51,6 +55,31 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
         self.platform._assets.dump_assets(simulation)
         self.platform._op_client.create_batch_file(simulation, **kwargs)
 
+        # Make command executable
+        # split the command
+        cmd = shlex.split(simulation.task.command.cmd.replace("\\", "/"))
+
+        # take the first item
+        exe = cmd[0]
+
+        sim_dir = self.platform._op_client.get_directory(simulation)
+        exe_path = sim_dir.joinpath(exe)
+
+        # see if it is a file
+        if exe_path.exists():
+            exe = exe_path
+        elif shutil.which(exe) is not None:
+            exe = Path(shutil.which(exe))
+        else:
+            logger.debug(f"Failed to find executable: {exe}")
+            exe = None
+        try:
+            if exe and not os.access(exe, os.X_OK):
+                self.platform._op_client.update_script_mode(exe)
+        except:
+            logger.debug(f"Failed to change file mode for executable: {exe}")
+
+        # Return Slurm Simulation
         meta = self.platform._metas.get(simulation)
         return SimulationDict(meta)
 
