@@ -49,6 +49,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         run_simulation_script = Path(__file__).parent.parent.joinpath('assets/run_simulation.sh')
         link_script = Path(self.platform._op_client.get_directory(experiment)).joinpath('run_simulation.sh')
         self.platform._op_client.link_file(run_simulation_script, link_script)
+        self.platform._op_client.update_script_mode(link_script)
 
         # Make executable
         self.platform._op_client.update_script_mode(link_script)

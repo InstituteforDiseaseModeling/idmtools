@@ -3,8 +3,15 @@
 n=0
 until [ "$n" -ge {{retries}} ]
 do
-
-   {{simulation.task.command.cmd}}
+    {% if simulation.task.sif_path is defined and simulation.task.sif_path %}
+        {% if simulation.task.command.cmd.startswith('singularity') %}
+            {{simulation.task.command.cmd}}
+        {% else %}
+            singularity exec {{simulation.task.sif_path}} {{simulation.task.command.cmd}}
+        {% endif %}
+    {% else %}
+        {{simulation.task.command.cmd}}
+    {% endif %}
    RESULT=$?
    if [ $RESULT -eq 0 ]; then
       break
