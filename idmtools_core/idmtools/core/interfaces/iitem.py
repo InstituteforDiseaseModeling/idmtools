@@ -8,7 +8,7 @@ from inspect import signature
 from logging import getLogger, DEBUG
 from typing import List, Callable, TYPE_CHECKING, Any, Dict
 from uuid import UUID, uuid4
-from idmtools.utils.hashing import hash_obj, ignore_fields_in_dataclass_on_pickle
+from idmtools.utils.hashing import ignore_fields_in_dataclass_on_pickle
 
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform

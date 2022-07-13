@@ -1,5 +1,5 @@
 [flake8]
-ignore = E501,W291,D212,D200
+ignore = E501,W291,D205,D212,D200,D411
 # exlcude prototypes, docs, test and misc code from linting
 exclude = .git,__pycache__,docs,*/tests/**,idmtools_test,idmtools_platform_comps/prototypes,venv,examples,idmtools_platform_slurm
 # enforce docstrings
