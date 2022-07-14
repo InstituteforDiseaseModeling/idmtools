@@ -99,14 +99,15 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         dry_run = kwargs.get('dry_run', False)
         if not dry_run:
             working_directory = self.platform._op_client.get_directory(experiment)
-            result = subprocess.run(['sbatch', 'sbatch.sh'], stdout=subprocess.PIPE, cwd=str(working_directory))
-            stdout = result.stdout.decode('utf-8').strip()
-            print(stdout)
+            result = subprocess.run(['sbatch', '--parsable', 'sbatch.sh'],
+                                    stdout=subprocess.PIPE, cwd=str(working_directory))
+            slurm_job_id = result.stdout.decode('utf-8').strip()
+            print(slurm_job_id)
 
             # obtain and record the slurm job id for the experiment
-            job_id_file = working_directory.joinpath('job_id.txt')
-            experiment.slurm_job_id = Experiment.read_slurm_job_id_from_file(path=job_id_file)
-            self.platform._metas.dump(experiment)
+            # job_id_file = working_directory.joinpath('job_id.txt')
+            # experiment.slurm_job_id = Experiment.read_slurm_job_id_from_file(path=job_id_file)
+            self.platform._metas.dump(slurm_job_id)
         else:
             experiment.slurm_job_id = None
 
