@@ -58,6 +58,10 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         meta = self.platform._metas.get(experiment)
         return ExperimentDict(meta)
 
+    def cancel(self, experiments: List[Experiment]) -> None:
+        slurm_ids = [exp.slurm_job_id for exp in experiments if exp.slurm_job_id is not None]
+        self.platform._op_client.cancel_jobs(ids=[slurm_ids])
+
     def get_children(self, experiment: Dict, parent=None, **kwargs) -> List[Dict]:
         """
         Fetch slurm experiment's children.
@@ -98,6 +102,9 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
             result = subprocess.run(['sbatch', 'sbatch.sh'], stdout=subprocess.PIPE, cwd=str(working_directory))
             stdout = result.stdout.decode('utf-8').strip()
             print(stdout)
+            experiment.slurm_job_id = stdout.returncode  # we are not failing on >0, so not calling check_returncode()
+        else:
+            experiment.slurm_job_id = None
 
     def send_assets(self, experiment: Experiment, **kwargs):
         """

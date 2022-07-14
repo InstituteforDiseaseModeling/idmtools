@@ -80,6 +80,9 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
     # simulations
     __replace_task_with_proxy: bool = field(default=True, init=False, compare=False)
 
+    # slurm only
+    slurm_job_id: int = field(default=None)
+
     def __post_init__(self, simulations):
         """
         Initialize Experiment.

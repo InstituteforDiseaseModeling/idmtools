@@ -3,13 +3,14 @@ Here we implement the SlurmPlatform operations.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+import subprocess
 from enum import Enum
 from pathlib import Path
 from logging import getLogger
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Union, Type, Any
-from paramiko import SSHClient, SFTP, AutoAddPolicy
+from paramiko import SSHClient, SFTP, AutoAddPolicy, SSHException
 from idmtools.core import EntityStatus
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities import Suite
@@ -40,6 +41,10 @@ DEFAULT_SIMULATION_BATCH = """#!/bin/bash
 """
 
 
+class SlurmOperationException(Exception):
+    pass
+
+
 class SlurmOperationalMode(Enum):
     SSH = 'ssh'
     LOCAL = 'local'
@@ -68,6 +73,17 @@ class SlurmOperations(ABC):
 
     @abstractmethod
     def submit_job(self, sjob_file_path: Union[Path, str]) -> None:
+        pass
+
+    @abstractmethod
+    def cancel_jobs(self, ids):
+        """
+        Cancels a set of slurm job ids. Raises SlurmOperationException on failure.
+        Args:
+            ids: a list of slurm job ids to cancel
+        Returns:
+            None
+        """
         pass
 
     @abstractmethod
@@ -107,6 +123,12 @@ class RemoteSlurmOperations(SlurmOperations):
 
     def submit_job(self, sjob_file_path: Union[Path, str]) -> None:
         pass
+
+    def cancel_jobs(self, ids):
+        try:
+            self._cmd_client.exec_command(f"scancel {' '.join([str(id) for id in ids])}")
+        except SSHException as e:
+            raise SlurmOperationException(e.args[0])
 
     def entity_status(self, item: IEntity) -> Any:
         pass
@@ -238,3 +260,9 @@ class LocalSlurmOperations(SlurmOperations):
             item status
         """
         raise NotImplementedError(f"{item.__class__.__name__} is not supported on SlurmPlatform.")
+
+    def cancel_jobs(self, ids):
+        try:
+            subprocess.check_output(f"scancel {' '.join([str(id) for id in ids])}")
+        except subprocess.CalledProcessError as e:
+            raise SlurmOperationException(e.args[0])
