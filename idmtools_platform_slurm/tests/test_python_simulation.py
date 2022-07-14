@@ -94,10 +94,6 @@ class TestPythonSimulation(ITestWithPersistence):
             self.assertSetEqual(set(files), set(["metadata.json", "_run.sh", "config.json"]))
         self.assertEqual(count, 9)  # make sure we found total 9 symlinks for Assets folder
 
-        # TODO, grab stdout.txt and stderr.txt from remote cluster and validate
-        # TODO, test experiment status
-        # TODO, test remote files
-
     def test_scripts(self):
         platform = Platform('SLURM_LOCAL', job_directory=self.job_directory, max_running_jobs=8, retries=5)
         experiment = self.create_experiment(platform=platform, a=5, b=5)
