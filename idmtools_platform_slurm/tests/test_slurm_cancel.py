@@ -42,7 +42,8 @@ class TestSlurmCanceling(unittest.TestCase):
 
     def test_canceling_a_full_experiment(self):
         print('RUNNING TEST')
-        self.experiment.run(wait_till_done=False)
+        # self.experiment.run(wait_till_done=False)
+        self.platform.run_items(items=[self.experiment])
         time.sleep(10)  # simulations should now exist in slurm
 
         self.assertIsNotNone(self.experiment.slurm_job_id)
