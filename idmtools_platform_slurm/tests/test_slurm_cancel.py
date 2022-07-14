@@ -45,6 +45,7 @@ class TestSlurmCanceling(unittest.TestCase):
         self.experiment.run(wait_till_done=False)
         time.sleep(10)  # simulations should now exist in slurm
 
+        self.assertIsNotNone(self.experiment.slurm_job_id)
         self.platform.cancel(experiments=[self.experiment])
 
         self.assertTrue(all([s.status == EntityStatus.FAILED for s in self.experiment.simulations]))

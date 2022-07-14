@@ -125,6 +125,8 @@ class RemoteSlurmOperations(SlurmOperations):
         pass
 
     def cancel_jobs(self, ids):
+        if len(ids) == 0:
+            return
         try:
             self._cmd_client.exec_command(f"scancel {' '.join([str(id) for id in ids])}")
         except SSHException as e:
@@ -262,6 +264,8 @@ class LocalSlurmOperations(SlurmOperations):
         raise NotImplementedError(f"{item.__class__.__name__} is not supported on SlurmPlatform.")
 
     def cancel_jobs(self, ids):
+        if len(ids) == 0:
+            return
         try:
             subprocess.check_output(f"scancel {' '.join([str(id) for id in ids])}")
         except subprocess.CalledProcessError as e:
