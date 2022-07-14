@@ -373,3 +373,6 @@ class IPlatformExperimentOperations(ABC):
             Experiment updated
         """
         return experiment
+
+    def cancel(self, experiments: List[Experiment]) -> None:
+        pass

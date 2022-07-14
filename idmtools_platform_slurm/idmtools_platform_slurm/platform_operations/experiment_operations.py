@@ -107,7 +107,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
             # obtain and record the slurm job id for the experiment
             # job_id_file = working_directory.joinpath('job_id.txt')
             # experiment.slurm_job_id = Experiment.read_slurm_job_id_from_file(path=job_id_file)
-            self.platform._metas.dump(slurm_job_id)
+            self.platform._metas.dump(item=experiment)
         else:
             experiment.slurm_job_id = None
 

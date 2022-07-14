@@ -3,10 +3,12 @@ Here we implement the SlurmPlatform object.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
-from typing import Optional, Any, Dict
+from typing import Optional, Any, Dict, Union, List
 from dataclasses import dataclass, field, fields
 from logging import getLogger
-from idmtools.entities.iplatform import IPlatform
+
+from idmtools.core.interfaces.ientity import IEntity
+from idmtools.entities.iplatform import IPlatform, ITEM_TYPE_TO_OBJECT_INTERFACE
 from idmtools.core import ItemType
 from idmtools_platform_slurm.platform_operations.json_metadata_operations import JSONMetadataOperations
 from idmtools_platform_slurm.platform_operations.asset_collection_operations import \
@@ -146,3 +148,22 @@ class SlurmPlatform(IPlatform):
         config_dict = {k: getattr(self, k) for k in self.slurm_fields}
         config_dict.update(kwargs)
         return config_dict
+
+    def cancel_items(self, items: Union[IEntity, List[IEntity]]):
+        """
+        Cancel items on the platform.
+
+        Args:
+            items: Items to cancel
+
+        Returns:
+            None
+        """
+        if isinstance(items, IEntity):
+            items = [items]
+        self._is_item_list_supported(items)
+
+        for item in items:
+            item.platform = self
+            interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
+            getattr(self, interface).cancel(item)
