@@ -11,6 +11,7 @@ from typing import List, Type, Dict
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
 from idmtools_platform_slurm.platform_operations.utils import SuiteDict, ExperimentDict
+from idmtools_platform_slurm.slurm_operations import SLURM_STATES
 
 
 @dataclass
@@ -59,8 +60,11 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         return ExperimentDict(meta)
 
     def cancel(self, experiments: List[Experiment]) -> None:
-        slurm_ids = [exp.slurm_job_id for exp in experiments if exp.slurm_job_id is not None]
+        exps_to_cancel = [exp for exp in experiments if exp.slurm_job_id is not None]
+        slurm_ids = [exp.slurm_job_id for exp in exps_to_cancel]
         self.platform._op_client.cancel_jobs(ids=[slurm_ids])
+        for exp in exps_to_cancel:
+            exp.status = SLURM_STATES['CANCELED']
 
     def get_children(self, experiment: Dict, parent=None, **kwargs) -> List[Dict]:
         """

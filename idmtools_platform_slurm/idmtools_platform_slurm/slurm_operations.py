@@ -22,7 +22,7 @@ logger = getLogger(__name__)
 
 SLURM_STATES = dict(
     BOOT_FAIL=EntityStatus.FAILED,
-    CANCELLED=EntityStatus.FAILED,
+    CANCELED=EntityStatus.FAILED,
     COMPLETED=EntityStatus.SUCCEEDED,
     DEADLINE=EntityStatus.FAILED,
     FAILED=EntityStatus.FAILED,
