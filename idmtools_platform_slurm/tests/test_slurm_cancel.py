@@ -19,7 +19,7 @@ class TestSlurmCanceling(unittest.TestCase):
 
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
-        self.platform = Platform('SLURM')
+        self.platform = Platform('SLURM_TEST')
         self.model_script = os.path.join(COMMON_INPUT_PATH, "python", "waiter.py")
 
         self.experiment = Experiment.from_task(name=self.case_name,
@@ -41,6 +41,7 @@ class TestSlurmCanceling(unittest.TestCase):
         self.suite.add_experiment(self.experiment)
 
     def test_canceling_a_full_experiment(self):
+        print('RUNNING TEST')
         self.experiment.run(wait_till_done=False)
         time.sleep(10)  # simulations should now exist in slurm
 
@@ -55,8 +56,10 @@ class TestSlurmCanceling(unittest.TestCase):
 
     def test_canceling_a_single_simulation(self):
         pass
-        raise NotImplementedError('')
 
     def test_canceling_a_full_suite(self):
         pass
-        raise NotImplementedError('')
+
+if __name__ == '__main__':
+    unittest.main()
+
