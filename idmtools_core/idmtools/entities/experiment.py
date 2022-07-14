@@ -607,6 +607,13 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
             user_logger.info(f"Simulation Type: {type(self.__simulations)}")
             user_logger.info(f"Assets: {self.assets}")
 
+    @staticmethod
+    def read_slurm_job_id_from_file(path):
+        with open(path, 'r') as f:
+            lines = f.readlines()
+        slurm_job_id = lines[0].strip()
+        return slurm_job_id
+
 
 class ExperimentSpecification(ExperimentPluginSpecification):
     """
