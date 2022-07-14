@@ -117,6 +117,7 @@ class TestPlatformFactory(ITestWithPersistence):
         kwargs = {key: members[key] for key in keys if not key.startswith('_')}
 
         platform2 = Platform('Test', **kwargs)
+        # same reason as above test
         platform.uid = None
         platform2.uid = None
         self.assertEqual(platform, platform2)
