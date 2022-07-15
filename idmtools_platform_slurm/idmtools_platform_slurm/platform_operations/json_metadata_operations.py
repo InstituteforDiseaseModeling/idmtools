@@ -31,7 +31,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
             JSON
         """
         filepath = Path(filepath)
-        with filepath.open(mode='r', encoding='utf-8') as f:
+        with filepath.open(mode='r') as f:
             metadata = json.load(f)
         return metadata
 
