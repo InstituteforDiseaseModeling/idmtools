@@ -13,30 +13,33 @@ logger = getLogger(__name__)
 
 
 class SlurmSuite:
-    def __init__(self, kwargs):
+    """
+    Represent Slurm Suite
+    """
+    def __init__(self, kwargs: Dict):
         for key, value in kwargs.items():
             setattr(self, key, value)
-
-        if hasattr(self, 'item_type'):
-            setattr(self, 'item_type', ItemType[getattr(self, 'item_type').upper()])
+        self.item_type = ItemType.SUITE
 
 
 class SlurmExperiment:
-    def __init__(self, kwargs):
+    """
+    Represent Slurm Experiment
+    """
+    def __init__(self, kwargs: Dict):
         for key, value in kwargs.items():
             setattr(self, key, value)
-
-        if hasattr(self, 'item_type'):
-            setattr(self, 'item_type', ItemType[getattr(self, 'item_type').upper()])
+        self.item_type = ItemType.EXPERIMENT
 
 
 class SlurmSimulation:
-    def __init__(self, kwargs):
+    """
+    Represent Slurm Simulation
+    """
+    def __init__(self, kwargs: Dict):
         for key, value in kwargs.items():
             setattr(self, key, value)
-
-        if hasattr(self, 'item_type'):
-            setattr(self, 'item_type', ItemType[getattr(self, 'item_type').upper()])
+        self.item_type = ItemType.SIMULATION
 
 
 def clean_experiment_name(experiment_name: str) -> str:
