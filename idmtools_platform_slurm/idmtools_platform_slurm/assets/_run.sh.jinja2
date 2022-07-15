@@ -1,0 +1,24 @@
+#!/bin/bash
+
+echo ${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID} > job_id.txt
+
+n=0
+until [ "$n" -ge {{retries}} ]
+do
+    {% if simulation.task.sif_path is defined and simulation.task.sif_path %}
+        {% if simulation.task.command.cmd.startswith('singularity') %}
+            {{simulation.task.command.cmd}}
+        {% else %}
+            singularity exec {{simulation.task.sif_path}} {{simulation.task.command.cmd}}
+        {% endif %}
+    {% else %}
+        {{simulation.task.command.cmd}}
+    {% endif %}
+   RESULT=$?
+   if [ $RESULT -eq 0 ]; then
+      break
+   fi
+   n=$((n+1))
+   sleep 15
+done
+exit $RESULT

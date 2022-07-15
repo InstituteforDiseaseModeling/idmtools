@@ -3,6 +3,8 @@ Here we implement the SlurmPlatform experiment operations.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+import subprocess
+from pathlib import Path
 from uuid import UUID, uuid4
 from dataclasses import dataclass, field
 from typing import List, Type, Dict
@@ -38,11 +40,21 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         """
         if not isinstance(experiment.uid, UUID):
             experiment.uid = uuid4()
+        # Generate Suite/Experiment/Simulation folder structure
         self.platform._op_client.mk_directory(experiment)
-        self.platform._metas.dump(experiment)
         self.platform._assets.dump_assets(experiment)
         self.platform._op_client.create_batch_file(experiment, **kwargs)
 
+        # Link file run_simulation.sh
+        run_simulation_script = Path(__file__).parent.parent.joinpath('assets/run_simulation.sh')
+        link_script = Path(self.platform._op_client.get_directory(experiment)).joinpath('run_simulation.sh')
+        self.platform._op_client.link_file(run_simulation_script, link_script)
+        self.platform._op_client.update_script_mode(link_script)
+
+        # Make executable
+        self.platform._op_client.update_script_mode(link_script)
+
+        # Return Slurm Experiment
         meta = self.platform._metas.get(experiment)
         return ExperimentDict(meta)
 
@@ -78,7 +90,14 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
             None
         """
-        pass
+        self.platform._metas.dump(experiment)
+
+        dry_run = kwargs.get('dry_run', False)
+        if not dry_run:
+            working_directory = self.platform._op_client.get_directory(experiment)
+            result = subprocess.run(['sbatch', 'sbatch.sh'], stdout=subprocess.PIPE, cwd=str(working_directory))
+            stdout = result.stdout.decode('utf-8').strip()
+            print(stdout)
 
     def send_assets(self, experiment: Experiment, **kwargs):
         """

@@ -7,8 +7,8 @@ from dataclasses import dataclass, field, fields
 from inspect import signature
 from logging import getLogger, DEBUG
 from typing import List, Callable, TYPE_CHECKING, Any, Dict
-from uuid import UUID
-from idmtools.utils.hashing import hash_obj, ignore_fields_in_dataclass_on_pickle
+from uuid import UUID, uuid4
+from idmtools.utils.hashing import ignore_fields_in_dataclass_on_pickle
 
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
@@ -40,7 +40,9 @@ class IItem:
         Returns:
             ID
         """
-        return hash_obj(self) if self._uid is None else self._uid
+        if self._uid is None:
+            self._uid = str(uuid4())
+        return self._uid
 
     @uid.setter
     def uid(self, uid):

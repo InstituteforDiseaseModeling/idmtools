@@ -12,11 +12,14 @@ from idmtools.core.interfaces.ientity import IEntity
 
 @dataclass
 class IMetadataOperations(ABC):
-
+    """
+    Operations to handle metadata for SlurmPlatform.
+    """
     @abstractmethod
     def get(self, item: IEntity) -> Dict:
         """
         Obtain item's metadata.
+
         Args:
             item: idmtools entity (Suite, Experiment and Simulation, etc.)
         Returns:
@@ -28,6 +31,7 @@ class IMetadataOperations(ABC):
     def dump(self, item: IEntity) -> None:
         """
         Save item's metadata to a file.
+
         Args:
             item: idmtools entity (Suite, Experiment and Simulation, etc.)
         Returns:
@@ -39,6 +43,7 @@ class IMetadataOperations(ABC):
     def load(self, item: IEntity) -> Dict:
         """
         Obtain item's metadata file.
+
         Args:
             item: idmtools entity (Suite, Experiment and Simulation, etc.)
         Returns:
@@ -50,6 +55,7 @@ class IMetadataOperations(ABC):
     def update(self, item: IEntity) -> None:
         """
         Update item's metadata file.
+
         Args:
             item: idmtools entity (Suite, Experiment and Simulation, etc.)
         Returns:
@@ -61,6 +67,7 @@ class IMetadataOperations(ABC):
     def clear(self, item: IEntity) -> None:
         """
         Clear the item's metadata file.
+
         Args:
             item: idmtools entity (Suite, Experiment and Simulation, etc.)
         Returns:
@@ -72,6 +79,7 @@ class IMetadataOperations(ABC):
     def filter(self, item_type: ItemType, item_filter: Dict = None) -> List:
         """
         Obtain all items that match the given item_filter key/value pairs passed.
+
         Args:
             item_type: the type of items to search for matches (simulation, experiment, suite, etc)
             item_filter: a dict of metadata key/value pairs for exact match searching

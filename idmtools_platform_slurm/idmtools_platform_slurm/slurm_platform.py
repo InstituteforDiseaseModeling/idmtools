@@ -20,6 +20,8 @@ from idmtools_platform_slurm.platform_operations.suite_operations import SlurmPl
 logger = getLogger(__name__)
 
 op_defaults = dict(default=None, compare=False, metadata={"pickle_ignore": True})
+CONFIG_PARAMETERS = ['ntasks', 'partition', 'nodes', 'mail_type', 'mail_user', 'ntasks_per_core', 'mem_per_cpu', 'time',
+                     'account', 'mem', 'exclusive', 'requeue', 'sbatch_custom', 'max_running_jobs']
 
 
 @dataclass(repr=False)
@@ -33,7 +35,7 @@ class SlurmPlatform(IPlatform):
     mail_type: Optional[str] = field(default=None, metadata=dict(sbatch=True))
 
     # send e=mail notification
-    #TODO Add Validations here from https://slurm.schedmd.com/sbatch.html#OPT_mail-type
+    # TODO Add Validations here from https://slurm.schedmd.com/sbatch.html#OPT_mail-type
     mail_user: Optional[str] = field(default=None, metadata=dict(sbatch=True))
 
     # How many nodes to be used
@@ -44,6 +46,9 @@ class SlurmPlatform(IPlatform):
 
     # CPU # per task
     ntasks_per_core: Optional[int] = field(default=None, metadata=dict(sbatch=True))
+
+    # Maximum of running jobs(Per experiment)
+    max_running_jobs: Optional[int] = field(default=None, metadata=dict(sbatch=True))
 
     # Memory per core: MB of memory
     mem: Optional[int] = field(default=None, metadata=dict(sbatch=True))
@@ -65,6 +70,9 @@ class SlurmPlatform(IPlatform):
 
     # Specifies that the batch job should be eligible for requeuing
     requeue: bool = field(default=True, metadata=dict(sbatch=True))
+
+    # Default retries for jobs
+    retries: int = field(default=1, metadata=dict(sbatch=False))
 
     # Pass custom commands to sbatch generation script
     sbatch_custom: Optional[str] = field(default=None, metadata=dict(sbatch=True))
