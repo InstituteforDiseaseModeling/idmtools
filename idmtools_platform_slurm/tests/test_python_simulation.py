@@ -60,7 +60,6 @@ class TestPythonSimulation(ITestWithPersistence):
 
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
-        #self.job_directory = "/home/schen/idm_test_dir"
         self.job_directory = "DEST"
         self.platform = Platform('SLURM_LOCAL', job_directory=self.job_directory)
 

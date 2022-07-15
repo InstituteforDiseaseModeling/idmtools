@@ -18,7 +18,7 @@ from idmtools_test import COMMON_INPUT_PATH
 
 # job dir should be /home/username/example
 job_directory = os.path.join(os.path.expanduser('~'), "example")
-# Define Slurm Platform. note, this code can only run in slurm cluster.
+# Define Slurm Platform. Note, this code can only run in slurm cluster.
 platform = Platform('SLURM_LOCAL', job_directory=job_directory)
 
 #Define our base task. Normally, you want to do set any assets/configurations you want across the
@@ -42,11 +42,11 @@ builder = SimulationBuilder()
 # # time on the model and add that param/value pair as a tag on our simulation.
 def param_update(simulation: Simulation, param: str, value: Any) -> Dict[str, Any]:
     """
-    This function is called during sweeping allowing us to pass the generated sweep values to our Task Configuration
+    This function is called during sweeping allowing us to pass the generated sweep values to our Task Configuration.
 
     We always receive a Simulation object. We know that simulations all have tasks and that for our particular set
     of simulations they will all include JSONConfiguredPythonTask. We configure the model with calls to set_parameter
-    to update the config. In addition, we are can return a dictionary of tags to add to the simulations so we return
+    to update the config. In addition, we can return a dictionary of tags to add to the simulations so we return
     the output of the 'set_parameter' call since it returns the param/value pair we set
 
     Args:
