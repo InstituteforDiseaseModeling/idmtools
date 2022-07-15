@@ -94,9 +94,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
             The Suite being the parent of this experiment.
         """
-        if experiment.parent:
-            return experiment.parent
-        elif experiment.parent_id is None:
+        if experiment.parent_id is None:
             return None
         else:
             return self.platform._suites.get(experiment.parent_id, raw=True, **kwargs)
