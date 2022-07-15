@@ -53,23 +53,27 @@ class JSONMetadataOperationsTest(unittest.TestCase):
         _, experiments, simulations = self._initialize_data(self)
         sim = simulations[2]  # test simulation3 and experiment2
         metadata = self.op.get(item=sim)
-        expected_meta = {'platform_id': None, 'status': None, 'tags': {}, 'item_type': 'Simulation', 'name': None,
+        expected_meta = {'platform_id': None, 'status': 'CREATED', 'tags': {}, 'item_type': 'Simulation', 'name': None,
                          'assets': [], 'task': None}
         expected_meta.update({"parent_id": experiments[1].id})
         expected_meta.update({"_uid": sim.id})
-        self.assertEqual(expected_meta, metadata)
+        expected_meta.update({"uid": sim.id})
+        expected_meta.update({"id": sim.id})
+        self.assertDictEqual(expected_meta, metadata)
 
     # test get meta for experiment
     def test_get_for_experiment_meta(self):
         suites, experiments, _ = self._initialize_data(self)
         exp = experiments[1]
         metadata = self.op.get(item=exp)
-        expected_meta = {'platform_id': None, 'status': None, 'tags': {}, 'item_type': 'Experiment', 'name': None,
+        expected_meta = {'platform_id': None, 'status': 'CREATED', 'tags': {}, 'item_type': 'Experiment', 'name': None,
                          'assets': [], 'suite_id': None, 'task_type': 'idmtools.entities.command_task.CommandTask',
                          'platform_requirements': None, 'frozen': False, 'gather_common_assets_from_task': True,
                          'simulations': []}
         expected_meta.update({"parent_id": suites[0].id})
         expected_meta.update({"_uid": exp.id})
+        expected_meta.update({"uid": exp.id})
+        expected_meta.update({"id": exp.id})
         self.assertEqual(expected_meta, metadata)
 
     # test get meta for suite
@@ -77,7 +81,7 @@ class JSONMetadataOperationsTest(unittest.TestCase):
         suites, experiments, _ = self._initialize_data(self)
         suite = suites[0]
         metadata = self.op.get(item=suite)
-        expected_suite_meta = {'platform_id': None, 'parent_id': None, 'status': None, 'tags': {}, 'item_type': 'Suite',
+        expected_suite_meta = {'platform_id': None, 'parent_id': None, 'status': 'CREATED', 'tags': {}, 'item_type': 'Suite',
                                'name': None, 'description': None}
         exp_meta_dict1 = {'platform_id': None, 'status': None, 'tags': {}, 'item_type': 'Experiment', 'name': None,
                           'assets': [], 'suite_id': None, 'task_type': 'idmtools.entities.command_task.CommandTask',
@@ -90,6 +94,8 @@ class JSONMetadataOperationsTest(unittest.TestCase):
         exp_meta_dict2.update({"_uid": experiments[1].id})
         expected_suite_meta.update({"parent_id": None})
         expected_suite_meta.update({"_uid": suite.id})
+        expected_suite_meta.update({"uid": suite.id})
+        expected_suite_meta.update({"id": suite.id})
         expected_suite_meta.update({"experiments": [exp_meta_dict1, exp_meta_dict2]})
         self.assertDictEqual(expected_suite_meta, metadata)
 
