@@ -112,10 +112,13 @@ class TestSlurmOperations(ITestWithPersistence):
 
     def test_simulation_list_assets(self):
         with self.subTest('test_list_assets'):
+            count = 0
             for sim in self.exp.simulations:
                 assets = self.platform._simulations.list_assets(sim)
                 self.assertEqual(1, len(assets))
                 self.assertEqual('config.json', assets[0].filename)
                 simulation_dir = self.platform._op_client.get_directory(sim).resolve()
                 self.assertEqual(assets[0].absolute_path, simulation_dir.joinpath('config.json'))
+                count += 1
+            self.assertEqual(count, 2)
 
