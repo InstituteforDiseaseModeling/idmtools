@@ -22,12 +22,13 @@ setA = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="a")
 
 @pytest.mark.serial
 @linux_only
-class TestRetrieval(ITestWithPersistence):
+class TestSlurmOperations(ITestWithPersistence):
 
     def create_experiment(self, platform=None):
-        bt = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"),
-                                      parameters=dict(c="c-value"))
-        ts = TemplatedSimulations(base_task=bt)
+        task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, 'python', 'model1.py'),
+                                      parameters=dict(c='c-value'))
+        task.common_assets.add_asset('input/hello.sh')
+        ts = TemplatedSimulations(base_task=task)
         builder = SimulationBuilder()
         builder.add_sweep_definition(setA, range(0, 2))
         ts.add_builder(builder)
@@ -37,8 +38,8 @@ class TestRetrieval(ITestWithPersistence):
         return suite, exp
 
     def setUp(self) -> None:
-        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
-        self.job_directory = "DEST"
+        self.case_name = os.path.basename(__file__) + '--' + self._testMethodName
+        self.job_directory = 'DEST'
         self.platform = Platform('SLURM_LOCAL', job_directory=self.job_directory)
         self.suite, self.exp = self.create_experiment(self.platform)
 
@@ -59,7 +60,7 @@ class TestRetrieval(ITestWithPersistence):
         self.assertEqual({k: (v or None) for k, v in self.exp.tags.items()}, slurm_experiment.tags)
 
         # Test retrieving less columns. Note, we still retrieve ONLY by uid, columns does not apply in filter
-        tags = {"number_tag": 456}
+        tags = {'number_tag': 456}
         slurm_experiment = self.platform.get_item(self.exp.uid, ItemType.EXPERIMENT, raw=True, load_children=[],
                                                   columns=[tags])
         self.assertEqual(str(self.exp.uid), slurm_experiment.uid)
@@ -94,3 +95,17 @@ class TestRetrieval(ITestWithPersistence):
         for s in self.exp.simulations:
             self.assertIn(s.uid, [s.uid for s in children])
         self.assertCountEqual(self.platform.get_children(self.exp.simulations[0].uid, ItemType.SIMULATION), [])
+
+    def test_experiment_list_assets(self):
+        with self.subTest('test_list_assets'):
+            assets = self.platform._experiments.list_assets(self.exp)
+            self.assertEqual(2, len(assets))
+            self.assertEqual('model1.py', assets[0].filename)
+            self.assertEqual('hello.sh', assets[1].filename)
+            experiment_dir = self.platform._op_client.get_directory(self.exp).resolve()
+            self.assertEqual(assets[0].absolute_path, experiment_dir.joinpath('Assets/model1.py'))
+            self.assertEqual(assets[1].absolute_path, experiment_dir.joinpath('Assets/hello.sh'))
+        with self.subTest('test_list_assets_add_exclude'):
+            assets = self.platform._experiments.list_assets(self.exp, exclude='hello.sh')
+            self.assertEqual(1, len(assets))
+            self.assertEqual('model1.py', assets[0].filename)
