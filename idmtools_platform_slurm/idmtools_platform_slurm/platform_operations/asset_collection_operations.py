@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 logger = getLogger(__name__)
 user_logger = getLogger("user")
 
-EXCLUDE_FILES = ['_run.sh', 'metadata.json', 'stdout.txt', 'stderr.txt', 'status.txt']
+EXCLUDE_FILES = ['_run.sh', 'metadata.json', 'stdout.txt', 'stderr.txt', 'status.txt', 'job_id']
 
 
 @dataclass
@@ -95,7 +95,7 @@ class SlurmPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
 
         return ret
 
-    def list_assets(self, item: Union[Experiment, Simulation], exclude: list[str] = None, **kwargs) -> List[Asset]:
+    def list_assets(self, item: Union[Experiment, Simulation], exclude: List[str] = None, **kwargs) -> List[Asset]:
         """
         List assets for Experiment/Simulation.
         Args:
@@ -151,7 +151,8 @@ class SlurmPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
             exp_asset_dir = Path(self.platform._op_client.get_directory(item), 'Assets')
             self.platform._op_client.mk_directory(dest=exp_asset_dir)
             for asset in item.assets:
-                self.copy_asset(asset, exp_asset_dir)
+                self.platform._op_client.mk_directory(dest=exp_asset_dir.joinpath(asset.relative_path))
+                self.copy_asset(asset, exp_asset_dir.joinpath(asset.relative_path))
         elif isinstance(item, Simulation):
             exp_dir = self.platform._op_client.get_directory(item.parent)
             for asset in item.assets:

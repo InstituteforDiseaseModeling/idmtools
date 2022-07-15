@@ -5,7 +5,7 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import json
 from pathlib import Path
-from typing import TYPE_CHECKING, Dict, List, Type, Union
+from typing import Dict, List, Type, Union
 from dataclasses import dataclass, field
 from idmtools.core import ItemType
 from idmtools.core.interfaces import imetadata_operations
@@ -14,13 +14,10 @@ from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.utils.json import IDMJSONEncoder
 
-if TYPE_CHECKING:
-    from idmtools_platform_slurm.slurm_platform import SlurmPlatform
-
 
 @dataclass
 class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
-    platform: 'SlurmPlatform'  # noqa: F821oqa: F821
+    platform: 'platform'  # noqa: F821
     platform_type: Type = field(default=None)
     metadata_filename: str = field(default='metadata.json')
 
@@ -34,7 +31,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
             JSON
         """
         filepath = Path(filepath)
-        with filepath.open(mode='r') as f:
+        with filepath.open(mode='r', encoding='utf-8') as f:
             metadata = json.load(f)
         return metadata
 
@@ -77,12 +74,11 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         """
         if not isinstance(item, (Suite, Experiment, Simulation)):
             raise RuntimeError(f"Get method supports Suite/Experiment/Simulation only.")
-        meta = item.to_dict()
-        meta['id'] = item.id
-        meta['uid'] = item.uid
-        meta.pop('_uid', None)
-        meta.pop('platform_id', None)
-        return json.loads(json.dumps(meta, cls=IDMJSONEncoder))
+        meta = json.loads(json.dumps(item.to_dict(), cls=IDMJSONEncoder))
+        meta['id'] = meta['_uid']
+        meta['uid'] = meta['_uid']
+        meta['status'] = 'CREATED'
+        return meta
 
     def dump(self, item: Union[Suite, Experiment, Simulation]) -> None:
         """
@@ -120,7 +116,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         Returns:
              key/value dict of metadata from the given filepath
         """
-        if not (Path(metadata_filepath).exists()):
+        if not Path(metadata_filepath).exists():
             raise RuntimeError(f"File not found: '{metadata_filepath}'.")
         meta = self._read_from_file(metadata_filepath)
         return meta

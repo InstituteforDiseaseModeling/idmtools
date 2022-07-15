@@ -8,10 +8,11 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, List, Dict, Type, Optional
 from idmtools.assets import Asset
 from idmtools.core import ItemType, EntityStatus
+from idmtools_platform_slurm.slurm_operations import SLURM_STATES
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
-from idmtools_platform_slurm.platform_operations.utils import SimulationDict, ExperimentDict, clean_experiment_name
+from idmtools_platform_slurm.platform_operations.utils import SlurmSimulation, SlurmExperiment, clean_experiment_name
 from logging import getLogger
 
 if TYPE_CHECKING:
@@ -23,11 +24,11 @@ logger = getLogger(__name__)
 @dataclass
 class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
     platform: 'SlurmPlatform'  # noqa: F821
-    platform_type: Type = field(default=SimulationDict)
+    platform_type: Type = field(default=SlurmSimulation)
 
     def get(self, simulation_id: UUID, **kwargs) -> Dict:
         """
-        Gets a simulation from the Slurm platform.
+        Gets an simulation from the Slurm platform.
         Args:
             simulation_id: Simulation id
             kwargs: keyword arguments used to expand functionality
@@ -36,11 +37,11 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
         """
         metas = self.platform._metas.filter(item_type=ItemType.SIMULATION, property_filter={'id': str(simulation_id)})
         if len(metas) > 0:
-            return SimulationDict(metas[0])
+            return SlurmSimulation(metas[0])
         else:
             raise RuntimeError(f"Not found Simulation with id '{simulation_id}'")
 
-    def platform_create(self, simulation: Simulation, **kwargs) -> Dict:
+    def platform_create(self, simulation: Simulation, **kwargs) -> SlurmSimulation:
         """
         Create the simulation on Slurm Platform.
         Args:
@@ -51,30 +52,23 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
         """
         if not isinstance(simulation.uid, UUID):
             simulation.uid = uuid4()
-
         simulation.name = clean_experiment_name(simulation.experiment.name if not simulation.name else simulation.name)
 
+        # Generate Simulation folder structure
         self.platform._op_client.mk_directory(simulation)
         self.platform._metas.dump(simulation)
         self.platform._assets.link_common_assets(simulation)
         self.platform._assets.dump_assets(simulation)
         self.platform._op_client.create_batch_file(simulation, **kwargs)
 
+        # Make command executable
+        self.platform._op_client.make_command_executable(simulation)
+
+        # Return Slurm Simulation
         meta = self.platform._metas.get(simulation)
-        return SimulationDict(meta)
+        return SlurmSimulation(meta)
 
-    def platform_run_item(self, simulation: Simulation, **kwargs):
-        """
-        For simulations on slurm, we let the experiment execute with sbatch
-        Args:
-            simulation: idmtools Simulation
-            kwargs: keyword arguments used to expand functionality
-        Returns:
-            None
-        """
-        pass
-
-    def get_parent(self, simulation: SimulationDict, **kwargs) -> ExperimentDict:
+    def get_parent(self, simulation: SlurmSimulation, **kwargs) -> SlurmExperiment:
         """
         Fetches the parent of a simulation.
         Args:
@@ -91,6 +85,17 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
             return self.platform._experiments.get(simulation.parent_id, raw=True,
                                                   **kwargs) if simulation.experiment_id else None
 
+    def platform_run_item(self, simulation: Simulation, **kwargs):
+        """
+        For simulations on slurm, we let the experiment execute with sbatch
+        Args:
+            simulation: idmtools Simulation
+            kwargs: keyword arguments used to expand functionality
+        Returns:
+            None
+        """
+        pass
+
     def send_assets(self, simulation: Simulation, **kwargs):
         """
         Send assets.
@@ -101,7 +106,7 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
         Returns:
             None
         """
-        self.platform._metas.dump_assets(simulation, **kwargs)
+        pass
 
     def refresh_status(self, simulation: Simulation, **kwargs):
         """
@@ -139,9 +144,10 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
         ret = self.platform._assets.list_assets(simulation, **kwargs)
         return ret
 
-    def to_entity(self, slurm_sim: Dict, parent: Optional[Experiment] = None, **kwargs) -> Simulation:
+    def to_entity(self, slurm_sim: SlurmSimulation, parent: Optional[Experiment] = None, **kwargs) -> Simulation:
         """
-        Convert a sim dict object to an ISimulation.
+        Convert a SlurmSimulation object to idmtools Simulation.
+
         Args:
             slurm_sim: simulation to convert
             parent: optional experiment object
@@ -150,15 +156,27 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
             Simulation object
         """
         if parent is None:
-            parent = self.platform.get_item(slurm_sim["parent_id"], ItemType.EXPERIMENT, force=True)
+            parent = self.platform.get_item(slurm_sim.parent_id, ItemType.EXPERIMENT, force=True)
         sim = Simulation(task=None)
         sim.platform = self.platform
-        sim._uid = UUID(slurm_sim['uid'])
-        sim.name = slurm_sim['name']
+        sim.uid = UUID(slurm_sim.uid)
+        sim.name = slurm_sim.name
         sim.parent_id = parent.id
         sim.parent = parent
-        sim.tags = slurm_sim['tags']
+        sim.tags = slurm_sim.tags
         sim._platform_object = slurm_sim
-        sim.status = EntityStatus[slurm_sim['status']] if slurm_sim['status'] else EntityStatus.CREATED
+        # Convert status
+        sim.status = SLURM_STATES[slurm_sim.status] if slurm_sim.status in SLURM_STATES else EntityStatus.CREATED
 
         return sim
+
+    def post_run_item(self, simulation: Simulation, **kwargs) -> None:
+        """
+        Trigger right after commissioning experiment on platform.
+        Args:
+            simulation: Experiment just commissioned
+            kwargs: keyword arguments used to expand functionality
+        Returns:
+            None
+        """
+        self.platform._metas.dump(simulation)

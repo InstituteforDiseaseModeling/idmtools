@@ -3,22 +3,22 @@ Here we implement the SlurmPlatform operations.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+import os
+import shlex
+import shutil
+import subprocess
 from enum import Enum
 from pathlib import Path
 from logging import getLogger
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Union, Type, Any
-from jinja2 import Template
-from paramiko import SSHClient, SFTP, AutoAddPolicy
-from idmtools.core import EntityStatus
+from idmtools.core import EntityStatus, ItemType
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
-
-SIMULATION_SH_FILE = '_run.sh'
-EXPERIMENT_SH_FILE = 'sbatch.sh'
+from idmtools_platform_slurm.assets import generate_script, generate_simulation_script
 
 logger = getLogger(__name__)
 
@@ -58,7 +58,19 @@ class SlurmOperations(ABC):
         pass
 
     @abstractmethod
+    def get_directory_by_id(self, item_id: str, item_type: ItemType) -> Path:
+        pass
+
+    @abstractmethod
+    def make_command_executable(self, simulation: Simulation) -> None:
+        pass
+
+    @abstractmethod
     def mk_directory(self, item: IEntity) -> None:
+        pass
+
+    @abstractmethod
+    def link_file(self, target: Union[Path, str], link: Union[Path, str]) -> None:
         pass
 
     @abstractmethod
@@ -66,7 +78,11 @@ class SlurmOperations(ABC):
         pass
 
     @abstractmethod
-    def get_batch_content(self, item: IEntity, **kwargs) -> str:
+    def update_script_mode(self, script_path: Union[Path, str], mode: int) -> None:
+        pass
+
+    @abstractmethod
+    def make_command_executable(self, simulation: Simulation) -> None:
         pass
 
     @abstractmethod
@@ -74,7 +90,7 @@ class SlurmOperations(ABC):
         pass
 
     @abstractmethod
-    def submit_job(self, sjob_file_path: Union[Path, str]) -> None:
+    def submit_job(self, item: Union[Experiment, Simulation], **kwargs) -> Any:
         pass
 
     @abstractmethod
@@ -89,33 +105,31 @@ class RemoteSlurmOperations(SlurmOperations):
     key_file: str = field(default=None)
     port: int = field(default=22)
 
-    _cmd_client: SSHClient = field(default=None)
-    _file_client: SFTP = field(default=None)
-
-    def __post_init__(self):
-        self._cmd_client = SSHClient()
-        self._cmd_client.set_missing_host_key_policy(AutoAddPolicy())
-        self._cmd_client.load_system_host_keys()
-        self._cmd_client.connect(self.hostname, self.port, self.username, key_filename=self.key_file, compress=True)
-
-        self._file_client = self._cmd_client.open_sftp()
-
     def get_directory(self, item: IEntity) -> Path:
+        pass
+
+    def get_directory_by_id(self, item_id: str, item_type: ItemType) -> Path:
         pass
 
     def mk_directory(self, item: IEntity) -> None:
         pass
 
+    def link_file(self, target: Union[Path, str], link: Union[Path, str]) -> None:
+        pass
+
     def link_dir(self, target: Union[Path, str], link: Union[Path, str]) -> None:
         pass
 
-    def get_batch_content(self, item: IEntity, **kwargs) -> str:
+    def update_script_mode(self, script_path: Union[Path, str], mode: int) -> None:
+        pass
+
+    def make_command_executable(self, simulation: Simulation) -> None:
         pass
 
     def create_batch_file(self, item: IEntity, **kwargs) -> None:
         pass
 
-    def submit_job(self, sjob_file_path: Union[Path, str]) -> None:
+    def submit_job(self, item: Union[Experiment, Simulation], **kwargs) -> Any:
         pass
 
     def entity_status(self, item: IEntity) -> Any:
@@ -151,6 +165,29 @@ class LocalSlurmOperations(SlurmOperations):
             raise RuntimeError(f"Get directory is not supported for {type(item)} object on SlurmPlatform")
 
         return item_dir
+
+    def get_directory_by_id(self, item_id: str, item_type: ItemType) -> Path:
+        """
+        Get item's path.
+        Args:
+            item_id: entity id (Suite, Experiment, Simulation)
+            item_type: the type of items (Suite, Experiment, Simulation)
+        Returns:
+            item file directory
+        """
+        if item_type is ItemType.SIMULATION:
+            pattern = f"*/*/{item_id}"
+        elif item_type is ItemType.EXPERIMENT:
+            pattern = f"*/{item_id}"
+        elif item_type is ItemType.SUITE:
+            pattern = f"{item_id}"
+        else:
+            raise RuntimeError(f"Unknown item type: {item_type}")
+
+        root = Path(self.platform.job_directory)
+        for item_path in root.glob(pattern=pattern):
+            return item_path
+        raise RuntimeError(f"Not found path for item_id: {item_id} with type: {item_type}.")
 
     def mk_directory(self, item: Union[Suite, Experiment, Simulation] = None, dest: Union[Path, str] = None,
                      exist_ok: bool = True) -> None:
@@ -198,7 +235,7 @@ class LocalSlurmOperations(SlurmOperations):
         link.symlink_to(target)
 
     @staticmethod
-    def update_script_mode(script_path: Union[Path, str], mode=0o755) -> None:
+    def update_script_mode(script_path: Union[Path, str], mode: int = 0o777) -> None:
         """
         Change file mode.
         Args:
@@ -210,104 +247,76 @@ class LocalSlurmOperations(SlurmOperations):
         script_path = Path(script_path)
         script_path.chmod(mode)
 
-    def get_batch_configs(self, **kwargs) -> str:
+    def make_command_executable(self, simulation: Simulation) -> None:
         """
-        Utility: build Batch for configuration part.
+        Make simulation command executable
         Args:
-            kwargs: keyword arguments used to expand functionality.
+            simulation: idmtools Simulation
         Returns:
-            text
+            None
         """
-        contents = ''
-        njobs = kwargs.pop('njobs', None)
-        max_running_jobs = kwargs.pop('max_running_jobs', False)
-        kwargs.pop('wait_on_done_progress', False)
-        sbatch_configs = self.platform.get_slurm_configs(**kwargs)
-        for p, v in sbatch_configs.items():
-            if not v:
-                continue
-            p = p.replace('_', '-')  # re-sore original command name
-            if p == 'modules':
-                for module in v:
-                    contents += f'module load {module}\n'
-            elif p in ['exclusive', 'requeue'] and v:
-                contents += f'#SBATCH --{p}\n'
-            else:
-                contents += f'#SBATCH --{p}={v}\n'
+        exe = simulation.task.command.executable
+        if exe == 'singularity':
+            # split the command
+            cmd = shlex.split(simulation.task.command.cmd.replace("\\", "/"))
+            # get real executable
+            exe = cmd[3]
 
-        # consider max_running_jobs
-        if max_running_jobs:
-            contents += f"#SBATCH--array=0-{njobs}%{max_running_jobs}\n"
+        sim_dir = self.get_directory(simulation)
+        exe_path = sim_dir.joinpath(exe)
+
+        # see if it is a file
+        if exe_path.exists():
+            exe = exe_path
+        elif shutil.which(exe) is not None:
+            exe = Path(shutil.which(exe))
         else:
-            contents += f"#SBATCH--array=0-{njobs}\n"
+            logger.debug(f"Failed to find executable: {exe}")
+            exe = None
+        try:
+            if exe and not os.access(exe, os.X_OK):
+                self.update_script_mode(exe)
+        except:
+            logger.debug(f"Failed to change file mode for executable: {exe}")
 
-        return contents
-
-    def get_batch_content(self, item: Union[Experiment, Simulation], **kwargs) -> str:
-        """
-        Get base batch content.
-        TODO: this is not the real script content and it just shows how some utility function are available/used.
-        TODO: Clinton is working on the details of the content and may completely re-write the generated script.
-        Args:
-            item: the item to build batch for
-            kwargs: keyword arguments used to expand functionality.
-        Returns:
-            text
-        """
-        contents = DEFAULT_SIMULATION_BATCH
-        contents += "\n"
-        if isinstance(item, Experiment):
-            kwargs['njobs'] = item.simulation_count
-            contents += self.get_batch_configs(**kwargs)
-            contents += "\n"
-            contents += "# All submissions happen at the experiment level\n"
-            contents += "srun run_simulation.sh $SLURM_ARRAY_TASK_ID 1> stdout.txt 2> stderr.txt\n"
-            contents += "wait\n"
-        elif isinstance(item, Simulation):
-            contents += f"{item.task.command.cmd}"
-        return contents
-
-    def create_batch_file(self, item: Union[Experiment, Simulation], item_path: Union[Path, str] = None,
-                          **kwargs) -> None:
+    def create_batch_file(self, item: Union[Experiment, Simulation], **kwargs) -> None:
         """
         Create batch file.
         Args:
             item: the item to build batch file for
-            item_path: the file path
             kwargs: keyword arguments used to expand functionality.
         Returns:
             None
         """
-        if item_path is None:
-            item_path = self.get_directory(item)
-        item_path = Path(item_path)
-
-        contents = self.get_batch_content(item, **kwargs)
         if isinstance(item, Experiment):
-            sh_file = EXPERIMENT_SH_FILE
+            max_running_jobs = kwargs.get('max_running_jobs', None)
+            generate_script(self.platform, item, max_running_jobs)
         elif isinstance(item, Simulation):
-            sh_file = SIMULATION_SH_FILE
+            retries = kwargs.get('retries', None)
+            generate_simulation_script(self.platform, item, retries)
         else:
             raise NotImplementedError(f"{item.__class__.__name__} is not supported for batch creation.")
 
-        # create batch file
-        script_path = item_path.joinpath(sh_file)
-        with script_path.open(mode='w') as out:
-            out.write(contents)
-
-        # make script executable
-        self.update_script_mode(script_path)
-
-    def submit_job(self, sjob_file_path: Union[Path, str], working_directory: Union[Path, str]) -> None:
+    def submit_job(self, item: Union[Experiment, Simulation], **kwargs) -> Any:
         """
         Submit a Slurm job.
         Args:
-            sjob_file_path: the file content
-            working_directory: the file path
+            item: idmtools Experiment or Simulation
+            kwargs: keyword arguments used to expand functionality
         Returns:
-            None
+            Any
         """
-        raise NotImplementedError(f"Submit job is not implemented on SlurmPlatform.")
+        dry_run = kwargs.get('dry_run', False)
+        if isinstance(item, Experiment):
+            if not dry_run:
+                working_directory = self.get_directory(item)
+                result = subprocess.run(['sbatch', 'sbatch.sh'], stdout=subprocess.PIPE, cwd=str(working_directory))
+                stdout = result.stdout.decode('utf-8').strip()
+                return stdout
+        elif isinstance(item, Simulation):
+            pass
+        else:
+            raise NotImplementedError(f"Submit job is not implemented on SlurmPlatform.")
 
     def entity_status(self, item: Union[Suite, Experiment, Simulation]) -> Any:
         """
