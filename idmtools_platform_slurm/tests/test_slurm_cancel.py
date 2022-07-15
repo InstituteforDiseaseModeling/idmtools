@@ -42,7 +42,7 @@ class TestSlurmCanceling(unittest.TestCase):
 
     def test_canceling_a_full_experiment(self):
         print('RUNNING TEST')
-        # self.experiment.run(wait_till_done=False)
+        self.experiment.run(wait_till_done=False)  # why does this not work? TODO, and why are there two ways to run?
         self.platform.run_items(items=[self.experiment])
         time.sleep(10)  # simulations should now exist in slurm
 

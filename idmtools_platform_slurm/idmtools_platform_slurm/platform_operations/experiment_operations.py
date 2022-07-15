@@ -112,6 +112,9 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
             # job_id_file = working_directory.joinpath('job_id.txt')
             # experiment.slurm_job_id = Experiment.read_slurm_job_id_from_file(path=job_id_file)
             experiment.slurm_job_id = int(slurm_job_id)
+            print(f"Set slurm_job_id: {experiment.slurm_job_id}")
+            import time
+            time.sleep(5)
             self.platform._metas.dump(item=experiment)
         else:
             experiment.slurm_job_id = None
