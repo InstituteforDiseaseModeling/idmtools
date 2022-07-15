@@ -202,7 +202,6 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         exp.parent = parent
         exp.tags = slurm_exp.tags
         exp._platform_object = slurm_exp
-        exp.status = EntityStatus[slurm_exp.status] if slurm_exp.status else EntityStatus.CREATED
 
         exp.assets = self.get_assets_from_slurm_experiment(slurm_exp)
         if exp.assets is None:

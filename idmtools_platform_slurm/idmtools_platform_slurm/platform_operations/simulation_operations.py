@@ -8,6 +8,7 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, List, Dict, Type, Optional
 from idmtools.assets import Asset
 from idmtools.core import ItemType, EntityStatus
+from idmtools_platform_slurm.slurm_operations import SLURM_STATES
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
@@ -164,8 +165,8 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
         sim.parent = parent
         sim.tags = slurm_sim.tags
         sim._platform_object = slurm_sim
-        sim.status = EntityStatus[slurm_sim.status] if slurm_sim.status else EntityStatus.CREATED
-        # sim.status = EntityStatus.SUCCEEDED  # TODO: test
+        # Convert status
+        sim.status = SLURM_STATES[slurm_sim.status] if slurm_sim.status in SLURM_STATES else EntityStatus.CREATED
 
         return sim
 

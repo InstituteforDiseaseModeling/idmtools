@@ -124,7 +124,6 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
         suite.parent = None
         suite.tags = slurm_suite.tags
         suite._platform_object = slurm_suite
-        suite.status = EntityStatus[slurm_suite.status] if slurm_suite.status else EntityStatus.CREATED
         if children:
             suite.experiments = self.get_children(slurm_suite, parent=suite)
         return suite
