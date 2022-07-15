@@ -77,13 +77,11 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
         Returns:
             The Experiment being the parent of this simulation.
         """
-        if simulation.parent:
-            return simulation.parent
-        elif simulation.parent_id is None:
+        if simulation.parent_id is None:
             return None
         else:
             return self.platform._experiments.get(simulation.parent_id, raw=True,
-                                                  **kwargs) if simulation.experiment_id else None
+                                                  **kwargs) if simulation.parent_id else None
 
     def platform_run_item(self, simulation: Simulation, **kwargs):
         """
