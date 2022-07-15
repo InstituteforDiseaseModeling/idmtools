@@ -60,11 +60,16 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         return ExperimentDict(meta)
 
     def cancel(self, experiments: List[Experiment]) -> None:
+        import time  # TODO: remove debug
+        print('Trying to cancel an experiment ...')
         exps_to_cancel = [exp for exp in experiments if exp.slurm_job_id is not None]
         slurm_ids = [exp.slurm_job_id for exp in exps_to_cancel]
+        print(f"Found {len(slurm_ids)} experiments to cancel ...")
         self.platform._op_client.cancel_jobs(ids=slurm_ids)
         for exp in exps_to_cancel:
             exp.status = SLURM_STATES['CANCELED']
+            print(f"Set canceled experiment slurm id: {exp.slurm_job_id} to status: {exp.status}")
+        time.sleep(5)
 
     def get_children(self, experiment: Dict, parent=None, **kwargs) -> List[Dict]:
         """
