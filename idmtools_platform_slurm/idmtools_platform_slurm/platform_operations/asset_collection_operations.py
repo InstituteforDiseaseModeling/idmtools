@@ -17,7 +17,7 @@ from idmtools.entities.iplatform_ops.iplatform_asset_collection_operations impor
 logger = getLogger(__name__)
 user_logger = getLogger("user")
 
-EXCLUDE_FILES = ['_run.sh', 'metadata.json', 'stdout.txt', 'stderr.txt', 'status.txt']
+EXCLUDE_FILES = ['_run.sh', 'metadata.json', 'stdout.txt', 'stderr.txt', 'status.txt', 'job_id']
 
 
 @dataclass
