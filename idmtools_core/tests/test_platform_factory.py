@@ -101,6 +101,11 @@ class TestPlatformFactory(ITestWithPersistence):
 
         platform2 = Platform('COMPS', **kwargs)
         self.assertEqual(mock_login.call_count, 2)
+        # Note, due to new bug fix for platform uid(in iitem.py), we can not longer compare 2 platforms equal as before.
+        # We used to have _uid member in platform which was comparison field and always None. Now, it has value with bug
+        # fix. So in order to compare 2 platforms equal, let's ignore this property and compare rest of members
+        platform.uid = None
+        platform2.uid = None
         self.assertEqual(platform, platform2)
 
     def test_TestPlatform(self):
@@ -112,5 +117,8 @@ class TestPlatformFactory(ITestWithPersistence):
         kwargs = {key: members[key] for key in keys if not key.startswith('_')}
 
         platform2 = Platform('Test', **kwargs)
+        # same reason as above test
+        platform.uid = None
+        platform2.uid = None
         self.assertEqual(platform, platform2)
         platform2.cleanup()

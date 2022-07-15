@@ -51,9 +51,9 @@ class TestPythonSimulation(ITestWithPersistence):
         suite.update_tags({'name': 'suite_tag', 'idmtools': '123'})
         # Add experiment to the suite
         suite.add_experiment(experiment)
-        # self.platform.create_items([suite])
+        # change dry_run=False when run in slurm cluster
         suite.run(platform=platform, wait_until_done=False, wait_on_done=wait_until_done, max_running_jobs=max_running_jobs,
-                  retries=retries, dry_run=True)  # dry_run - True for running this in user's local to test folder structure
+                  retries=retries, dry_run=True)
         print("suite_id: " + suite.id)
         print("experiment_id: " + experiment.id)
         return experiment
@@ -93,10 +93,6 @@ class TestPythonSimulation(ITestWithPersistence):
                 files.extend(filenames)
             self.assertSetEqual(set(files), set(["metadata.json", "_run.sh", "config.json"]))
         self.assertEqual(count, 9)  # make sure we found total 9 symlinks for Assets folder
-
-        # TODO, grab stdout.txt and stderr.txt from remote cluster and validate
-        # TODO, test experiment status
-        # TODO, test remote files
 
     def test_scripts(self):
         platform = Platform('SLURM_LOCAL', job_directory=self.job_directory, max_running_jobs=8, retries=5)
@@ -163,5 +159,6 @@ class TestPythonSimulation(ITestWithPersistence):
         experiment_dir = self.platform._op_client.get_directory(experiment)
         self.assertTrue(os.path.exists(os.path.join(experiment_dir, "job_id.txt")))
         job_id = open(os.path.join(experiment_dir, 'job_id.txt'), 'r').read()
+        self.assertTrue(type(job_id) == int)
         for simulation in experiment.simulations:
             pass
