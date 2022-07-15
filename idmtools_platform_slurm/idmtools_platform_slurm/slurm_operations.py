@@ -248,11 +248,19 @@ class LocalSlurmOperations(SlurmOperations):
         script_path.chmod(mode)
 
     def make_command_executable(self, simulation: Simulation) -> None:
-        # split the command
-        cmd = shlex.split(simulation.task.command.cmd.replace("\\", "/"))
-
-        # take the first item
-        exe = cmd[0]
+        """
+        Make simulation command executable
+        Args:
+            simulation: idmtools Simulation
+        Returns:
+            None
+        """
+        exe = simulation.task.command.executable
+        if exe == 'singularity':
+            # split the command
+            cmd = shlex.split(simulation.task.command.cmd.replace("\\", "/"))
+            # get real exe
+            exe = cmd[3]
 
         sim_dir = self.get_directory(simulation)
         exe_path = sim_dir.joinpath(exe)
