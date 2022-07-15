@@ -9,7 +9,7 @@ from uuid import UUID, uuid4
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, List, Type, Dict, Optional
 from idmtools.assets import Asset, AssetCollection
-from idmtools.core import ItemType, EntityStatus
+from idmtools.core import ItemType
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations

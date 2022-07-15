@@ -7,7 +7,6 @@ from uuid import UUID, uuid4
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, List, Type, Dict, Tuple
 from idmtools.core import ItemType
-from idmtools.core import EntityStatus
 from idmtools.entities import Suite
 from idmtools.entities.iplatform_ops.iplatform_suite_operations import IPlatformSuiteOperations
 from idmtools_platform_slurm.platform_operations.utils import SlurmSuite, SlurmExperiment
@@ -50,9 +49,11 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
         """
         if not isinstance(suite.uid, UUID):
             suite.uid = uuid4()
+        # Generate Suite folder structure
         self.platform._op_client.mk_directory(suite)
         self.platform._metas.dump(suite)
 
+        # Return Slurm Suite
         meta = self.platform._metas.get(suite)
         slurm_suite = SlurmSuite(meta)
         return slurm_suite, slurm_suite.id

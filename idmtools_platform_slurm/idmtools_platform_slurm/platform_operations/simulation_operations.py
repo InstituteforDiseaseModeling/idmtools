@@ -52,9 +52,9 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
         """
         if not isinstance(simulation.uid, UUID):
             simulation.uid = uuid4()
-
         simulation.name = clean_experiment_name(simulation.experiment.name if not simulation.name else simulation.name)
 
+        # Generate Simulation folder structure
         self.platform._op_client.mk_directory(simulation)
         self.platform._metas.dump(simulation)
         self.platform._assets.link_common_assets(simulation)
@@ -161,7 +161,7 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
         sim.platform = self.platform
         sim.uid = UUID(slurm_sim.uid)
         sim.name = slurm_sim.name
-        sim.parent_id = parent.id  # may not need this
+        sim.parent_id = parent.id
         sim.parent = parent
         sim.tags = slurm_sim.tags
         sim._platform_object = slurm_sim

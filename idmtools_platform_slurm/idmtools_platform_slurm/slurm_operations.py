@@ -259,7 +259,7 @@ class LocalSlurmOperations(SlurmOperations):
         if exe == 'singularity':
             # split the command
             cmd = shlex.split(simulation.task.command.cmd.replace("\\", "/"))
-            # get real exe
+            # get real executable
             exe = cmd[3]
 
         sim_dir = self.get_directory(simulation)
