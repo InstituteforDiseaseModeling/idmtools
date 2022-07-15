@@ -49,3 +49,28 @@ class TestCommandLine(unittest.TestCase):
         self.assertEqual("python36 Assets/examples.py --input 'Ada Lovelace.MD' --input-pattern", str(cl))
         cl.is_windows = True
         self.assertEqual("python36 Assets/examples.py --input \"Ada Lovelace.MD\" --input-pattern", str(cl))
+
+    def test_zdu(self):
+        self.sif_filename = 'my_sif'
+        self.executable_name = 'my_exe'
+        self.config_file_name = 'config.json'
+        cl = CommandLine("singularity", "exec", f"Assets/{self.sif_filename}", f"Assets/{self.executable_name}",
+                         "--config", f"{self.config_file_name}", "--dll-path", "./Assets", is_windows=False)
+
+        cmd = cl.cmd
+        print(cmd)
+        print(111)
+
+    def test_zdu_2(self):
+        self.sif_filename = 'my_sif'
+        self.executable_name = 'my_exe'
+        self.config_file_name = 'config.json'
+        cl = CommandLine(f"Assets/{self.executable_name}", "--config", f"{self.config_file_name}", "--dll-path", "./Assets", is_windows=False)
+
+        cl.add_argument('arg_zdu')
+
+        cl.add_option('p1', 'v1')
+
+        cmd = cl.cmd
+        print(cmd)
+        print(111)
