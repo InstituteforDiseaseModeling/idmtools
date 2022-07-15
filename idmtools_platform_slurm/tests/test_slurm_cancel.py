@@ -49,6 +49,7 @@ class TestSlurmCanceling(unittest.TestCase):
         self.assertIsNotNone(self.experiment.slurm_job_id)
         self.platform.cancel_items(items=[self.experiment])
 
+        self.assertEqual(self.experiment.status, EntityStatus.FAILED)
         self.assertTrue(all([s.status == EntityStatus.FAILED for s in self.experiment.simulations]))
 
         # validation

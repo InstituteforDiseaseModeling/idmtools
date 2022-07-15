@@ -166,4 +166,4 @@ class SlurmPlatform(IPlatform):
         for item in items:
             item.platform = self
             interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
-            getattr(self, interface).cancel(item)
+            getattr(self, interface).cancel([item])

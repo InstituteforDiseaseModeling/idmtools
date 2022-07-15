@@ -267,6 +267,6 @@ class LocalSlurmOperations(SlurmOperations):
         if len(ids) == 0:
             return
         try:
-            subprocess.check_output(f"scancel {' '.join([str(id) for id in ids])}")
+            subprocess.check_output(['scancel', *[str(id) for id in ids]])
         except subprocess.CalledProcessError as e:
             raise SlurmOperationException(e.args[0])

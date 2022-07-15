@@ -62,7 +62,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
     def cancel(self, experiments: List[Experiment]) -> None:
         exps_to_cancel = [exp for exp in experiments if exp.slurm_job_id is not None]
         slurm_ids = [exp.slurm_job_id for exp in exps_to_cancel]
-        self.platform._op_client.cancel_jobs(ids=[slurm_ids])
+        self.platform._op_client.cancel_jobs(ids=slurm_ids)
         for exp in exps_to_cancel:
             exp.status = SLURM_STATES['CANCELED']
 
@@ -111,6 +111,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
             # obtain and record the slurm job id for the experiment
             # job_id_file = working_directory.joinpath('job_id.txt')
             # experiment.slurm_job_id = Experiment.read_slurm_job_id_from_file(path=job_id_file)
+            experiment.slurm_job_id = int(slurm_job_id)
             self.platform._metas.dump(item=experiment)
         else:
             experiment.slurm_job_id = None
