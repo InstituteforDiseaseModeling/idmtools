@@ -2,7 +2,7 @@ import os
 from functools import partial
 import pytest
 from idmtools.builders import SimulationBuilder
-from idmtools.core import ItemType
+from idmtools.core import ItemType, EntityStatus
 
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
@@ -137,4 +137,3 @@ class TestSlurmOperations(ITestWithPersistence):
         self.assertEqual(sorted(slurm_experiment_assets), sorted(idm_experiment_assets))
         self.assertEqual(slurm_experiment.status, 'CREATED')
         self.assertEqual(idm_experiment.status, EntityStatus.CREATED)
-
