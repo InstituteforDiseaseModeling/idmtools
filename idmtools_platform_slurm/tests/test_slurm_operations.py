@@ -1,13 +1,10 @@
 import os
 from functools import partial
-
 import pytest
 from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType
 
 from idmtools.core.platform_factory import Platform
-from idmtools.entities import Suite
-from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
@@ -111,14 +108,31 @@ class TestSlurmOperations(ITestWithPersistence):
             self.assertEqual('model1.py', assets[0].filename)
 
     def test_simulation_list_assets(self):
-        with self.subTest('test_list_assets'):
-            count = 0
-            for sim in self.exp.simulations:
-                assets = self.platform._simulations.list_assets(sim)
-                self.assertEqual(1, len(assets))
-                self.assertEqual('config.json', assets[0].filename)
-                simulation_dir = self.platform._op_client.get_directory(sim).resolve()
-                self.assertEqual(assets[0].absolute_path, simulation_dir.joinpath('config.json'))
-                count += 1
-            self.assertEqual(count, 2)
+        count = 0
+        for sim in self.exp.simulations:
+            assets = self.platform._simulations.list_assets(sim)
+            self.assertEqual(1, len(assets))
+            self.assertEqual('config.json', assets[0].filename)
+            simulation_dir = self.platform._op_client.get_directory(sim).resolve()
+            self.assertEqual(assets[0].absolute_path, simulation_dir.joinpath('config.json'))
+            count += 1
+        self.assertEqual(count, 2)
+
+    def test_platform_list_files(self):
+        assets = self.platform._experiments.platform_list_files(self.exp)
+        self.assertEqual(len(assets), 2)
+
+    def test_to_entity(self):
+        slurm_experiment = self.platform.get_item(self.exp.id, item_type=ItemType.EXPERIMENT, raw=True)
+        idm_experiment = self.platform._experiments.to_entity(slurm_experiment)
+        self.assertEqual(slurm_experiment.id, idm_experiment.id)
+        self.assertEqual(slurm_experiment.uid, idm_experiment.id)
+        self.assertEqual(slurm_experiment.name, idm_experiment.name)
+        self.assertEqual(slurm_experiment.tags, idm_experiment.tags)
+        self.assertEqual(sorted(slurm_experiment.simulations),sorted([sim.id for sim in idm_experiment.simulations.items]))
+
+        # we only compare asset filenames
+        slurm_experiment_assets = [asset['filename'] for asset in slurm_experiment.assets]
+        idm_experiment_assets = [asset.filename for asset in idm_experiment.assets]
+        self.assertEqual(sorted(slurm_experiment_assets), sorted(idm_experiment_assets))
 
