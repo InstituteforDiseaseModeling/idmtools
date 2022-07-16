@@ -135,4 +135,6 @@ class TestSlurmOperations(ITestWithPersistence):
         slurm_experiment_assets = [asset['filename'] for asset in slurm_experiment.assets]
         idm_experiment_assets = [asset.filename for asset in idm_experiment.assets]
         self.assertEqual(sorted(slurm_experiment_assets), sorted(idm_experiment_assets))
+        self.assertEqual(slurm_experiment.status, 'CREATED')
+        self.assertEqual(idm_experiment.status, EntityStatus.CREATED)
 
