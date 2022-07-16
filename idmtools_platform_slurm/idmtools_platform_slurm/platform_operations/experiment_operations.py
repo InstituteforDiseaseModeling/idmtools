@@ -157,12 +157,14 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
             List[Asset]
         """
         assets = self.list_assets(experiment, **kwargs)
-        if experiment.assets is None:
-            return assets
-        else:
-            exp_assets = copy.deepcopy(experiment.assets.assets)
-            exp_assets.extend(assets)
-        return exp_assets
+        return assets
+
+        # if experiment.assets is None:
+        #     return assets
+        # else:
+        #     exp_assets = copy.deepcopy(experiment.assets.assets)
+        #     exp_assets.extend(assets)
+        # return exp_assets
 
     def get_assets_from_slurm_experiment(self, experiment: SlurmExperiment) -> AssetCollection:
         """
