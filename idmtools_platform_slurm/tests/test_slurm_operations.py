@@ -17,13 +17,14 @@ from idmtools_platform_slurm.platform_operations.utils import add_dammy_suite, S
 
 setA = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="a")
 
+
 @pytest.mark.serial
 @linux_only
 class TestSlurmOperations(ITestWithPersistence):
 
     def create_experiment(self, platform=None):
         task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, 'python', 'model1.py'),
-                                      parameters=dict(c='c-value'))
+                                        parameters=dict(c='c-value'))
         task.common_assets.add_asset('input/hello.sh')
         ts = TemplatedSimulations(base_task=task)
         builder = SimulationBuilder()
@@ -99,7 +100,8 @@ class TestSlurmOperations(ITestWithPersistence):
             self.assertEqual(2, len(assets))
             self.assertEqual(sorted([asset.filename for asset in assets]), sorted(['model1.py', 'hello.sh']))
             experiment_dir = self.platform._op_client.get_directory(self.exp).resolve()
-            expected_assets_path = [str(experiment_dir.joinpath('Assets/model1.py')), str(experiment_dir.joinpath('Assets/hello.sh'))]
+            expected_assets_path = [str(experiment_dir.joinpath('Assets/model1.py')),
+                                    str(experiment_dir.joinpath('Assets/hello.sh'))]
             self.assertEqual(sorted([asset.absolute_path for asset in assets]), sorted(expected_assets_path))
 
         with self.subTest('test_list_assets_add_exclude'):
@@ -112,7 +114,8 @@ class TestSlurmOperations(ITestWithPersistence):
         for sim in self.exp.simulations:
             assets = self.platform._simulations.list_assets(sim)
             self.assertEqual(3, len(assets))
-            self.assertEqual(sorted([asset.filename for asset in assets]), sorted(['model1.py', 'hello.sh', 'config.json']))
+            self.assertEqual(sorted([asset.filename for asset in assets]),
+                             sorted(['model1.py', 'hello.sh', 'config.json']))
             simulation_dir = self.platform._op_client.get_directory(sim).resolve()
             expected_assets_path = [str(simulation_dir.joinpath('Assets/model1.py')),
                                     str(simulation_dir.joinpath('Assets/hello.sh')),
@@ -121,7 +124,6 @@ class TestSlurmOperations(ITestWithPersistence):
             count += 1
         self.assertEqual(count, 2)
 
-
     def test_to_entity(self):
         slurm_experiment = self.platform.get_item(self.exp.id, item_type=ItemType.EXPERIMENT, raw=True)
         idm_experiment = self.platform._experiments.to_entity(slurm_experiment)
@@ -129,7 +131,8 @@ class TestSlurmOperations(ITestWithPersistence):
         self.assertEqual(slurm_experiment.uid, idm_experiment.id)
         self.assertEqual(slurm_experiment.name, idm_experiment.name)
         self.assertEqual(slurm_experiment.tags, idm_experiment.tags)
-        self.assertEqual(sorted(slurm_experiment.simulations),sorted([sim.id for sim in idm_experiment.simulations.items]))
+        self.assertEqual(sorted(slurm_experiment.simulations),
+                         sorted([sim.id for sim in idm_experiment.simulations.items]))
 
         # we only compare asset filenames
         slurm_experiment_assets = [asset['filename'] for asset in slurm_experiment.assets]
@@ -137,5 +140,3 @@ class TestSlurmOperations(ITestWithPersistence):
         self.assertEqual(sorted(slurm_experiment_assets), sorted(idm_experiment_assets))
         self.assertEqual(slurm_experiment.status, 'CREATED')
         self.assertEqual(idm_experiment.status, EntityStatus.CREATED)
-
-
