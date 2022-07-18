@@ -33,7 +33,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
             Slurm Experiment object
         """
-        metas = self.platform._metas.filter(item_type=ItemType.EXPERIMENT, property_filter={'uid': str(experiment_id)})
+        metas = self.platform._metas.filter(item_type=ItemType.EXPERIMENT, property_filter={'id': str(experiment_id)})
         if len(metas) > 0:
             return SlurmExperiment(metas[0])
         else:
@@ -124,17 +124,6 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         """
         pass
 
-    def refresh_status(self, experiment: Experiment, **kwargs):
-        """
-        Refresh status of experiment.
-        Args:
-            experiment: idmtools Experiment
-            kwargs: keyword arguments used to expand functionality
-        Returns:
-            None
-        """
-        raise NotImplementedError("Refresh_status has not been implemented on the Slurm Platform")
-
     def list_assets(self, experiment: Experiment, **kwargs) -> List[Asset]:
         """
         List assets for an experiment.
@@ -144,29 +133,11 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
             List[Asset]
         """
-        ret = self.platform._assets.list_assets(experiment, **kwargs)
-        return ret
-
-    def platform_list_files(self, experiment: Experiment, **kwargs) -> List[Asset]:
-        """
-        List files for a platform
-        Args:
-            experiment: Experiment
-            kwargs:
-        Returns:
-            List[Asset]
-        """
-        assets = self.list_assets(experiment, **kwargs)
+        assets = self.platform._assets.list_assets(experiment, **kwargs)
         return assets
 
-        # if experiment.assets is None:
-        #     return assets
-        # else:
-        #     exp_assets = copy.deepcopy(experiment.assets.assets)
-        #     exp_assets.extend(assets)
-        # return exp_assets
-
-    def get_assets_from_slurm_experiment(self, experiment: SlurmExperiment) -> AssetCollection:
+    @staticmethod
+    def get_assets_from_slurm_experiment(experiment: SlurmExperiment) -> AssetCollection:
         """
         Get assets for a comps experiment.
         Args:
@@ -211,3 +182,14 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
             exp.simulations = self.get_children(slurm_exp, parent=exp)
 
         return exp
+
+    def refresh_status(self, experiment: Experiment, **kwargs):
+        """
+        Refresh status of experiment.
+        Args:
+            experiment: idmtools Experiment
+            kwargs: keyword arguments used to expand functionality
+        Returns:
+            None
+        """
+        raise NotImplementedError("Refresh_status has not been implemented on the Slurm Platform")
