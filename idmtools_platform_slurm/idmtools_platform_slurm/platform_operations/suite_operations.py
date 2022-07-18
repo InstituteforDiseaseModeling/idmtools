@@ -97,17 +97,6 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
             exp_list.append(exp)
         return exp_list
 
-    def refresh_status(self, suite: Suite, **kwargs):
-        """
-        Refresh the status of a suite. On comps, this is done by refreshing all experiments.
-        Args:
-            suite: idmtools suite
-            kwargs: keyword arguments used to expand functionality
-        Returns:
-            None
-        """
-        raise NotImplementedError("Refresh statu has not been implemented on the Slurm Platform")
-
     def to_entity(self, slurm_suite: SlurmSuite, children: bool = True, **kwargs) -> Suite:
         """
         Convert a SlurmSuite object to idmtools Suite.
@@ -128,3 +117,14 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
         if children:
             suite.experiments = self.get_children(slurm_suite, parent=suite)
         return suite
+
+    def refresh_status(self, suite: Suite, **kwargs):
+        """
+        Refresh the status of a suite. On comps, this is done by refreshing all experiments.
+        Args:
+            suite: idmtools suite
+            kwargs: keyword arguments used to expand functionality
+        Returns:
+            None
+        """
+        raise NotImplementedError("Refresh statu has not been implemented on the Slurm Platform")

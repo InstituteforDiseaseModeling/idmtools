@@ -106,17 +106,6 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
         """
         pass
 
-    def refresh_status(self, simulation: Simulation, **kwargs):
-        """
-        Refresh status
-        Args:
-            simulation: idmtools Simulation
-            kwargs: keyword arguments used to expand functionality
-        Returns:
-            None
-        """
-        raise NotImplementedError("Refresh status has not been implemented on the Slurm Platform")
-
     def get_assets(self, simulation: Simulation, files: List[str], **kwargs) -> Dict[str, bytearray]:
         """
         Get assets for simulation.
@@ -168,13 +157,13 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
 
         return sim
 
-    def post_run_item(self, simulation: Simulation, **kwargs) -> None:
+    def refresh_status(self, simulation: Simulation, **kwargs):
         """
-        Trigger right after commissioning experiment on platform.
+        Refresh status
         Args:
-            simulation: Experiment just commissioned
+            simulation: idmtools Simulation
             kwargs: keyword arguments used to expand functionality
         Returns:
             None
         """
-        self.platform._metas.dump(simulation)
+        raise NotImplementedError("Refresh status has not been implemented on the Slurm Platform")
