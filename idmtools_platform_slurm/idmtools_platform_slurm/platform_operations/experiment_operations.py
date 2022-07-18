@@ -67,7 +67,8 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         print(f"Found {len(slurm_ids)} experiments to cancel ...")
         self.platform._op_client.cancel_jobs(ids=slurm_ids)
         for exp in exps_to_cancel:
-            exp.status = SLURM_STATES['CANCELED']
+            for sim in exp.simulations:
+                sim.status = SLURM_STATES['CANCELED']
             print(f"Set canceled experiment slurm id: {exp.slurm_job_id} to status: {exp.status}")
         time.sleep(5)
 
