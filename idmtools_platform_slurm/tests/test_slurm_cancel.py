@@ -35,7 +35,7 @@ class TestSlurmCanceling(unittest.TestCase):
         builder = SimulationBuilder()
         builder.add_sweep_definition(partial(param_update, param="a"), range(5))
         ts.add_builder(builder)
-        experiment = Experiment.from_template(ts, name=self.case_name)
+        self.experiment = Experiment.from_template(ts, name=self.case_name)
         self.experiment.tags = {"idmtools": "slurm_platform_test"}
 
         # self.experiment = Experiment.from_task(name=self.case_name,
