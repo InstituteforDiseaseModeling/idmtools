@@ -136,8 +136,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         assets = self.platform._assets.list_assets(experiment, **kwargs)
         return assets
 
-    @staticmethod
-    def get_assets_from_slurm_experiment(experiment: SlurmExperiment) -> AssetCollection:
+    def get_assets_from_slurm_experiment(self, experiment: SlurmExperiment) -> AssetCollection:
         """
         Get assets for a comps experiment.
         Args:
@@ -147,7 +146,11 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         """
         assets = AssetCollection()
         for a in experiment.assets:
-            asset = Asset(absolute_path=a["absolute_path"], filename=a["filename"], relative_path=a["relative_path"])
+            if a["absolute_path"] == a["filename"]:
+                abs_path = self.platform._op_client.get_directory_by_id(experiment.id, item_type=ItemType.EXPERIMENT).joinpath(f'Assets/{a["filename"]}')
+                asset = Asset(absolute_path=abs_path, filename=a["filename"], relative_path=a["relative_path"])
+            else:
+                asset = Asset(absolute_path=a["absolute_path"], filename=a["filename"], relative_path=a["relative_path"])
             assets.add_asset(asset)
         return assets
 
