@@ -240,13 +240,14 @@ class TestPythonExperiment(ITestWithPersistence):
             # validate output/config.json
             assets = self.assert_valid_config_stdout_and_assets(simulation, validate_config=validate_config,
                                                                 validate_stdout=validate_stdout)
-            self.assertEqual(len(assets), 5)
+            self.assertEqual(len(assets), 6)
 
             expected_list = [{'filename': '__init__.py', 'relative_path': 'MyExternalLibrary'},
                              {'filename': '__init__.py', 'relative_path': ''},
                              {'filename': 'model.py', 'relative_path': ''},
                              {'filename': 'temp.py', 'relative_path': 'MyLib'},
-                             {'filename': 'functions.py', 'relative_path': 'MyExternalLibrary'}]
+                             {'filename': 'functions.py', 'relative_path': 'MyExternalLibrary'},
+                             {'filename': 'functions.py', 'relative_path': 'MyLib'}]
             self.validate_assets(assets, expected_list)
 
     def assert_valid_config_stdout_and_assets(self, simulation, validate_config=True, validate_stdout=True):
@@ -449,11 +450,12 @@ class TestPythonExperiment(ITestWithPersistence):
         for simulation in COMPSExperiment.get(exp_id).get_simulations():
             # validate output/config.json
             assets = self.assert_valid_new_assets(simulation)
-            self.assertEqual(len(assets), 6)
+            self.assertEqual(len(assets), 7)
 
             expected_list = [{'filename': '__init__.py', 'relative_path': 'MyExternalLibrary'},
                              {'filename': '__init__.py', 'relative_path': ''},
                              {'filename': 'temp.py', 'relative_path': 'MyLib'},
+                             {'filename': 'functions.py', 'relative_path': 'MyLib'},
                              {'filename': 'functions.py', 'relative_path': 'MyExternalLibrary'},
                              {'filename': 'working_model.py', 'relative_path': ''},
                              {'filename': 'test.json', 'relative_path': ''}]
