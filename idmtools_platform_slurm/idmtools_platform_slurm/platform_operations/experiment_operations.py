@@ -146,7 +146,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         """
         assets = AssetCollection()
         for a in experiment.assets:
-            if a["absolute_path"] == a["filename"]:
+            if a["absolute_path"] is None or a["absolute_path"] == a["filename"]:
                 abs_path = self.platform._op_client.get_directory_by_id(experiment.id, item_type=ItemType.EXPERIMENT).joinpath(f'Assets/{a["filename"]}')
                 asset = Asset(absolute_path=abs_path, filename=a["filename"], relative_path=a["relative_path"])
             else:
