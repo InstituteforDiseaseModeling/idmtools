@@ -1,4 +1,3 @@
-import json
 import os
 import tempfile
 from functools import partial
@@ -16,6 +15,8 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools.entities.templated_simulation import TemplatedSimulations
 
 from idmtools_platform_slurm.platform_operations.utils import add_dammy_suite, SlurmExperiment, SlurmSimulation
+
+from idmtools.assets.asset import Asset
 
 setA = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="a")
 
@@ -164,11 +165,11 @@ class TestSlurmOperations(ITestWithPersistence):
             with open(os.path.join(output_dir, self.exp.simulations[0].id, 'config.json'), 'rb') as m:
                 self.assertEqual(files_retrieved['config.json'], m.read())
 
-            with self.subTest('test_get_files_for_experiment_no_existing'):
-                with self.assertRaises(RuntimeError) as context:
-                    self.platform.get_files(self.exp, ['Assets/no_existing.txt'])
-                self.assertTrue(
-                        "Couldn't find asset for path 'Assets/no_existing.txt'." in str(context.exception.args[0]))
+        with self.subTest('test_get_files_for_experiment_no_existing'):
+            with self.assertRaises(RuntimeError) as context:
+                self.platform.get_files(self.exp, ['Assets/no_existing.txt'])
+            self.assertTrue(
+                    "Couldn't find asset for path 'Assets/no_existing.txt'." in str(context.exception.args[0]))
 
     def test_get_files_by_id(self):
         with self.subTest('test_get_files_by_id_for_experiment'):
@@ -191,3 +192,17 @@ class TestSlurmOperations(ITestWithPersistence):
                 self.assertEqual(files_retrieved['Assets/hello.sh'], m.read())
             with open(os.path.join(output_dir, self.exp.simulations[0].id, 'config.json'), 'rb') as m:
                 self.assertEqual(files_retrieved['config.json'], m.read())
+
+    def test_get_files_from_dynamic_created(self):
+        task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, 'python', 'model1.py'),
+                                        parameters=dict(c='c-value'))
+        task.common_assets.add_asset(Asset(content="test", filename="test.txt"))
+        exp = Experiment.from_task(task, name=self.case_name)
+        suite = add_dammy_suite(exp)
+        platform = Platform('SLURM_LOCAL', job_directory="test")
+        suite.run(platform=platform, wait_until_done=False, wait_on_done=False, dry_run=True)
+        my_exp = platform.get_item(exp.id, ItemType.EXPERIMENT)
+        self.assertEqual(my_exp.id, exp.id)
+        assets = my_exp.assets
+        self.assertEqual(2, len(assets))
+        self.assertEqual(sorted([asset.filename for asset in assets]), sorted(['model1.py', 'test.txt']))

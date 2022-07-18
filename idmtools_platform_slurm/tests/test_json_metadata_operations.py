@@ -96,7 +96,7 @@ class JSONMetadataOperationsTest(unittest.TestCase):
         expected_suite_meta.update({"_uid": suite.id})
         expected_suite_meta.update({"uid": suite.id})
         expected_suite_meta.update({"id": suite.id})
-        expected_suite_meta.update({"experiments": [exp_meta_dict1, exp_meta_dict2]})
+        expected_suite_meta.update({"experiments": [experiments[0].id, experiments[1].id]})
         self.assertDictEqual(expected_suite_meta, metadata)
 
     # test load with no meta_data file

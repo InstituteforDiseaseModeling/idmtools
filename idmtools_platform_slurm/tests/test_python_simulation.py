@@ -52,8 +52,7 @@ class TestPythonSimulation(ITestWithPersistence):
         # Add experiment to the suite
         suite.add_experiment(experiment)
         # change dry_run=False when run in slurm cluster
-        suite.run(platform=platform, wait_until_done=False, wait_on_done=wait_until_done,
-                  max_running_jobs=max_running_jobs,
+        suite.run(platform=platform, wait_until_done=False, wait_on_done=wait_until_done, max_running_jobs=max_running_jobs,
                   retries=retries, dry_run=True)
         print("suite_id: " + suite.id)
         print("experiment_id: " + experiment.id)
@@ -61,7 +60,6 @@ class TestPythonSimulation(ITestWithPersistence):
 
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
-        # self.job_directory = "/home/schen/idm_test_dir"
         self.job_directory = "DEST"
         self.platform = Platform('SLURM_LOCAL', job_directory=self.job_directory)
 
@@ -131,9 +129,7 @@ class TestPythonSimulation(ITestWithPersistence):
         with open(os.path.join(suite_dir, 'metadata.json'), 'r') as j:
             contents = json.loads(j.read())
             self.assertEqual(contents['_uid'], suite.id)
-            self.assertEqual(contents['experiments'][0]['parent_id'], suite.id)
-            self.assertEqual(contents['experiments'][0]['_uid'], experiment.id)
-            self.assertEqual(sorted(contents['experiments'][0]['simulations']), sorted(simulation_ids))
+            self.assertEqual(contents['experiments'][0], experiment.id)
 
         # verify ids in metadata.json for experiment
         with open(os.path.join(experiment_dir, 'metadata.json'), 'r') as j:
@@ -152,7 +148,7 @@ class TestPythonSimulation(ITestWithPersistence):
                 self.assertEqual(contents['task']['command'], 'python3 Assets/model3.py --config config.json')
                 with open(os.path.join(simulation_dir, 'config.json'), 'r') as j:
                     config_contents = json.loads(j.read())
-                self.assertDictEqual(contents['task']['parameters'], config_contents['parameters'])
+                self.assertDictEqual(contents['task']['parameters'],  config_contents['parameters'])
 
     @pytest.mark.skip("wait for status")
     def test_std_status_jobid_files(self):
