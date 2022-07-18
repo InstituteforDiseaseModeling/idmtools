@@ -1,6 +1,8 @@
 import os
 import time
 import unittest
+from functools import partial
+from typing import Any, Dict
 
 import pytest
 
@@ -19,20 +21,25 @@ class TestSlurmCanceling(unittest.TestCase):
 
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
-        self.platform = Platform('SLURM_TEST')
+        self.platform = Platform('SLURM_LOCAL')
         self.model_script = os.path.join(COMMON_INPUT_PATH, "python", "waiter.py")
 
         self.experiment = Experiment.from_task(name=self.case_name,
                                                task=JSONConfiguredPythonTask(script_path=self.model_script))
         self.experiment.tags = {"idmtools": "slurm_platform_test"}
 
-        def param_a_update(simulation: Simulation, value: dict):
-            simulation.set_parameter("a", value)
-            return {"a": value}
+        # def param_a_update(simulation: Simulation, value: dict):
+        #     simulation.set_parameter("a", value)
+        #     return {"a": value}
+
+        def param_update(simulation: Simulation, param: str, value: Any) -> Dict[str, Any]:
+            return simulation.task.set_parameter(param, value)
 
         builder = SimulationBuilder()
+        builder.add_sweep_definition(partial(param_update, param="a"), range(5))
+
         # Sweep parameter "a"
-        builder.add_sweep_definition(param_a_update, range(0, 5))
+        # builder.add_sweep_definition(param_a_update, range(0, 5))
         self.experiment.builder = builder
         self.suite = Suite(name='Idm Suite')
         self.suite.update_tags({'name': 'testing_suite', 'idmtools': '123'})
