@@ -60,17 +60,12 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         return ExperimentDict(meta)
 
     def cancel(self, experiments: List[Experiment]) -> None:
-        import time  # TODO: remove debug
-        print('Trying to cancel an experiment ...')
         exps_to_cancel = [exp for exp in experiments if exp.slurm_job_id is not None]
         slurm_ids = [exp.slurm_job_id for exp in exps_to_cancel]
-        print(f"Found {len(slurm_ids)} experiments to cancel ...")
         self.platform._op_client.cancel_jobs(ids=slurm_ids)
         for exp in exps_to_cancel:
             for sim in exp.simulations:
                 sim.status = SLURM_STATES['CANCELED']
-            print(f"Set canceled experiment slurm id: {exp.slurm_job_id} to status: {exp.status}")
-        time.sleep(5)
 
     def get_children(self, experiment: Dict, parent=None, **kwargs) -> List[Dict]:
         """
@@ -112,15 +107,9 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
             result = subprocess.run(['sbatch', '--parsable', 'sbatch.sh'],
                                     stdout=subprocess.PIPE, cwd=str(working_directory))
             slurm_job_id = result.stdout.decode('utf-8').strip()
-            print(slurm_job_id)
 
             # obtain and record the slurm job id for the experiment
-            # job_id_file = working_directory.joinpath('job_id.txt')
-            # experiment.slurm_job_id = Experiment.read_slurm_job_id_from_file(path=job_id_file)
             experiment.slurm_job_id = int(slurm_job_id)
-            print(f"Set slurm_job_id: {experiment.slurm_job_id}")
-            import time
-            time.sleep(5)
             self.platform._metas.dump(item=experiment)
         else:
             experiment.slurm_job_id = None

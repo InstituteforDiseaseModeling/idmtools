@@ -25,34 +25,17 @@ class TestSlurmCanceling(unittest.TestCase):
         self.platform = Platform('SLURM_LOCAL')
         self.model_script = os.path.join(COMMON_INPUT_PATH, "python", "waiter.py")
 
-
         def param_update(simulation: Simulation, param: str, value: Any) -> Dict[str, Any]:
             return simulation.task.set_parameter(param, value)
 
-        task = JSONConfiguredPythonTask(script_path=self.model_script) # , envelope="parameters", parameters=(dict(c=0)))
-        task.python_path = "python3"
+        # generate experiment & containing suite of 5 simulations that will wait for cancelation
+        task = JSONConfiguredPythonTask(script_path=self.model_script)
         ts = TemplatedSimulations(base_task=task)
         builder = SimulationBuilder()
         builder.add_sweep_definition(partial(param_update, param="a"), range(5))
         ts.add_builder(builder)
         self.experiment = Experiment.from_template(ts, name=self.case_name)
         self.experiment.tags = {"idmtools": "slurm_platform_test"}
-
-        # self.experiment = Experiment.from_task(name=self.case_name,
-        #                                        task=JSONConfiguredPythonTask(script_path=self.model_script))
-        # self.experiment.tags = {"idmtools": "slurm_platform_test"}
-        #
-        # # def param_a_update(simulation: Simulation, value: dict):
-        # #     simulation.set_parameter("a", value)
-        # #     return {"a": value}
-        #
-        #
-        # builder = SimulationBuilder()
-        # builder.add_sweep_definition(partial(param_update, param="a"), range(5))
-        #
-        # # Sweep parameter "a"
-        # # builder.add_sweep_definition(param_a_update, range(0, 5))
-        # self.experiment.builder = builder
         self.suite = Suite(name='Idm Suite')
         self.suite.update_tags({'name': 'testing_suite', 'idmtools': '123'})
         self.platform.create_items([self.suite])
@@ -61,7 +44,6 @@ class TestSlurmCanceling(unittest.TestCase):
 
     def test_canceling_a_full_experiment(self):
         print('RUNNING TEST')
-        #self.experiment.run(wait_till_done=False)  # why does this not work? TODO, and why are there two ways to run?
         self.platform.run_items(items=[self.experiment])
         time.sleep(10)  # simulations should now exist in slurm
 
@@ -74,13 +56,15 @@ class TestSlurmCanceling(unittest.TestCase):
         # validation
         self.assertEqual(self.experiment.simulation_count, 5)
         self.assertIsNotNone(self.experiment.uid)
-        self.assertTrue(self.experiment.failed)
 
+    # Not implemented in current work scope
     def test_canceling_a_single_simulation(self):
         pass
 
+    # Not implemented in current work scope
     def test_canceling_a_full_suite(self):
         pass
+
 
 if __name__ == '__main__':
     unittest.main()
