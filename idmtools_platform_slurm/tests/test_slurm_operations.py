@@ -1,4 +1,6 @@
+import json
 import os
+import tempfile
 from functools import partial
 import pytest
 from idmtools.builders import SimulationBuilder
@@ -32,7 +34,7 @@ class TestSlurmOperations(ITestWithPersistence):
         ts.add_builder(builder)
         exp = Experiment(name=self.case_name, simulations=ts, tags=dict(number_tag=123, KeyOnly=None))
         suite = add_dammy_suite(exp)
-        suite.run(platform=platform, wait_until_done=False, wait_on_done=False, dry_run=False)
+        suite.run(platform=platform, wait_until_done=False, wait_on_done=False, dry_run=True)
         return suite, exp
 
     def setUp(self) -> None:
@@ -140,3 +142,52 @@ class TestSlurmOperations(ITestWithPersistence):
         self.assertEqual(sorted(slurm_experiment_assets), sorted(idm_experiment_assets))
         self.assertEqual(slurm_experiment.status, 'CREATED')
         self.assertEqual(idm_experiment.status, EntityStatus.CREATED)
+
+    def test_get_files(self):
+        with self.subTest('test_get_files_for_experiment'):
+            exp_files = self.platform.get_files(self.exp, ['Assets/model1.py', 'Assets/hello.sh'])
+            with open(os.path.join(COMMON_INPUT_PATH, 'python', 'model1.py'), 'rb') as m:
+                self.assertEqual(exp_files[self.exp.simulations[0].uid]['Assets/model1.py'], m.read())
+            with open('input/hello.sh', 'rb') as m:
+                self.assertEqual(exp_files[self.exp.simulations[0].uid]['Assets/hello.sh'], m.read())
+
+        with self.subTest('test_get_files_for_simulation'):
+            # get_file from one of simulations
+            output_dir = tempfile.TemporaryDirectory().name  # save files to temp dir
+            files_needed = ["config.json", 'Assets/model1.py', 'Assets/hello.sh']
+            files_retrieved = self.platform.get_files(item=self.exp.simulations[0], files=files_needed,
+                                                      output=output_dir)
+            with open(os.path.join(output_dir, self.exp.simulations[0].id, 'Assets', 'model1.py'), 'rb') as m:
+                self.assertEqual(files_retrieved['Assets/model1.py'], m.read())
+            with open(os.path.join(output_dir, self.exp.simulations[0].id, 'Assets', 'hello.sh'), 'rb') as m:
+                self.assertEqual(files_retrieved['Assets/hello.sh'], m.read())
+            with open(os.path.join(output_dir, self.exp.simulations[0].id, 'config.json'), 'rb') as m:
+                self.assertEqual(files_retrieved['config.json'], m.read())
+
+            with self.subTest('test_get_files_for_experiment_no_existing'):
+                with self.assertRaises(RuntimeError) as context:
+                    self.platform.get_files(self.exp, ['Assets/no_existing.txt'])
+                self.assertTrue(
+                        "Couldn't find asset for path 'Assets/no_existing.txt'." in str(context.exception.args[0]))
+
+    def test_get_files_by_id(self):
+        with self.subTest('test_get_files_by_id_for_experiment'):
+            exp_files = self.platform.get_files_by_id(self.exp.id, ItemType.EXPERIMENT,
+                                                      ['Assets/model1.py', 'Assets/hello.sh'])
+            with open(os.path.join(COMMON_INPUT_PATH, 'python', 'model1.py'), 'rb') as m:
+                self.assertEqual(exp_files[self.exp.simulations[0].uid]['Assets/model1.py'], m.read())
+            with open('input/hello.sh', 'rb') as m:
+                self.assertEqual(exp_files[self.exp.simulations[0].uid]['Assets/hello.sh'], m.read())
+
+        with self.subTest('test_get_files_by_id_for_simulation'):
+            # get_file from one of simulations
+            output_dir = tempfile.TemporaryDirectory().name  # save files to temp dir
+            files_needed = ["config.json", 'Assets/model1.py', 'Assets/hello.sh']
+            files_retrieved = self.platform.get_files_by_id(self.exp.simulations[0].id, ItemType.SIMULATION,
+                                                            files=files_needed, output=output_dir)
+            with open(os.path.join(output_dir, self.exp.simulations[0].id, 'Assets', 'model1.py'), 'rb') as m:
+                self.assertEqual(files_retrieved['Assets/model1.py'], m.read())
+            with open(os.path.join(output_dir, self.exp.simulations[0].id, 'Assets', 'hello.sh'), 'rb') as m:
+                self.assertEqual(files_retrieved['Assets/hello.sh'], m.read())
+            with open(os.path.join(output_dir, self.exp.simulations[0].id, 'config.json'), 'rb') as m:
+                self.assertEqual(files_retrieved['config.json'], m.read())
