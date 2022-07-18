@@ -172,7 +172,7 @@ class TestCompsCLI(unittest.TestCase):
         # idmtools comps SLURMStage  download --experiment acd2f035-b098-eb11-a2c4-f0921c167864 --name test_download --output-path outputs
         result = run_command('comps', 'SLURMSTAGE', 'download', '--experiment', 'acd2f035-b098-eb11-a2c4-f0921c167864',
                              '--name', self.case_name, '--output-path', 'output', '--pattern', '**/*.json',
-                             '--pattern', '**/*.png', '--pattern', '**/*.xlsx')
+                             '--pattern', '**/*.png', '--pattern', '**/*.xlsx', '--no-delete-after-download')
 
         self.assertTrue(result.exit_code == 0)
         # verify download files correctly

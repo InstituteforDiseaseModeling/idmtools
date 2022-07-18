@@ -1,4 +1,5 @@
 import os
+import pathlib
 import shutil
 import tempfile
 from uuid import uuid4
@@ -10,6 +11,7 @@ from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools_platform_slurm.slurm_operations import LocalSlurmOperations
+from idmtools_test.utils.decorators import linux_only
 
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.test_task import TestTask
@@ -27,44 +29,37 @@ class TestSlurmPlatform(ITestWithPersistence):
     # Test platform slurm_fields property
     def test_slurm_platform_fields(self):
         actual_field_set = self.platform.slurm_fields
-        expected_field_set = {'mem_per_cpu', 'cpus_per_task', 'requeue', 'mail_type',
-                              'exclusive', 'nodes', 'account', 'ntasks', 'modules', 'partition', 'mail_user',
-                              'time'}
+        expected_field_set = {'mem', 'partition', 'time', 'requeue', 'mail_user', 'ntasks', 'modules',
+                              'exclusive', 'mail_type', 'sbatch_custom', 'nodes', 'ntasks_per_core', 'account',
+                              'mem_per_cpu', 'max_running_jobs'}
+
         self.assertEqual(sorted(expected_field_set), sorted(actual_field_set))
 
     # Test platform get_slurm_configs with default config
     def test_slurm_configs_default(self):
         slurm_configs_dict = self.platform.get_slurm_configs()
-        expected_config_dict = {'mail_user': None, 'account': None, 'exclusive': False, 'ntasks': 1,
-                                'partition': 'cpu_short', 'mem_per_cpu': 8192, 'modules': [], 'mail_type': None,
-                                'time': None, 'requeue': True, 'cpus_per_task': 1,
-                                'nodes': 1}
-        self.assertEqual(slurm_configs_dict, expected_config_dict)
+        expected_config_dict = {'mem': None, 'time': None, 'modules': [], 'mail_user': None,
+                                'exclusive': False, 'sbatch_custom': None, 'nodes': None, 'mail_type': None,
+                                'partition': None, 'account': None, 'ntasks_per_core': None, 'requeue': True,
+                                'max_running_jobs': None, 'mem_per_cpu': None, 'ntasks': None}
+
+        self.assertEqual(sorted(slurm_configs_dict), sorted(expected_config_dict))
 
     # Test platform get_slurm_configs with user defined configs
     def test_slurm_configs_from_user_defined(self):
         platform = Platform("SLURM_TEST", job_directory=".", mode="local", mail_user="test@test.com",
-                            account="test_acct", mail_type="begin", mem_per_cpu=2048, cpus_per_task=2)
+                            account="test_acct", mail_type="begin", mem_per_cpu=2048)
         slurm_configs_dict = platform.get_slurm_configs()
-        expected_config_dict = {'account': 'test_acct', 'cpus_per_task': 2, 'exclusive': False, 'mail_type': 'begin',
-                                'mail_user': 'test@test.com', 'mem_per_cpu': 2048, 'modules': [], 'nodes': 1,
-                                'ntasks': 1, 'partition': 'cpu_short', 'requeue': True, 'time': None}
-        self.assertEqual(slurm_configs_dict, expected_config_dict)
+        expected_config_dict = ['account', 'exclusive', 'mail_type', 'mail_user', 'max_running_jobs', 'mem',
+                                'mem_per_cpu', 'modules', 'nodes', 'ntasks', 'ntasks_per_core', 'partition', 'requeue',
+                                'sbatch_custom', 'time']
+
+        self.assertEqual(sorted(slurm_configs_dict), sorted(expected_config_dict))
 
         # validate custom default config get override with Platform parameters
         self.assertEqual(platform.job_directory, '.')
         self.assertEqual(platform.mode.name, "LOCAL")
         self.assertEqual(platform.mode.value, "local")
-
-    # Test LocalSlurmOperations get_batch_configs method
-    def test_localSlurmOperations_get_batch_configs(self):
-        local = LocalSlurmOperations(platform=self.platform)
-        batch_config = local.get_batch_configs()
-        self.assertIn("#SBATCH --ntasks=1", batch_config)
-        self.assertIn("#SBATCH --partition=cpu_short", batch_config)
-        self.assertIn("#SBATCH --cpus-per-task=1", batch_config)
-        self.assertIn("#SBATCH --nodes=1", batch_config)
-        self.assertIn("#SBATCH --mem-per-cpu=8192", batch_config)
 
     # Test LocalSlurmOperations get_directory for suite only case
     def test_localSlurmOperations_get_directory_suite(self):
@@ -180,16 +175,15 @@ class TestSlurmPlatform(ITestWithPersistence):
         local.mk_directory(experiment)
         local.create_batch_file(experiment)
         # verify batch file locally
-        job_path = os.path.join(cwd, suite.id, experiment.id, "job_submit.sh")
+        job_path = os.path.join(cwd, suite.id, experiment.id, "sbatch.sh")
         self.assertTrue(os.path.exists(job_path))
-        # TODO validation job_submit.sh content
-        # with open(job_path) as f:
-        #     contents = f.readlines()
-        # # check #SBATCH --job-name=experiment.id in job_submit.sh file.
-        # if any("#SBATCH --job-name=" + experiment.id in i for i in contents):
-        #     self.assertTrue(1)
-        # else:
-        #     self.assertFalse(1)
+        # TODO validation sbatch.sh content
+        with open(job_path) as f:
+            contents = f.read()
+        # check srun run_simulation.sh in sbatch.sh file
+        self.assertIn(
+            "run run_simulation.sh",
+            contents)
         # clean up suite folder
         shutil.rmtree(os.path.join(cwd, suite.id))
         self.assertFalse(os.path.exists(job_path))
@@ -238,3 +232,51 @@ class TestSlurmPlatform(ITestWithPersistence):
             local.create_batch_file(suite, item_path=temp_path)
         self.assertEqual(ex.exception.args[0], "Suite is not supported for batch creation.")
 
+    @linux_only
+    def test_localSlurmOperations_link_file(self):
+        local = LocalSlurmOperations(platform=self.platform)
+        temp_source_path = tempfile.mkdtemp()
+        temp_dest_path = tempfile.mkdtemp()
+        target_file = "test.txt"
+        with open(os.path.join(temp_source_path, target_file), 'w') as fp:
+            fp.write("this is test file")
+
+        # First test with filepath for target and link
+        local.link_file(target=os.path.join(temp_source_path, target_file),
+                        link=os.path.join(temp_dest_path, target_file))
+        self.assertTrue(os.path.exists(os.path.join(temp_dest_path, target_file)))
+        with open(os.path.join(temp_dest_path, target_file), 'r') as fpr:
+            contents = fpr.read()
+        self.assertEqual(contents, "this is test file")
+
+        # Second test with filepath as string for target and link path as string
+        temp_source_path = tempfile.mkdtemp()
+        temp_dest_path = tempfile.mkdtemp()
+        with open(os.path.join(temp_source_path, target_file), 'w') as fp:
+            fp.write("this is test file1")
+        local.link_file(target=temp_source_path + "/" + target_file, link=temp_dest_path + "/" + target_file)
+        self.assertTrue(os.path.exists(os.path.join(temp_dest_path, target_file)))
+        with open(os.path.join(temp_dest_path, target_file), 'r') as fpr:
+            contents = fpr.read()
+        self.assertEqual(contents, "this is test file1")
+
+    @linux_only
+    def test_localSlurmOperations_link_dir(self):
+        local = LocalSlurmOperations(platform=self.platform)
+        temp_source_path = tempfile.mkdtemp()
+        dest_path = "DEST_TEST"
+        target_file = "test.txt"
+        with open(os.path.join(temp_source_path, target_file), 'w') as fp:
+            fp.write("this is test file")
+        local.link_dir(target=temp_source_path, link=dest_path)
+        self.assertTrue(os.path.exists(os.path.join(dest_path, target_file)))
+        with open(os.path.join(dest_path, target_file), 'r') as fpr:
+            contents = fpr.read()
+        self.assertEqual(contents, "this is test file")
+
+        # Clean up dest_path dir
+        for path in pathlib.Path(dest_path).glob("**/*"):
+            if path.is_file():
+                path.unlink()
+        if os.path.isdir(dest_path):
+            pathlib.Path(dest_path).unlink()
