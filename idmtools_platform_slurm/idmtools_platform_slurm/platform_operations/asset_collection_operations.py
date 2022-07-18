@@ -120,13 +120,8 @@ class SlurmPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
                 assets.append(asset)
         return assets
 
-        # for asset_file in assets_dir.iterdir():
-        #     if asset_file.is_file() and asset_file.name not in exclude:
-        #         asset = Asset(absolute_path=asset_file.absolute())
-        #         assets.append(asset)
-        # return assets
-
-    def copy_asset(self, src: Union[Asset, Path, str], dest: Union[Path, str]) -> None:
+    @staticmethod
+    def copy_asset(src: Union[Asset, Path, str], dest: Union[Path, str]) -> None:
         """
         Copy asset/file to destination.
         Args:
