@@ -5,9 +5,8 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import json
 from pathlib import Path
-from typing import Dict, List, Type, Union
+from typing import TYPE_CHECKING, Dict, List, Type, Union
 from dataclasses import dataclass, field
-from idmtools.core.interfaces.ientity import IEntity
 from idmtools.core import ItemType
 from idmtools.core.interfaces import imetadata_operations
 from idmtools.entities import Suite
@@ -15,10 +14,13 @@ from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.utils.json import IDMJSONEncoder
 
+if TYPE_CHECKING:
+    from idmtools_platform_slurm.slurm_platform import SlurmPlatform
+
 
 @dataclass
 class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
-    platform: 'platform'  # noqa: F821
+    platform: 'SlurmPlatform'  # noqa: F821
     platform_type: Type = field(default=None)
     metadata_filename: str = field(default='metadata.json')
 
@@ -75,7 +77,13 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         """
         if not isinstance(item, (Suite, Experiment, Simulation)):
             raise RuntimeError(f"Get method supports Suite/Experiment/Simulation only.")
-        meta = json.loads(json.dumps(item.to_dict(), cls=IDMJSONEncoder))
+        data = item.to_dict()
+        if isinstance(item, Suite):
+            data['experiments'] = [exp.id for exp in item.experiments]
+        meta = json.loads(json.dumps(data, cls=IDMJSONEncoder))
+        meta['id'] = meta['_uid']
+        meta['uid'] = meta['_uid']
+        meta['status'] = 'CREATED'
         return meta
 
     def dump(self, item: Union[Suite, Experiment, Simulation]) -> None:
@@ -114,7 +122,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         Returns:
              key/value dict of metadata from the given filepath
         """
-        if not (Path(metadata_filepath).exists()):
+        if not Path(metadata_filepath).exists():
             raise RuntimeError(f"File not found: '{metadata_filepath}'.")
         meta = self._read_from_file(metadata_filepath)
         return meta

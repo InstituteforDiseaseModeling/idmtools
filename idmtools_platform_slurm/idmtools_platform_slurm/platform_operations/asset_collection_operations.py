@@ -8,16 +8,19 @@ from uuid import UUID
 from pathlib import Path
 from dataclasses import field, dataclass
 from logging import getLogger
-from typing import Type, List, Dict, Union, Optional
+from typing import TYPE_CHECKING, Type, List, Dict, Union, Optional
 from idmtools.assets import AssetCollection, Asset
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.iplatform_ops.iplatform_asset_collection_operations import IPlatformAssetCollectionOperations
 
+if TYPE_CHECKING:
+    from idmtools_platform_slurm.slurm_platform import SlurmPlatform
+
 logger = getLogger(__name__)
 user_logger = getLogger("user")
 
-EXCLUDE_FILES = ['_run.sh', 'metadata.json', 'stdout.txt', 'stderr.txt', 'status.txt']
+EXCLUDE_FILES = ['_run.sh', 'metadata.json', 'stdout.txt', 'stderr.txt', 'status.txt', 'job_id']
 
 
 @dataclass
@@ -111,13 +114,14 @@ class SlurmPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         else:
             raise NotImplementedError("List assets for this item is not supported on SlurmPlatform.")
 
-        for asset_file in assets_dir.iterdir():
-            if asset_file.is_file() and asset_file.name not in exclude:
-                asset = Asset(absolute_path=asset_file.absolute())
+        ac = AssetCollection.assets_from_directory(assets_dir, recursive=True)
+        for asset in ac:
+            if asset.filename not in exclude:
                 assets.append(asset)
         return assets
 
-    def copy_asset(self, src: Union[Asset, Path, str], dest: Union[Path, str]) -> None:
+    @staticmethod
+    def copy_asset(src: Union[Asset, Path, str], dest: Union[Path, str]) -> None:
         """
         Copy asset/file to destination.
         Args:
