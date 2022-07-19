@@ -145,13 +145,10 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
             AssetCollection if configuration is set and configuration.asset_collection_id is set.
         """
         assets = AssetCollection()
-        for a in experiment.assets:
-            if a["absolute_path"] is None or a["absolute_path"] == a["filename"]:
-                abs_path = self.platform._op_client.get_directory_by_id(experiment.id, item_type=ItemType.EXPERIMENT).joinpath(f'Assets/{a["filename"]}')
-                asset = Asset(absolute_path=abs_path, filename=a["filename"], relative_path=a["relative_path"])
-            else:
-                asset = Asset(absolute_path=a["absolute_path"], filename=a["filename"], relative_path=a["relative_path"])
-            assets.add_asset(asset)
+        assets_dir = Path(self.platform._op_client.get_directory_by_id(experiment.id, ItemType.EXPERIMENT), 'Assets')
+        assets_list = AssetCollection.assets_from_directory(assets_dir, recursive=True)
+        for a in assets_list:
+            assets.add_asset(a)
         return assets
 
     def to_entity(self, slurm_exp: SlurmExperiment, parent: Optional[Suite] = None, children: bool = True,
