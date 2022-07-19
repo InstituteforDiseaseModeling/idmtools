@@ -108,9 +108,9 @@ class TestSlurmOperations(ITestWithPersistence):
             self.assertEqual(sorted([asset.absolute_path for asset in assets]), sorted(expected_assets_path))
 
         with self.subTest('test_list_assets_add_exclude'):
-            assets = self.platform._experiments.list_assets(self.exp, exclude='hello.sh')
-            self.assertEqual(1, len(assets))
-            self.assertEqual('model1.py', assets[0].filename)
+            assets = self.platform._simulations.list_assets(self.exp.simulations[0], exclude='hello.sh')
+            self.assertEqual(4, len(assets))
+            self.assertTrue(["hello.sh" is not asset.filename for asset in assets])
 
     def test_simulation_list_assets(self):
         count = 0
