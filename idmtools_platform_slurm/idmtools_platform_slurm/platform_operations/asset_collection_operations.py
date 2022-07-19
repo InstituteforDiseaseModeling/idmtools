@@ -67,18 +67,18 @@ class SlurmPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         link_dir = Path(self.platform._op_client.get_directory(simulation), 'Assets')
         self.platform._op_client.link_dir(common_asset_dir, link_dir)
 
-    def get_assets(self, item: Union[Experiment, Simulation], files: List[str], **kwargs) -> Dict[str, bytearray]:
+    def get_assets(self, simulation: Simulation, files: List[str], **kwargs) -> Dict[str, bytearray]:
         """
         Get assets for simulation.
         Args:
-            item: Experiment/Simulation
+            simulation: Simulation
             files: files to be retrieved
             kwargs: keyword arguments used to expand functionality.
         Returns:
             Dict[str, bytearray]
         """
         ret = dict()
-        if isinstance(item, Simulation):
+        if isinstance(simulation, Simulation):
             sim_dir = self.platform._op_client.get_directory(item)
             for file in files:
                 asset_file = Path(sim_dir, file)
@@ -87,11 +87,8 @@ class SlurmPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
                     ret[file] = bytearray(asset.bytes)
                 else:
                     raise RuntimeError(f"Couldn't find asset for path '{file}'.")
-        elif isinstance(item, Experiment):
-            for sim in item.simulations:
-                ret[sim.id] = self.get_assets(sim, files, **kwargs)
         else:
-            raise NotImplementedError(f"get_assets() for items of type {type(item)} is not supported on SlurmPlatform.")
+            raise NotImplementedError(f"get_assets() for items of type {type(simulation)} is not supported on SlurmPlatform.")
 
         return ret
 
