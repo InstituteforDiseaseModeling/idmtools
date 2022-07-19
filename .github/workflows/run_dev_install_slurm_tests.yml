@@ -1,0 +1,75 @@
+# dev install and run all test
+# trigger by clicking button "Run Workflow".
+
+name: "run_dev_install_slurm_tests"
+on:
+  workflow_dispatch:
+
+jobs:
+  run-setup-dev-slurm-tests:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+        python-version: [3.9]
+    env:
+      PYPI_STAGING_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
+      PYPI_STAGING_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+      - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
+      - name: Upgrade pip
+        run: |
+          python -m pip install --upgrade pip
+      - name: Install Python dependencies
+        run: |
+          pip install idm-buildtools wheel pygit2 --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+
+      - name: install idmtools
+        run: |
+          make setup-dev
+      - name: login to comps2
+
+        run: |
+          python dev_scripts/create_auth_token_args.py --username "${{ secrets.COMPS_USER }}"
+        env:
+          COMPS_PASS: ${{ secrets.COMPS_PASSWORD }}
+      - name: login to docker staging
+        run: |
+          echo '${{ env.PYPI_STAGING_PASSWORD }}' | docker login idm-docker-staging.packages.idmod.org --username ${{ env.PYPI_STAGING_USERNAME }} --password-stdin
+          echo '${{ env.PYPI_STAGING_PASSWORD }}' | docker login docker-staging.packages.idmod.org --username ${{ env.PYPI_STAGING_USERNAME }} --password-stdin
+      - name: run idmtools_cli tests
+        run: |
+          cd idmtools_cli
+          PARALLEL_TEST_COUNT=2 make test-all
+      - name: Upload idmtools_cli all test results
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: idmtools_cli_test_results
+          path: idmtools_cli/tests/reports/
+      - name: run idmtools_core tests
+        run: |
+          cd idmtools_core
+          PARALLEL_TEST_COUNT=2 make test-all
+      - name: Upload idmtools_core all test results
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: idmtools_core_test_results
+          path: idmtools_core/tests/reports/
+      - name: run idmtools_platform_slurm tests
+        run: |
+          cd idmtools_platform_slurm
+          make test-all
+      - name: Upload idmtools_platform_slurm all test results
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: idmtools_platform_slurm_test_results
+          path: idmtools_platform_slurm/tests/reports/
