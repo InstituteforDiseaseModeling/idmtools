@@ -23,7 +23,7 @@ class TestSingularity(ITestWithPersistence):
     def testExecutableMode(self):
         command = "Assets/hello.sh"
         task = CommandTask(command=command)
-        task.common_assets.add_asset("hello.sh")
+        task.common_assets.add_asset("input/hello.sh")
 
         # create experiment from task
         experiment = Experiment.from_task(task, name="run_task")
