@@ -79,7 +79,7 @@ class SlurmPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         """
         ret = dict()
         if isinstance(simulation, Simulation):
-            sim_dir = self.platform._op_client.get_directory(item)
+            sim_dir = self.platform._op_client.get_directory(simulation)
             for file in files:
                 asset_file = Path(sim_dir, file)
                 if asset_file.exists():
