@@ -90,24 +90,41 @@ class TestSlurmOperations(ITestWithPersistence):
         parent_suite = self.platform.get_parent(self.exp.uid, ItemType.EXPERIMENT)
         self.assertEqual(self.suite.uid, parent_suite.uid)
 
-    # To test get_children with raw=False(default). Children should be idmtools Simulation type
+    # To test get_children with raw=False(default). Children should be idmtools Simulation or Experiment type
     def test_children(self):
-        children = self.platform.get_children(self.exp.uid, ItemType.EXPERIMENT)
-        for child in children:
-            self.assertTrue(isinstance(child, Simulation))
-            self.assertTrue(isinstance(child.uid, UUID))
-        self.assertEqual(len(self.exp.simulations), len(children))
-        for s in self.exp.simulations:
-            self.assertIn(s.uid, [s.uid for s in children])
-        self.assertCountEqual(self.platform.get_children(self.exp.simulations[0].uid, ItemType.SIMULATION), [])
+        with self.subTest('test_get_children_for_experiment'):
+            children = self.platform.get_children(self.exp.uid, ItemType.EXPERIMENT)
+            for child in children:
+                self.assertTrue(isinstance(child, Simulation))
+                self.assertTrue(isinstance(child.uid, UUID))
+            self.assertEqual(len(self.exp.simulations), len(children))
+            for s in self.exp.simulations:
+                self.assertIn(s.uid, [s.uid for s in children])
+            self.assertCountEqual(self.platform.get_children(self.exp.simulations[0].uid, ItemType.SIMULATION), [])
+
+        with self.subTest('test_get_children_for_suite'):
+            children = self.platform.get_children(self.suite.uid, ItemType.SUITE)
+            for child in children:
+                self.assertTrue(isinstance(child, Experiment))
+                self.assertTrue(isinstance(child.uid, UUID))
+            self.assertEqual(len(children), 1)
+            for e in self.suite.experiments:
+                self.assertIn(e.uid, [e.uid for e in children])
 
     # To test get_children with raw=True. Children should be Slurm type
     def test_children_with_raw(self):
-        children = self.platform.get_children(self.exp.uid, ItemType.EXPERIMENT, raw=True)
-        self.assertEqual(len(self.exp.simulations), len(children))
-        for child in children:
-            self.assertTrue(isinstance(child, SlurmSimulation))
-            self.assertTrue(isinstance(child.uid, str))
+        with self.subTest('test_get_children_for_experiment_raw_true'):
+            children = self.platform.get_children(self.exp.uid, ItemType.EXPERIMENT, raw=True)
+            self.assertEqual(len(self.exp.simulations), len(children))
+            for child in children:
+                self.assertTrue(isinstance(child, SlurmSimulation))
+                self.assertTrue(isinstance(child.uid, str))
+        with self.subTest('test_get_children_for_suite_raw_true'):
+            children = self.platform.get_children(self.suite.uid, ItemType.SUITE, raw=True)
+            self.assertEqual(len(children), 1)
+            for child in children:
+                self.assertTrue(isinstance(child, SlurmExperiment))
+                self.assertTrue(isinstance(child.uid, str))
 
     def test_experiment_list_assets(self):
         with self.subTest('test_list_assets'):
