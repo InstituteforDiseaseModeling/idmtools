@@ -2,6 +2,7 @@ import os
 import tempfile
 from functools import partial
 from pathlib import Path
+from uuid import UUID
 
 import pytest
 from idmtools.builders import SimulationBuilder
@@ -9,6 +10,7 @@ from idmtools.core import ItemType, EntityStatus
 
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
+from idmtools.entities.simulation import Simulation
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.decorators import linux_only
@@ -88,12 +90,24 @@ class TestSlurmOperations(ITestWithPersistence):
         parent_suite = self.platform.get_parent(self.exp.uid, ItemType.EXPERIMENT)
         self.assertEqual(self.suite.uid, parent_suite.uid)
 
+    # To test get_children with raw=False(default). Children should be idmtools Simulation type
     def test_children(self):
         children = self.platform.get_children(self.exp.uid, ItemType.EXPERIMENT)
+        for child in children:
+            self.assertTrue(isinstance(child, Simulation))
+            self.assertTrue(isinstance(child.uid, UUID))
         self.assertEqual(len(self.exp.simulations), len(children))
         for s in self.exp.simulations:
             self.assertIn(s.uid, [s.uid for s in children])
         self.assertCountEqual(self.platform.get_children(self.exp.simulations[0].uid, ItemType.SIMULATION), [])
+
+    # To test get_children with raw=True. Children should be Slurm type
+    def test_children_with_raw(self):
+        children = self.platform.get_children(self.exp.uid, ItemType.EXPERIMENT, raw=True)
+        self.assertEqual(len(self.exp.simulations), len(children))
+        for child in children:
+            self.assertTrue(isinstance(child, SlurmSimulation))
+            self.assertTrue(isinstance(child.uid, str))
 
     def test_experiment_list_assets(self):
         with self.subTest('test_list_assets'):
