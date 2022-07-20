@@ -12,46 +12,47 @@ from logging import getLogger
 logger = getLogger(__name__)
 
 
-class SlurmSuite:
+class SlurmItem:
+    """
+    Represent Slurm Object
+    """
+
+    def __init__(self, kwargs: Dict):
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+    def get_platform_object(self):
+        return self
+
+
+class SlurmSuite(SlurmItem):
     """
     Represent Slurm Suite
     """
 
     def __init__(self, kwargs: Dict):
-        for key, value in kwargs.items():
-            setattr(self, key, value)
+        super().__init__(kwargs)
         self.item_type = ItemType.SUITE
 
-    def get_platform_object(self):
-        return self
 
-
-class SlurmExperiment:
+class SlurmExperiment(SlurmItem):
     """
     Represent Slurm Experiment
     """
 
     def __init__(self, kwargs: Dict):
-        for key, value in kwargs.items():
-            setattr(self, key, value)
+        super().__init__(kwargs)
         self.item_type = ItemType.EXPERIMENT
 
-    def get_platform_object(self):
-        return self
 
-
-class SlurmSimulation:
+class SlurmSimulation(SlurmItem):
     """
     Represent Slurm Simulation
     """
 
     def __init__(self, kwargs: Dict):
-        for key, value in kwargs.items():
-            setattr(self, key, value)
+        super().__init__(kwargs)
         self.item_type = ItemType.SIMULATION
-
-    def get_platform_object(self):
-        return self
 
 
 def clean_experiment_name(experiment_name: str) -> str:
