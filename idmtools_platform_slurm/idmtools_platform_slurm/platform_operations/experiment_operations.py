@@ -7,7 +7,7 @@ import copy
 from pathlib import Path
 from uuid import UUID, uuid4
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, List, Type, Dict, Optional
+from typing import TYPE_CHECKING, List, Type, Dict, Optional, Any
 from idmtools.assets import Asset, AssetCollection
 from idmtools.core import ItemType
 from idmtools.entities import Suite
@@ -68,11 +68,12 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         meta = self.platform._metas.get(experiment)
         return SlurmExperiment(meta)
 
-    def get_children(self, experiment: SlurmExperiment, parent: Experiment = None, **kwargs) -> List[SlurmSimulation]:
+    def get_children(self, experiment: SlurmExperiment, parent: Experiment = None, raw = True, **kwargs) -> List[Any]:
         """
         Fetch slurm experiment's children.
         Args:
             experiment: Slurm experiment
+            raw: True/False
             parent: the parent of the simulations
             kwargs: keyword arguments used to expand functionality
         Returns:
@@ -81,8 +82,12 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         sim_list = []
         sim_meta_list = self.platform._metas.get_children(parent)
         for meta in sim_meta_list:
-            sim = self.platform._simulations.to_entity(SlurmSimulation(meta), parent=parent)
-            sim_list.append(sim)
+            slurm_sim = SlurmSimulation(meta)
+            if raw:
+                sim_list.append(slurm_sim)
+            else:
+                sim = self.platform._simulations.to_entity(slurm_sim, parent=parent)
+                sim_list.append(sim)
         return sim_list
 
     def get_parent(self, experiment: SlurmExperiment, **kwargs) -> SlurmSuite:
@@ -179,7 +184,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
             exp.assets = AssetCollection()
 
         if children:
-            exp.simulations = self.get_children(slurm_exp, parent=exp)
+            exp.simulations = self.get_children(slurm_exp, parent=exp, raw=False)
 
         return exp
 
