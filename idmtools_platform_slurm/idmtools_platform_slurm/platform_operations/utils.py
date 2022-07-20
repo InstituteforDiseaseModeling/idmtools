@@ -16,30 +16,42 @@ class SlurmSuite:
     """
     Represent Slurm Suite
     """
+
     def __init__(self, kwargs: Dict):
         for key, value in kwargs.items():
             setattr(self, key, value)
         self.item_type = ItemType.SUITE
+
+    def get_platform_object(self):
+        return self
 
 
 class SlurmExperiment:
     """
     Represent Slurm Experiment
     """
+
     def __init__(self, kwargs: Dict):
         for key, value in kwargs.items():
             setattr(self, key, value)
         self.item_type = ItemType.EXPERIMENT
+
+    def get_platform_object(self):
+        return self
 
 
 class SlurmSimulation:
     """
     Represent Slurm Simulation
     """
+
     def __init__(self, kwargs: Dict):
         for key, value in kwargs.items():
             setattr(self, key, value)
         self.item_type = ItemType.SIMULATION
+
+    def get_platform_object(self):
+        return self
 
 
 def clean_experiment_name(experiment_name: str) -> str:
