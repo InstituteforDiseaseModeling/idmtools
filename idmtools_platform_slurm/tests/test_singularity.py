@@ -37,6 +37,9 @@ class TestSingularity(ITestWithPersistence):
             simulation_dir = self.platform._op_client.get_directory(simulation)
             exe = simulation_dir.joinpath(command)
             self.assertTrue(os.access(exe, os.X_OK))
+            with open(os.path.join(simulation_dir, '_run.sh'), 'r') as fpr:
+                contents = fpr.read()
+            self.assertIn(command, contents)
 
     def testSingularity(self):
         command = "singularity exec /shared/rocky_dtk_runner_py39.sif Assets/hello.sh"
@@ -56,3 +59,6 @@ class TestSingularity(ITestWithPersistence):
             simulation_dir = self.platform._op_client.get_directory(simulation)
             exe = simulation_dir.joinpath("Assets/hello.sh")
             self.assertTrue(os.access(exe, os.X_OK))
+            with open(os.path.join(simulation_dir, '_run.sh'), 'r') as fpr:
+                contents = fpr.read()
+            self.assertIn(command, contents)

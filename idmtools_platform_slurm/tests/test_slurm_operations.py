@@ -1,6 +1,8 @@
 import os
 import tempfile
 from functools import partial
+from pathlib import Path
+
 import pytest
 from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType, EntityStatus
@@ -13,9 +15,7 @@ from idmtools_test.utils.decorators import linux_only
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 from idmtools.entities.templated_simulation import TemplatedSimulations
-
 from idmtools_platform_slurm.platform_operations.utils import add_dammy_suite, SlurmExperiment, SlurmSimulation
-
 from idmtools.assets.asset import Asset
 
 setA = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="a")
@@ -60,10 +60,8 @@ class TestSlurmOperations(ITestWithPersistence):
         self.assertEqual(self.exp.name, slurm_experiment.name)
         self.assertEqual({k: (v or None) for k, v in self.exp.tags.items()}, slurm_experiment.tags)
 
-        # Test retrieving less columns. Note, we still retrieve ONLY by uid, columns does not apply in filter
-        tags = {'number_tag': 456}
-        slurm_experiment = self.platform.get_item(self.exp.uid, ItemType.EXPERIMENT, raw=True, load_children=[],
-                                                  columns=[tags])
+        # Test retrieving less columns
+        slurm_experiment = self.platform.get_item(self.exp.uid, ItemType.EXPERIMENT, raw=True)
         self.assertEqual(str(self.exp.uid), slurm_experiment.uid)
         self.assertEqual(self.exp.name, slurm_experiment.name)
         self.assertEqual(str(self.exp.uid), slurm_experiment.uid)
@@ -101,11 +99,11 @@ class TestSlurmOperations(ITestWithPersistence):
         with self.subTest('test_list_assets'):
             assets = self.platform._experiments.list_assets(self.exp)
             self.assertEqual(2, len(assets))
-            self.assertEqual(sorted([asset.filename for asset in assets]), sorted(['model1.py', 'hello.sh']))
-            experiment_dir = self.platform._op_client.get_directory(self.exp).resolve()
+            self.assertEqual(set([asset.filename for asset in assets]), set(['model1.py', 'hello.sh']))
+            experiment_dir = Path.resolve(self.platform._op_client.get_directory(self.exp))
             expected_assets_path = [str(experiment_dir.joinpath('Assets/model1.py')),
                                     str(experiment_dir.joinpath('Assets/hello.sh'))]
-            self.assertEqual(sorted([asset.absolute_path for asset in assets]), sorted(expected_assets_path))
+            self.assertEqual(set([asset.absolute_path for asset in assets]), set(expected_assets_path))
 
         with self.subTest('test_list_assets_add_exclude'):
             assets = self.platform._simulations.list_assets(self.exp.simulations[0], exclude='hello.sh')
@@ -117,13 +115,13 @@ class TestSlurmOperations(ITestWithPersistence):
         for sim in self.exp.simulations:
             assets = self.platform._simulations.list_assets(sim)
             self.assertEqual(3, len(assets))
-            self.assertEqual(sorted([asset.filename for asset in assets]),
-                             sorted(['model1.py', 'hello.sh', 'config.json']))
-            simulation_dir = self.platform._op_client.get_directory(sim).resolve()
+            self.assertEqual(set([asset.filename for asset in assets]),
+                             set(['model1.py', 'hello.sh', 'config.json']))
+            simulation_dir = Path.resolve(self.platform._op_client.get_directory(sim))
             expected_assets_path = [str(simulation_dir.joinpath('Assets/model1.py')),
                                     str(simulation_dir.joinpath('Assets/hello.sh')),
                                     str(simulation_dir.joinpath('config.json'))]
-            self.assertEqual(sorted([asset.absolute_path for asset in assets]), sorted(expected_assets_path))
+            self.assertEqual(set([asset.absolute_path for asset in assets]), set(expected_assets_path))
             count += 1
         self.assertEqual(count, 2)
 
@@ -134,13 +132,13 @@ class TestSlurmOperations(ITestWithPersistence):
         self.assertEqual(slurm_experiment.uid, idm_experiment.id)
         self.assertEqual(slurm_experiment.name, idm_experiment.name)
         self.assertEqual(slurm_experiment.tags, idm_experiment.tags)
-        self.assertEqual(sorted(slurm_experiment.simulations),
-                         sorted([sim.id for sim in idm_experiment.simulations.items]))
+        self.assertEqual(set(slurm_experiment.simulations),
+                         set([sim.id for sim in idm_experiment.simulations.items]))
 
         # we only compare asset filenames
         slurm_experiment_assets = [asset['filename'] for asset in slurm_experiment.assets]
         idm_experiment_assets = [asset.filename for asset in idm_experiment.assets]
-        self.assertEqual(sorted(slurm_experiment_assets), sorted(idm_experiment_assets))
+        self.assertEqual(set(slurm_experiment_assets), set(idm_experiment_assets))
         self.assertEqual(slurm_experiment.status, 'CREATED')
         self.assertEqual(idm_experiment.status, EntityStatus.CREATED)
 
@@ -205,4 +203,4 @@ class TestSlurmOperations(ITestWithPersistence):
         self.assertEqual(my_exp.id, exp.id)
         assets = my_exp.assets
         self.assertEqual(2, len(assets))
-        self.assertEqual(sorted([asset.filename for asset in assets]), sorted(['model1.py', 'test.txt']))
+        self.assertEqual(set([asset.filename for asset in assets]), set(['model1.py', 'test.txt']))
