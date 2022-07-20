@@ -13,6 +13,7 @@ from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.utils.json import IDMJSONEncoder
+from idmtools_platform_slurm.platform_operations.utils import SlurmSuite, SlurmExperiment, SlurmSimulation
 
 if TYPE_CHECKING:
     from idmtools_platform_slurm.slurm_platform import SlurmPlatform
@@ -162,14 +163,14 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         """
         Fetch item's children.
         Args:
-            item: idmtools entity (Suite, Experiment)
+            item: idmtools entity (Suite, SlurmSuite, Experiment, SlurmExperiment)
         Returns:
             Lis of metadata
         """
-        if not isinstance(item, (Suite, Experiment)):
-            raise RuntimeError(f"Get children method supports Suite and Experiment only.")
+        if not isinstance(item, (Suite, SlurmSuite, Experiment, SlurmExperiment)):
+            raise RuntimeError(f"Get children method supports [Slurm]Suite and [Slurm]Experiment only.")
         item_list = []
-        item_dir = self.platform._op_client.get_directory(item)
+        item_dir = self.platform._op_client.get_directory_by_id(item.id, item.item_type)
         pattern = f'*/{self.metadata_filename}'
         for meta_file in item_dir.glob(pattern=pattern):
             meta = self.load_from_file(meta_file)
