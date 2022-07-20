@@ -7,7 +7,7 @@ import copy
 from pathlib import Path
 from uuid import UUID, uuid4
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, List, Type, Dict, Optional
+from typing import TYPE_CHECKING, List, Type, Dict, Optional, Any
 from idmtools.assets import Asset, AssetCollection
 from idmtools.core import ItemType
 from idmtools.entities import Suite
