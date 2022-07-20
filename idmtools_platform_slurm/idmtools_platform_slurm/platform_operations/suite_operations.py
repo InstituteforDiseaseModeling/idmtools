@@ -80,11 +80,12 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
         """
         return None
 
-    def get_children(self, suite: SlurmSuite, parent: Suite = None, **kwargs) -> List[SlurmExperiment]:
+    def get_children(self, suite: SlurmSuite, parent: Suite = None, raw = True, **kwargs) -> List[Any]:
         """
         Fetch Slurm suite's children.
         Args:
             suite: Slurm suite
+            raw: True/False
             parent: the parent of the experiments
             kwargs: keyword arguments used to expand functionality
         Returns:
@@ -93,8 +94,12 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
         exp_list = []
         exp_meta_list = self.platform._metas.get_children(parent)
         for meta in exp_meta_list:
-            exp = self.platform._experiments.to_entity(SlurmExperiment(meta), parent=parent)
-            exp_list.append(exp)
+            slurm_exp = SlurmExperiment(meta)
+            if raw:
+                exp_list.append(slurm_exp)
+            else:
+                exp = self.platform._experiments.to_entity(slurm_exp, parent=parent)
+                exp_list.append(exp)
         return exp_list
 
     def to_entity(self, slurm_suite: SlurmSuite, children: bool = True, **kwargs) -> Suite:
@@ -115,7 +120,7 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
         suite.tags = slurm_suite.tags
         suite._platform_object = slurm_suite
         if children:
-            suite.experiments = self.get_children(slurm_suite, parent=suite)
+            suite.experiments = self.get_children(slurm_suite, parent=suite, raw=False)
         return suite
 
     def refresh_status(self, suite: Suite, **kwargs):
