@@ -12,7 +12,7 @@ Prerequisites
 =============
 * Linux client
 
-* |SLURM_s| cluster access and general understanding of
+* |SLURM_s| cluster access and general understanding
 
 * |Python_IT| (https://www.python.org/downloads/release)
 
@@ -52,17 +52,15 @@ Submit a job
 ````````````
 Run the following included Python script to submit and run a job on your |SLURM_s| cluster::
 
-    simple python script name goes here
+    /examples/native_slurm/python_sims.py
 
-Upon completion you should see the following output...::
-
-    return value/output from python script example
 
 .. note::
 
-    ``workitems`` are not supported on the |SLURM_s| platform with |IT_s|. If you've 
-    used the |COMPS_s| platform with |IT_s| you may have scripts using this object. 
-    To modify these scripts you should....
+    ``workitems`` and ``AssetCollection`` are not supported on the |SLURM_s| platform with |IT_s|. If you've 
+    used the |COMPS_s| platform with |IT_s| you may have scripts using these objects. You would need 
+    to update these scripts without using these object in order to run them on the |SLURM_s| platform.
+    
 
 .. toctree::
     :maxdepth: 2
