@@ -8,16 +8,19 @@ from uuid import UUID
 from pathlib import Path
 from dataclasses import field, dataclass
 from logging import getLogger
-from typing import Type, List, Dict, Union, Optional
+from typing import TYPE_CHECKING, Type, List, Dict, Union, Optional
 from idmtools.assets import AssetCollection, Asset
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.iplatform_ops.iplatform_asset_collection_operations import IPlatformAssetCollectionOperations
 
+if TYPE_CHECKING:
+    from idmtools_platform_slurm.slurm_platform import SlurmPlatform
+
 logger = getLogger(__name__)
 user_logger = getLogger("user")
 
-EXCLUDE_FILES = ['_run.sh', 'metadata.json', 'stdout.txt', 'stderr.txt', 'status.txt']
+EXCLUDE_FILES = ['_run.sh', 'metadata.json', 'stdout.txt', 'stderr.txt', 'status.txt', 'job_id']
 
 
 @dataclass
@@ -64,19 +67,19 @@ class SlurmPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         link_dir = Path(self.platform._op_client.get_directory(simulation), 'Assets')
         self.platform._op_client.link_dir(common_asset_dir, link_dir)
 
-    def get_assets(self, item: Union[Experiment, Simulation], files: List[str], **kwargs) -> Dict[str, bytearray]:
+    def get_assets(self, simulation: Simulation, files: List[str], **kwargs) -> Dict[str, bytearray]:
         """
         Get assets for simulation.
         Args:
-            item: Experiment/Simulation
+            simulation: Simulation
             files: files to be retrieved
             kwargs: keyword arguments used to expand functionality.
         Returns:
             Dict[str, bytearray]
         """
         ret = dict()
-        if isinstance(item, Simulation):
-            sim_dir = self.platform._op_client.get_directory(item)
+        if isinstance(simulation, Simulation):
+            sim_dir = self.platform._op_client.get_directory(simulation)
             for file in files:
                 asset_file = Path(sim_dir, file)
                 if asset_file.exists():
@@ -84,11 +87,8 @@ class SlurmPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
                     ret[file] = bytearray(asset.bytes)
                 else:
                     raise RuntimeError(f"Couldn't find asset for path '{file}'.")
-        elif isinstance(item, Experiment):
-            for sim in item.simulations:
-                ret[sim.id] = self.get_assets(sim, files, **kwargs)
         else:
-            raise NotImplementedError(f"get_assets() for items of type {type(item)} is not supported on SlurmPlatform.")
+            raise NotImplementedError(f"get_assets() for items of type {type(simulation)} is not supported on SlurmPlatform.")
 
         return ret
 
@@ -103,21 +103,19 @@ class SlurmPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
             list of Asset
         """
         exclude = exclude if exclude is not None else EXCLUDE_FILES
-        assets = []
         if isinstance(item, Experiment):
             assets_dir = Path(self.platform._op_client.get_directory(item), 'Assets')
+            return AssetCollection.assets_from_directory(assets_dir, recursive=True)
         elif isinstance(item, Simulation):
             assets_dir = self.platform._op_client.get_directory(item)
+            asset_list = AssetCollection.assets_from_directory(assets_dir, recursive=True)
+            assets = [asset for asset in asset_list if asset.filename not in exclude]
+            return assets
         else:
             raise NotImplementedError("List assets for this item is not supported on SlurmPlatform.")
 
-        for asset_file in assets_dir.iterdir():
-            if asset_file.is_file() and asset_file.name not in exclude:
-                asset = Asset(absolute_path=asset_file.absolute())
-                assets.append(asset)
-        return assets
-
-    def copy_asset(self, src: Union[Asset, Path, str], dest: Union[Path, str]) -> None:
+    @staticmethod
+    def copy_asset(src: Union[Asset, Path, str], dest: Union[Path, str]) -> None:
         """
         Copy asset/file to destination.
         Args:
