@@ -29,13 +29,24 @@ Recommendations
 
 * Simulation results and files should be backed up
 
-* ``job_directory``, an option available in the ``idmtools.ini`` file which points to where simulations, experiments, 
-  and suites are written, should point to a directory mounted on 
-  all nodes in the cluster. For example, something similar to the following::
+* Specify where you want simulations, experiments, and suites written to. You can do this by either using the ``job_directory`` 
+  option in the ``idmtools.ini`` file or you can specify the job directory within the Python script when you define the 
+  |SLURM_s| platform. 
 
-    [SLURM]
+  idmtools.ini example::
+
+    [SLURM_LOCAL]
     type = SLURM
     job_directory = /home/userxyz/experiments
+
+  Python script example::
+
+    Platform('SLURM_LOCAL', job_directory='/home/userxyz/experiments')
+
+.. note::
+
+    If you do not specify ``job_directory`` using idmtools.ini or Python script then |IT_s| defaults 
+    to the directory from which you ran the simulations. 
 
 Getting started
 ===============
