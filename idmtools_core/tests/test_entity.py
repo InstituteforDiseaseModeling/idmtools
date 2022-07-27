@@ -172,6 +172,17 @@ class TestEntity(ITestWithPersistence):
         s.add_pre_creation_hook(inc_count)
         s.pre_creation(fake_platform)
 
+    def test_task_pre_creation_hooks(self):
+        fake_platform = MagicMock()
+        tt = TestTask()
+        s = Simulation(task=tt)
+        e = Experiment()
+        e.simulations.append(s)
+        test_hook =  MagicMock()
+        tt.add_pre_creation_hook(test_hook)
+        s.pre_creation(fake_platform)
+        self.assertEqual(test_hook.call_count, 1)
+
     def test_task_pre_creation_hooks_bad_signature(self):
         fake_platform = MagicMock()
         tt = TestTask()
