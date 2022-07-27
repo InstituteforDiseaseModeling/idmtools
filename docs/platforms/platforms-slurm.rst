@@ -26,9 +26,16 @@ Prerequisites
 
 Recommendations
 ````````````````
-* sim_root should be a shared drive and mounted on all nodes in the cluster
 
 * Simulation results and files should be backed up
+
+* ``job_directory``, an option available in the ``idmtools.ini`` file which points to where simulations, experiments, 
+  and suites are written, should point to a directory mounted on 
+  all nodes in the cluster. For example, something similar to the following::
+
+    [SLURM]
+    type = SLURM
+    job_directory = /home/userxyz/experiments
 
 Getting started
 ===============
@@ -59,7 +66,7 @@ Run the following included Python script to submit and run a job on your |SLURM_
 
     ``workitems`` and ``AssetCollection`` are not supported on the |SLURM_s| platform with |IT_s|. If you've 
     used the |COMPS_s| platform with |IT_s| you may have scripts using these objects. You would need 
-    to update these scripts without using these object in order to run them on the |SLURM_s| platform.
+    to update these scripts without using these objects in order to run them on the |SLURM_s| platform.
     
 
 .. toctree::
