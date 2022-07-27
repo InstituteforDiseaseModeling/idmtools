@@ -105,7 +105,7 @@ class TestAddingSimulationsToExistingExperiment(unittest.TestCase):
         builder = SimulationBuilder()
         builder.add_sweep_definition(JSONConfiguredPythonTask.set_parameter_partial("Run_Number"), [i for i in range(5)])
         exp = Experiment.from_builder(builder, base_task=base_task)
-        mock_hook =  MagicMock()
+        mock_hook = MagicMock()
         exp.add_post_creation_hook(mock_hook)
         exp.run(wait_until_done=True)
         self.assertEqual(mock_hook.call_count, 1)

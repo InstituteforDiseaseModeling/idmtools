@@ -127,6 +127,8 @@ class ITask(metaclass=ABCMeta):
         Returns:
             None
         """
+        if len(signature(hook).parameters) != 2:
+            raise ValueError("Post creation hooks should have 2 arguments. The first argument will be the item, the second the platform")
         self.__post_creation_hooks.append(hook)
 
     def add_platform_requirement(self, requirement: Union[PlatformRequirements, str]) -> NoReturn:
