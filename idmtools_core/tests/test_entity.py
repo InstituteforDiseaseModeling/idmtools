@@ -16,6 +16,8 @@ from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.test_task import TestTask
 
+PRE_COMMIT_FAIL_MESSAGE = 'Pre creation hooks should have 2 arguments. The first argument will be the item, the second the platform'
+
 
 @dataclass
 class EntityWithIgnoreField(IEntity):
@@ -113,7 +115,7 @@ class TestEntity(ITestWithPersistence):
 
             s = Simulation(task=TestTask())
             s.add_pre_creation_hook(bad_function_signature)
-        self.assertEqual(m.exception.args[0], 'Pre creation hooks should have 2 arguments. The first argument will be the item, the second the platform')
+        self.assertEqual(m.exception.args[0], PRE_COMMIT_FAIL_MESSAGE)
 
     def test_pre_creation_allow_partials(self):
 
@@ -169,6 +171,19 @@ class TestEntity(ITestWithPersistence):
             self.assertEqual(platform, fake_platform)
         s.add_pre_creation_hook(inc_count)
         s.pre_creation(fake_platform)
+
+    def test_task_pre_creation_hooks_bad_signature(self):
+        fake_platform = MagicMock()
+        tt = TestTask()
+
+        s = Simulation(task=tt)
+
+        def inc_count(s):
+            pass
+
+        with self.assertRaises(ValueError) as m:
+            tt.add_pre_creation_hook(inc_count)
+        self.assertEqual(m.exception.args[0], PRE_COMMIT_FAIL_MESSAGE)
 
     def test_simulation_post_creation_hooks(self):
         fake_platform = MagicMock()

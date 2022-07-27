@@ -12,6 +12,7 @@ from idmtools.assets import AssetCollection
 from idmtools.entities.command_line import CommandLine
 from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.utils.hashing import ignore_fields_in_dataclass_on_pickle
+from inspect import signature
 
 logger = getLogger(__name__)
 # Tasks can be allocated multiple ways
@@ -112,6 +113,8 @@ class ITask(metaclass=ABCMeta):
         Returns:
             None
         """
+        if len(signature(hook).parameters) != 2:
+            raise ValueError("Pre creation hooks should have 2 arguments. The first argument will be the item, the second the platform")
         self.__pre_creation_hooks.append(hook)
 
     def add_post_creation_hook(self, hook: TTaskHook):
