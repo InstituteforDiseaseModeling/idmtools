@@ -159,11 +159,11 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
 
     def refresh_status(self, simulation: Simulation, **kwargs):
         """
-        Refresh status
+        Refresh simulation status: we actually don't really refresh simulation' status directly.
         Args:
             simulation: idmtools Simulation
             kwargs: keyword arguments used to expand functionality
         Returns:
             None
         """
-        raise NotImplementedError("Refresh status has not been implemented on the Slurm Platform")
+        raise NotImplementedError("Refresh simulation status is not called directly on the Slurm Platform")

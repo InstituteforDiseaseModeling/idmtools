@@ -336,7 +336,6 @@ class LocalSlurmOperations(SlurmOperations):
         Returns:
             None
         """
-        # raise NotImplementedError(f"{item.__class__.__name__} is not supported on SlurmPlatform.")
         # Workaround (cancelling job not output -1): check if slurm job got cancelled
         job_term_path = self.get_directory(experiment).joinpath('Terminated.txt')
         job_cancelled = job_term_path.exists()
