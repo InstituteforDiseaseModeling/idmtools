@@ -45,8 +45,9 @@ Recommendations
 
 .. note::
 
-    If you do not specify ``job_directory`` using idmtools.ini or Python script then |IT_s| defaults 
-    to the directory from which you ran the simulations. 
+    If you create a [SLURM_LOCAL] block within idmtools.ini and do not specify ``job_directory``, 
+    then |IT_s| will throw an exception error. If you do not specify ``job_directory`` in the Python script 
+    then |IT_s| defaults to the directory from which you ran the simulations.
 
 Getting started
 ===============
