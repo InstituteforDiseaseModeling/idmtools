@@ -188,13 +188,16 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
 
         return exp
 
-    def refresh_status(self, experiment: Experiment, **kwargs):
+    def refresh_status(self, experiment: Experiment, raw=False, **kwargs):
         """
         Refresh status of experiment.
         Args:
             experiment: idmtools Experiment
+            raw: True/False - True: not convert RUNNING to FAILED
             kwargs: keyword arguments used to expand functionality
         Returns:
             None
         """
-        raise NotImplementedError("Refresh_status has not been implemented on the Slurm Platform")
+        self.platform._op_client.refresh_status(experiment, **kwargs)
+
+
