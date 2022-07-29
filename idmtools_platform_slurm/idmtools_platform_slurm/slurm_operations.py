@@ -101,6 +101,10 @@ class SlurmOperations(ABC):
     def submit_job(self, item: Union[Experiment, Simulation], **kwargs) -> Any:
         pass
 
+    @abstractmethod
+    def get_simulation_status(self, sim_id: Union[UUID, str]) -> Any:
+        pass
+
 
 @dataclass
 class RemoteSlurmOperations(SlurmOperations):
@@ -134,6 +138,9 @@ class RemoteSlurmOperations(SlurmOperations):
         pass
 
     def submit_job(self, item: Union[Experiment, Simulation], **kwargs) -> Any:
+        pass
+
+    def get_simulation_status(self, sim_id: Union[UUID, str]) -> Any:
         pass
 
 
