@@ -3,6 +3,7 @@ Here we implement the SlurmPlatform object.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+from pathlib import Path
 from typing import Optional, Any, Dict, Union, List
 from dataclasses import dataclass, field, fields
 from logging import getLogger
@@ -28,6 +29,8 @@ CONFIG_PARAMETERS = ['ntasks', 'partition', 'nodes', 'mail_type', 'mail_user', '
 
 @dataclass(repr=False)
 class SlurmPlatform(IPlatform):
+    ID_FILE = 'job_id.txt'
+
     job_directory: str = field(default=None)
     mode: SlurmOperationalMode = field(default=None)
 
@@ -167,3 +170,41 @@ class SlurmPlatform(IPlatform):
             item.platform = self
             interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
             getattr(self, interface).cancel([item])
+
+    @staticmethod
+    def get_slurm_job_id_from_file(path):
+        with open(path, 'r') as f:
+            job_id = f.read().strip()
+        return job_id
+
+    def get_slurm_job_id_for_item(self, item: IEntity) -> str:
+        """
+        Obtain the slurm job id for a given item (suite, exp, sim)
+
+        Args:
+            item: item to get slurm job id for
+
+        Returns:
+            a slurm job id
+        """
+        self._is_item_list_supported([item])
+
+        item.platform = self
+        item_id_file_path = Path(self._op_client.get_directory(item=item), self.ID_FILE)
+        slurm_job_id = self.get_slurm_job_id_from_file(path=item_id_file_path)
+        return slurm_job_id
+
+    def set_slurm_job_id_for_item(self, item: IEntity, slurm_job_id: str) -> None:
+        """
+        Record the slurm job id for a given item (suite, exp, sim)
+
+        Args:
+            item: item to set slurm job id on
+            slurm_job_id: the slurm job id to set on item
+
+        Returns:
+            Nothing
+        """
+        item_id_file_path = Path(self._op_client.get_directory(item=item), self.ID_FILE)
+        with open(item_id_file_path, 'w') as f:
+            f.write(slurm_job_id)

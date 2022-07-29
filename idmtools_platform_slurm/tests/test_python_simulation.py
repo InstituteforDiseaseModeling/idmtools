@@ -101,6 +101,7 @@ class TestPythonSimulation(ITestWithPersistence):
         with open(os.path.join(experiment_dir, 'sbatch.sh'), 'r') as fpr:
             contents = fpr.read()
         self.assertIn("#SBATCH --array=1-25%8", contents)  # 25=a*b=5*5, 8=max_running_jobs
+        # TODO: this usage of job_id.txt no longer matches the usage within the code, especially the int() check below
         self.assertIn("echo $SLURM_ARRAY_JOB_ID > job_id.txt", contents)
         self.assertIn("srun run_simulation.sh", contents)
 
