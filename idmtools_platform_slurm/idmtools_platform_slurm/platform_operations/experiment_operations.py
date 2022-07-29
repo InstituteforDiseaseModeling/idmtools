@@ -68,7 +68,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         meta = self.platform._metas.get(experiment)
         return SlurmExperiment(meta)
 
-    def get_children(self, experiment: SlurmExperiment, parent: Experiment = None, raw = True, **kwargs) -> List[Any]:
+    def get_children(self, experiment: SlurmExperiment, parent: Experiment = None, raw=True, **kwargs) -> List[Any]:
         """
         Fetch slurm experiment's children.
         Args:
@@ -198,6 +198,10 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
             None
         """
-        self.platform._op_client.refresh_status(experiment, **kwargs)
+        # Check if CANCEL EVENT happens
+        job_term_path = self.platform._op_client.get_directory(experiment).joinpath('Terminated.txt')
+        job_cancelled = job_term_path.exists()
 
-
+        # Refresh status for each simulation
+        for sim in experiment.simulations:
+            sim.status = self.platform._op_client.get_simulation_status(sim.id, job_cancelled, raw, **kwargs)

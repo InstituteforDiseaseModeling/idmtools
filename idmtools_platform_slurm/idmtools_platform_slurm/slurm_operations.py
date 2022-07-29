@@ -9,6 +9,7 @@ import shutil
 import subprocess
 from enum import Enum
 from pathlib import Path
+from uuid import UUID, uuid4
 from logging import getLogger
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
@@ -100,10 +101,6 @@ class SlurmOperations(ABC):
     def submit_job(self, item: Union[Experiment, Simulation], **kwargs) -> Any:
         pass
 
-    @abstractmethod
-    def refresh_status(self, item: IEntity) -> None:
-        pass
-
 
 @dataclass
 class RemoteSlurmOperations(SlurmOperations):
@@ -137,9 +134,6 @@ class RemoteSlurmOperations(SlurmOperations):
         pass
 
     def submit_job(self, item: Union[Experiment, Simulation], **kwargs) -> Any:
-        pass
-
-    def refresh_status(self, item: IEntity) -> None:
         pass
 
 
@@ -325,31 +319,35 @@ class LocalSlurmOperations(SlurmOperations):
         else:
             raise NotImplementedError(f"Submit job is not implemented on SlurmPlatform.")
 
-    def refresh_status(self, experiment: Experiment, raw=False, **kwargs) -> None:
+    def get_simulation_status(self, sim_id: Union[UUID, str], job_cancelled: bool = None, raw: bool = False,
+                              **kwargs) -> EntityStatus:
         """
-        Get experiment status.
+        Retrieve simulation status.
         Args:
-            experiment: idmtools Experiment
+            sim_id: Simulation ID
+            job_cancelled: bool
             raw: bool
                 - True: keep original CREATED (not processed)
                 - False: convert CREATED (not processed) to FAILED
+            kwargs: keyword arguments used to expand functionality
         Returns:
-            None
+            EntityStatus
         """
         # Workaround (cancelling job not output -1): check if slurm job got cancelled
-        job_term_path = self.get_directory(experiment).joinpath('Terminated.txt')
-        job_cancelled = job_term_path.exists()
+        sim_dir = self.get_directory_by_id(sim_id, ItemType.SIMULATION)
+        if job_cancelled is None:
+            job_term_path = sim_dir.parent.joinpath('Terminated.txt')
+            job_cancelled = job_term_path.exists()
 
-        # Refresh each simulation status
-        for sim in experiment.simulations:
-            job_status_path = self.get_directory(sim).joinpath('job_status.txt')
-            if job_status_path.exists():
-                status = open(job_status_path).read().strip()
-                status = SLURM_MAPS[status]
-            else:
-                status = SLURM_MAPS['None']
-            # Consider Cancel Case so that we may get out of the refresh loop
-            if job_cancelled and not raw and status == EntityStatus.CREATED:
-                status = EntityStatus.FAILED
-            # Update sim status
-            sim.status = status
+        # Check process status
+        job_status_path = sim_dir.joinpath('job_status.txt')
+        if job_status_path.exists():
+            status = open(job_status_path).read().strip()
+            status = SLURM_MAPS[status]
+        else:
+            status = SLURM_MAPS['None']
+        # Consider Cancel Case so that we may get out of the refresh loop
+        if job_cancelled and not raw and status == EntityStatus.CREATED:
+            status = EntityStatus.FAILED
+
+        return status
