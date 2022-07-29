@@ -106,7 +106,8 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
             working_directory = self.platform._op_client.get_directory(experiment)
             result = subprocess.run(['sbatch', '--parsable', 'sbatch.sh'],
                                     stdout=subprocess.PIPE, cwd=str(working_directory))
-            slurm_job_id = result.stdout.decode('utf-8').strip()
+            # we are not capturing the cluster name, which would be [1] of the following command
+            slurm_job_id = result.stdout.decode('utf-8').strip().split(';')[0]
 
             # obtain and record the slurm job id for the experiment
             experiment.slurm_job_id = int(slurm_job_id)
