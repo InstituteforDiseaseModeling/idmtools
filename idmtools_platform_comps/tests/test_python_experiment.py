@@ -1,4 +1,7 @@
 import copy
+import typing
+from pathlib import Path
+from time import time
 
 import allure
 import json
@@ -22,7 +25,9 @@ from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
+from idmtools.utils.entities import save_id_as_file_as_hook
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
+
 from idmtools_platform_comps.utils.general import update_item
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.common_experiments import get_model1_templated_experiment, get_model_py_templated_experiment, \
@@ -31,6 +36,9 @@ from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id,
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.shared_functions import validate_output, validate_sim_tags
 from idmtools_test.utils.utils import get_case_name
+
+if typing.TYPE_CHECKING:
+    from idmtools_platform_comps.comps_platform import COMPSPlatform
 
 setA = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="a")
 setB = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="b")
@@ -68,6 +76,9 @@ class TestPythonExperiment(ITestWithPersistence):
     def test_sweeps_with_partial_comps(self):   # zdu: no metadata file any more
 
         e = get_model1_templated_experiment(self.case_name)
+        id_file = Path(f"{e.item_type}.{e.name}.id")
+        if id_file.exists():
+            id_file.unlink(True)
         builder = SimulationBuilder()
         # ------------------------------------------------------
         # Sweeping parameters:
@@ -87,6 +98,15 @@ class TestPythonExperiment(ITestWithPersistence):
 
         e.simulations.add_builder(builder)
 
+        ran_at = str(time())
+
+        # test pre create hook
+        def add_date_as_tag(experiment: Experiment, platform: 'COMPSPlatform'):
+            experiment.tags['date'] = ran_at
+
+        e.add_pre_creation_hook(add_date_as_tag)
+        e.add_post_creation_hook(save_id_as_file_as_hook)
+
         wait_on_experiment_and_check_all_sim_status(self, e, self.platform)
         experiment = COMPSExperiment.get(e.uid)
         print(experiment.id)
@@ -104,9 +124,12 @@ class TestPythonExperiment(ITestWithPersistence):
         actual_exp_tags = experiment.get(experiment.id, QueryCriteria().select_children('tags')).tags
         expected_exp_tags = {'idmtools': __version__, 'number_tag': '123', 'string_tag': 'test',
                              'KeyOnly': '',
+                             'date': ran_at,
                              'task_type': 'idmtools_models.python.json_python_task.JSONConfiguredPythonTask'}
         self.assertDictEqual(expected_exp_tags, actual_exp_tags)
         self.assertDictEqual(expected_exp_tags, actual_exp_tags)
+
+        self.assertTrue(id_file.exists(), msg=f"Could not find {id_file}")
 
         # validate reload
         # with self.subTest("test_sweeps_with_partial_comps_reload_with_task"):

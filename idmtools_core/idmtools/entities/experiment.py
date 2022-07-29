@@ -76,6 +76,9 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
     #: Determines if we should gather assets from a the first task. Only use when not using TemplatedSimulations
     gather_common_assets_from_task: bool = field(default=None, compare=False)
 
+    #: Determines if we should gather assets from a the first task. Only use when not using TemplatedSimulations
+    disable_default_pre_create: bool = field(default=False, compare=False)
+
     #: Enable replacing the task with a proxy to reduce the memory footprint. Useful in provisioning large sets of
     # simulations
     __replace_task_with_proxy: bool = field(default=True, init=False, compare=False)
@@ -230,48 +233,50 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
             ValueError - If simulations length is 0
         """
         # Gather the assets
-        self.gather_assets()
+        IItem.pre_creation(self, platform)
+        if not self.disable_default_pre_create:
+            self.gather_assets()
 
-        # to keep experiments clean, let's only do this is we have a special experiment class
-        if self.__class__ is not Experiment:
-            # Add a tag to keep the Experiment class name
-            self.tags["experiment_type"] = f'{self.__class__.__module__}.{self.__class__.__name__}'
+            # to keep experiments clean, let's only do this is we have a special experiment class
+            if self.__class__ is not Experiment:
+                # Add a tag to keep the Experiment class name
+                self.tags["experiment_type"] = f'{self.__class__.__module__}.{self.__class__.__name__}'
 
-        # if it is a template, set task type on experiment
-        if gather_assets:
-            if isinstance(self.simulations.items, TemplatedSimulations):
-                if len(self.simulations.items) == 0:
-                    raise ValueError("You cannot run an empty experiment")
-                if logger.isEnabledFor(DEBUG):
-                    logger.debug("Using Base task from template for experiment level assets")
-                self.simulations.items.base_task.gather_common_assets()
-                self.assets.add_assets(self.simulations.items.base_task.common_assets, fail_on_duplicate=False)
-                for sim in self.simulations.items.extra_simulations():
-                    self.assets.add_assets(sim.task.gather_common_assets(), fail_on_duplicate=False)
-                if "task_type" not in self.tags:
-                    task_class = self.simulations.items.base_task.__class__
+            # if it is a template, set task type on experiment
+            if gather_assets:
+                if isinstance(self.simulations.items, TemplatedSimulations):
+                    if len(self.simulations.items) == 0:
+                        raise ValueError("You cannot run an empty experiment")
+                    if logger.isEnabledFor(DEBUG):
+                        logger.debug("Using Base task from template for experiment level assets")
+                    self.simulations.items.base_task.gather_common_assets()
+                    self.assets.add_assets(self.simulations.items.base_task.common_assets, fail_on_duplicate=False)
+                    for sim in self.simulations.items.extra_simulations():
+                        self.assets.add_assets(sim.task.gather_common_assets(), fail_on_duplicate=False)
+                    if "task_type" not in self.tags:
+                        task_class = self.simulations.items.base_task.__class__
+                        self.tags["task_type"] = f'{task_class.__module__}.{task_class.__name__}'
+                elif self.gather_common_assets_from_task and isinstance(self.simulations.items, List):
+                    if len(self.simulations.items) == 0:
+                        raise ValueError("You cannot run an empty experiment")
+                    if logger.isEnabledFor(DEBUG):
+                        logger.debug("Using all tasks to gather assets")
+                    task_class = self.__simulations[0].task.__class__
                     self.tags["task_type"] = f'{task_class.__module__}.{task_class.__name__}'
-            elif self.gather_common_assets_from_task and isinstance(self.simulations.items, List):
-                if len(self.simulations.items) == 0:
+                    pbar = self.__simulations
+                    if not IdmConfigParser.is_progress_bar_disabled():
+                        from tqdm import tqdm
+                        pbar = tqdm(self.__simulations, desc="Discovering experiment assets from tasks", unit="simulation")
+                    for sim in pbar:
+                        # don't gather assets from simulations that have been provisioned
+                        if sim.status is None:
+                            assets = sim.task.gather_common_assets()
+                            if assets is not None:
+                                self.assets.add_assets(assets, fail_on_duplicate=True, fail_on_deep_comparison=True)
+                elif isinstance(self.simulations.items, List) and len(self.simulations.items) == 0:
                     raise ValueError("You cannot run an empty experiment")
-                if logger.isEnabledFor(DEBUG):
-                    logger.debug("Using all tasks to gather assets")
-                task_class = self.__simulations[0].task.__class__
-                self.tags["task_type"] = f'{task_class.__module__}.{task_class.__name__}'
-                pbar = self.__simulations
-                if not IdmConfigParser.is_progress_bar_disabled():
-                    from tqdm import tqdm
-                    pbar = tqdm(self.__simulations, desc="Discovering experiment assets from tasks", unit="simulation")
-                for sim in pbar:
-                    # don't gather assets from simulations that have been provisioned
-                    if sim.status is None:
-                        assets = sim.task.gather_common_assets()
-                        if assets is not None:
-                            self.assets.add_assets(assets, fail_on_duplicate=True, fail_on_deep_comparison=True)
-            elif isinstance(self.simulations.items, List) and len(self.simulations.items) == 0:
-                raise ValueError("You cannot run an empty experiment")
 
-        self.tags.update(get_default_tags())
+            self.tags.update(get_default_tags())
 
     @property
     def done(self):

@@ -13,6 +13,7 @@ from idmtools.assets import AssetCollection
 from idmtools.assets.file_list import FileList
 from idmtools.core import ItemType
 from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
+from idmtools.core.interfaces.iitem import IItem
 from idmtools.core.interfaces.inamed_entity import INamedEntity
 from idmtools.core.interfaces.irunnable_entity import IRunnableEntity
 from idmtools.entities.itask import ITask
@@ -122,9 +123,9 @@ class IWorkflowItem(IAssetsEnabled, INamedEntity, IRunnableEntity, ABC):
         """
         Called before the actual creation of the entity.
         """
+        IItem.pre_creation(self, platform)
         if self.name is None:
             raise ValueError("Name is required")
-
         files_to_be_removed = ('comps_log.log', 'idmtools.log')
         super().pre_creation(platform)
         if self.task:

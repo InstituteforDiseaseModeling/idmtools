@@ -262,6 +262,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             user_logger.log(SUCCESS, f"\nThe created experiment can be viewed at {self.platform.endpoint}/#explore/"
                                      f"Simulations?filters=ExperimentId={experiment.uid}\nSimulations are still being created\n"
                             )
+        experiment.post_creation(self.platform)
 
     def post_run_item(self, experiment: Experiment, **kwargs):
         """
