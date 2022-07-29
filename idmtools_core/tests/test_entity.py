@@ -10,9 +10,11 @@ from idmtools.builders import SimulationBuilder
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
+from idmtools.entities.generic_workitem import GenericWorkItem
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.suite import Suite
 from idmtools.entities.templated_simulation import TemplatedSimulations
+from idmtools.utils.entities import save_id_as_file_as_hook
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.test_task import TestTask
 
@@ -113,13 +115,19 @@ class TestEntity(ITestWithPersistence):
 
     def test_pre_creation_only_two_args(self):
         with self.assertRaises(ValueError) as m:
-
             s = Simulation(task=TestTask())
             s.add_pre_creation_hook(bad_function_signature)
         self.assertEqual(m.exception.args[0], PRE_COMMIT_FAIL_MESSAGE)
 
-    def test_pre_creation_allow_partials(self):
+    def test_post_creation_no_save_id(self):
+        fake_platform = MagicMock()
+        with self.assertRaises(NotImplementedError) as m:
+            s = Simulation(task=TestTask())
+            s.add_post_creation_hook(save_id_as_file_as_hook)
+            s.post_creation(fake_platform)
+        self.assertEqual(m.exception.args[0], 'aaaaa')
 
+    def test_pre_creation_allow_partials(self):
         s = Simulation(task=TestTask())
         globals()['abc'] = 0
 
@@ -249,7 +257,18 @@ class TestEntity(ITestWithPersistence):
         e.add_post_creation_hook(inc_count)
         e.post_creation(fake_platform)
 
+    def test_workitem_pre_create(self):
+        wi = GenericWorkItem(task=TestTask())
+        fake_platform = MagicMock()
+        self.assertTrue(False)
+
+    def test_workitem_post_create(self):
+        wi = GenericWorkItem(task=TestTask())
+        fake_platform = MagicMock()
+        self.assertTrue(False)
+
     def test_suite_pre_creation_hooks(self):
+        wi = GenericWorkItem(task=TestTask())
         fake_platform = MagicMock()
         e = Experiment()
         e.simulations.append(Simulation(task=TestTask()))
