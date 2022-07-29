@@ -110,7 +110,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
             slurm_job_id = result.stdout.decode('utf-8').strip().split(';')[0]
 
             # obtain and record the slurm job id for the experiment
-            experiment.slurm_job_id = int(slurm_job_id)
+            experiment.slurm_job_id = slurm_job_id
             self.platform._metas.dump(item=experiment)
         else:
             experiment.slurm_job_id = None

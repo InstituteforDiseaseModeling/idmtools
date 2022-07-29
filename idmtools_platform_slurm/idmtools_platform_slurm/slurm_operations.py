@@ -128,7 +128,7 @@ class RemoteSlurmOperations(SlurmOperations):
         if len(ids) == 0:
             return
         try:
-            self._cmd_client.exec_command(f"scancel {' '.join([str(id) for id in ids])}")
+            self._cmd_client.exec_command(f"scancel {' '.join([id for id in ids])}")
         except SSHException as e:
             raise SlurmOperationException(e.args[0])
 
@@ -267,6 +267,6 @@ class LocalSlurmOperations(SlurmOperations):
         if len(ids) == 0:
             return
         try:
-            subprocess.check_output(['scancel', *[str(id) for id in ids]])
+            subprocess.check_output(['scancel', *[id for id in ids]])
         except subprocess.CalledProcessError as e:
             raise SlurmOperationException(e.args[0])
