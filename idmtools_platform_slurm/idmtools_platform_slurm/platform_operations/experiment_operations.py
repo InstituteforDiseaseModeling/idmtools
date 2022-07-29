@@ -74,8 +74,10 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         slurm_ids = [exp.slurm_job_id for exp in exps_to_cancel]
         self.platform._op_client.cancel_jobs(ids=slurm_ids)
         for exp in exps_to_cancel:
-            for sim in exp.simulations:
-                sim.status = SLURM_STATES['CANCELED']
+            for simulation in exp.simulations:
+                if not simulation.done:
+                    simulation.status = SLURM_STATES['CANCELED']
+                    self.platform._metas.dump(item=simulation)
 
     def get_children(self, experiment: SlurmExperiment, parent: Experiment = None, raw = True, **kwargs) -> List[Any]:
         """
