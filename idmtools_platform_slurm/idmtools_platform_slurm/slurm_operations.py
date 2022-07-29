@@ -3,6 +3,9 @@ Here we implement the SlurmPlatform operations.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+import os
+import shlex
+import shutil
 import subprocess
 from enum import Enum
 from pathlib import Path
@@ -10,8 +13,7 @@ from logging import getLogger
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Union, Type, Any
-from paramiko import SSHClient, SFTP, AutoAddPolicy, SSHException
-from idmtools.core import EntityStatus
+from idmtools.core import EntityStatus, ItemType
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
@@ -60,7 +62,19 @@ class SlurmOperations(ABC):
         pass
 
     @abstractmethod
+    def get_directory_by_id(self, item_id: str, item_type: ItemType) -> Path:
+        pass
+
+    @abstractmethod
+    def make_command_executable(self, simulation: Simulation) -> None:
+        pass
+
+    @abstractmethod
     def mk_directory(self, item: IEntity) -> None:
+        pass
+
+    @abstractmethod
+    def link_file(self, target: Union[Path, str], link: Union[Path, str]) -> None:
         pass
 
     @abstractmethod
@@ -68,11 +82,19 @@ class SlurmOperations(ABC):
         pass
 
     @abstractmethod
+    def update_script_mode(self, script_path: Union[Path, str], mode: int) -> None:
+        pass
+
+    @abstractmethod
+    def make_command_executable(self, simulation: Simulation) -> None:
+        pass
+
+    @abstractmethod
     def create_batch_file(self, item: IEntity, **kwargs) -> None:
         pass
 
     @abstractmethod
-    def submit_job(self, sjob_file_path: Union[Path, str]) -> None:
+    def submit_job(self, item: Union[Experiment, Simulation], **kwargs) -> Any:
         pass
 
     @abstractmethod
@@ -98,30 +120,31 @@ class RemoteSlurmOperations(SlurmOperations):
     key_file: str = field(default=None)
     port: int = field(default=22)
 
-    _cmd_client: SSHClient = field(default=None)
-    _file_client: SFTP = field(default=None)
-
-    def __post_init__(self):
-        self._cmd_client = SSHClient()
-        self._cmd_client.set_missing_host_key_policy(AutoAddPolicy())
-        self._cmd_client.load_system_host_keys()
-        self._cmd_client.connect(self.hostname, self.port, self.username, key_filename=self.key_file, compress=True)
-
-        self._file_client = self._cmd_client.open_sftp()
-
     def get_directory(self, item: IEntity) -> Path:
+        pass
+
+    def get_directory_by_id(self, item_id: str, item_type: ItemType) -> Path:
         pass
 
     def mk_directory(self, item: IEntity) -> None:
         pass
 
+    def link_file(self, target: Union[Path, str], link: Union[Path, str]) -> None:
+        pass
+
     def link_dir(self, target: Union[Path, str], link: Union[Path, str]) -> None:
+        pass
+
+    def update_script_mode(self, script_path: Union[Path, str], mode: int) -> None:
+        pass
+
+    def make_command_executable(self, simulation: Simulation) -> None:
         pass
 
     def create_batch_file(self, item: IEntity, **kwargs) -> None:
         pass
 
-    def submit_job(self, sjob_file_path: Union[Path, str]) -> None:
+    def submit_job(self, item: Union[Experiment, Simulation], **kwargs) -> Any:
         pass
 
     def cancel_jobs(self, ids):
@@ -165,6 +188,29 @@ class LocalSlurmOperations(SlurmOperations):
             raise RuntimeError(f"Get directory is not supported for {type(item)} object on SlurmPlatform")
 
         return item_dir
+
+    def get_directory_by_id(self, item_id: str, item_type: ItemType) -> Path:
+        """
+        Get item's path.
+        Args:
+            item_id: entity id (Suite, Experiment, Simulation)
+            item_type: the type of items (Suite, Experiment, Simulation)
+        Returns:
+            item file directory
+        """
+        if item_type is ItemType.SIMULATION:
+            pattern = f"*/*/{item_id}"
+        elif item_type is ItemType.EXPERIMENT:
+            pattern = f"*/{item_id}"
+        elif item_type is ItemType.SUITE:
+            pattern = f"{item_id}"
+        else:
+            raise RuntimeError(f"Unknown item type: {item_type}")
+
+        root = Path(self.platform.job_directory)
+        for item_path in root.glob(pattern=pattern):
+            return item_path
+        raise RuntimeError(f"Not found path for item_id: {item_id} with type: {item_type}.")
 
     def mk_directory(self, item: Union[Suite, Experiment, Simulation] = None, dest: Union[Path, str] = None,
                      exist_ok: bool = True) -> None:
@@ -212,7 +258,7 @@ class LocalSlurmOperations(SlurmOperations):
         link.symlink_to(target)
 
     @staticmethod
-    def update_script_mode(script_path: Union[Path, str], mode=0o755) -> None:
+    def update_script_mode(script_path: Union[Path, str], mode: int = 0o777) -> None:
         """
         Change file mode.
         Args:
@@ -223,6 +269,38 @@ class LocalSlurmOperations(SlurmOperations):
         """
         script_path = Path(script_path)
         script_path.chmod(mode)
+
+    def make_command_executable(self, simulation: Simulation) -> None:
+        """
+        Make simulation command executable
+        Args:
+            simulation: idmtools Simulation
+        Returns:
+            None
+        """
+        exe = simulation.task.command.executable
+        if exe == 'singularity':
+            # split the command
+            cmd = shlex.split(simulation.task.command.cmd.replace("\\", "/"))
+            # get real executable
+            exe = cmd[3]
+
+        sim_dir = self.get_directory(simulation)
+        exe_path = sim_dir.joinpath(exe)
+
+        # see if it is a file
+        if exe_path.exists():
+            exe = exe_path
+        elif shutil.which(exe) is not None:
+            exe = Path(shutil.which(exe))
+        else:
+            logger.debug(f"Failed to find executable: {exe}")
+            exe = None
+        try:
+            if exe and not os.access(exe, os.X_OK):
+                self.update_script_mode(exe)
+        except:
+            logger.debug(f"Failed to change file mode for executable: {exe}")
 
     def create_batch_file(self, item: Union[Experiment, Simulation], **kwargs) -> None:
         """
@@ -242,16 +320,26 @@ class LocalSlurmOperations(SlurmOperations):
         else:
             raise NotImplementedError(f"{item.__class__.__name__} is not supported for batch creation.")
 
-    def submit_job(self, sjob_file_path: Union[Path, str], working_directory: Union[Path, str]) -> None:
+    def submit_job(self, item: Union[Experiment, Simulation], **kwargs) -> Any:
         """
         Submit a Slurm job.
         Args:
-            sjob_file_path: the file content
-            working_directory: the file path
+            item: idmtools Experiment or Simulation
+            kwargs: keyword arguments used to expand functionality
         Returns:
-            None
+            Any
         """
-        raise NotImplementedError(f"Submit job is not implemented on SlurmPlatform.")
+        dry_run = kwargs.get('dry_run', False)
+        if isinstance(item, Experiment):
+            if not dry_run:
+                working_directory = self.get_directory(item)
+                result = subprocess.run(['sbatch', 'sbatch.sh'], stdout=subprocess.PIPE, cwd=str(working_directory))
+                stdout = result.stdout.decode('utf-8').strip()
+                return stdout
+        elif isinstance(item, Simulation):
+            pass
+        else:
+            raise NotImplementedError(f"Submit job is not implemented on SlurmPlatform.")
 
     def entity_status(self, item: Union[Suite, Experiment, Simulation]) -> Any:
         """

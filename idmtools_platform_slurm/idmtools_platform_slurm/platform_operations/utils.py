@@ -3,25 +3,56 @@ This is SlurmPlatform operations utils.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
-from logging import getLogger, DEBUG
-from typing import TYPE_CHECKING, Generator, Dict, Any
+from typing import Dict
+from idmtools.core import ItemType
+from idmtools.entities import Suite
+from idmtools.entities.experiment import Experiment
+from logging import getLogger
 
 logger = getLogger(__name__)
 
 
-class SuiteDict(dict):
-    """Alias for slurm platform experiment objects."""
-    pass
+class SlurmItem:
+    """
+    Represent Slurm Object
+    """
+
+    def __init__(self, metas: Dict):
+        for key, value in metas.items():
+            setattr(self, key, value)
+
+    def get_platform_object(self):
+        return self
 
 
-class ExperimentDict(dict):
-    """Alias for slurm platform experiment objects."""
-    pass
+class SlurmSuite(SlurmItem):
+    """
+    Represent Slurm Suite
+    """
+
+    def __init__(self, metas: Dict):
+        super().__init__(metas)
+        self.item_type = ItemType.SUITE
 
 
-class SimulationDict(dict):
-    """Alias for slurm platform simulation objects."""
-    pass
+class SlurmExperiment(SlurmItem):
+    """
+    Represent Slurm Experiment
+    """
+
+    def __init__(self, metas: Dict):
+        super().__init__(metas)
+        self.item_type = ItemType.EXPERIMENT
+
+
+class SlurmSimulation(SlurmItem):
+    """
+    Represent Slurm Simulation
+    """
+
+    def __init__(self, metas: Dict):
+        super().__init__(metas)
+        self.item_type = ItemType.SIMULATION
 
 
 def clean_experiment_name(experiment_name: str) -> str:
@@ -37,3 +68,26 @@ def clean_experiment_name(experiment_name: str) -> str:
 
     experiment_name = clean_names_expr.sub("_", experiment_name)
     return experiment_name.encode("ascii", "ignore").decode('utf8').strip()
+
+
+def add_dammy_suite(experiment: Experiment, suite_name: str = None, tags: Dict = None) -> Suite:
+    """
+    Create Suite parent for given experiment
+    Args:
+        experiment: idmtools Experiment
+        suite_name: new Suite name
+        tags: new Suite tags
+    Returns:
+
+    """
+    if suite_name is None:
+        suite_name = 'Dammy Suite'
+    suite = Suite(name=suite_name)
+
+    if not tags:
+        suite.tags = tags
+
+    # add experiment
+    suite.add_experiment(experiment)
+
+    return suite

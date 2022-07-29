@@ -40,8 +40,8 @@
 {% endif %}
 #SBATCH --array=1-{{njobs}}%{{max_running_jobs}}
 #SBATCH --open-mode=append
-#SBATCH --output=log_%A.out
-#SBATCH --error=log_%A.err
+#SBATCH --output=stdout.txt
+#SBATCH --error=stderr.txt
 
 
 {% if modules is defined and modules is not none and modules|length > 0 %}
