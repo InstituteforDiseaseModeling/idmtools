@@ -41,6 +41,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
         user_files.add_asset(os.path.join(self.input_file_path, "hello.py"))
 
         wi = SSMTWorkItem(name=self.case_name, command=command, transient_assets=user_files, tags=self.tags)
+        # TODO ADD PRECreate/post create testing here
         wi.run(wait_on_done=True)
 
         # verify workitem output files
