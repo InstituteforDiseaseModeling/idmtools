@@ -1,2 +1,2 @@
-idmtools~=1.6.6
+idmtools~=1.6.7
 jinja2~=3.0.1
