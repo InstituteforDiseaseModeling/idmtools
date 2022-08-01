@@ -80,7 +80,7 @@ suite.update_tags({'name': 'suite_tag', 'idmtools': '123'})
 # Add experiment to the suite
 suite.add_experiment(experiment)
 
-suite.run(platform=platform, wait_until_done=True, wait_on_done=True, max_running_jobs=10,
+suite.run(platform=platform, wait_until_done=True, max_running_jobs=10,
           retries=5, dry_run=False)
 sys.exit(0 if experiment.succeeded else -1)
 
