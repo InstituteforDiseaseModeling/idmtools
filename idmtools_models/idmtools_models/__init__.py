@@ -5,4 +5,3 @@ This package provides some common model tasks like Python, Template Scripts, or 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 __version__ = "1.6.7+nightly"
-
