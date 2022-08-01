@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Optional, Any, Dict, Union, List
 from dataclasses import dataclass, field, fields
 from logging import getLogger
+from uuid import UUID
 
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities.iplatform import IPlatform, ITEM_TYPE_TO_OBJECT_INTERFACE
@@ -152,16 +153,7 @@ class SlurmPlatform(IPlatform):
         config_dict.update(kwargs)
         return config_dict
 
-    def cancel_items(self, items: Union[IEntity, List[IEntity]]):
-        """
-        Cancel items on the platform.
-
-        Args:
-            items: Items to cancel
-
-        Returns:
-            None
-        """
+    def cancel_items(self, items: Union[IEntity, List[IEntity]]) -> None:
         if isinstance(items, IEntity):
             items = [items]
         self._is_item_list_supported(items)
@@ -171,11 +163,15 @@ class SlurmPlatform(IPlatform):
             interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
             getattr(self, interface).cancel([item])
 
+    def cancel_items_by_id(self, ids: Dict[UUID, ItemType]) -> None:
+        items = [self.get_item(item_id=id, item_type=item_type) for id, item_type in ids.items()]
+        return self.cancel_items(items=items)
+
     @staticmethod
-    def get_slurm_job_id_from_file(path):
+    def _get_slurm_job_id_from_file(path):
         with open(path, 'r') as f:
-            job_id = f.read().strip()
-        return job_id
+            slurm_job_id = f.read().strip()
+        return slurm_job_id
 
     def get_slurm_job_id_for_item(self, item: IEntity) -> str:
         """
@@ -191,7 +187,7 @@ class SlurmPlatform(IPlatform):
 
         item.platform = self
         item_id_file_path = Path(self._op_client.get_directory(item=item), self.ID_FILE)
-        slurm_job_id = self.get_slurm_job_id_from_file(path=item_id_file_path)
+        slurm_job_id = self._get_slurm_job_id_from_file(path=item_id_file_path)
         return slurm_job_id
 
     def set_slurm_job_id_for_item(self, item: IEntity, slurm_job_id: str) -> None:

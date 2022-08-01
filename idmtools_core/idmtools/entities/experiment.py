@@ -80,9 +80,6 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
     # simulations
     __replace_task_with_proxy: bool = field(default=True, init=False, compare=False)
 
-    # slurm only
-    slurm_job_id: str = field(default=None)
-
     def __post_init__(self, simulations):
         """
         Initialize Experiment.
@@ -606,13 +603,6 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         if verbose:
             user_logger.info(f"Simulation Type: {type(self.__simulations)}")
             user_logger.info(f"Assets: {self.assets}")
-
-    @staticmethod
-    def read_slurm_job_id_from_file(path):
-        with open(path, 'r') as f:
-            lines = f.readlines()
-        slurm_job_id = lines[0].strip()
-        return slurm_job_id
 
 
 class ExperimentSpecification(ExperimentPluginSpecification):

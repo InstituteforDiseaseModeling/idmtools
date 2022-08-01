@@ -989,6 +989,18 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         """
         pass
 
+    def cancel_items_by_id(self, ids: Dict[UUID, ItemType]) -> None:
+        """
+        Cancel items on the platform, finding the items by uid
+
+        Args:
+            ids: uids of the items to cancel
+
+        Returns:
+            None
+        """
+        pass
+
 
 TPlatform = TypeVar("TPlatform", bound=IPlatform)
 TPlatformClass = Type[TPlatform]
