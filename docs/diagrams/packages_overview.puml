@@ -28,11 +28,16 @@ note left of [idmtools-platform-local]
     Provides ability to run
     locally using Docker containers
 end note
+[idmtools-platform-slurm]
+note right of [idmtools-platform-slurm]
+    Provides ability to 
+    interact with SLURM
+end note
 
 [idmtools-cli] --> [idmtools]
 [idmtools-models] --> [idmtools]
 [idmtools-platform-comps] -> idmtools
 [idmtools-platform-local] -up-> idmtools
-
+[idmtools-platform-slurm] -up-> idmtools
 
 @enduml

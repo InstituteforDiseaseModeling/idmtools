@@ -118,10 +118,10 @@ class TestPythonSimulation(ITestWithPersistence):
         for simulation in experiment.simulations:
             simulation_ids.append(simulation.id)
             simulation_dir = platform._op_client.get_directory(simulation)
-            asserts_dir = simulation_dir.joinpath("Assets")
             with open(os.path.join(simulation_dir, '_run.sh'), 'r') as fpr:
                 contents = fpr.read()
             self.assertIn("until [ \"$n\" -ge 5 ]", contents)  # 5 here is from retries=5 in platform
+            self.assertIn("python3 Assets/model3.py --config config.json", contents)
 
         # verify ids in metadata.json  for suite
         suite = experiment.suite
@@ -129,16 +129,14 @@ class TestPythonSimulation(ITestWithPersistence):
         with open(os.path.join(suite_dir, 'metadata.json'), 'r') as j:
             contents = json.loads(j.read())
             self.assertEqual(contents['_uid'], suite.id)
-            self.assertEqual(contents['experiments'][0]['parent_id'], suite.id)
-            self.assertEqual(contents['experiments'][0]['_uid'], experiment.id)
-            self.assertEqual(sorted(contents['experiments'][0]['simulations']), sorted(simulation_ids))
+            self.assertEqual(contents['experiments'][0], experiment.id)
 
         # verify ids in metadata.json for experiment
         with open(os.path.join(experiment_dir, 'metadata.json'), 'r') as j:
             contents = json.loads(j.read())
             self.assertEqual(contents['_uid'], experiment.id)
             self.assertEqual(contents['parent_id'], suite.id)
-            self.assertEqual(sorted(contents['simulations']), sorted(simulation_ids))
+            self.assertEqual(set(contents['simulations']), set(simulation_ids))
 
         # verify ids in metadata.json for simulation, also verify sweep parameter in config.json file
         for simulation in experiment.simulations:

@@ -17,8 +17,8 @@ class SlurmItem:
     Represent Slurm Object
     """
 
-    def __init__(self, kwargs: Dict):
-        for key, value in kwargs.items():
+    def __init__(self, metas: Dict):
+        for key, value in metas.items():
             setattr(self, key, value)
 
     def get_platform_object(self):
@@ -30,8 +30,8 @@ class SlurmSuite(SlurmItem):
     Represent Slurm Suite
     """
 
-    def __init__(self, kwargs: Dict):
-        super().__init__(kwargs)
+    def __init__(self, metas: Dict):
+        super().__init__(metas)
         self.item_type = ItemType.SUITE
 
 
@@ -40,8 +40,8 @@ class SlurmExperiment(SlurmItem):
     Represent Slurm Experiment
     """
 
-    def __init__(self, kwargs: Dict):
-        super().__init__(kwargs)
+    def __init__(self, metas: Dict):
+        super().__init__(metas)
         self.item_type = ItemType.EXPERIMENT
 
 
@@ -50,8 +50,8 @@ class SlurmSimulation(SlurmItem):
     Represent Slurm Simulation
     """
 
-    def __init__(self, kwargs: Dict):
-        super().__init__(kwargs)
+    def __init__(self, metas: Dict):
+        super().__init__(metas)
         self.item_type = ItemType.SIMULATION
 
 
