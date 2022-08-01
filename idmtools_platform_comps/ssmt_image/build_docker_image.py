@@ -82,8 +82,6 @@ def get_username_and_password(disable_keyring_load=False, disable_keyring_save=F
             logger.info("Saving Credentials")
             keyring.set_password(KEYRING_NAME, "username", username)
             keyring.set_password(KEYRING_NAME, "password", password)
-    username = 'shchen@idmod.org'
-    password="Hongminc914211914211"
     return username, password
 
 
