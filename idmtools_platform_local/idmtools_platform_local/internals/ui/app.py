@@ -7,8 +7,8 @@ from idmtools_platform_local.internals.ui.controllers.experiments import Experim
 from idmtools_platform_local.internals.ui.controllers.healthcheck import HealthCheck
 from idmtools_platform_local.internals.ui.controllers.simulations import Simulations
 
-# We setup a simple data folder browser
-# We meed to manually add our rules because we don't want them at
+# We set up a simple data folder browser
+# We need to manually add our rules because we don't want them at
 # / and /<path>:<path>
 
 

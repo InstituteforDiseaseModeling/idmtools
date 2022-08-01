@@ -43,6 +43,8 @@ class TestPlatformFactory(ITestWithPersistence):
         platform2 = Platform('Local', **kwargs)
         # override this to make only part unique the same
         platform2._config_block = platform._config_block
+        platform.uid = None
+        platform2.uid = None
         self.assertEqual(platform, platform2)
         del platform
         del platform2

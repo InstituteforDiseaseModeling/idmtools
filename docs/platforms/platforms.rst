@@ -37,5 +37,6 @@ For additional information about configuring idmtools.ini, see :doc:`../configur
 
 .. toctree::
    platforms-comps
+   platforms-slurm
    platforms-local
    platforms-plugin
