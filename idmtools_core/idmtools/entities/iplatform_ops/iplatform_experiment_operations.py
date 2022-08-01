@@ -375,4 +375,13 @@ class IPlatformExperimentOperations(ABC):
         return experiment
 
     def cancel(self, experiments: List[Experiment]) -> None:
+        """
+        Cancel one or more Experiments
+
+        Args:
+            experiments: the experiment(s) to cancel
+
+        Returns:
+            None
+        """
         pass

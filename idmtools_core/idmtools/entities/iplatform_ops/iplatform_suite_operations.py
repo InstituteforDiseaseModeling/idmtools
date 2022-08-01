@@ -284,3 +284,16 @@ class IPlatformSuiteOperations(ABC):
             e = self.platform.get_item(exp.uid, ItemType.EXPERIMENT)
             ret[str(exp.uid)] = self.platform.get_files(e, files, **kwargs)
         return ret
+
+    def cancel(self, suites: List[Suite]) -> None:
+        """
+        Cancel one or more Suites
+
+        Args:
+            experiments: the experiment(s) to cancel
+
+        Returns:
+            None
+        """
+        for suite in suites:
+            self.platform.cancel_items(items=suite.experiments)
