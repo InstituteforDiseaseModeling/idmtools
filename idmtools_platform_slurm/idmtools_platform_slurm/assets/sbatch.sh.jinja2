@@ -43,6 +43,19 @@
 #SBATCH --output=stdout.txt
 #SBATCH --error=stderr.txt
 
+#SBATCH --signal=B:SIGTERM@30
+
+# define the handler function
+pre_termination_handler()
+{
+    # do whatever cleanup you want here
+    # create a new file as an indicator
+    touch Terminated.txt
+    exit -1
+}
+
+# associate the function "pre_termination_handler" with the TERM signal
+trap 'pre_termination_handler' TERM
 
 {% if modules is defined and modules is not none and modules|length > 0 %}
 {% for m in modules %}

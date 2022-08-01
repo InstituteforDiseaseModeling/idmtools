@@ -132,4 +132,5 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
         Returns:
             None
         """
-        raise NotImplementedError("Refresh statu has not been implemented on the Slurm Platform")
+        for experiment in suite.experiments:
+            self.platform.refresh_status(experiment, **kwargs)

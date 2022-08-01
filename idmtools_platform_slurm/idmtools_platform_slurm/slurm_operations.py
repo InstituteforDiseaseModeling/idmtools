@@ -9,10 +9,11 @@ import shutil
 import subprocess
 from enum import Enum
 from pathlib import Path
+from uuid import UUID, uuid4
 from logging import getLogger
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Union, Type, Any
+from typing import Union, Type, Any, Dict
 from idmtools.core import EntityStatus, ItemType
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities import Suite
@@ -38,6 +39,13 @@ SLURM_STATES = dict(
     SUSPENDED=EntityStatus.FAILED,
     TIMEOUT=EntityStatus.FAILED
 )
+
+SLURM_MAPS = {
+    "0": EntityStatus.SUCCEEDED,
+    "-1": EntityStatus.FAILED,
+    "100": EntityStatus.RUNNING,
+    "None": EntityStatus.CREATED
+}
 
 DEFAULT_SIMULATION_BATCH = """#!/bin/bash
 """
@@ -94,7 +102,7 @@ class SlurmOperations(ABC):
         pass
 
     @abstractmethod
-    def entity_status(self, item: IEntity) -> Any:
+    def get_simulation_status(self, sim_id: Union[UUID, str]) -> Any:
         pass
 
 
@@ -132,7 +140,7 @@ class RemoteSlurmOperations(SlurmOperations):
     def submit_job(self, item: Union[Experiment, Simulation], **kwargs) -> Any:
         pass
 
-    def entity_status(self, item: IEntity) -> Any:
+    def get_simulation_status(self, sim_id: Union[UUID, str]) -> Any:
         pass
 
 
@@ -318,12 +326,35 @@ class LocalSlurmOperations(SlurmOperations):
         else:
             raise NotImplementedError(f"Submit job is not implemented on SlurmPlatform.")
 
-    def entity_status(self, item: Union[Suite, Experiment, Simulation]) -> Any:
+    def get_simulation_status(self, sim_id: Union[UUID, str], job_cancelled: bool = None, raw: bool = False,
+                              **kwargs) -> EntityStatus:
         """
-        Get item status.
+        Retrieve simulation status.
         Args:
-            item: IEntity
+            sim_id: Simulation ID
+            job_cancelled: bool
+            raw: bool
+                - True: keep original CREATED (not processed)
+                - False: convert CREATED (not processed) to FAILED
+            kwargs: keyword arguments used to expand functionality
         Returns:
-            item status
+            EntityStatus
         """
-        raise NotImplementedError(f"{item.__class__.__name__} is not supported on SlurmPlatform.")
+        # Workaround (cancelling job not output -1): check if slurm job got cancelled
+        sim_dir = self.get_directory_by_id(sim_id, ItemType.SIMULATION)
+        if job_cancelled is None:
+            job_term_path = sim_dir.parent.joinpath('Terminated.txt')
+            job_cancelled = job_term_path.exists()
+
+        # Check process status
+        job_status_path = sim_dir.joinpath('job_status.txt')
+        if job_status_path.exists():
+            status = open(job_status_path).read().strip()
+            status = SLURM_MAPS[status]
+        else:
+            status = SLURM_MAPS['None']
+        # Consider Cancel Case so that we may get out of the refresh loop
+        if job_cancelled and not raw and status == EntityStatus.CREATED:
+            status = EntityStatus.FAILED
+
+        return status

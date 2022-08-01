@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 logger = getLogger(__name__)
 user_logger = getLogger("user")
 
-EXCLUDE_FILES = ['_run.sh', 'metadata.json', 'stdout.txt', 'stderr.txt', 'status.txt', 'job_id']
+EXCLUDE_FILES = ['_run.sh', 'metadata.json', 'stdout.txt', 'stderr.txt', 'status.txt', 'job_id.txt', 'job_status.txt']
 
 
 @dataclass

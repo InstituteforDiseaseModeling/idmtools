@@ -5,7 +5,7 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 from uuid import UUID, uuid4
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, List, Dict, Type, Optional
+from typing import TYPE_CHECKING, List, Dict, Type, Optional, Union
 from idmtools.assets import Asset
 from idmtools.core import ItemType, EntityStatus
 from idmtools_platform_slurm.slurm_operations import SLURM_STATES
@@ -37,7 +37,10 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
         """
         metas = self.platform._metas.filter(item_type=ItemType.SIMULATION, property_filter={'id': str(simulation_id)})
         if len(metas) > 0:
-            return SlurmSimulation(metas[0])
+            # update status - data analysis may need this
+            slurm_sim = SlurmSimulation(metas[0])
+            slurm_sim.status = self.platform._op_client.get_simulation_status(slurm_sim.id)
+            return slurm_sim
         else:
             raise RuntimeError(f"Not found Simulation with id '{simulation_id}'")
 
@@ -153,17 +156,17 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
         sim.tags = slurm_sim.tags
         sim._platform_object = slurm_sim
         # Convert status
-        sim.status = SLURM_STATES[slurm_sim.status] if slurm_sim.status in SLURM_STATES else EntityStatus.CREATED
+        sim.status = slurm_sim.status
 
         return sim
 
     def refresh_status(self, simulation: Simulation, **kwargs):
         """
-        Refresh status
+        Refresh simulation status: we actually don't really refresh simulation' status directly.
         Args:
             simulation: idmtools Simulation
             kwargs: keyword arguments used to expand functionality
         Returns:
             None
         """
-        raise NotImplementedError("Refresh status has not been implemented on the Slurm Platform")
+        raise NotImplementedError("Refresh simulation status is not called directly on the Slurm Platform")
