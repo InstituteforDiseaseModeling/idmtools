@@ -358,7 +358,7 @@ class LocalSlurmOperations(SlurmOperations):
         else:
             status = SLURM_MAPS['None']
         # Consider Cancel Case so that we may get out of the refresh loop
-        if job_cancelled and not raw and status == EntityStatus.CREATED:
+        if job_cancelled and not raw and status not in (EntityStatus.SUCCEEDED, EntityStatus.FAILED):
             status = EntityStatus.FAILED
 
         return status
