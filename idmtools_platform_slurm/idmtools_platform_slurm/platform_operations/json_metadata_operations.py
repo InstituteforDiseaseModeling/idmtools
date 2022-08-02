@@ -84,8 +84,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         meta = json.loads(json.dumps(data, cls=IDMJSONEncoder))
         meta['id'] = meta['_uid']
         meta['uid'] = meta['_uid']
-        # meta['status'] = 'CREATED'
-        meta.pop('status')
+        meta['status'] = 'CREATED'
         return meta
 
     def dump(self, item: Union[Suite, Experiment, Simulation]) -> None:
