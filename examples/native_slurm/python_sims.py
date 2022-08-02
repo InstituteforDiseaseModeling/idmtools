@@ -3,6 +3,7 @@
 # printed to stdout.txt file and output/result.txt file in each simulation folder.
 # Path for simulation in cluster machine: /home/username/example/suite_id/experiment_id/simulation_id
 import os
+import sys
 from functools import partial
 from typing import Any, Dict
 
@@ -79,8 +80,8 @@ suite.update_tags({'name': 'suite_tag', 'idmtools': '123'})
 # Add experiment to the suite
 suite.add_experiment(experiment)
 
-# TODO, change wait_until_done and wait_on_done to True once we have 'status' feature
-suite.run(platform=platform, wait_until_done=False, wait_on_done=False, max_running_jobs=10,
+suite.run(platform=platform, wait_until_done=True, max_running_jobs=10,
           retries=5, dry_run=False)
+sys.exit(0 if experiment.succeeded else -1)
 
 
