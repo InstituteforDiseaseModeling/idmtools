@@ -79,7 +79,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
                     simulation.status = SLURM_STATES['CANCELED']
                     self.platform._metas.dump(item=simulation)
 
-    def get_children(self, experiment: SlurmExperiment, parent: Experiment = None, raw = True, **kwargs) -> List[Any]:
+    def get_children(self, experiment: SlurmExperiment, parent: Experiment = None, raw=True, **kwargs) -> List[Any]:
         """
         Fetch slurm experiment's children.
         Args:
@@ -209,13 +209,25 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
 
         return exp
 
-    def refresh_status(self, experiment: Experiment, **kwargs):
+    def refresh_status(self, experiment: Experiment, raw=False, **kwargs):
         """
         Refresh status of experiment.
         Args:
             experiment: idmtools Experiment
+            raw: True/False - True: not convert RUNNING to FAILED
             kwargs: keyword arguments used to expand functionality
         Returns:
             None
         """
-        raise NotImplementedError("Refresh_status has not been implemented on the Slurm Platform")
+        # Check if CANCEL EVENT happens
+        job_id_path = self.platform._op_client.get_directory(experiment).joinpath('job_id.txt')
+        if not job_id_path.exists():
+            print(f'job_id is not available for experiment: {experiment.id}')
+            return
+
+        job_id = open(job_id_path, 'r').read().strip()
+        job_cancelled = self.platform._op_client.check_cancelled(job_id, **kwargs)
+
+        # Refresh status for each simulation
+        for sim in experiment.simulations:
+            sim.status = self.platform._op_client.get_simulation_status(sim.id, job_cancelled, raw, **kwargs)
