@@ -343,8 +343,12 @@ class LocalSlurmOperations(SlurmOperations):
         # Workaround (cancelling job not output -1): check if slurm job got cancelled
         sim_dir = self.get_directory_by_id(sim_id, ItemType.SIMULATION)
         if job_cancelled is None:
-            job_term_path = sim_dir.parent.joinpath('Terminated.txt')
-            job_cancelled = job_term_path.exists()
+            job_id_path = sim_dir.parent.joinpath('job_id.txt')
+            if job_id_path.exists():
+                job_id = open(job_id_path).read().strip()
+                job_cancelled = self.check_cancelled(job_id)
+            else:
+                job_cancelled = False
 
         # Check process status
         job_status_path = sim_dir.joinpath('job_status.txt')
@@ -358,3 +362,26 @@ class LocalSlurmOperations(SlurmOperations):
             status = EntityStatus.FAILED
 
         return status
+
+    @staticmethod
+    def check_cancelled(job_id: str, display: bool = False, **kwargs) -> Any:
+        """
+        Check if there is RUNNING or PENDING job.
+        Args:
+            job_id: Slurm job id
+            kwargs: keyword arguments used to expand functionality
+        Returns:
+            Any
+        """
+        # Get slurm jobs summary
+        p1 = subprocess.Popen(['sacct', '-n', '-X', '-P', '--format=state', '-j', job_id], stdout=subprocess.PIPE)
+        p2 = subprocess.Popen(['sort'], stdin=p1.stdout, stdout=subprocess.PIPE)
+        p1.stdout.close()
+        p3 = subprocess.Popen(['uniq', '-c'], stdin=p2.stdout, stdout=subprocess.PIPE)
+        p2.stdout.close()
+
+        result = p3.communicate()[0]
+        stdout = result.decode('utf-8').strip()
+        if display:
+            print(stdout)
+        return ('PENDING' not in stdout) and ('RUNNING' not in stdout)

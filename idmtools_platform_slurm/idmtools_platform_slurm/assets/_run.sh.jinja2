@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#SBATCH --signal=B:SIGTERM@30
+
 # define the handler function
 term_handler()
 {

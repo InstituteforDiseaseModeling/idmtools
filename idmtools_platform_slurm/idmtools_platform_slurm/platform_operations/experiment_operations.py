@@ -199,8 +199,13 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
             None
         """
         # Check if CANCEL EVENT happens
-        job_term_path = self.platform._op_client.get_directory(experiment).joinpath('Terminated.txt')
-        job_cancelled = job_term_path.exists()
+        job_id_path = self.platform._op_client.get_directory(experiment).joinpath('job_id.txt')
+        if not job_id_path.exists():
+            print(f'job_id is not available for experiment: {experiment.id}')
+            return
+
+        job_id = open(job_id_path, 'r').read().strip()
+        job_cancelled = self.platform._op_client.check_cancelled(job_id, **kwargs)
 
         # Refresh status for each simulation
         for sim in experiment.simulations:
