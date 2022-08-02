@@ -11,14 +11,15 @@ from uuid import UUID
 
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities.iplatform import IPlatform, ITEM_TYPE_TO_OBJECT_INTERFACE
-from idmtools.core import ItemType
+from idmtools.core import ItemType, EntityStatus
+from idmtools.entities.simulation import Simulation
 from idmtools_platform_slurm.platform_operations.json_metadata_operations import JSONMetadataOperations
 from idmtools_platform_slurm.platform_operations.asset_collection_operations import \
     SlurmPlatformAssetCollectionOperations
 from idmtools_platform_slurm.platform_operations.experiment_operations import SlurmPlatformExperimentOperations
 from idmtools_platform_slurm.platform_operations.simulation_operations import SlurmPlatformSimulationOperations
 from idmtools_platform_slurm.slurm_operations import SlurmOperations, SlurmOperationalMode, RemoteSlurmOperations, \
-    LocalSlurmOperations
+    LocalSlurmOperations, JOB_STATUS_MAP
 from idmtools_platform_slurm.platform_operations.suite_operations import SlurmPlatformSuiteOperations
 
 logger = getLogger(__name__)
@@ -31,6 +32,7 @@ CONFIG_PARAMETERS = ['ntasks', 'partition', 'nodes', 'mail_type', 'mail_user', '
 @dataclass(repr=False)
 class SlurmPlatform(IPlatform):
     ID_FILE = 'job_id.txt'
+    SIMULATION_STATUS_FILE = 'job_status.txt'
 
     job_directory: str = field(default=None)
     mode: SlurmOperationalMode = field(default=None)
@@ -190,3 +192,68 @@ class SlurmPlatform(IPlatform):
         item_id_file_path = Path(self._op_client.get_directory(item=item), self.ID_FILE)
         with open(item_id_file_path, 'w') as f:
             f.write(slurm_job_id)
+
+    def get_status_for_simulation(self, simulation: Simulation) -> EntityStatus:
+        """
+        Obtain a status object for the given simulation
+
+        Args:
+            simulation: the simulation object to get the status for
+
+        Returns:
+            an EntityStatus status object
+        """
+        return self.get_status_for_simulation_by_id(id=simulation.uid)
+
+    def get_status_for_simulation_by_id(self, id: Union[UUID, str]) -> EntityStatus:
+        """
+        Obtain a status object for the given simulation id
+
+        Args:
+            id: the simulation id to get the status for
+
+        Returns:
+            an EntityStatus status object
+        """
+        try:
+            simulation_directory = self._op_client.get_directory_by_id(item_id=str(id),
+                                                                       item_type=ItemType.SIMULATION)
+            simulation_status_path = Path(simulation_directory, self.SIMULATION_STATUS_FILE)
+            with open(simulation_status_path, 'r') as f:
+                status_txt = f.read().strip()
+        except FileNotFoundError as e:
+            status_txt = None
+        status = JOB_STATUS_MAP[status_txt]
+        return status
+
+    def set_status_for_simulation(self, simulation: Simulation, status: str) -> None:
+        """
+        Set the status for a given simulation object, using status file strings
+
+        Args:
+            simulation: the simulation object to set the status for
+            status: the status file string representing the status to set
+
+        Returns:
+            None
+        """
+        return self.set_status_for_simulation_by_id(id=simulation.uid, status=status)
+
+    def set_status_for_simulation_by_id(self, id: Union[UUID, str], status: str) -> None:
+        """
+        Set the status for a given simulation id, using status file strings
+
+        Args:
+            id: the simulation id to set the status for
+            status: the status file string representing the status to set
+
+        Returns:
+            None
+        """
+        simulation_directory = self._op_client.get_directory_by_id(item_id=str(id),
+                                                                   item_type=ItemType.SIMULATION)
+        simulation_status_path = Path(simulation_directory, self.SIMULATION_STATUS_FILE)
+        if status not in JOB_STATUS_MAP:
+            raise Exception(f"Unknown simulation status code being set: {status}")
+        with open(simulation_status_path, 'w') as f:
+            f.write(status)

@@ -70,14 +70,12 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         return SlurmExperiment(meta)
 
     def cancel(self, experiments: List[Experiment]) -> None:
-        exps_to_cancel = [exp for exp in experiments if exp.slurm_job_id is not None]
-        slurm_ids = [exp.slurm_job_id for exp in exps_to_cancel]
+        slurm_ids = [self.platform.get_slurm_job_id_for_item(item=experiment) for experiment in experiments]
         self.platform._op_client.cancel_jobs(ids=slurm_ids)
-        for exp in exps_to_cancel:
-            for simulation in exp.simulations:
+        for experiment in experiments:
+            for simulation in experiment.simulations:
                 if not simulation.done:
-                    simulation.status = SLURM_STATES['CANCELED']
-                    self.platform._metas.dump(item=simulation)
+                    self.platform.set_status_for_simulation(simulation=simulation, status="-2")  # canceled status
 
     def get_children(self, experiment: SlurmExperiment, parent: Experiment = None, raw=True, **kwargs) -> List[Any]:
         """
@@ -209,7 +207,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
 
         return exp
 
-    def refresh_status(self, experiment: Experiment, raw=False, **kwargs):
+    def refresh_status(self, experiment: Experiment, **kwargs):
         """
         Refresh status of experiment.
         Args:
@@ -219,15 +217,6 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
             None
         """
-        # Check if CANCEL EVENT happens
-        job_id_path = self.platform._op_client.get_directory(experiment).joinpath('job_id.txt')
-        if not job_id_path.exists():
-            print(f'job_id is not available for experiment: {experiment.id}')
-            return
-
-        job_id = open(job_id_path, 'r').read().strip()
-        job_cancelled = self.platform._op_client.check_cancelled(job_id, **kwargs)
-
         # Refresh status for each simulation
         for sim in experiment.simulations:
-            sim.status = self.platform._op_client.get_simulation_status(sim.id, job_cancelled, raw, **kwargs)
+            sim.status = self.platform.get_status_for_simulation(simulation=sim)

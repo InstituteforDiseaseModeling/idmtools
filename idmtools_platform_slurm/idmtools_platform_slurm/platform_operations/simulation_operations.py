@@ -20,13 +20,17 @@ if TYPE_CHECKING:
 
 logger = getLogger(__name__)
 
+#
+# BUG: there is no parent_id for SlurmSimulation objects. Either add or swap to using Simulation throughout.
+#
+
 
 @dataclass
 class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
     platform: 'SlurmPlatform'  # noqa: F821
     platform_type: Type = field(default=SlurmSimulation)
 
-    def get(self, simulation_id: UUID, **kwargs) -> Dict:
+    def get(self, simulation_id: UUID, **kwargs) -> SlurmSimulation:
         """
         Gets an simulation from the Slurm platform.
         Args:
@@ -36,13 +40,13 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
             Slurm Simulation object
         """
         metas = self.platform._metas.filter(item_type=ItemType.SIMULATION, property_filter={'id': str(simulation_id)})
-        if len(metas) > 0:
-            # update status - data analysis may need this
-            slurm_sim = SlurmSimulation(metas[0])
-            slurm_sim.status = self.platform._op_client.get_simulation_status(slurm_sim.id)
-            return slurm_sim
-        else:
+        if len(metas) == 0:
             raise RuntimeError(f"Not found Simulation with id '{simulation_id}'")
+
+        # update status - data analysis may need this
+        slurm_sim = SlurmSimulation(metas[0])
+        slurm_sim.status = self.platform.get_status_for_simulation_by_id(id=simulation_id)
+        return slurm_sim
 
     def platform_create(self, simulation: Simulation, **kwargs) -> SlurmSimulation:
         """
@@ -80,10 +84,10 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
             The Experiment being the parent of this simulation.
         """
         if simulation.parent_id is None:
-            return None
+            parent = None
         else:
-            return self.platform._experiments.get(simulation.parent_id, raw=True,
-                                                  **kwargs) if simulation.parent_id else None
+            parent = self.platform._experiments.get(simulation.parent_id, raw=True, **kwargs)
+        return parent
 
     def platform_run_item(self, simulation: Simulation, **kwargs):
         """

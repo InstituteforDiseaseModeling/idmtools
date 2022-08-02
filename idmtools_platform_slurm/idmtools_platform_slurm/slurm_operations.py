@@ -30,7 +30,7 @@ SLURM_STATES = dict(
     DEADLINE=EntityStatus.FAILED,
     FAILED=EntityStatus.FAILED,
     OUT_OF_MEMORY=EntityStatus.FAILED,
-    PENDING=EntityStatus.RUNNING,
+    PENDING=EntityStatus.CREATED,
     PREEMPTED=EntityStatus.FAILED,
     RUNNING=EntityStatus.RUNNING,
     REQUEUED=EntityStatus.RUNNING,
@@ -40,11 +40,13 @@ SLURM_STATES = dict(
     TIMEOUT=EntityStatus.FAILED
 )
 
-SLURM_MAPS = {
-    "0": EntityStatus.SUCCEEDED,
-    "-1": EntityStatus.FAILED,
-    "100": EntityStatus.RUNNING,
-    "None": EntityStatus.CREATED
+# maps values in job_status.txt to actual status coded
+JOB_STATUS_MAP = {
+    "0": SLURM_STATES['COMPLETED'],
+    "-1": SLURM_STATES['FAILED'],
+    "100": SLURM_STATES['RUNNING'],
+    "-2": SLURM_STATES['CANCELED'],
+    None: SLURM_STATES['PENDING'],
 }
 
 DEFAULT_SIMULATION_BATCH = """#!/bin/bash
@@ -114,9 +116,6 @@ class SlurmOperations(ABC):
         Returns:
             None
         """
-        pass
-
-    def get_simulation_status(self, sim_id: Union[UUID, str]) -> Any:
         pass
 
 
@@ -355,63 +354,3 @@ class LocalSlurmOperations(SlurmOperations):
             subprocess.check_output(['scancel', *[id for id in ids]])
         except subprocess.CalledProcessError as e:
             raise SlurmOperationException(e.args[0])
-
-    def get_simulation_status(self, sim_id: Union[UUID, str], job_cancelled: bool = None, raw: bool = False,
-                              **kwargs) -> EntityStatus:
-        """
-        Retrieve simulation status.
-        Args:
-            sim_id: Simulation ID
-            job_cancelled: bool
-            raw: bool
-                - True: keep original CREATED (not processed)
-                - False: convert CREATED (not processed) to FAILED
-            kwargs: keyword arguments used to expand functionality
-        Returns:
-            EntityStatus
-        """
-        # Workaround (cancelling job not output -1): check if slurm job got cancelled
-        sim_dir = self.get_directory_by_id(sim_id, ItemType.SIMULATION)
-        if job_cancelled is None:
-            job_id_path = sim_dir.parent.joinpath('job_id.txt')
-            if job_id_path.exists():
-                job_id = open(job_id_path).read().strip()
-                job_cancelled = self.check_cancelled(job_id)
-            else:
-                job_cancelled = False
-
-        # Check process status
-        job_status_path = sim_dir.joinpath('job_status.txt')
-        if job_status_path.exists():
-            status = open(job_status_path).read().strip()
-            status = SLURM_MAPS[status]
-        else:
-            status = SLURM_MAPS['None']
-        # Consider Cancel Case so that we may get out of the refresh loop
-        if job_cancelled and not raw and status not in (EntityStatus.SUCCEEDED, EntityStatus.FAILED):
-            status = EntityStatus.FAILED
-
-        return status
-
-    @staticmethod
-    def check_cancelled(job_id: str, display: bool = False, **kwargs) -> Any:
-        """
-        Check if there is RUNNING or PENDING job.
-        Args:
-            job_id: Slurm job id
-            kwargs: keyword arguments used to expand functionality
-        Returns:
-            Any
-        """
-        # Get slurm jobs summary
-        p1 = subprocess.Popen(['sacct', '-n', '-X', '-P', '--format=state', '-j', job_id], stdout=subprocess.PIPE)
-        p2 = subprocess.Popen(['sort'], stdin=p1.stdout, stdout=subprocess.PIPE)
-        p1.stdout.close()
-        p3 = subprocess.Popen(['uniq', '-c'], stdin=p2.stdout, stdout=subprocess.PIPE)
-        p2.stdout.close()
-
-        result = p3.communicate()[0]
-        stdout = result.decode('utf-8').strip()
-        if display:
-            print(stdout)
-        return ('PENDING' not in stdout) and ('RUNNING' not in stdout)
