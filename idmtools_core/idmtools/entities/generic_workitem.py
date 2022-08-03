@@ -8,6 +8,11 @@ from uuid import UUID
 from idmtools.assets.file_list import FileList
 from idmtools.entities.command_task import CommandTask
 from idmtools.entities.iworkflow_item import IWorkflowItem
+from idmtools.core.interfaces.iitem import IItem
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:  # pragma: no cover
+    from idmtools.entities.iplatform import IPlatform
 
 
 @dataclass
@@ -42,3 +47,27 @@ class GenericWorkItem(IWorkflowItem):
             Hash id
         """
         return hash(self.id)
+
+    def pre_creation(self, platform: 'IPlatform'):
+        """
+        Pre Creation of Generic Workitem.
+
+        Args:
+            platform: Platform we are creating item on
+
+        Returns:
+            None
+        """
+        IItem.pre_creation(self, platform)
+
+    def post_creation(self, platform: 'IPlatform'):
+        """
+        Post Creation of Generic Workitem.
+
+        Args:
+            platform: Platform
+
+        Returns:
+            None
+        """
+        IItem.post_creation(self, platform)

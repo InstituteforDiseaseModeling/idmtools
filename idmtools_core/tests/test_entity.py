@@ -125,7 +125,7 @@ class TestEntity(ITestWithPersistence):
             s = Simulation(task=TestTask())
             s.add_post_creation_hook(save_id_as_file_as_hook)
             s.post_creation(fake_platform)
-        self.assertEqual(m.exception.args[0], 'aaaaa')
+        self.assertEqual(m.exception.args[0], "Saving id is currently only support for Experiments and Workitems")
 
     def test_pre_creation_allow_partials(self):
         s = Simulation(task=TestTask())
@@ -260,12 +260,20 @@ class TestEntity(ITestWithPersistence):
     def test_workitem_pre_create(self):
         wi = GenericWorkItem(task=TestTask())
         fake_platform = MagicMock()
-        self.assertTrue(False)
+        def inc_count(item, platform):
+            self.assertEqual(wi, item)
+            self.assertEqual(platform, fake_platform)
+        wi.add_pre_creation_hook(inc_count)
+        wi.pre_creation(fake_platform)
 
     def test_workitem_post_create(self):
         wi = GenericWorkItem(task=TestTask())
         fake_platform = MagicMock()
-        self.assertTrue(False)
+        def inc_count(item, platform):
+            self.assertEqual(wi, item)
+            self.assertEqual(platform, fake_platform)
+        wi.add_post_creation_hook(inc_count)
+        wi.post_creation(fake_platform)
 
     def test_suite_pre_creation_hooks(self):
         wi = GenericWorkItem(task=TestTask())

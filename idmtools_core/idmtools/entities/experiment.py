@@ -73,10 +73,10 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
     #: Internal storage of simulation
     __simulations: Union[SUPPORTED_SIM_TYPE] = field(default_factory=lambda: EntityContainer(), compare=False)
 
-    #: Determines if we should gather assets from a the first task. Only use when not using TemplatedSimulations
+    #: Determines if we should gather assets from the first task. Only use when not using TemplatedSimulations
     gather_common_assets_from_task: bool = field(default=None, compare=False)
 
-    #: Determines if we should gather assets from a the first task. Only use when not using TemplatedSimulations
+    #: Determines if we should gather assets from the first task. Only use when not using TemplatedSimulations
     disable_default_pre_create: bool = field(default=False, compare=False)
 
     #: Enable replacing the task with a proxy to reduce the memory footprint. Useful in provisioning large sets of

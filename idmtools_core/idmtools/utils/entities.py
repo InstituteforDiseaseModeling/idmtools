@@ -106,7 +106,7 @@ def get_default_tags() -> typing.Dict[str, str]:
 
 def save_id_as_file_as_hook(item: typing.Union['Experiment', 'IWorkflowItem'], platform: 'IPlatform'):
     """
-    Predefined hook that will save ids to files for Experiment or WorkItems
+    Predefined hook that will save ids to files for Experiment or WorkItems.
 
     Args:
         item:
@@ -115,7 +115,7 @@ def save_id_as_file_as_hook(item: typing.Union['Experiment', 'IWorkflowItem'], p
     Returns:
         None
     """
-    # Import locally because of circuluar deps
+    # Import locally because of circular deps
     from idmtools.entities.experiment import Experiment
     from idmtools.entities.iworkflow_item import IWorkflowItem
     if not isinstance(item, (Experiment, IWorkflowItem)):
