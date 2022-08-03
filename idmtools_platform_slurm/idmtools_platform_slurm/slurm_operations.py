@@ -345,11 +345,6 @@ class LocalSlurmOperations(SlurmOperations):
                 # we are not capturing the cluster name, which would be [1] of the following command
                 slurm_job_id = result.stdout.decode('utf-8').strip().split(';')[0]
                 self.platform.set_slurm_job_id_for_item(item=item, slurm_job_id=slurm_job_id)
-
-                # working_directory = self.get_directory(item)
-                # result = subprocess.run(['sbatch', 'sbatch.sh'], stdout=subprocess.PIPE, cwd=str(working_directory))
-                # stdout = result.stdout.decode('utf-8').strip()
-                # return stdout
         elif isinstance(item, Simulation):
             pass
         else:

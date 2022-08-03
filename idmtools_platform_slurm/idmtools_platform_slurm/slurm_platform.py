@@ -238,7 +238,6 @@ class SlurmPlatform(IPlatform):
             None
         """
         ret = self.set_status_for_simulation_by_id(id=simulation.uid, status=status)
-        simulation.status = JOB_STATUS_MAP[status]
         return ret
 
     def set_status_for_simulation_by_id(self, id: Union[UUID, str], status: str) -> None:

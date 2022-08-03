@@ -43,19 +43,21 @@ class TestSlurmCanceling(unittest.TestCase):
         self.suite.add_experiment(self.experiment)
 
     def test_canceling_a_full_experiment(self):
-        print('RUNNING TEST')
         self.platform.run_items(items=[self.experiment])
-        time.sleep(10)  # simulations should now exist in slurm
+        time.sleep(5)  # simulations should now exist in slurm
 
-        self.assertIsNotNone(self.experiment.slurm_job_id)
-        self.platform.cancel_items(items=[self.experiment])
-
-        self.assertEqual(self.experiment.status, EntityStatus.FAILED)
-        self.assertTrue(all([s.status == EntityStatus.FAILED for s in self.experiment.simulations]))
-
-        # validation
-        self.assertEqual(self.experiment.simulation_count, 5)
+        job_id = self.platform.get_slurm_job_id_for_item(item=self.experiment)
+        self.assertIsNotNone(job_id)
         self.assertIsNotNone(self.experiment.uid)
+        self.assertEqual(self.experiment.simulation_count, 5)
+
+        self.platform.cancel_items(items=[self.experiment])
+        self.platform.refresh_status(item=self.experiment)
+        
+        self.assertEqual(self.experiment.status, EntityStatus.FAILED)
+        # at least one simulation should have been marked as failed/canceled . Probably all, but technically only
+        # one is necessary
+        self.assertTrue(len([sim for sim in self.experiment.simulations if sim.status == EntityStatus.FAILED]) >= 1)
 
     # Not implemented in current work scope
     def test_canceling_a_single_simulation(self):
