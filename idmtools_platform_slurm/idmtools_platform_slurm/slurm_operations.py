@@ -338,14 +338,23 @@ class LocalSlurmOperations(SlurmOperations):
         dry_run = kwargs.get('dry_run', False)
         if isinstance(item, Experiment):
             if not dry_run:
-                working_directory = self.get_directory(item)
-                result = subprocess.run(['sbatch', 'sbatch.sh'], stdout=subprocess.PIPE, cwd=str(working_directory))
-                stdout = result.stdout.decode('utf-8').strip()
-                return stdout
+                working_directory = self.platform._op_client.get_directory(item)
+                result = subprocess.run(['sbatch', '--parsable', 'sbatch.sh'],
+                                        stdout=subprocess.PIPE, cwd=str(working_directory))
+                # obtain and record the slurm job id for the experiment
+                # we are not capturing the cluster name, which would be [1] of the following command
+                slurm_job_id = result.stdout.decode('utf-8').strip().split(';')[0]
+                self.platform.set_slurm_job_id_for_item(item=item, slurm_job_id=slurm_job_id)
+
+                # working_directory = self.get_directory(item)
+                # result = subprocess.run(['sbatch', 'sbatch.sh'], stdout=subprocess.PIPE, cwd=str(working_directory))
+                # stdout = result.stdout.decode('utf-8').strip()
+                # return stdout
         elif isinstance(item, Simulation):
             pass
         else:
-            raise NotImplementedError(f"Submit job is not implemented on SlurmPlatform.")
+            raise NotImplementedError(f"submit_job() is not implemented on SlurmPlatform for item of type: "
+                                      f"{type(item)}.")
 
     def cancel_jobs(self, ids):
         if len(ids) == 0:
