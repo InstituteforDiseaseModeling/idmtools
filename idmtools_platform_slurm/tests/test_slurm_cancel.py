@@ -74,8 +74,10 @@ class TestSlurmCanceling(unittest.TestCase):
         self.platform.cancel_items(items=[self.suite])
         self.platform.refresh_status(item=self.suite)
 
-        # self.assertEqual(self.experiment.status, EntityStatus.FAILED)
-        self.assertEqual(self.suite.status, EntityStatus.FAILED)
+        self.assertEqual(self.experiment.status, EntityStatus.FAILED)
+        
+        # TODO: re-enable this check once suite status is updated to depend on child experiments.
+        # self.assertEqual(self.suite.status, EntityStatus.FAILED)
 
         # at least one simulation should have been marked as failed/canceled . Probably all, but technically only
         # one is necessary
