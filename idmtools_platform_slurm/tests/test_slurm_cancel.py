@@ -65,7 +65,21 @@ class TestSlurmCanceling(unittest.TestCase):
 
     # Not implemented in current work scope
     def test_canceling_a_full_suite(self):
-        pass
+        self.platform.run_items(items=[self.suite])
+        time.sleep(5)
+
+        self.assertEqual(len(self.suite.experiments), 1)
+        self.assertEqual(self.experiment.simulation_count, 5)
+
+        self.platform.cancel_items(items=[self.suite])
+        self.platform.refresh_status(item=self.suite)
+
+        # self.assertEqual(self.experiment.status, EntityStatus.FAILED)
+        self.assertEqual(self.suite.status, EntityStatus.FAILED)
+
+        # at least one simulation should have been marked as failed/canceled . Probably all, but technically only
+        # one is necessary
+        self.assertTrue(len([sim for exp in self.suite.experiments for sim in exp.simulations if sim.status == EntityStatus.FAILED]) >= 1)
 
 
 if __name__ == '__main__':
