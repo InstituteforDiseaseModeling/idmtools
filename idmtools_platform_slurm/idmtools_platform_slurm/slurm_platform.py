@@ -142,6 +142,15 @@ class SlurmPlatform(IPlatform):
         return config_dict
 
     def cancel_items(self, items: Union[IEntity, List[IEntity]]) -> None:
+        """
+        Cancel one or more items (e.g. experiments/suites)
+
+        Args:
+            items: an item or list of item(s) to cancel
+
+        Returns:
+            None
+        """
         if isinstance(items, IEntity):
             items = [items]
         self._is_item_list_supported(items)
@@ -152,6 +161,15 @@ class SlurmPlatform(IPlatform):
             getattr(self, interface).cancel([item])
 
     def cancel_items_by_id(self, ids: Dict[UUID, ItemType]) -> None:
+        """
+        Cancel one or more items specified by their item id (e.g. experiments/suites)
+
+        Args:
+            ids: list of item id(s) with which to obtain items to cancel
+
+        Returns:
+            None
+        """
         items = [self.get_item(item_id=id, item_type=item_type) for id, item_type in ids.items()]
         return self.cancel_items(items=items)
 

@@ -13,7 +13,7 @@ from uuid import UUID, uuid4
 from logging import getLogger
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Union, Type, Any, Dict
+from typing import Union, Type, Any, Dict, List
 from idmtools.core import EntityStatus, ItemType
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities import Suite
@@ -352,7 +352,16 @@ class LocalSlurmOperations(SlurmOperations):
             raise NotImplementedError(f"submit_job() is not implemented on SlurmPlatform for item of type: "
                                       f"{type(item)}.")
 
-    def cancel_jobs(self, ids):
+    def cancel_jobs(self, ids: List[str]) -> None:
+        """
+        Use scancel to cancel one or more provided slurm job ids
+
+        Args:
+            ids: a list of one or more slurm job ids to cancel
+
+        Returns:
+            None
+        """
         if len(ids) == 0:
             return
         try:
