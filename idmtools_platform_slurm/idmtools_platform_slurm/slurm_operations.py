@@ -154,12 +154,13 @@ class RemoteSlurmOperations(SlurmOperations):
         pass
 
     def cancel_jobs(self, ids):
-        if len(ids) == 0:
-            return
-        try:
-            self._cmd_client.exec_command(f"scancel {' '.join([id for id in ids])}")
-        except SSHException as e:
-            raise SlurmOperationException(e.args[0])
+        pass
+        # if len(ids) == 0:
+        #     return
+        # try:
+        #     self._cmd_client.exec_command(f"scancel {' '.join([id for id in ids])}")
+        # except SSHException as e:
+        #     raise SlurmOperationException(e.args[0])
 
     def get_simulation_status(self, sim_id: Union[UUID, str]) -> Any:
         pass
