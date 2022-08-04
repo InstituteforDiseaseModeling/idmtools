@@ -127,7 +127,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         dry_run = kwargs.get('dry_run', False)
         if not dry_run:
             stdout = self.platform._op_client.submit_job(experiment, **kwargs)
-        print(stdout)
+            print(stdout)
 
     def send_assets(self, experiment: Experiment, **kwargs):
         """
