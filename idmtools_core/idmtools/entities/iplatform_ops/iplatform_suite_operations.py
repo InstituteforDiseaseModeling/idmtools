@@ -290,7 +290,7 @@ class IPlatformSuiteOperations(ABC):
         Cancel one or more Suites
 
         Args:
-            experiments: the experiment(s) to cancel
+            suites: the experiment(s) to cancel
 
         Returns:
             None

@@ -977,7 +977,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         """
         return [x for x in self._platform_defaults if isinstance(x, default_type)]
 
-    def cancel_items(self, items: Union[IEntity, List[IEntity]]):
+    def cancel_items(self, items: Union[IEntity, List[IEntity]]) -> None:
         """
         Cancel items on the platform.
 
