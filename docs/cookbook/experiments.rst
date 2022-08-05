@@ -24,7 +24,7 @@ from a task.
     :language: python
 
 Creating an experiment with a pre- and post- creation hook
-----------------------------------------
+----------------------------------------------------------
 
 Prior to running an experiment or a work item, you can add pre or post creation hooks to the item.
 
