@@ -22,3 +22,11 @@ from a task.
 
 .. literalinclude:: ../../examples/cookbook/experiments/create_experiment_with_one_sim.py
     :language: python
+
+Creating an experiment with a pre- and post- creation hook
+----------------------------------------
+
+Prior to running an experiment or a work item, you can add pre or post creation hooks to the item.
+
+.. literalinclude:: ../../examples/cookbook/experiments/create_experiment_with_hooks.py
+    :language: python
