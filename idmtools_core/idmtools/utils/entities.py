@@ -4,6 +4,7 @@ utilities for dataclasses.
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import ast
+import os
 import dataclasses
 import typing
 from logging import getLogger
@@ -120,4 +121,7 @@ def save_id_as_file_as_hook(item: typing.Union['Experiment', 'IWorkflowItem'], p
     from idmtools.entities.iworkflow_item import IWorkflowItem
     if not isinstance(item, (Experiment, IWorkflowItem)):
         raise NotImplementedError("Saving id is currently only support for Experiments and Workitems")
-    item.to_id_file(Path(f'{item.item_type}.{item.name}.id'))
+    id_file = Path(f'{item.item_type}.{item.name}.id')
+    if os.path.exists(id_file):
+        os.remove(id_file)
+    item.to_id_file(id_file)
