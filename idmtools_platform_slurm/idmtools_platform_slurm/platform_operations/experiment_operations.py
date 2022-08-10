@@ -206,8 +206,8 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
             return
 
         job_id = open(job_id_path, 'r').read().strip()
-        job_cancelled = self.platform._op_client.check_cancelled(job_id, **kwargs)
+        job_finished = self.platform._op_client.check_finished(job_id, **kwargs)
 
         # Refresh status for each simulation
         for sim in experiment.simulations:
-            sim.status = self.platform._op_client.get_simulation_status(sim.id, job_cancelled, raw, **kwargs)
+            sim.status = self.platform._op_client.get_simulation_status(sim.id, job_finished, raw, **kwargs)
