@@ -46,7 +46,7 @@
 
 {% if modules is defined and modules is not none and modules|length > 0 %}
 {% for m in modules %}
-module load {{modules}}
+module load {{m}}
 {% endfor %}
 {% endif %}
 
