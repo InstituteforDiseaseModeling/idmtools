@@ -235,30 +235,33 @@ class TestEntity(ITestWithPersistence):
         s.post_creation(fake_platform)
 
     def test_experiment_pre_creation_hooks(self):
-        fake_platform = MagicMock()
-        e = Experiment()
-        e.simulations.append(Simulation(task=TestTask()))
-
-        def inc_count(item, platform):
-            self.assertEqual(e, item)
-            self.assertEqual(platform, fake_platform)
-
-        e.add_pre_creation_hook(inc_count)
-        e.pre_creation(fake_platform)
+        fake_platform = Platform("TestExecute", missing_ok=True)
+        base_task = TestTask()
+        sim = Simulation.from_task(base_task)
+        builder = SimulationBuilder()
+        exp = Experiment.from_builder(builder, base_task=base_task)
+        exp.simulations.append(sim)
+        mock_hook = MagicMock()
+        exp.add_pre_creation_hook(mock_hook)
+        with fake_platform:
+            exp.run(wait_until_done=True)
+            self.assertEqual(mock_hook.call_count, 1)
 
     def test_experiment_post_creation_hooks(self):
-        fake_platform = MagicMock()
-        e = Experiment()
-
-        def inc_count(item, platform):
-            self.assertEqual(e, item)
-            self.assertEqual(platform, fake_platform)
-
-        e.add_post_creation_hook(inc_count)
-        e.post_creation(fake_platform)
+        fake_platform = Platform("TestExecute", missing_ok=True)
+        base_task = TestTask()
+        sim = Simulation.from_task(base_task)
+        builder = SimulationBuilder()
+        exp = Experiment.from_builder(builder, base_task=base_task)
+        exp.simulations.append(sim)
+        mock_hook = MagicMock()
+        exp.add_post_creation_hook(mock_hook)
+        with fake_platform:
+            exp.run(wait_until_done=True)
+            self.assertEqual(mock_hook.call_count, 1)
 
     def test_workitem_pre_create(self):
-        wi = GenericWorkItem(task=TestTask())
+        wi = GenericWorkItem(task=TestTask(), name='test_wi_precreate')
         fake_platform = MagicMock()
         def inc_count(item, platform):
             self.assertEqual(wi, item)

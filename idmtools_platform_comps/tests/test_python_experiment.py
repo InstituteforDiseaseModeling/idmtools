@@ -39,6 +39,8 @@ from idmtools_test.utils.utils import get_case_name
 
 if typing.TYPE_CHECKING:
     from idmtools_platform_comps.comps_platform import COMPSPlatform
+    from idmtools.entities.experiment import Experiment
+    from idmtools.entities.simulation import Simulation
 
 setA = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="a")
 setB = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="b")
@@ -101,8 +103,8 @@ class TestPythonExperiment(ITestWithPersistence):
         ran_at = str(time())
 
         # test pre create hook
-        def add_date_as_tag(experiment: Experiment, platform: 'COMPSPlatform'):
-            experiment.tags['date'] = ran_at
+        def add_date_as_tag(item: 'Experiment', platform: 'COMPSPlatform'):
+            item.tags['date'] = ran_at
 
         e.add_pre_creation_hook(add_date_as_tag)
         e.add_post_creation_hook(save_id_as_file_as_hook)
@@ -245,7 +247,6 @@ class TestPythonExperiment(ITestWithPersistence):
                                               relative_path=None)
         # sim = pe.simulation() # uncomment this line when issue #138 gets fixed
         # TODO update this syntax in TC. We have better manual building methods for simulations
-        sim = e.simulations.new_simulation()
         sim.task.set_parameter("a", 1)
         sim.task.set_parameter("b", 10)
 
@@ -599,6 +600,29 @@ class TestPythonExperiment(ITestWithPersistence):
                          {'a': '1', 'aa': '1', 'b': 'test', 'task_type': tag_value}]
         validate_sim_tags(self, experiment.id, expected_tags, tag_value)
 
+    def test_simulation_hooks(self):
+        base_task = CommandTask(command="python --version")
+        sim = Simulation(task=base_task)
+
+        exp = Experiment(name='SimHooks')
+        exp.simulations = [sim]
+
+        def add_exp_id_as_tag(item: Simulation, platform: 'COMPSPlatform'):
+            item.tags['e_id'] = exp.id
+
+        def update_tags(item: Simulation, platform: 'COMPSPlatform'):
+            tags = {"a": 0}
+            update_item(self.platform, item.id, ItemType.SIMULATION, tags)
+
+        sim.add_pre_creation_hook(add_exp_id_as_tag)
+        sim.pre_creation(self.platform)
+        self.assertEqual(exp.id, sim.tags['e_id'])
+        exp.run(wait_until_done=True)
+        sim.add_post_creation_hook(update_tags)
+        sim.post_creation(self.platform)
+        tag_value = "idmtools.entities.command_task.CommandTask"
+        exp_tags = [{'e_id': exp.id, 'a': '0', 'task_type': tag_value}]
+        validate_sim_tags(self, exp.id, exp_tags, tag_value)
 
 if __name__ == '__main__':
     unittest.main()
