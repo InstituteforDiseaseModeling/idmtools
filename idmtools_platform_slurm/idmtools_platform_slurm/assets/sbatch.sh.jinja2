@@ -17,6 +17,9 @@
 {% if ntasks_per_core is defined and ntasks_per_core  is not none %}
 #SBATCH --ntasks-per-core={{ntasks_per_core}}
 {% endif %}
+{% if cpus_per_task is defined and cpus_per_task  is not none %}
+#SBATCH --cpus-per-task={{cpus_per_task}}
+{% endif %}
 {% if mem_per_cpu is defined and mem_per_cpu is not none %}
 #SBATCH --mem-per-cpu={{mem_per_cpu}}
 {% endif %}
