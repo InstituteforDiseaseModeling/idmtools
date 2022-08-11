@@ -354,7 +354,10 @@ class LocalSlurmOperations(SlurmOperations):
         job_status_path = sim_dir.joinpath('job_status.txt')
         if job_status_path.exists():
             status = open(job_status_path).read().strip()
-            status = SLURM_MAPS[status]
+            if status in ['100', '0', '-1']:
+                status = SLURM_MAPS[status]
+            else:
+                status = SLURM_MAPS['100']      # To be safe
         else:
             status = SLURM_MAPS['None']
         # Consider Cancel Case so that we may get out of the refresh loop
