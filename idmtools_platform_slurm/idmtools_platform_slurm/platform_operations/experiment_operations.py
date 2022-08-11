@@ -14,6 +14,9 @@ from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
 from idmtools_platform_slurm.platform_operations.utils import SlurmExperiment, SlurmSimulation, SlurmSuite
+from logging import getLogger
+
+logger = getLogger(__name__)
 
 if TYPE_CHECKING:
     from idmtools_platform_slurm.slurm_platform import SlurmPlatform
@@ -202,7 +205,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         # Check if CANCEL EVENT happens
         job_id_path = self.platform._op_client.get_directory(experiment).joinpath('job_id.txt')
         if not job_id_path.exists():
-            print(f'job_id is not available for experiment: {experiment.id}')
+            logger.debug(f'job_id is not available for experiment: {experiment.id}')
             return
 
         job_id = open(job_id_path, 'r').read().strip()
