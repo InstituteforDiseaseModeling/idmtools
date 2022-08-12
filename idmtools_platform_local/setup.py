@@ -61,6 +61,9 @@ setup(
     include_package_data=True,
     keywords='modeling, IDM',
     name='idmtools_platform_local',
+    # At the moment, docker python doesn't work with python 3.10 on Windows
+    # See https://github.com/docker/docker-py/issues/2967
+    python_requires=">=3.6,<3.10.0",
     packages=find_packages(),
     setup_requires=setup_requirements,
     entry_points=dict(idmtools_platform=  # noqa: E251
@@ -71,5 +74,5 @@ setup(
     test_suite='tests',
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='1.6.6+nightly'
+    version='1.6.7+nightly'
 )

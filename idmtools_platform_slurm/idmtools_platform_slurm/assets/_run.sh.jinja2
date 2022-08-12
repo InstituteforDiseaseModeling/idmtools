@@ -1,10 +1,24 @@
 #!/bin/bash
 
+#SBATCH --signal=B:SIGTERM@30
+
+# define the handler function
+term_handler()
+{
+    # do whatever cleanup you want here
+    echo "-1" > job_status.txt
+    exit -1
+}
+
+# associate the function "term_handler" with the TERM signal
+trap 'term_handler' TERM
+
 echo ${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID} > job_id.txt
 
 n=0
 until [ "$n" -ge {{retries}} ]
 do
+    echo "100" > job_status.txt
     {% if simulation.task.sif_path is defined and simulation.task.sif_path %}
         {% if simulation.task.command.cmd.startswith('singularity') %}
             {{simulation.task.command.cmd}}
@@ -16,9 +30,11 @@ do
     {% endif %}
    RESULT=$?
    if [ $RESULT -eq 0 ]; then
-      break
+      echo "0" > job_status.txt
+      exit $RESULT
    fi
    n=$((n+1))
    sleep 15
 done
+echo "-1" > job_status.txt
 exit $RESULT

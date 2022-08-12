@@ -82,21 +82,12 @@ class SlurmPlatform(IPlatform):
 
     # endregion
 
-    # options for ssh mode
-    remote_host: Optional[str] = field(default=None)
-    remote_port: int = field(default=22)
-    remote_user: Optional[str] = field(default=None)
-    key_file: Optional[str] = field(default=None)
-
     _suites: SlurmPlatformSuiteOperations = field(**op_defaults, repr=False, init=False)
     _experiments: SlurmPlatformExperimentOperations = field(**op_defaults, repr=False, init=False)
     _simulations: SlurmPlatformSimulationOperations = field(**op_defaults, repr=False, init=False)
     _assets: SlurmPlatformAssetCollectionOperations = field(**op_defaults, repr=False, init=False)
     _metas: JSONMetadataOperations = field(**op_defaults, repr=False, init=False)
     _op_client: SlurmOperations = field(**op_defaults, repr=False, init=False)
-
-    # make Property available
-    _experiment_dir: str = field(default=None)
 
     def __post_init__(self):
         self.mode = SlurmOperationalMode[self.mode.upper()] if self.mode else self.mode
@@ -108,12 +99,7 @@ class SlurmPlatform(IPlatform):
 
     def __init_interfaces(self):
         if self.mode == SlurmOperationalMode.SSH:
-            if self.remote_host is None or self.remote_user is None:
-                raise ValueError("remote_host, remote_user and key_file are required configuration parameters "
-                                 "when the mode is SSH")
-            self._op_client = RemoteSlurmOperations(platform=self, hostname=self.remote_host,
-                                                    username=self.remote_user, key_file=self.key_file,
-                                                    port=self.remote_port)
+            raise NotImplementedError("SSH mode has not been implemented on the Slurm Platform")
         else:
             self._op_client = LocalSlurmOperations(platform=self)
 

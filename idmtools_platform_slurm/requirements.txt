@@ -1,4 +1,4 @@
-idmtools~=1.6.6
-jinja2~=3.0.1
-paramiko~=2.7.2
+idmtools~=1.6.7
+jinja2~=3.1.2
+paramiko~=2.11.0
 dataclasses-json
