@@ -326,13 +326,13 @@ class LocalSlurmOperations(SlurmOperations):
         else:
             raise NotImplementedError(f"Submit job is not implemented on SlurmPlatform.")
 
-    def get_simulation_status(self, sim_id: Union[UUID, str], job_cancelled: bool = None, raw: bool = False,
+    def get_simulation_status(self, sim_id: Union[UUID, str], job_finished: bool = None, raw: bool = False,
                               **kwargs) -> EntityStatus:
         """
         Retrieve simulation status.
         Args:
             sim_id: Simulation ID
-            job_cancelled: bool
+            job_finished: bool
             raw: bool
                 - True: keep original CREATED (not processed)
                 - False: convert CREATED (not processed) to FAILED
@@ -340,31 +340,34 @@ class LocalSlurmOperations(SlurmOperations):
         Returns:
             EntityStatus
         """
-        # Workaround (cancelling job not output -1): check if slurm job got cancelled
+        # Workaround (cancelling job not output -1): check if slurm job finished
         sim_dir = self.get_directory_by_id(sim_id, ItemType.SIMULATION)
-        if job_cancelled is None:
+        if job_finished is None:
             job_id_path = sim_dir.parent.joinpath('job_id.txt')
             if job_id_path.exists():
                 job_id = open(job_id_path).read().strip()
-                job_cancelled = self.check_cancelled(job_id)
+                job_finished = self.check_finished(job_id)
             else:
-                job_cancelled = False
+                job_finished = False
 
         # Check process status
         job_status_path = sim_dir.joinpath('job_status.txt')
         if job_status_path.exists():
             status = open(job_status_path).read().strip()
-            status = SLURM_MAPS[status]
+            if status in ['100', '0', '-1']:
+                status = SLURM_MAPS[status]
+            else:
+                status = SLURM_MAPS['100']      # To be safe
         else:
             status = SLURM_MAPS['None']
         # Consider Cancel Case so that we may get out of the refresh loop
-        if job_cancelled and not raw and status not in (EntityStatus.SUCCEEDED, EntityStatus.FAILED):
+        if job_finished and not raw and status not in (EntityStatus.SUCCEEDED, EntityStatus.FAILED):
             status = EntityStatus.FAILED
 
         return status
 
     @staticmethod
-    def check_cancelled(job_id: str, display: bool = False, **kwargs) -> Any:
+    def check_finished(job_id: str, display: bool = False, **kwargs) -> Any:
         """
         Check if there is RUNNING or PENDING job.
         Args:
