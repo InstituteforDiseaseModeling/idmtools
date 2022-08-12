@@ -31,9 +31,9 @@ class TestSlurmPlatform(ITestWithPersistence):
         actual_field_set = self.platform.slurm_fields
         expected_field_set = {'mem', 'partition', 'time', 'requeue', 'mail_user', 'ntasks', 'modules',
                               'exclusive', 'mail_type', 'sbatch_custom', 'nodes', 'ntasks_per_core', 'account',
-                              'mem_per_cpu', 'max_running_jobs'}
+                              'mem_per_cpu', 'max_running_jobs', 'cpus_per_task'}
 
-        self.assertEqual(sorted(expected_field_set), sorted(actual_field_set))
+        self.assertEqual(set(expected_field_set), set(actual_field_set))
 
     # Test platform get_slurm_configs with default config
     def test_slurm_configs_default(self):
@@ -41,20 +41,22 @@ class TestSlurmPlatform(ITestWithPersistence):
         expected_config_dict = {'mem': None, 'time': None, 'modules': [], 'mail_user': None,
                                 'exclusive': False, 'sbatch_custom': None, 'nodes': None, 'mail_type': None,
                                 'partition': None, 'account': None, 'ntasks_per_core': None, 'requeue': True,
-                                'max_running_jobs': None, 'mem_per_cpu': None, 'ntasks': None}
+                                'max_running_jobs': None, 'mem_per_cpu': None, 'ntasks': None, 'cpus_per_task': None}
 
-        self.assertEqual(sorted(slurm_configs_dict), sorted(expected_config_dict))
+        self.assertEqual(set(slurm_configs_dict), set(expected_config_dict))
 
     # Test platform get_slurm_configs with user defined configs
     def test_slurm_configs_from_user_defined(self):
         platform = Platform("SLURM_TEST", job_directory=".", mode="local", mail_user="test@test.com",
                             account="test_acct", mail_type="begin", mem_per_cpu=2048)
         slurm_configs_dict = platform.get_slurm_configs()
-        expected_config_dict = ['account', 'exclusive', 'mail_type', 'mail_user', 'max_running_jobs', 'mem',
-                                'mem_per_cpu', 'modules', 'nodes', 'ntasks', 'ntasks_per_core', 'partition', 'requeue',
-                                'sbatch_custom', 'time']
+        expected_config_dict = {'account': 'test_acct', 'exclusive': False, 'mail_type': 'begin',
+                                'mail_user': 'test@test.com', 'max_running_jobs': None, 'mem': None,
+                                'mem_per_cpu': 2048, 'modules': [], 'nodes': None, 'ntasks': None,
+                                'ntasks_per_core': None, 'partition': None, 'requeue': True,
+                                'sbatch_custom': None, 'time': None, 'cpus_per_task': None}
 
-        self.assertEqual(sorted(slurm_configs_dict), sorted(expected_config_dict))
+        self.assertEqual(set(slurm_configs_dict), set(expected_config_dict))
 
         # validate custom default config get override with Platform parameters
         self.assertEqual(platform.job_directory, '.')
