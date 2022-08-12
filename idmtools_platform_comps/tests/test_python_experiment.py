@@ -247,6 +247,7 @@ class TestPythonExperiment(ITestWithPersistence):
                                               relative_path=None)
         # sim = pe.simulation() # uncomment this line when issue #138 gets fixed
         # TODO update this syntax in TC. We have better manual building methods for simulations
+        sim = e.simulations.new_simulation()
         sim.task.set_parameter("a", 1)
         sim.task.set_parameter("b", 10)
 
