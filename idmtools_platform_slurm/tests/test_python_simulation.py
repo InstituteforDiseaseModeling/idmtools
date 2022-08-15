@@ -150,7 +150,7 @@ class TestPythonSimulation(ITestWithPersistence):
                     config_contents = json.loads(j.read())
                 self.assertDictEqual(contents['task']['parameters'],  config_contents['parameters'])
 
-    #@pytest.mark.skip("unskip this line when doing real run in local")
+    @pytest.mark.skip("unskip this line when doing real run in local")
     def test_std_status_jobid_files(self):
         experiment = self.create_experiment(self.platform, a=3, b=3, wait_until_done=True, dry_run=False)
         experiment_dir = self.platform._op_client.get_directory(experiment)
