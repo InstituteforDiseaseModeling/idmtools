@@ -150,17 +150,16 @@ class TestPythonSimulation(ITestWithPersistence):
                     config_contents = json.loads(j.read())
                 self.assertDictEqual(contents['task']['parameters'],  config_contents['parameters'])
 
-    @pytest.mark.skip("unskip this line when doing real run in local")
+    #@pytest.mark.skip("unskip this line when doing real run in local")
     def test_std_status_jobid_files(self):
         experiment = self.create_experiment(self.platform, a=3, b=3, wait_until_done=True, dry_run=False)
         experiment_dir = self.platform._op_client.get_directory(experiment)
         self.assertTrue(os.path.exists(os.path.join(experiment_dir, "job_id.txt")))
-        job_id = open(os.path.join(experiment_dir, 'job_id.txt'), 'r').read().strip("\n")
-        self.assertTrue(len(job_id.strip()) > 0)
+        job_id = open(os.path.join(experiment_dir, 'job_id.txt'), 'r').read().strip()
+        self.assertTrue(len(job_id) > 0)
         for simulation in experiment.simulations:
             simulation_dir = self.platform._op_client.get_directory(simulation)
             status_file = os.path.join(simulation_dir, "job_status.txt")
             self.assertTrue(os.path.exists(status_file))
-            with open(status_file, 'r') as j:
-                status = j.readlines()[0].strip()
-                self.assertEqual(int(status), 0)
+            status = open(status_file, 'r').read().strip()
+            self.assertEqual(int(status), 0)
