@@ -24,7 +24,7 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 @linux_only
 class TestPythonSimulation(ITestWithPersistence):
 
-    def create_experiment(self, platform=None, a=1, b=1, max_running_jobs=None, retries=None, wait_until_done=False):
+    def create_experiment(self, platform=None, a=1, b=1, max_running_jobs=None, retries=None, wait_until_done=False, dry_run=True):
         task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model3.py"),
                                         envelope="parameters", parameters=(dict(c=0)))
         task.python_path = "python3"
@@ -53,7 +53,7 @@ class TestPythonSimulation(ITestWithPersistence):
         suite.add_experiment(experiment)
         # change dry_run=False when run in slurm cluster
         suite.run(platform=platform, wait_until_done=False, wait_on_done=wait_until_done, max_running_jobs=max_running_jobs,
-                  retries=retries, dry_run=True)
+                  retries=retries, dry_run=dry_run)
         print("suite_id: " + suite.id)
         print("experiment_id: " + experiment.id)
         return experiment
@@ -150,12 +150,16 @@ class TestPythonSimulation(ITestWithPersistence):
                     config_contents = json.loads(j.read())
                 self.assertDictEqual(contents['task']['parameters'],  config_contents['parameters'])
 
-    @pytest.mark.skip("wait for status")
+    #@pytest.mark.skip("unskip this line when doing real run in local")
     def test_std_status_jobid_files(self):
-        experiment = self.create_experiment(self.platform, a=3, b=3, wait_until_done=True)
+        experiment = self.create_experiment(self.platform, a=3, b=3, wait_until_done=True, dry_run=False)
         experiment_dir = self.platform._op_client.get_directory(experiment)
         self.assertTrue(os.path.exists(os.path.join(experiment_dir, "job_id.txt")))
-        job_id = open(os.path.join(experiment_dir, 'job_id.txt'), 'r').read()
-        self.assertTrue(type(job_id) == int)
+        job_id = open(os.path.join(experiment_dir, 'job_id.txt'), 'r').read().strip()
+        self.assertTrue(len(job_id) > 0)
         for simulation in experiment.simulations:
-            pass
+            simulation_dir = self.platform._op_client.get_directory(simulation)
+            status_file = os.path.join(simulation_dir, "job_status.txt")
+            self.assertTrue(os.path.exists(status_file))
+            status = open(status_file, 'r').read().strip()
+            self.assertEqual(int(status), 0)
