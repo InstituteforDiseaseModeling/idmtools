@@ -4,9 +4,8 @@ SLURM
 The |SLURM_s| platform allows use of the |SLURM_l|. "Slurm is an open source, fault-tolerant, and highly scalable cluster management and job scheduling system for large and small Linux clusters.", as quoted from (https://slurm.schedmd.com/overview.html). For high-level architecture information about |SLURM_s|, 
 see (https://slurm.schedmd.com/quickstart.html#arch). 
 For architecure and included packages information about |IT_s| and |SLURM_s|, 
-see (https://docs.idmod.org/projects/idmtools/en/latest/reference.html).
+see (:doc:`../reference`).
 
-.. :doc:`reference` errors out as unknown document when building sphinx local files, not sure why as the file exists and is in the same directory as other working referenced files, such as basis-installation...
 
 Prerequisites
 =============
