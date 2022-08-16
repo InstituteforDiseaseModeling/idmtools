@@ -14,6 +14,9 @@ from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
 from idmtools_platform_slurm.platform_operations.utils import SlurmExperiment, SlurmSimulation, SlurmSuite
+from logging import getLogger
+
+logger = getLogger(__name__)
 
 if TYPE_CHECKING:
     from idmtools_platform_slurm.slurm_platform import SlurmPlatform
@@ -83,6 +86,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         sim_meta_list = self.platform._metas.get_children(parent)
         for meta in sim_meta_list:
             slurm_sim = SlurmSimulation(meta)
+            slurm_sim.status = self.platform._op_client.get_simulation_status(slurm_sim.id)
             if raw:
                 sim_list.append(slurm_sim)
             else:
@@ -201,12 +205,12 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         # Check if CANCEL EVENT happens
         job_id_path = self.platform._op_client.get_directory(experiment).joinpath('job_id.txt')
         if not job_id_path.exists():
-            print(f'job_id is not available for experiment: {experiment.id}')
+            logger.debug(f'job_id is not available for experiment: {experiment.id}')
             return
 
         job_id = open(job_id_path, 'r').read().strip()
-        job_cancelled = self.platform._op_client.check_cancelled(job_id, **kwargs)
+        job_finished = self.platform._op_client.check_finished(job_id, **kwargs)
 
         # Refresh status for each simulation
         for sim in experiment.simulations:
-            sim.status = self.platform._op_client.get_simulation_status(sim.id, job_cancelled, raw, **kwargs)
+            sim.status = self.platform._op_client.get_simulation_status(sim.id, job_finished, raw, **kwargs)

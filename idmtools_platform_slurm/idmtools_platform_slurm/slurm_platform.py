@@ -20,7 +20,7 @@ from idmtools_platform_slurm.platform_operations.suite_operations import SlurmPl
 logger = getLogger(__name__)
 
 op_defaults = dict(default=None, compare=False, metadata={"pickle_ignore": True})
-CONFIG_PARAMETERS = ['ntasks', 'partition', 'nodes', 'mail_type', 'mail_user', 'ntasks_per_core', 'mem_per_cpu', 'time',
+CONFIG_PARAMETERS = ['ntasks', 'partition', 'nodes', 'mail_type', 'mail_user', 'ntasks_per_core', 'cpus_per_task', 'mem_per_cpu', 'time',
                      'account', 'mem', 'exclusive', 'requeue', 'sbatch_custom', 'max_running_jobs']
 
 
@@ -45,6 +45,9 @@ class SlurmPlatform(IPlatform):
     ntasks: Optional[int] = field(default=None, metadata=dict(sbatch=True))
 
     # CPU # per task
+    cpus_per_task: Optional[int] = field(default=None, metadata=dict(sbatch=True))
+
+    # Task # per core
     ntasks_per_core: Optional[int] = field(default=None, metadata=dict(sbatch=True))
 
     # Maximum of running jobs(Per experiment)
