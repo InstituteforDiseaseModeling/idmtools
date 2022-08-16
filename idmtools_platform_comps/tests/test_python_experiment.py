@@ -616,11 +616,10 @@ class TestPythonExperiment(ITestWithPersistence):
             update_item(self.platform, item.id, ItemType.SIMULATION, tags)
 
         sim.add_pre_creation_hook(add_exp_id_as_tag)
-        sim.pre_creation(self.platform)
-        self.assertEqual(exp.id, sim.tags['e_id'])
-        exp.run(wait_until_done=True)
         sim.add_post_creation_hook(update_tags)
-        sim.post_creation(self.platform)
+
+        exp.run(wait_until_done=True)
+
         tag_value = "idmtools.entities.command_task.CommandTask"
         exp_tags = [{'e_id': exp.id, 'a': '0', 'task_type': tag_value}]
         validate_sim_tags(self, exp.id, exp_tags, tag_value)

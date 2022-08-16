@@ -192,19 +192,8 @@ class TestEntity(ITestWithPersistence):
         s.pre_creation(fake_platform)
         self.assertEqual(test_hook.call_count, 1)
 
-    def test_simulation_post_creation_hooks(self):
-        fake_platform = MagicMock()
-        s = Simulation(task=TestTask())
-
-        def inc_count(item, platform):
-            self.assertEqual(s, item)
-            self.assertEqual(platform, fake_platform)
-        s.add_post_creation_hook(inc_count)
-        s.post_creation(fake_platform)
-
     def test_task_pre_creation_hooks_bad_signature(self):
         tt = TestTask()
-        s = Simulation(task=tt)
 
         def inc_count(s):
             pass
@@ -215,7 +204,6 @@ class TestEntity(ITestWithPersistence):
 
     def test_task_post_creation_hooks_bad_signature(self):
         tt = TestTask()
-        s = Simulation(task=tt)
 
         def inc_count(s):
             pass
@@ -261,25 +249,22 @@ class TestEntity(ITestWithPersistence):
             self.assertEqual(mock_hook.call_count, 1)
 
     def test_workitem_pre_create(self):
-        wi = GenericWorkItem(task=TestTask(), name='test_wi_precreate')
         fake_platform = MagicMock()
-        def inc_count(item, platform):
-            self.assertEqual(wi, item)
-            self.assertEqual(platform, fake_platform)
-        wi.add_pre_creation_hook(inc_count)
+        wi = GenericWorkItem(task=TestTask(), name='test_wi_precreate')
+        test_hook = MagicMock()
+        wi.add_pre_creation_hook(test_hook)
         wi.pre_creation(fake_platform)
+        self.assertEqual(test_hook.call_count, 1)
 
     def test_workitem_post_create(self):
-        wi = GenericWorkItem(task=TestTask())
         fake_platform = MagicMock()
-        def inc_count(item, platform):
-            self.assertEqual(wi, item)
-            self.assertEqual(platform, fake_platform)
-        wi.add_post_creation_hook(inc_count)
-        wi.post_creation(fake_platform)
+        wi = GenericWorkItem(task=TestTask(), name='test_wi_postcreate')
+        test_hook = MagicMock()
+        wi.add_pre_creation_hook(test_hook)
+        wi.pre_creation(fake_platform)
+        self.assertEqual(test_hook.call_count, 1)
 
     def test_suite_pre_creation_hooks(self):
-        wi = GenericWorkItem(task=TestTask())
         fake_platform = MagicMock()
         e = Experiment()
         e.simulations.append(Simulation(task=TestTask()))
