@@ -185,8 +185,6 @@ class TestEntity(ITestWithPersistence):
         fake_platform = MagicMock()
         tt = TestTask()
         s = Simulation(task=tt)
-        e = Experiment()
-        e.simulations.append(s)
         test_hook = MagicMock()
         tt.add_pre_creation_hook(test_hook)
         s.pre_creation(fake_platform)
