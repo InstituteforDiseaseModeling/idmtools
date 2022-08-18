@@ -10,11 +10,16 @@ from idmtools.builders import SimulationBuilder
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
+from idmtools.entities.generic_workitem import GenericWorkItem
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.suite import Suite
 from idmtools.entities.templated_simulation import TemplatedSimulations
+from idmtools.utils.entities import save_id_as_file_as_hook
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.test_task import TestTask
+
+PRE_COMMIT_FAIL_MESSAGE = 'Pre creation hooks should have 2 arguments. The first argument will be the item, the second the platform'
+POST_COMMIT_FAIL_MESSAGE = 'Post creation hooks should have 2 arguments. The first argument will be the item, the second the platform'
 
 
 @dataclass
@@ -110,13 +115,19 @@ class TestEntity(ITestWithPersistence):
 
     def test_pre_creation_only_two_args(self):
         with self.assertRaises(ValueError) as m:
-
             s = Simulation(task=TestTask())
             s.add_pre_creation_hook(bad_function_signature)
-        self.assertEqual(m.exception.args[0], 'Pre creation hooks should have 2 arguments. The first argument will be the item, the second the platform')
+        self.assertEqual(m.exception.args[0], PRE_COMMIT_FAIL_MESSAGE)
+
+    def test_post_creation_no_save_id(self):
+        fake_platform = MagicMock()
+        with self.assertRaises(NotImplementedError) as m:
+            s = Simulation(task=TestTask())
+            s.add_post_creation_hook(save_id_as_file_as_hook)
+            s.post_creation(fake_platform)
+        self.assertEqual(m.exception.args[0], "Saving id is currently only support for Experiments and Workitems")
 
     def test_pre_creation_allow_partials(self):
-
         s = Simulation(task=TestTask())
         globals()['abc'] = 0
 
@@ -170,6 +181,35 @@ class TestEntity(ITestWithPersistence):
         s.add_pre_creation_hook(inc_count)
         s.pre_creation(fake_platform)
 
+    def test_task_pre_creation_hooks(self):
+        fake_platform = MagicMock()
+        tt = TestTask()
+        s = Simulation(task=tt)
+        test_hook = MagicMock()
+        tt.add_pre_creation_hook(test_hook)
+        s.pre_creation(fake_platform)
+        self.assertEqual(test_hook.call_count, 1)
+
+    def test_task_pre_creation_hooks_bad_signature(self):
+        tt = TestTask()
+
+        def inc_count(s):
+            pass
+
+        with self.assertRaises(ValueError) as m:
+            tt.add_pre_creation_hook(inc_count)
+        self.assertEqual(m.exception.args[0], PRE_COMMIT_FAIL_MESSAGE)
+
+    def test_task_post_creation_hooks_bad_signature(self):
+        tt = TestTask()
+
+        def inc_count(s):
+            pass
+
+        with self.assertRaises(ValueError) as m:
+            tt.add_post_creation_hook(inc_count)
+        self.assertEqual(m.exception.args[0], POST_COMMIT_FAIL_MESSAGE)
+
     def test_simulation_post_creation_hooks(self):
         fake_platform = MagicMock()
         s = Simulation(task=TestTask())
@@ -181,27 +221,46 @@ class TestEntity(ITestWithPersistence):
         s.post_creation(fake_platform)
 
     def test_experiment_pre_creation_hooks(self):
-        fake_platform = MagicMock()
-        e = Experiment()
-        e.simulations.append(Simulation(task=TestTask()))
-
-        def inc_count(item, platform):
-            self.assertEqual(e, item)
-            self.assertEqual(platform, fake_platform)
-
-        e.add_pre_creation_hook(inc_count)
-        e.pre_creation(fake_platform)
+        fake_platform = Platform("TestExecute", missing_ok=True)
+        base_task = TestTask()
+        sim = Simulation.from_task(base_task)
+        builder = SimulationBuilder()
+        exp = Experiment.from_builder(builder, base_task=base_task)
+        exp.simulations.append(sim)
+        mock_hook = MagicMock()
+        exp.add_pre_creation_hook(mock_hook)
+        with fake_platform:
+            exp.run(wait_until_done=True)
+            self.assertEqual(mock_hook.call_count, 1)
 
     def test_experiment_post_creation_hooks(self):
+        fake_platform = Platform("TestExecute", missing_ok=True)
+        base_task = TestTask()
+        sim = Simulation.from_task(base_task)
+        builder = SimulationBuilder()
+        exp = Experiment.from_builder(builder, base_task=base_task)
+        exp.simulations.append(sim)
+        mock_hook = MagicMock()
+        exp.add_post_creation_hook(mock_hook)
+        with fake_platform:
+            exp.run(wait_until_done=True)
+            self.assertEqual(mock_hook.call_count, 1)
+
+    def test_workitem_pre_create(self):
         fake_platform = MagicMock()
-        e = Experiment()
+        wi = GenericWorkItem(task=TestTask(), name='test_wi_precreate')
+        test_hook = MagicMock()
+        wi.add_pre_creation_hook(test_hook)
+        wi.pre_creation(fake_platform)
+        self.assertEqual(test_hook.call_count, 1)
 
-        def inc_count(item, platform):
-            self.assertEqual(e, item)
-            self.assertEqual(platform, fake_platform)
-
-        e.add_post_creation_hook(inc_count)
-        e.post_creation(fake_platform)
+    def test_workitem_post_create(self):
+        fake_platform = MagicMock()
+        wi = GenericWorkItem(task=TestTask(), name='test_wi_postcreate')
+        test_hook = MagicMock()
+        wi.add_pre_creation_hook(test_hook)
+        wi.pre_creation(fake_platform)
+        self.assertEqual(test_hook.call_count, 1)
 
     def test_suite_pre_creation_hooks(self):
         fake_platform = MagicMock()

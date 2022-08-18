@@ -2,6 +2,8 @@ import allure
 import json
 import os
 import pytest
+from time import time
+from pathlib import Path
 from idmtools.analysis.download_analyzer import DownloadAnalyzer
 from idmtools.assets import AssetCollection
 from idmtools.core import ItemType
@@ -13,6 +15,7 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools.analysis.analyze_manager import AnalyzeManager
 from idmtools_test.utils.utils import get_case_name
 from .get_latest_ssmt_image import get_latest_image_stage
+from idmtools.utils.entities import save_id_as_file_as_hook
 
 
 @pytest.mark.comps
@@ -41,6 +44,16 @@ class TestSSMTWorkItem(ITestWithPersistence):
         user_files.add_asset(os.path.join(self.input_file_path, "hello.py"))
 
         wi = SSMTWorkItem(name=self.case_name, command=command, transient_assets=user_files, tags=self.tags)
+        id_file = Path(f"{wi.item_type}.{wi.name}.id")
+
+        # test pre create hook
+        ran_at = str(time())
+
+        def add_date_as_tag(work_item: SSMTWorkItem, platform: 'COMPSPlatform'):
+            work_item.tags['date'] = ran_at
+
+        wi.add_pre_creation_hook(add_date_as_tag)
+        wi.add_post_creation_hook(save_id_as_file_as_hook)
         wi.run(wait_on_done=True)
 
         # verify workitem output files
@@ -48,7 +61,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
         out_filenames = ["hello.py", "WorkOrder.json"]  # files to retrieve from workitem dir
         self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, out_filenames, local_output_path)
 
-        # verify that we do retrieved the correct files from comps' workitem to local
+        # verify that we do retrieve the correct files from comps' workitem to local
         self.assertTrue(os.path.exists(os.path.join("output", wi.id, "hello.py")))
         self.assertTrue(os.path.exists(os.path.join("output", wi.id, "WorkOrder.json")))
 
@@ -59,6 +72,12 @@ class TestSSMTWorkItem(ITestWithPersistence):
         execution = worker_order['Execution']
         self.assertEqual(execution['Command'],
                          "python3 hello.py")
+
+        # verify that pre-creation hook worked properly
+        self.assertTrue(wi.tags['date'] == ran_at)
+
+        # verify that post-creation hook worked properly
+        self.assertTrue(id_file.exists(), msg=f"Could not find {id_file}")
 
     # test using SSMTWormItem to run PopulationAnalyzer in comps's SSMT DockerWorker
     @pytest.mark.smoke
