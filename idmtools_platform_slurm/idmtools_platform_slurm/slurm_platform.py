@@ -105,7 +105,7 @@ class SlurmPlatform(IPlatform):
         if self.mode == SlurmOperationalMode.SSH:
             # from idmtools_platform_slurm.slurm_operations.remote_operations import RemoteSlurmOperations
             raise NotImplementedError("SSH mode has not been implemented on the Slurm Platform")
-        elif self.mode == SlurmOperationalMode.Bridged:
+        elif self.mode == SlurmOperationalMode.BRIDGED:
             from idmtools_platform_slurm.slurm_operations.bridged_operations import BridgedLocalSlurmOperations
             self._op_client = BridgedLocalSlurmOperations(platform=self)
         else:
