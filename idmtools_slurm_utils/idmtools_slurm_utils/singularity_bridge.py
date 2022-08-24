@@ -94,6 +94,7 @@ def main():
         StreamHandler(sys.stdout),
         FileHandler(bp.joinpath("sb.log"))
     ])
+
     parser = argparse.ArgumentParser("idmtools Slurm Bridge")
     parser.add_argument("--job-directory", default=str(bp))
     parser.add_argument("--status-directory", default=str(bp.joinpath("results")))
