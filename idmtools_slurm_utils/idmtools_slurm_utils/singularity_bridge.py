@@ -89,7 +89,7 @@ def dir_path(string):
 
 def main():
     bp = Path.home().joinpath(".idmtools").joinpath("singularity-bridge")
-    basicConfig(filename=bp.joinpath("sb.log"), encoding='utf-8', level=DEBUG)
+    basicConfig(filename=bp.joinpath("sb.log"), level=DEBUG)
     parser = argparse.ArgumentParser("idmtools Slurm Bridge")
     parser.add_argument("--job-directory", default=str(bp))
     parser.add_argument("--status-directory", default=str(bp.joinpath("results")))
