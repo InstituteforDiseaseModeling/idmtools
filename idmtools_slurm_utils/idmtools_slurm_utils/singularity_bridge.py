@@ -2,8 +2,9 @@ import argparse
 import json
 import os
 import subprocess
+import sys
 import time
-from logging import getLogger, basicConfig, DEBUG
+from logging import getLogger, basicConfig, DEBUG, FileHandler, StreamHandler
 from os import PathLike
 from pathlib import Path
 
@@ -89,7 +90,10 @@ def dir_path(string):
 
 def main():
     bp = Path.home().joinpath(".idmtools").joinpath("singularity-bridge")
-    basicConfig(filename=bp.joinpath("sb.log"), level=DEBUG)
+    basicConfig(level=DEBUG, handlers=[
+        StreamHandler(sys.stdout),
+        FileHandler(bp.joinpath("sb.log"))
+    ])
     parser = argparse.ArgumentParser("idmtools Slurm Bridge")
     parser.add_argument("--job-directory", default=str(bp))
     parser.add_argument("--status-directory", default=str(bp.joinpath("results")))
