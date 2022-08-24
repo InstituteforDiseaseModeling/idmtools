@@ -38,7 +38,7 @@ class BridgedLocalSlurmOperations(LocalSlurmOperations):
     jobs_directory = Path.home().joinpath(".idmtools").joinpath("singularity-bridge")
     results_directory = Path.home().joinpath(".idmtools").joinpath("singularity-bridge")
 
-    def __init__(self):
+    def __post_init__(self):
         if not self.jobs_directory.exists():
             if logger.isEnabledFor(INFO):
                 logger.info(f'Creating directory {self.jobs_directory}')
