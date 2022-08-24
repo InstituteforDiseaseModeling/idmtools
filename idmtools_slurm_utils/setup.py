@@ -11,7 +11,7 @@ with open('README.md') as readme_file:
 
 # Load our Requirements files
 with open('requirements.txt') as requirements_file:
-    requirements = requirements_file.read().split("\n")
+    requirements = [dependency for dependency in requirements_file.read().split("\n") if not dependency.startswith("--")]
 
 build_requirements = ['flake8', 'coverage', 'bump2version']
 setup_requirements = []
