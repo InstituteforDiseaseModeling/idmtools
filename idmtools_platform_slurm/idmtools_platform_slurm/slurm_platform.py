@@ -13,8 +13,9 @@ from idmtools_platform_slurm.platform_operations.asset_collection_operations imp
     SlurmPlatformAssetCollectionOperations
 from idmtools_platform_slurm.platform_operations.experiment_operations import SlurmPlatformExperimentOperations
 from idmtools_platform_slurm.platform_operations.simulation_operations import SlurmPlatformSimulationOperations
-from idmtools_platform_slurm.slurm_operations import SlurmOperations, SlurmOperationalMode, RemoteSlurmOperations, \
-    LocalSlurmOperations
+from idmtools_platform_slurm.slurm_operations.operations_interface import SlurmOperations
+
+from idmtools_platform_slurm.slurm_operations.slurm_constants import SlurmOperationalMode
 from idmtools_platform_slurm.platform_operations.suite_operations import SlurmPlatformSuiteOperations
 
 logger = getLogger(__name__)
@@ -102,8 +103,13 @@ class SlurmPlatform(IPlatform):
 
     def __init_interfaces(self):
         if self.mode == SlurmOperationalMode.SSH:
+            # from idmtools_platform_slurm.slurm_operations.remote_operations import RemoteSlurmOperations
             raise NotImplementedError("SSH mode has not been implemented on the Slurm Platform")
+        elif self.mode == SlurmOperationalMode.Bridged:
+            from idmtools_platform_slurm.slurm_operations.bridged_operations import BridgedLocalSlurmOperations
+            self._op_client = BridgedLocalSlurmOperations(platform=self)
         else:
+            from idmtools_platform_slurm.slurm_operations.local_operations import LocalSlurmOperations
             self._op_client = LocalSlurmOperations(platform=self)
 
         self._suites = SlurmPlatformSuiteOperations(platform=self)
