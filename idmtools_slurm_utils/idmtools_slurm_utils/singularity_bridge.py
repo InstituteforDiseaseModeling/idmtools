@@ -81,11 +81,17 @@ def dir_path(string):
 def main():
     bp = Path.home().joinpath(".idmtools").joinpath("singularity-bridge")
     parser = argparse.ArgumentParser("idmtools Slurm Bridge")
-    parser.add_argument("--job-directory", type=dir_path, default=str(bp))
+    parser.add_argument("--job-directory", default=str(bp))
     parser.add_argument("--status-directory", default=str(bp.joinpath("results")))
     parser.add_argument("--check-every", type=int, default=5)
 
     args = parser.parse_args()
+
+    if not Path(args.status_directory).exists():
+        Path(args.status_directory).mkdir(parents=True, exist_ok=True)
+
+    if not Path(args.job_directory).exists():
+        Path(args.job_directory).mkdir(parents=True, exist_ok=True)
 
     w = IdmtoolsJobWatcher(args.job_directory, args.status_directory, args.check_every)
     w.run()
