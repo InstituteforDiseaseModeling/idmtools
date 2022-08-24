@@ -4,6 +4,8 @@ import os
 import subprocess
 import time
 from os import PathLike
+from pathlib import Path
+
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
@@ -77,9 +79,10 @@ def dir_path(string):
 
 
 def main():
+    bp = Path.home().joinpath(".idmtools").joinpath("singularity-bridge")
     parser = argparse.ArgumentParser("idmtools Slurm Bridge")
-    parser.add_argument("--job-directory", type=dir_path, default=os.curdir)
-    parser.add_argument("--status-directory", default=os.path.join(os.curdir, "results"))
+    parser.add_argument("--job-directory", type=dir_path, default=str(bp))
+    parser.add_argument("--status-directory", default=str(bp.joinpath("results")))
     parser.add_argument("--check-every", type=int, default=5)
 
     args = parser.parse_args()
