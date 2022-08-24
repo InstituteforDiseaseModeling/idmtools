@@ -3,11 +3,14 @@ import json
 import os
 import subprocess
 import time
+from logging import getLogger, basicConfig, DEBUG
 from os import PathLike
 from pathlib import Path
 
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
+
+logger = getLogger(__name__)
 
 
 class IdmtoolsJobWatcher:
@@ -25,9 +28,9 @@ class IdmtoolsJobWatcher:
         try:
             while True:
                 time.sleep(self._check_every)
-        except:
+        except Exception as e:
             self.observer.stop()
-            print("Error")
+            logger.exception(e)
         self.observer.join()
 
 
@@ -53,12 +56,14 @@ def process_job(job_path, result_dir, cleanup_job: bool = True):
             if 'working_directory' in info:
                 if not os.path.exists(info['working_directory']):
                     result = "FAILED: No Directory name %s" % info['working_directory']
+                else:
                     result = run_sbatch(info['working_directory'])
                 with open(result_name, "w") as rout:
                     rout.write(result)
                 if cleanup_job:
                     os.unlink(job_path)
-    except:
+    except Exception as e:
+        logger.exception(e)
         pass
 
 
@@ -66,8 +71,12 @@ def run_sbatch(working_directory):
     sbp = os.path.join(working_directory, "sbatch.sh")
     if not os.path.exists(sbp):
         return "FAILED: No Directory name %s" % sbp
+    if logger.isEnabledFor(DEBUG):
+        logger.debug(f"Running 'sbatch sbatch.sh' in {working_directory}")
     result = subprocess.run(['sbatch', 'sbatch.sh'], stdout=subprocess.PIPE, cwd=str(working_directory))
     stdout = result.stdout.decode('utf-8').strip()
+    if logger.isEnabledFor(DEBUG):
+        logger.debug(f"Result\n=============\n{stdout}\n=============\n")
     return stdout
 
 
@@ -80,6 +89,7 @@ def dir_path(string):
 
 def main():
     bp = Path.home().joinpath(".idmtools").joinpath("singularity-bridge")
+    basicConfig(filename=bp.joinpath("sb.log"), encoding='utf-8', level=DEBUG)
     parser = argparse.ArgumentParser("idmtools Slurm Bridge")
     parser.add_argument("--job-directory", default=str(bp))
     parser.add_argument("--status-directory", default=str(bp.joinpath("results")))
@@ -93,6 +103,7 @@ def main():
     if not Path(args.job_directory).exists():
         Path(args.job_directory).mkdir(parents=True, exist_ok=True)
 
+    logger.info(f"Bridging jobs from {args.job_directory}")
     w = IdmtoolsJobWatcher(args.job_directory, args.status_directory, args.check_every)
     w.run()
 
