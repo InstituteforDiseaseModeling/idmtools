@@ -1,13 +1,9 @@
-import os
 import allure
 import pytest
 from idmtools import IdmConfigParser
 from unittest import TestCase
 from idmtools.registry.platform_specification import PlatformPlugins
 from idmtools.utils.info import get_packages_from_pip
-
-model_path = os.path.abspath(os.path.join("..", "..", "examples", "python_model", "inputs", "simple_python", "model.py"))
-ID_PLUGIN_FAIL_MESSAGE = "Could not find the id plugin idmtools_id_generate_abcdefg defined by id_generator in your idmtools.ini. id_generator must be set to 'uuid' or 'item_sequence'"
 
 
 @pytest.mark.smoke

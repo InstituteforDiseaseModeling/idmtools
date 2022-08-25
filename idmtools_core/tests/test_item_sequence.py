@@ -6,10 +6,8 @@ from pathlib import Path
 
 from idmtools import IdmConfigParser
 from idmtools.core.platform_factory import Platform
-from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools_test.utils.test_task import TestTask
-
 from idmtools.entities.experiment import Experiment
 
 

@@ -62,4 +62,3 @@ Configuration format::
     [item_sequence]
     sequence_file = <custom file name>.json
     id_format_str = '<custom string format>'
-

@@ -45,10 +45,10 @@ class IItem:
         """
         if self._uid is None:
             fpm = FunctionPluginManager.instance()
-            id_gen = IdmConfigParser.get_option(None, "id_generator", "uuid")  # Defines id_gen as the type of id generator we have defined in our .ini config file
-            plugin = fpm.get_plugin(f"idmtools_id_generate_{id_gen}")  # idmtools_id_generate_uuid is our plugin; matches plugin defined in setup.py
+            id_gen = IdmConfigParser.get_option(None, "id_generator", "uuid")
+            plugin = fpm.get_plugin(f"idmtools_id_generate_{id_gen}")
             if plugin:
-                self._uid = plugin.idmtools_generate_id(self)  # sets item _uid to str returned from uuid_generator plugin's method: idmtools_generate_id
+                self._uid = plugin.idmtools_generate_id(self)
             else:
                 id_plugins = sorted([x[0] for x in fpm.list_name_plugin() if x[0].startswith("idmtools_id_generate_")])
                 raise RuntimeError(f"Could not find the id plugin idmtools_id_generate_{id_gen} defined by id_generator in your idmtools.ini."

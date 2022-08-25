@@ -1,5 +1,14 @@
 """
-Define a id generator plugin that generates ids in sequence by item type.
+Defines a id generator plugin that generates ids in sequence by item type.
+To configure, set 'id_generator' in .ini configuration file to 'item_sequence':
+[COMMON]
+id_generator = item_sequence
+
+You can also customize the sequence_file that stores the sequential ids per item type
+as well as the id format using the following parameters in the .ini configuration file:
+[item_sequence]
+sequence_file = <file_name>.json    ex: item_sequences.json
+id_format_str = <custom_str_format>     ex: {item_name}{data[item_name]:06d}
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
@@ -15,6 +24,15 @@ logger = getLogger(__name__)
 
 
 def load_existing_sequence_data(sequence_file):
+    """
+    Loads item sequence data from sequence_file into a dictionary.
+
+    Args:
+        sequence_file: File that user has indicated to store the sequential ids of items
+
+    Returns:
+        Data loaded from sequence_file as a dictionary
+    """
     data = dict()
 
     if Path(sequence_file).exists():
@@ -26,7 +44,7 @@ def load_existing_sequence_data(sequence_file):
 @function_hook_impl
 def idmtools_generate_id(item: IEntity) -> str:
     """
-    Generates an UUID
+    Generates a UUID.
 
     Args:
         item: IEntity using the item_sequence plugin
