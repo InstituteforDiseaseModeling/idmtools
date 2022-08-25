@@ -47,6 +47,17 @@ def idmtools_on_start():
 
 
 @function_hook_spec
+def idmtools_generate_id(item: 'IEntity') -> str:
+    """
+    Generates an id for an IItem.
+
+    Returns:
+        None
+    """
+    pass
+
+
+@function_hook_spec
 def idmtools_runnable_on_done(item: 'IRunnableEntity', **kwargs):
     """
     Called when a runnable item finishes when it was being monitored.

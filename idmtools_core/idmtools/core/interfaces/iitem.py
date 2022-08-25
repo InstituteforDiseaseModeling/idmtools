@@ -7,7 +7,10 @@ from dataclasses import dataclass, field, fields
 from inspect import signature
 from logging import getLogger, DEBUG
 from typing import List, Callable, TYPE_CHECKING, Any, Dict
-from uuid import UUID, uuid4
+from uuid import UUID
+
+from idmtools import IdmConfigParser
+from idmtools.registry.functions import FunctionPluginManager
 from idmtools.utils.hashing import ignore_fields_in_dataclass_on_pickle
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -41,7 +44,15 @@ class IItem:
             ID
         """
         if self._uid is None:
-            self._uid = str(uuid4())
+            fpm = FunctionPluginManager.instance()
+            id_gen = IdmConfigParser.get_option(None, "id_generator", "uuid")  # Defines id_gen as the type of id generator we have defined in our .ini config file
+            plugin = fpm.get_plugin(f"idmtools_id_generate_{id_gen}")  # idmtools_id_generate_uuid is our plugin; matches plugin defined in setup.py
+            if plugin:
+                self._uid = plugin.idmtools_generate_id(self)  # sets item _uid to str returned from uuid_generator plugin's method: idmtools_generate_id
+            else:
+                id_plugins = sorted([x[0] for x in fpm.list_name_plugin() if x[0].startswith("idmtools_id_generate_")])
+                raise RuntimeError(f"Could not find the id plugin idmtools_id_generate_{id_gen} defined by id_generator in your idmtools.ini."
+                                   f"Please use one of the following plugins: {', '.join(id_plugins)}")
         return self._uid
 
     @uid.setter
