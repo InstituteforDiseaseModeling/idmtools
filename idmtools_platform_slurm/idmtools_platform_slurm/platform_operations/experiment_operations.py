@@ -4,6 +4,7 @@ Here we implement the SlurmPlatform experiment operations.
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import copy
+import json
 from pathlib import Path
 from uuid import UUID, uuid4
 from dataclasses import dataclass, field
@@ -13,7 +14,8 @@ from idmtools.core import ItemType
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
-from idmtools_platform_slurm.platform_operations.utils import SlurmExperiment, SlurmSimulation, SlurmSuite
+from idmtools_platform_slurm.platform_operations.utils import SlurmExperiment, SlurmSimulation, SlurmSuite, \
+    add_dammy_suite
 from logging import getLogger
 
 logger = getLogger(__name__)
@@ -51,10 +53,19 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
             Slurm Experiment object created
         """
+        # ensure experiment's parent
+        experiment.parent_id = experiment.parent_id or experiment.suite_id
+        if experiment.parent_id is None:
+            suite = add_dammy_suite(experiment)
+            self.platform._suites.platform_create(suite)
+            # update parent
+            experiment.parent = suite
+
         if not isinstance(experiment.uid, UUID):
             experiment.uid = uuid4()
         # Generate Suite/Experiment/Simulation folder structure
         self.platform._op_client.mk_directory(experiment)
+        self.platform._metas.dump(experiment)
         self.platform._assets.dump_assets(experiment)
         self.platform._op_client.create_batch_file(experiment, **kwargs)
 
@@ -117,9 +128,23 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
             None
         """
+        # Ensure parent
+        experiment.parent.add_experiment(experiment)
+        self.platform._metas.dump(experiment.parent)
+        # Generate/update metadata
         self.platform._metas.dump(experiment)
-        stdout = self.platform._op_client.submit_job(experiment, **kwargs)
-        print(stdout)
+        # Commission
+        dry_run = kwargs.get('dry_run', False)
+        if not dry_run:
+            slurm_job_id = self.platform._op_client.submit_job(experiment, **kwargs)
+        else:
+            slurm_job_id = None
+        suite_id = experiment.parent_id or experiment.suite_id
+
+        print("job_id:".ljust(15), slurm_job_id)
+        print("job_directory:".ljust(15), Path(self.platform.job_directory).resolve())
+        print("suite:".ljust(15), str(suite_id))
+        print("experiment:".ljust(15), experiment.id)
 
     def send_assets(self, experiment: Experiment, **kwargs):
         """
@@ -192,25 +217,21 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
 
         return exp
 
-    def refresh_status(self, experiment: Experiment, raw=False, **kwargs):
+    def refresh_status(self, experiment: Experiment, **kwargs):
         """
         Refresh status of experiment.
         Args:
             experiment: idmtools Experiment
-            raw: True/False - True: not convert RUNNING to FAILED
             kwargs: keyword arguments used to expand functionality
         Returns:
             None
         """
-        # Check if CANCEL EVENT happens
+        # Check if file job_id.txt exists
         job_id_path = self.platform._op_client.get_directory(experiment).joinpath('job_id.txt')
         if not job_id_path.exists():
             logger.debug(f'job_id is not available for experiment: {experiment.id}')
             return
 
-        job_id = open(job_id_path, 'r').read().strip()
-        job_finished = self.platform._op_client.check_finished(job_id, **kwargs)
-
         # Refresh status for each simulation
         for sim in experiment.simulations:
-            sim.status = self.platform._op_client.get_simulation_status(sim.id, job_finished, raw, **kwargs)
+            sim.status = self.platform._op_client.get_simulation_status(sim.id, **kwargs)
