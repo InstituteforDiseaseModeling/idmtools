@@ -111,7 +111,8 @@ class TestExecutePlatformSimulationOperation(IPlatformSimulationOperations):
     def platform_create(self, simulation: Simulation, **kwargs) -> Simulation:
         simulation.platform = self
         experiment_id = simulation.parent_id
-        simulation.uid = uuid4()
+        if simulation.uid is None:
+            simulation.uid = uuid4()
         self.save_metadata(simulation)
         return simulation
 
@@ -123,7 +124,8 @@ class TestExecutePlatformSimulationOperation(IPlatformSimulationOperations):
             if simulation.status is None:
                 self.pre_create(simulation, **kwargs)
                 experiment_id = simulation.parent_id
-                simulation.uid = uuid4()
+                if simulation.uid is None:
+                    simulation.uid = uuid4()
                 self.save_metadata(simulation)
                 self.post_create(simulation, **kwargs)
                 simulations.append(simulation)
