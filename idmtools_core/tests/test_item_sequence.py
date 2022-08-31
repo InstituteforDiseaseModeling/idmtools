@@ -126,7 +126,8 @@ class TestItemSequence(unittest.TestCase):
         parser._load_config_file(file_name='idmtools_slurm.ini')
         parser.ensure_init(file_name='idmtools_slurm.ini', force=True)
         sequence_file = self.get_sequence_file()
-        task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model3.py"),
+        mp = Path(COMMON_INPUT_PATH).joinpath("python").joinpath("model3.py")
+        task = JSONConfiguredPythonTask(script_path=str(mp),
                                         envelope="parameters", parameters=(dict(c=0)))
         platform = Platform('TestExecute', missing_ok=True)
         ts = TemplatedSimulations(base_task=task)
@@ -140,10 +141,14 @@ class TestItemSequence(unittest.TestCase):
         builder.add_sweep_definition(partial(param_update, param="a"), range(3))
         builder.add_sweep_definition(partial(param_update, param="b"), range(3))
         e.simulations.add_builder(builder)
-        simulations = e.simulations.items
+        # to test ids before we must generate all the simulations
+        # this mean we have to add our assets manually to experiment as it will no longer
+        # be a template
+        e.assets.add_asset(str(mp))
+        e.simulations = [s for s in e.simulations]
+        e.gather_common_assets_from_task = False
         print("Before run")
-        [print(sim.id) for sim in simulations]
+        [print(sim.id) for sim in e.simulations.items]
         e.run(wait_until_done=True)
         print("After run")
-        simulations = e.simulations.items
-        [print(sim.id) for sim in simulations]
+        [print(sim.id) for sim in e.simulations.items]
