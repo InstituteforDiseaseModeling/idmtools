@@ -17,7 +17,7 @@ from idmtools_test.utils.decorators import linux_only
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 from idmtools.entities.templated_simulation import TemplatedSimulations
-from idmtools_platform_slurm.platform_operations.utils import add_dammy_suite, SlurmExperiment, SlurmSimulation
+from idmtools_platform_slurm.platform_operations.utils import add_dummy_suite, SlurmExperiment, SlurmSimulation
 from idmtools.assets.asset import Asset
 
 setA = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="a")
@@ -36,7 +36,7 @@ class TestSlurmOperations(ITestWithPersistence):
         builder.add_sweep_definition(setA, range(0, 2))
         ts.add_builder(builder)
         exp = Experiment(name=self.case_name, simulations=ts, tags=dict(number_tag=123, KeyOnly=None))
-        suite = add_dammy_suite(exp)
+        suite = add_dummy_suite(exp)
         suite.run(platform=platform, wait_until_done=False, wait_on_done=False, dry_run=True)
         return suite, exp
 
@@ -227,7 +227,7 @@ class TestSlurmOperations(ITestWithPersistence):
                                         parameters=dict(c='c-value'))
         task.common_assets.add_asset(Asset(content="test", filename="test.txt"))
         exp = Experiment.from_task(task, name=self.case_name)
-        suite = add_dammy_suite(exp)
+        suite = add_dummy_suite(exp)
         platform = Platform('SLURM_LOCAL', job_directory="test")
         suite.run(platform=platform, wait_until_done=False, wait_on_done=False, dry_run=True)
         my_exp = platform.get_item(exp.id, ItemType.EXPERIMENT)

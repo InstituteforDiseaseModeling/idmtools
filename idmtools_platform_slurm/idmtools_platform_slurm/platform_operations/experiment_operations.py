@@ -15,7 +15,7 @@ from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
 from idmtools_platform_slurm.platform_operations.utils import SlurmExperiment, SlurmSimulation, SlurmSuite, \
-    add_dammy_suite
+    add_dummy_suite
 from logging import getLogger
 
 logger = getLogger(__name__)
@@ -56,7 +56,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         # ensure experiment's parent
         experiment.parent_id = experiment.parent_id or experiment.suite_id
         if experiment.parent_id is None:
-            suite = add_dammy_suite(experiment)
+            suite = add_dummy_suite(experiment)
             self.platform._suites.platform_create(suite)
             # update parent
             experiment.parent = suite
