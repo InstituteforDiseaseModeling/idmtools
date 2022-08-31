@@ -13,6 +13,7 @@ from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
+from idmtools_test.utils.test_execute_platform import clear_execute_platform
 from idmtools_test.utils.test_task import TestTask
 from idmtools.entities.experiment import Experiment
 from idmtools_test.utils.utils import get_performance_scale, clear_id_cache
@@ -24,13 +25,12 @@ from idmtools_test.utils.utils import get_performance_scale, clear_id_cache
 @allure.story("Plugins")
 @allure.suite("idmtools_core")
 class TestItemSequence(unittest.TestCase):
+
+    def setUp(self):
+        clear_execute_platform()
+
     def test_id_generator_error(self):
         clear_id_cache()
-        platform = Platform('Test')
-        tt = TestTask()
-        s = Simulation(task=tt)
-        e = Experiment()
-        e.simulations.append(s)
 
         parser = IdmConfigParser()
         parser._load_config_file(file_name='idmtools_uuid_error.ini')
@@ -40,6 +40,10 @@ class TestItemSequence(unittest.TestCase):
         self.assertEqual(id_gen, 'abcdefg')
         with self.assertRaises(RuntimeError) as r:
             platform = Platform('Test')
+            tt = TestTask()
+            s = Simulation(task=tt)
+            e = Experiment()
+            e.simulations.append(s)
         self.assertIn("Could not find the id plugin idmtools_id_generate_abcdefg defined by ", r.exception.args[0])
         self.assertIn("idmtools_id_generate_item_sequence, idmtools_id_generate_uuid", r.exception.args[0])
 
@@ -93,6 +97,8 @@ class TestItemSequence(unittest.TestCase):
             self.assertEqual(s2.id, 'Simulation00000' + f'{sim_num}')
             self.assertEqual(seq['Unknown'], 0)
 
+    @pytest.mark.serial
+    @pytest.mark.performance
     def test_local_execute_perf(self):
         clear_id_cache()
         platform = Platform('TestExecute', missing_ok=True)
@@ -108,11 +114,12 @@ class TestItemSequence(unittest.TestCase):
         def param_update(simulation, param, value):
             return simulation.task.set_parameter(param, value)
 
-        builder.add_sweep_definition(partial(param_update, param="a"), range(30 * get_performance_scale()))
+        builder.add_sweep_definition(partial(param_update, param="a"), range(10 * get_performance_scale()))
         builder.add_sweep_definition(partial(param_update, param="b"), range(50))
         e.simulations.add_builder(builder)
         e.run(wait_until_done=True)
 
+    @pytest.mark.serial
     def test_id(self):
         clear_id_cache()
         parser = IdmConfigParser()
