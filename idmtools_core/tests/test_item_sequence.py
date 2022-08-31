@@ -15,7 +15,7 @@ from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.test_task import TestTask
 from idmtools.entities.experiment import Experiment
-from idmtools_test.utils.utils import get_performance_scale
+from idmtools_test.utils.utils import get_performance_scale, clear_id_cache
 
 
 @pytest.mark.assets
@@ -25,6 +25,7 @@ from idmtools_test.utils.utils import get_performance_scale
 @allure.suite("idmtools_core")
 class TestItemSequence(unittest.TestCase):
     def test_id_generator_error(self):
+        clear_id_cache()
         platform = Platform('Test')
         tt = TestTask()
         s = Simulation(task=tt)
@@ -43,6 +44,7 @@ class TestItemSequence(unittest.TestCase):
         self.assertIn("idmtools_id_generate_item_sequence, idmtools_id_generate_uuid", r.exception.args[0])
 
     def test_id_item_sequence_no_config(self):
+        clear_id_cache()
         parser = IdmConfigParser()
         config_ini = 'idmtools_item_sequence_no_config.ini'
         parser._load_config_file(file_name=config_ini)
@@ -62,6 +64,7 @@ class TestItemSequence(unittest.TestCase):
         return sequence_file
 
     def test_id_item_sequence(self):
+        clear_id_cache()
         parser = IdmConfigParser()
         parser._load_config_file(file_name='idmtools_item_sequence.ini')
         parser.ensure_init(file_name='idmtools_item_sequence.ini', force=True)
@@ -91,6 +94,7 @@ class TestItemSequence(unittest.TestCase):
             self.assertEqual(seq['Unknown'], 0)
 
     def test_local_execute_perf(self):
+        clear_id_cache()
         platform = Platform('TestExecute', missing_ok=True)
         parser = IdmConfigParser()
         parser._load_config_file(file_name='idmtools_slurm.ini')
@@ -110,6 +114,7 @@ class TestItemSequence(unittest.TestCase):
         e.run(wait_until_done=True)
 
     def test_id(self):
+        clear_id_cache()
         parser = IdmConfigParser()
         parser._load_config_file(file_name='idmtools_slurm.ini')
         parser.ensure_init(file_name='idmtools_slurm.ini', force=True)
