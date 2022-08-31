@@ -19,6 +19,7 @@ from idmtools.entities.experiment import Experiment
 from idmtools_test.utils.utils import get_performance_scale, clear_id_cache
 
 
+@pytest.mark.serial
 @pytest.mark.assets
 @pytest.mark.smoke
 @allure.story("Entities")
@@ -28,6 +29,11 @@ class TestItemSequence(unittest.TestCase):
 
     def setUp(self):
         clear_execute_platform()
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        clear_id_cache()
+        clear_execute_platform
 
     def test_id_generator_error(self):
         clear_id_cache()
