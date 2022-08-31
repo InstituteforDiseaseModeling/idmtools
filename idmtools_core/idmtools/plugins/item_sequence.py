@@ -13,6 +13,7 @@ id_format_str = <custom_str_format>     ex: {item_name}{data[item_name]:06d}
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import json
+from functools import cache
 from logging import getLogger, INFO
 from pathlib import Path
 
@@ -41,6 +42,13 @@ def load_existing_sequence_data(sequence_file):
     return data
 
 
+@cache
+def get_plugin_config():
+    sequence_file = Path(IdmConfigParser.get_option("item_sequence", "sequence_file", 'item_sequences.json')).expanduser()
+    id_format_str = IdmConfigParser.get_option("item_sequence", "id_format_str", '{item_name}{data[item_name]:07d}')
+    return sequence_file, id_format_str
+
+
 @function_hook_impl
 def idmtools_generate_id(item: IEntity) -> str:
     """
@@ -53,8 +61,8 @@ def idmtools_generate_id(item: IEntity) -> str:
         ID for the respective item, based on the formatting defined in the id_format_str (in .ini config file)
 
     """
-    sequence_file = Path(IdmConfigParser.get_option("item_sequence", "sequence_file", 'item_sequences.json')).expanduser()
-    id_format_str = IdmConfigParser.get_option("item_sequence", "id_format_str", '{item_name}{data[item_name]:07d}')
+
+    sequence_file, id_format_str = get_plugin_config()
     data = load_existing_sequence_data(sequence_file)
 
     item_name = str(item.item_type if hasattr(item, 'item_type') else "Unknown")
@@ -64,10 +72,12 @@ def idmtools_generate_id(item: IEntity) -> str:
         if logger.isEnabledFor(INFO):
             logger.info(f"Starting sequence for {item_name} at 0")
         data[item_name] = 0
-    if not sequence_file.parent.exists():
-        if logger.isEnabledFor(INFO):
-            logger.info(f"Creating {sequence_file.parent}")
-        sequence_file.parent.mkdir(exist_ok=True, parents=True)
+        # we can check for existence here since it should only not exist when a new sequence is started
+        if not sequence_file.parent.exists():
+            if logger.isEnabledFor(INFO):
+                logger.info(f"Creating {sequence_file.parent}")
+            sequence_file.parent.mkdir(exist_ok=True, parents=True)
+
     with open(sequence_file, 'w') as f:
         json.dump(data, f)
     return eval("f'" + id_format_str + "'")

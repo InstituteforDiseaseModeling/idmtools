@@ -4,6 +4,7 @@ IItem is the base of all items that have ids such as AssetCollections, Experimen
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 from dataclasses import dataclass, field, fields
+from functools import cache
 from inspect import signature
 from logging import getLogger, DEBUG
 from typing import List, Callable, TYPE_CHECKING, Any, Dict
@@ -19,6 +20,14 @@ if TYPE_CHECKING:  # pragma: no cover
 logger = getLogger(__name__)
 
 PRE_POST_CREATION_HOOK = Callable[['IItem', 'IPlatform'], None]
+
+
+@cache
+def get_id_generator():
+    fpm = FunctionPluginManager.instance()
+    id_gen = IdmConfigParser.get_option(None, "id_generator", "uuid")
+    plugin = fpm.get_plugin(f"idmtools_id_generate_{id_gen}")
+    return id_gen, plugin
 
 
 @dataclass(repr=False)
@@ -44,12 +53,11 @@ class IItem:
             ID
         """
         if self._uid is None:
-            fpm = FunctionPluginManager.instance()
-            id_gen = IdmConfigParser.get_option(None, "id_generator", "uuid")
-            plugin = fpm.get_plugin(f"idmtools_id_generate_{id_gen}")
+            id_gen, plugin = get_id_generator()
             if plugin:
                 self._uid = plugin.idmtools_generate_id(self)
             else:
+                fpm = FunctionPluginManager.instance()
                 id_plugins = sorted([x[0] for x in fpm.list_name_plugin() if x[0].startswith("idmtools_id_generate_")])
                 raise RuntimeError(f"Could not find the id plugin idmtools_id_generate_{id_gen} defined by id_generator in your idmtools.ini."
                                    f"Please use one of the following plugins: {', '.join(id_plugins)}")

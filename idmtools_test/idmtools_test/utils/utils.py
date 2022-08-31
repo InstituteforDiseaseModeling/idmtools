@@ -135,3 +135,11 @@ def captured_output():
 def is_global_configuration_enabled() -> bool:
     from idmtools import IdmConfigParser
     return os.path.exists(IdmConfigParser.get_global_configuration_name()) or os.environ.get("IDMTOOLS_CONFIG_FILE", None) is not None
+
+
+def get_performance_scale() -> int:
+    try:
+        scale = int(os.getenv("IDMTOOLS_TEST_SCALE", "1"))
+    except:
+        scale = 1
+    return scale

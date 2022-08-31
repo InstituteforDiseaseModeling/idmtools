@@ -12,10 +12,10 @@ from idmtools.core.platform_factory import Platform
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
-from idmtools_platform_slurm.platform_operations.utils import add_dammy_suite
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.test_task import TestTask
 from idmtools.entities.experiment import Experiment
+from idmtools_test.utils.utils import get_performance_scale
 
 
 @pytest.mark.assets
@@ -90,7 +90,7 @@ class TestItemSequence(unittest.TestCase):
             self.assertEqual(s2.id, 'Simulation00000' + f'{sim_num}')
             self.assertEqual(seq['Unknown'], 0)
 
-    def test_perf(self):
+    def test_local_execute_perf(self):
         platform = Platform('TestExecute', missing_ok=True)
         parser = IdmConfigParser()
         parser._load_config_file(file_name='idmtools_slurm.ini')
@@ -104,7 +104,7 @@ class TestItemSequence(unittest.TestCase):
         def param_update(simulation, param, value):
             return simulation.task.set_parameter(param, value)
 
-        builder.add_sweep_definition(partial(param_update, param="a"), range(30))
+        builder.add_sweep_definition(partial(param_update, param="a"), range(30 * get_performance_scale()))
         builder.add_sweep_definition(partial(param_update, param="b"), range(50))
         e.simulations.add_builder(builder)
         e.run(wait_until_done=True)
@@ -131,8 +131,6 @@ class TestItemSequence(unittest.TestCase):
         simulations = e.simulations.items
         print("Before run")
         [print(sim.id) for sim in simulations]
-        #suite = add_dammy_suite(e)
-        #suite.run(platform=platform, dry_run=True, wait_until_done=False, wait_on_done=False)
         e.run(wait_until_done=True)
         print("After run")
         simulations = e.simulations.items
