@@ -5,9 +5,9 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import copy
 from pathlib import Path
-from uuid import UUID, uuid4
+from uuid import UUID
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, List, Type, Dict, Optional, Any
+from typing import TYPE_CHECKING, List, Type, Dict, Optional, Any, Union
 from idmtools.assets import Asset, AssetCollection
 from idmtools.core import ItemType
 from idmtools.entities import Suite
@@ -27,7 +27,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
     platform: 'SlurmPlatform'  # noqa: F821
     platform_type: Type = field(default=SlurmExperiment)
 
-    def get(self, experiment_id: UUID, **kwargs) -> Dict:
+    def get(self, experiment_id: Union[str, UUID], **kwargs) -> Dict:
         """
         Gets an experiment from the Slurm platform.
         Args:
@@ -51,8 +51,6 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
             Slurm Experiment object created
         """
-        if not isinstance(experiment.uid, UUID):
-            experiment.uid = uuid4()
         # Generate Suite/Experiment/Simulation folder structure
         self.platform._op_client.mk_directory(experiment)
         self.platform._assets.dump_assets(experiment)

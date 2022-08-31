@@ -26,7 +26,7 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
     platform: 'SlurmPlatform'  # noqa: F821
     platform_type: Type = field(default=SlurmSimulation)
 
-    def get(self, simulation_id: UUID, **kwargs) -> Dict:
+    def get(self, simulation_id: Union[str, UUID], **kwargs) -> Dict:
         """
         Gets an simulation from the Slurm platform.
         Args:
@@ -53,8 +53,6 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
         Returns:
             Slurm Simulation object created.
         """
-        if not isinstance(simulation.uid, UUID):
-            simulation.uid = uuid4()
         simulation.name = clean_experiment_name(simulation.experiment.name if not simulation.name else simulation.name)
 
         # Generate Simulation folder structure

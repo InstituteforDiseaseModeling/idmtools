@@ -70,7 +70,7 @@ def clean_experiment_name(experiment_name: str) -> str:
     return experiment_name.encode("ascii", "ignore").decode('utf8').strip()
 
 
-def add_dammy_suite(experiment: Experiment, suite_name: str = None, tags: Dict = None) -> Suite:
+def add_dummy_suite(experiment: Experiment, suite_name: str = None, tags: Dict = None) -> Suite:
     """
     Create Suite parent for given experiment
     Args:

@@ -47,8 +47,6 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
         Returns:
             Slurm Suite object created
         """
-        if not isinstance(suite.uid, UUID):
-            suite.uid = uuid4()
         # Generate Suite folder structure
         self.platform._op_client.mk_directory(suite)
         self.platform._metas.dump(suite)
