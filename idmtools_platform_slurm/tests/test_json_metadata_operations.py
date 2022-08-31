@@ -2,11 +2,8 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
-from uuid import uuid4
-
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
-
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.suite import Suite
@@ -18,14 +15,14 @@ class JSONMetadataOperationsTest(unittest.TestCase):
     @staticmethod
     def _initialize_data(self):
         # create 1 suite, 2 experiments, 3 simulations for general usage. Meta is default one for each item
-        suite = Suite(_uid=uuid4())
-        exp1 = Experiment(_uid=uuid4())
+        suite = Suite()
+        exp1 = Experiment()
         exp1.suite = suite
-        exp2 = Experiment(_uid=uuid4())
+        exp2 = Experiment()
         exp2.suite = suite
-        simulation1 = Simulation(_uid=uuid4())
-        simulation2 = Simulation(_uid=uuid4())
-        simulation3 = Simulation(_uid=uuid4())
+        simulation1 = Simulation()
+        simulation2 = Simulation()
+        simulation3 = Simulation()
         simulation1.experiment = exp1
         simulation2.experiment = exp1
         simulation3.experiment = exp2

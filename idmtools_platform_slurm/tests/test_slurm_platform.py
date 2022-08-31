@@ -2,10 +2,7 @@ import os
 import pathlib
 import shutil
 import tempfile
-from uuid import uuid4
-
 import pytest
-
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
@@ -153,8 +150,8 @@ class TestSlurmPlatform(ITestWithPersistence):
         suite = Suite()
         experiment = Experiment()
         experiment.parent = suite
-        simulation1 = Simulation(_uid=uuid4())  # create uniq simulation
-        simulation2 = Simulation(_uid=uuid4())
+        simulation1 = Simulation()  # create uniq simulation
+        simulation2 = Simulation()
         simulation1.parent = experiment
         simulation2.parent = experiment
         local.mk_directory(simulation1)
@@ -172,7 +169,7 @@ class TestSlurmPlatform(ITestWithPersistence):
     def test_localSlurmOperations_create_batch_file_experiment(self):
         local = LocalSlurmOperations(platform=self.platform)
         suite = Suite()
-        experiment = Experiment(_uid=uuid4())
+        experiment = Experiment()
         experiment.parent = suite
         local.mk_directory(experiment)
         local.create_batch_file(experiment)
@@ -194,9 +191,9 @@ class TestSlurmPlatform(ITestWithPersistence):
     def test_localSlurmOperations_create_batch_file_simulation(self):
         local = LocalSlurmOperations(platform=self.platform)
         suite = Suite()
-        experiment = Experiment(_uid=uuid4())
+        experiment = Experiment()
         experiment.parent = suite
-        simulation = Simulation(_uid=uuid4(), task=TestTask())
+        simulation = Simulation(task=TestTask())
         simulation.parent = experiment
         local.mk_directory(simulation)
         local.create_batch_file(simulation)
@@ -212,9 +209,9 @@ class TestSlurmPlatform(ITestWithPersistence):
     def test_localSlurmOperations_create_batch_file_simulation_and_item_path(self):
         local = LocalSlurmOperations(platform=self.platform)
         suite = Suite()
-        experiment = Experiment(_uid=uuid4())
+        experiment = Experiment()
         experiment.parent = suite
-        simulation = Simulation(_uid=uuid4(), task=TestTask())
+        simulation = Simulation(task=TestTask())
         simulation.parent = experiment
         temp_path = tempfile.mkdtemp()
         local.mk_directory(simulation, dest=temp_path)

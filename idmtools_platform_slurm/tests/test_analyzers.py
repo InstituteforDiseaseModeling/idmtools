@@ -1,6 +1,5 @@
-import allure
+
 import os
-import time
 from functools import partial
 from typing import Any, Dict
 import pytest
@@ -13,9 +12,7 @@ from idmtools.entities.experiment import Experiment
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
-
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
-
 from idmtools.entities.simulation import Simulation
 current_directory = os.path.dirname(os.path.realpath(__file__))
 param_a = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="a")
