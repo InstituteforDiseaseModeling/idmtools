@@ -207,6 +207,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         exp.parent = parent
         exp.tags = slurm_exp.tags
         exp._platform_object = slurm_exp
+        exp.simulations = []
 
         exp.assets = self.get_assets_from_slurm_experiment(slurm_exp)
         if exp.assets is None:

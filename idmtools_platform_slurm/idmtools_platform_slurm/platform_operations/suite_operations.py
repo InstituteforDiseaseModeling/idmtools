@@ -119,6 +119,8 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
         suite.parent = None
         suite.tags = slurm_suite.tags
         suite._platform_object = slurm_suite
+        suite.experiments = []
+
         if children:
             suite.experiments = self.get_children(slurm_suite, parent=suite, raw=False)
         return suite

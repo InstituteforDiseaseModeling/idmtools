@@ -218,7 +218,10 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
             None
         """
         if parent:
-            parent.experiments.append(self)
+            if parent.experiments is None:
+                parent.experiments = [self]
+            else:
+                parent.experiments.append(self)
         IEntity.parent.__set__(self, parent)
 
     def display(self):
