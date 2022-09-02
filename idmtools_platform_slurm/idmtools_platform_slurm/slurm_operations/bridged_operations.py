@@ -1,5 +1,4 @@
 import json
-import subprocess
 import time
 from dataclasses import dataclass
 from logging import getLogger, INFO
