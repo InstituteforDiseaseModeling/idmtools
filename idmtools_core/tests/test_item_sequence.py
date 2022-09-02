@@ -33,7 +33,7 @@ class TestItemSequence(unittest.TestCase):
     @classmethod
     def tearDownClass(cls) -> None:
         clear_id_cache()
-        clear_execute_platform
+        clear_execute_platform()
 
     def test_id_generator_error(self):
         clear_id_cache()
