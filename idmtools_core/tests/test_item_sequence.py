@@ -61,9 +61,8 @@ class TestItemSequence(unittest.TestCase):
         parser.ensure_init(file_name=config_ini, force=True)
         sequence_file = self.get_sequence_file()
 
-        tt = TestTask()
         self.assertFalse(sequence_file.exists())
-        s = Simulation(task=tt)
+        s = Simulation(task=TestTask())
         self.assertEqual(s.id, "Simulation0000000")
 
     @staticmethod
@@ -109,7 +108,7 @@ class TestItemSequence(unittest.TestCase):
         clear_id_cache()
         platform = Platform('TestExecute', missing_ok=True)
         parser = IdmConfigParser()
-        parser._load_config_file(file_name='idmtools_slurm.ini')
+        parser._load_config_file(file_name='idmtools_xxx.ini')
         task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"),
                                         envelope="parameters", parameters=(dict(c=0)))
         ts = TemplatedSimulations(base_task=task)
@@ -129,8 +128,8 @@ class TestItemSequence(unittest.TestCase):
     def test_id(self):
         clear_id_cache()
         parser = IdmConfigParser()
-        parser._load_config_file(file_name='idmtools_slurm.ini')
-        parser.ensure_init(file_name='idmtools_slurm.ini', force=True)
+        parser._load_config_file(file_name='idmtools_item_sequence.ini')
+        parser.ensure_init(file_name='idmtools_item_sequence.ini', force=True)
         sequence_file = self.get_sequence_file()
         mp = Path(COMMON_INPUT_PATH).joinpath("python").joinpath("model3.py")
         task = JSONConfiguredPythonTask(script_path=str(mp),
@@ -147,14 +146,11 @@ class TestItemSequence(unittest.TestCase):
         builder.add_sweep_definition(partial(param_update, param="a"), range(3))
         builder.add_sweep_definition(partial(param_update, param="b"), range(3))
         e.simulations.add_builder(builder)
-        # to test ids before we must generate all the simulations
-        # this mean we have to add our assets manually to experiment as it will no longer
-        # be a template
         e.assets.add_asset(str(mp))
         e.simulations = [s for s in e.simulations]
         e.gather_common_assets_from_task = False
-        print("Before run")
-        [print(sim.id) for sim in e.simulations.items]
+
+        pre_run = e.simulations.items
         e.run(wait_until_done=True)
-        print("After run")
-        [print(sim.id) for sim in e.simulations.items]
+        post_run = e.simulations.items
+        self.assertEqual(pre_run, post_run)

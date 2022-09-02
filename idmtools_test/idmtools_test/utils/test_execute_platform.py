@@ -34,12 +34,13 @@ DEFAULT_OUTPUT_PATH = Path(os.getenv("IDMTOOLS_TEST_EXECUTE_PATH", Path().cwd().
 
 
 def clear_execute_platform():
-    for file in os.listdir(DEFAULT_OUTPUT_PATH):
-        path = Path(DEFAULT_OUTPUT_PATH).joinpath(file)
-        try:
-            shutil.rmtree(path)
-        except OSError:
-            os.remove(path)
+    if Path.exists(DEFAULT_OUTPUT_PATH):
+        for file in os.listdir(DEFAULT_OUTPUT_PATH):
+            path = Path(DEFAULT_OUTPUT_PATH).joinpath(file)
+            try:
+                shutil.rmtree(path)
+            except OSError:
+                os.remove(path)
 
 
 @dataclass(repr=False)
