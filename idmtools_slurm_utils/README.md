@@ -18,7 +18,7 @@
 # User Installation
 
 ```bash
-pip install idmtools_slurm_utils --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+pip install idmtools-slurm-utils --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
 ```
 
 ## Pre-requisites
