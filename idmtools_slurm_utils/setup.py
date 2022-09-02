@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""The setup script for the idmtools_slurm_utils"""
-import sys
+"""The setup script for the idmtools_slurm_utils."""
 
 from setuptools import setup, find_packages
 
