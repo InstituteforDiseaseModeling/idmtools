@@ -8,7 +8,7 @@ Supported platforms
 
 .. include:: /reuse/comps_note.txt
 
-**SLURM**: You can also run simulations on the open-source |SLURM_s| platform for large and small Linux clusters.". For more information, see :doc:`platforms-slurm`.
+**SLURM**: You can also run simulations on the open-source |SLURM_s| platform for large and small Linux clusters.". For more information, see :doc:`slurm/index`.
 
 **Local**: You can also run simulations and analysis locally on your computer, rather than on a remote high-performance computer (HPC). For more information about these modules, see :doc:`../idmtools_platform_local_index`.
 
