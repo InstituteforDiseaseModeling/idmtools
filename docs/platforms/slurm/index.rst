@@ -4,7 +4,7 @@ SLURM
 The |SLURM_s| platform allows use of the |SLURM_l|. "Slurm is an open source, fault-tolerant, and highly scalable cluster management and job scheduling system for large and small Linux clusters.", as quoted from (https://slurm.schedmd.com/overview.html). For high-level architecture information about |SLURM_s|,
 see (https://slurm.schedmd.com/quickstart.html#arch).
 For architecure and included packages information about |IT_s| and |SLURM_s|,
-see (:doc:`../reference`).
+see (:doc:`../../reference`).
 
 
 Prerequisites
@@ -42,6 +42,8 @@ You can also do this directly from code by passing the minimum requirements
 
     Platform('SLURM_LOCAL', job_directory='/home/userxyz/experiments')
 
+
+
 Configuration Options
 `````````````````````
 .. list-table:: Title
@@ -49,48 +51,52 @@ Configuration Options
 
    * - Parameter
      - Description
-   * - job_directory
-     - This defines the location that idmtools will use to manage experiments on the slurm cluster. The directory should be located somewhere that is mounted on all slurm nodes at the same location. If you are unsure, ask your Slurm Server Administrator for guidance.
+   * - **job_directory**
+     - This defines the location that |IT_s| will use to manage experiments on the slurm cluster. The directory should be located somewhere that is mounted on all slurm nodes at the same location. If you are unsure, ask your Slurm Server Administrator for guidance.
    * - mode
-     - Allows you to control the operational mode for idmtools. There are two modes currently supported.
+     - Allows you to control the operational mode for |IT_s|. There are two modes currently supported.
        * - local
        * - bridged
        Bridged mode is *required* if you are running from within a singularity container. See :ref:``Operation Modes`` for details.
 
+.. note::
+
+    Bold parameters are required
 
 Operation Modes
 ===============
 
-Local
-`````
+The |SLURM_s| platform supports two modes of operation, Local and Bridged. Local is the default mode.
 
 Bridged
 ```````
+Bridged mode allows you to utilize the emodpy/idmtools Singularity environment containers.
+This is accomplished through a script that manages the communication to Slurm outside the container.
+
+Bridge mode requires the package `idmtools-slurm-utils`.
+
+To use bridge mode, before running your container you must run the bridge script outside the container::
+
+    idmtools-slurm-bridge
+
+If you plan on using the same terminal, you may want to run the bridge in the background::
+
+    idmtools-slurm-bridge &
+
+One you have the bridge running, you can now run idmtools scripts from within Singularity containers. Ensure you platform is configured to use bridged mode::
+
+    singularity exec idmtools_1.6.8 bash
+    $ python my_script.py
+
+Local
+`````
+Local operation is meant to be executed directly on a |SLURM_s| cluster node.
+
 
 Recommendations
 ===============
 
 * Simulation results and files should be backed up
-
-* Specify where you want simulations, experiments, and suites written to. You can do this by either using the ``job_directory``
-  option in the ``idmtools.ini`` file or you can specify the job directory within the Python script when you define the
-  |SLURM_s| platform.
-
-  idmtools.ini example::
-
-    [SLURM_LOCAL]
-    type = SLURM
-    job_directory = /home/userxyz/experiments
-
-  Python script example::
-
-    Platform('SLURM_LOCAL', job_directory='/home/userxyz/experiments')
-
-.. note::
-
-    If you create a [SLURM_LOCAL] block within idmtools.ini and do not specify ``job_directory``,
-    then |IT_s| will throw an exception error. If you do not specify ``job_directory`` in the Python script
-    then |IT_s| defaults to the directory from which you ran the simulations.
 
 Getting started
 ===============
