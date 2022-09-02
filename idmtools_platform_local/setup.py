@@ -63,7 +63,7 @@ setup(
     name='idmtools_platform_local',
     # At the moment, docker python doesn't work with python 3.10 on Windows
     # See https://github.com/docker/docker-py/issues/2967
-    python_requires=">=3.6,<3.10.0",
+    python_requires=">=3.6,<3.11.0",
     packages=find_packages(),
     setup_requires=setup_requirements,
     entry_points=dict(idmtools_platform=  # noqa: E251
