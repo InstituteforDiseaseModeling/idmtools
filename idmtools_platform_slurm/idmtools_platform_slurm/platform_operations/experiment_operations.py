@@ -141,10 +141,10 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
             slurm_job_id = None
         suite_id = experiment.parent_id or experiment.suite_id
 
-        print("job_id:".ljust(15), slurm_job_id)
-        print("job_directory:".ljust(15), Path(self.platform.job_directory).resolve())
-        print("suite:".ljust(15), str(suite_id))
-        print("experiment:".ljust(15), experiment.id)
+        logger.info(f'job_id: {slurm_job_id}')
+        logger.info(f'job_directory: {Path(self.platform.job_directory).resolve()}')
+        logger.info(f'suite: {str(suite_id)}')
+        logger.info(f'experiment: {experiment.id}')
 
     def send_assets(self, experiment: Experiment, **kwargs):
         """
