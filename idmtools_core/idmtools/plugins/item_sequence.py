@@ -44,6 +44,13 @@ def load_existing_sequence_data(sequence_file):
 
 @cache
 def get_plugin_config():
+    """
+    Retrieves the sequence file and format string (for id generation) from the .ini config file.
+
+    Returns:
+        sequence_file: specified json file in .ini config in which id generator keeps track of sequential id's
+        id_format_str: string specified in .ini config by which id's are formatted when assigned to sequential items
+    """
     sequence_file = Path(IdmConfigParser.get_option("item_sequence", "sequence_file", 'item_sequences.json')).expanduser()
     id_format_str = IdmConfigParser.get_option("item_sequence", "id_format_str", '{item_name}{data[item_name]:07d}')
     return sequence_file, id_format_str
@@ -61,7 +68,6 @@ def idmtools_generate_id(item: IEntity) -> str:
         ID for the respective item, based on the formatting defined in the id_format_str (in .ini config file)
 
     """
-
     sequence_file, id_format_str = get_plugin_config()
     data = load_existing_sequence_data(sequence_file)
 

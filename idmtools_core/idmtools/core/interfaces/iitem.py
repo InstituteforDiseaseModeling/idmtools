@@ -24,6 +24,13 @@ PRE_POST_CREATION_HOOK = Callable[['IItem', 'IPlatform'], None]
 
 @cache
 def get_id_generator():
+    """
+    Retrieves the type of id generator specified in .ini config as well as corresponding plugin.
+
+    Returns:
+        id_gen: specified id generation plugin in .ini config (uuid, item_sequence, etc)
+        plugin: id generation plugin that is used to determine ids for items. See setup.py > entry_points > idmtools_hooks for full names of plugin options
+    """
     fpm = FunctionPluginManager.instance()
     id_gen = IdmConfigParser.get_option(None, "id_generator", "uuid")
     plugin = fpm.get_plugin(f"idmtools_id_generate_{id_gen}")
