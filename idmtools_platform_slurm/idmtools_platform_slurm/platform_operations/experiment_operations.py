@@ -19,6 +19,7 @@ from idmtools_platform_slurm.platform_operations.utils import SlurmExperiment, S
 from logging import getLogger
 
 logger = getLogger(__name__)
+user_logger = getLogger('user')
 
 if TYPE_CHECKING:
     from idmtools_platform_slurm.slurm_platform import SlurmPlatform
@@ -141,10 +142,10 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
             slurm_job_id = None
         suite_id = experiment.parent_id or experiment.suite_id
 
-        logger.info(f'job_id: {slurm_job_id}')
-        logger.info(f'job_directory: {Path(self.platform.job_directory).resolve()}')
-        logger.info(f'suite: {str(suite_id)}')
-        logger.info(f'experiment: {experiment.id}')
+        user_logger.info(f'job_id: {slurm_job_id}')
+        user_logger.info(f'job_directory: {Path(self.platform.job_directory).resolve()}')
+        user_logger.info(f'suite: {str(suite_id)}')
+        user_logger.info(f'experiment: {experiment.id}')
 
     def send_assets(self, experiment: Experiment, **kwargs):
         """
