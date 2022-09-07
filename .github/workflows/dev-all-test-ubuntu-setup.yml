@@ -34,7 +34,7 @@ jobs:
               - 'idmtools_platform_comps/**'
             local:
               - 'idmtools_platform_local/**'
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         if: steps.filter.outputs.core == 'true'
         with:
           path: ~/.cache/pip
@@ -93,7 +93,7 @@ jobs:
               - 'idmtools_core/**'
             cli:
               - 'idmtools_cli/**'
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         if: steps.filter.outputs.core == 'true' ||  steps.filter.outputs.cli == 'true'
         with:
           path: ~/.cache/pip
@@ -160,7 +160,7 @@ jobs:
               - 'idmtools_platform_comps/**'
             local:
               - 'idmtools_platform_local/**'
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.models == 'true'
         with:
           path: ~/.cache/pip
@@ -229,7 +229,7 @@ jobs:
               - 'idmtools_platform_comps/**'
             local:
               - 'idmtools_platform_local/**'
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.comps == 'true' || steps.filter.outputs.models == 'true'
         with:
           path: ~/.cache/pip
@@ -297,7 +297,7 @@ jobs:
               - 'idmtools_platform_comps/**'
             local:
               - 'idmtools_platform_local/**'
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.local == 'true' || steps.filter.outputs.models == 'true'
         with:
           path: ~/.cache/pip
