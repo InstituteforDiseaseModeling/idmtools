@@ -5,7 +5,7 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 from uuid import UUID, uuid4
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, List, Type, Dict, Tuple
+from typing import TYPE_CHECKING, Any, List, Type, Dict, Tuple, Union
 from idmtools.core import ItemType
 from idmtools.entities import Suite
 from idmtools.entities.iplatform_ops.iplatform_suite_operations import IPlatformSuiteOperations
@@ -23,7 +23,7 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
     platform: 'SlurmPlatform'  # noqa F821
     platform_type: Type = field(default=SlurmSuite)
 
-    def get(self, suite_id: UUID, **kwargs) -> Dict:
+    def get(self, suite_id: Union[str, UUID], **kwargs) -> Dict:
         """
         Get a suite from the Slurm platform.
         Args:
@@ -119,6 +119,8 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
         suite.parent = None
         suite.tags = slurm_suite.tags
         suite._platform_object = slurm_suite
+        suite.experiments = []
+
         if children:
             suite.experiments = self.get_children(slurm_suite, parent=suite, raw=False)
         return suite

@@ -158,10 +158,10 @@ class LocalSlurmOperations(SlurmOperations):
         if isinstance(item, Suite):
             item_dir = Path(self.platform.job_directory, item.id)
         elif isinstance(item, Experiment):
-            suite = item.parent
-            if suite is None:
+            suite_id = item.parent_id or item.suite_id
+            if suite_id is None:
                 raise RuntimeError("Experiment missing parent!")
-            suite_dir = self.get_directory(suite)
+            suite_dir = Path(self.platform.job_directory, str(suite_id))
             item_dir = Path(suite_dir, item.id)
         elif isinstance(item, Simulation):
             exp = item.parent
@@ -314,41 +314,28 @@ class LocalSlurmOperations(SlurmOperations):
         Returns:
             Any
         """
-        dry_run = kwargs.get('dry_run', False)
         if isinstance(item, Experiment):
-            if not dry_run:
-                working_directory = self.get_directory(item)
-                result = subprocess.run(['sbatch', 'sbatch.sh'], stdout=subprocess.PIPE, cwd=str(working_directory))
-                stdout = result.stdout.decode('utf-8').strip()
-                return stdout
+            working_directory = self.get_directory(item)
+            result = subprocess.run(['sbatch', '--parsable', 'sbatch.sh'], stdout=subprocess.PIPE,
+                                    cwd=str(working_directory))
+            slurm_job_id = result.stdout.decode('utf-8').strip().split(';')[0]
+            return slurm_job_id
         elif isinstance(item, Simulation):
             pass
         else:
             raise NotImplementedError(f"Submit job is not implemented on SlurmPlatform.")
 
-    def get_simulation_status(self, sim_id: Union[UUID, str], job_finished: bool = None, raw: bool = False,
-                              **kwargs) -> EntityStatus:
+    def get_simulation_status(self, sim_id: Union[UUID, str], **kwargs) -> EntityStatus:
         """
         Retrieve simulation status.
         Args:
             sim_id: Simulation ID
-            job_finished: bool
-            raw: bool
-                - True: keep original CREATED (not processed)
-                - False: convert CREATED (not processed) to FAILED
             kwargs: keyword arguments used to expand functionality
         Returns:
             EntityStatus
         """
         # Workaround (cancelling job not output -1): check if slurm job finished
         sim_dir = self.get_directory_by_id(sim_id, ItemType.SIMULATION)
-        if job_finished is None:
-            job_id_path = sim_dir.parent.joinpath('job_id.txt')
-            if job_id_path.exists():
-                job_id = open(job_id_path).read().strip()
-                job_finished = self.check_finished(job_id)
-            else:
-                job_finished = False
 
         # Check process status
         job_status_path = sim_dir.joinpath('job_status.txt')
@@ -357,34 +344,8 @@ class LocalSlurmOperations(SlurmOperations):
             if status in ['100', '0', '-1']:
                 status = SLURM_MAPS[status]
             else:
-                status = SLURM_MAPS['100']      # To be safe
+                status = SLURM_MAPS['100']  # To be safe
         else:
             status = SLURM_MAPS['None']
-        # Consider Cancel Case so that we may get out of the refresh loop
-        if job_finished and not raw and status not in (EntityStatus.SUCCEEDED, EntityStatus.FAILED):
-            status = EntityStatus.FAILED
 
         return status
-
-    @staticmethod
-    def check_finished(job_id: str, display: bool = False, **kwargs) -> Any:
-        """
-        Check if there is RUNNING or PENDING job.
-        Args:
-            job_id: Slurm job id
-            kwargs: keyword arguments used to expand functionality
-        Returns:
-            Any
-        """
-        # Get slurm jobs summary
-        p1 = subprocess.Popen(['sacct', '-n', '-X', '-P', '--format=state', '-j', job_id], stdout=subprocess.PIPE)
-        p2 = subprocess.Popen(['sort'], stdin=p1.stdout, stdout=subprocess.PIPE)
-        p1.stdout.close()
-        p3 = subprocess.Popen(['uniq', '-c'], stdin=p2.stdout, stdout=subprocess.PIPE)
-        p2.stdout.close()
-
-        result = p3.communicate()[0]
-        stdout = result.decode('utf-8').strip()
-        if display:
-            print(stdout)
-        return ('PENDING' not in stdout) and ('RUNNING' not in stdout)

@@ -26,7 +26,7 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
     platform: 'SlurmPlatform'  # noqa: F821
     platform_type: Type = field(default=SlurmSimulation)
 
-    def get(self, simulation_id: UUID, **kwargs) -> Dict:
+    def get(self, simulation_id: Union[str, UUID], **kwargs) -> Dict:
         """
         Gets an simulation from the Slurm platform.
         Args:
