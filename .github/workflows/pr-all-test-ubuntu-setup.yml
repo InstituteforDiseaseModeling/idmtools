@@ -33,9 +33,9 @@ jobs:
         if: steps.filter.outputs.core == 'true'
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/*_requirements.txt') }}
+          key: ${{ runner.os }}-${{ runner.python-version }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/*_requirements.txt') }}
           restore-keys: |
-            ${{ runner.os }}-pip-
+            ${{ runner.os }}-pip-${{ runner.python-version }}
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
         if: steps.filter.outputs.core == 'true'
         uses: actions/setup-python@v2.2.2
