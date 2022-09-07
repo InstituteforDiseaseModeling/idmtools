@@ -43,7 +43,7 @@ jobs:
             ${{ runner.os }}-${{ runner.python-version }}-pip-
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
         if: steps.filter.outputs.core == 'true'
-        uses: actions/setup-python@v2.2.2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install Python dependencies
@@ -102,7 +102,7 @@ jobs:
             ${{ runner.os }}-pip-
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
         if: steps.filter.outputs.core == 'true' ||  steps.filter.outputs.cli == 'true'
-        uses: actions/setup-python@v2.2.2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
@@ -168,7 +168,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2.2.2
+        uses: actions/setup-python@v4
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.models == 'true'
         with:
           python-version: ${{ matrix.python-version }}
@@ -238,7 +238,7 @@ jobs:
             ${{ runner.os }}-pip-
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.comps == 'true' || steps.filter.outputs.models == 'true'
-        uses: actions/setup-python@v2.2.2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
@@ -306,7 +306,7 @@ jobs:
             ${{ runner.os }}-pip-
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.local == 'true' || steps.filter.outputs.models == 'true'
-        uses: actions/setup-python@v2.2.2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64

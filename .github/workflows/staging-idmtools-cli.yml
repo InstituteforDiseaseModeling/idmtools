@@ -17,7 +17,7 @@ jobs:
     if: "!contains(github.event.head_commit.message, 'Bump version: ')"
     steps:
       - name: Set up Python
-        uses: actions/setup-python@v1
+        uses: actions/cache@v3python@v1
         with:
           python-version: '3.7'
       - name: Install dependencies
