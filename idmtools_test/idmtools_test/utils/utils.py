@@ -148,5 +148,7 @@ def get_performance_scale() -> int:
 def clear_id_cache():
     from idmtools.core.interfaces.iitem import get_id_generator
     from idmtools.plugins.item_sequence import get_plugin_config
+    from idmtools.plugins.item_sequence import _get_template
     get_id_generator.cache_clear()
     get_plugin_config.cache_clear()
+    _get_template.cache_clear()
