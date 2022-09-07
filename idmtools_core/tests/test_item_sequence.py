@@ -1,5 +1,6 @@
 import json
 import os
+import time
 import unittest.mock
 from functools import partial
 
@@ -13,6 +14,7 @@ from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
+from idmtools_test.utils.decorators import run_test_in_n_seconds
 from idmtools_test.utils.test_execute_platform import clear_execute_platform
 from idmtools_test.utils.test_task import TestTask
 from idmtools.entities.experiment import Experiment
@@ -28,6 +30,7 @@ from idmtools_test.utils.utils import get_performance_scale, clear_id_cache
 class TestItemSequence(unittest.TestCase):
 
     def setUp(self):
+        self.get_sequence_file()
         clear_execute_platform()
 
     @classmethod
@@ -106,9 +109,29 @@ class TestItemSequence(unittest.TestCase):
     @pytest.mark.performance
     def test_local_execute_perf(self):
         clear_id_cache()
-        platform = Platform('TestExecute', missing_ok=True)
+
         parser = IdmConfigParser()
-        parser._load_config_file(file_name='idmtools_xxx.ini')
+        parser._load_config_file(file_name='idmtools_item_sequence.ini')
+
+        start_time_a = time.time()
+        self._run_experiment()
+        start_time_b = time.time()
+        run_time_a = start_time_b - start_time_a
+
+        IdmConfigParser.clear_instance()
+
+        parser = IdmConfigParser()
+        parser._load_config_file(file_name='idmtools.ini')
+
+        start_time_c = time.time()
+        self._run_experiment()
+        start_time_d = time.time()
+        run_time_b = start_time_d - start_time_c
+        self.assertTrue(run_time_a <= run_time_b or (run_time_a - run_time_b) < (run_time_b * .30))
+
+    def _run_experiment(self, ):
+        platform = Platform('TestExecute', missing_ok=True)
+
         task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"),
                                         envelope="parameters", parameters=(dict(c=0)))
         ts = TemplatedSimulations(base_task=task)
@@ -123,6 +146,7 @@ class TestItemSequence(unittest.TestCase):
         builder.add_sweep_definition(partial(param_update, param="b"), range(50))
         e.simulations.add_builder(builder)
         e.run(wait_until_done=True)
+        return
 
     @pytest.mark.serial
     def test_id(self):

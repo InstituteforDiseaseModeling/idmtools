@@ -15,11 +15,12 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 import json
 import time
 from functools import cache
+from json import JSONDecodeError
 from logging import getLogger, INFO, DEBUG
 from pathlib import Path
 from random import randint
 
-from filelock import FileLock, Timeout
+from filelock import FileLock
 from idmtools import IdmConfigParser
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.registry.hook_specs import function_hook_impl
@@ -41,7 +42,10 @@ def load_existing_sequence_data(sequence_file):
 
     if Path(sequence_file).exists():
         with open(sequence_file, 'r') as file:
-            data = json.load(file)
+            try:
+                data = json.load(file)
+            except JSONDecodeError:
+                return dict()
     return data
 
 
