@@ -115,7 +115,7 @@ def run_sbatch(working_directory):
 
     """
     sbp = Path(working_directory).joinpath("sbatch.sh")
-    if sbp.exists():
+    if not sbp.exists():
         return f"FAILED: No Directory name {sbp}"
     if logger.isEnabledFor(DEBUG):
         logger.debug(f"Running 'sbatch sbatch.sh' in {working_directory}")
