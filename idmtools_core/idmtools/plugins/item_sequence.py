@@ -22,7 +22,6 @@ from random import randint
 
 import jinja2
 from filelock import FileLock
-from jinja2 import environment
 
 from idmtools import IdmConfigParser
 from idmtools.core.interfaces.ientity import IEntity
