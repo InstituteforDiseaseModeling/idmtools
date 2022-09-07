@@ -20,7 +20,10 @@ from logging import getLogger, INFO, DEBUG
 from pathlib import Path
 from random import randint
 
+import jinja2
 from filelock import FileLock
+from jinja2 import environment
+
 from idmtools import IdmConfigParser
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.registry.hook_specs import function_hook_impl
@@ -59,8 +62,23 @@ def get_plugin_config():
         id_format_str: string specified in .ini config by which id's are formatted when assigned to sequential items
     """
     sequence_file = Path(IdmConfigParser.get_option("item_sequence", "sequence_file", 'item_sequences.json')).expanduser()
-    id_format_str = IdmConfigParser.get_option("item_sequence", "id_format_str", '{item_name}{data[item_name]:07d}')
+    id_format_str = IdmConfigParser.get_option("item_sequence", "id_format_str", None)
     return sequence_file, id_format_str
+
+
+@cache
+def _get_template(id_format_str):
+    """
+    Get our jinja template. Cache this to reduce work
+    Args:
+        id_format_str: Format string
+
+    Returns:
+        Jinja2 template
+    """
+    environment = jinja2.Environment()
+    template = environment.from_string(id_format_str)
+    return template
 
 
 @function_hook_impl
@@ -111,4 +129,7 @@ def idmtools_generate_id(item: IEntity) -> str:
                 logger.error("Trouble generating sequence.")
                 logger.exception(e)
             time.sleep(randint(1, 4) * 0.01)
-    return eval("f'" + id_format_str + "'")
+    if id_format_str:
+        return _get_template(id_format_str).render(**locals())
+    else:
+        return f'{item_name}{data[item_name]:07d}'

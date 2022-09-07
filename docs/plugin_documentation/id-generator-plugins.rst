@@ -62,3 +62,5 @@ Configuration format::
     [item_sequence]
     sequence_file = <custom file name>.json
     id_format_str = '<custom string format>'
+
+The configuration string format should be a jinja2 template. See https://jinja.palletsprojects.com/

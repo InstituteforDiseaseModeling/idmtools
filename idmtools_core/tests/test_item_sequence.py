@@ -111,6 +111,30 @@ class TestItemSequence(unittest.TestCase):
         clear_id_cache()
 
         parser = IdmConfigParser()
+        parser._load_config_file(file_name='idmtools_item_sequence_no_config.ini')
+
+        start_time_a = time.time()
+        self._run_experiment()
+        start_time_b = time.time()
+        run_time_a = start_time_b - start_time_a
+
+        IdmConfigParser.clear_instance()
+
+        parser = IdmConfigParser()
+        parser._load_config_file(file_name='idmtools.ini')
+
+        start_time_c = time.time()
+        self._run_experiment()
+        start_time_d = time.time()
+        run_time_b = start_time_d - start_time_c
+        self.assertTrue(run_time_a <= run_time_b or (run_time_a - run_time_b) > (run_time_b * .10))
+
+    @pytest.mark.serial
+    @pytest.mark.performance
+    def test_local_execute_perf_with_template(self):
+        clear_id_cache()
+
+        parser = IdmConfigParser()
         parser._load_config_file(file_name='idmtools_item_sequence.ini')
 
         start_time_a = time.time()
@@ -127,7 +151,7 @@ class TestItemSequence(unittest.TestCase):
         self._run_experiment()
         start_time_d = time.time()
         run_time_b = start_time_d - start_time_c
-        self.assertTrue(run_time_a <= run_time_b or (run_time_a - run_time_b) < (run_time_b * .30))
+        self.assertTrue(run_time_a <= run_time_b or (run_time_a - run_time_b) > (run_time_b * .10))
 
     def _run_experiment(self, ):
         platform = Platform('TestExecute', missing_ok=True)
