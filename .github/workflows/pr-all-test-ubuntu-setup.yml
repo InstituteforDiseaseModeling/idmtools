@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         os: [self-linux]
-        python-version: [ '3.7.x', '3.8.x', '3.9.x' ]
+        python-version: [ '3.7', '3.8', '3.9' ]
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
@@ -41,6 +41,7 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+          check-latest: true
       - name: Install Python dependencies
         if: steps.filter.outputs.core == 'true'
         run: |
