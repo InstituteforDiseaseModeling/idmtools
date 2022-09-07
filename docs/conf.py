@@ -49,7 +49,6 @@ extensions = [
     'plantweb.directive',
     'sphinxcontrib.programoutput',
     'sphinx_copybutton',
-    'sphinxext.remoteliteralinclude',
     # intersphinx to allow cross-reference
     'sphinx.ext.intersphinx',
     # automatic section names so linking between section is easy
