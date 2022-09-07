@@ -15,7 +15,7 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 import json
 import time
 from functools import cache
-from logging import getLogger, INFO
+from logging import getLogger, INFO, DEBUG
 from pathlib import Path
 from random import randint
 
@@ -78,7 +78,9 @@ def idmtools_generate_id(item: IEntity) -> str:
             logger.info(f"Creating {sequence_file.parent}")
         sequence_file.parent.mkdir(exist_ok=True, parents=True)
 
-    while True:
+    max_tries = 100
+    attempts = 0
+    while attempts < max_tries:
         try:
             lock = FileLock(sequence_file, timeout=1)
             with lock:
@@ -95,6 +97,13 @@ def idmtools_generate_id(item: IEntity) -> str:
 
                     json.dump(data, f)
                     break
-        except Timeout:
+        except Exception as e:
+            attempts += 1
+            if attempts >= max_tries:
+                raise e
+            # We had an issue generating sequence. We assume
+            if logger.isEnabledFor(DEBUG):
+                logger.error("Trouble generating sequence.")
+                logger.exception(e)
             time.sleep(randint(1, 4) * 0.01)
     return eval("f'" + id_format_str + "'")
