@@ -43,6 +43,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
           architecture: x64
           check-latest: true
+          os: linux
       - name: Install Python dependencies
         if: steps.filter.outputs.core == 'true'
         run: |
