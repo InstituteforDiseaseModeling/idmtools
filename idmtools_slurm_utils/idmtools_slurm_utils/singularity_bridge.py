@@ -150,6 +150,7 @@ def main():
     CLI main.
     """
     bp = Path.home().joinpath(".idmtools").joinpath("singularity-bridge")
+    bp.mkdir(parents=True, exist_ok=True)
     basicConfig(level=INFO, handlers=[
         StreamHandler(sys.stdout),
         FileHandler(bp.joinpath("sb.log"))
