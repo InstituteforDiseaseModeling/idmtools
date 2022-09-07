@@ -45,8 +45,8 @@ if sys.version_info <= (3, 6):
     extra_require_files['requirements'].append('dataclasses')
 
 setup(
-    author=[author[0] for author in authors],
-    author_email=[author[1] for author in authors],
+    author=", ".join([author[0] for author in authors]),
+    author_email=", ".join([author[1] for author in authors]),
     classifiers=[
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
