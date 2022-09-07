@@ -69,21 +69,22 @@ def idmtools_generate_id(item: IEntity) -> str:
 
     """
     sequence_file, id_format_str = get_plugin_config()
-    data = load_existing_sequence_data(sequence_file)
-
-    item_name = str(item.item_type if hasattr(item, 'item_type') else "Unknown")
-    if item_name in data:
-        data[item_name] += 1
-    else:
+    # we can check for existence here since it should only not exist when a new sequence is started
+    if not sequence_file.parent.exists():
         if logger.isEnabledFor(INFO):
-            logger.info(f"Starting sequence for {item_name} at 0")
-        data[item_name] = 0
-        # we can check for existence here since it should only not exist when a new sequence is started
-        if not sequence_file.parent.exists():
-            if logger.isEnabledFor(INFO):
-                logger.info(f"Creating {sequence_file.parent}")
-            sequence_file.parent.mkdir(exist_ok=True, parents=True)
+            logger.info(f"Creating {sequence_file.parent}")
+        sequence_file.parent.mkdir(exist_ok=True, parents=True)
 
     with open(sequence_file, 'w') as f:
+        data = load_existing_sequence_data(sequence_file)
+
+        item_name = str(item.item_type if hasattr(item, 'item_type') else "Unknown")
+        if item_name in data:
+            data[item_name] += 1
+        else:
+            if logger.isEnabledFor(INFO):
+                logger.info(f"Starting sequence for {item_name} at 0")
+            data[item_name] = 0
+
         json.dump(data, f)
     return eval("f'" + id_format_str + "'")
