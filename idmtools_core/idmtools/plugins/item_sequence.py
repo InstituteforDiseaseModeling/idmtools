@@ -84,23 +84,24 @@ def idmtools_generate_id(item: IEntity) -> str:
 
     max_tries = 100
     attempts = 0
+    data = dict()
+    item_name = str(item.item_type if hasattr(item, 'item_type') else "Unknown")
     while attempts < max_tries:
         try:
-            lock = FileLock(sequence_file, timeout=1)
+            lock = FileLock(f"{sequence_file}.lock", timeout=1)
             with lock:
+                data = load_existing_sequence_data(sequence_file)
+
+                if item_name in data:
+                    data[item_name] += 1
+                else:
+                    if logger.isEnabledFor(INFO):
+                        logger.info(f"Starting sequence for {item_name} at 0")
+                    data[item_name] = 0
+
                 with open(sequence_file, 'w') as f:
-                    data = load_existing_sequence_data(sequence_file)
-
-                    item_name = str(item.item_type if hasattr(item, 'item_type') else "Unknown")
-                    if item_name in data:
-                        data[item_name] += 1
-                    else:
-                        if logger.isEnabledFor(INFO):
-                            logger.info(f"Starting sequence for {item_name} at 0")
-                        data[item_name] = 0
-
                     json.dump(data, f)
-                    break
+                break
         except Exception as e:
             attempts += 1
             if attempts >= max_tries:

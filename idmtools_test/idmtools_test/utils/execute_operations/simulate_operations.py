@@ -8,6 +8,7 @@ import sys
 from dataclasses import dataclass
 from functools import partial
 from logging import getLogger
+from pathlib import Path
 from threading import Lock
 from typing import List, Dict, Any, Type, TYPE_CHECKING, Optional
 from uuid import UUID, uuid4
@@ -223,11 +224,11 @@ class TestExecutePlatformSimulationOperation(IPlatformSimulationOperations):
 
         """
         for asset in simulation.parent.assets:
-            remote_path = os.path.join(exp_path, asset.relative_path) if asset.relative_path else exp_path
-            sim_assets = os.path.join(sim_path, "Assets")
-            src_path = os.path.join(remote_path, asset.filename)
-            dest_path = os.path.join(sim_assets, asset.filename)
-            os.makedirs(sim_assets, exist_ok=True)
+            remote_path = Path(exp_path).joinpath(asset.relative_path) if asset.relative_path else Path(exp_path)
+            sim_assets = Path(sim_path).joinpath("Assets")
+            src_path = remote_path.joinpath(asset.filename)
+            dest_path = sim_assets.joinpath(asset.filename)
+            sim_assets.mkdir(parents=True, exist_ok=True)
             if sys.platform in ['win32']:
                 import win32file
                 link_worked = True
