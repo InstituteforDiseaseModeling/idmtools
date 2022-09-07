@@ -13,10 +13,13 @@ id_format_str = <custom_str_format>     ex: {item_name}{data[item_name]:06d}
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import json
+import time
 from functools import cache
 from logging import getLogger, INFO
 from pathlib import Path
+from random import randint
 
+from filelock import FileLock, Timeout
 from idmtools import IdmConfigParser
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.registry.hook_specs import function_hook_impl
@@ -75,16 +78,23 @@ def idmtools_generate_id(item: IEntity) -> str:
             logger.info(f"Creating {sequence_file.parent}")
         sequence_file.parent.mkdir(exist_ok=True, parents=True)
 
-    with open(sequence_file, 'w') as f:
-        data = load_existing_sequence_data(sequence_file)
+    while True:
+        try:
+            lock = FileLock(sequence_file, timeout=1)
+            with lock:
+                with open(sequence_file, 'w') as f:
+                    data = load_existing_sequence_data(sequence_file)
 
-        item_name = str(item.item_type if hasattr(item, 'item_type') else "Unknown")
-        if item_name in data:
-            data[item_name] += 1
-        else:
-            if logger.isEnabledFor(INFO):
-                logger.info(f"Starting sequence for {item_name} at 0")
-            data[item_name] = 0
+                    item_name = str(item.item_type if hasattr(item, 'item_type') else "Unknown")
+                    if item_name in data:
+                        data[item_name] += 1
+                    else:
+                        if logger.isEnabledFor(INFO):
+                            logger.info(f"Starting sequence for {item_name} at 0")
+                        data[item_name] = 0
 
-        json.dump(data, f)
+                    json.dump(data, f)
+                    break
+        except Timeout:
+            time.sleep(randint(1, 4) * 0.01)
     return eval("f'" + id_format_str + "'")
