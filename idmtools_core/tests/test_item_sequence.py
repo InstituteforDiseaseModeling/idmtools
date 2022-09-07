@@ -3,18 +3,15 @@ import os
 import time
 import unittest.mock
 from functools import partial
-
 import allure
 import pytest
 from pathlib import Path
-
 from idmtools import IdmConfigParser
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
-from idmtools_test.utils.decorators import run_test_in_n_seconds
 from idmtools_test.utils.test_execute_platform import clear_execute_platform
 from idmtools_test.utils.test_task import TestTask
 from idmtools.entities.experiment import Experiment
@@ -118,7 +115,9 @@ class TestItemSequence(unittest.TestCase):
         start_time_b = time.time()
         run_time_a = start_time_b - start_time_a
 
+        # Reset to uuid generation and run again
         IdmConfigParser.clear_instance()
+        clear_id_cache()
 
         parser = IdmConfigParser()
         parser._load_config_file(file_name='idmtools.ini')
@@ -126,6 +125,8 @@ class TestItemSequence(unittest.TestCase):
         start_time_c = time.time()
         self._run_experiment()
         start_time_d = time.time()
+
+        # compare run times
         run_time_b = start_time_d - start_time_c
         self.assertTrue(run_time_a <= run_time_b or (run_time_a - run_time_b) > (run_time_b * .10))
 
@@ -142,7 +143,9 @@ class TestItemSequence(unittest.TestCase):
         start_time_b = time.time()
         run_time_a = start_time_b - start_time_a
 
+        # Reset to uuid generation
         IdmConfigParser.clear_instance()
+        clear_id_cache()
 
         parser = IdmConfigParser()
         parser._load_config_file(file_name='idmtools.ini')
@@ -151,6 +154,8 @@ class TestItemSequence(unittest.TestCase):
         self._run_experiment()
         start_time_d = time.time()
         run_time_b = start_time_d - start_time_c
+
+        # compare run times
         self.assertTrue(run_time_a <= run_time_b or (run_time_a - run_time_b) > (run_time_b * .10))
 
     def _run_experiment(self, ):
