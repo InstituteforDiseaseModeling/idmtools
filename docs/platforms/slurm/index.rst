@@ -11,6 +11,7 @@ Prerequisites
 =============
 * Linux client
 
+
 * |SLURM_s| cluster access and general understanding
 
 * |Python_IT| (https://www.python.org/downloads/release)
@@ -100,7 +101,7 @@ Recommendations
 
 Getting started
 ===============
-After you have installed |IT_s| (:doc:`basic-installation` or :doc:`dev-installation`) and met the
+After you have installed |IT_s| (:doc:`../../basic-installation` or :doc:`../../dev-installation`) and met the
 above listed prerequisites, you can begin submitting and running jobs to your |SLURM_s| cluster with |IT_s|.
 First verify your |SLURM_s| platform is running. Then submit a job with the included example Python script.
 
