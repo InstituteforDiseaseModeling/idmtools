@@ -4,7 +4,7 @@ IItem is the base of all items that have ids such as AssetCollections, Experimen
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 from dataclasses import dataclass, field, fields
-from functools import cache
+from functools import lru_cache
 from inspect import signature
 from logging import getLogger, DEBUG
 from typing import List, Callable, TYPE_CHECKING, Any, Dict
@@ -22,7 +22,7 @@ logger = getLogger(__name__)
 PRE_POST_CREATION_HOOK = Callable[['IItem', 'IPlatform'], None]
 
 
-@cache
+@lru_cache(maxsize=None)
 def get_id_generator():
     """
     Retrieves the type of id generator specified in .ini config as well as corresponding plugin.

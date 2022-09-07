@@ -14,7 +14,7 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import json
 import time
-from functools import cache
+from functools import lru_cache
 from json import JSONDecodeError
 from logging import getLogger, INFO, DEBUG
 from pathlib import Path
@@ -51,7 +51,7 @@ def load_existing_sequence_data(sequence_file):
     return data
 
 
-@cache
+@lru_cache(maxsize=None)
 def get_plugin_config():
     """
     Retrieves the sequence file and format string (for id generation) from the .ini config file.
@@ -65,7 +65,7 @@ def get_plugin_config():
     return sequence_file, id_format_str
 
 
-@cache
+@lru_cache(maxsize=None)
 def _get_template(id_format_str):
     """
     Get our jinja template. Cache this to reduce work
