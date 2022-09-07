@@ -50,8 +50,8 @@ authors = [
 ]
 
 setup(
-    author=[author[0] for author in authors],
-    author_email=[author[1] for author in authors],
+    author=", ".join([author[0] for author in authors]),
+    author_email=", ".join([author[1] for author in authors]),
     classifiers=[
         'Framework:: IDM-Tools :: Platform',
     ],
