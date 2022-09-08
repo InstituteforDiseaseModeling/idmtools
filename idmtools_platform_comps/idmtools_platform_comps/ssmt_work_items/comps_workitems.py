@@ -2,12 +2,10 @@
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
-import warnings
 from logging import getLogger, DEBUG
 from dataclasses import dataclass, field, InitVar
 from uuid import UUID
 from idmtools.assets.file_list import FileList
-from idmtools.entities import CommandLine
 from idmtools.entities.command_task import CommandTask
 from idmtools_platform_comps.ssmt_work_items.icomps_workflowitem import ICOMPSWorkflowItem
 
