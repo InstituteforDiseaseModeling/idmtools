@@ -84,22 +84,6 @@ class SSMTWorkItem(ICOMPSWorkflowItem):
 
         return docker_image
 
-    @property
-    def command(self) -> str:
-        """Command to run."""
-        return str(self.task.command)
-
-    @command.setter
-    def command(self, value: str):
-        """
-        Alias for legacy code for assets. It will be deprecated in 1.7.0.
-
-        Returns:
-            None
-        """
-        warnings.warn("Setting commands via command alias will be deprecated in 1.7.0. Set on task, task.command", DeprecationWarning)
-        self.task.command = CommandLine.from_string(value)
-
 
 @dataclass
 class InputDataWorkItem(ICOMPSWorkflowItem):
