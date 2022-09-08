@@ -66,12 +66,12 @@ class JSONMetadataOperationsTest(unittest.TestCase):
         expected_meta = {'platform_id': None, 'status': 'CREATED', 'tags': {}, 'item_type': 'Experiment', 'name': None,
                          'assets': [], 'suite_id': None, 'task_type': 'idmtools.entities.command_task.CommandTask',
                          'platform_requirements': None, 'frozen': False, 'gather_common_assets_from_task': True,
-                         'simulations': []}
+                         'simulations': [], 'parent_id': suites[0].id, 'disable_default_pre_create': False}
         expected_meta.update({"parent_id": suites[0].id})
         expected_meta.update({"_uid": exp.id})
         expected_meta.update({"uid": exp.id})
         expected_meta.update({"id": exp.id})
-        self.assertEqual(expected_meta, metadata)
+        self.assertDictEqual(expected_meta, metadata)
 
     # test get meta for suite
     def test_get_for_suite_meta(self):
