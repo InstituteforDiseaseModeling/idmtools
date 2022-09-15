@@ -22,13 +22,12 @@ from idmtools_platform_slurm.slurm_operations import SlurmOperations, SlurmOpera
 from idmtools_platform_slurm.platform_operations.suite_operations import SlurmPlatformSuiteOperations
 from idmtools_platform_slurm.platform_operations.utils import SlurmSuite, SlurmExperiment, SlurmSimulation
 
-
 logger = getLogger(__name__)
 
 op_defaults = dict(default=None, compare=False, metadata={"pickle_ignore": True})
 CONFIG_PARAMETERS = ['ntasks', 'partition', 'nodes', 'mail_type', 'mail_user', 'ntasks_per_core', 'cpus_per_task',
-                     'mem_per_cpu', 'time', 'account', 'mem', 'exclusive', 'requeue', 'sbatch_custom',
-                     'max_running_jobs']
+                     'mem_per_cpu', 'time',
+                     'account', 'mem', 'exclusive', 'requeue', 'sbatch_custom', 'max_running_jobs']
 
 
 @dataclass(repr=False)
