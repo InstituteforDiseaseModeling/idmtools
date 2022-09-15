@@ -1,6 +1,4 @@
-import allure
 import os
-import time
 from functools import partial
 from typing import Any, Dict
 import pytest
