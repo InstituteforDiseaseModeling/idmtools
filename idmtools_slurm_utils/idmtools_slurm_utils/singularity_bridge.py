@@ -179,16 +179,9 @@ def dir_path(directory_path):
 
 def cleanup(*args, **kwargs):
     """
-    Cleanup pid when user tries to kill process
-
-    Args:
-        *args:
-        **kwargs:
-
-    Returns:
-
+    Cleanup pid when user tries to kill process.
     """
-    pid_file = bp = Path.home().joinpath(".idmtools").joinpath("slurm-bridge.pid")
+    pid_file = Path.home().joinpath(".idmtools").joinpath("slurm-bridge.pid")
     pid_file.unlink(missing_ok=True)
 
 
