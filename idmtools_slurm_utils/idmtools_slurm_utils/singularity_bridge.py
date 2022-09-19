@@ -2,6 +2,7 @@
 import argparse
 import json
 import os
+import signal
 import subprocess
 import sys
 import time
@@ -176,11 +177,27 @@ def dir_path(directory_path):
         raise NotADirectoryError(directory_path)
 
 
+def cleanup(*args, **kwargs):
+    """
+    Cleanup pid when user tries to kill process
+
+    Args:
+        *args:
+        **kwargs:
+
+    Returns:
+
+    """
+    pid_file = bp = Path.home().joinpath(".idmtools").joinpath("slurm-bridge.pid")
+    pid_file.unlink(missing_ok=True)
+
+
 def main():
     """
     CLI main.
     """
     bp = Path.home().joinpath(".idmtools").joinpath("singularity-bridge")
+    pid_file = Path.home().joinpath(".idmtools").joinpath("slurm-bridge.pid")
     bp.mkdir(parents=True, exist_ok=True)
     basicConfig(level=INFO, handlers=[
         StreamHandler(sys.stdout),
@@ -200,7 +217,20 @@ def main():
     if not Path(args.job_directory).exists():
         Path(args.job_directory).mkdir(parents=True, exist_ok=True)
 
+    if pid_file.exists():
+        print("It appears another slurm-bridge process is running. Running multiple instances can cause issues.")
+        while True:
+            answer = input("Are you sure you want to continue [y/n]?")
+            if answer.lower() in ["n", "no"]:
+                return
+            elif answer.lower() not in ["y", "yes"]:
+                break
+            else:
+                print("Please answer y or n")
+
     logger.info(f"Bridging jobs from {args.job_directory}")
+    # Capture control C/Z
+    signal.signal((signal.SIGINT, signal.SIGTSTP), cleanup)
     w = IdmtoolsJobWatcher(args.job_directory, args.status_directory, args.check_every)
     w.run()
 
