@@ -76,7 +76,7 @@ This is accomplished through a script that manages the communication to Slurm ou
 
 Bridge mode requires the package `idmtools-slurm-utils`.
 
-To use bridge mode, before running your container you must run the bridge script outside the container::
+To use bridged mode, before running your container you must run the bridge script outside the container::
 
     idmtools-slurm-bridge
 
@@ -84,7 +84,7 @@ If you plan on using the same terminal, you may want to run the bridge in the ba
 
     idmtools-slurm-bridge &
 
-One you have the bridge running, you can now run idmtools scripts from within Singularity containers. Ensure you platform is configured to use bridged mode::
+One you have the bridge running, you can now run idmtools scripts from within Singularity containers. Ensure your platform is configured to use bridged mode::
 
     singularity exec idmtools_1.6.8 bash
     $ python my_script.py

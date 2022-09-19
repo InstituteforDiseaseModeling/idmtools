@@ -3,6 +3,7 @@ Here we implement the SlurmPlatform object.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+from pathlib import Path
 from typing import Optional, Any, Dict
 from dataclasses import dataclass, field, fields
 from logging import getLogger
@@ -27,7 +28,8 @@ CONFIG_PARAMETERS = ['ntasks', 'partition', 'nodes', 'mail_type', 'mail_user', '
 
 @dataclass(repr=False)
 class SlurmPlatform(IPlatform):
-    job_directory: str = field(default=None)
+    jobs_directory = Path.home().joinpath(".idmtools").joinpath("singularity-bridge")
+    results_directory = Path.home().joinpath(".idmtools").joinpath("singularity-bridge").joinpath("results")
     mode: SlurmOperationalMode = field(default=None)
 
     # region: Resources request
@@ -98,8 +100,6 @@ class SlurmPlatform(IPlatform):
         self.__init_interfaces()
         self.supported_types = {ItemType.SUITE, ItemType.EXPERIMENT, ItemType.SIMULATION}
         super().__post_init__()
-        if self.job_directory is None:
-            raise ValueError("Job Directory is required.")
 
     def __init_interfaces(self):
         if self.mode == SlurmOperationalMode.SSH:

@@ -8,10 +8,13 @@ import time
 from logging import getLogger, basicConfig, DEBUG, FileHandler, StreamHandler, INFO
 from os import PathLike
 from pathlib import Path
+from typing import Dict
+
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
 logger = getLogger(__name__)
+VALID_COMMANDS = ['sbatch', 'scancel', 'verify']
 
 
 class IdmtoolsJobWatcher:
@@ -87,18 +90,34 @@ def process_job(job_path, result_dir, cleanup_job: bool = True):
         cleanup_job: Cleanup job when done(true), false leave it in place.
     """
     try:
-        if not os.path.exists(result_dir):
-            os.makedirs(result_dir, exist_ok=True)
-        result_name = os.path.join(result_dir, os.path.basename(job_path) + ".result")
+        result_dir = Path(result_dir)
+        if not result_dir.exists():
+            result_dir.mkdir(parents=True, exist_ok=True)
+        result_name = result_dir.joinpath(f'{os.path.basename(Path(job_path))}.result')
         with open(job_path, "r") as jin:
             info = json.load(jin)
-            if 'working_directory' in info:
-                if not os.path.exists(info['working_directory']):
-                    result = "FAILED: No Directory name %s" % info['working_directory']
-                else:
-                    result = run_sbatch(info['working_directory'])
-                with open(result_name, "w") as rout:
-                    rout.write(result)
+
+            if "command" not in info or info['command'].lower() not in VALID_COMMANDS:
+                result = dict(
+                    status="error",
+                    output="No command specified. You must specify either sbatch, scancel, or verify"
+                )
+            else:
+                command = info['command'].lower()
+                if command == "sbatch":
+                    if 'working_directory' in info:
+                        wd = Path(info['working_directory'])
+                        if not wd.exists():
+                            output = "FAILED: No Directory name %s" % info['working_directory']
+                            return_code = -1
+                        else:
+                            output, return_code = run_sbatch(wd)
+                        result = dict(
+                            status="success" if return_code == 0 else "error",
+                            return_code=return_code,
+                            output=output
+                        )
+                write_result(result, result_name)
                 if cleanup_job:
                     os.unlink(job_path)
     except Exception as e:
@@ -106,7 +125,19 @@ def process_job(job_path, result_dir, cleanup_job: bool = True):
         pass
 
 
-def run_sbatch(working_directory):
+def write_result(result: Dict, result_name: Path):
+    """
+    Write the result of a job to a directory.
+
+    Args:
+        result: Result to write
+        result_name: Path to write result to.
+    """
+    with open(result_name, "w") as rout:
+        json.dump(result, rout)
+
+
+def run_sbatch(working_directory: Path):
     """
     Just a sbatch script.
 
@@ -114,16 +145,16 @@ def run_sbatch(working_directory):
         working_directory: Working directory
 
     """
-    sbp = Path(working_directory).joinpath("sbatch.sh")
+    sbp = working_directory.joinpath("sbatch.sh")
     if not sbp.exists():
         return f"FAILED: No Directory name {sbp}"
     if logger.isEnabledFor(DEBUG):
         logger.debug(f"Running 'sbatch sbatch.sh' in {working_directory}")
-    result = subprocess.run(['sbatch', 'sbatch.sh'], stdout=subprocess.PIPE, cwd=str(working_directory))
+    result = subprocess.run(['sbatch', '--parsable', 'sbatch.sh'], stdout=subprocess.PIPE, cwd=str(working_directory))
     stdout = result.stdout.decode('utf-8').strip()
     if logger.isEnabledFor(DEBUG):
         logger.debug(f"Result\n=============\n{stdout}\n=============\n")
-    return stdout
+    return stdout, result.returncode
 
 
 def dir_path(directory_path):
