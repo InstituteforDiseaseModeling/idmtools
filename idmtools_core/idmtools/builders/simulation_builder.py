@@ -127,18 +127,16 @@ class SimulationBuilder:
 
         The sweep will be defined as a cross-product between the parameters passed.
 
-
         Args:
             function: The sweep function, which must include a **simulation** parameter (or
                 whatever is specified in :attr:`~idmtools.builders.ExperimentBuilder.SIMULATION_ATTR`).
-            *args: List of arguments to be passed
-            **kwargs: List of keyword arguments to be passed
+            args: List of arguments to be passed
+            kwargs: List of keyword arguments to be passed
 
         Returns:
             None. Updates the Sweeps
 
         Examples:
-
             Examples of valid functions::
 
                 # This function takes two parameters

@@ -1,4 +1,7 @@
 import copy
+import typing
+from pathlib import Path
+from time import time
 
 import allure
 import json
@@ -22,7 +25,9 @@ from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
+from idmtools.utils.entities import save_id_as_file_as_hook
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
+
 from idmtools_platform_comps.utils.general import update_item
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.common_experiments import get_model1_templated_experiment, get_model_py_templated_experiment, \
@@ -31,6 +36,11 @@ from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id,
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.shared_functions import validate_output, validate_sim_tags
 from idmtools_test.utils.utils import get_case_name
+
+if typing.TYPE_CHECKING:
+    from idmtools_platform_comps.comps_platform import COMPSPlatform
+    from idmtools.entities.experiment import Experiment
+    from idmtools.entities.simulation import Simulation
 
 setA = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="a")
 setB = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="b")
@@ -68,6 +78,9 @@ class TestPythonExperiment(ITestWithPersistence):
     def test_sweeps_with_partial_comps(self):   # zdu: no metadata file any more
 
         e = get_model1_templated_experiment(self.case_name)
+        id_file = Path(f"{e.item_type}.{e.name}.id")
+        if id_file.exists():
+            id_file.unlink(True)
         builder = SimulationBuilder()
         # ------------------------------------------------------
         # Sweeping parameters:
@@ -87,6 +100,15 @@ class TestPythonExperiment(ITestWithPersistence):
 
         e.simulations.add_builder(builder)
 
+        ran_at = str(time())
+
+        # test pre create hook
+        def add_date_as_tag(item: 'Experiment', platform: 'COMPSPlatform'):
+            item.tags['date'] = ran_at
+
+        e.add_pre_creation_hook(add_date_as_tag)
+        e.add_post_creation_hook(save_id_as_file_as_hook)
+
         wait_on_experiment_and_check_all_sim_status(self, e, self.platform)
         experiment = COMPSExperiment.get(e.uid)
         print(experiment.id)
@@ -104,9 +126,12 @@ class TestPythonExperiment(ITestWithPersistence):
         actual_exp_tags = experiment.get(experiment.id, QueryCriteria().select_children('tags')).tags
         expected_exp_tags = {'idmtools': __version__, 'number_tag': '123', 'string_tag': 'test',
                              'KeyOnly': '',
+                             'date': ran_at,
                              'task_type': 'idmtools_models.python.json_python_task.JSONConfiguredPythonTask'}
         self.assertDictEqual(expected_exp_tags, actual_exp_tags)
         self.assertDictEqual(expected_exp_tags, actual_exp_tags)
+
+        self.assertTrue(id_file.exists(), msg=f"Could not find {id_file}")
 
         # validate reload
         # with self.subTest("test_sweeps_with_partial_comps_reload_with_task"):
@@ -240,13 +265,14 @@ class TestPythonExperiment(ITestWithPersistence):
             # validate output/config.json
             assets = self.assert_valid_config_stdout_and_assets(simulation, validate_config=validate_config,
                                                                 validate_stdout=validate_stdout)
-            self.assertEqual(len(assets), 5)
+            self.assertEqual(len(assets), 6)
 
             expected_list = [{'filename': '__init__.py', 'relative_path': 'MyExternalLibrary'},
                              {'filename': '__init__.py', 'relative_path': ''},
                              {'filename': 'model.py', 'relative_path': ''},
                              {'filename': 'temp.py', 'relative_path': 'MyLib'},
-                             {'filename': 'functions.py', 'relative_path': 'MyExternalLibrary'}]
+                             {'filename': 'functions.py', 'relative_path': 'MyExternalLibrary'},
+                             {'filename': 'functions.py', 'relative_path': 'MyLib'}]
             self.validate_assets(assets, expected_list)
 
     def assert_valid_config_stdout_and_assets(self, simulation, validate_config=True, validate_stdout=True):
@@ -449,11 +475,12 @@ class TestPythonExperiment(ITestWithPersistence):
         for simulation in COMPSExperiment.get(exp_id).get_simulations():
             # validate output/config.json
             assets = self.assert_valid_new_assets(simulation)
-            self.assertEqual(len(assets), 6)
+            self.assertEqual(len(assets), 7)
 
             expected_list = [{'filename': '__init__.py', 'relative_path': 'MyExternalLibrary'},
                              {'filename': '__init__.py', 'relative_path': ''},
                              {'filename': 'temp.py', 'relative_path': 'MyLib'},
+                             {'filename': 'functions.py', 'relative_path': 'MyLib'},
                              {'filename': 'functions.py', 'relative_path': 'MyExternalLibrary'},
                              {'filename': 'working_model.py', 'relative_path': ''},
                              {'filename': 'test.json', 'relative_path': ''}]
@@ -574,6 +601,28 @@ class TestPythonExperiment(ITestWithPersistence):
                          {'a': '1', 'aa': '1', 'b': 'test', 'task_type': tag_value}]
         validate_sim_tags(self, experiment.id, expected_tags, tag_value)
 
+    def test_simulation_hooks(self):
+        base_task = CommandTask(command="python --version")
+        sim = Simulation(task=base_task)
+
+        exp = Experiment(name='SimHooks')
+        exp.simulations = [sim]
+
+        def add_exp_id_as_tag(item: Simulation, platform: 'COMPSPlatform'):
+            item.tags['e_id'] = exp.id
+
+        def update_tags(item: Simulation, platform: 'COMPSPlatform'):
+            tags = {"a": 0}
+            update_item(self.platform, item.id, ItemType.SIMULATION, tags)
+
+        sim.add_pre_creation_hook(add_exp_id_as_tag)
+        sim.add_post_creation_hook(update_tags)
+
+        exp.run(wait_until_done=True)
+
+        tag_value = "idmtools.entities.command_task.CommandTask"
+        exp_tags = [{'e_id': exp.id, 'a': '0', 'task_type': tag_value}]
+        validate_sim_tags(self, exp.id, exp_tags, tag_value)
 
 if __name__ == '__main__':
     unittest.main()

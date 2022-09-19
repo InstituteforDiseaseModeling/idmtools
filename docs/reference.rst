@@ -37,6 +37,12 @@ Local platform
 
 .. include:: /reuse/comps_note.txt
 
+|SLURM_s| platform
+------------------
+
+.. uml:: /diagrams/slurm.puml
+
+
 Models reference
 ----------------
 

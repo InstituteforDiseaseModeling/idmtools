@@ -124,7 +124,6 @@ class IWorkflowItem(IAssetsEnabled, INamedEntity, IRunnableEntity, ABC):
         """
         if self.name is None:
             raise ValueError("Name is required")
-
         files_to_be_removed = ('comps_log.log', 'idmtools.log')
         super().pre_creation(platform)
         if self.task:

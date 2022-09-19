@@ -1,0 +1,25 @@
+       @startuml
+
+title Slurm Platform File Operations
+
+
+interface SlurmFileOperations {
+   {abstract} method copy_asset(asset, destination)
+   {abstract} method download_asset(dest, output)
+   {abstract} method mk_directory(dest)
+   {abstract} method link_dir(src, dest)
+   {abstract} method submit_job(sjob_file_path, working_directory)
+   {abstract} method get_batch_contents(simulation, sim_path)
+   {abstract} method create_simulation_batch_file(simulation, sim_dir)
+}
+
+note left of SlurmFileOperations : This abstracts all file operations to support both SSH and local
+
+class RemoteSlurmOperations
+note top of RemoteSlurmOperations : SSH based file operations
+class LocalSlurmOperations
+note top of LocalSlurmOperations : Local based file operations
+
+RemoteSlurmOperations <|-- SlurmFileOperations
+LocalSlurmOperations <|-- SlurmFileOperations
+@enduml
