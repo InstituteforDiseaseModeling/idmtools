@@ -34,8 +34,8 @@ CONFIG_PARAMETERS = ['ntasks', 'partition', 'nodes', 'mail_type', 'mail_user', '
 
 @dataclass(repr=False)
 class SlurmPlatform(IPlatform):
-    jobs_directory = Path.home().joinpath(".idmtools").joinpath("singularity-bridge")
-    results_directory = Path.home().joinpath(".idmtools").joinpath("singularity-bridge").joinpath("results")
+    jobs_directory: str = field(default=Path.home().joinpath(".idmtools").joinpath("singularity-bridge"))
+    results_directory: str = field(default=Path.home().joinpath(".idmtools").joinpath("singularity-bridge").joinpath("results"))
     mode: SlurmOperationalMode = field(default=None)
 
     # region: Resources request
@@ -102,6 +102,8 @@ class SlurmPlatform(IPlatform):
     _op_client: SlurmOperations = field(**op_defaults, repr=False, init=False)
 
     def __post_init__(self):
+        if self.mode.upper() not in [mode.value.upper() for mode in SlurmOperationalMode]:
+            raise ValueError(f"{self.mode} is not a value mode. Please select one of the following {', '.join([mode.value for mode in SlurmOperationalMode])}")
         self.mode = SlurmOperationalMode[self.mode.upper()] if self.mode else self.mode
         self.__init_interfaces()
         self.supported_types = {ItemType.SUITE, ItemType.EXPERIMENT, ItemType.SIMULATION}
