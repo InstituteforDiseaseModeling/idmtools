@@ -183,6 +183,7 @@ def cleanup(*args, **kwargs):
     """
     pid_file = Path.home().joinpath(".idmtools").joinpath("slurm-bridge.pid")
     pid_file.unlink(missing_ok=True)
+    sys.exit(0)
 
 
 def main():
@@ -223,9 +224,12 @@ def main():
 
     logger.info(f"Bridging jobs from {args.job_directory}")
     # Capture control C/Z
-    signal.signal((signal.SIGINT, signal.SIGTSTP), cleanup)
+    signal.signal(signal.SIGINT, cleanup)
+    signal.signal(signal.SIGTSTP, cleanup)
     w = IdmtoolsJobWatcher(args.job_directory, args.status_directory, args.check_every)
     w.run()
+    # We shouldn't ever hit here as user has to end process using ctrl+c or ctrl+z and it get triggered from there
+    cleanup()
 
 
 if __name__ == '__main__':
