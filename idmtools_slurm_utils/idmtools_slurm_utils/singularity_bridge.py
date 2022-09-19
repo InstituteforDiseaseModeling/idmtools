@@ -226,6 +226,8 @@ def main():
     # Capture control C/Z
     signal.signal(signal.SIGINT, cleanup)
     signal.signal(signal.SIGTSTP, cleanup)
+    with open(pid_file, 'w') as pid_out:
+        pid_out.write(str(os.getpid()))
     w = IdmtoolsJobWatcher(args.job_directory, args.status_directory, args.check_every)
     w.run()
     # We shouldn't ever hit here as user has to end process using ctrl+c or ctrl+z and it get triggered from there
