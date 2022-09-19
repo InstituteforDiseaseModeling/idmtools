@@ -2,6 +2,7 @@
 Here we implement the SlurmPlatform object.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 from pathlib import Path
 from typing import Optional, Any, Dict, List, Union
 from dataclasses import dataclass, field, fields
@@ -18,8 +19,8 @@ from idmtools_platform_slurm.platform_operations.asset_collection_operations imp
     SlurmPlatformAssetCollectionOperations
 from idmtools_platform_slurm.platform_operations.experiment_operations import SlurmPlatformExperimentOperations
 from idmtools_platform_slurm.platform_operations.simulation_operations import SlurmPlatformSimulationOperations
+from idmtools_platform_slurm.slurm_operations.operations_interface import SlurmOperations
 from idmtools_platform_slurm.slurm_operations.slurm_constants import SlurmOperationalMode
-from idmtools_platform_slurm.slurm_operations import SlurmOperations, SlurmOperationalMode, LocalSlurmOperations
 from idmtools_platform_slurm.platform_operations.suite_operations import SlurmPlatformSuiteOperations
 from idmtools_platform_slurm.platform_operations.utils import SlurmSuite, SlurmExperiment, SlurmSimulation
 
