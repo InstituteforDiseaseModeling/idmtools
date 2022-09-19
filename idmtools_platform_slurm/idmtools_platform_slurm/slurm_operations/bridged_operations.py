@@ -14,13 +14,13 @@ from idmtools_platform_slurm.slurm_operations.local_operations import LocalSlurm
 logger = getLogger(__name__)
 
 
-def create_bridged_job(working_directory, jobs_directory, results_directory, cleanup_results: bool = True):
+def create_bridged_job(working_directory, bridged_jobs_directory, results_directory, cleanup_results: bool = True):
     """
     Creates a bridged job.
 
     Args:
         working_directory: Work Directory
-        jobs_directory: Jobs Directory
+        bridged_jobs_directory: Jobs Directory
         results_directory: Results directory
         cleanup_results: Should we clean up results file
 
@@ -28,7 +28,7 @@ def create_bridged_job(working_directory, jobs_directory, results_directory, cle
         Result from job run
     """
     bridged_id = str(uuid4())
-    jn = Path(jobs_directory).joinpath(f'{bridged_id}.json')
+    jn = Path(bridged_jobs_directory).joinpath(f'{bridged_id}.json')
     rf = Path(results_directory).joinpath(f'{bridged_id}.json.result')
     with open(jn, "w") as jout:
         info = dict(command='sbatch', working_directory=str(working_directory))
@@ -54,12 +54,12 @@ def create_bridged_job(working_directory, jobs_directory, results_directory, cle
 class BridgedLocalSlurmOperations(LocalSlurmOperations):
 
     def __post_init__(self):
-        if not self.platform.jobs_directory.exists():
+        if not self.platform.bridged_jobs_directory.exists():
             if logger.isEnabledFor(INFO):
-                logger.info(f'Creating directory {self.platform.jobs_directory}')
-            if not isinstance(self.platform.jobs_directory, Path):
-                self.platform.jobs_directory = Path(self.platform.jobs_directory)
-            self.platform.jobs_directory.mkdir(parents=True, exist_ok=True)
+                logger.info(f'Creating directory {self.platform.bridged_jobs_directory}')
+            if not isinstance(self.platform.bridged_jobs_directory, Path):
+                self.platform.bridged_jobs_directory = Path(self.platform.bridged_jobs_directory)
+            self.platform.bridged_jobs_directory.mkdir(parents=True, exist_ok=True)
 
     def submit_job(self, item: Union[Experiment, Simulation], **kwargs) -> Any:
         """
@@ -72,7 +72,7 @@ class BridgedLocalSlurmOperations(LocalSlurmOperations):
         """
         if isinstance(item, Experiment):
             working_directory = self.get_directory(item)
-            return create_bridged_job(working_directory, self.platform.jobs_directory, self.platform.results_directory)
+            return create_bridged_job(working_directory, self.platform.bridged_jobs_directory, self.platform.bridged_results_directory)
         elif isinstance(item, Simulation):
             pass
         else:

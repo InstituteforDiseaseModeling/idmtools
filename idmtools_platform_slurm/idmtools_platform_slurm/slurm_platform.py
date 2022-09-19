@@ -34,8 +34,12 @@ CONFIG_PARAMETERS = ['ntasks', 'partition', 'nodes', 'mail_type', 'mail_user', '
 
 @dataclass(repr=False)
 class SlurmPlatform(IPlatform):
-    jobs_directory: str = field(default=Path.home().joinpath(".idmtools").joinpath("singularity-bridge"))
-    results_directory: str = field(default=Path.home().joinpath(".idmtools").joinpath("singularity-bridge").joinpath("results"))
+    job_directory: str = field(default=None)
+
+    #: Needed for bridge mode
+    bridged_jobs_directory: str = field(default=Path.home().joinpath(".idmtools").joinpath("singularity-bridge"))
+    bridged_results_directory: str = field(default=Path.home().joinpath(".idmtools").joinpath("singularity-bridge").joinpath("results"))
+
     mode: SlurmOperationalMode = field(default=None)
 
     # region: Resources request
@@ -107,6 +111,8 @@ class SlurmPlatform(IPlatform):
         self.mode = SlurmOperationalMode[self.mode.upper()] if self.mode else self.mode
         self.__init_interfaces()
         self.supported_types = {ItemType.SUITE, ItemType.EXPERIMENT, ItemType.SIMULATION}
+        if self.job_directory is None:
+            raise ValueError("Job Directory is required.")
         super().__post_init__()
 
     def __init_interfaces(self):
