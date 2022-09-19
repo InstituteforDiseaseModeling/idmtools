@@ -53,12 +53,12 @@ Configuration Options
    * - Parameter
      - Description
    * - **job_directory**
-     - This defines the location that |IT_s| will use to manage experiments on the slurm cluster. The directory should be located somewhere that is mounted on all slurm nodes at the same location. If you are unsure, ask your Slurm Server Administrator for guidance.
+     - This defines the location that |IT_s| will use to manage experiments on the |SLURM_s| cluster. The directory should be located somewhere that is mounted on all |SLURM_s| nodes at the same location. If you are unsure, ask your |SLURM_s| server administrator for guidance.
    * - mode
      - Allows you to control the operational mode for |IT_s|. There are two modes currently supported.
        * - local
        * - bridged
-       Bridged mode is *required* if you are running from within a singularity container. See :ref:``Operation Modes`` for details.
+       Bridged mode is *required* if you are running from within a Singularity container. See :ref:``Operation Modes`` for details.
 
 .. note::
 
@@ -74,7 +74,7 @@ Bridged
 Bridged mode allows you to utilize the emodpy/idmtools Singularity environment containers.
 This is accomplished through a script that manages the communication to Slurm outside the container.
 
-Bridge mode requires the package `idmtools-slurm-utils`.
+Bridged mode requires the package `idmtools-slurm-utils`.
 
 To use bridged mode, before running your container you must run the bridge script outside the container::
 
