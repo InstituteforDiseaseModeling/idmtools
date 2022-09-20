@@ -220,7 +220,7 @@ def main():
             answer = answer.lower()
             if answer in ["n", "no"]:
                 return
-            elif answer not in ["y", "yes"]:
+            elif answer in ["y", "yes"]:
                 break
             else:
                 print("Please answer y or n")
