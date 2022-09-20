@@ -119,8 +119,8 @@ def process_job(job_path, result_dir, cleanup_job: bool = True):
                             output=output
                         )
                 write_result(result, result_name)
-                if cleanup_job:
-                    os.unlink(job_path)
+            if cleanup_job:
+                os.unlink(job_path)
     except Exception as e:
         logger.exception(e)
         pass

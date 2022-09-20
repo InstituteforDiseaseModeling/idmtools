@@ -39,13 +39,13 @@ def create_bridged_job(working_directory, bridged_jobs_directory, results_direct
         time.sleep(1)
         if Path(rf).exists():
             with open(rf, 'r') as rin:
-                result = rin.read()
+                result = json.load(rin)
             if cleanup_results:
                 try:
                     os.unlink(rf)
                 except:
                     pass
-            return result
+            return result['output']
         tries += 1
     return "FAILED: Bridge never reported result"
 
