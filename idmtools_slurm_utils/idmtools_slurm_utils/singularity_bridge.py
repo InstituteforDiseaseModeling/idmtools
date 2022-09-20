@@ -226,7 +226,7 @@ def main():
                 print("Please answer y or n")
 
     logger.info(f"Bridging jobs from {args.job_directory}")
-    # Capture control C/Z
+    # Capture control C
     signal.signal(signal.SIGINT, cleanup)
     with open(pid_file, 'w') as pid_out:
         pid_out.write(str(os.getpid()))
