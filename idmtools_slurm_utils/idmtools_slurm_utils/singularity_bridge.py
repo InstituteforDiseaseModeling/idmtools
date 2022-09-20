@@ -212,12 +212,15 @@ def main():
         Path(args.job_directory).mkdir(parents=True, exist_ok=True)
 
     if pid_file.exists():
-        print("It appears another slurm-bridge process is running. Running multiple instances can cause issues.")
+        print("It appears another slurm-bridge process is running. "
+              "Running multiple instances can cause issues."
+              f"(If a previous run of idmtools-slurm-bridge crashed, you may need to remove {pid_file}.")
         while True:
             answer = input("Are you sure you want to continue [y/n]?")
-            if answer.lower() in ["n", "no"]:
+            answer = answer.lower()
+            if answer in ["n", "no"]:
                 return
-            elif answer.lower() not in ["y", "yes"]:
+            elif answer not in ["y", "yes"]:
                 break
             else:
                 print("Please answer y or n")
@@ -225,7 +228,6 @@ def main():
     logger.info(f"Bridging jobs from {args.job_directory}")
     # Capture control C/Z
     signal.signal(signal.SIGINT, cleanup)
-    signal.signal(signal.SIGTSTP, cleanup)
     with open(pid_file, 'w') as pid_out:
         pid_out.write(str(os.getpid()))
     w = IdmtoolsJobWatcher(args.job_directory, args.status_directory, args.check_every)
