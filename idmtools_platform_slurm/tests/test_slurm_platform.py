@@ -6,11 +6,12 @@ from uuid import uuid4
 
 import pytest
 
+from idmtools import IdmConfigParser
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
-from idmtools_platform_slurm.slurm_operations import LocalSlurmOperations
+from idmtools_platform_slurm.slurm_operations.local_operations import LocalSlurmOperations
 from idmtools_test.utils.decorators import linux_only
 
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
@@ -47,6 +48,7 @@ class TestSlurmPlatform(ITestWithPersistence):
 
     # Test platform get_slurm_configs with user defined configs
     def test_slurm_configs_from_user_defined(self):
+        IdmConfigParser.clear_instance()
         platform = Platform("SLURM_TEST", job_directory=".", mode="local", mail_user="test@test.com",
                             account="test_acct", mail_type="begin", mem_per_cpu=2048)
         slurm_configs_dict = platform.get_slurm_configs()
