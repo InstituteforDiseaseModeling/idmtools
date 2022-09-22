@@ -9,10 +9,17 @@ with open('README.md') as readme_file:
     readme = readme_file.read()
 
 # Load our Requirements files
-with open('requirements.txt') as requirements_file:
-    requirements = [dependency for dependency in requirements_file.read().split("\n") if not dependency.startswith("--")]
+extra_require_files = dict()
+for file_prefix in ['', 'dev_', 'build_']:
+    filename = f'{file_prefix}requirements'
+    with open(f'{filename}.txt') as requirements_file:
+        extra_require_files[file_prefix.strip("_") if file_prefix else filename] = [dependency for dependency in requirements_file.read().split("\n") if not dependency.startswith("--")]
 
 build_requirements = ['flake8', 'coverage', 'bump2version']
+if 'build' in extra_require_files:
+    build_requirements += extra_require_files['build']
+    build_requirements = list(set(build_requirements))
+
 setup_requirements = []
 test_requirements = ['pytest', 'pytest-runner', 'xmlrunner', 'pytest-timeout', 'pytest-cache'] + build_requirements
 
@@ -34,7 +41,7 @@ setup(
         'Programming Language :: Python :: 3.7'
     ],
     description="idmtools slurm utils",
-    install_requires=requirements,
+    install_requires=extra_require_files['requirements'],
     long_description=readme,
     include_package_data=True,
     keywords='modeling, IDM',
