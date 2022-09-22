@@ -113,6 +113,7 @@ def main():
     user_logger.info(f"Job Directory: {args.job_directory}")
     user_logger.info(f"Status Directory: {args.status_directory}")
     user_logger.info(f'Refresh Every: {args.check_every}')
+    user_logger.info('Press Ctrl+C To Stop')
 
     if pid_file.exists():
         existing_process_running(pid_file)
