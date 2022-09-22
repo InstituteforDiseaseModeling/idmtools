@@ -26,13 +26,14 @@ def setup_loggers(config_directory: Path, console_level: int, file_level: int):
     Returns:
         None
     """
-    formatter = Formatter('%(asctime)s | %(name)s |  %(levelname)s: %(message)s')
+    formatter = Formatter("%(levelname)s:%(name)s:%(message)s")
+    formatter = Formatter("[%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)d] %(message)s")
     # When user sets console level to debug, use colorlogs for all the logging
     if console_level > DEBUG:
         logger.setLevel(console_level)
 
         stream_handler = StreamHandler()
-        stream_handler.setLevel(console_level)
+        stream_handler.setLevel(DEBUG)
         stream_handler.setFormatter(formatter)
     else:
         coloredlogs.install(level=console_level, logger=logger)
@@ -42,9 +43,13 @@ def setup_loggers(config_directory: Path, console_level: int, file_level: int):
     file_handler.setFormatter(formatter)
     file_handler.setLevel(file_level)
     logger.addHandler(file_handler)
-    logger.addHandler(stream_handler)
+    if console_level > DEBUG:
+        logger.addHandler(stream_handler)
 
     coloredlogs.install(level='DEBUG', logger=user_logger, fmt='%(message)s')
+
+    from watchdog.observers.inotify_buffer import logger as wd_logger
+    wd_logger.setLevel('INFO')
 
 
 def existing_process_running(pid_file: Path):
@@ -86,7 +91,7 @@ def main():
     parser.add_argument("--job-directory", default=str(bp))
     parser.add_argument("--status-directory", default=str())
     parser.add_argument("--check-every", type=int, default=5)
-    parser.add_argument("--console-level", type=str, default='WARNING', choices=['INFO', 'DEBUG', 'WARNING', 'ERROR'])
+    parser.add_argument("--console-level", type=str, default='INFO', choices=['INFO', 'DEBUG', 'WARNING', 'ERROR'])
     parser.add_argument("--file-level", type=str, default='DEBUG', choices=['INFO', 'DEBUG', 'WARNING', 'ERROR'])
 
     args = parser.parse_args()
@@ -96,10 +101,6 @@ def main():
     args.console_level = getLevelName(args.console_level)
     args.file_level = getLevelName(args.file_level)
 
-    user_logger.info(f"Job Directory: {args.job_directory}")
-    user_logger.info(f"Status Directory: {args.status_directory}")
-    user_logger.info(f'Refresh Every: {args.check_every}')
-
     pid_file = args.job_directory.joinpath("slurm-bridge.pid")
     if not args.status_directory.exists():
         Path(args.status_directory).mkdir(parents=True, exist_ok=True)
@@ -108,6 +109,10 @@ def main():
         Path(args.job_directory).mkdir(parents=True, exist_ok=True)
 
     setup_loggers(args.job_directory, args.console_level, args.file_level)
+
+    user_logger.info(f"Job Directory: {args.job_directory}")
+    user_logger.info(f"Status Directory: {args.status_directory}")
+    user_logger.info(f'Refresh Every: {args.check_every}')
 
     if pid_file.exists():
         existing_process_running(pid_file)
