@@ -18,7 +18,7 @@ for file_prefix in ['', 'dev_', 'build_']:
 
 build_requirements = ['flake8', 'coverage', 'bump2version']
 if 'dev' in extra_require_files:
-    build_requirements += extra_require_files['build']
+    build_requirements += extra_require_files['dev']
     build_requirements = list(set(build_requirements))
 
 setup_requirements = []
