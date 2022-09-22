@@ -2,7 +2,7 @@ import json
 import os
 import time
 from dataclasses import dataclass
-from logging import getLogger, INFO
+from logging import getLogger, INFO, DEBUG
 from pathlib import Path
 from typing import Union, Any
 from uuid import uuid4
@@ -32,21 +32,29 @@ def create_bridged_job(working_directory, bridged_jobs_directory, results_direct
     rf = Path(results_directory).joinpath(f'{bridged_id}.json.result')
     with open(jn, "w") as jout:
         info = dict(command='sbatch', working_directory=str(working_directory))
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f"Requesting job: {jn} in {working_directory}")
         json.dump(info, jout)
 
     tries = 0
     while tries < 15:
         time.sleep(1)
         if Path(rf).exists():
+            if logger.isEnabledFor(DEBUG):
+                logger.debug(f"Found result job: {rf}")
             with open(rf, 'r') as rin:
                 result = json.load(rin)
             if cleanup_results:
                 try:
+                    if logger.isEnabledFor(DEBUG):
+                        logger.debug(f"Removing result: {rf}")
                     os.unlink(rf)
                 except:
                     pass
             return result['output']
         tries += 1
+    if logger.isEnabledFor(DEBUG):
+        logger.debug(f"Failed to get result from bridge")
     return "FAILED: Bridge never reported result"
 
 
