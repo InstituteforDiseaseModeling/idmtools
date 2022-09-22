@@ -27,11 +27,15 @@ def setup_loggers(config_directory: Path, console_level: int, file_level: int):
         None
     """
     formatter = Formatter('%(asctime)s | %(name)s |  %(levelname)s: %(message)s')
-    logger.setLevel(DEBUG)
+    # When user sets console level to debug, use colorlogs for all the logging
+    if console_level > DEBUG:
+        logger.setLevel(console_level)
 
-    stream_handler = StreamHandler()
-    stream_handler.setLevel(console_level)
-    stream_handler.setFormatter(formatter)
+        stream_handler = StreamHandler()
+        stream_handler.setLevel(console_level)
+        stream_handler.setFormatter(formatter)
+    else:
+        coloredlogs.install(level=console_level, logger=logger)
 
     log_file_path = config_directory.joinpath("idmtools-slurm-bridge.log")
     file_handler = TimedRotatingFileHandler(filename=log_file_path, when='midnight', backupCount=30)
@@ -40,7 +44,7 @@ def setup_loggers(config_directory: Path, console_level: int, file_level: int):
     logger.addHandler(file_handler)
     logger.addHandler(stream_handler)
 
-    coloredlogs.install(level='DEBUG', logger=user_logger)
+    coloredlogs.install(level='DEBUG', logger=user_logger, fmt='%(message)s')
 
 
 def existing_process_running(pid_file: Path):
@@ -82,7 +86,7 @@ def main():
     parser.add_argument("--job-directory", default=str(bp))
     parser.add_argument("--status-directory", default=str())
     parser.add_argument("--check-every", type=int, default=5)
-    parser.add_argument("--console-level", type=str, default='INFO', choices=['INFO', 'DEBUG', 'WARNING', 'ERROR'])
+    parser.add_argument("--console-level", type=str, default='WARNING', choices=['INFO', 'DEBUG', 'WARNING', 'ERROR'])
     parser.add_argument("--file-level", type=str, default='DEBUG', choices=['INFO', 'DEBUG', 'WARNING', 'ERROR'])
 
     args = parser.parse_args()
@@ -91,6 +95,10 @@ def main():
     args.job_directory = Path(args.job_directory)
     args.console_level = getLevelName(args.console_level)
     args.file_level = getLevelName(args.file_level)
+
+    user_logger.info(f"Job Directory: {args.job_directory}")
+    user_logger.info(f"Status Directory: {args.status_directory}")
+    user_logger.info(f'Refresh Every: {args.check_every}')
 
     pid_file = args.job_directory.joinpath("slurm-bridge.pid")
     if not args.status_directory.exists():

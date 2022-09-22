@@ -21,5 +21,6 @@ def command_verify(info: Dict):
     return dict(
         sbridge_python_version=sys.version,
         sbrige_python_executable=sys.executable,
-        sbridge_os=os.name
+        sbridge_os=os.name,
+        sbridge_pid=os.getpid()
     )
