@@ -61,13 +61,13 @@ def existing_process_running(pid_file: Path):
         current_process = p_in.read()
     user_logger.warning(
         f"It appears another slurm-bridge process is running. Running multiple instances can cause issues. It appears {current_process} is running"
-        f"(If a previous run of idmtools-slurm-bridge crashed, you may need to remove {pid_file}."
+        f"(If a previous run of idmtools-slurm-bridge crashed, you may need to remove {pid_file}.)"
     )
     while True:
         answer = input("Are you sure you want to continue [y/n]?")
         answer = answer.lower()
         if answer in ["n", "no"]:
-            return
+            sys.exit(0)
         elif answer in ["y", "yes"]:
             break
         else:
@@ -123,15 +123,17 @@ def main():
     cleanup(config_directory=args.job_directory)
 
 
-def cleanup(config_directory: Path, *args, **kwargs):
+def cleanup(*args, **kwargs):
     """
     Cleanup pid when user tries to kill process.
 
     Args:
         config_directory: The base config directory
     """
-    pid_file = config_directory.joinpath("slurm-bridge.pid")
-    if logger.isEnabledFor(DEBUG):
-        logger.debug(f'Deleting {pid_file}')
-    pid_file.unlink(missing_ok=True)
-    sys.exit(0)
+    if 'config_directory' in kwargs:
+        config_directory = kwargs.pop("config_directory")
+        pid_file = config_directory.joinpath("slurm-bridge.pid")
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f'Deleting {pid_file}')
+        pid_file.unlink(missing_ok=True)
+        sys.exit(0)
