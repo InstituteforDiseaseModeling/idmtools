@@ -95,9 +95,9 @@ jobs:
         if: steps.filter.outputs.core == 'true' ||  steps.filter.outputs.cli == 'true'
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/*_requirements.txt') }}
+          key: ${{ runner.os }}-${{ runner.python-version }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/*_requirements.txt') }}
           restore-keys: |
-            ${{ runner.os }}-pip-
+            ${{ runner.os }}${{ runner.python-version }}-pip-
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
         if: steps.filter.outputs.core == 'true' ||  steps.filter.outputs.cli == 'true'
         uses: actions/setup-python@v4
@@ -162,9 +162,9 @@ jobs:
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.models == 'true'
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/*_requirements.txt') }}
+          key: ${{ runner.os }}-${{ runner.python-version }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/*_requirements.txt') }}
           restore-keys: |
-            ${{ runner.os }}-pip-
+            ${{ runner.os }}-${{ runner.python-version }}-pip-
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.models == 'true'
@@ -231,9 +231,9 @@ jobs:
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.comps == 'true' || steps.filter.outputs.models == 'true'
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/*_requirements.txt') }}
+          key: ${{ runner.os }}-${{ runner.python-version }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/*_requirements.txt') }}
           restore-keys: |
-            ${{ runner.os }}-pip-
+            ${{ runner.os }}-${{ runner.python-version }}-pip-
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.comps == 'true' || steps.filter.outputs.models == 'true'
         uses: actions/setup-python@v4
@@ -299,9 +299,9 @@ jobs:
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.local == 'true' || steps.filter.outputs.models == 'true'
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/*_requirements.txt') }}
+          key: ${{ runner.os }}-${{ runner.python-version }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/*_requirements.txt') }}
           restore-keys: |
-            ${{ runner.os }}-pip-
+            ${{ runner.os }}-${{ runner.python-version }}-pip-
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.local == 'true' || steps.filter.outputs.models == 'true'
         uses: actions/setup-python@v4
@@ -368,9 +368,9 @@ jobs:
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.slurm == 'true' || steps.filter.outputs.models == 'true'
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/*_requirements.txt') }}
+          key: ${{ runner.os }}-${{ runner.python-version }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/*_requirements.txt') }}
           restore-keys: |
-            ${{ runner.os }}-pip-
+            ${{ runner.os }}-${{ runner.python-version }}-pip-
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.slurm == 'true' || steps.filter.outputs.models == 'true'
         uses: actions/setup-python@v3
@@ -398,3 +398,60 @@ jobs:
         with:
           name: idmtools_platform_slurm_test_results
           path: idmtools_platform_slurm/tests/reports/
+  pr-test-slurm-utils-linux:
+    runs-on: ${{ matrix.os }}
+    env:
+      PYPI_STAGING_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
+      PYPI_STAGING_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
+    strategy:
+      matrix:
+        os: [ self-linux ]
+        python-version: [ '3.7.x', '3.8.x', '3.9.x' ]
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          base: dev
+          filters: |
+            core:
+              - 'idmtools_core/**'
+            slurm:
+              - 'idmtools_platform_slurm/**'
+            slurm_utils:
+              - 'idmtools_slurm_utils/**'
+      - uses: actions/cache@v3
+        if: steps.filter.outputs.core == 'true' || steps.filter.outputs.slurm == 'true' || steps.filter.outputs.slurm_utils == 'true'
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-${{ runner.python-version }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/*_requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.python-version }}-pip-
+      - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
+        if: steps.filter.outputs.core == 'true' || steps.filter.outputs.slurm == 'true' || steps.filter.outputs.slurm_utils == 'true'
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
+      - name: Install Python dependencies
+        if: steps.filter.outputs.core == 'true' || steps.filter.outputs.slurm == 'true' || steps.filter.outputs.slurm_utils == 'true'
+        run: |
+          pip install idm-buildtools flake8 wheel --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+      - name: Run setup-dev
+        # only run if full install for core, slurm changes, or models
+        if: steps.filter.outputs.core == 'true' ||  steps.filter.outputs.slurm == 'true' ||  steps.filter.outputs.slurm_utils == 'true'
+        run: |
+          make setup-dev
+      - name: run idmtools_slurm_utils all tests
+        # only run if core and comps changed
+        if: steps.filter.outputs.core == 'true' || steps.filter.outputs.slurm == 'true' || steps.filter.outputs.slurm_utils == 'true'
+        run: |
+          cd idmtools_slurm_utils
+          make test-all
+      - name: Upload idmtools_slurm_utils all test results
+        uses: actions/upload-artifact@v2
+        if: failure() && (steps.filter.outputs.core == 'true' || steps.filter.outputs.slurm == 'true' || steps.filter.outputs.slurm_utils == 'true')
+        with:
+          name: idmtools_slurm_utils_test_results
+          path: idmtools_slurm_utils/tests/reports/
