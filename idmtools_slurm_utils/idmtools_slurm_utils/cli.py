@@ -26,9 +26,9 @@ def setup_loggers(config_directory: Path, console_level: int, file_level: int):
     Returns:
         None
     """
-    formatter = Formatter("%(levelname)s:%(name)s:%(message)s")
     formatter = Formatter("[%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)d] %(message)s")
     # When user sets console level to debug, use colorlogs for all the logging
+    stream_handler = None
     if console_level > DEBUG:
         logger.setLevel(console_level)
 
@@ -43,7 +43,7 @@ def setup_loggers(config_directory: Path, console_level: int, file_level: int):
     file_handler.setFormatter(formatter)
     file_handler.setLevel(file_level)
     logger.addHandler(file_handler)
-    if console_level > DEBUG:
+    if console_level > DEBUG and stream_handler is not None:
         logger.addHandler(stream_handler)
 
     coloredlogs.install(level='DEBUG', logger=user_logger, fmt='%(message)s')
@@ -96,8 +96,13 @@ def main():
 
     args = parser.parse_args()
 
-    args.status_directory = Path(args.status_directory)
     args.job_directory = Path(args.job_directory)
+    # If default is empty string, join it to the job_directory directory
+    if args.status_directory.strip() == '':
+        args.status_directory = args.job_directory.joinpath('results')
+    else:
+        args.status_directory = Path(args.status_directory)
+
     args.console_level = getLevelName(args.console_level)
     args.file_level = getLevelName(args.file_level)
 
