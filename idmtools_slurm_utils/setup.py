@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """The setup script for the idmtools_slurm_utils."""
-
+import os
 from setuptools import setup, find_packages
 
 with open('README.md') as readme_file:
@@ -12,8 +12,9 @@ with open('README.md') as readme_file:
 extra_require_files = dict()
 for file_prefix in ['', 'dev_', 'build_']:
     filename = f'{file_prefix}requirements'
-    with open(f'{filename}.txt') as requirements_file:
-        extra_require_files[file_prefix.strip("_") if file_prefix else filename] = [dependency for dependency in requirements_file.read().split("\n") if not dependency.startswith("--")]
+    if os.path.exists(f'{filename}.txt'):
+        with open(f'{filename}.txt') as requirements_file:
+            extra_require_files[file_prefix.strip("_") if file_prefix else filename] = [dependency for dependency in requirements_file.read().split("\n") if not dependency.startswith("--")]
 
 build_requirements = ['flake8', 'coverage', 'bump2version']
 if 'dev' in extra_require_files:
