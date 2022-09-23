@@ -44,7 +44,7 @@ class SSMTWorkItem(ICOMPSWorkflowItem):
             "WorkItem_Type": self.work_item_type,
             "Execution": {
                 "ImageName": self.get_comps_ssmt_image_name(),
-                "Command": self.command
+                "Command": str(self.task.command)
             }
         }
 
