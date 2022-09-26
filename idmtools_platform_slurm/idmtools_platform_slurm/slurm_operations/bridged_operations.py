@@ -67,8 +67,6 @@ class BridgedLocalSlurmOperations(LocalSlurmOperations):
         if not self.platform.bridged_jobs_directory.exists():
             if logger.isEnabledFor(INFO):
                 logger.info(f'Creating directory {self.platform.bridged_jobs_directory}')
-            if not isinstance(self.platform.bridged_jobs_directory, Path):
-                self.platform.bridged_jobs_directory = Path(self.platform.bridged_jobs_directory)
             self.platform.bridged_jobs_directory.mkdir(parents=True, exist_ok=True)
 
     def submit_job(self, item: Union[Experiment, Simulation], **kwargs) -> Any:
