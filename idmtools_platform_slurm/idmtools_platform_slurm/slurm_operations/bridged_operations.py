@@ -62,6 +62,8 @@ def create_bridged_job(working_directory, bridged_jobs_directory, results_direct
 class BridgedLocalSlurmOperations(LocalSlurmOperations):
 
     def __post_init__(self):
+        if not isinstance(self.platform.bridged_jobs_directory, Path):
+            self.platform.bridged_jobs_directory = Path(self.platform.bridged_jobs_directory)
         if not self.platform.bridged_jobs_directory.exists():
             if logger.isEnabledFor(INFO):
                 logger.info(f'Creating directory {self.platform.bridged_jobs_directory}')
