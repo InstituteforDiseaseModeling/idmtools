@@ -89,6 +89,14 @@ if "%1" == "generate-api" (
 	sphinx-apidoc -f -e -M -o . --templatedir api_templates ../idmtools_platform_comps/idmtools_platform_comps
 	REN modules.rst idmtools_platform_comps_index.rst
 
+	del idmtools_platform_slurm_index.rst >nul 2>&1
+	sphinx-apidoc -f -e -M -o . --templatedir api_templates ../idmtools_platform_slurm/idmtools_platform_slurm
+	REN modules.rst idmtools_platform_slurm_index.rst
+
+	del idmtools_slurm_utils_index.rst >nul 2>&1
+	sphinx-apidoc -f -e -M -o . --templatedir api_templates ../idmtools_slurm_utils/idmtools_slurm_utils
+	REN modules.rst idmtools_slurm_utils_index.rst
+
 	del idmtools_platform_local_index.rst >nul 2>&1
 	DEL /Q /F /S "*.tmp" >nul 2>&1
 	sphinx-apidoc -f -e -M -o . --templatedir api_templates ../idmtools_platform_local/idmtools_platform_local

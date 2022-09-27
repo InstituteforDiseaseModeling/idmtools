@@ -155,6 +155,7 @@ class BaseAnalyzer(IAnalyzer, metaclass=ABCMeta):
             filenames: The files for the analyzer to download.
         """
         logger.warning('Base analyzer name will soon be deprecated in favor of IAnalyzer')
+        # TODO: Make transition documentation so we can deprecat this
         super().__init__(uid, working_dir, parse, filenames)
 
 

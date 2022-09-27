@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         os: [self-linux]
-        python-version: [ '3.7.x', '3.8.x', '3.9.x' ]
+        python-version: [ '3.7', '3.8', '3.9' ]
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
@@ -34,18 +34,21 @@ jobs:
               - 'idmtools_platform_comps/**'
             local:
               - 'idmtools_platform_local/**'
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         if: steps.filter.outputs.core == 'true'
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/*_requirements.txt') }}
+          key: ${{ runner.os }}-${{ runner.python-version }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/*_requirements.txt') }}
           restore-keys: |
-            ${{ runner.os }}-pip-
+            ${{ runner.os }}-${{ runner.python-version }}-pip-
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
         if: steps.filter.outputs.core == 'true'
-        uses: actions/setup-python@v2.2.2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+          architecture: x64
+          check-latest: true
+          os: linux
       - name: Install Python dependencies
         if: steps.filter.outputs.core == 'true'
         run: |
@@ -93,7 +96,7 @@ jobs:
               - 'idmtools_core/**'
             cli:
               - 'idmtools_cli/**'
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         if: steps.filter.outputs.core == 'true' ||  steps.filter.outputs.cli == 'true'
         with:
           path: ~/.cache/pip
@@ -102,7 +105,7 @@ jobs:
             ${{ runner.os }}-pip-
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
         if: steps.filter.outputs.core == 'true' ||  steps.filter.outputs.cli == 'true'
-        uses: actions/setup-python@v2.2.2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
@@ -160,7 +163,7 @@ jobs:
               - 'idmtools_platform_comps/**'
             local:
               - 'idmtools_platform_local/**'
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.models == 'true'
         with:
           path: ~/.cache/pip
@@ -168,7 +171,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2.2.2
+        uses: actions/setup-python@v4
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.models == 'true'
         with:
           python-version: ${{ matrix.python-version }}
@@ -229,7 +232,7 @@ jobs:
               - 'idmtools_platform_comps/**'
             local:
               - 'idmtools_platform_local/**'
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.comps == 'true' || steps.filter.outputs.models == 'true'
         with:
           path: ~/.cache/pip
@@ -238,7 +241,7 @@ jobs:
             ${{ runner.os }}-pip-
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.comps == 'true' || steps.filter.outputs.models == 'true'
-        uses: actions/setup-python@v2.2.2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
@@ -297,7 +300,7 @@ jobs:
               - 'idmtools_platform_comps/**'
             local:
               - 'idmtools_platform_local/**'
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.local == 'true' || steps.filter.outputs.models == 'true'
         with:
           path: ~/.cache/pip
@@ -306,7 +309,7 @@ jobs:
             ${{ runner.os }}-pip-
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.local == 'true' || steps.filter.outputs.models == 'true'
-        uses: actions/setup-python@v2.2.2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64

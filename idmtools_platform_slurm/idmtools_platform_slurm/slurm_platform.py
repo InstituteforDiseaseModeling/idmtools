@@ -3,6 +3,7 @@ Here we implement the SlurmPlatform object.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+from pathlib import Path
 from typing import Optional, Any, Dict, List, Union
 from dataclasses import dataclass, field, fields
 from logging import getLogger
@@ -18,7 +19,8 @@ from idmtools_platform_slurm.platform_operations.asset_collection_operations imp
     SlurmPlatformAssetCollectionOperations
 from idmtools_platform_slurm.platform_operations.experiment_operations import SlurmPlatformExperimentOperations
 from idmtools_platform_slurm.platform_operations.simulation_operations import SlurmPlatformSimulationOperations
-from idmtools_platform_slurm.slurm_operations import SlurmOperations, SlurmOperationalMode, LocalSlurmOperations
+from idmtools_platform_slurm.slurm_operations.operations_interface import SlurmOperations
+from idmtools_platform_slurm.slurm_operations.slurm_constants import SlurmOperationalMode
 from idmtools_platform_slurm.platform_operations.suite_operations import SlurmPlatformSuiteOperations
 from idmtools_platform_slurm.platform_operations.utils import SlurmSuite, SlurmExperiment, SlurmSimulation
 
@@ -33,6 +35,11 @@ CONFIG_PARAMETERS = ['ntasks', 'partition', 'nodes', 'mail_type', 'mail_user', '
 @dataclass(repr=False)
 class SlurmPlatform(IPlatform):
     job_directory: str = field(default=None)
+
+    #: Needed for bridge mode
+    bridged_jobs_directory: str = field(default=Path.home().joinpath(".idmtools").joinpath("singularity-bridge"))
+    bridged_results_directory: str = field(default=Path.home().joinpath(".idmtools").joinpath("singularity-bridge").joinpath("results"))
+
     mode: SlurmOperationalMode = field(default=None)
 
     # region: Resources request
@@ -99,17 +106,24 @@ class SlurmPlatform(IPlatform):
     _op_client: SlurmOperations = field(**op_defaults, repr=False, init=False)
 
     def __post_init__(self):
+        if self.mode.upper() not in [mode.value.upper() for mode in SlurmOperationalMode]:
+            raise ValueError(f"{self.mode} is not a value mode. Please select one of the following {', '.join([mode.value for mode in SlurmOperationalMode])}")
         self.mode = SlurmOperationalMode[self.mode.upper()] if self.mode else self.mode
         self.__init_interfaces()
         self.supported_types = {ItemType.SUITE, ItemType.EXPERIMENT, ItemType.SIMULATION}
-        super().__post_init__()
         if self.job_directory is None:
             raise ValueError("Job Directory is required.")
+        super().__post_init__()
 
     def __init_interfaces(self):
         if self.mode == SlurmOperationalMode.SSH:
+            # from idmtools_platform_slurm.slurm_operations.remote_operations import RemoteSlurmOperations
             raise NotImplementedError("SSH mode has not been implemented on the Slurm Platform")
+        elif self.mode == SlurmOperationalMode.BRIDGED:
+            from idmtools_platform_slurm.slurm_operations.bridged_operations import BridgedLocalSlurmOperations
+            self._op_client = BridgedLocalSlurmOperations(platform=self)
         else:
+            from idmtools_platform_slurm.slurm_operations.local_operations import LocalSlurmOperations
             self._op_client = LocalSlurmOperations(platform=self)
 
         self._suites = SlurmPlatformSuiteOperations(platform=self)

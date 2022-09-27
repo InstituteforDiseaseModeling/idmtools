@@ -2,12 +2,10 @@
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
-import warnings
 from logging import getLogger, DEBUG
 from dataclasses import dataclass, field, InitVar
 from uuid import UUID
 from idmtools.assets.file_list import FileList
-from idmtools.entities import CommandLine
 from idmtools.entities.command_task import CommandTask
 from idmtools_platform_comps.ssmt_work_items.icomps_workflowitem import ICOMPSWorkflowItem
 
@@ -46,7 +44,7 @@ class SSMTWorkItem(ICOMPSWorkflowItem):
             "WorkItem_Type": self.work_item_type,
             "Execution": {
                 "ImageName": self.get_comps_ssmt_image_name(),
-                "Command": self.command
+                "Command": str(self.task.command)
             }
         }
 
@@ -83,22 +81,6 @@ class SSMTWorkItem(ICOMPSWorkflowItem):
             logger.debug(f'docker_image in use: {docker_image}')
 
         return docker_image
-
-    @property
-    def command(self) -> str:
-        """Command to run."""
-        return str(self.task.command)
-
-    @command.setter
-    def command(self, value: str):
-        """
-        Alias for legacy code for assets. It will be deprecated in 1.7.0.
-
-        Returns:
-            None
-        """
-        warnings.warn("Setting commands via command alias will be deprecated in 1.7.0. Set on task, task.command", DeprecationWarning)
-        self.task.command = CommandLine.from_string(value)
 
 
 @dataclass
