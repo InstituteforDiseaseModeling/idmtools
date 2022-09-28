@@ -78,7 +78,7 @@ def add_dummy_suite(experiment: Experiment, suite_name: str = None, tags: Dict =
         suite_name: new Suite name
         tags: new Suite tags
     Returns:
-
+        Suite
     """
     if suite_name is None:
         suite_name = 'Dummy Suite'
