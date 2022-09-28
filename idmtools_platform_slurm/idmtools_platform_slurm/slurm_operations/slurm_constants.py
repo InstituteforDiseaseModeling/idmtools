@@ -1,3 +1,8 @@
+"""
+Here we implement the SlurmPlatform operations constants.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 from enum import Enum
 
 from idmtools.core import EntityStatus

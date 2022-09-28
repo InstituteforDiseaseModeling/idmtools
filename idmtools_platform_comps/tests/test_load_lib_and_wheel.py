@@ -12,7 +12,7 @@ from idmtools_platform_comps.utils.package_version import get_latest_pypi_packag
 from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_collection import RequirementsToAssetCollection
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.utils import del_folder, get_case_name
-
+from idmtools_test.utils.decorators import warn_amount_ssmt_image_decorator
 model_path = os.path.join(os.path.dirname(__file__), "inputs", "simple_load_lib_example")
 sys.path.insert(0, model_path)
 
@@ -93,6 +93,7 @@ class TestLoadLibWheel(ITestWithPersistence):
 
     @pytest.mark.long
     @pytest.mark.comps
+    @warn_amount_ssmt_image_decorator
     def test_requirements_to_assetcollection_ignores_platform_num_cores(self):
         # ------------------------------------------------------
         # First load 'zipp' package (note: comps does not have 'zipp' package)
@@ -107,6 +108,7 @@ class TestLoadLibWheel(ITestWithPersistence):
     @pytest.mark.long
     @pytest.mark.comps
     @pytest.mark.serial
+    @warn_amount_ssmt_image_decorator
     def test_exp_with_load_zipp_lib(self):
         # ------------------------------------------------------
         # First load 'zipp' package (note: comps does not have 'zipp' package)
@@ -236,6 +238,7 @@ class TestLoadLibWheel(ITestWithPersistence):
     @pytest.mark.comps
     @pytest.mark.smoke
     @pytest.mark.serial
+    @warn_amount_ssmt_image_decorator
     def test_exp_with_load_zipp_lib_slurm(self):
         # ------------------------------------------------------
         # First load 'zipp' package (note: comps does not have 'zipp' package)

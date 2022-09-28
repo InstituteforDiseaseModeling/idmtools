@@ -10,3 +10,4 @@ pytest-timeout~=2.1.0
 pytest-xdist~=2.5
 pytest~=6.2.4
 xmlrunner~=1.7.7
+pytest-lazy-fixture

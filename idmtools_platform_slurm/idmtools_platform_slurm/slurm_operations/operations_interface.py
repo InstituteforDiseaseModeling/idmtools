@@ -1,3 +1,8 @@
+"""
+Here we implement the SlurmPlatform operations interfaces.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from pathlib import Path

@@ -1,3 +1,8 @@
+"""
+Here we implement the SlurmPlatform local operations.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import os
 import shlex
 import shutil
