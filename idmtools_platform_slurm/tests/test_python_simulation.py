@@ -63,9 +63,6 @@ class TestPythonSimulation(ITestWithPersistence):
         self.job_directory = "DEST"
         self.platform = Platform('SLURM_LOCAL', job_directory=self.job_directory)
 
-    def tearDown(self):
-        shutil.rmtree(self.job_directory)
-
     def test_sweeping_and_local_folders_creation(self):
         experiment = self.create_experiment(self.platform, a=3, b=3)
         experiment_dir = self.platform._op_client.get_directory(experiment)
