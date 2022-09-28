@@ -127,6 +127,16 @@ jobs:
         with:
           name: idmtools_platform_slurm_test_results
           path: idmtools_platform_slurm/tests/reports/
+      - name: run idmtools_slurm_utils tests
+        run: |
+          cd idmtools_slurm_utils
+          make test-all
+      - name: Upload idmtools_slurm_utils all test results
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: idmtools_slurm_utils_test_results
+          path: idmtools_slurm_utils/tests/reports/
       - name: run idmtools_platform_local tests
         run: |
           cd idmtools_platform_local
