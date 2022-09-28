@@ -198,6 +198,9 @@ class Platform:
             # is output enabled and is showing of platform config enabled?
             if IdmConfigParser.is_output_enabled() and IdmConfigParser.get_option(None, "SHOW_PLATFORM_CONFIG", 't').lower() in TRUTHY_VALUES:
                 if is_alias:
+                    for k, v in section.items():
+                        if k in inputs:
+                            section[k] = inputs[k]
                     user_logger.log(VERBOSE, f"\n[{block}]")
                     user_logger.log(VERBOSE, json.dumps(section, indent=3))
                 else:
