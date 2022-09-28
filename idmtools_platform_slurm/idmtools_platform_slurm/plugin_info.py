@@ -68,6 +68,10 @@ class SlurmPlatformSpecification(PlatformSpecification):
             SLURM_LOCAL=dict(
                 mode="local",
                 job_directory=str(Path.home())
+            ),
+            SLURM_BRIDGED=dict(
+                mode="bridged",
+                job_directory=str(Path.home())
             )
         )
         return config_aliases
