@@ -23,7 +23,7 @@ formats:
 python:
    version: 3.7
    install:
-      - requirements: dev_scripts/package_requirements.txt
+     - requirements: dev_scripts/package_requirements.txt
       - requirements: docs/requirements.txt
       - method: pip
         path: idmtools_core
@@ -47,14 +47,18 @@ python:
         path: idmtools_models
         extra_requirements:
           - test
-      - method: pip
-        path: idmtools_platform_slurm
-        extra_requirements:
-          - test
-      - method: pip
-        path: idmtools_test
-        extra_requirements:
-          - test
+     - method: pip
+       path: idmtools_platform_slurm
+       extra_requirements:
+         - test
+     - method: pip
+       path: idmtools_test
+       extra_requirements:
+         - test
+     - method: pip
+       path: idmtools_slurm_utils
+       extra_requirements:
+         - test
  
 
 
