@@ -1,3 +1,8 @@
+"""
+Here we implement the SlurmPlatform bridged operations.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import json
 import os
 import time
