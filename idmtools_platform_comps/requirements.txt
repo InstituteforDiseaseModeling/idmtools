@@ -1,6 +1,5 @@
-idmtools~=1.6.7
+idmtools~=1.7.0
 jinja2~=3.1.2
 tqdm>=4.52.0,<5
-pytest-lazy-fixture~=0.6.3
 pyCOMPS~=2.6
 natsort~=8.1.0
