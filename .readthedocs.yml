@@ -23,7 +23,7 @@ formats:
 python:
    version: 3.7
    install:
-     - requirements: dev_scripts/package_requirements.txt
+      - requirements: dev_scripts/package_requirements.txt
       - requirements: docs/requirements.txt
       - method: pip
         path: idmtools_core
