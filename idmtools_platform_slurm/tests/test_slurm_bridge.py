@@ -21,3 +21,11 @@ class TestSlurmBridge(ITestWithPersistence):
                          os.path.join(os.path.expanduser('~'), ".idmtools", "singularity-bridge"))
         self.assertEqual(platform.bridged_results_directory,
                          os.path.join(os.path.expanduser('~'), ".idmtools", "singularity-bridge", "results"))
+
+    def test_bridge_alias(self):
+        platform = Platform('SLURM_BRIDGED', job_directory=".")
+        self.assertEqual(platform.mode, SlurmOperationalMode.BRIDGED)
+        self.assertEqual(platform.bridged_jobs_directory,
+                         os.path.join(os.path.expanduser('~'), ".idmtools", "singularity-bridge"))
+        self.assertEqual(platform.bridged_results_directory,
+                         os.path.join(os.path.expanduser('~'), ".idmtools", "singularity-bridge", "results"))
