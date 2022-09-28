@@ -21,45 +21,45 @@ formats:
 
 # Optionally set the version of Python and requirements required to build your docs
 python:
-   version: 3.7
-   install:
-      - requirements: dev_scripts/package_requirements.txt
-      - requirements: docs/requirements.txt
-      - method: pip
-        path: idmtools_core
-        extra_requirements:
-          - test
-      - method: pip
-        path: idmtools_cli
-        extra_requirements:
-          - test
-      - method: pip
-        path: idmtools_platform_local
-        extra_requirements:
-          - test
-          - workers
-          - ui
-      - method: pip
-        path: idmtools_platform_comps
-        extra_requirements:
-          - test
-      - method: pip
-        path: idmtools_models
-        extra_requirements:
-          - test
-     - method: pip
-       path: idmtools_platform_slurm
-       extra_requirements:
-         - test
-     - method: pip
-       path: idmtools_test
-       extra_requirements:
-         - test
-     - method: pip
-       path: idmtools_slurm_utils
-       extra_requirements:
-         - test
- 
+  version: 3.7
+  install:
+    - requirements: dev_scripts/package_requirements.txt
+    - requirements: docs/requirements.txt
+    - method: pip
+      path: idmtools_core
+      extra_requirements:
+        - test
+    - method: pip
+      path: idmtools_cli
+      extra_requirements:
+        - test
+    - method: pip
+      path: idmtools_platform_local
+      extra_requirements:
+        - test
+        - workers
+        - ui
+    - method: pip
+      path: idmtools_platform_comps
+      extra_requirements:
+        - test
+    - method: pip
+      path: idmtools_models
+      extra_requirements:
+        - test
+    - method: pip
+      path: idmtools_platform_slurm
+      extra_requirements:
+        - test
+    - method: pip
+      path: idmtools_test
+      extra_requirements:
+        - test
+    - method: pip
+      path: idmtools_slurm_utils
+      extra_requirements:
+        - test
+
 
 
 # Optionally rank topics in search results, between -10 (lower) and 10 (higher).
