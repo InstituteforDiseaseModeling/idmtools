@@ -1,7 +1,7 @@
 ==========================
 Configuration and commands
 ==========================
-|IT_s| supports the |SLURM_s| commands for configuring, submitting and running jobs. 
+|IT_s| supports the |SLURM_s| options for configuring, submitting and running jobs.
 The following lists some of the sbatch commands (https://slurm.schedmd.com/sbatch.html) 
 that are used when making calls to :py:class:`idmtools_platform_slurm.platform_operations.SlurmPlatform`:
 
