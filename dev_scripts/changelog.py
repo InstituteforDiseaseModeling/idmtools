@@ -19,6 +19,8 @@ import pygit2  # noqa: I900
 from github import Github  # noqa: I900
 
 RELEASE_EXPR = re.compile('.*?([0-9.]+).*?')
+EXCLUDE_LABELS = ['Research', 'wontfix', 'Discuss', 'duplicate', 'Exclude from Changelog', 'Epic', 'Release/Packaging', 'Support', 'Transition']
+EXCLUDE_MESSAGES = ['Merge branch', 'Merge pull request', 'Merge remote-tracking branch', 'Bump version']
 
 
 def get_tags_from_repo(repo):
@@ -30,9 +32,6 @@ def get_tags_from_repo(repo):
 
 
 def get_release_ranges_and_messages(repo, tags):
-    next_release = None
-    exclude_messages = ['Merge branch', 'Merge pull request', 'Merge remote-tracking branch', 'Bump version']
-
     release_ranges = dict()
     release_notes = defaultdict(lambda: defaultdict(list))
     for index, tag in enumerate(tags):
@@ -55,12 +54,12 @@ def get_release_ranges_and_messages(repo, tags):
                 release_ranges[release_name] = (nc, commit.commit_time)
             if next_release and (not isinstance(next_release, str) and commit.oid == next_release.target):
                 break
-            if not any([x in commit.message for x in exclude_messages]):
+            if not any([x in commit.message for x in EXCLUDE_MESSAGES]):
                 release_notes[release_name][commit.message.strip()].append(commit)
     return release_notes, release_ranges
 
 
-def get_issue_type(issue, labels):
+def get_issue_type(issue_types, issue, labels):
     """Returns the issue type based on the labels and assigns that to the issue_types map.
 
     Args:
@@ -70,7 +69,6 @@ def get_issue_type(issue, labels):
     Returns:
         None
     """
-    global issue_types
     if any([x in labels for x in ['Support']]):
         issue_types[issue] = 'Support'
     elif 'bug' in labels:
@@ -128,7 +126,7 @@ def generate_release_note_files(docs_dir, release_notes_final):
     final_out = ''
     for release, contents in release_notes_final.items():
         release_file = docs_dir.joinpath('changelog', f'changelog_{release}.rst')
-        if not os.path.exists(release_file):
+        if not release_file.exists():
             final_out = release_templates.format(**dict(release=release, release_under='=' * len(release)))
             scontents = sorted(contents.keys())
             for section in scontents:
@@ -158,7 +156,7 @@ def generate_release_note_messages(docs_dir, issue_types, issues_to_references, 
 def main(token):
     gh = Github(token)
     gh_repo = gh.get_repo("InstituteforDiseaseModeling/idmtools")
-    base_dir = Path(__file__).parent
+    base_dir = Path(__file__).parent.parent
     repo = pygit2.Repository(base_dir)
     docs_dir = base_dir.joinpath("docs")
     tags = get_tags_from_repo(repo)
@@ -170,17 +168,17 @@ def main(token):
     issue_types = dict()
 
     # fetch issue details
-    exclude_labels = ['Research', 'wontfix', 'Discuss', 'duplicate', 'Exclude from Changelog', 'Epic', 'Release/Packaging', 'Support', 'Transition']
+
     for issue in issues_to_references.keys():
         issue_data = gh_repo.get_issue(issue)
         labels = [label.name for label in issue_data.labels]
         if (issue_data.pull_request is None or issue_data.pull_request.html_url != issue_data.html_url) \
-                and not any(x in labels for x in exclude_labels):
+                and not any(x in labels for x in EXCLUDE_LABELS):
             issues_to_references[issue] = issue_data
-            get_issue_type(issue, labels)
+            get_issue_type(issue_types, issue, labels)
         elif "dependencies" in labels:
             issues_to_references[issue] = issue_data
-            get_issue_type(issue, labels)
+            get_issue_type(issue_types, issue, labels)
 
     # fetch rest of issues
     for issue in gh_repo.get_issues(state='closed'):
@@ -191,17 +189,17 @@ def main(token):
                     start = 0
                 labels = [label.name for label in issue.labels]
                 if end >= issue.closed_at.replace(tzinfo=timezone.utc).timestamp() >= start \
-                        and not any(x in labels for x in exclude_labels):
+                        and not any(x in labels for x in EXCLUDE_LABELS):
                     release_file = docs_dir.joinpath(f'changelog_{release}.rst')
                     if issue.pull_request is None or issue.pull_request.html_url != issue.html_url:
                         if not os.path.exists(release_file):
                             issues_to_references[issue.number] = issue
                             release_notes[release][f'#{issue.number} - {issue.title}'] = [issue]
-                            get_issue_type(issue.number, labels)
-                    elif "dependencies" in labels and issue.as_pull_request().merged_at is not None and not os.path.exists(release_file):
+                            get_issue_type(issue_types, issue.number, labels)
+                    elif "dependencies" in labels and issue.as_pull_request().merged_at is not None and not release_file.exists():
                         issues_to_references[issue.number] = issue
                         release_notes[release][f'#{issue.number} - {issue.title}'] = [issue]
-                        get_issue_type(issue.number, labels)
+                        get_issue_type(issue_types, issue.number, labels)
     generate_release_note_messages(docs_dir, issue_types, issues_to_references, regex_fix, release_notes, release_notes_final)
     generate_release_note_files(docs_dir, release_notes_final)
     generate_changelog_index(docs_dir)
