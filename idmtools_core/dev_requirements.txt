@@ -1,5 +1,5 @@
-allure-pytest>=2.8.34,<2.11
-junitparser~=2.1.1
+allure-pytest>=2.8.34,<2.10
+junitparser~=2.8.0
 livereload~=2.6.3
 pytest-cache~=1.0
 pytest-cov>=2.11.1
