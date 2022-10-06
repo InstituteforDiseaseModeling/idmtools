@@ -1,4 +1,4 @@
-backoff>=1.10.0,<2.2
+backoff>=1.10.0,<2.3
 coloredlogs~=15.0
 diskcache~=5.4.0
 more-itertools~=8.14.0
