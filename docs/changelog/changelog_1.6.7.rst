@@ -58,6 +58,3 @@ Platforms
 * `#1697 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1697>`_ - Create a new metadata operations API
 * `#1737 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1737>`_ - Cleanup Metadata Operations
 * `#1738 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1738>`_ - Integrate Metadata, FileOperations, and Slurm Script into Slurm Platform
-* `#1758 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1758>`_ - Document how to cancel jobs on slurm using slurm docs
-* `#1764 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1764>`_ - Update the sbatch script to dump the SARRAY job id
-* `#1765 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1765>`_ - Update the simulation script to dump the Job id into a file within each simulation directory

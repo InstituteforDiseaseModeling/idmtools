@@ -63,5 +63,8 @@ Platforms
 ---------
 * `#1678 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1678>`_ - Retry logic for slurm
 * `#1717 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1717>`_ - Formalize shell script for SLURM job submission
+* `#1758 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1758>`_ - Document how to cancel jobs on slurm using slurm docs
+* `#1764 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1764>`_ - Update the sbatch script to dump the SARRAY job id
+* `#1765 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1765>`_ - Update the simulation script to dump the Job id into a file within each simulation directory
 * `#1770 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1770>`_ - Develop base singularity image
 * `#1822 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1822>`_ - COMPSPlatform suite operation: platform_create returns Tuple[COMPSSuite, UUID]

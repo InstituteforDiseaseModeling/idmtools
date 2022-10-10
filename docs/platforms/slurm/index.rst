@@ -95,12 +95,11 @@ When using the slurm-bridge, there are a few tips for use
 
 1. When you background the process by running::
 
-   idmtools-slurm-bridge &
-
+       idmtools-slurm-bridge &
 
    You will need to run::
 
-   fg
+       fg
 
    See [Foreground and Background Processes](https://www.linuxshelltips.com/foreground-and-background-process-in-linux/) in Linux
 
