@@ -40,21 +40,3 @@ Developer/Test
 * `#1789 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1789>`_ - Update coverage requirement from <5.6,>=5.3 to >=5.3,<6.5
 * `#1792 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1792>`_ - Update pytest-runner requirement from ~=5.3 to ~=6.0
 * `#1793 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1793>`_ - Update flake8 requirement from ~=3.9.2 to ~=4.0.1
-
-Documentation
--------------
-* `#1750 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1750>`_ - Slurm Documentation skeleton
-
-
-Platforms
----------
-* `#1038 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1038>`_ - Slurm experiment operations needs updating with newest API
-* `#1039 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1039>`_ - Slurm needs to implement some basic asset operations
-* `#1040 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1040>`_ - Slurm Simulations operations is out of date
-* `#1041 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1041>`_ - Implement suite operations on Slurm Platform
-* `#1675 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1675>`_ - File Operations: Link Operations
-* `#1676 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1676>`_ - Move metadata operation to its own class for future API
-* `#1693 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1693>`_ - Abstract file operations in a way the underlying implementation can be changed and shared across platforms
-* `#1697 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1697>`_ - Create a new metadata operations API
-* `#1737 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1737>`_ - Cleanup Metadata Operations
-* `#1738 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1738>`_ - Integrate Metadata, FileOperations, and Slurm Script into Slurm Platform

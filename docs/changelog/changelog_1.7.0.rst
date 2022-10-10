@@ -51,6 +51,10 @@ Developer/Test
 * `#1874 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1874>`_ - Update allure-pytest requirement from <2.10,>=2.8.34 to >=2.8.34,<2.11
 * `#1884 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1884>`_ - Update junitparser requirement from ~=2.1.1 to ~=2.8.0
 
+Documentation
+-------------
+* `#1750 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1750>`_ - Slurm Documentation skeleton
+
 Feature Request
 ---------------
 * `#1691 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1691>`_ - Feature request: Add existing experiments to suite
@@ -61,8 +65,18 @@ Feature Request
 
 Platforms
 ---------
+* `#1038 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1038>`_ - Slurm experiment operations needs updating with newest API
+* `#1039 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1039>`_ - Slurm needs to implement some basic asset operations
+* `#1040 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1040>`_ - Slurm Simulations operations is out of date
+* `#1041 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1041>`_ - Implement suite operations on Slurm Platform
+* `#1675 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1675>`_ - File Operations: Link Operations
+* `#1676 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1676>`_ - Move metadata operation to its own class for future API
 * `#1678 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1678>`_ - Retry logic for slurm
+* `#1693 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1693>`_ - Abstract file operations in a way the underlying implementation can be changed and shared across platforms
+* `#1697 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1697>`_ - Create a new metadata operations API
 * `#1717 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1717>`_ - Formalize shell script for SLURM job submission
+* `#1737 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1737>`_ - Cleanup Metadata Operations
+* `#1738 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1738>`_ - Integrate Metadata, FileOperations, and Slurm Script into Slurm Platform
 * `#1758 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1758>`_ - Document how to cancel jobs on slurm using slurm docs
 * `#1764 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1764>`_ - Update the sbatch script to dump the SARRAY job id
 * `#1765 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1765>`_ - Update the simulation script to dump the Job id into a file within each simulation directory
