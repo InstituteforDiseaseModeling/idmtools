@@ -103,7 +103,8 @@ When using the slurm-bridge, there are a few tips for use
 
    See [Foreground and Background Processes](https://www.linuxshelltips.com/foreground-and-background-process-in-linux/) in Linux
 
-2. You may need to load modules before executing the bridge. See
+2. You may need to load modules before executing the bridge. See [Modules documentation](https://curc.readthedocs.io/en/latest/compute/modules.html) for more details.
+
 Local
 `````
 Local operation is meant to be executed directly on a |SLURM_s| cluster node.
