@@ -315,7 +315,7 @@ def set_file_logging(logging_config: IdmToolsLoggingConfig, formatter: logging.F
     if file_handler is None:
         # We had an issue creating file handler, so let's try using default name + pids
         for i in range(64):  # We go to 64. This is a reasonable max id for any computer we might actually run item.
-            file_handler = create_file_handler(logging_config.file_level, formatter, f"{logging_config.file_level}.{i}.log")
+            file_handler = create_file_handler(logging_config.file_level, formatter, f"{logging_config.file_log_format_str}.{i}.log")
             if file_handler:
                 break
         if file_handler is None:
