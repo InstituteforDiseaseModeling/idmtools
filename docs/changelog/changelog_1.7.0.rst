@@ -1,6 +1,6 @@
 ===========
-Development
-===========
+1.7.0
+=====
 
 
 Additional Changes
