@@ -411,6 +411,7 @@ docs/idmtools.*
 docs/idmtools*index.rst
 docs/idmtools_models*.rst
 docs/idmtools_platform*.rst
+docs/idmtools_slurm*.rst
 
 /**/tests/.test_platform/
 /**/.test_platform/

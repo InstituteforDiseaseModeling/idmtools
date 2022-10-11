@@ -84,10 +84,26 @@ If you plan on using the same terminal, you may want to run the bridge in the ba
 
     idmtools-slurm-bridge &
 
-One you have the bridge running, you can now run idmtools scripts from within Singularity containers. Ensure your platform is configured to use bridged mode::
+Once you have the bridge running, you can now run idmtools scripts from within Singularity containers. Ensure your platform is configured to use bridged mode::
 
     singularity exec idmtools_1.6.8 bash
     $ python my_script.py
+
+Tips
+....
+When using the slurm-bridge, there are a few tips for use
+
+1. When you background the process by running::
+
+       idmtools-slurm-bridge &
+
+   You will need to run::
+
+       fg
+
+   See [Foreground and Background Processes](https://www.linuxshelltips.com/foreground-and-background-process-in-linux/) in Linux
+
+2. You may need to load modules before executing the bridge. See [Modules documentation](https://curc.readthedocs.io/en/latest/compute/modules.html) for more details.
 
 Local
 `````
@@ -134,5 +150,5 @@ Run the following included Python script to submit and run a job on your |SLURM_
 .. toctree::
     :maxdepth: 2
 
-    commands
+    options
     cancel
