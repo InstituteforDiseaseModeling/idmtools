@@ -6,6 +6,7 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 import os
 import logging
 import time
+from pathlib import Path
 from multiprocessing import cpu_count
 
 import diskcache
@@ -18,7 +19,7 @@ class IPersistenceService(metaclass=ABCMeta):
     """
     IPersistenceService provides a persistent cache. This is useful for network heavy operations.
     """
-    cache_directory = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data")
+    cache_directory = None
     cache_name = None
 
     @classmethod
@@ -30,7 +31,10 @@ class IPersistenceService(metaclass=ABCMeta):
             None
         """
         import sqlite3
-        cache_directory = os.path.join(cls.cache_directory, 'disk_cache', cls.cache_name)
+        from idmtools import IdmConfigParser
+        cache_directory = Path(
+            IdmConfigParser.get_value("cache_directory", default=Path.home().joinpath(".idmtools").joinpath("cache")))
+
         # the more the cpus, the more likely we are to encounter a scaling issue. Let's try to scale with that up to
         # one second. above one second, we are introducing to much lag in processes
         default_timeout = min(max(0.25, cpu_count() * 0.025 * 2), 2)
@@ -39,7 +43,8 @@ class IPersistenceService(metaclass=ABCMeta):
 
             try:
                 os.makedirs(cache_directory, exist_ok=True)
-                cache = diskcache.FanoutCache(os.path.join(cls.cache_directory, 'disk_cache', cls.cache_name), timeout=default_timeout, shards=cpu_count() * 2)
+                cache = diskcache.FanoutCache(os.path.join(cls.cache_directory, 'disk_cache', cls.cache_name),
+                                              timeout=default_timeout, shards=cpu_count() * 2)
                 return cache
             except (sqlite3.OperationalError, FileNotFoundError):
                 retries += 1
