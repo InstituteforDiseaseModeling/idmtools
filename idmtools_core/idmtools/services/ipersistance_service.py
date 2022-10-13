@@ -33,7 +33,7 @@ class IPersistenceService(metaclass=ABCMeta):
         import sqlite3
         from idmtools import IdmConfigParser
         cache_directory = Path(
-            IdmConfigParser.get_option("cache_directory", default=Path.home().joinpath(".idmtools").joinpath("cache")))
+            IdmConfigParser.get_option("cache_directory", fallback=Path.home().joinpath(".idmtools").joinpath("cache")))
 
         # the more the cpus, the more likely we are to encounter a scaling issue. Let's try to scale with that up to
         # one second. above one second, we are introducing to much lag in processes
