@@ -43,7 +43,7 @@ class IPersistenceService(metaclass=ABCMeta):
 
             try:
                 os.makedirs(cache_directory, exist_ok=True)
-                cache = diskcache.FanoutCache(os.path.join(cls.cache_directory, 'disk_cache', cls.cache_name),
+                cache = diskcache.FanoutCache(os.path.join(cls.cache_directory.stem, 'disk_cache', cls.cache_name),
                                               timeout=default_timeout, shards=cpu_count() * 2)
                 return cache
             except (sqlite3.OperationalError, FileNotFoundError):
