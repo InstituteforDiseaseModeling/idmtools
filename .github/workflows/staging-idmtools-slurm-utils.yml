@@ -1,6 +1,6 @@
 # This workflows will upload a Python Package using Twine when a release is created
 
-name: "Staging: idmtools-platform-slurm"
+name: "Staging: idmtools-slurm-utils"
 
 on:
   push:
