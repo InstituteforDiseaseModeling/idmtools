@@ -32,7 +32,7 @@ class IPersistenceService(metaclass=ABCMeta):
         """
         import sqlite3
         from idmtools import IdmConfigParser
-        cache_directory = Path(
+        cls.cache_directory = Path(
             IdmConfigParser.get_option(option="cache_directory", fallback=Path.home().joinpath(".idmtools").joinpath("cache")))
 
         # the more the cpus, the more likely we are to encounter a scaling issue. Let's try to scale with that up to
@@ -42,7 +42,7 @@ class IPersistenceService(metaclass=ABCMeta):
         while retries < 5:
 
             try:
-                os.makedirs(cache_directory, exist_ok=True)
+                os.makedirs(cls.cache_directory, exist_ok=True)
                 cache = diskcache.FanoutCache(os.path.join(str(cls.cache_directory), 'disk_cache', cls.cache_name),
                                               timeout=default_timeout, shards=cpu_count() * 2)
                 return cache
