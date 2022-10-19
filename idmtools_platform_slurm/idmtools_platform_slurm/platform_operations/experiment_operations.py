@@ -3,8 +3,7 @@ Here we implement the SlurmPlatform experiment operations.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
-import copy
-import json
+import shutil
 from pathlib import Path
 from uuid import UUID, uuid4
 from dataclasses import dataclass, field
@@ -70,14 +69,13 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         self.platform._assets.dump_assets(experiment)
         self.platform._op_client.create_batch_file(experiment, **kwargs)
 
-        # Link file run_simulation.sh
+        # Copy file run_simulation.sh
         run_simulation_script = Path(__file__).parent.parent.joinpath('assets/run_simulation.sh')
-        link_script = Path(self.platform._op_client.get_directory(experiment)).joinpath('run_simulation.sh')
-        self.platform._op_client.link_file(run_simulation_script, link_script)
-        self.platform._op_client.update_script_mode(link_script)
+        dest_script = Path(self.platform._op_client.get_directory(experiment)).joinpath('run_simulation.sh')
+        shutil.copy(str(run_simulation_script), str(dest_script))
 
         # Make executable
-        self.platform._op_client.update_script_mode(link_script)
+        self.platform._op_client.update_script_mode(dest_script)
 
         # Return Slurm Experiment
         meta = self.platform._metas.get(experiment)
