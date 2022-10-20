@@ -1,6 +1,6 @@
 # This workflows will upload a Python Package using Twine when a release is created
 
-name: "Staging: idmtools-platform-slurm"
+name: "Staging: idmtools-slurm-utils"
 
 on:
   push:
@@ -12,7 +12,7 @@ on:
       - 'idmtools_slurm_utils/**'
 
 jobs:
-  deploy-slurm-staging:
+  deploy-slurm-utils-staging:
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, 'Bump version: ')"
     steps:
