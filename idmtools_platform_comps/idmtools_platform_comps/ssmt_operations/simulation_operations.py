@@ -3,6 +3,7 @@
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import os
+from pathlib import Path
 from uuid import UUID
 from typing import List, Dict, Optional
 from idmtools.entities.simulation import Simulation
@@ -75,4 +76,29 @@ class SSMTPlatformSimulationOperations(CompsPlatformSimulationOperations):
                 logger.debug(full_path)
             with open(full_path, 'rb') as fin:
                 results[file] = fin.read()
+        return results
+
+    def get_asset_uris(self, simulation: Simulation, files: List[str], **kwargs) -> Dict[str, str]:
+        """
+                Get assets for Simulation.
+
+                Args:
+                    simulation: Simulation to fetch
+                    files: Files to get
+                    **kwargs: Any keyword arguments
+
+                Returns:
+                    Files fetched
+                """
+        files = [f.replace("\\", '/') for f in files]
+        po: COMPSSimulation = simulation.get_platform_object(load_children=["files", "configuration", "hpc_jobs"])
+        working_directory = Path(po.hpc_jobs[0].working_directory)
+        results = dict()
+        for file in files:
+            full_path = working_directory.joinpath(file.replace("\\", '/'))
+            if not full_path.exists():
+                msg = f"Cannot find the file {file} at {full_path}"
+                logger.error(msg)
+                raise FileNotFoundError(msg)
+            results[file] = str(full_path)
         return results

@@ -5,7 +5,7 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 import ntpath
 import re
 from logging import getLogger, DEBUG
-from typing import List, Dict, Union, Generator, Optional
+from typing import List, Dict, Union, Generator, Optional, Callable
 from uuid import UUID
 
 from COMPS import Client
@@ -142,6 +142,36 @@ def get_file_from_collection(platform: IPlatform, collection_id: UUID, file_path
             return asset_file.retrieve()
 
 
+def get_uri_from_collection(platform: IPlatform, collection_id: UUID, file_path: str) -> str:
+    """
+    Retrieve a file from an asset collection.
+
+    Args:
+        platform: Platform object to use
+        collection_id: Asset Collection ID
+        file_path: Path within collection
+
+    Examples::
+    >>> import uuid
+    >>> get_file_from_collection(platform, uuid.UUID("fc461146-3b2a-441f-bc51-0bff3a9c1ba0"), "StdOut.txt")
+
+    Returns:
+        Object Byte Array
+    """
+    print(f"Cache miss for {collection_id} {file_path}")
+
+    # retrieve the collection
+    ac = platform.get_item(collection_id, ItemType.ASSETCOLLECTION, raw=True)
+
+    # Look for the asset file in the collection
+    file_name = ntpath.basename(file_path)
+    path = ntpath.dirname(file_path).lstrip(ASSETS_PATH)
+
+    for asset_file in ac.assets:
+        if asset_file.file_name == file_name and (asset_file.relative_path or '') == path:
+            return asset_file.uri if asset_file.uri else asset_file.absolute_path
+
+
 def get_file_as_generator(file: Union[SimulationFile, AssetCollectionFile, AssetFile, WorkItemFile, OutputFileMetadata],
                           chunk_size: int = 128, resume_byte_pos: Optional[int] = None) -> \
         Generator[bytearray, None, None]:
@@ -182,7 +212,13 @@ class Workitem(object):
     pass
 
 
-def get_asset_for_comps_item(platform: IPlatform, item: IEntity, files: List[str], cache=None, load_children: List[str] = None, comps_item: Union[Experiment, Workitem, Simulation] = None) -> Dict[str, bytearray]:
+def get_asset_for_comps_item(platform: IPlatform, item: IEntity, files: List[str],
+                             cache=None, load_children: List[str] = None,
+                             comps_item: Union[Experiment, Workitem, Simulation] = None,
+                             transient_func: str = 'retrieve_output_files',
+                             transient_func_conv_func: Callable = None,
+                             retrieve_func_asset: Callable = get_file_from_collection
+                             ) -> Dict[str, bytearray]:
     """
     Retrieve assets from an Entity(Simulation, Experiment, WorkItem).
 
@@ -221,7 +257,9 @@ def get_asset_for_comps_item(platform: IPlatform, item: IEntity, files: List[str
     # Retrieve the transient if any
     if isinstance(comps_item, (Simulation, WorkItem)):
         if transients or len(files) == 0:
-            transient_files = comps_item.retrieve_output_files(paths=transients)
+            transient_files = getattr(comps_item, transient_func)(paths=transients)
+            if transient_func_conv_func:
+                transient_files = transient_func_conv_func(transient_files)
             ret = dict(zip(transients, transient_files))
     else:
         ret = dict()
@@ -236,9 +274,9 @@ def get_asset_for_comps_item(platform: IPlatform, item: IEntity, files: List[str
                 # Normalize the separators
                 normalized_path = ntpath.normpath(file_path)
                 if cache is not None:
-                    ret[file_path] = cache.memoize()(get_file_from_collection)(platform, collection_id, normalized_path)
+                    ret[file_path] = cache.memoize()(retrieve_func_asset)(platform, collection_id, normalized_path)
                 else:
-                    ret[file_path] = get_file_from_collection(platform, collection_id, normalized_path)
+                    ret[file_path] = retrieve_func_asset(platform, collection_id, normalized_path)
     return ret
 
 

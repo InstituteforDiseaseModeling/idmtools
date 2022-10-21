@@ -283,6 +283,20 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
         """
         pass
 
+    def get_asset_uris(self, workflow_item: IWorkflowItem, files: List[str], **kwargs) -> Dict[str, str]:
+        """
+        Load assets for workflow item.
+
+        Args:
+            workflow_item: Item
+            files: List of files to load
+            **kwargs:
+
+        Returns:
+            Dictionary with filename as key and value as binary content
+        """
+        return dict()
+
     @abstractmethod
     def list_assets(self, workflow_item: IWorkflowItem, **kwargs) -> List[Asset]:
         """

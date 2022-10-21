@@ -120,6 +120,9 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
         ret = self.platform._assets.get_assets(simulation, files, **kwargs)
         return ret
 
+    def get_asset_uris(self, simulation: Simulation, files: List[str], **kwargs) -> Dict[str, str]:
+        return self.platform._assets.get_asset_uris(simulation, files, **kwargs)
+
     def list_assets(self, simulation: Simulation, **kwargs) -> List[Asset]:
         """
         List assets for simulation.

@@ -35,8 +35,8 @@ echo after install of newer idmtools
 export PYTHONPATH=$(pwd)/Assets/site-packages:$(pwd)/Assets/:$PYTHONPATH
 
 echo "Installing updated versions of idmtools packages"
-pip install Assets/{COMPS_PACKAGE_FILENAME} --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
-pip install Assets/{CORE_PACKAGE_FILENAME} --force --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+pip install Assets/{COMPS_PACKAGE_FILENAME} --no-deps --force --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+pip install Assets/{CORE_PACKAGE_FILENAME} --no-deps --force --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
 
 $@
 """

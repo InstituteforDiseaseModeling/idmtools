@@ -8,13 +8,12 @@ import os
 import sys
 import time
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
-from functools import partial
 from logging import getLogger, DEBUG
 from typing import NoReturn, List, Dict, Tuple, Optional, Union, TYPE_CHECKING
 from uuid import UUID
 from tqdm import tqdm
 from idmtools import IdmConfigParser
-from idmtools.analysis.map_worker_entry import map_item, _file_get_mapped_data_for_item
+from idmtools.analysis.map_worker_entry import map_item
 from idmtools.core import NoPlatformException
 from idmtools.core.enums import ItemType
 from idmtools.core.interfaces.ientity import IEntity
@@ -47,7 +46,7 @@ def pool_worker_initializer(func, analyzers, platform: 'IPlatform') -> NoReturn:
     func.platform = platform
 
 
-class AnalyzeManager:
+class FileAnalyzeManager:
     """
     Analyzer Manager Class. This is the main driver of analysis.
     """
@@ -76,7 +75,7 @@ class AnalyzeManager:
                  partial_analyze_ok: bool = False, max_items: Optional[int] = None, verbose: bool = True,
                  force_manager_working_directory: bool = False,
                  exclude_ids: List[Union[str, UUID]] = None, analyze_failed_items: bool = False,
-                 max_workers: Optional[int] = None, executor_type: str = 'process', filepath_only: bool = False):
+                 max_workers: Optional[int] = None, executor_type: str = 'process'):
         """
         Initialize the AnalyzeManager.
 
@@ -94,7 +93,6 @@ class AnalyzeManager:
             analyze_failed_items (bool, optional): Allows analyzing of failed items. Useful when you are trying to aggregate items that have failed. Defaults to False.
             max_workers (int, optional): Set the max workers. If not provided, falls back to the configuration item *max_threads*. If max_workers is not set in configuration, defaults to CPU count
             executor_type: (str): Whether to use process or thread pooling. Process pooling is more efficient but threading might be required in some environments
-            filepath_only: (str): Whether to return just filenames rather than data
         """
         super().__init__()
         if working_dir is None:
@@ -140,7 +138,6 @@ class AnalyzeManager:
         # force_wd overrides this by forcing all results to be in working_dir .
         self.working_dir = working_dir
         self.force_wd = force_manager_working_directory
-        self.filepath_only = filepath_only
 
         # Take the provided ids and determine the full set of unique root items (e.g. simulations) in them to analyze
         logger.debug("Load information about items from platform")
@@ -327,10 +324,9 @@ class AnalyzeManager:
         results = dict()
         status = True
         # create status bar and then queue our futures
-        map_partial = partial(map_item, get_item=None if not self.filepath_only else _file_get_mapped_data_for_item)
         with tqdm(total=len(self._items)) as progress:
             for i in self._items.values():
-                future = executor.submit(map_partial, i)
+                future = executor.submit(map_item, i)
                 future.add_done_callback(lambda p: progress.update())
                 futures[future] = i
 

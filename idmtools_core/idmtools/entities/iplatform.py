@@ -623,6 +623,31 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         return ret
 
+    def get_file_uris(self, item: IEntity, files: Union[Set[str], List[str]], **kwargs) -> \
+            Dict[str, Dict[str, str]]:
+        """
+        Get files for a platform entity.
+
+        Args:
+            item: Item to fetch files for
+            files: List of file names to get
+            output: save files to
+            kwargs: Platform arguments
+
+        Returns:
+            For simulations, this returns a dictionary with filename as key and values being binary data from file or a
+            dict.
+
+            For experiments, this returns a dictionary with key as sim id and then the values as a dict of the
+            simulations described above
+        """
+        if item.item_type not in self.platform_type_map.values():
+            raise UnsupportedPlatformType("The provided type is invalid or not supported by this platform...")
+        interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
+        ret = getattr(self, interface).get_asset_uris(item, files, **kwargs)
+
+        return ret
+
     def get_files_by_id(self, item_id: UUID, item_type: ItemType, files: Union[Set[str], List[str]],
                         output: str = None) -> \
             Union[Dict[str, Dict[str, bytearray]], Dict[str, bytearray]]:

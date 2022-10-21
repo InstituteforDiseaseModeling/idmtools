@@ -5,11 +5,11 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 
 import io
-import os
 from dataclasses import dataclass, field, InitVar
 from io import BytesIO
 from logging import getLogger, DEBUG
-from pathlib import PurePosixPath
+from os import PathLike
+from pathlib import PurePosixPath, Path
 from typing import TypeVar, Union, List, Callable, Any, Optional, Generator, BinaryIO
 import backoff
 import requests
@@ -24,13 +24,14 @@ class Asset:
     """
     A class representing an asset. An asset can either be related to a physical asset present on the computer or directly specified by a filename and content.
     """
-
     #: The absolute path of the asset. Optional if **filename** and **content** are given.
-    absolute_path: Optional[str] = field(default=None)
+    absolute_path: Optional[PathLike] = field(default=None)
     #: The relative path (compared to the simulation root folder).
     relative_path: Optional[str] = field(default=None)
     #: Name of the file. Optional if **absolute_path** is given.
     filename: Optional[str] = field(default=None)
+    #: URI Of the file is applicable
+    uri: Optional[str] = field(default=None)
     #: The content of the file. Optional if **absolute_path** is given.
     content: InitVar[Any] = None
     _content: bytes = field(default=None, init=False)
@@ -66,19 +67,19 @@ class Asset:
         self._key = None
         self._content = None if isinstance(content, property) else content
         self._checksum = checksum if not isinstance(checksum, property) else None
-        self.filename = self.filename or (os.path.basename(self.absolute_path) if self.absolute_path else None)
+        self.filename = self.filename or (Path(self.absolute_path).name if self.absolute_path else None)
         # populate absolute path for conditions where user does not supply info
         if not self._checksum and self._content is None and not self.absolute_path and self.filename and not self.persisted:
             # try relative path
-            if self.relative_path and os.path.exists(self.short_remote_path()):
-                self.absolute_path = os.path.abspath(self.short_remote_path())
+            if self.relative_path and Path(self.short_remote_path()).exists():
+                self.absolute_path = Path(self.short_remote_path()).absolute()
             else:
-                self.absolute_path = os.path.abspath(self.filename)
+                self.absolute_path = Path(self.filename).absolute()
         if self.absolute_path and self._content is not None:
             raise ValueError("Absolute Path and Content are mutually exclusive. Please provide only one of the options")
-        elif self.absolute_path and not os.path.exists(self.absolute_path):
+        elif self.absolute_path and not Path(self.absolute_path).exists():
             raise FileNotFoundError(f"Cannot find specified asset: {self.absolute_path}")
-        elif self.absolute_path and os.path.isdir(self.absolute_path) and not self.persisted:
+        elif self.absolute_path and Path(self.absolute_path).is_dir() and not self.persisted:
             raise ValueError("Asset cannot be a directory!")
         elif not self.absolute_path and (not self.filename or (self.filename and not self._checksum and self._content is None and not self.persisted)):
             raise ValueError("Impossible to create the asset without either absolute path, filename and content, or filename and checksum!")
@@ -90,7 +91,7 @@ class Asset:
         Returns:
             String representation
         """
-        return f"<Asset: {os.path.join(self.relative_path, self.filename)} from {self.absolute_path}>"
+        return f"<Asset: {Path(self.relative_path).joinpath(self.filename)} from {self.absolute_path}>"
 
     @property
     def checksum(self):
@@ -130,7 +131,7 @@ class Asset:
         Notes:
             This does not preserve the case of the extension in the filename. Extensions will always be returned in lowercase.
         """
-        return os.path.splitext(self.filename)[1].lstrip('.').lower()
+        return Path(self.filename).suffix.lstrip(".").lower()
 
     @property
     def filename(self):
@@ -372,14 +373,13 @@ class Asset:
         Returns:
             None
         """
-        if os.path.isdir(dest):
-            path = os.path.join(dest, self.short_remote_path())
-            path = path.replace("\\", os.path.sep)
-            os.makedirs(os.path.dirname(path), exist_ok=True)
+        if Path(dest).is_dir():
+            path = Path(dest).joinpath(self.short_remote_path())
+            path.mkdir(parents=True, exist_ok=True)
         else:
             path = dest
 
-        if not os.path.exists(path) or force:
+        if not Path(path).exists() or force:
             with open(path, 'wb') as out:
                 if logger.isEnabledFor(DEBUG):
                     logger.debug(f"Download {self.filename} to {path}")

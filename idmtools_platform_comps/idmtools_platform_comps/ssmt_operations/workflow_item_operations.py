@@ -4,6 +4,7 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import os
 from dataclasses import dataclass
+from pathlib import Path
 from uuid import UUID
 from typing import List, Dict, Optional
 from idmtools.entities.iworkflow_item import IWorkflowItem
@@ -71,4 +72,29 @@ class SSMTPlatformWorkflowItemOperations(CompsPlatformWorkflowItemOperations):
                 logger.debug(full_path)
             with open(full_path, 'rb') as fin:
                 results[file] = fin.read()
+        return results
+
+    def get_asset_uris(self, workflow_item: IWorkflowItem, files: List[str], **kwargs) -> Dict[str, str]:
+        """
+        Get Assets for workflow_item.
+
+        Args:
+            workflow_item: WorkflowItem
+            files: Files to get
+            **kwargs:
+
+        Returns:
+            Files requested
+        """
+        files = [f.replace("\\", '/') for f in files]
+        po: COMPSWorkItem = workflow_item.get_platform_object(load_children=["files", "configuration", "hpc_jobs"])
+        working_directory = Path(po.working_directory)
+        results = dict()
+        for file in files:
+            full_path = working_directory.joinpath(file.replace("\\", '/'))
+            if not full_path.exists():
+                msg = f"Cannot find the file {file} at {full_path}"
+                logger.error(msg)
+                raise FileNotFoundError(msg)
+            results[file] = str(full_path)
         return results

@@ -1,18 +1,26 @@
 import functools
 import tempfile
+from io import BytesIO
 
 import allure
 import json
 import os
 import sys
+
+import pandas as pd
 import pytest
+from COMPS.Data import WorkItem
+
 from idmtools.assets import AssetCollection
+from idmtools.entities.experiment import Experiment
+from idmtools.entities.iworkflow_item import IWorkflowItem
 from idmtools_platform_comps import __version__ as platform_comps_version
 from idmtools import __version__ as core_version, IdmConfigParser
 from idmtools.analysis.platform_anaylsis import PlatformAnalysis
 from idmtools.core.platform_factory import Platform
 from idmtools_test.utils.comps import COMPS_LOCAL_PACKAGE, CORE_LOCAL_PACKAGE, COMPS_LOAD_SSMT_PACKAGES_WRAPPER
 from idmtools_test.utils.decorators import run_in_temp_dir, warn_amount_ssmt_image_decorator
+from idmtools_test.utils.download_file_path_anaylzer import DownloadFilepathAnalyzer
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools.core import ItemType, TRUTHY_VALUES
 from idmtools_test.utils.utils import get_case_name
@@ -98,6 +106,23 @@ class TestPlatformAnalysis(ITestWithPersistence):
             self.assertEqual(execution['Command'], f"/bin/bash {os.path.basename(wrapper)} {base_cmd}")
         else:
             self.assertEqual(execution['Command'], base_cmd)
+
+        with self.subTest("Filepath_only"):
+
+            analysis = PlatformAnalysis(platform=platform, experiment_ids=[experiment_id], analyzers=[DownloadFilepathAnalyzer],
+                                        analyzers_args=[{'filenames': ['config.json']}], analysis_name=self.case_name,
+                                        tags={'idmtools': self._testMethodName, 'WorkItem type': 'Docker'},
+                                        extra_args=dict(filepath_only=True), **extra_args)
+            analysis.analyze(check_status=True)
+
+            wi: IWorkflowItem = analysis.get_work_item()
+            po: WorkItem = wi.get_platform_object()
+
+            files = po.retrieve_output_files(['files.csv'])
+            bio = BytesIO(files[0])
+            df = pd.read_csv(bio)
+            self.assertTrue(df.shape[0] == Experiment.from_id(TARGET_EXPERIMENT_ID).simulation_count)
+            self.assertTrue([str(x).endswith("config.json") for x in df['path'].tolist()])
 
     @pytest.mark.smoke
     @warn_amount_ssmt_image_decorator

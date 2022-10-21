@@ -218,6 +218,22 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         byte_arrs = wi.retrieve_output_files(files)
         return dict(zip(files, byte_arrs))
 
+    def get_asset_uris(self, workflow_item: IWorkflowItem, files: List[str], **kwargs) -> Dict[str, str]:
+        """
+        Retrieve files association with WorkItem.
+
+        Args:
+            workflow_item: workflow item
+            files: list of file paths
+            **kwargs: Optional arguments mainly for extensibility
+
+        Returns: dict with key/value: file_path/file_content
+        """
+        wi = self.platform.get_item(workflow_item.uid, ItemType.WORKFLOW_ITEM, raw=True)
+        file_info = wi.retrieve_output_file_info(files)
+        file_info = [x['url'] for x in file_info]
+        return dict(zip(files, file_info))
+
     def to_entity(self, work_item: COMPSWorkItem, **kwargs) -> IWorkflowItem:
         """
         Converts the platform representation of workflow_item to idmtools representation.

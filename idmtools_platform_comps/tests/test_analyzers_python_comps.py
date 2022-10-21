@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import allure
 import os
 import sys
@@ -10,8 +12,10 @@ from idmtools.analysis.download_analyzer import DownloadAnalyzer
 from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
+from idmtools.entities.ianalyzer import ANALYSIS_ITEM_MAP_DATA_TYPE, ANALYZABLE_ITEM, ANALYSIS_REDUCE_DATA_TYPE
 from idmtools_test.utils.common_experiments import wait_on_experiment_and_check_all_sim_status, \
     get_model1_templated_experiment
+from idmtools_test.utils.download_file_path_anaylzer import DownloadFilepathAnalyzer
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.utils import del_folder, get_case_name
 from idmtools_test.utils.decorators import run_in_temp_dir
@@ -19,8 +23,8 @@ from idmtools_test.utils.decorators import run_in_temp_dir
 current_directory = os.path.dirname(os.path.realpath(__file__))
 
 # import analyzers from current dir's inputs dir
-analyzer_path = os.path.join(os.path.dirname(__file__), "inputs")
-sys.path.insert(0, analyzer_path)
+analyzer_path = Path(os.path.dirname(__file__)).joinpath("inputs")
+sys.path.insert(0, str(analyzer_path))
 
 
 @pytest.mark.analysis
@@ -75,8 +79,8 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         am = AnalyzeManager(ids=[(exp_id1, ItemType.EXPERIMENT)], analyzers=analyzers)
         am.analyze()
         for simulation in COMPSExperiment.get(exp_id1).get_simulations():
-            self.assertTrue(os.path.exists(os.path.join(output_folder, str(simulation.id), "config.json")))
-            self.assertTrue(os.path.exists(os.path.join(output_folder, str(simulation.id), "result.json")))
+            self.assertTrue(os.path.exists(Path(output_folder).joinpath(str(simulation.id)).joinpath("config.json")))
+            self.assertTrue(os.path.exists(Path(output_folder).joinpath(str(simulation.id)).joinpath("result.json")))
 
         # step2: test with 2 experiments
         exp_id2 = self.create_experiment()
@@ -89,8 +93,15 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         am.analyze()
         for exp_id in exp_list:
             for simulation in COMPSExperiment.get(exp_id[0]).get_simulations():
-                self.assertTrue(os.path.exists(os.path.join(output_folder, str(simulation.id), "config.json")))
-                self.assertTrue(os.path.exists(os.path.join(output_folder, str(simulation.id), "result.json")))
+                self.assertTrue(Path(output_folder).joinpath(str(simulation.id)).joinpath("config.json").exists())
+                self.assertTrue(Path(output_folder).joinpath(str(simulation.id)).joinpath("result.json").exists())
+
+        analyzers = [DownloadFilepathAnalyzer(filenames=filenames, output_path=output_folder)]
+        am = AnalyzeManager(ids=exp_list, analyzers=analyzers, filepath_only=True, executor_type='Thread')
+        am.analyze()
+
+        self.assertTrue((DownloadFilepathAnalyzer.gdf[DownloadFilepathAnalyzer.gdf['filename'] == 'config.json']).shape[0] == 4)
+        self.assertTrue((DownloadFilepathAnalyzer.gdf[DownloadFilepathAnalyzer.gdf['filename'] == 'output/result.json']).shape[0] == 4)
 
     @pytest.mark.serial
     @run_in_temp_dir
@@ -106,7 +117,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         am.analyze()
 
         # validate result
-        file_path = os.path.join(output_folder, exp_id, "b_match.csv")
+        file_path = Path(output_folder).joinpath(exp_id).joinpath("b_match.csv")
         self.assertTrue(os.path.exists(file_path))
         df = pd.read_csv(file_path, names=['index', 'key', 'value'], header=None)
         self.assertTrue(df['key'].values[1:5].size == 4)
@@ -128,7 +139,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         am.analyze()
 
         # validate result
-        file_path = os.path.join(output_folder, exp_id, "result.csv")
+        file_path = Path(output_folder).joinpath(exp_id).joinpath("result.csv")
         self.assertTrue(os.path.exists(file_path))
         # validate content of output.csv
         df = pd.read_csv(file_path, names=['SimId', 'a', 'b', 'c'], header=None)
@@ -152,7 +163,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
 
         # validation
         for simulation in self.p.get_children(experiment_id, ItemType.EXPERIMENT):
-            file = os.path.join(output_folder, str(simulation.id), "stdErr.txt")
+            file = Path(output_folder).joinpath(str(simulation.id)).joinpath("stdErr.txt")
             # make sure we have download all stdErr.txt files from all sims including failed ones
             self.assertTrue(os.path.exists(file))
             # make sure download analyzer results are correct
@@ -190,7 +201,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         for simulation in self.p.get_children(experiment_id, ItemType.EXPERIMENT):
             if simulation.id == "c7e4ef50-ee63-ea11-a2bf-f0921c167862" \
                     or simulation.id == "c5e4ef50-ee63-ea11-a2bf-f0921c167862":
-                file = os.path.join(output_folder, str(simulation.id), "stdOut.txt")
+                file = Path(output_folder).joinpath(str(simulation.id)).joinpath("stdOut.txt")
                 # make sure DownloadAnalyzer only download succeeded simulation's stdOut.txt files
                 self.assertTrue(os.path.exists(file))
                 # make sure download analyzer results are correct
@@ -203,7 +214,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
                 self.assertIn("Done", contents)
             # for failed simulations, make sure there is no strOut.txt downloaded in local dir
             else:
-                file = os.path.join(output_folder, str(simulation.id), "stdOut.txt")
+                file = Path(output_folder).joinpath(str(simulation.id)).joinpath("stdOut.txt")
                 self.assertFalse(os.path.exists(file))
 
     @run_in_temp_dir
@@ -223,5 +234,5 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
 
         # verify download success
         for simulation in self.p.get_children(experiment_id, ItemType.EXPERIMENT):
-            path, dirs, files = next(os.walk(os.path.join(output_folder, str(simulation.id))))
+            path, dirs, files = next(os.walk(Path(output_folder).joinpath(str(simulation.id))))
             self.assertEqual(set(files), {'WorkOrder.json', 'results.xlsx', 'results.json'})

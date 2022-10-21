@@ -214,6 +214,38 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         file_data = super().get_files(item, files, output, **kwargs)
         return file_data
 
+    def get_file_uris(self, item: Union[COMPSSimulation, COMPSWorkItem, COMPSAssetCollection], files: Union[Set[str], List[str]], output: str = None, **kwargs) -> \
+            Dict[str, Dict[str, str]]:
+        """
+        Get files for a platform entity.
+
+        Args:
+            item: Item to fetch files for
+            files: List of file names to get
+            output: save files to
+            kwargs: Platform arguments
+
+        Returns:
+            For simulations, this returns a dictionary with filename as key and values being binary data from file or a
+            dict.
+
+            For experiments, this returns a dictionary with key as sim id and then the values as a dict of the
+            simulations described above
+        """
+        if isinstance(item, COMPSSimulation):
+            item = self._simulations.to_entity(item, parent=item.experiment)
+        elif isinstance(item, COMPSWorkItem):
+            item = self._workflow_items.to_entity(item)
+        elif isinstance(item, COMPSAssetCollection):
+            item = self._assets.to_entity(item)
+        elif isinstance(item, (Simulation, IWorkflowItem, AssetCollection)):
+            item = item
+        else:
+            raise Exception(f'Item Type: {type(item)} is not supported!')
+
+        file_data = super().get_file_uris(item, files, **kwargs)
+        return file_data
+
     def flatten_item(self, item: object, raw=False, **kwargs) -> List[object]:
         """
         Flatten an item: resolve the children until getting to the leaves.

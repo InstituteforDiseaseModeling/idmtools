@@ -194,7 +194,7 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
             # add items to asset collection
             for asset in assets:
                 if isinstance(asset, OutputFileMetadata):
-                    a = Asset(filename=asset.friendly_name, relative_path=asset.path_from_root, persisted=True)
+                    a = Asset(filename=asset.friendly_name, relative_path=asset.path_from_root, persisted=True, uri=asset._url)
                 else:
                     a = Asset(filename=asset.file_name, checksum=asset.md5_checksum)
                     a._platform_object = asset
@@ -218,7 +218,7 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         Returns:
             Asset created from sim file.
         """
-        asset = Asset(filename=asset_collection.file_name, checksum=asset_collection.md5_checksum)
+        asset = Asset(filename=asset_collection.file_name, checksum=asset_collection.md5_checksum, uri=asset_collection.uri)
         # set original object for quick access again later
         asset._platform_object = asset_collection
         asset.is_simulation_file = True

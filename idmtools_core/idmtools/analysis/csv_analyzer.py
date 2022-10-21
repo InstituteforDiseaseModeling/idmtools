@@ -75,6 +75,7 @@ class CSVAnalyzer(IAnalyzer):
         Returns:
             Items joined together into a dataframe.
         """
+        print(data)
         # If there are 1 to many csv files, concatenate csv data columns into one dataframe
         concatenated_df = pd.concat(list(data.values()), axis=0, ignore_index=True, sort=True)
         return concatenated_df

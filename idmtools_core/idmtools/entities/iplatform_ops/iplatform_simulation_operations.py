@@ -266,6 +266,20 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         """
         pass
 
+    def get_asset_uris(self, simulation: Simulation, files: List[str], **kwargs) -> Dict[str, str]:
+        """
+        Get files from simulation.
+
+        Args:
+            simulation: Simulation to fetch files from
+            files: Files to get
+            **kwargs:
+
+        Returns:
+            Dictionary containing filename and content
+        """
+        return dict()
+
     @abstractmethod
     def list_assets(self, simulation: Simulation, **kwargs) -> List[Asset]:
         """
