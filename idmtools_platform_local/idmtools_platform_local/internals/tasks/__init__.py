@@ -1,3 +1,7 @@
+"""idmtools local platform task actors.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 from os.path import dirname, basename, isfile, join
 import glob
 modules = glob.glob(join(dirname(__file__), "*.py"))

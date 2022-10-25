@@ -1,4 +1,3 @@
-
 # Packages Status
 ![Staging: idmtools-core](https://github.com/InstituteforDiseaseModeling/idmtools/workflows/Staging:%20idmtools-core/badge.svg?branch=dev)
 ![Staging: idmtools-cli](https://github.com/InstituteforDiseaseModeling/idmtools/workflows/Staging:%20idmtools-cli/badge.svg?branch=dev)
@@ -22,7 +21,7 @@
   - [Recommended install](#recommended-install)
   - [Advanced Install](#advanced-install)
   - [Installing Development/Early Release Versions](#installing-developmentearly-release-versions)
-    - [PyPI](#pypi)
+      - [PyPI](#pypi)
   - [Pre-requisites](#pre-requisites)
 - [Reporting issues](#reporting-issues)
 - [Requesting a feature](#requesting-a-feature)
@@ -32,14 +31,35 @@
 
 # User Installation
 
-See Private documentation is located at https://docs.idmod.org/projects/idmtools/en/latest/. Scroll to "Do you have a password? Access here" and use the password "IDM2020idmtools".  for complete documentation
+Documentation is located at https://docs.idmod.org/projects/idmtools/en/latest/.
+
+To build the documentation locally, do the following:
+
+1. Create and activate a venv.
+2. Navigate to the root directory of the repo and enter the following:
+
+    ```
+    pip install -r dev_scripts/package_requirements.txt
+    pip install -r docs/requirements.txt
+    python dev_scripts/bootstrap.py
+    cd docs
+    make html
+    ```
+3. (Optional) To automatically serve the built docs locally in your browser, enter the following from
+   the root directory:
+
+    ```
+    python dev_scripts/serve_docs.py
+    ```
 
 ## Recommended install
 
 The recommended install is to use
+
 ```bash
 pip install idmtools[full] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
 ```
+
 This will install the core tools, the cli, the comps and local platforms, support for EMOD models, and python models
 
 If you do not need the local platform, you can use the following command
@@ -87,15 +107,19 @@ Include the following information in your post:
 -   If possible, include a `minimal reproducible example` to help us
     identify the issue. This also helps check that the issue is not with
     your own code.
--   Describe what actually happened. Include the full traceback if there
-    was an exception.
+- Describe what actually happened. Include the full traceback if there
+  was an exception.
 
-You can report an issue directly on GitHub or by emailing [idmtools-issue@idmod.org](mailto:idmtools-issue@idmod.org). Please include steps to reproduce the issue
+You can report an issue directly on GitHub or by emailing [idmtools-issue@idmod.org](mailto:idmtools-issue@idmod.org).
+Please include steps to reproduce the issue
 
-# Requesting a feature 
+# Requesting a feature
 
-You can request a feature but opening a ticket on the repo or by emailing [idmtools-feature@idmod.org](mailto:idmtools-feature@idmod.org)
+You can request a feature but opening a ticket on the repo or by
+emailing [idmtools-feature@idmod.org](mailto:idmtools-feature@idmod.org)
 
 # Development Documentation
+
+[![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/InstituteforDiseaseModeling/idmtools)
 
 See [DEVELOPMENT_README.md](DEVELOPMENT_README.md)

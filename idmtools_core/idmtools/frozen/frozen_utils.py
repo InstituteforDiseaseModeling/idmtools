@@ -1,3 +1,8 @@
+"""
+frozen_utils provided utilities for a read-only objects.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 from enum import Enum
 from idmtools.frozen.frozen_dict import ImDict
 from idmtools.frozen.frozen_list import ImList
@@ -8,6 +13,8 @@ from idmtools.frozen.ifrozen import IFrozen
 
 def get_frozen_item(obj):
     """
+    Get frozen version of item.
+
     Args:
         obj: object to be frozen
 
@@ -87,6 +94,15 @@ def get_frozen_item(obj):
 
 
 def is_builtins_single_object(obj):
+    """
+    Is builtins single object?
+
+    Args:
+        obj: Object
+
+    Returns:
+        True if single object
+    """
     # Handle special cases
     if isinstance(obj, (Enum, range)):
         return True
@@ -95,16 +111,42 @@ def is_builtins_single_object(obj):
 
 
 def is_builtins_collection(obj):
+    """
+    Is object a builtin collection?
+
+    Args:
+        obj: Object
+
+    Returns:
+        True if a built in collection
+    """
     from collections.abc import Collection
     return isinstance(obj, Collection) and not isinstance(obj, (str, bytes, bytearray))  # range, generator, etc,...
 
 
 def is_user_defined_object(obj):
+    """
+    Is user defined object.
+
+    Args:
+        obj: Object to check
+
+    Returns:
+        True if item is not a builtin type
+    """
     return type(obj).__module__ != 'builtins'
 
 
 def frozen_transform(obj=None):
+    """
+    Transform item to frozen version.
 
+    Args:
+        obj:Obj to transform
+
+    Returns:
+        Frozen version of object
+    """
     if isinstance(obj, IFrozen):
         obj.freeze()
         return obj

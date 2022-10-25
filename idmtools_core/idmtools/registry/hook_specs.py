@@ -1,3 +1,8 @@
+"""
+Define a list of function only hook specs. Useful for simple plugins.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 from logging import getLogger
 from typing import TYPE_CHECKING
 
@@ -18,13 +23,14 @@ function_hook_impl = HookimplMarker(IDMTOOLS_HOOKS)
 @function_hook_spec
 def idmtools_platform_pre_create_item(item: 'IEntity', kwargs) -> 'IEntity':
     """
-    This callback is called by the pre_create of each object type on a platform. An item can be a suite, workitem, simulation, asset collection or an experiment
+    This callback is called by the pre_create of each object type on a platform. An item can be a suite, workitem, simulation, asset collection or an experiment.
+
     Args:
         item:
         kwargs: extra args
 
     Returns:
-
+        None
     """
     pass
 
@@ -32,10 +38,10 @@ def idmtools_platform_pre_create_item(item: 'IEntity', kwargs) -> 'IEntity':
 @function_hook_spec
 def idmtools_on_start():
     """
-    Execute on startup when idmtools is first imported
+    Execute on startup when idmtools is first imported.
 
     Returns:
-
+        None
     """
     pass
 
@@ -43,14 +49,14 @@ def idmtools_on_start():
 @function_hook_spec
 def idmtools_runnable_on_done(item: 'IRunnableEntity', **kwargs):
     """
-    Called when a runnable item finishes when it was being monitored
+    Called when a runnable item finishes when it was being monitored.
 
     Args:
         item: Item that was running
         **kwargs:
 
     Returns:
-
+        None
     """
     pass
 
@@ -58,14 +64,14 @@ def idmtools_runnable_on_done(item: 'IRunnableEntity', **kwargs):
 @function_hook_spec
 def idmtools_runnable_on_succeeded(item: 'IRunnableEntity', **kwargs):
     """
-    Executed when a runnable item succeeds
+    Executed when a runnable item succeeds.
 
     Args:
         item: Item that was running
         **kwargs:
 
     Returns:
-
+        None
     """
     pass
 
@@ -73,13 +79,13 @@ def idmtools_runnable_on_succeeded(item: 'IRunnableEntity', **kwargs):
 @function_hook_spec
 def idmtools_runnable_on_failure(item: 'IRunnableEntity', **kwargs):
     """
-    Executed when a runnable item fails
+    Executed when a runnable item fails.
 
     Args:
         item: Item that was running
         **kwargs:
 
     Returns:
-
+        None
     """
     pass

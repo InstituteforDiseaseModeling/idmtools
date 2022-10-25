@@ -1,6 +1,10 @@
+"""idmtools python task.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import os
 from dataclasses import dataclass, field
-from logging import getLogger
+from logging import getLogger, DEBUG
 from os import PathLike
 from typing import Set, List, Type, Union, TYPE_CHECKING
 from idmtools.assets import Asset, AssetCollection
@@ -18,11 +22,20 @@ logger = getLogger(__name__)
 
 @dataclass()
 class PythonTask(ITask):
+    """
+    PythonTask makes running python scripts a bit easier through idmtools.
+
+    Notes:
+        TODO - Link examples here
+    """
     script_path: Union[str, PathLike] = field(default=None, metadata={"md": True})
     python_path: str = field(default='python', metadata={"md": True})
     platform_requirements: Set[PlatformRequirements] = field(default_factory=lambda: [PlatformRequirements.PYTHON])
 
     def __post_init__(self):
+        """
+        Constructor.
+        """
         super().__post_init__()
         if isinstance(self.script_path, PathLike):
             self.script_path = str(self.script_path)
@@ -38,34 +51,35 @@ class PythonTask(ITask):
 
     def gather_common_assets(self) -> AssetCollection:
         """
-        Get the common assets. This should be a set of assets that are common to all tasks in an experiment
+        Get the common assets. This should be a set of assets that are common to all tasks in an experiment.
 
         Returns:
             AssetCollection
         """
         # ensure that assets is in collection
-        self._task_log.info('Adding Common asset from %s', self.script_path)
+        if logger.isEnabledFor(DEBUG):
+            logger.debug('Adding Common asset from %s', self.script_path)
         self.common_assets.add_or_replace_asset(Asset(absolute_path=self.script_path))
         return self.common_assets
 
     def gather_transient_assets(self) -> AssetCollection:
         """
-        Gather transient assets. Generally this is the simulation level assets
+        Gather transient assets. Generally this is the simulation level assets.
 
         Returns:
-
+            Transient assets. Also known as simulation level assets.
         """
         return self.transient_assets
 
     def reload_from_simulation(self, simulation: Simulation, **kwargs):
         """
-        Reloads a python task from a simulation
+        Reloads a python task from a simulation.
 
         Args:
             simulation: Simulation to reload
 
         Returns:
-
+            None
         """
         # check experiment level assets for items
         if simulation.parent.assets:
@@ -79,7 +93,7 @@ class PythonTask(ITask):
 
     def pre_creation(self, parent: Union[Simulation, IWorkflowItem], platform: 'IPlatform'):
         """
-        Called before creation of parent
+        Called before creation of parent.
 
         Args:
             parent: Parent
@@ -91,17 +105,19 @@ class PythonTask(ITask):
         Raise:
             ValueError if script name is not provided
         """
-
         if self.script_path is None:
             raise ValueError("Script name is required")
         self.command = CommandLine.from_string(f'{self.python_path} {platform.join_path(platform.common_asset_path, os.path.basename(self.script_path))}')
 
 
 class PythonTaskSpecification(TaskSpecification):
+    """
+    PythonTaskSpecification provides the plugin info for PythonTask.
+    """
 
     def get(self, configuration: dict) -> PythonTask:
         """
-        Get instance of Python Task with specified configuration
+        Get instance of Python Task with specified configuration.
 
         Args:
             configuration: Configuration for task
@@ -113,7 +129,7 @@ class PythonTaskSpecification(TaskSpecification):
 
     def get_description(self) -> str:
         """
-        Description of the plugin
+        Description of the plugin.
 
         Returns:
             Description string
@@ -122,7 +138,7 @@ class PythonTaskSpecification(TaskSpecification):
 
     def get_example_urls(self) -> List[str]:
         """
-        Return List of urls that have examples using PythonTask
+        Return List of urls that have examples using PythonTask.
 
         Returns:
             List of urls(str) that point to examples
@@ -133,7 +149,7 @@ class PythonTaskSpecification(TaskSpecification):
 
     def get_type(self) -> Type[PythonTask]:
         """
-        Get Type for Plugin
+        Get Type for Plugin.
 
         Returns:
             PythonTask
@@ -142,7 +158,7 @@ class PythonTaskSpecification(TaskSpecification):
 
     def get_version(self) -> str:
         """
-        Returns the version of the plugin
+        Returns the version of the plugin.
 
         Returns:
             Plugin Version

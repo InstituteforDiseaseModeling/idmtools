@@ -37,8 +37,14 @@ Local platform
 
 .. include:: /reuse/comps_note.txt
 
-Models
-------
+|SLURM_s| platform
+------------------
+
+.. uml:: /diagrams/slurm.puml
+
+
+Models reference
+----------------
 
 .. uml:: /diagrams/models.puml
 
@@ -64,3 +70,5 @@ API class specifications
    idmtools_models_index
    idmtools_platform_comps_index
    idmtools_platform_local_index
+   idmtools_platform_slurm_index
+   idmtools_slurm_utils_index

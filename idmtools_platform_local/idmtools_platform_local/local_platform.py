@@ -1,3 +1,7 @@
+"""idmtools local platform.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import copy
 from dataclasses import dataclass, field
 from logging import getLogger
@@ -77,12 +81,18 @@ class LocalPlatform(IPlatform):
                                                            repr=False, init=False)
 
     def __post_init__(self):
+        """Constructor."""
         logger.debug("Setting up local platform")
         self.supported_types = {ItemType.EXPERIMENT, ItemType.SIMULATION}
         self.__init_interfaces()
         super().__post_init__()
 
     def __init_interfaces(self):
+        """
+        Create our interfaces.
+
+        Here, we try to load the service manager. If not defined, we create it and assure all our containers are running before continuing.
+        """
         # Start our docker services
         if self._sm is None:
             # import docker here to avoid need to do it later
@@ -96,8 +106,21 @@ class LocalPlatform(IPlatform):
         self._simulations = LocalPlatformSimulationOperations(platform=self)
 
     def cleanup(self, delete_data: bool = False, shallow_delete: bool = False, tear_down_brokers: bool = False):
+        """
+        Cleanup the platform.
+
+        If delete data is true, the local platform data is deleted.
+        If shallow delete is true, just the data within the local platform data directory is deleted.
+        If tear down brokers is true, the task brokers talking to the server are destroyed.
+
+        Args:
+            delete_data: Should data be deleted
+            shallow_delete: Should just the files be deleted
+            tear_down_brokers: Should we destroy our brokers
+        """
         self._sm.cleanup(delete_data, tear_down_brokers=tear_down_brokers)
         self._do.cleanup(delete_data, shallow_delete=shallow_delete)
 
     def post_setstate(self):
+        """Post set-state."""
         self.__init_interfaces()

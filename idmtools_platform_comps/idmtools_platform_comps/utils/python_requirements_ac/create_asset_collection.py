@@ -1,3 +1,9 @@
+"""idmtools create asset collection script.
+
+This is part of the RequirementsToAssetCollection tool. This is ran on the SSMT to convert installed files to a AssetCollection.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import os
 import sys
 from COMPS import Client
@@ -13,13 +19,13 @@ LIBRARY_ROOT_PREFIX = 'L'
 
 def build_asset_file_list(prefix=LIBRARY_ROOT_PREFIX):
     """
-    Utility function to build all library files
+    Utility function to build all library files.
+
     Args:
         prefix: used to identify library files
 
     Returns: file paths as a list
     """
-
     output = []
     for root, _, filenames in os.walk(prefix):
         for filename in filenames:
@@ -35,7 +41,8 @@ def build_asset_file_list(prefix=LIBRARY_ROOT_PREFIX):
 
 def get_first_simulation_of_experiment(exp_id):
     """
-    Retrieve the first simulation from an experiment
+    Retrieve the first simulation from an experiment.
+
     Args:
         exp_id: use input (experiment id)
 
@@ -49,6 +56,7 @@ def get_first_simulation_of_experiment(exp_id):
 
 
 def main():  # pragma: no cover
+    """Main entry point for our create asset collection script."""
     print(sys.argv)
 
     if len(sys.argv) < 3:

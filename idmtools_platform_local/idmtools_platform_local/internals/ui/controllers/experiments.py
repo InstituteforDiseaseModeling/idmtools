@@ -1,3 +1,7 @@
+"""idmtools local platform experiment controller(API).
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import logging
 import shutil
 import sys
@@ -19,6 +23,7 @@ logger = logging.getLogger(__name__)
 
 
 def progress_to_status_str(progress):
+    """Convert progress to status."""
     if str(Status.failed) in progress and progress[str(Status.failed)] > 0:
         return 'failed'
     elif str(Status.canceled) in progress and progress[str(Status.canceled)] > 0:
@@ -32,6 +37,7 @@ def progress_to_status_str(progress):
 
 
 def handle_backoff_exc(details):
+    """Log backoff exceptions to our app logger and restart db connection."""
     current_app.logger.info("Attempting to recover from DB API Error")
     curr_exec = sys.exc_info()[1]
     if isinstance(curr_exec, ProgrammingError):
@@ -44,7 +50,7 @@ def handle_backoff_exc(details):
 def experiment_filter(id: Optional[str], tags: Optional[List[Tuple[str, str]]], page: int = 1, per_page: int = 10) -> \
         Tuple[Dict, int]:
     """
-    List the status of experiment(s) with the ability to filter by experiment id and tags
+    List the status of experiment(s) with the ability to filter by experiment id and tags.
 
     Args:
         id (Optional[str]): Optional ID of the experiment you want to filter by
@@ -109,7 +115,9 @@ delete_args.add_argument('data', help='Should the data for the experiment and al
 
 
 class Experiments(Resource):
+    """Experiment API controller."""
     def get(self, id=None):
+        """Get experiment."""
         args = idx_parser.parse_args()
         args['id'] = id
 
@@ -123,6 +131,7 @@ class Experiments(Resource):
         return result, 200, {'X-Total': total, 'X-Per-Page': args.per_page}
 
     def delete(self, id):
+        """Delete an experiment."""
         args = delete_args.parse_args()
         session = db.session
         job: JobStatus = session.query(JobStatus).filter(JobStatus.uuid == id).first()

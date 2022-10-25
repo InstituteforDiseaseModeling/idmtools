@@ -1,3 +1,10 @@
+"""
+DockerTask provides a utility to run docker images.
+
+This is currently only used by idmtools_local_platform.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import os
 import re
 import sys
@@ -18,6 +25,9 @@ user_logger = getLogger('user')
 
 @dataclass
 class DockerTask(ITask):
+    """
+    Provides a task to run or optionally build a docker container.
+    """
     image_name: str = field(default=None, metadata={"md": True})
     # Optional config to build the docker image
     build: bool = field(default=False, metadata={"md": True})
@@ -30,6 +40,12 @@ class DockerTask(ITask):
     __image_built: bool = field(default=False)
 
     def __post_init__(self):
+        """
+        Set our platform requirements and optionally trigger image build.
+
+        Returns:
+            None
+        """
         super().__post_init__()
         self.add_platform_requirement(PlatformRequirements.DOCKER)
         if self.build:
@@ -37,7 +53,7 @@ class DockerTask(ITask):
 
     def gather_common_assets(self) -> AssetCollection:
         """
-        Gather common(experiment-level) assets from task
+        Gather common(experiment-level) assets from task.
 
         Returns:
             AssetCollection containing all the common assets
@@ -48,7 +64,7 @@ class DockerTask(ITask):
 
     def gather_transient_assets(self) -> AssetCollection:
         """
-        Gather transient(simulation-level) assets from task
+        Gather transient(simulation-level) assets from task.
 
         Returns:
             AssetCollection
@@ -56,6 +72,16 @@ class DockerTask(ITask):
         return self.transient_assets
 
     def build_image(self, spinner=None, **extra_build_args):
+        """
+        Build our docker image.
+
+        Args:
+            spinner: Should we display a CLI spinner
+            **extra_build_args: Extra build arguments to pass to docker
+
+        Returns:
+            None
+        """
         if not self.__image_built:
             import docker
             from docker.errors import BuildError
@@ -135,14 +161,26 @@ class DockerTask(ITask):
                     prog.close()
 
     def reload_from_simulation(self, simulation: 'Simulation'):  # noqa E821
+        """
+        Method to reload task details from simulation object. Currently we do not do this for docker task.
+
+        Args:
+            simulation: Simulation to load data from
+
+        Returns:
+            None
+        """
         pass
 
 
 class DockerTaskSpecification(TaskSpecification):
+    """
+    DockerTaskSpecification provides the task plugin to idmtools for DockerTask.
+    """
 
     def get(self, configuration: dict) -> DockerTask:
         """
-        Get instance of DockerTask with configuration provided
+        Get instance of DockerTask with configuration provided.
 
         Args:
             configuration: configuration for DockerTask
@@ -154,7 +192,7 @@ class DockerTaskSpecification(TaskSpecification):
 
     def get_description(self) -> str:
         """
-        Get description of plugin
+        Get description of plugin.
 
         Returns:
             Plugin description
@@ -163,7 +201,7 @@ class DockerTaskSpecification(TaskSpecification):
 
     def get_type(self) -> Type[DockerTask]:
         """
-        Get type of task provided by plugin
+        Get type of task provided by plugin.
 
         Returns:
             DockerTask

@@ -1,3 +1,8 @@
+"""
+utilities for command line.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import contextlib
 import logging
 import sys

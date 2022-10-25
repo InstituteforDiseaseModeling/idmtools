@@ -1,10 +1,15 @@
+"""idmtools cli utils.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 from dataclasses import Field
 from typing import Dict, Tuple
 
 
 def validate_range(value: float, min: float, max: float) -> Tuple[bool, str]:
     """
-    Function used to validate an integer value between min and max
+    Function used to validate an integer value between min and max.
+
     Args:
         value: The value set by the user
         min: Minimum value
@@ -20,7 +25,9 @@ def validate_range(value: float, min: float, max: float) -> Tuple[bool, str]:
 def environment_list(previous_settings: Dict, current_field: Field) -> Dict:
     """
     Allows the CLI to provide a list of available environments.
+
     Uses the previous_settings to get the endpoint to query for environments
+
     Args:
         previous_settings: previous settings set by the user in the CLI.
         current_field: Current field specs

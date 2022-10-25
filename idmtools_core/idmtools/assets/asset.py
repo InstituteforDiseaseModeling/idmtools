@@ -1,3 +1,9 @@
+"""
+idmtools asset class definition.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
+
 import io
 import os
 from dataclasses import dataclass, field, InitVar
@@ -16,9 +22,7 @@ logger = getLogger(__name__)
 @dataclass(repr=False)
 class Asset:
     """
-    A class representing an asset. An asset can either be related to a physical
-    asset present on the computer or directly specified by a filename and content.
-
+    A class representing an asset. An asset can either be related to a physical asset present on the computer or directly specified by a filename and content.
     """
 
     #: The absolute path of the asset. Optional if **filename** and **content** are given.
@@ -42,6 +46,22 @@ class Asset:
     _checksum: Optional[str] = field(default=None, init=False)
 
     def __post_init__(self, content, checksum):
+        """
+        After dataclass setup, validate options.
+
+        Args:
+            content: Content to set
+            checksum: Checksum to set on object
+
+        Returns:
+            None
+
+        Raises:
+            ValueError - If absolute path and content are both provided. You can only provide one.
+                         If absolute path is set and is a directory. Only file paths are supported.
+                         If absolute path, filename, checksum, and content is not set.
+            FileNotFoundError - If absolute_path doesn't exist
+        """
         # Cache of our asset key
         self._key = None
         self._content = None if isinstance(content, property) else content
@@ -64,14 +84,23 @@ class Asset:
             raise ValueError("Impossible to create the asset without either absolute path, filename and content, or filename and checksum!")
 
     def __repr__(self):
+        """
+        String representation of Asset.
+
+        Returns:
+            String representation
+        """
         return f"<Asset: {os.path.join(self.relative_path, self.filename)} from {self.absolute_path}>"
 
     @property
     def checksum(self):
         """
 
-        Returns checksum of object. This will return None unless the user has provided checksum or called calculate checksum to avoid
-        computation. If you need to guarantee a checksum value, call calculate_checksum beforehand
+        Returns checksum of object.
+
+        This will return None unless the user has provided checksum or called calculate checksum to avoid computation. If you need to guarantee a
+        checksum value, call calculate_checksum beforehand.
+
         Returns:
             Checksum
         """
@@ -79,49 +108,122 @@ class Asset:
 
     @checksum.setter
     def checksum(self, checksum):
+        """
+        Set the checksum property.
+
+        Args:
+            checksum: Checksum set
+
+        Returns:
+            None
+        """
         self._checksum = checksum
 
     @property
-    def extension(self):
+    def extension(self) -> str:
+        """
+        Returns extension of asset.
+
+        Returns:
+            Extension
+
+        Notes:
+            This does not preserve the case of the extension in the filename. Extensions will always be returned in lowercase.
+        """
         return os.path.splitext(self.filename)[1].lstrip('.').lower()
 
     @property
     def filename(self):
+        """
+        Filename as asset.
+
+        Returns:
+            Filename
+        """
         return self._filename or ""
 
     @filename.setter
     def filename(self, filename):
+        """
+        Set the filename.
+
+        Args:
+            filename: Filename
+
+        Returns:
+            None
+        """
         self._filename = filename if not isinstance(filename, property) and filename else None
         self._key = None
 
     @property
     def relative_path(self):
+        """
+        Get the relative path.
+
+        Returns:
+            Relative path
+        """
         return self._relative_path or ""
 
     @relative_path.setter
     def relative_path(self, relative_path):
+        """
+        Sets the relative path of an asset.
+
+        We filter out strings ending in forward or backward slashes.
+
+        Args:
+            relative_path: Relative path for the item
+
+        Returns:
+            None
+        """
         self._relative_path = relative_path.strip(" \\/") if not isinstance(relative_path, property) and relative_path else None
         self._key = None
 
     @property
     def bytes(self):
+        """
+        Bytes is the content as bytes.
+
+        Returns:
+            None
+        """
         if isinstance(self.content, bytes):
             return self.content
         return str.encode(self.handler(self.content))
 
     @property
     def length(self):
+        """
+        Get length of item.
+
+        Returns:
+            Length of the content
+        """
         if self._length is None:
             self._length = len(self.content)
         return self._length
 
     @length.setter
     def length(self, new_length):
+        """
+        Set length of asset.
+
+        Args:
+            new_length: Length to set
+
+        Returns:
+            None
+        """
         self._length = new_length
 
     @property
     def content(self):
         """
+        Content of the asset.
+
         Returns:
             The content of the file, either from the content attribute or by opening the absolute path.
         """
@@ -138,6 +240,15 @@ class Asset:
 
     @content.setter
     def content(self, content):
+        """
+        Content property setting.
+
+        Args:
+            content: Content to set
+
+        Returns:
+            None
+        """
         self._content = None if isinstance(content, property) else content
         # Reset checksum to None until requested
         if self._checksum:
@@ -145,11 +256,20 @@ class Asset:
 
     # region Equality and Hashing
     def __eq__(self, other: 'Asset'):
+        """
+        Equality between assets. Assets are the same if the key is the same.
+
+        Args:
+            other: Other assets to compare with
+
+        Returns:
+            True if the keys are the same.
+        """
         return self.__key() == other.__key()
 
     def deep_equals(self, other: 'Asset') -> bool:
         """
-        Performs a deep comparison of assets, including contents
+        Performs a deep comparison of assets, including contents.
 
         Args:
             other: Other asset to compare
@@ -162,6 +282,12 @@ class Asset:
         return False
 
     def __key(self):
+        """
+        Get asset key. Asset key is filename and relative path.
+
+        Returns:
+            Asset key
+        """
         # We only care to check if filename and relative path is same. Goal here is not identical check but rather that
         # two files don't exist in same remote path
         if self._key is None:
@@ -169,16 +295,27 @@ class Asset:
         return self._key
 
     def __hash__(self):
+        """
+        Hash of Asset item.
+
+        Returns:
+            Asset hash
+        """
         return hash(self.__key())
     # endregion
 
     def download_generator(self) -> Generator[bytearray, None, None]:
         """
-        A Download Generator that returns chunks of bytes from the file
-
+        A Download Generator that returns chunks of bytes from the file.
 
         Returns:
             Generator of bytearray
+
+        Raises:
+            ValueError - When there is not a download generator hook defined
+
+        Notes:
+            TODO - Add a custom error with doclink.
         """
         if not self.download_generator_hook:
             raise ValueError("To be able to download, the Asset needs to be fetched from a platform object")
@@ -187,7 +324,7 @@ class Asset:
 
     def download_stream(self) -> BytesIO:
         """
-        Get a bytes IO stream of the asset
+        Get a bytes IO stream of the asset.
 
         Returns:
             BytesIO of the Asset
@@ -201,14 +338,14 @@ class Asset:
     @backoff.on_exception(backoff.expo, (requests.exceptions.Timeout, requests.exceptions.ConnectionError), max_tries=8)
     def __write_download_generator_to_stream(self, stream: BinaryIO, progress: bool = False):
         """
-        Write the download generator to another stream
+        Write the download generator to another stream.
 
         Args:
-            stream:
-            progress:
+            stream: Stream to download
+            progress: Show progress
 
         Returns:
-
+            None
         """
         gen = self.download_generator()
         if progress and not IdmConfigParser.is_progress_bar_disabled():
@@ -226,7 +363,7 @@ class Asset:
 
     def download_to_path(self, dest: str, force: bool = False):
         """
-        Download an asset to path. This requires loadings the object through the platofrm
+        Download an asset to path. This requires loadings the object through the platform.
 
         Args:
             dest: Path to write to. If it is a directory, the asset filename will be added to it
@@ -235,7 +372,6 @@ class Asset:
         Returns:
             None
         """
-
         if os.path.isdir(dest):
             path = os.path.join(dest, self.short_remote_path())
             path = path.replace("\\", os.path.sep)
@@ -251,7 +387,7 @@ class Asset:
 
     def calculate_checksum(self) -> str:
         """
-        Calculate checksum on asset. If previous checksum was calculated, that value will be returned
+        Calculate checksum on asset. If previous checksum was calculated, that value will be returned.
 
         Returns:
             Checksum string
@@ -265,12 +401,11 @@ class Asset:
 
     def short_remote_path(self) -> str:
         """
-        Returns the short remote path. This is the join of the relative path and filename
+        Returns the short remote path. This is the join of the relative path and filename.
 
         Returns:
             Remote Path + Filename
         """
-
         if self.relative_path:
             path = PurePosixPath(self.relative_path.replace("\\", "/")).joinpath(self.filename)
         else:

@@ -1,3 +1,8 @@
+"""
+Command Task is the simplest task. It defined a simple task object with a command line.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 from dataclasses import dataclass, field
 from typing import List, Callable, Type, Union, TYPE_CHECKING
 from idmtools.assets import AssetCollection
@@ -12,6 +17,11 @@ if TYPE_CHECKING:  # pragma: no cover
 
 @dataclass()
 class CommandTask(ITask):
+    """
+    CommandTask is the simplest task.
+
+    A CommandTask is basically a command line and assets.
+    """
     #: Hooks to gather common assets
     gather_common_asset_hooks: List[Callable[[ITask], AssetCollection]] = field(default_factory=list)
     #: Hooks to gather transient assets
@@ -21,13 +31,19 @@ class CommandTask(ITask):
     """
 
     def __post_init__(self):
+        """
+        Post init.
+
+        Returns:
+            None
+        """
         super().__post_init__()
         if self.command is None:
             raise ValueError("Command is required")
 
     def gather_common_assets(self) -> AssetCollection:
         """
-        Gather common(experiment-level) assets for task
+        Gather common(experiment-level) assets for task.
 
         Returns:
             AssetCollection containing common assets
@@ -41,7 +57,7 @@ class CommandTask(ITask):
 
     def gather_transient_assets(self) -> AssetCollection:
         """
-        Gather transient(experiment-level) assets for task
+        Gather transient(experiment-level) assets for task.
 
         Returns:
             AssetCollection containing transient assets
@@ -55,18 +71,43 @@ class CommandTask(ITask):
         return ac
 
     def reload_from_simulation(self, simulation: 'Simulation'):  # noqa: F821
+        """
+        Reload task from a simulation.
+
+        Args:
+            simulation: Simulation to load
+
+        Returns:
+            None
+        """
         pass
 
     def pre_creation(self, parent: Union['Simulation', 'IWorkflowItem'], platform: 'IPlatform'):
+        """
+        pre-creation for the command task.
+
+        The default is to set the windows on the command line based on the platform.
+
+        Args:
+            parent: Parent of task
+            platform: Platform we are going to pre-creation
+
+        Returns:
+            None
+        """
         super().pre_creation(parent, platform)
         if platform.is_windows_platform(parent):
             self.command.is_windows = True
 
 
 class CommandTaskSpecification(TaskSpecification):
+    """
+    CommandTaskSpecification is the plugin definition for CommandTask.
+    """
+
     def get(self, configuration: dict) -> CommandTask:
         """
-        Get instance of CommandTask with configuration
+        Get instance of CommandTask with configuration.
 
         Args:
             configuration: configuration for CommandTask
@@ -78,7 +119,7 @@ class CommandTaskSpecification(TaskSpecification):
 
     def get_description(self) -> str:
         """
-        Get description of plugin
+        Get description of plugin.
 
         Returns:
             Plugin description
@@ -87,7 +128,7 @@ class CommandTaskSpecification(TaskSpecification):
 
     def get_example_urls(self) -> List[str]:
         """
-        Get example urls related to CommandTask
+        Get example urls related to CommandTask.
 
         Returns:
             List of urls that have examples related to CommandTask
@@ -96,7 +137,7 @@ class CommandTaskSpecification(TaskSpecification):
 
     def get_type(self) -> Type[CommandTask]:
         """
-        Get task type provided by plugin
+        Get task type provided by plugin.
 
         Returns:
             CommandTask
@@ -104,5 +145,11 @@ class CommandTaskSpecification(TaskSpecification):
         return CommandTask
 
     def get_version(self) -> str:
+        """
+        Get version of command task plugin.
+
+        Returns:
+            Version of plugin
+        """
         from idmtools import __version__
         return __version__

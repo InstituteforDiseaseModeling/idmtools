@@ -1,0 +1,41 @@
+@startuml
+
+cloud "Slurm Cluster" {
+  storage "Shared Storage" as shared {
+    folder "Job Directory" as job0
+  }
+  node "Head Node" {
+    folder "Job Directory" as job1
+
+    folder "/home/user" as home0
+    agent "Slurm Controller" as sctl
+    agent "idmtools-slurm-bridge" as bridgeagent
+    node "Singularity Environment" as senv {
+      folder "/home/user" as home1
+      file "idmtools_script.py" as user_script
+    }
+    bridgeagent <--> home0
+    home1 <--> home0
+    bridgeagent <--> sctl
+    user_script <--> bridgeagent
+    user_script <--> job1
+  }
+  node "Node 1" {
+    folder "Job Directory" as job2 {
+      folder "Suite1/Experiment0/Simulation1" as jfolder {
+        file "_run.sh" as jshell
+      }
+    }
+    agent "Slurm Job" as sj
+    jshell <-- sj
+  }
+  node "Node ..." {
+    folder "Job Directory" as job3
+  }
+  job1 <--> job0
+  job2 <--> job0
+  job3 <--> job0
+}
+
+
+@enduml

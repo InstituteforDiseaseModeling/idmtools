@@ -1,3 +1,8 @@
+"""
+IAssetsEnabled interface definition.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, field
 from typing import NoReturn, Union
@@ -14,6 +19,12 @@ class IAssetsEnabled(metaclass=ABCMeta):
                                     metadata={"pickle_ignore": True})
 
     def __post_init__(self):
+        """
+        Post init. Nothing needed for IAssetsEnabled.
+
+        Returns:
+            None
+        """
         pass
 
     @abstractmethod
@@ -31,4 +42,17 @@ class IAssetsEnabled(metaclass=ABCMeta):
             self.assets.add_asset(asset, fail_on_duplicate)
 
     def add_asset(self, asset: Union[str, 'TAsset'] = None, fail_on_duplicate: bool = True) -> NoReturn:
+        """
+        Add an asset to our item.
+
+        Args:
+            asset: Asset to add. Asset can be a string in which case it is assumed to be a file path
+            fail_on_duplicate: Should we rain an exception if there is an existing file with same information
+
+        Returns:
+            None
+
+        Raise:
+            DuplicatedAssetError in cases where fail_on_duplicate are true
+        """
         self.assets.add_asset(asset, fail_on_duplicate)

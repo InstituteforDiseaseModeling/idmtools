@@ -16,6 +16,7 @@ from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.common_experiments import wait_on_experiment_and_check_all_sim_status
 from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id, get_asset_collection_by_id, \
     setup_test_with_platform_and_simple_sweep
+from idmtools_test.utils.utils import get_case_name
 
 
 @pytest.mark.comps
@@ -28,7 +29,7 @@ class TestAssetsInComps(unittest.TestCase):
     def setUp(self) -> None:
         self.base_path = os.path.abspath(os.path.join(COMMON_INPUT_PATH, "assets", "collections"))
         self.platform: COMPSPlatform = None
-        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
+        self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
         setup_test_with_platform_and_simple_sweep(self)
 
     def _run_and_test_experiment(self, experiment):
@@ -40,7 +41,7 @@ class TestAssetsInComps(unittest.TestCase):
         wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform)
 
     def test_comps_asset_to_idmtools_asset(self):
-        comps_ac: CompsAssetCollection = self.platform.get_item('2c62399b-1a31-ea11-a2be-f0921c167861',
+        comps_ac: CompsAssetCollection = self.platform.get_item('16a032ab-bcb6-ec11-92e8-f0921c167864',
                                                                 item_type=ItemType.ASSETCOLLECTION, raw=True)
         ac: AssetCollection = self.platform._assets.to_entity(comps_ac)
         self.assertIsInstance(ac, AssetCollection)
@@ -51,7 +52,7 @@ class TestAssetsInComps(unittest.TestCase):
         self.assertEqual(filenames_comps, filenames)
 
     def test_create_asset_collection_from_existing_collection(self):
-        ac = AssetCollection.from_id('2c62399b-1a31-ea11-a2be-f0921c167861')
+        ac = AssetCollection.from_id('16a032ab-bcb6-ec11-92e8-f0921c167864')
         self.assertIsInstance(ac, AssetCollection)
         new_ac = AssetCollection(ac.assets)
         new_ac.add_asset(Asset(relative_path=None, filename="test.json", content=json.dumps({"a": 9, "b": 2})))

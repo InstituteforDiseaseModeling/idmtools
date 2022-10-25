@@ -37,5 +37,5 @@ Integration with |SSMT_l| increases the performance of running analyzers. You ma
 
    analyzers-example
    analyzers-create
-   analyzers-convert
    analyzers-ssmt
+   analyzers-convert

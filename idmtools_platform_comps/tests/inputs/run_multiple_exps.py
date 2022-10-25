@@ -9,7 +9,7 @@ sys.path.append(os.path.dirname(__file__))
 from population_analyzer import PopulationAnalyzer  # noqa
 
 if __name__ == "__main__":
-    platform = Platform('COMPS2')
+    platform = Platform('BAYESIAN')
 
     analyzers = [PopulationAnalyzer()]
     if len(sys.argv) > 1:

@@ -1,4 +1,8 @@
 #!/usr/bin/env python
+"""Run a command and wait on the command to finish with an optional timeout parameter.
+
+This is used by the build to time-box some build commands.
+"""
 import errno
 from functools import wraps
 
@@ -14,6 +18,15 @@ base_directory = abspath(join(dirname(__file__), '..'))
 
 
 def timeout(seconds=10, error_message=None):
+    """Decorator to add a timeout to a function. Default to 10 second timeout.
+
+    Args:
+        seconds: Seconds until a call should be considered timed out
+        error_message: Optional error message to display
+
+    Returns:
+        None
+    """
     if error_message is None:
         error_message = os.strerror(errno.ETIME)
 
@@ -36,6 +49,15 @@ def timeout(seconds=10, error_message=None):
 
 
 def run_command_on_all(commands: List['str'], parallel: bool = True):
+    """Run a set of commands.
+
+    Args:
+        commands: List of commands to run
+        parallel: Should we run the commands in parallel mode
+
+    Returns:
+        None
+    """
     processes = []
 
     @timeout(10)

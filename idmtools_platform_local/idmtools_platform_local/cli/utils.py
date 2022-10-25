@@ -1,3 +1,8 @@
+"""idmtools local platform cli utils.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
+
 from math import floor
 from typing import Dict
 from colorama import Fore, Back
@@ -15,6 +20,17 @@ tags_help = "Tag to filter by. This should be in the form name value. For exampl
 
 
 def get_service_info(service_manger: DockerServiceManager, diff: bool, logs: bool) -> str:
+    """
+    Get info about services for statusing.
+
+    Args:
+        service_manger: Service manager to use
+        diff:Should we run a diff on the container.
+        logs: Should logs be used
+
+    Returns:
+        Local platform container info.
+    """
     info = []
     for service in ['redis', 'postgres', 'workers']:
         info.append(f'\n{service}\n{"=" * 20}')
@@ -45,7 +61,8 @@ def get_service_info(service_manger: DockerServiceManager, diff: bool, logs: boo
 
 def colorize_status(status: Status) -> str:
     """
-    Colorizes a status for the console
+    Colorizes a status for the console.
+
     Args:
         status (Status): Status to colorize
 
@@ -61,7 +78,7 @@ def colorize_status(status: Status) -> str:
 
 def parent_status_to_progress(status: Dict[Status, int], width: int = 12) -> str:
     """
-    Convert a status object into a colorized progress bar for the console
+    Convert a status object into a colorized progress bar for the console.
 
     Args:
         status (Dict[Status, int]): Status dictionary. The dictionary should Status values for keys and the values should be the total
@@ -105,7 +122,8 @@ def parent_status_to_progress(status: Dict[Status, int], width: int = 12) -> str
 
 def urlize_data_path(path: str) -> str:
     """
-    URL-ize a data-path so it can be made click-able in the console(if the console supports it)
+    URL-ize a data-path so it can be made click-able in the console(if the console supports it).
+
     Args:
         path (str): path to urilze
     Returns:

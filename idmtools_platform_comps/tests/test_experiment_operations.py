@@ -16,6 +16,7 @@ from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test.utils.common_experiments import get_model1_templated_experiment
+from idmtools_test.utils.utils import get_case_name
 
 logger = getLogger()
 # Enable Caching of experiment past one session. Useful for working with problems in validating output of experiment
@@ -23,7 +24,7 @@ cache = dc.Cache(os.getcwd() if os.getenv("CACHE_FIXTURES", "No").lower()[0] in 
 
 
 @cache.memoize(expire=300)
-def setup_command_no_asset(case_name, platform: str = 'COMPS2'):
+def setup_command_no_asset(case_name, platform: str = 'SlurmStage'):
     bt = CommandTask("Assets\\hello_world.bat")
     experiment = Experiment.from_task(
         bt,
@@ -41,7 +42,7 @@ def setup_command_no_asset(case_name, platform: str = 'COMPS2'):
 
 
 @cache.memoize(expire=300)
-def setup_python_model_1(case_name, platform: str = 'COMPS2'):
+def setup_python_model_1(case_name, platform: str = 'SlurmStage'):
     platform = Platform(platform)
     e = get_model1_templated_experiment(case_name)
     builder = SimulationBuilder()
@@ -72,14 +73,14 @@ def setup_python_model_1(case_name, platform: str = 'COMPS2'):
 class TestExperimentOperations(unittest.TestCase):
 
     def setUp(self) -> None:
-        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
-        self.platform = Platform("COMPS2")
+        self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
+        self.platform = Platform("SlurmStage")
 
     def test_no_assets(self):
-        setup_command_no_asset(self.case_name, "COMPS2")
+        setup_command_no_asset(self.case_name, "SlurmStage")
 
         # Ensure login is called
-        with platform("COMPS2"):
+        with platform("SlurmStage"):
             # Call Experiments
             qc = QueryCriteria().select_children("tags").where_tag(
                 [
@@ -117,7 +118,7 @@ class TestExperimentOperations(unittest.TestCase):
         Returns:
 
         """
-        eid = setup_python_model_1(self.case_name, 'COMPS2')
+        eid = setup_python_model_1(self.case_name, 'SlurmStage')
 
         e_p: Experiment = Experiment.from_id(eid)
         with self.subTest("test_list_assets_and_download_children"):

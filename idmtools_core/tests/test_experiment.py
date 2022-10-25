@@ -3,7 +3,7 @@ import itertools
 import os
 import sys
 import unittest
-
+from unittest.mock import MagicMock
 import pytest
 from idmtools.assets import Asset
 from idmtools.builders import SimulationBuilder
@@ -14,6 +14,7 @@ from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test.utils.utils import captured_output
+from idmtools_test.utils.test_task import TestTask
 
 model_path = os.path.abspath(os.path.join("..", "..", "examples", "python_model", "inputs", "simple_python", "model.py"))
 
@@ -57,6 +58,15 @@ class TestAddingSimulationsToExistingExperiment(unittest.TestCase):
                 if i > 4:
                     break
                 self.assertIn(f"{sim.id} | - Run_Number:{sim.tags['Run_Number']}", out[0].getvalue())
+
+    def test_experiment_disabled_precreate(self):
+        base_task = TestTask()
+        sim = Simulation.from_task(base_task)
+        exp = Experiment(disable_default_pre_create=True)
+        exp.simulations.append(sim)
+        platform = Platform("TestExecute", missing_ok=True)
+        exp.pre_creation(platform=platform)
+        self.assertEqual(exp.tags, {})
 
     def test_empty_experiment_template(self):
         base_task = JSONConfiguredPythonTask(script_path=model_path, python_path=sys.executable)
@@ -105,7 +115,10 @@ class TestAddingSimulationsToExistingExperiment(unittest.TestCase):
         builder = SimulationBuilder()
         builder.add_sweep_definition(JSONConfiguredPythonTask.set_parameter_partial("Run_Number"), [i for i in range(5)])
         exp = Experiment.from_builder(builder, base_task=base_task)
+        mock_hook = MagicMock()
+        exp.add_post_creation_hook(mock_hook)
         exp.run(wait_until_done=True)
+        self.assertEqual(mock_hook.call_count, 1)
 
         self.assertFalse(exp.assets.is_editable())
         # existing sims and status

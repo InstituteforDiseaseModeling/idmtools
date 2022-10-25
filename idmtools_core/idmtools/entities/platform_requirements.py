@@ -1,9 +1,14 @@
+"""
+Defines our PlatformRequirements enum.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 from enum import Enum
 
 
 class PlatformRequirements(Enum):
     """
-    Defines possible requirements a task could need from a platform
+    Defines possible requirements a task could need from a platform.
     """
     SHELL = "shell"  # Shell commands like ls -al
     NativeBinary = "NativeBinary"  # Run a user-provided binary

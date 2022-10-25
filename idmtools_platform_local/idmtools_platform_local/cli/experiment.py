@@ -1,3 +1,7 @@
+"""idmtools cli experiment tools.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 from typing import Optional, Tuple, List, Any, Dict
 import click
 import requests
@@ -12,7 +16,9 @@ EXPERIMENTS_URL = f'{API_PATH}/experiments'
 
 def prettify_experiment(experiment: Dict[str, Any]):
     """
-    Prettifies a JSON Experiment object for printing on a console. This includes
+    Prettifies a JSON Experiment object for printing on a console.
+
+    This includes
     - Making a pretty progress bar
     - URL-ifying the data paths
     - sorting the columns
@@ -21,7 +27,7 @@ def prettify_experiment(experiment: Dict[str, Any]):
         experiment: JSON representation of the Experiment(from API)
 
     Returns:
-
+        Prettify experiment
     """
     experiment['progress'] = parent_status_to_progress(experiment['progress'])
     experiment['data_path'] = urlize_data_path(experiment['data_path'])
@@ -31,7 +37,7 @@ def prettify_experiment(experiment: Dict[str, Any]):
 
 def status(id: Optional[str], tags: Optional[List[Tuple[str, str]]]):
     """
-    List the status of experiment(s) with the ability to filter by experiment id and tags
+    List the status of experiment(s) with the ability to filter by experiment id and tags.
 
     Args:
         id (Optional[str]): Optional ID of the experiment you want to filter by
@@ -54,8 +60,7 @@ def status(id: Optional[str], tags: Optional[List[Tuple[str, str]]]):
 
 
 def extra_commands():
-    """ This ensures our local platform specific commands are loaded
-    """
+    """This ensures our local platform specific commands are loaded."""
     from idmtools_cli.cli.experiment import experiment
     from idmtools_cli.cli.utils import show_error
     import idmtools_platform_local.cli.local  # noqa: 40F1
@@ -65,7 +70,7 @@ def extra_commands():
     @click.option('--data/--no-data', default=False, help="Should we delete the data as well?")
     def delete(experiment_id: str, data: bool):
         """
-        Delete an experiment, and optionally, its data
+        Delete an experiment, and optionally, its data.
 
         Args:
             experiment_id (str): ID of exp to delete

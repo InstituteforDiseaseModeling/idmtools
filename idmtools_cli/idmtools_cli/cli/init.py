@@ -1,3 +1,4 @@
+"""Defines the init(templates) cli command."""
 import itertools
 import json
 import logging
@@ -14,11 +15,13 @@ logger = getLogger(__name__)
 
 @cli.group(help="Commands to help start or extend projects through templating.")
 def init():
+    """Base init group command."""
     pass
 
 
 @cli.command(help="Export list of project templates")
 def init_export():
+    """Export project templates."""
     with open('templates.json', 'w') as o:
         import dataclasses
         result = get_project_list()
@@ -28,12 +31,13 @@ def init_export():
 
 def define_cookiecutter_project_command(project_details: ProjectTemplate):
     """
-    Defines the specific project cookie cutter command
+    Defines the specific project cookie cutter command.
+
     Args:
         project_details:
 
     Returns:
-
+        Define a dynamic cookie cutter command around a template
     """
 
     @init.command(name=project_details.name, help=project_details.description)
@@ -49,9 +53,10 @@ def define_cookiecutter_project_command(project_details: ProjectTemplate):
 
 def get_project_list() -> Dict[str, ProjectTemplate]:
     """
-    Build a list of cookie cutter options for menu
-    Returns:
+    Build a list of cookie cutter options for menu.
 
+    Returns:
+        Return list of project templates
     """
     from idmtools.registry.experiment_specification import ExperimentPlugins
     from idmtools.registry.platform_specification import PlatformPlugins
@@ -81,9 +86,10 @@ def get_project_list() -> Dict[str, ProjectTemplate]:
 
 def build_project_commands():
     """
-    Builds the cookie cutter cli commands
-    Returns:
+    Builds the cookie cutter cli commands.
 
+    Returns:
+        None
     """
     result = get_project_list()
     # Now define all the cookie cutter projects
@@ -93,14 +99,14 @@ def build_project_commands():
 
 def read_templates_from_json_stream(items: List[ProjectTemplate], s):
     """
-    Read Project Template from stream onto the list
+    Read Project Template from stream onto the list.
 
     Args:
         items: List to append data to
         s: Stream where json data resides
 
     Returns:
-
+        None
     """
     data = json.loads(s.read().decode())
     for item in data:

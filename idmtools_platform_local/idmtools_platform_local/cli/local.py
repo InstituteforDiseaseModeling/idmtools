@@ -1,3 +1,7 @@
+"""idmtools local platform group.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import time
 
 import click
@@ -12,10 +16,12 @@ from idmtools_platform_local.infrastructure.service_manager import DockerService
 
 
 class LocalCliContext:
+    """Local CLI Context."""
     do: DockerIO = None
     sm: DockerServiceManager = None
 
     def __init__(self, config=None):
+        """Constructor."""
         client = docker.from_env()
         if config is None:
             config = dict()
@@ -28,6 +34,7 @@ pass_do = click.make_pass_decorator(LocalCliContext)
 
 
 def stop_services(cli_context: LocalCliContext, delete_data):
+    """Stop services."""
     if delete_data:
         delete_data = click.confirm(
             f'Do you want to remove all data associated with the local platform?({cli_context.do.host_data_directory})',
@@ -42,6 +49,10 @@ def stop_services(cli_context: LocalCliContext, delete_data):
                                              "Example values are \"1000:1000\"")
 @click.pass_context
 def local(ctx, run_as):
+    """Local command group.
+
+    We create our local platform context here.
+    """
     config = dict()
     if run_as:
         config['run_as'] = run_as
@@ -53,21 +64,22 @@ def local(ctx, run_as):
 @click.option("--delete-data/--no-delete-data", default=False)
 @pass_do
 def down(cli_context: LocalCliContext, delete_data):
-    """Shutdown the local execution platform(and optionally delete data"""
+    """Shutdown the local execution platform(and optionally delete data."""
     stop_services(cli_context, delete_data)
 
 
 @local.command()
-@click.option("--delete-data/--no-delete-data", default=False)
+@click.option("--delete-data/--no-delete-data", help="SHold the local platform be deleted", default=False)
 @pass_do
 def stop(cli_context: LocalCliContext, delete_data):
+    """Stop the local platform."""
     stop_services(cli_context, delete_data)
 
 
 @local.command()
 @pass_do
 def start(cli_context: LocalCliContext):
-    """Start the local execution platform"""
+    """Start the local execution platform."""
     cli_context.sm.create_services()
     try:
         time.sleep(4)
@@ -82,7 +94,7 @@ def start(cli_context: LocalCliContext):
 @local.command()
 @pass_do
 def restart(cli_context: LocalCliContext):
-    """Restart the local execution platform"""
+    """Restart the local execution platform."""
     cli_context.sm.restart_all()
 
 
@@ -91,7 +103,7 @@ def restart(cli_context: LocalCliContext):
 @click.option("--diff/--no-diff", default=False)
 @click.option('--output-filename', default=None, help="Output filename")
 @pass_do
-def info(cli_context: LocalCliContext, logs: bool, diff: bool, output_filename: str):
+def info(cli_context: LocalCliContext, logs: bool, diff: bool, output_filename: str):  # noqa: D103
     i = get_service_info(cli_context.sm, diff, logs)
     if output_filename is not None:
         with open(output_filename, 'w') as logout:
@@ -104,7 +116,7 @@ def info(cli_context: LocalCliContext, logs: bool, diff: bool, output_filename: 
 @pass_do
 def status(cli_context: LocalCliContext):
     """
-    Check the status of the local execution platform
+    Check the status of the local execution platform.
     """
     for c in ['redis', 'postgres', 'workers']:
         container = cli_context.sm.get(c, create=False)
@@ -112,6 +124,16 @@ def status(cli_context: LocalCliContext):
 
 
 def container_status_text(name, container):
+    """
+    Print container status in color based on state.
+
+    Args:
+        name: Name to display
+        container: Container to status
+
+    Returns:
+        None
+    """
     if container:
         click.echo(
             f'{name: >10}: [{Fore.GREEN}{container.status}{Fore.RESET}] [{container.name: >17}] [{container.short_id}] [{container.labels}]')

@@ -1,5 +1,5 @@
+PACKAGE_NAME=idmtools_slurm
+include $(abspath ../dev_scripts/package_general.mk)
 
-HTML_TEST_REPORT ?= slurm.test_results.html
-# Local only has serial tests
-SERIAL_TESTING = 1
-include $(abspath ../../dev_scripts/test_root.mk)
+help:
+	help-from-makefile -f ../dev_scripts/package_general.mk -f ./Makefile

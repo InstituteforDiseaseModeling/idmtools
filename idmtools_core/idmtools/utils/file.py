@@ -1,3 +1,8 @@
+"""
+utilities for files.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import os
 from os import DirEntry
 from typing import Iterable, Generator, List
@@ -9,7 +14,7 @@ def scan_directory(basedir: str, recursive: bool = True, ignore_directories: Lis
 
     Args:
         basedir: The root directory to start from.
-        recursive: True to search the subfolders recursively; False to stay in the root directory.
+        recursive: True to search the sub-folders recursively; False to stay in the root directory.
         ignore_directories: Ignore directories
 
     Returns:
@@ -25,13 +30,14 @@ def scan_directory(basedir: str, recursive: bool = True, ignore_directories: Lis
 
 def file_contents_to_generator(filename, chunk_size=128) -> Generator[bytearray, None, None]:
     """
-    Create a generator from file contents in chunks(useful for streaming binary data and piping)
+    Create a generator from file contents in chunks(useful for streaming binary data and piping).
+
     Args:
         filename:
         chunk_size:
 
     Returns:
-
+        Generator that return bytes in chunks of size chunk_size
     """
     with open(filename, 'rb') as i:
         while True:

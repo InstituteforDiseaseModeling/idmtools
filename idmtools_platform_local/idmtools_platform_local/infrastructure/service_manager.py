@@ -1,3 +1,7 @@
+"""idmtools service manager. Manages all our local platform services.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 from dataclasses import dataclass, field, fields
 import logging
 import time
@@ -27,6 +31,9 @@ logger = getLogger(__name__)
 
 @dataclass
 class DockerServiceManager:
+    """
+    Provides single interface to manage all the local platform services.
+    """
     client: DockerClient
     host_data_directory: str = get_data_directory()
     network: str = 'idmtools'
@@ -50,6 +57,7 @@ class DockerServiceManager:
     _services: Dict[str, BaseServiceContainer] = None
 
     def __post_init__(self):
+        """Constructor."""
         self.system_info = get_system_information()
         if self.run_as is None:
             self.run_as = self.system_info.user_group_str
@@ -65,6 +73,7 @@ class DockerServiceManager:
         self.init_services()
 
     def init_services(self):
+        """Start all the containers we should have running."""
         self._services = dict()
         for _i, service in enumerate(SERVICES):
             sn = service.__name__.replace("Container", "").lower()
@@ -73,8 +82,9 @@ class DockerServiceManager:
 
     def cleanup(self, delete_data: bool = False, tear_down_brokers: bool = False) -> NoReturn:
         """
-        Stops the containers and removes the network. Optionally the postgres data container can be deleted as well
-        as closing any active Redis connections
+        Stops the containers and removes the network.
+
+        Optionally the postgres data container can be deleted as well as closing any active Redis connections.
 
         Args:
             delete_data: Delete postgres data
@@ -102,11 +112,13 @@ class DockerServiceManager:
 
     @staticmethod
     def setup_broker(heartbeat_timeout):
+        """Start the broker to send data to workers."""
         from idmtools_platform_local.internals.workers.brokers import setup_broker
         setup_broker(heartbeat_timeout)
 
     @staticmethod
     def restart_brokers(heartbeat_timeout):
+        """Restart brokers talking to workers."""
         from idmtools_platform_local.internals.workers.brokers import setup_broker, close_brokers
         close_brokers()
         setup_broker(heartbeat_timeout)
@@ -114,7 +126,7 @@ class DockerServiceManager:
     @optional_yaspin_load(text="Ensure IDM Tools Local Platform services are loaded")
     def create_services(self, spinner=None) -> NoReturn:
         """
-        Create all the components of our
+        Create all the components of local platform.
 
         Our architecture is as depicted in the UML diagram below
 
@@ -173,8 +185,9 @@ class DockerServiceManager:
     def wait_on_ports_to_open(self, ports: List[str], wait_between_tries: Union[int, float] = 0.2, max_retries: int = 5,
                               sleep_after: Union[int, float] = 0.5) -> bool:
         """
-        Polls list of port attributes(eg postgres_port, redis_port and checks if they are currently open. We use this
-        to verify postgres/redis are ready for our workers
+        Polls list of port attributes(eg postgres_port, redis_port and checks if they are currently open.
+
+        We use this to verify postgres/redis are ready for our workers
 
         Args:
             ports: List of port attributes
@@ -201,7 +214,7 @@ class DockerServiceManager:
     @optional_yaspin_load(text="Stopping IDM Tools Local Platform services")
     def stop_services(self, spinner=None) -> NoReturn:
         """
-        Stops all running IDM Tools services
+        Stops all running IDM Tools services.
 
         Returns:
             (NoReturn)
@@ -217,28 +230,28 @@ class DockerServiceManager:
 
     def get(self, container_name: str, create=True) -> Container:
         """
-        Get the server with specified name
+        Get the server with specified name.
 
         Args:
             container_name: Name of container
             create: Create if it doesn't exists
 
         Returns:
-
+            Container
         """
         service = self._services[container_name.lower()]
         return service.get_or_create() if create else service.get()
 
     def get_container_config(self, service: BaseServiceContainer, opts=None):
         """
-        Get the container config for the service
+        Get the container config for the service.
 
         Args:
             service: Service to get config for
             opts: Opts to Extract. Should be a fields object
 
         Returns:
-
+            Container config
         """
         dest_fields = {f.name: f for f in fields(service)}
         if not opts:
@@ -266,19 +279,18 @@ class DockerServiceManager:
     @optional_yaspin_load(text="Restarting IDM-Tools services")
     def restart_all(self, spinner=None) -> NoReturn:  # noqa: F811
         """
-        Restart all the services IDM-Tools services
+        Restart all the services IDM-Tools services.
 
         Returns:
             (NoReturn)
         """
-
         for service in self._services.values():
             service.restart()
 
     @staticmethod
     def is_port_open(host: str, port: int) -> bool:
         """
-        Check if a port is open
+        Check if a port is open.
 
         Args:
             host: Host to check
@@ -297,13 +309,13 @@ class DockerServiceManager:
     @staticmethod
     def stop_service_and_wait(service) -> bool:
         """
-        Stop server and wait
+        Stop server and wait.
 
         Args:
             service: Service to stop
 
         Returns:
-
+            True
         """
         service.stop(True)
         container = service.get()
@@ -314,7 +326,7 @@ class DockerServiceManager:
 
     def get_network(self) -> Network:
         """
-        Fetches the IDM Tools network
+        Fetches the IDM Tools network.
 
         Returns:
             (Network) Return Docker network object

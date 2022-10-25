@@ -1,6 +1,6 @@
-==============
-Local platform
-==============
+=====
+Local
+=====
 
 To run simulations and experiments on the local platform you must have met the installation prerequisites. For more information, see :doc:`../installation`. In addition, the Docker client must be running. For more information, see |dev_install|.
 
@@ -24,7 +24,7 @@ If not then you may need to run::
 
 Run examples
 ````````````
-To run the included examples on local platform you must configure the :py:class:`~idmtools.core.platform_factory.Platform` to ``Local``, such as::
+To run the included examples on local platform you must configure :py:class:`~idmtools.core.platform_factory.Platform` to ``Local``, such as::
 
     platform = Platform('Local')
 
@@ -39,7 +39,7 @@ And, you must include the following block in the ``idmtools.ini`` file::
 
 View simulations and experiments
 ````````````````````````````````
-You can the dashboard or the CLI for |IT_s| to view and monitor the status of your simulations and experiments.
+You can use the dashboard or the CLI for |IT_s| to view and monitor the status of your simulations and experiments.
 
 The **dashboard** runs on a localhost server on port 5000 (http://localhost:5000). It is recommended that you use Google Chrome to open the dashboard.
 

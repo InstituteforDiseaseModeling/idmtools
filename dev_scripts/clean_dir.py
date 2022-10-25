@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+"""Utility script to allow downloading files using glob patterns for file, directories, etc, for any platform."""
 import argparse
 import os
 import glob
@@ -7,6 +8,17 @@ from contextlib import suppress
 
 
 def clean_package_dir(glob_file_patterns, glob_delete_patterns, delete_directories):
+    """
+    Clean the repo using patterns specified.
+
+    Args:
+        glob_file_patterns: List of file patterns to remove
+        glob_delete_patterns: List of directory patterns to delete
+        delete_directories: List of directories to delete
+
+    Returns:
+        None
+    """
     for gp in glob_file_patterns:
         for i in glob.glob(gp, recursive=True):
             with suppress(FileNotFoundError):

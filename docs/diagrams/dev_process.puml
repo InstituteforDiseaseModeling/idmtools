@@ -1,0 +1,29 @@
+@startuml
+
+title Development Release \n
+
+start
+
+:Commit to Branch;
+:Run Linting(Optional);
+if (Linting Passed?) then (yes)
+    :Run Unit Tests;
+
+    if (Tests Passed?) then (yes)
+    note left
+    We could add doc building here as well
+    end note
+        if (Is Version a Dev Version?) then (yes)
+           :Publish to Artifactory Production;
+        else (no)
+           :Publish to Staging;
+        endif
+    else (no)
+        :Send Test/Dev Team Alert;
+    endif
+else (no)
+    :Send Test/Dev Team Alert of Linting failure;
+endif
+stop
+
+@enduml

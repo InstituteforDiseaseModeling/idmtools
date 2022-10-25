@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-"""The setup script for the idmtools_platform_local module, which provides ability to run models locally using docker
-containers to idmtools."""
+"""The setup script for the idmtools_platform_local module, which provides ability to run models locally using docker containers to idmtools."""
 import sys
 
 from setuptools import setup, find_packages
@@ -19,9 +17,8 @@ with open('workers_requirements.txt') as requirements_file:
 with open('ui_requirements.txt') as requirements_file:
     ui_requirements = requirements_file.read().split("\n")
 
-
 setup_requirements = []
-server_requirements = ['uwsgi==2.0.18', 'Werkzeug==0.16.1']
+server_requirements = ['uwsgi==2.0.18']
 test_requirements = ['pytest', 'pytest-runner', 'pytest-timeout', 'pytest-cache']
 
 if sys.platform in ["win32", "cygwin"]:
@@ -52,8 +49,8 @@ authors = [
 ]
 
 setup(
-    author=[author[0] for author in authors],
-    author_email=[author[1] for author in authors],
+    author=", ".join([author[0] for author in authors]),
+    author_email=", ".join([author[1] for author in authors]),
     classifiers=[
         'Framework:: IDM-Tools :: Platform',
     ],
@@ -63,6 +60,9 @@ setup(
     include_package_data=True,
     keywords='modeling, IDM',
     name='idmtools_platform_local',
+    # At the moment, docker python doesn't work with python 3.10 on Windows
+    # See https://github.com/docker/docker-py/issues/2967
+    python_requires=">=3.6,<3.11.0",
     packages=find_packages(),
     setup_requires=setup_requirements,
     entry_points=dict(idmtools_platform=  # noqa: E251
@@ -73,5 +73,5 @@ setup(
     test_suite='tests',
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='1.6.2+nightly'
+    version='1.7.1'
 )

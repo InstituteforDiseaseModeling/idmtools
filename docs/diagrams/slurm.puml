@@ -1,0 +1,14 @@
+@startuml
+
+package "idmtools-core" as registry {
+    () "PlatformAPI" as PlatformAPI
+}
+
+package "idmtools-platform-slurm" as slurm {
+    [SLURMPlatform]   
+}
+
+
+PlatformAPI <-down-- SLURMPlatform: SLURM\nImplementation
+
+@enduml

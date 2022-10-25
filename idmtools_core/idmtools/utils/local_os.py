@@ -1,3 +1,8 @@
+"""
+Info to determine info about Operation Systems.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import platform
 import getpass
 
@@ -8,6 +13,9 @@ class LocalOS:
     """
 
     class UnknownOS(Exception):
+        """
+        Unknown os detected.
+        """
         pass
 
     os_mapping = {'windows': 'win',
@@ -22,5 +30,11 @@ class LocalOS:
     name = os_mapping[_os]
 
     @staticmethod
-    def is_window():
+    def is_window() -> bool:
+        """
+        Are we running on a windows system?
+
+        Returns:
+            True if on windows
+        """
         return LocalOS.name == 'win'

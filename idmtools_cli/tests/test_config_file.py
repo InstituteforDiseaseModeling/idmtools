@@ -3,7 +3,7 @@ import allure
 import unittest
 import pytest
 from click.testing import CliRunner
-os.environ['IDMTOOLS_LOGGING_USER_PRINT'] = '1'
+os.environ['IDMTOOLS_LOGGING_USE_COLORED_LOGS'] = 'F'
 os.environ['IDMTOOLS_HIDE_DEV_WARNING'] = '1'
 from idmtools_cli.cli.config_file import config
 

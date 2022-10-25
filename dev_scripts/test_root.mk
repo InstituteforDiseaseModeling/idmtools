@@ -77,6 +77,9 @@ test-docker: reports-exist ## Run our docker tests
 test-python: reports-exist ## Run our python tests
 	$(TEST_COMMAND) -m "python"
 
+test-ssmt: reports-exist ## Run our ssmt tests
+	$(TEST_COMMAND) -m "ssmt"
+
 test-smoke: reports-exist ## Run our smoke tests
 ifneq (1, $(PARALLEL_TESTING)) # Only run these tests if Parallel Only Testing is disabled
 	-echo "Running Serial Tests"

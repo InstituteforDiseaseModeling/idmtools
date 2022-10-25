@@ -1,3 +1,7 @@
+"""idmtools comps lookups.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 from datetime import datetime, timedelta
 from logging import getLogger
 from typing import List
@@ -11,14 +15,16 @@ logger = getLogger(__name__)
 
 @backoff.on_exception(backoff.constant(1.5), (Timeout, ConnectionError, HTTPError), max_tries=5, giveup=fatal_code)
 def get_experiment_by_id(exp_id, query_criteria: QueryCriteria = None) -> Experiment:
+    """Get an experiment by id."""
     return Experiment.get(exp_id, query_criteria=query_criteria)
 
 
 @backoff.on_exception(backoff.constant(1.5), (Timeout, ConnectionError, HTTPError), max_tries=5, giveup=fatal_code)
 def get_simulation_by_id(sim_id, query_criteria: QueryCriteria = None) -> Simulation:
     """
-    Fetches simulation by id and optional query criteria. Wrapped in additional Retry Logic. Used by other lookup
-        methods
+    Fetches simulation by id and optional query criteria.
+
+    Wrapped in additional Retry Logic. Used by other lookup methods
 
     Args:
         sim_id:
@@ -32,7 +38,7 @@ def get_simulation_by_id(sim_id, query_criteria: QueryCriteria = None) -> Simula
 
 def get_all_experiments_for_user(user: str) -> List[Experiment]:
     """
-    Returns all the experiments for a specific user
+    Returns all the experiments for a specific user.
 
     Args:
         user: username to locate
@@ -74,12 +80,13 @@ def get_all_experiments_for_user(user: str) -> List[Experiment]:
 
 def get_simulations_from_big_experiments(experiment_id):
     """
+    Get simulation for large experiment. This allows us to pull simulations in chunks.
 
     Args:
-        experiment_id:
+        experiment_id: Experiment id to load
 
     Returns:
-
+        List of simulations
     """
     e = get_experiment_by_id(experiment_id)
     start_date = end_date = e.date_created

@@ -8,7 +8,10 @@ from the creation of input files (if required), to calibration of the model to d
 and running simulations, through the analysis of results. Modelers can use |IT_s| to run models
 locally or send suites of simulations to an HPC or other computing source. This framework is
 free, open-source, and model agnostic: it can be used to interact with a variety of models,
-such as custom models written in R or Python, or IDM's own |EMOD_s|.
+such as custom models written in R or Python, or IDM's own |EMOD_s|. Additional functionality 
+for interacting with |EMOD_s| is provided in the :doc:`emod_api:emod_api` and 
+:doc:`emodpy:emodpy`.
+
 
 
 |IT_s| workflow
@@ -24,13 +27,73 @@ Assets can be added at any level of the process, from running a specific task, t
 a simulation, to creating a :term:`experiment`. This allows the user to create inputs based on their
 specific needs: they can be transient, or sharable across multiple simulations.
 
-Exact workflows for using |IT_s| is user-dependent, and can include any of the tasks listed below.
-
 .. To help new users get started, a series of Cookiecutter projects have been added, designed to
 .. guide modelers through necessary tasks. See :doc:`cookiecutters` for the available templates.
 
+The diagram below shows how |IT_s| and each of the related packages are used in
+an end-to-end workflow using |EMOD_s| as the disease transmission model.
 
 
+.. uml::
+
+   hide stereotype
+   skinparam component {
+     BackgroundColor<<emodpy-disease>> F9BA9D
+     BackgroundColor<<idmtools>> 006CA6
+     BackgroundColor<<calibration>> gray
+     BackgroundColor<<emodpy-core>> F18153
+     BackgroundColor<<COMPS>> lightgray
+     BackgroundColor<<EMOD>> 47C8F5
+   }
+
+
+   [emodpy-generic] <<emodpy-disease>>
+   [emodpy-generic] --> [emodpy]
+
+   [emodpy-hiv] <<emodpy-disease>>
+   [emodpy-hiv] --> [emodpy]
+
+   [emodpy-malaria] <<emodpy-disease>>
+   [emodpy-malaria] --> [emodpy]
+
+   [emodpy-measles] <<emodpy-disease>>
+   [emodpy-measles] --> [emodpy]
+
+   [emodpy-tbhiv] <<emodpy-disease>>
+   [emodpy-tbhiv] --> [emodpy]
+
+
+   [emodpy] <<emodpy-core>>
+   [emod-api] <<emodpy-core>>
+   [emodpy] --> [emod-api]
+
+   [emodpy] <-> [idmtools]
+
+   [idmtools] <<idmtools>>
+   [COMPS] <<COMPS>>
+   [idmtools] <-> [COMPS] : Commission and status
+
+   [idmtools-calibra] <<calibration>>
+   [idmtools-calibra] <--> [idmtools] : Commission and analysis
+   [idmtools-calibra] <--> [emodpy] : Calibration
+
+   [emodpy-calibra] <<calibration>>
+   [emodpy-calibra] <--> [emodpy]: EMOD-specific calibration utils
+   [emodpy-calibra] <--> [idmtools-calibra]
+   [Input files] <<EMOD>>
+   [emod-api] --> [Input files] : Create
+
+   [Input files] ..> [emod-api] : Inspect
+
+   [EMOD Eradication.exe] <<EMOD>>
+   [Input files] -> [EMOD Eradication.exe]
+
+   [Output files] <<EMOD>>
+   [EMOD Eradication.exe] -> [Output files]
+   [Output files] --> [emod-api]
+
+
+Exact workflows for using |IT_s| is user-dependent, and can include any of the tasks listed below.
 
 .. toctree::
    :maxdepth: 3
@@ -40,6 +103,7 @@ Exact workflows for using |IT_s| is user-dependent, and can include any of the t
    configuration
    platforms/platforms
    create-sims
+   containers/containers
    parameter-sweeps
    reports
    analyzers/analyzers
@@ -47,6 +111,7 @@ Exact workflows for using |IT_s| is user-dependent, and can include any of the t
    reference
    recipes_index
    cli/cli_index
+   dtkt-convert
    faq
    glossary
    changelog/changelog

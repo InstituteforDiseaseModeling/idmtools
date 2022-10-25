@@ -1,3 +1,4 @@
+"""Misc util functions for cli."""
 from __future__ import absolute_import
 from __future__ import with_statement
 
@@ -14,7 +15,6 @@ except NameError:
 
 def expand_path(path):
     """Expands directories and globs in given path."""
-
     paths = []
     path = os.path.expanduser(path)
     path = os.path.expandvars(path)
@@ -32,7 +32,6 @@ def expand_path(path):
 
 def is_collection(obj):
     """Tests if an object is a collection. Strings don't count."""
-
     if isinstance(obj, basestring):
         return False
 

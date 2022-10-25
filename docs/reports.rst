@@ -10,7 +10,7 @@ Python object. All other formats are loaded as a raw binary stream. For more
 information, see :doc:`analyzers/analyzers`.
 
 If you are running simulations on |COMPS_s|, the configuration of the
-``idmtools.ini`` file will determine where output files can be found. 
+"idmtools.ini" file will determine where output files can be found. 
 For more information, see :doc:`cli/wizard`
 
 .. include:: reuse/comps_note.txt

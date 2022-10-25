@@ -2,9 +2,7 @@ import allure
 import os
 import time
 from functools import partial
-
 import pytest
-
 from idmtools.analysis.analyze_manager import AnalyzeManager
 from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType
@@ -16,7 +14,6 @@ from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.common_experiments import wait_on_experiment_and_check_all_sim_status
 from idmtools_test.utils.confg_local_runner_test import get_test_local_env_overrides
-from idmtools_test.utils.decorators import ensure_local_platform_running
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 current_directory = os.path.dirname(os.path.realpath(__file__))

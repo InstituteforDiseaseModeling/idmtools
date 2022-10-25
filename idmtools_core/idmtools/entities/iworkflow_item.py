@@ -1,5 +1,10 @@
-import warnings
+"""
+Defines our IWorkflowItem interface.
 
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
+
+import warnings
 from abc import ABC
 from dataclasses import dataclass, field, fields, InitVar
 from typing import NoReturn, Dict, Any, TYPE_CHECKING
@@ -19,7 +24,7 @@ if TYPE_CHECKING:  # pragma: no cover
 @dataclass
 class IWorkflowItem(IAssetsEnabled, INamedEntity, IRunnableEntity, ABC):
     """
-    Interface of idmtools work item
+    Interface of idmtools work item.
     """
 
     #: Name of the workflow step
@@ -50,6 +55,18 @@ class IWorkflowItem(IAssetsEnabled, INamedEntity, IRunnableEntity, ABC):
     item_type: 'ItemType' = field(default=ItemType.WORKFLOW_ITEM, compare=False, init=False)
 
     def __post_init__(self, item_name: str, asset_collection_id: UUID, asset_files: FileList, user_files: FileList):
+        """
+        Constructor.
+
+        Args:
+            item_name: Item name
+            asset_collection_id: AssetCollectionId
+            asset_files: AssetFiles
+            user_files: UserFiles
+
+        Returns:
+            None
+        """
         if item_name is not None and not isinstance(item_name, property):
             self.name = item_name
 
@@ -59,7 +76,7 @@ class IWorkflowItem(IAssetsEnabled, INamedEntity, IRunnableEntity, ABC):
 
         if asset_files and not isinstance(asset_files, property):
             # user property since it can convert file lists
-            self.asset_files = user_files
+            self.asset_files = asset_files
 
         if asset_collection_id and not isinstance(asset_collection_id, property):
             # user property since it will inform user of changes
@@ -71,6 +88,9 @@ class IWorkflowItem(IAssetsEnabled, INamedEntity, IRunnableEntity, ABC):
         self.tags = self.tags or dict()
 
     def __repr__(self):
+        """
+        String representation of workflow items.
+        """
         return f"<WorkItem {self.uid}>"
 
     def gather_assets(self) -> NoReturn:
@@ -81,7 +101,8 @@ class IWorkflowItem(IAssetsEnabled, INamedEntity, IRunnableEntity, ABC):
 
     def add_file(self, af):
         """
-        Methods used to add new file
+        Methods used to add new file.
+
         Args:
             af: file to add
 
@@ -91,7 +112,7 @@ class IWorkflowItem(IAssetsEnabled, INamedEntity, IRunnableEntity, ABC):
 
     def clear_user_files(self):
         """
-        Clear all existing user files
+        Clear all existing user files.
 
         Returns: None
         """
@@ -103,7 +124,6 @@ class IWorkflowItem(IAssetsEnabled, INamedEntity, IRunnableEntity, ABC):
         """
         if self.name is None:
             raise ValueError("Name is required")
-
         files_to_be_removed = ('comps_log.log', 'idmtools.log')
         super().pre_creation(platform)
         if self.task:
@@ -113,6 +133,18 @@ class IWorkflowItem(IAssetsEnabled, INamedEntity, IRunnableEntity, ABC):
         self.transient_assets.files = [f for f in self.transient_assets.assets if f.filename.lower() not in files_to_be_removed]
 
     def __check_for_platform(self, platform: 'IPlatform'):  # noqa: F821
+        """
+        Check for platform. If platform is non, we try to load the current platform instead.
+
+        Args:
+            platform: Platform that can be pre-defined.
+
+        Returns:
+            None
+
+        Raises:
+            ValueError - If platform cannot be found
+        """
         from idmtools.core.context import CURRENT_PLATFORM
         if platform is not None:
             self.platform = platform
@@ -122,99 +154,15 @@ class IWorkflowItem(IAssetsEnabled, INamedEntity, IRunnableEntity, ABC):
             self.platform = CURRENT_PLATFORM
 
     def to_dict(self) -> Dict:
+        """
+        Convert IWorkflowItem to a dictionary.
+
+        Returns:
+            Dictionary of WorkflowItem
+        """
         result = dict()
         for f in fields(self):
             if not f.name.startswith("_") and f.name not in ['parent']:
                 result[f.name] = getattr(self, f.name)
         result['_uid'] = self.uid
         return result
-
-    @property
-    def asset_collection_id(self) -> UUID:
-        """
-        Alias for legacy code for assets.id. It will be deprecated in 1.7.0
-
-        Returns:
-            Item common assets
-        """
-        warnings.warn("asset_collection_id will be deprecated in favor of assets in 1.7.0. Set the Assets using AssetCollection.from_id.. going forward", DeprecationWarning)
-        return self.assets.id
-
-    @asset_collection_id.setter
-    def asset_collection_id(self, value: UUID) -> UUID:
-        """
-        Error message to notify user of breaking change they must fix now. By 1.7.0, all code must be migrated over
-        Args:
-            value:
-
-        Returns:
-
-        """
-        raise ValueError("Setting asset collection id no longer possible. To set ID, use workitem.assets = AssetCollection.from_id(...)")
-
-    @property
-    def asset_files(self) -> FileList:
-        """
-        Alias for legacy code for assets. It will be deprecated in 1.7.0
-
-        Returns:
-            Item common assets
-        """
-        warnings.warn("asset_files will be deprecated in favor of assets in 1.7.0", DeprecationWarning)
-        return FileList.from_asset_collection(self.assets)
-
-    @asset_files.setter
-    def asset_files(self, value: FileList):
-        """
-        Alias for legacy code for assets. It will be deprecated in 1.7.0
-
-        Returns:
-            None
-        """
-        warnings.warn("asset_files will be deprecated in favor of assets in 1.7.0", DeprecationWarning)
-        self.assets = value.to_asset_collection()
-
-    @property
-    def item_name(self):
-        """
-        Alias for legacy code for name. It will be deprecated in 1.7.0
-
-        Returns:
-            name of item
-        """
-        warnings.warn("Item name will be deprecated in favor of name in 1.7.0", DeprecationWarning)
-        return self. name
-
-    @item_name.setter
-    def item_name(self, value: str):
-        """
-        Alias for legacy code for name. It will be deprecated in 1.7.0
-
-        Returns:
-            None
-        """
-        warnings.warn("Item name will be deprecated in favor of name in 1.7.0", DeprecationWarning)
-
-        self.name = value
-
-    @property
-    def user_files(self) -> FileList:
-        """
-        Alias for legacy code for transient assets. It will be deprecated in 1.7.0
-
-        Returns:
-            File List of transient assets
-        """
-        warnings.warn("user_files will be deprecated in favor of transient_assets in 1.7.0", DeprecationWarning)
-        return FileList.from_asset_collection(self.transient_assets)
-
-    @user_files.setter
-    def user_files(self, file_list: FileList):
-        """
-        Alias for legacy code for transient assets. It will be deprecated in 1.7.0
-        Set transient assets
-
-        Returns:
-            None
-        """
-        self.transient_assets = file_list.to_asset_collection()

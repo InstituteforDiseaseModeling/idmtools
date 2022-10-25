@@ -1,3 +1,7 @@
+"""idmtools local platform experiment operations.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import functools
 import logging
 import os
@@ -29,12 +33,15 @@ logger = getLogger(__name__)
 
 @dataclass
 class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
+    """
+    Provide Experiment operation for the LocalPlatform.
+    """
     platform: 'LocalPlatform'  # noqa F821
     platform_type: type = ExperimentDict
 
     def get(self, experiment_id: UUID, **kwargs) -> ExperimentDict:
         """
-        Get the experiment object by id
+        Get the experiment object by id.
 
         Args:
             experiment_id: Id
@@ -97,7 +104,7 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
 
     def get_children(self, experiment: Dict, **kwargs) -> List[SimulationDict]:
         """
-        Get children for an experiment
+        Get children for an experiment.
 
         Args:
             experiment: Experiment to get chidren for
@@ -112,26 +119,26 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
 
     def get_parent(self, experiment: Any, **kwargs) -> None:
         """
-        Experiment on local platform have no parents so return None
+        Experiment on local platform have no parents so return None.
 
         Args:
             experiment:
             **kwargs:
 
         Returns:
-
+            None
         """
         return None
 
     def platform_run_item(self, experiment: Experiment, **kwargs):
         """
-        Run the experiment
+        Run the experiment.
 
         Args:
             experiment: experiment to run
 
         Returns:
-
+            None
         """
         if IdmConfigParser.is_progress_bar_disabled():
             prog_items = experiment.simulations
@@ -151,13 +158,13 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
     def send_assets(self, experiment: Experiment, **kwargs):
         """
 
-        Sends assets for specified experiment
+        Sends assets for specified experiment.
 
         Args:
             experiment: Experiment to send assets for
 
         Returns:
-
+            None
         """
         # Go through all the assets
         path = "/".join(["/data", experiment.uid, "Assets"])
@@ -167,13 +174,13 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
 
     def refresh_status(self, experiment: Experiment, **kwargs):
         """
-        Refresh status of experiment
+        Refresh status of experiment.
 
         Args:
             experiment: Experiment to refresh status for
 
         Returns:
-
+            None
         """
         status = SimulationsClient.get_all(experiment_id=experiment.uid, per_page=9999)
         for s in experiment.simulations:
@@ -187,7 +194,7 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
     @staticmethod
     def from_experiment(experiment: Experiment) -> Dict:
         """
-        Create a experiment dictionary from Experiment object
+        Create a experiment dictionary from Experiment object.
 
         Args:
             experiment: Experiment object
@@ -200,7 +207,7 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
 
     def to_entity(self, experiment: Dict, children: bool = True, **kwargs) -> Experiment:
         """
-        Convert an ExperimentDict to an Experiment
+        Convert an ExperimentDict to an Experiment.
 
         Args:
             experiment: Experiment to convert
@@ -222,14 +229,14 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
 
     def _run_docker_sim(self, experiment_uid: UUID, simulation_uid: UUID, task: DockerTask):
         """
-        Run a docker based simulation
+        Run a docker based simulation.
 
         Args:
             experiment_uid: Experiment to run
             simulation_uid: Simulation to run
 
         Returns:
-
+            None
         """
         from idmtools_platform_local.internals.tasks.docker_run import DockerRunTask, GPURunTask
         logger.debug(f"Preparing Docker Task Configuration for {experiment_uid}:{simulation_uid}")
@@ -245,13 +252,16 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
 
     def _launch_item_in_browser(self, item):
         """
-        Launch experiment data page in a web browser
+        Launch experiment data page in a web browser.
 
         Args:
             item:
 
         Returns:
+            None
 
+        Raises:
+            NotImplementedError - if the launch item is not an experiment or simulation
         """
         if isinstance(item, Experiment):
             t_str = item.uid
@@ -298,7 +308,8 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
     @staticmethod
     def __get_experiment_path(platform: 'LocalPlatform', experiment: Experiment) -> str:
         """
-        Returns path to experiment on disk
+        Returns path to experiment on disk.
+
         Args:
             platform: Platform with config
             experiment: Experiment
@@ -310,13 +321,13 @@ class LocalPlatformExperimentOperations(IPlatformExperimentOperations):
 
     def list_assets(self, experiment: Experiment, **kwargs) -> List[Asset]:
         """
-        List assets for a sim
+        List assets for a sim.
 
         Args:
             experiment: Experiment object
 
         Returns:
-
+            List of assets.
         """
         assets = []
         experiment_path = self.__get_experiment_path(self.platform, experiment)

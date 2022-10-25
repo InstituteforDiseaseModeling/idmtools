@@ -12,6 +12,8 @@ from idmtools_platform_comps.ssmt_work_items.comps_workitems import InputDataWor
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 # Set up the paths
+from idmtools_test.utils.utils import get_case_name
+
 current_dir = os.path.dirname(os.path.realpath(__file__))
 output_path = os.path.join(current_dir, 'output')
 intermediate_dir = os.path.join(current_dir, 'inputs')
@@ -22,9 +24,9 @@ intermediate_dir = os.path.join(current_dir, 'inputs')
 class InputDataWorkItemTests(ITestWithPersistence):
 
     def setUp(self):
-        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
+        self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
         self.tags = {'idmtools': self._testMethodName, 'WorkItem type': 'InputData'}
-        self.p = Platform('COMPS2')
+        self.p = Platform('Bayesian')
 
     # ------------------------------------------
     # test generate inputdata climate files with comps work item
@@ -65,8 +67,7 @@ class InputDataWorkItemTests(ITestWithPersistence):
 
         inputdata_wi = InputDataWorkItem(name=self.case_name, tags=self.tags)
         inputdata_wi.load_work_order(work_order_path)
-        self.p.run_items(inputdata_wi)
-        self.p.wait_till_done(inputdata_wi)
+        inputdata_wi.run(wait_until_done=True)
         self.assertIsNotNone(inputdata_wi)
 
     def getEntityIds(self, demo):
@@ -82,13 +83,13 @@ class InputDataWorkItemTests(ITestWithPersistence):
     # ------------------------------------------
     @pytest.mark.comps
     @pytest.mark.long
+    @pytest.mark.skip("run way long, we can skip this test in github action")
     def test_generate_inputdata_climate_files_from_wo(self):
         work_order_path = os.path.join(intermediate_dir, 'wo.json')
 
         inputdata_wi = InputDataWorkItem(name=self.case_name)
         inputdata_wi.load_work_order(work_order_path)
-        self.p.run_items(inputdata_wi)
-        self.p.wait_till_done(inputdata_wi)
+        inputdata_wi.run(wait_until_done=True)
 
         self.assertIsNotNone(inputdata_wi)
 

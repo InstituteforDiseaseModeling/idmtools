@@ -1,3 +1,4 @@
+"""Entrypoint for idmtools cli."""
 import os
 from typing import NoReturn
 from colorama import init as color_init
@@ -5,8 +6,9 @@ from colorama import init as color_init
 
 def main() -> NoReturn:
     """
-    This is our main run function for the CLI. It basically calls start(load cli including the plugins) and then
-    run the cli
+    This is our main run function for the CLI.
+
+    It basically calls start(load cli including the plugins) and then run the cli.
 
     Returns:
         None
@@ -19,7 +21,7 @@ def main() -> NoReturn:
 
 def start() -> NoReturn:
     """
-    Loads the different components of the CLI
+    Loads the different components of the CLI.
 
     Currently this involves
 

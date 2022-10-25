@@ -1,3 +1,8 @@
+"""
+IPlatformWorkflowItemOperations defines workflow item operations interface.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from logging import DEBUG
@@ -17,13 +22,16 @@ logger = getLogger(__name__)
 
 @dataclass
 class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
+    """
+    IPlatformWorkflowItemOperations defines workflow item operations interface.
+    """
     platform: 'IPlatform'  # noqa: F821
     platform_type: Type
 
     @abstractmethod
     def get(self, workflow_item_id: UUID, **kwargs) -> Any:
         """
-        Returns the platform representation of an WorkflowItem
+        Returns the platform representation of an WorkflowItem.
 
         Args:
             workflow_item_id: Item id of WorkflowItems
@@ -36,7 +44,7 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
 
     def batch_create(self, workflow_items: List[IWorkflowItem], display_progress: bool = True, **kwargs) -> List[Any]:
         """
-        Provides a method to batch create workflow items
+        Provides a method to batch create workflow items.
 
         Args:
             workflow_items: List of worfklow items to create
@@ -44,14 +52,14 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
             **kwargs:
 
         Returns:
-            List of tuples containing the create object and id of item that was created
+            List of tuples containing the create object and id of item that was created.
         """
         return batch_create_items(workflow_items, create_func=self.create, display_progress=display_progress,
                                   progress_description="Creating WorkItems", unit="workitem", **kwargs)
 
     def pre_create(self, workflow_item: IWorkflowItem, **kwargs) -> NoReturn:
         """
-        Run the platform/workflow item post creation events
+        Run the platform/workflow item post creation events.
 
         Args:
             workflow_item: IWorkflowItem to run post-creation events
@@ -69,7 +77,7 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
 
     def post_create(self, workflow_item: IWorkflowItem, **kwargs) -> NoReturn:
         """
-        Run the platform/workflow item post creation events
+        Run the platform/workflow item post creation events.
 
         Args:
             workflow_item: IWorkflowItem to run post-creation events
@@ -84,8 +92,9 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
 
     def create(self, workflow_item: IWorkflowItem, do_pre: bool = True, do_post: bool = True, **kwargs) -> Any:
         """
-        Creates an workflow item from an IDMTools IWorkflowItem object. Also performs pre-creation and post-creation
-        locally and on platform
+        Creates an workflow item from an IDMTools IWorkflowItem object.
+
+        Also performs pre-creation and post-creation locally and on platform.
 
         Args:
             workflow_item: Suite to create
@@ -96,7 +105,6 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
         Returns:
             Created platform item and the UUID of said item
         """
-
         if workflow_item.status is not None:
             return workflow_item._platform_object, workflow_item.uid
         if do_pre:
@@ -116,7 +124,7 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
     @abstractmethod
     def platform_create(self, workflow_item: IWorkflowItem, **kwargs) -> Tuple[Any, UUID]:
         """
-        Creates an workflow_item from an IDMTools workflow_item object
+        Creates an workflow_item from an IDMTools workflow_item object.
 
         Args:
             workflow_item: WorkflowItem to create
@@ -129,14 +137,15 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
 
     def pre_run_item(self, workflow_item: IWorkflowItem, **kwargs):
         """
-        Trigger right before commissioning experiment on platform. This ensures that the item is created. It also
-            ensures that the children(simulations) have also been created
+        Trigger right before commissioning experiment on platform.
+
+        This ensures that the item is created. It also ensures that the children(simulations) have also been created.
 
         Args:
             workflow_item: Experiment to commission
 
         Returns:
-
+            None
         """
         # ensure the item is created before running
         # TODO what status are valid here? Create only?
@@ -153,19 +162,19 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
             workflow_item: Experiment just commissioned
 
         Returns:
-
+            None
         """
         pass
 
     def run_item(self, workflow_item: IWorkflowItem, **kwargs):
         """
-        Called during commissioning of an item. This should create the remote resource
+        Called during commissioning of an item. This should create the remote resource.
 
         Args:
             workflow_item:
 
         Returns:
-
+            None
         """
         if logger.isEnabledFor(DEBUG):
             logger.debug("Calling pre_run_item")
@@ -180,26 +189,27 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
     @abstractmethod
     def platform_run_item(self, workflow_item: IWorkflowItem, **kwargs):
         """
-        Called during commissioning of an item. This should perform what is needed to commission job on platform
+        Called during commissioning of an item. This should perform what is needed to commission job on platform.
 
         Args:
             workflow_item:
 
         Returns:
-
+            None
         """
         pass
 
     @abstractmethod
     def get_parent(self, workflow_item: Any, **kwargs) -> Any:
         """
-        Returns the parent of item. If the platform doesn't support parents, you should throw a TopLevelItem error
+        Returns the parent of item. If the platform doesn't support parents, you should throw a TopLevelItem error.
 
         Args:
-            workflow_item:
+            workflow_item: Workflow item to get parent of
             **kwargs:
 
         Returns:
+            Parent of Worktflow item
 
         Raise:
             TopLevelItem
@@ -209,7 +219,7 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
     @abstractmethod
     def get_children(self, workflow_item: Any, **kwargs) -> List[Any]:
         """
-        Returns the children of an workflow_item object
+        Returns the children of an workflow_item object.
 
         Args:
             workflow_item: WorkflowItem object
@@ -222,7 +232,7 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
 
     def to_entity(self, workflow_item: Any, **kwargs) -> IWorkflowItem:
         """
-        Converts the platform representation of workflow_item to idmtools representation
+        Converts the platform representation of workflow_item to idmtools representation.
 
         Args:
             workflow_item:Platform workflow_item object
@@ -235,7 +245,8 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
     @abstractmethod
     def refresh_status(self, workflow_item: IWorkflowItem, **kwargs):
         """
-        Refresh status for workflow item
+        Refresh status for workflow item.
+
         Args:
             workflow_item: Item to refresh status for
 
@@ -247,20 +258,21 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
     @abstractmethod
     def send_assets(self, workflow_item: Any, **kwargs):
         """
-        Send assets for workflow item to platform
+        Send assets for workflow item to platform.
 
         Args:
             workflow_item: Item to send assets for
 
         Returns:
-
+            None
         """
         pass
 
     @abstractmethod
     def get_assets(self, workflow_item: IWorkflowItem, files: List[str], **kwargs) -> Dict[str, bytearray]:
         """
-        Load assets for workflow item
+        Load assets for workflow item.
+
         Args:
             workflow_item: Item
             files: List of files to load
@@ -274,7 +286,7 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
     @abstractmethod
     def list_assets(self, workflow_item: IWorkflowItem, **kwargs) -> List[Asset]:
         """
-        List available assets for a workflow item
+        List available assets for a workflow item.
 
         Args:
             workflow_item: workflow item to list files for

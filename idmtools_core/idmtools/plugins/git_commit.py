@@ -1,3 +1,6 @@
+"""
+Git plugin to add git repo details to items.
+"""
 import functools
 import os
 from contextlib import suppress
@@ -17,6 +20,35 @@ user_logger = getLogger('user')
 
 @function_hook_impl
 def idmtools_platform_pre_create_item(item: 'IEntity', kwargs):
+    """
+    Adds git information from local repo as tags to items on creation.
+
+    There following options are valid kwargs and configuration options:
+    * add_git_tags_to_all - Add git tags to everything
+    * add_to_experiments - Add git tags to experiments
+    * add_git_tags_to_simulations - Add git tags to simulations
+    * add_git_tags_to_workitems - Add git tags to workitems
+    * add_git_tags_to_suite - Add git tags to suites
+    * add_git_tags_to_asset_collection - Add git tags to asset collections
+
+    Every option expects a truthy value, meaning "True, False, t, f, 1, 0, yes, or no. Any positive value, True, yes, 1, t, y will enable the option.
+
+    When defined in the idmtools.ini, these should be added under the "git_tag" section without the "git_tags" portion. For example
+
+    [git_tag]
+    add_to_experiments = y
+
+    Also, you can do this through environment variables using IDMTOOLS_GIT_TAG_<option>. For example, experiments would be
+
+    IDMTOOLS_GIT_TAG_ADD_TO_EXPERIMENTS
+
+    Args:
+        item: Item to add tags two
+        kwargs: Optional kwargs
+
+    Returns:
+        None
+    """
     from idmtools.entities.experiment import Experiment
     from idmtools.entities.simulation import Simulation
     from idmtools.entities.iworkflow_item import IWorkflowItem
@@ -42,6 +74,12 @@ def idmtools_platform_pre_create_item(item: 'IEntity', kwargs):
 
 @functools.lru_cache(1)
 def add_details_using_gitpython():
+    """
+    Support gitpython if installed.
+
+    Returns:
+        Git tags
+    """
     result = dict()
     with suppress(ImportError):
         import git
@@ -58,6 +96,12 @@ def add_details_using_gitpython():
 
 @functools.lru_cache(1)
 def add_details_using_pygit() -> Dict[str, str]:
+    """
+    Support pygit if installed.
+
+    Returns:
+        Git tags
+    """
     result = dict()
     with suppress(ImportError):
         import pygit2

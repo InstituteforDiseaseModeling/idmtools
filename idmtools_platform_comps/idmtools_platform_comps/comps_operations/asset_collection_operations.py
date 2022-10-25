@@ -1,3 +1,7 @@
+"""idmtools comps asset collections operations.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import os
 import uuid
 from dataclasses import field, dataclass
@@ -22,12 +26,15 @@ user_logger = getLogger("user")
 
 @dataclass
 class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations):
+    """
+    Provides AssetCollection Operations to COMPSPlatform.
+    """
     platform: 'COMPSPlatform'  # noqa F821
     platform_type: Type = field(default=COMPSAssetCollection)
 
     def get(self, asset_collection_id: Optional[UUID], load_children: Optional[List[str]] = None, query_criteria: Optional[QueryCriteria] = None, **kwargs) -> COMPSAssetCollection:
         """
-        Get an asset collection by id
+        Get an asset collection by id.
 
         Args:
             asset_collection_id: Id of asset collection
@@ -47,7 +54,7 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
 
     def platform_create(self, asset_collection: AssetCollection, **kwargs) -> COMPSAssetCollection:
         """
-        Create AssetCollection
+        Create AssetCollection.
 
         Args:
             asset_collection: AssetCollection to create
@@ -153,7 +160,7 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
     def to_entity(self, asset_collection: Union[COMPSAssetCollection, SimulationFile, List[SimulationFile], OutputFileMetadata, List[WorkItemFile]], **kwargs) \
             -> AssetCollection:
         """
-        Convert COMPS Asset Collection or Simulation File to IDM Asset Collection
+        Convert COMPS Asset Collection or Simulation File to IDM Asset Collection.
 
         Args:
             asset_collection: Comps asset/asset collection to convert to idm asset collection
@@ -161,8 +168,13 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
 
         Returns:
             AssetCollection
+
+        Raises:
+            ValueError - If the file is not a SimulationFile or WorkItemFile
         """
         ac = AssetCollection()
+        # set the platform/original object
+        ac.platform = self.platform
         # we support comps simulations files and experiments as asset collections
         # only true asset collections have ids
         if isinstance(asset_collection, COMPSAssetCollection):
@@ -185,6 +197,7 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
                     a = Asset(filename=asset.friendly_name, relative_path=asset.path_from_root, persisted=True)
                 else:
                     a = Asset(filename=asset.file_name, checksum=asset.md5_checksum)
+                    a._platform_object = asset
                 if isinstance(asset_collection, COMPSAssetCollection):
                     a.relative_path = asset.relative_path
                 a.persisted = True
@@ -197,14 +210,17 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
 
     def __simulation_file_to_asset(self, asset_collection: Union[SimulationFile, WorkItemFile]):
         """
-        Converts a Simulation File to an Asset
+        Converts a Simulation File to an Asset.
+
         Args:
             asset_collection:
 
         Returns:
-
+            Asset created from sim file.
         """
         asset = Asset(filename=asset_collection.file_name, checksum=asset_collection.md5_checksum)
+        # set original object for quick access again later
+        asset._platform_object = asset_collection
         asset.is_simulation_file = True
         asset.persisted = True
         asset.length = asset_collection.length

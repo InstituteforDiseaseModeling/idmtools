@@ -5,7 +5,7 @@ PDS=$(PY) ../../dev_scripts/
 PDR=$(PDS)run.py
 
 help:
-	$(PDS)get_help_from_makefile.py
+	help-from-makefile -f ./Makefile
 
 clean-all: clean ## Deleting package info hides plugins so we only want to do that for packaging
 	$(CLDIR) --dir-patterns "**/*.egg-info/"

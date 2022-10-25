@@ -1,3 +1,9 @@
+"""idmtools workers container.
+
+The workers container has our UI, API, and queue workers.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import os
 import platform
 import time
@@ -16,8 +22,13 @@ logger = getLogger(__name__)
 
 
 def get_worker_image_default():
-    # determine default docker to use
-    # we first check if it is nightly. Nightly will ALWAYS use staging
+    """
+    Get our default worker image.
+
+    We first check if it is nightly. Nightly will ALWAYS use staging.
+
+    If we are not using nightly, we then us production using the current version.
+    """
     if "nightly" in __version__:
         docker_repo = 'idm-docker-staging.packages.idmod.org'
     # otherwise we let the user have come control by default to docker-public
@@ -33,6 +44,7 @@ def get_worker_image_default():
 
 @dataclass
 class WorkersContainer(BaseServiceContainer):
+    """Proves the Workers container definition."""
     host_data_directory: str = None
     postgres_port: int = 5432
     redis_port: int = 6379
@@ -51,11 +63,13 @@ class WorkersContainer(BaseServiceContainer):
     enable_singularity_support: bool = False
 
     def __post_init__(self):
+        """Constructor."""
         system_info = get_system_information()
         if self.run_as is None:
             self.run_as = system_info.user_group_str
 
     def get_configuration(self) -> Dict:
+        """Get our configuration."""
         logger.debug('Creating working container')
         if not self.data_volume_name:
             data_dir = os.path.join(self.host_data_directory, 'workers')
@@ -104,6 +118,12 @@ class WorkersContainer(BaseServiceContainer):
         return container_config
 
     def create(self, spinner=None) -> Container:
+        """
+        Create our workers container.
+
+        Raises:
+            EnvironmentError - If the local platform isn't in ready state.
+        """
         try:
             image = self.client.images.get(self.image)
             logger.info(f'Found {self.image} with id {image.id}')

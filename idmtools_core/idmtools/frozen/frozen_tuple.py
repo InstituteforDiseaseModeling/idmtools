@@ -1,3 +1,8 @@
+"""
+Frozen_tuple provided utilities for a read-only tuple.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 from idmtools.frozen.ifrozen import IFrozen
 
 
@@ -7,7 +12,7 @@ class ImTuple(tuple, IFrozen):
     """
 
     def __add__(self, *args, **kwargs):  # real signature unknown
-        """ Return self+value. """
+        """Return self+value."""
         if self._frozen:
             raise Exception('Frozen')
         super().__add__(*args, **kwargs)

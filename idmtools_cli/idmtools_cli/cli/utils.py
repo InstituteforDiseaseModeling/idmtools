@@ -1,3 +1,4 @@
+"""Defines utilities used with the cli commands."""
 import sys
 from typing import NoReturn, Union
 import requests
@@ -16,7 +17,7 @@ tags_help = "Tag to filter by. This should be in the form name value. For exampl
 
 def show_error(message: Union[str, requests.Response]) -> NoReturn:
     """
-    Display an error response from API on the command line
+    Display an error response from API on the command line.
 
     Args:
         message (Union[str, requests.Response]): message to display
@@ -29,6 +30,16 @@ def show_error(message: Union[str, requests.Response]) -> NoReturn:
 
 
 def get_platform_from_config_or_name(config_block, platform):
+    """
+    Attempt to find the config block or crete platform obj from name.
+
+    Args:
+        config_block: Config block
+        platform: Platform type
+
+    Returns:
+        Platform object
+    """
     if platform is None and config_block is None:
         raise UsageError("You must specify a platform or a configuration block")
     if config_block:

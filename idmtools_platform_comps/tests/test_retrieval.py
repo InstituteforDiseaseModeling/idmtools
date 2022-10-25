@@ -29,7 +29,7 @@ class TestRetrieval(ITestWithPersistence):
         cls.case_name = os.path.basename(__file__) + "--" + cls.__name__
         print(cls.case_name)
 
-        cls.platform = Platform('COMPS2')
+        cls.platform = Platform('SlurmStage')
         print(cls.platform.uid)
         bt = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"),
                                       parameters=dict(c="c-value"))

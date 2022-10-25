@@ -1,3 +1,8 @@
+"""
+CacheEnabled definition. CacheEnabled enables diskcache wrapping on an item.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import os
 import shutil
 import tempfile
@@ -26,11 +31,17 @@ class CacheEnabled:
     _cache_directory: str = field(default=None, init=False, compare=False)
 
     def __del__(self):
+        """
+        Deletes object. On Deletion, we destroy the cache.
+
+        Returns:
+            None
+        """
         self.cleanup_cache()
 
     def initialize_cache(self, shards: Optional[int] = None, eviction_policy=None):
         """
-        Initialize cache
+        Initialize cache.
 
         Args:
             shards (Optional[int], optional): How many shards. It is best to set this when multi-procressing Defaults to None.
@@ -61,6 +72,12 @@ class CacheEnabled:
             self._cache = Cache(self._cache_directory)
 
     def cleanup_cache(self):
+        """
+        Cleanup our cache.
+
+        Returns:
+            None
+        """
         # Only delete and close the cache if the owner thread ends
         # Avoid deleting and closing when a child thread ends
         with suppress(AttributeError):
@@ -85,6 +102,12 @@ class CacheEnabled:
 
     @property
     def cache(self) -> Union[Cache, FanoutCache]:
+        """
+        Allows fetches of cache and ensures it is initialized.
+
+        Returns:
+            Cache
+        """
         if self._cache is None:
             self.initialize_cache()
 

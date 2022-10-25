@@ -1,3 +1,7 @@
+"""idmtools local platform experiment API Client.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import logging
 from typing import Optional, Tuple, List, Dict, Any
 from idmtools_platform_local.client.base import BaseClient
@@ -6,13 +10,14 @@ logger = logging.getLogger(__name__)
 
 
 class ExperimentsClient(BaseClient):
+    """Provides API client for Experiments."""
     path_url = 'experiments'
 
     @classmethod
     def get_all(cls, tags: Optional[List[Tuple[str, str]]] = None,
                 page: Optional[int] = None, per_page: Optional[int] = None) -> List[Dict[str, Any]]:
         """
-        Get all experiments with options to filter by tags
+        Get all experiments with options to filter by tags.
 
         Args:
             per_page: How many experiments to return per page
@@ -37,7 +42,7 @@ class ExperimentsClient(BaseClient):
     @classmethod
     def get_one(cls, id: str, tags: Optional[List[Tuple[str, str]]] = None) -> Dict[str, Any]:
         """
-        Convenience method to get one experiment
+        Convenience method to get one experiment.
 
         Args:
             id (str):  ID of the experiment
@@ -54,7 +59,7 @@ class ExperimentsClient(BaseClient):
     @classmethod
     def delete(cls, id: str, delete_data: bool = False, ignore_doesnt_exist: bool = True) -> bool:
         """
-        Delete an experiment. Optionally you can delete the experiment data. WARNING: Deleting the data is irreversible
+        Delete an experiment. Optionally you can delete the experiment data. WARNING: Deleting the data is irreversible.
 
         Args:
             id (str): ID of the experiments

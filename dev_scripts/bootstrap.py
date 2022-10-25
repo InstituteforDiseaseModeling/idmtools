@@ -1,4 +1,17 @@
 #!/usr/bin/env python
+"""This scripts aids in setup of development environments.
+
+The script installs all the local packages
+defined by packages using development installs.
+
+It is best used
+1) After the creation of a new virtualenv
+2) Installing new packages into an existing environment
+3) Updating existing environments
+
+ To use simply run
+ python bootstrap.py
+"""
 import argparse
 import shutil
 import logging
@@ -10,20 +23,11 @@ from logging import getLogger
 from os.path import abspath, join, dirname
 from typing import List, Generator
 
+
 # on windows virtual env is not populated through pymake
 if sys.platform == "win32" and 'VIRTUAL_ENV' in os.environ:
     sys.path.insert(0, os.environ['VIRTUAL_ENV'] + "\\Lib\\site-packages")
 
-# This scripts aids in setup of development environments by installing all the local packages
-# defined by packages using development installs.
-#
-# It is best used
-# 1) After the creation of a new virtualenv
-# 2) Installing new packages into an existing environment
-# 3) Updating existing environments
-#
-# To use simply run
-# python bootstrap.py
 
 script_dir = abspath(dirname(__file__))
 base_directory = abspath(join(dirname(__file__), '..'))
@@ -43,14 +47,14 @@ packages = dict(
     idmtools_platform_file=data_class_default,
     idmtools_models=data_class_default,
     idmtools_platform_slurm=data_class_default,
+    idmtools_slurm_utils=[],
     idmtools_test=[]
 )
 logger = getLogger("bootstrap")
 
 
 def execute(cmd: List['str'], cwd: str = base_directory, ignore_error: bool = False) -> Generator[str, None, None]:
-    """
-    Runs a command and filters output
+    """Runs a command and filters output.
 
     Args:
         cmd: Command to run
@@ -73,8 +77,9 @@ def execute(cmd: List['str'], cwd: str = base_directory, ignore_error: bool = Fa
 
 
 def process_output(output_line: str):
-    """
-    Process output
+    """Process output line for display.
+
+    This function adds coloring, filters output, and strips non-ascii characters(Docker builds have some odd characters)
 
     Args:
         output_line: Output line
@@ -95,30 +100,49 @@ def process_output(output_line: str):
 
 
 def install_dev_packages(pip_url):
+    """Install the development packages.
+
+    This loops through all our idmtools packages and runs pip install -e . on each package
+    It also runs a pip install -r requirements from the  docs directory.
+
+    Args:
+        pip_url: Url to install package from
+
+    Returns:
+        None
+    """
     # loop through and install our packages
     for package, extras in packages.items():
         extras_str = f"[{','.join(extras)}]" if extras else ''
         logger.info(f'Installing {package} with extras: {extras_str if extras_str else "None"} from {base_directory}')
         try:
-            for line in execute(["pip", "install", "-e", f".{extras_str}", f"--extra-index-url={pip_url}"], cwd=join(base_directory, package)):
+            for line in execute(["pip3", "install", "-e", f".{extras_str}", f"--extra-index-url={pip_url}"], cwd=join(base_directory, package)):
                 process_output(line)
         except subprocess.CalledProcessError as e:
             logger.critical(f'{package} installed failed using {e.cmd} did not succeed')
             result = e.returncode
             logger.debug(f'Return Code: {result}')
-    for line in execute(["pip", "install", "-r", "requirements.txt", f"--extra-index-url={pip_url}"], cwd=join(base_directory, 'docs')):
+    for line in execute(["pip3", "install", "-r", "requirements.txt", f"--extra-index-url={pip_url}"], cwd=join(base_directory, 'docs')):
         process_output(line)
 
 
 def install_base_environment(pip_url):
+    """Installs the base packages needed for development environments.
+
+    We install wheel first(so we can utilize it in later installs).
+    We then uninstall py-make
+    We then install idm-buildtools
+
+    Lastly, we create an idmtools ini in example for developers
+    """
     # install wheel first to benefit from binaries
-    for line in execute(["pip", "install", "wheel", f"--extra-index-url={pip_url}"]):
+    for line in execute(["pip3", "install", "wheel", f"--extra-index-url={pip_url}"]):
         process_output(line)
 
-    for line in execute(["pip", "uninstall", "-y", "py-make"], ignore_error=True):
+    for line in execute(["pip3", "uninstall", "-y", "py-make"], ignore_error=True):
         process_output(line)
 
-    for line in execute(["pip", "install", "idm-buildtools~=1.0.1", f"--index-url={pip_url}"]):
+    for line in execute(["pip3", "install", "idm-buildtools~=1.0.1", f"--index-url={pip_url}"]):
         process_output(line)
 
     dev_idmtools_ini = join(base_directory, "examples", "idmtools.ini")

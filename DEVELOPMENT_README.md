@@ -135,25 +135,38 @@ The directories that should be added as source roots are
     ```
 2. Restart
 3.
-   a. If you do a Linux Distro installed already through WSL run the following command in a powershell windows
+a. If you do a Linux Distro installed already through WSL run the following command in a powershell windows
        ```powershell
-       wsl --set-version <Distro> 2
+wsl --set-version <Distro> 2
        ```
        You most likely want to run the following command as well to ensure wsl2 is default going forward
        ```powershell
-       wsl --set-default-version 2
-       ```
-   b. If you do not yet have a copy of linux installed through WSL, see https://docs.microsoft.com/en-us/windows/wsl/install-win10#install-your-linux-distribution-of-choice
-
+wsl --set-default-version 2
+```
+b. If you do not yet have a copy of linux installed through WSL,
+see https://docs.microsoft.com/en-us/windows/wsl/install-win10#install-your-linux-distribution-of-choice
 
 ## Troubleshooting the Development Environment
 
-1. Docker Auth issues.
-   Idmtools currently does not prompt users for docker credentials. Because of this you must login
+1. Docker Auth issues
+
+   Idmtools currently does not prompt users for docker credentials. Because of this, user must login
    beforehand using `docker login docker-staging.packages.idmod.org`
-2. Docker image not found
-   Rerun the `pymake setup-dev` or `make setup-dev` on unix systems
-  
+2. Docker image not found issue
+
+   Rerun `pymake setup-dev` or `make setup-dev` command on unix systems
+3. Dev install get stuck with cmd: `pymake setup-dev` or `python dev_scripts\bootstrap.py`
+
+   Sometimes dev install command can get stuck on some packages. This most likely due to users company credential
+   changed
+   (login username/password). This should only happen on first time after changed credentials. To overcome it, try to
+   install issued package in the folder first, for example, to install idmtools_platform_comps package directly, run:
+   `cd idmtools_platform_comps`
+   `pip install -e .`
+   It may prompt to enter User (i.e: User for packages.idmod.org:), hit 'Enter' key. This should release installing the
+   dependency packages from production artifactory or public pypi server. Once successfully installed once, user should
+   not need to do this step anymore.
+
 # Documentation
 
 The following section documents how to build and edit the documentation.
@@ -161,7 +174,8 @@ The following section documents how to build and edit the documentation.
 ## Editing the Documentation
 
 The documentation is built using Sphinx from the rst files in the `docs` folder. The documentation is a series of linked
-documents and generated documents from the python code. `index.rst` is the entry point into the documentation. For details
+documents and generated documents from the python code. `index.rst` is the entry point into the documentation. For
+details
 on the formatting of documentation, see the [Sphinx](https://www.sphinx-doc.org/en/stable/) docs
 
 There are two make jobs related to documentation

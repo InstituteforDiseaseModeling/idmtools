@@ -1,6 +1,9 @@
 #!/usr/bin/env python
+"""Serves and watches the docs/_build/html folder.
 
-# This script should be executed from the root directory of the repo
+Any change to any python file will re-trigger html build automatically while this is running
+This script should be executed from the root directory of the repo.
+"""
 import glob
 import webbrowser
 import argparse

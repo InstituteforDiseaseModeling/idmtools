@@ -1,3 +1,7 @@
+"""idmtools local platform statuses.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import enum
 
 
@@ -6,7 +10,7 @@ import enum
 
 class Status(enum.Enum):
     """
-    Our status enum for jobs
+    Our status enum for jobs.
     """
     created = 'created'
     in_progress = 'in_progress'
@@ -15,4 +19,5 @@ class Status(enum.Enum):
     done = 'done'
 
     def __str__(self):
+        """Represent as string using the value."""
         return str(self.value)

@@ -11,6 +11,7 @@ from idmtools.entities.experiment import Experiment
 from idmtools_models.templated_script_task import TemplatedScriptTask, \
     get_script_wrapper_windows_task, ScriptWrapperTask, get_script_wrapper_unix_task, LINUX_PYTHON_PATH_WRAPPER, WINDOWS_PYTHON_PATH_WRAPPER
 from idmtools_test.utils.decorators import windows_only, linux_only
+from idmtools_test.utils.utils import get_case_name
 
 
 @pytest.mark.tasks
@@ -20,7 +21,7 @@ from idmtools_test.utils.decorators import windows_only, linux_only
 class TestTemplatedScriptTask(TestCase):
 
     def setUp(self) -> None:
-        self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
+        self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
         print(self.case_name)
 
     @staticmethod

@@ -20,15 +20,18 @@ import configparser
 import os
 import subprocess
 import sys
-from datetime import datetime
-
 import sphinx_rtd_theme
+from datetime import datetime
 
 if sys.platform in ["linux", "darwin"]:
     subprocess.check_output(["make", "generate-api"], cwd=os.path.dirname(os.path.abspath(__file__)))
 else:
     subprocess.check_output(["make.bat", "generate-api"], cwd=os.path.dirname(os.path.abspath(__file__)))
+
 # -- General configuration ------------------------------------------------
+
+# This is the equivalent of -t in SPHINXOPTS for the RTD build
+tags.add('idmtools')
 
 # If your docs needs a minimal Sphinx version, state it here.
 #
@@ -41,11 +44,15 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.githubpages',
     'sphinx.ext.autodoc',
-    'sphinxcontrib.napoleon',
+    'sphinx.ext.napoleon',
     'sphinx.ext.todo',
     'plantweb.directive',
     'sphinxcontrib.programoutput',
-    'sphinx_copybutton'
+    'sphinx_copybutton',
+    # intersphinx to allow cross-reference
+    'sphinx.ext.intersphinx',
+    # automatic section names so linking between section is easy
+    'sphinx.ext.autosectionlabel'
 ]
 
 plantuml = 'plantweb'
@@ -53,13 +60,16 @@ plantuml = 'plantweb'
 autodoc_default_options = {
     'member-order': 'bysource',
     'members': None,
+    'special-members': '__init__',
     'exclude-members': '__all__'
 }
 
 autodoc_mock_imports = ['pika',
-                        'dramatiq'
-                        ]
+                        'dramatiq']
 
+suppress_warnings = [
+    'autosectionlabel.*',
+]
 
 napoleon_google_docstring = True
 # napoleon_numpy_docstring = True
@@ -82,7 +92,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'idmtools'
-copyright = f'1999 - {datetime.today().year}, Bill & Melinda Gates Foundation. All rights reserved.'
+copyright = f'1999 - {datetime.today().year}, Bill & Melinda Gates Foundation. All rights reserved'
 author = u'Institute for Disease Modeling'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -104,7 +114,7 @@ version = config['bumpversion']['current_version']
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = 'en'
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
@@ -388,4 +398,8 @@ texinfo_documents = [
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
-# intersphinx_mapping = {'https://docs.python.org/': None}
+intersphinx_mapping = {'python': ('https://docs.python.org/3', None),
+                       'emod_api': ('https://docs.idmod.org/projects/emod-api/en/latest/', None),
+                       'emodpy': ('https://docs.idmod.org/projects/emodpy/en/latest/', None),
+                       'pycomps': ('https://docs.idmod.org/projects/pycomps/en/latest/', None)
+                       }

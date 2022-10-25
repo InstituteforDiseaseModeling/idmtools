@@ -1,4 +1,12 @@
+"""
+Here we define the Platform interface.
+
+IPlatform is responsible for all the communication to our platform and translation from idmtools objects to platform specific objects and vice versa.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import os
+import warnings
 from abc import ABCMeta
 from dataclasses import dataclass
 from dataclasses import fields, field
@@ -17,6 +25,7 @@ from idmtools.core.interfaces.iitem import IItem
 from idmtools.core.interfaces.irunnable_entity import IRunnableEntity
 from idmtools.entities.experiment import Experiment
 from idmtools.core.id_file import read_id_file
+from idmtools.entities.iplatform_default import IPlatformDefault
 from idmtools.entities.iplatform_ops.iplatform_asset_collection_operations import IPlatformAssetCollectionOperations
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
@@ -30,15 +39,17 @@ from idmtools.entities.simulation import Simulation
 from idmtools.entities.suite import Suite
 from idmtools.assets.asset_collection import AssetCollection
 from idmtools.services.platforms import PlatformPersistService
+from idmtools.utils.caller import get_caller
 from idmtools.utils.entities import validate_user_inputs_against_dataclass
+
 logger = getLogger(__name__)
 user_logger = getLogger('user')
 
-CALLER_LIST = ['_create_from_block',    # create platform through Platform Factory
-               'fetch',                 # create platform through un-pickle
-               'get',                   # create platform through platform spec' get method
-               '__newobj__',            # create platform through copy.deepcopy
-               '_main']                 # create platform through analyzer manager
+CALLER_LIST = ['_create_from_block',  # create platform through Platform Factory
+               'fetch',  # create platform through un-pickle
+               'get',  # create platform through platform spec' get method
+               '__newobj__',  # create platform through copy.deepcopy
+               '_main']  # create platform through analyzer manager
 
 # Maps an object type to a platform interface object. We use strings to use getattr. This also let's us also reduce
 # all the if else crud
@@ -61,6 +72,7 @@ STANDARD_TYPE_TO_INTERFACE = {
 class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     """
     Interface defining a platform.
+
     A platform needs to implement basic operation such as:
 
     - Creating experiment
@@ -74,6 +86,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
     supported_types: Set[ItemType] = field(default_factory=lambda: set(), repr=False, init=False)
     _platform_supports: List[PlatformRequirements] = field(default_factory=list, repr=False, init=False)
+    _platform_defaults: List[IPlatformDefault] = field(default_factory=list)
 
     _experiments: IPlatformExperimentOperations = field(default=None, repr=False, init=False, compare=False)
     _simulations: IPlatformSimulationOperations = field(default=None, repr=False, init=False, compare=False)
@@ -87,25 +100,6 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     #: Defines the path to common assets
     _common_asset_path: str = field(default="Assets", repr=True, init=False, compare=False)
 
-    @staticmethod
-    def get_caller():
-        """
-        Trace the stack and find the caller.
-
-        Returns:
-            The direct caller.
-        """
-        import inspect
-
-        try:
-            s = inspect.stack()
-        except (IndexError, RuntimeError):
-            # in some high thread environments and under heavy load, we can get environment changes before retrieving
-            # stack in those case assume we are good
-            # We can also encounter IndexError in dynamic environments like Snakemake, jinja, etc
-            return "__newobj__"
-        return s[2][3]
-
     def __new__(cls, *args, **kwargs):
         """
         Create a new object.
@@ -116,16 +110,18 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         Returns:
             The object created.
-        """
 
+        Raises:
+            ValueError - If the platform was not created as expected.
+        """
         # Check the caller
-        caller = cls.get_caller()
+        caller = get_caller()
 
         # Action based on the caller
         if caller not in CALLER_LIST:
-            raise ValueError("Please use Factory to create Platform! For example: \n    platform = Platform('COMPS', **kwargs)")
-        else:
-            return super().__new__(cls)
+            warnings.warn(
+                "Please use Factory to create Platform! For example: \n    platform = Platform('COMPS', **kwargs)")
+        return super().__new__(cls)
 
     def __post_init__(self) -> NoReturn:
         """
@@ -169,8 +165,9 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
     def _get_platform_item(self, item_id: UUID, item_type: ItemType, **kwargs) -> Any:
         """
-        Get an item by its ID. The implementing classes must know how to distinguish
-        items of different levels (e.g. simulation, experiment, suite).
+        Get an item by its ID.
+
+        The implementing classes must know how to distinguish items of different levels (e.g. simulation, experiment, suite).
 
         Args:
             item_id: The ID of the item to retrieve.
@@ -188,9 +185,11 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item_type]
         return getattr(self, interface).get(item_id, **kwargs)
 
-    def get_item(self, item_id: Union[str, UUID], item_type: ItemType = None, force: bool = False, raw: bool = False, **kwargs) -> Union[Experiment, Suite, Simulation, IWorkflowItem, AssetCollection, None]:
+    def get_item(self, item_id: Union[str, UUID], item_type: ItemType = None, force: bool = False, raw: bool = False,
+                 **kwargs) -> Union[Experiment, Suite, Simulation, IWorkflowItem, AssetCollection, None]:
         """
         Retrieve an object from the platform.
+
         This function is cached; force allows you to force the refresh of the cache.
         If no **object_type** is passed, the function will try all the types (experiment, suite, simulation).
 
@@ -205,6 +204,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         Raises:
             ValueError: If the item type is not supported
+            UnknownItemException: If the item type is not found on platform
         """
         if not item_type or item_type not in self.platform_type_map.values():
             raise ValueError("The provided type is invalid or not supported by this platform...")
@@ -247,7 +247,9 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
     def _get_children_for_platform_item(self, item: Any, raw: bool = True, **kwargs) -> List[Any]:
         """
-        Returns the children for a platform object. For example, A Comps Experiment or Simulation
+        Returns the children for a platform object.
+
+        For example, A COMPS Experiment or Simulation.
 
         The children can either be returns as native platform objects or as idmtools objects.
 
@@ -278,8 +280,9 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
     def _get_operation_interface(self, item: Any) -> Tuple[ItemType, str]:
         """
-        Get the base item type and the interface string for said item. For example, on COMPSPlatform, if you passed a
-        COMPSExperiment object, the function would return ItemType.Experiment, _experiments
+        Get the base item type and the interface string for said item.
+
+        For example, on COMPSPlatform, if you passed a COMPSExperiment object, the function would return ItemType.Experiment, _experiments
 
 
         Args:
@@ -330,7 +333,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
     def get_children_by_object(self, parent: IEntity) -> List[IEntity]:
         """
-        Returns a list of children for an entity
+        Returns a list of children for an entity.
 
         Args:
             parent: Parent object
@@ -342,7 +345,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
     def get_parent_by_object(self, child: IEntity) -> IEntity:
         """
-        Parent of object
+        Parent of object.
 
         Args:
             child: Child object to find parent for
@@ -407,6 +410,20 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         return self.cache.get(cache_key)
 
     def get_cache_key(self, force, item_id, item_type, kwargs, raw, prefix='p'):
+        """
+        Get cache key for an item.
+
+        Args:
+            force: Should we force the load
+            item_id: Item id
+            item_type: Item type
+            kwargs: Kwargs
+            raw: Should we use raw storage?
+            prefix: Prefix for the item
+
+        Returns:
+            Cache Key
+        """
         if not item_type or item_type not in self.supported_types:
             raise Exception("The provided type is invalid or not supported by this platform...")
         # Create the cache key based on everything we pass to the function
@@ -417,8 +434,10 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
     def create_items(self, items: Union[List[IEntity], IEntity], **kwargs) -> List[IEntity]:
         """
-        Create items (simulations, experiments, or suites) on the platform. The function will batch the items based on
-        type and call the self._create_batch for creation
+        Create items (simulations, experiments, or suites) on the platform.
+
+        The function will batch the items based on type and call the self._create_batch for creation.
+
         Args:
             items: The list of items to create.
             kwargs: Extra arguments
@@ -437,14 +456,14 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
     def _create_items_of_type(self, items: Iterator[IEntity], item_type: ItemType, **kwargs):
         """
-        Creates items of specific type using batches
+        Creates items of specific type using batches.
 
         Args:
             items: Items to create
             item_type: Item type to create
 
         Returns:
-
+            Items created
         """
         interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item_type]
         ni = getattr(self, interface).batch_create(items, **kwargs)
@@ -452,7 +471,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
     def _is_item_list_supported(self, items: List[IEntity]):
         """
-        Checks if all items in a list are supported by the platform
+        Checks if all items in a list are supported by the platform.
 
         Args:
             items: Items to verify
@@ -470,11 +489,12 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     def run_items(self, items: Union[IEntity, List[IEntity]], **kwargs):
         """
         Run items on the platform.
+
         Args:
-            items:
+            items: Items to run
 
         Returns:
-
+            None
         """
         if isinstance(items, IEntity):
             items = [items]
@@ -486,11 +506,12 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             getattr(self, interface).run_item(item, **kwargs)
 
     def __repr__(self):
+        """Platform as string."""
         return f"<Platform {self.__class__.__name__} - id: {self.uid}>"
 
     def _convert_platform_item_to_entity(self, platform_item: Any, **kwargs) -> IEntity:
         """
-        Convert an Native Platform Object to an idmtools object
+        Convert a Native Platform Object to an idmtools object.
 
         Args:
             platform_item:  Item to convert
@@ -505,14 +526,36 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
                 return getattr(self, interface).to_entity(platform_item, **kwargs)
         return platform_item
 
-    def flatten_item(self, item: IEntity) -> List[IEntity]:
+    def validate_item_for_analysis(self, item: object, analyze_failed_items=False):
+        """
+        Check if item is valid for analysis.
+
+        Args:
+            item: Which item to flatten
+            analyze_failed_items: bool
+
+        Returns: bool
+
+        """
+        result = False
+        if item.succeeded:
+            result = True
+        else:
+            if analyze_failed_items and item.status == EntityStatus.FAILED:
+                result = True
+
+        return result
+
+    def flatten_item(self, item: object, **kwargs) -> List[object]:
         """
         Flatten an item: resolve the children until getting to the leaves.
+
         For example, for an experiment, will return all the simulations.
         For a suite, will return all the simulations contained in the suites experiments.
 
         Args:
             item: Which item to flatten
+            kwargs: extra parameters
 
         Returns:
             List of leaves
@@ -544,13 +587,13 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     def get_files(self, item: IEntity, files: Union[Set[str], List[str]], output: str = None, **kwargs) -> \
             Union[Dict[str, Dict[str, bytearray]], Dict[str, bytearray]]:
         """
-        Get files for a platform entity
+        Get files for a platform entity.
 
         Args:
             item: Item to fetch files for
             files: List of file names to get
             output: save files to
-            **kwargs: Platform arguments
+            kwargs: Platform arguments
 
         Returns:
             For simulations, this returns a dictionary with filename as key and values being binary data from file or a
@@ -583,7 +626,8 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
                         output: str = None) -> \
             Union[Dict[str, Dict[str, bytearray]], Dict[str, bytearray]]:
         """
-        Get files by item id (UUID)
+        Get files by item id (UUID).
+
         Args:
             item_id: COMPS Item, say, Simulation Id or WorkItem Id
             item_type: Item Type
@@ -597,7 +641,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
     def are_requirements_met(self, requirements: Union[PlatformRequirements, Set[PlatformRequirements]]) -> bool:
         """
-        Does the platform support the list of requirements
+        Does the platform support the list of requirements.
 
         Args:
             requirements: Requirements should be a list of PlatformRequirements or a single PlatformRequirements
@@ -611,8 +655,9 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
     def is_task_supported(self, task: ITask) -> bool:
         """
-        Is a task supported on this platform. This depends on the task properly setting its requirements. See
-        :py:attr:`idmtools.entities.itask.ITask.platform_requirements` and
+        Is a task supported on this platform.
+
+        This depends on the task properly setting its requirements. See :py:attr:`idmtools.entities.itask.ITask.platform_requirements` and
         :py:class:`idmtools.entities.platform_requirements.PlatformRequirements`
 
         Args:
@@ -625,12 +670,12 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
     def __wait_till_callback(
             self, item: Union[Experiment, IWorkflowItem, Suite],
-            callback: Union[partial, Callable[[Union[Experiment, IWorkflowItem, Suite]], bool]], timeout: int = 60 * 60 * 24,
+            callback: Union[partial, Callable[[Union[Experiment, IWorkflowItem, Suite]], bool]],
+            timeout: int = 60 * 60 * 24,
             refresh_interval: int = 5
     ):
         """
-        Runs a loop until a timeout is met where the item's status is refreshed, then a callback is called with the
-        items as the arguments and if the returns is true, we stop waiting.
+        Runs a loop until a timeout is met where the item's status is refreshed. A callback is then called with the items as the arguments and if the returns is true, we stop waiting.
 
         Args:
             item: Item to monitor
@@ -684,10 +729,12 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     @staticmethod
     def __wait_until_done_progress_callback(item: Union[Experiment, IWorkflowItem], progress_bar: 'tqdm',  # noqa: F821
                                             child_attribute: str = 'simulations',
-                                            done_states: List[EntityStatus] = None, failed_warning: Dict[str, bool] = False) -> bool:
+                                            done_states: List[EntityStatus] = None,
+                                            failed_warning: Dict[str, bool] = False) -> bool:
         """
-        A callback for progress bar(when an item has children) and checking if an item has completed execution. This is
-        meant for mainly for aggregate types where the status is from the children
+        A callback for progress bar(when an item has children) and checking if an item has completed execution.
+
+        This is mainly meant for aggregate types where the status is from the children.
 
         Args:
             item: Item to monitor
@@ -739,9 +786,10 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             failed_warning['failed_warning'] = True
         return item.done
 
-    def wait_till_done_progress(self, item: IRunnableEntity, timeout: int = 60 * 60 * 24, refresh_interval: int = 5, wait_progress_desc: str = None):
+    def wait_till_done_progress(self, item: IRunnableEntity, timeout: int = 60 * 60 * 24, refresh_interval: int = 5,
+                                wait_progress_desc: str = None):
         """
-        Wait on an item to complete with progress bar
+        Wait on an item to complete with progress bar.
 
         Args:
             item: Item to monitor
@@ -764,27 +812,35 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         if not IdmConfigParser.is_progress_bar_disabled():
             from tqdm import tqdm
             if isinstance(item, Experiment):
-                prog = tqdm([], total=len(item.simulations), desc=wait_progress_desc if wait_progress_desc else f"Waiting on Experiment {item.name} to Finish running", unit="simulation")
+                prog = tqdm([], total=len(item.simulations),
+                            desc=wait_progress_desc if wait_progress_desc else f"Waiting on Experiment {item.name} to Finish running",
+                            unit="simulation")
                 child_attribute = 'simulations'
             elif isinstance(item, Suite):
-                prog = tqdm([], total=len(item.experiments), desc=wait_progress_desc if wait_progress_desc else f"Waiting on Suite {item.name} to Finish running", unit="experiment")
+                prog = tqdm([], total=len(item.experiments),
+                            desc=wait_progress_desc if wait_progress_desc else f"Waiting on Suite {item.name} to Finish running",
+                            unit="experiment")
                 child_attribute = 'experiments'
             elif isinstance(item, IWorkflowItem):
-                prog = tqdm([], total=1, desc=wait_progress_desc if wait_progress_desc else f"Waiting on WorkItem {item.name}", unit="workitem")
+                prog = tqdm([], total=1,
+                            desc=wait_progress_desc if wait_progress_desc else f"Waiting on WorkItem {item.name}",
+                            unit="workitem")
         else:
             child_attribute = None
 
         failed_warning = dict(failed_warning=False)
         self.__wait_till_callback(
             item,
-            partial(self.__wait_until_done_progress_callback, progress_bar=prog, child_attribute=child_attribute, failed_warning=failed_warning),
+            partial(self.__wait_until_done_progress_callback, progress_bar=prog, child_attribute=child_attribute,
+                    failed_warning=failed_warning),
             timeout,
             refresh_interval
         )
 
     def get_related_items(self, item: IWorkflowItem, relation_type: RelationType) -> Dict[str, Dict[str, str]]:
         """
-        Retrieve all related objects
+        Retrieve all related objects.
+
         Args:
             item: SSMTWorkItem
             relation_type: Depends or Create
@@ -798,10 +854,10 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
     def __enter__(self):
         """
-        Enable our platform to work on contexts
+        Enable our platform to work on contexts.
 
         Returns:
-
+            Platform
         """
         from idmtools.core.context import set_current_platform
         set_current_platform(self)
@@ -809,22 +865,22 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         """
-        Enable our platform to work on contexts
+        Enable our platform to work on contexts.
 
         Args:
-            exc_type:
-            exc_val:
-            exc_tb:
+            exc_type: Type of exception type
+            exc_val:Value
+            exc_tb: Traceback
 
         Returns:
-
+            None
         """
         from idmtools.core.context import remove_current_platform
         remove_current_platform()
 
     def is_regather_assets_on_modify(self) -> bool:
         """
-        Return default behaviour for platform when rerunning experiment and gathering assets
+        Return default behaviour for platform when rerunning experiment and gathering assets.
 
         Returns:
             True or false
@@ -833,22 +889,39 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
     def is_windows_platform(self, item: IEntity = None) -> bool:
         """
-        Returns is the target platform is a windows system
+        Returns is the target platform is a windows system.
         """
         return self.are_requirements_met(PlatformRequirements.WINDOWS)
 
     @property
     def common_asset_path(self):
+        """
+        Return the path to common assets stored on the platform.
+
+        Returns:
+            Common Asset Path
+        """
         return self._common_asset_path
 
     @common_asset_path.setter
     def common_asset_path(self, value):
+        """
+        Set path to common assets stored on the platform. This path should be in defined in relation to individual items(simulations, workflow items).
+
+        For example, on COMPS, we would set "Assets"
+
+        Args:
+            value: Path to use for common path
+
+        Returns:
+            None
+        """
         if not isinstance(value, property):
             logger.warning("Cannot set common asset path")
 
     def join_path(self, *args) -> str:
         """
-        Join path using platform rules
+        Join path using platform rules.
 
         Args:
             *args:List of paths to join
@@ -865,29 +938,43 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
     def id_from_file(self, filename: str):
         """
-        Load just the id portion of a id file
+        Load just the id portion of an id file.
 
         Args:
             filename: Filename
 
         Returns:
-
+            Item id laoded from file
         """
         item_id, item_type, platform_block, extra_args = read_id_file(filename)
         return item_id
 
     def get_item_from_id_file(self, id_filename: Union[PathLike, str], item_type: Optional[ItemType] = None) -> IEntity:
         """
-        Load an item from an id file. This ignores the platform in the file
+        Load an item from an id file. This ignores the platform in the file.
+
         Args:
             id_filename: Filename to load
             item_type: Optional item type
 
         Returns:
-
+            Item from id file.
         """
         item_id, file_item_type, platform_block, extra_args = read_id_file(id_filename)
         return self.get_item(item_id, item_type if item_type else ItemType[file_item_type.upper()])
+
+    def get_defaults_by_type(self, default_type: Type) -> List[IPlatformDefault]:
+        """
+
+        Returns any platform defaults for specific types.
+
+        Args:
+            default_type: Default type
+
+        Returns:
+            List of default of that type
+        """
+        return [x for x in self._platform_defaults if isinstance(x, default_type)]
 
 
 TPlatform = TypeVar("TPlatform", bound=IPlatform)

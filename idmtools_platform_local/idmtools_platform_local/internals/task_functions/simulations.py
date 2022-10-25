@@ -1,3 +1,7 @@
+"""idmtools local platform simulation task tools.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import logging
 import os
 from typing import Dict, Tuple, Any
@@ -13,6 +17,18 @@ SIM_ID_LENGTH = 8
 
 @backoff.on_exception(backoff.constant, IntegrityError, max_tries=3, interval=0.02, jitter=None)
 def get_uuid_and_data_path(experiment_id, session, tags, extra_details: Dict[str, any]):
+    """
+    Get the simulation uuid and data path.
+
+    Args:
+        experiment_id: Experiment id
+        session: db session
+        tags: Tags to set on item
+        extra_details: Extra details to store.
+
+    Returns:
+        uuid and data path
+    """
     from idmtools_platform_local.internals.workers.utils import create_or_update_status
     uuid = ''.join(random.choice(string.digits + string.ascii_uppercase) for _ in range(SIM_ID_LENGTH))
     if logger.isEnabledFor(logging.DEBUG):
@@ -28,8 +44,9 @@ def get_uuid_and_data_path(experiment_id, session, tags, extra_details: Dict[str
 def create_simulation(experiment_id: str, tags_and_extra_details: Tuple[Dict[str, Any], Dict[str, any]],
                       session=None) -> UUID:
     """
-    Creates the simulation. We pass tags and extra details as tuple to make batching easier and overlap with the
-    normal create
+    Creates the simulation.
+
+    We pass tags and extra details as tuple to make batching easier and overlap with the normal create.
 
     Args:
         experiment_id: Experiment id

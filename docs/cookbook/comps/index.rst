@@ -7,3 +7,4 @@ COMPS Recipes
    :titlesonly:
 
    assetize_outputs
+   ssmt.rst

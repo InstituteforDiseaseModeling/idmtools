@@ -74,9 +74,15 @@ class TestTasks(TestCase):
             global platform_item
             platform_item = platform
             simulation.tags['a'] = 12
+
         task.add_pre_creation_hook(update_sim)
         sim = Simulation(task=task)
         p = Platform('Test')
         task.pre_creation(sim, Platform('Test'))
         self.assertEqual(sim.tags['a'], 12)
+        # Note, due to new bug fix for platform uid(in iitem.py), we can not longer compare 2 platforms equal as before.
+        # We used to have _uid member in platform which was comparison field and always None. Now, it has value with bug
+        # fix. So in order to compare 2 platforms equal, let's ignore this property and compare rest of members
+        platform_item.uid = None
+        p.uid = None
         self.assertEqual(platform_item, p)

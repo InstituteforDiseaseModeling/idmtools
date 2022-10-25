@@ -13,9 +13,9 @@ extra_require_files = dict()
 for file_prefix in ['', 'dev_', 'build_']:
     filename = f'{file_prefix}requirements'
     with open(f'{filename}.txt') as requirements_file:
-        extra_require_files[file_prefix.strip("_") if file_prefix else filename] = requirements_file.read().split("\n")
+        extra_require_files[file_prefix.strip("_") if file_prefix else filename] = [dependency for dependency in requirements_file.read().split("\n") if not dependency.startswith("--")]
 
-version = '1.6.2+nightly'
+version = '1.7.1'
 
 extras = {
     'test': extra_require_files['build'] + extra_require_files['dev'],
@@ -24,7 +24,7 @@ extras = {
     'packaging': extra_require_files['build'],
     'idm': ['idmtools_platform_comps', 'idmtools_cli', 'idmtools_models'],
     # our full install include all common plugins
-    'full': ['idmtools_platform_comps', 'idmtools_platform_local', 'idmtools_cli', 'idmtools_models']
+    'full': ['idmtools_platform_comps', 'idmtools_platform_local', 'idmtools_cli', 'idmtools_models', 'idmtools_platform_slurm', 'idmtools_slurm_utils']
 }
 
 authors = [
@@ -36,7 +36,8 @@ authors = [
     ("Mandy Izzo", "mizzo@idmod.org"),
     ("Clark Kirkman IV", "ckirkman@idmod.org"),
     ("Benoit Raybaud", "braybaud@idmod.org"),
-    ("Jen Schripsema", "jschripsema@idmod.org")
+    ("Jen Schripsema", "jschripsema@idmod.org"),
+    ("Lauren George", "lgeorge@idmod.org")
 ]
 
 # check for python 3.6
@@ -44,8 +45,8 @@ if sys.version_info <= (3, 6):
     extra_require_files['requirements'].append('dataclasses')
 
 setup(
-    author=[author[0] for author in authors],
-    author_email=[author[1] for author in authors],
+    author=", ".join([author[0] for author in authors]),
+    author_email=", ".join([author[1] for author in authors]),
     classifiers=[
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',

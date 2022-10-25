@@ -1,3 +1,8 @@
+"""
+JSON utilities for idmtools such as encoders and decoders.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import json
 from enum import Enum
 from json import JSONEncoder
@@ -16,17 +21,22 @@ from datetime import datetime
 user_logger = getLogger('user')
 
 
-class DefaultEncoder(JSONEncoder):
-    """
-    A default JSON encoder to naively make Python objects serializable by using their __dict__.
-    """
-
-    def default(self, o):
-        return o.__dict__
-
-
 class IDMJSONEncoder(JSONEncoder):
+    """
+    IDMJSONEncoder handles encoding IDM specific items.
+
+    """
+
     def default(self, o):
+        """
+        JSON Encode item.
+
+        Args:
+            o: Object to encode
+
+        Returns:
+            JSON encoded object
+        """
         if isinstance(o, Enum):
             return o.value
         elif isinstance(o, EntityStatus):
@@ -55,7 +65,7 @@ class IDMJSONEncoder(JSONEncoder):
 
 def load_json_file(path: str) -> Union[Dict[Any, Any], List]:
     """
-    Load a json object from a file
+    Load a json object from a file.
 
     Args:
         path: Path to file
