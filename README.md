@@ -21,7 +21,7 @@
   - [Recommended install](#recommended-install)
   - [Advanced Install](#advanced-install)
   - [Installing Development/Early Release Versions](#installing-developmentearly-release-versions)
-      - [PyPI](#pypi)
+    - [PyPI](#pypi)
   - [Pre-requisites](#pre-requisites)
 - [Reporting issues](#reporting-issues)
 - [Requesting a feature](#requesting-a-feature)
