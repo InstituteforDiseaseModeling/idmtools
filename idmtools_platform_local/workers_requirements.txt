@@ -1,2 +1,2 @@
-sqlalchemy~=1.4.41
+sqlalchemy~=1.4.42
 psycopg2-binary~=2.9.4
