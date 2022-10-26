@@ -20,6 +20,8 @@ jobs:
           pip install setuptools wheel twine bump2version --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
           git config --global user.name "IDM Tools"
           git config --global user.name "idmtools@idmod.org"
+      - name: Check out Git repository
+          uses: actions/checkout@v2
       - uses: azure/docker-login@v1
         with:
           login-server: idm-docker-staging.packages.idmod.org
