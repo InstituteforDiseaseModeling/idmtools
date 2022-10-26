@@ -1,14 +1,10 @@
 name: "build_rocky_image"
 on:
-  push:
-    paths:
-      - 'examples/singularity/rocky/**'
-      - '**.*'
+  workflow_dispatch:
 
 jobs:
   build_rocky_image:
     runs-on: ubuntu-latest
-    if: "contains(github.event.head_commit.message, 'build rocky')"
     steps:
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -39,3 +35,4 @@ jobs:
             PYPI_STAGING_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
         run: |
           python build_docker_image.py --username ${{ secrets.PYPI_STAGING_USERNAME }} --password ${{ secrets.PYPI_STAGING_PASSWORD }}
+          python publish_docker_image.py --username ${{ env.PYPI_STAGING_USERNAME }} --password ${{ env.PYPI_STAGING_PASSWORD }}
