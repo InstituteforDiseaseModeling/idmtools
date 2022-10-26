@@ -3,7 +3,7 @@ on:
   push:
     paths:
       - 'examples/singularity/rocky/**'
-      - - '**.*'
+      - '**.*'
 
 jobs:
   deploy-comps-staging:
