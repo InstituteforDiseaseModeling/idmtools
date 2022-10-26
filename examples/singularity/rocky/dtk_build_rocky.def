@@ -8,6 +8,7 @@ From: rockylinux:8.5
     dnf install boost-devel -y
     dnf install git -y
     dnf install vim -y
+    dnf install snappy -y
 
     dnf group install "Development Tools" -y
 
@@ -15,7 +16,7 @@ From: rockylinux:8.5
 
     python3 -m pip install pip --upgrade
     python3 -m pip install scons pytest
-
+	python3 -m pip install emod-api --extra-index-url https://packages.idmod.org/api/pypi/pypi-production/simple
 %runscript
 
 
