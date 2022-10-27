@@ -1,7 +1,9 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
 
-
+- [Push sif to artifactory:](#push-sif-to-artifactory)
+- [Download from artifactory:](#download-from-artifactory)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
