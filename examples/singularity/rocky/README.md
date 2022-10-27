@@ -5,8 +5,8 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-push sif to artifactory:
+# Push sif to artifactory:
 curl -u idm_bamboo_user@idmod.org:apikey -X PUT https://packages.idmod.org/artifactory/idm-docker-staging/idmtools/rocky_mpi/dtk_run_rocky_py39.sif -T ./dtk_run_rocky_py39.sif
 
-download from artifactory:
+# Download from artifactory:
 curl -u idm_bamboo_user@idmod.org:apikey https://packages.idmod.org:443/artifactory/idm-docker-staging/idmtools/rocky_mpi/dtk_run_rocky_py39.sif -o dtk_run_rocky_py39.sif
