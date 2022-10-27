@@ -10,7 +10,7 @@ from idmtools_platform_comps.utils.singularity_build import SingularityBuildWork
 if __name__ == '__main__':
     platform = Platform("Calculon")
     sbi = SingularityBuildWorkItem(name="Create dtk rocky sif", definition_file="dtk_run_rocky_py39.def", image_name="dtk_run_rocky_py39.sif", force=True)
-    sbi.tags = dict(python="3.9")
+    sbi.tags = {"python": "3.9", "rockylinux": "8.5"}
     ac_obj = sbi.run(wait_until_done=True, platform=platform)
 
     if sbi.succeeded:
