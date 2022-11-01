@@ -74,6 +74,9 @@ class IPlatformExperimentOperations(ABC):
             NoReturn
         """
         if logger.isEnabledFor(DEBUG):
+            logger.debug("Calling idmtools_platform_post_create_item hooks")
+        FunctionPluginManager.instance().hook.idmtools_platform_post_create_item(item=experiment, kwargs=kwargs)
+        if logger.isEnabledFor(DEBUG):
             logger.debug("Calling experiment post_creation")
         experiment.post_creation(self.platform)
 
