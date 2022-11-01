@@ -11,7 +11,7 @@ with open('requirements.txt') as requirements_file:
     requirements = requirements_file.read().split("\n")
 
 build_requirements = ['flake8', 'coverage', 'bump2version', 'twine', "natsort"]
-test_requirements = ['pytest', 'pytest-runner', 'matplotlib', 'pytest-timeout', 'pytest-cache'] + build_requirements
+test_requirements = ['pytest', 'pytest-runner', 'matplotlib', 'pytest-timeout', 'pytest-cache', 'pytest-lazy-fixture'] + build_requirements
 
 extras = dict(test=test_requirements, dev=['Pympler'], packaging=build_requirements)
 
@@ -29,8 +29,8 @@ authors = [
 ]
 
 setup(
-    author=[author[0] for author in authors],
-    author_email=[author[1] for author in authors],
+    author=", ".join([author[0] for author in authors]),
+    author_email=", ".join([author[1] for author in authors]),
     classifiers=[
         'Framework:: IDM-Tools :: Platform',
     ],
@@ -54,5 +54,5 @@ comps-cli=idmtools_platform_comps.cli.comps:comps
 """,
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='1.6.7+nightly'
+    version='1.7.1+nightly'
 )

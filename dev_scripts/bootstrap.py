@@ -46,6 +46,7 @@ packages = dict(
     idmtools_platform_comps=data_class_default,
     idmtools_models=data_class_default,
     idmtools_platform_slurm=data_class_default,
+    idmtools_slurm_utils=[],
     idmtools_test=[]
 )
 logger = getLogger("bootstrap")
@@ -114,13 +115,13 @@ def install_dev_packages(pip_url):
         extras_str = f"[{','.join(extras)}]" if extras else ''
         logger.info(f'Installing {package} with extras: {extras_str if extras_str else "None"} from {base_directory}')
         try:
-            for line in execute(["pip", "install", "-e", f".{extras_str}", f"--extra-index-url={pip_url}"], cwd=join(base_directory, package)):
+            for line in execute(["pip3", "install", "-e", f".{extras_str}", f"--extra-index-url={pip_url}"], cwd=join(base_directory, package)):
                 process_output(line)
         except subprocess.CalledProcessError as e:
             logger.critical(f'{package} installed failed using {e.cmd} did not succeed')
             result = e.returncode
             logger.debug(f'Return Code: {result}')
-    for line in execute(["pip", "install", "-r", "requirements.txt", f"--extra-index-url={pip_url}"], cwd=join(base_directory, 'docs')):
+    for line in execute(["pip3", "install", "-r", "requirements.txt", f"--extra-index-url={pip_url}"], cwd=join(base_directory, 'docs')):
         process_output(line)
 
 
@@ -134,13 +135,13 @@ def install_base_environment(pip_url):
     Lastly, we create an idmtools ini in example for developers
     """
     # install wheel first to benefit from binaries
-    for line in execute(["pip", "install", "wheel", f"--extra-index-url={pip_url}"]):
+    for line in execute(["pip3", "install", "wheel", f"--extra-index-url={pip_url}"]):
         process_output(line)
 
-    for line in execute(["pip", "uninstall", "-y", "py-make"], ignore_error=True):
+    for line in execute(["pip3", "uninstall", "-y", "py-make"], ignore_error=True):
         process_output(line)
 
-    for line in execute(["pip", "install", "idm-buildtools~=1.0.1", f"--index-url={pip_url}"]):
+    for line in execute(["pip3", "install", "idm-buildtools~=1.0.1", f"--index-url={pip_url}"]):
         process_output(line)
 
     dev_idmtools_ini = join(base_directory, "examples", "idmtools.ini")

@@ -2,7 +2,7 @@
 MKDIR ?= mkdir
 MV ?= mv
 RM ?= rm
-IPY=python -c
+IPY=python3 -c
 PY=python
 PDS=$(PY) dev_scripts/
 MAKEALL=$(PDS)run_pymake_on_all.py

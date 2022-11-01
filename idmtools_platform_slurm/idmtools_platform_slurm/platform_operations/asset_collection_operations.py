@@ -9,10 +9,12 @@ from pathlib import Path
 from dataclasses import field, dataclass
 from logging import getLogger
 from typing import TYPE_CHECKING, Type, List, Dict, Union, Optional
+from idmtools.core import ItemType
 from idmtools.assets import AssetCollection, Asset
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.iplatform_ops.iplatform_asset_collection_operations import IPlatformAssetCollectionOperations
+from idmtools_platform_slurm.platform_operations.utils import SlurmSimulation
 
 if TYPE_CHECKING:
     from idmtools_platform_slurm.slurm_platform import SlurmPlatform
@@ -67,19 +69,20 @@ class SlurmPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         link_dir = Path(self.platform._op_client.get_directory(simulation), 'Assets')
         self.platform._op_client.link_dir(common_asset_dir, link_dir)
 
-    def get_assets(self, simulation: Simulation, files: List[str], **kwargs) -> Dict[str, bytearray]:
+    def get_assets(self, simulation: Union[Simulation, SlurmSimulation], files: List[str], **kwargs) -> Dict[
+        str, bytearray]:
         """
         Get assets for simulation.
         Args:
-            simulation: Simulation
+            simulation: Simulation or SlurmSimulation
             files: files to be retrieved
             kwargs: keyword arguments used to expand functionality.
         Returns:
             Dict[str, bytearray]
         """
         ret = dict()
-        if isinstance(simulation, Simulation):
-            sim_dir = self.platform._op_client.get_directory(simulation)
+        if isinstance(simulation, (Simulation, SlurmSimulation)):
+            sim_dir = self.platform._op_client.get_directory_by_id(simulation.id, ItemType.SIMULATION)
             for file in files:
                 asset_file = Path(sim_dir, file)
                 if asset_file.exists():
@@ -88,8 +91,8 @@ class SlurmPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
                 else:
                     raise RuntimeError(f"Couldn't find asset for path '{file}'.")
         else:
-            raise NotImplementedError(f"get_assets() for items of type {type(simulation)} is not supported on SlurmPlatform.")
-
+            raise NotImplementedError(
+                f"get_assets() for items of type {type(simulation)} is not supported on SlurmPlatform.")
         return ret
 
     def list_assets(self, item: Union[Experiment, Simulation], exclude: List[str] = None, **kwargs) -> List[Asset]:

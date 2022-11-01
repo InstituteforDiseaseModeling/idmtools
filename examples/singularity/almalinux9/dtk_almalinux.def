@@ -1,0 +1,27 @@
+Bootstrap: library
+From: almalinux:latest
+
+%post
+    dnf install python39 -y
+    dnf install snappy -y
+    dnf install mpich -y
+    dnf install python3-pip -y
+
+    python3 -m pip install pip --upgrade
+    python3 -m pip install emod-api --extra-index-url https://packages.idmod.org/api/pypi/pypi-production/simple
+
+%runscript
+
+
+%environment
+    export PATH=$PATH:/usr/lib64/mpich/bin
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib64/mpich/lib
+
+%test
+
+
+%labels
+    Author shchen@idmod.org
+
+%help
+    Minimal container for running EMOD using emod-api for file support.

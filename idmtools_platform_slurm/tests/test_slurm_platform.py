@@ -3,17 +3,19 @@ import pathlib
 import shutil
 import tempfile
 import pytest
+
+from idmtools import IdmConfigParser
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
-from idmtools_platform_slurm.slurm_operations import LocalSlurmOperations
+from idmtools_platform_slurm.slurm_operations.local_operations import LocalSlurmOperations
 from idmtools_test.utils.decorators import linux_only
 
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.test_task import TestTask
 
-cwd = os.path.dirname(__file__)
+job_dir = os.path.expanduser('~')
 
 
 @pytest.mark.smoke
@@ -44,6 +46,7 @@ class TestSlurmPlatform(ITestWithPersistence):
 
     # Test platform get_slurm_configs with user defined configs
     def test_slurm_configs_from_user_defined(self):
+        IdmConfigParser.clear_instance()
         platform = Platform("SLURM_TEST", job_directory=".", mode="local", mail_user="test@test.com",
                             account="test_acct", mail_type="begin", mem_per_cpu=2048)
         slurm_configs_dict = platform.get_slurm_configs()
@@ -65,7 +68,7 @@ class TestSlurmPlatform(ITestWithPersistence):
         suite = Suite()
         local = LocalSlurmOperations(platform=self.platform)
         actual_entity_path = local.get_directory(suite)
-        expected_path = os.path.join(cwd, suite.id)
+        expected_path = os.path.join(job_dir, suite.id)
         self.assertEqual(str(actual_entity_path), expected_path)
 
     # Test LocalSlurmOperations get_directory for multiple experiments case
@@ -79,11 +82,11 @@ class TestSlurmPlatform(ITestWithPersistence):
         exp3.parent = suite
         local = LocalSlurmOperations(platform=self.platform)
         actual_suite_path = local.get_directory(suite)
-        expected_suite_path = os.path.join(cwd, suite.id)
+        expected_suite_path = os.path.join(job_dir, suite.id)
         self.assertEqual(str(actual_suite_path), expected_suite_path)
 
         actual_exp1_path = local.get_directory(exp1)
-        expected_exp1_path = os.path.join(cwd, suite.id, exp1.id)
+        expected_exp1_path = os.path.join(job_dir, suite.id, exp1.id)
         self.assertEqual(str(actual_exp1_path), expected_exp1_path)
 
     # Test LocalSlurmOperations get_directory for experiment only
@@ -103,7 +106,7 @@ class TestSlurmPlatform(ITestWithPersistence):
         simulation.parent = experiment
         local = LocalSlurmOperations(platform=self.platform)
         actual_entity_path = local.get_directory(simulation)
-        expected_path = os.path.join(cwd, suite.id, experiment.id, simulation.id)
+        expected_path = os.path.join(job_dir, suite.id, experiment.id, simulation.id)
         self.assertEqual(str(actual_entity_path), expected_path)
 
     # Test LocalSlurmOperations get_directory for simulation without parent, it should throw error
@@ -119,7 +122,7 @@ class TestSlurmPlatform(ITestWithPersistence):
         suite = Suite()
         local = LocalSlurmOperations(platform=self.platform)
         local.mk_directory(suite)
-        expected_dir = os.path.join(cwd, suite.id)
+        expected_dir = os.path.join(job_dir, suite.id)
         self.assertTrue(os.path.isdir(expected_dir))
         # delete dir after test
         shutil.rmtree(expected_dir)
@@ -156,12 +159,12 @@ class TestSlurmPlatform(ITestWithPersistence):
         simulation2.parent = experiment
         local.mk_directory(simulation1)
         local.mk_directory(simulation2)
-        expected_dir1 = os.path.join(cwd, suite.id, experiment.id, simulation1.id)
-        expected_dir2 = os.path.join(cwd, suite.id, experiment.id, simulation2.id)
+        expected_dir1 = os.path.join(job_dir, suite.id, experiment.id, simulation1.id)
+        expected_dir2 = os.path.join(job_dir, suite.id, experiment.id, simulation2.id)
         self.assertTrue(os.path.isdir(expected_dir1))
         self.assertTrue(os.path.isdir(expected_dir2))
         # delete dir after test
-        shutil.rmtree(os.path.join(cwd, suite.id))
+        shutil.rmtree(os.path.join(job_dir, suite.id))
         self.assertFalse(os.path.isdir(expected_dir1))
         self.assertFalse(os.path.isdir(expected_dir2))
 
@@ -174,7 +177,7 @@ class TestSlurmPlatform(ITestWithPersistence):
         local.mk_directory(experiment)
         local.create_batch_file(experiment)
         # verify batch file locally
-        job_path = os.path.join(cwd, suite.id, experiment.id, "sbatch.sh")
+        job_path = os.path.join(job_dir, suite.id, experiment.id, "sbatch.sh")
         self.assertTrue(os.path.exists(job_path))
         # TODO validation sbatch.sh content
         with open(job_path) as f:
@@ -184,7 +187,7 @@ class TestSlurmPlatform(ITestWithPersistence):
             "run run_simulation.sh",
             contents)
         # clean up suite folder
-        shutil.rmtree(os.path.join(cwd, suite.id))
+        shutil.rmtree(os.path.join(job_dir, suite.id))
         self.assertFalse(os.path.exists(job_path))
 
     # Test LocalSlurmOperations create_batch_file for simulation
@@ -198,11 +201,11 @@ class TestSlurmPlatform(ITestWithPersistence):
         local.mk_directory(simulation)
         local.create_batch_file(simulation)
         # verify batch file
-        job_path = os.path.join(cwd, suite.id, experiment.id, simulation.id, "_run.sh")
+        job_path = os.path.join(job_dir, suite.id, experiment.id, simulation.id, "_run.sh")
         self.assertTrue(os.path.exists(job_path))
         # TODO validation _run.sh content
         # clean up suite folder
-        shutil.rmtree(os.path.join(cwd, suite.id))
+        shutil.rmtree(os.path.join(job_dir, suite.id))
         self.assertFalse(os.path.exists(job_path))
 
     # Test LocalSlurmOperations create_batch_file with simulation and item_path

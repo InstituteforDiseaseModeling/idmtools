@@ -168,7 +168,7 @@ class IItem:
         """
         for hook in self.__post_creation_hooks:
             if logger.isEnabledFor(DEBUG):
-                logger.debug(f'Calling pre-create hook named {hook.__name__ if hasattr(hook, "__name__") else str(hook)}')
+                logger.debug(f'Calling post-create hook named {hook.__name__ if hasattr(hook, "__name__") else str(hook)}')
             hook(self, platform)
 
     def add_pre_creation_hook(self, hook: PRE_POST_CREATION_HOOK):

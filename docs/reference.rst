@@ -13,20 +13,6 @@ Packages overview
 .. uml:: /diagrams/packages_overview.puml
 
 
-API and Plugin Documentation
-============================
-.. toctree::
-   :maxdepth: 2
-   :titlesonly:
-
-
-
-   idmtools_index
-   idmtools_models_index
-   idmtools_platform_comps_index
-   idmtools_platform_local_index
-   plugin_documentation/index
-
 Packages and APIs
 =================
 
@@ -74,3 +60,11 @@ API class specifications
 
 .. uml:: /diagrams/apis-emod.puml
 
+
+
+   idmtools_index
+   idmtools_models_index
+   idmtools_platform_comps_index
+   idmtools_platform_local_index
+   idmtools_platform_slurm_index
+   idmtools_slurm_utils_index

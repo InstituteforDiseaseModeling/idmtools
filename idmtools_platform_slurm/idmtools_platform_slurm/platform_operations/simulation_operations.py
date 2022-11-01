@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, List, Dict, Type, Optional, Union
 from idmtools.assets import Asset
 from idmtools.core import ItemType, EntityStatus
-from idmtools_platform_slurm.slurm_operations import SLURM_STATES
+from idmtools_platform_slurm.slurm_operations.slurm_constants import SLURM_STATES
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
@@ -80,8 +80,7 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
         if simulation.parent_id is None:
             return None
         else:
-            return self.platform._experiments.get(simulation.parent_id, raw=True,
-                                                  **kwargs) if simulation.parent_id else None
+            return self.platform._experiments.get(simulation.parent_id, raw=True, **kwargs)
 
     def platform_run_item(self, simulation: Simulation, **kwargs):
         """

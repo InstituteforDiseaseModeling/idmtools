@@ -19,7 +19,7 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@v2
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
@@ -73,6 +73,26 @@ jobs:
         with:
           name: idmtools_models_test_results
           path: idmtools_models/tests/reports/
+      - name: run idmtools_platform_slurm tests
+        run: |
+          cd idmtools_platform_slurm
+          make test-all
+      - name: Upload idmtools_platform_slurm all test results
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: idmtools_platform_slurm_test_results
+          path: idmtools_platform_slurm/tests/reports/
+      - name: run idmtools_slurm_utils tests
+        run: |
+          cd idmtools_slurm_utils
+          make test-all
+      - name: Upload idmtools_slurm_utils all test results
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: idmtools_slurm_utils_test_results
+          path: idmtools_slurm_utils/tests/reports/
       - name: run idmtools_platform_comps tests
         run: |
           cd idmtools_platform_comps
@@ -97,7 +117,7 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@v2
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
@@ -117,16 +137,6 @@ jobs:
         run: |
           echo '${{ env.PYPI_STAGING_PASSWORD }}' | docker login idm-docker-staging.packages.idmod.org --username ${{ env.PYPI_STAGING_USERNAME }} --password-stdin
           echo '${{ env.PYPI_STAGING_PASSWORD }}' | docker login docker-staging.packages.idmod.org --username ${{ env.PYPI_STAGING_USERNAME }} --password-stdin
-      - name: run idmtools_platform_slurm tests
-        run: |
-          cd idmtools_platform_slurm
-          make test-all
-      - name: Upload idmtools_platform_slurm all test results
-        uses: actions/upload-artifact@v2
-        if: failure()
-        with:
-          name: idmtools_platform_slurm_test_results
-          path: idmtools_platform_slurm/tests/reports/
       - name: run idmtools_platform_local tests
         run: |
           cd idmtools_platform_local

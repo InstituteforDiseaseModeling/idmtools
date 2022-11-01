@@ -32,8 +32,8 @@ authors = [
 ]
 
 setup(
-    author=[author[0] for author in authors],
-    author_email=[author[1] for author in authors],
+    author=", ".join([author[0] for author in authors]),
+    author_email=", ".join([author[1] for author in authors]),
     classifiers=[
         'Framework:: IDM-Tools :: Platform',
     ],
@@ -51,5 +51,5 @@ setup(
     test_suite='tests',
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='1.6.7+nightly'
+    version='1.7.1+nightly'
 )
