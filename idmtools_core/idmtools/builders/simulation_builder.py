@@ -26,7 +26,7 @@ class SimulationBuilder:
     Class that represents an experiment builder.
 
     Examples:
-        .. literalinclude:: ../examples/builders/simulation_builder.py
+        .. literalinclude:: ../../examples/builders/simulation_builder.py
 
         Add tags with builder callbacks::
 
