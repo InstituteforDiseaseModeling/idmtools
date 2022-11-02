@@ -19,9 +19,7 @@ isolated. You must also have |Python_IT| and Python virtual environments install
 see the links below for instructions.
 
 * Windows 10 Pro or Enterprise
-
 * |Python_IT| (https://www.python.org/downloads/release)
-
 * Python virtual environments
 
     Python virtual environments enable you to isolate your Python environments from one
