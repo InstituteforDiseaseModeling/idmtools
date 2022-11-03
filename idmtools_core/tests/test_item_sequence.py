@@ -67,7 +67,7 @@ class TestItemSequence(unittest.TestCase):
 
     @staticmethod
     def get_sequence_file():
-        sequence_file = Path(IdmConfigParser.get_option("item_sequence", "sequence_file", 'item_sequences.json')).expanduser()
+        sequence_file = Path(IdmConfigParser.get_option("item_sequence", "sequence_file", Path().home().joinpath(".idmtools", "itemsequence", "index.json")))
         if sequence_file.exists():
             sequence_file.unlink()
         return sequence_file
