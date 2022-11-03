@@ -4,13 +4,13 @@ Supported platforms
 
 |IT_s| currently supports running on the following platforms:
 
-**COMPS**: |COMPS_l| is a high performance computing cluster used by employees and collaborators at |IDM_s|. To support running simulations and analysis on |COMPS_s|, |IT_s| includes the following modules: :doc:`../idmtools_platform_comps_index`.
+**COMPS**: |COMPS_l| is a high performance computing cluster used by employees and collaborators at |IDM_s|. To support running simulations and analysis on |COMPS_s|, |IT_s| includes the following modules: :doc:`../api/idmtools_platform_comps_index`.
 
 .. include:: /reuse/comps_note.txt
 
 **SLURM**: You can also run simulations on the open-source |SLURM_s| platform for large and small Linux clusters.". For more information, see :doc:`slurm/index`.
 
-**Local**: You can also run simulations and analysis locally on your computer, rather than on a remote high-performance computer (HPC). For more information about these modules, see :doc:`../idmtools_platform_local_index`.
+**Local**: You can also run simulations and analysis locally on your computer, rather than on a remote high-performance computer (HPC). For more information about these modules, see :doc:`../api/idmtools_platform_local_index`.
 
 If you need to use a different platform, you can also add a new platform to |IT_s| by creating a new platform plugin, as described in :doc:`platforms-plugin`. 
 
