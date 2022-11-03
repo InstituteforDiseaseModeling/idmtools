@@ -39,6 +39,9 @@ if __name__ == "__main__":
     for i in range(5):
         # first copy the simulation
         sim = copy.deepcopy(base_simulation)
+        # For now, you have to reset the uid manually when copying here. In future, you should only need to do a
+        # copy method here
+        sim._uid = None
         # configure it
         sim.task.set_parameter("a", i)
         sim.task.set_parameter("b", i + 10)
