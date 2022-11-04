@@ -3,9 +3,11 @@
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 from dataclasses import dataclass, field
-from typing import Any, List, Tuple, Union, Type, TYPE_CHECKING, Optional
+from typing import Any, List, Dict, Tuple, Union, Type, TYPE_CHECKING, Optional
 from uuid import UUID
 from COMPS.Data import Suite as COMPSSuite, QueryCriteria, Experiment as COMPSExperiment, WorkItem
+
+from idmtools.core import ItemType
 from idmtools.entities import Suite
 from idmtools.entities.iplatform_ops.iplatform_suite_operations import IPlatformSuiteOperations
 
@@ -140,3 +142,21 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
             for exp in comps_exps:
                 obj.experiments.append(self.platform._experiments.to_entity(exp, parent=obj, **kwargs))
         return obj
+
+    def create_sim_directory_map(self, suite_id: Union[str, UUID]) -> Dict:
+        """
+        Build simulation working directory mapping.
+        Args:
+            suite_id: suite id
+
+        Returns:
+            Dict
+        """
+        # s = Suite.get(suite_id)
+        comps_suite = self.platform.get_item(suite_id, ItemType.SUITE, raw=True)
+        comps_exps = comps_suite.get_experiments(QueryCriteria().select('id'))
+        sims_map = {}
+        for exp in comps_exps:
+            r = self.platform._experiments.create_sim_directory_map(exp.id)
+            sims_map = {**sims_map, **r}
+        return sims_map

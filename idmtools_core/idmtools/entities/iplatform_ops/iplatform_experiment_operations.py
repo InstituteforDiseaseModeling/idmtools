@@ -129,7 +129,8 @@ class IPlatformExperimentOperations(ABC):
         """
         pass
 
-    def batch_create(self, experiments: List[Experiment], display_progress: bool = True, **kwargs) -> List[Tuple[Experiment]]:
+    def batch_create(self, experiments: List[Experiment], display_progress: bool = True, **kwargs) -> List[
+        Tuple[Experiment]]:
         """
         Provides a method to batch create experiments.
 
@@ -222,13 +223,15 @@ class IPlatformExperimentOperations(ABC):
         if isinstance(experiment.simulations, (GeneratorType, Iterator)):
             if logger.isEnabledFor(DEBUG):
                 logger.debug("Calling _create_items_of_type for sims")
-            experiment.simulations = self.platform._create_items_of_type(experiment.simulations, ItemType.SIMULATION, **kwargs)
+            experiment.simulations = self.platform._create_items_of_type(experiment.simulations, ItemType.SIMULATION,
+                                                                         **kwargs)
         elif len(experiment.simulations) == 0:
             raise ValueError("You cannot have an experiment with no simulations")
         else:
             if logger.isEnabledFor(DEBUG):
                 logger.debug("Calling _create_items_of_type for sims")
-            experiment.simulations = self.platform._create_items_of_type(experiment.simulations, ItemType.SIMULATION, **kwargs)
+            experiment.simulations = self.platform._create_items_of_type(experiment.simulations, ItemType.SIMULATION,
+                                                                         **kwargs)
         if logger.isEnabledFor(DEBUG):
             logger.debug("Finished checking simulations")
 
@@ -361,7 +364,8 @@ class IPlatformExperimentOperations(ABC):
         """
         return []
 
-    def platform_modify_experiment(self, experiment: Experiment, regather_common_assets: bool = False, **kwargs) -> Experiment:
+    def platform_modify_experiment(self, experiment: Experiment, regather_common_assets: bool = False,
+                                   **kwargs) -> Experiment:
         """
         API to allow detection of experiments already created.
 
@@ -373,3 +377,14 @@ class IPlatformExperimentOperations(ABC):
             Experiment updated
         """
         return experiment
+
+    def create_sim_directory_map(self, experiment_id: Union[str, UUID]) -> Dict:
+        """
+        Build simulation working directory mapping.
+        Args:
+            experiment_id: experiment id
+
+        Returns:
+            Dict
+        """
+        return {}

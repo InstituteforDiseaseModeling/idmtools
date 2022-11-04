@@ -7,7 +7,7 @@ import os
 from dataclasses import dataclass, field
 from itertools import tee
 from logging import getLogger, DEBUG
-from typing import List, Type, Generator, NoReturn, Optional, TYPE_CHECKING
+from typing import List, Dict, Type, Generator, NoReturn, Optional, TYPE_CHECKING, Union
 from uuid import UUID
 from COMPS.Data import Experiment as COMPSExperiment, QueryCriteria, Configuration, Suite as COMPSSuite, \
     Simulation as COMPSSimulation
@@ -467,3 +467,19 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         else:
             assets = copy.deepcopy(experiment.assets.assets)
         return assets
+
+    def create_sim_directory_map(self, experiment_id: Union[str, UUID]) -> Dict:
+        """
+        Build simulation working directory mapping.
+        Args:
+            experiment_id: experiment id
+
+        Returns:
+            Dict
+        """
+        from idmtools_platform_comps.utils.linux_mounts import set_linux_mounts
+        set_linux_mounts(self.platform)
+
+        comps_exp = self.platform.get_item(experiment_id, ItemType.EXPERIMENT, raw=True)
+        comps_sims = comps_exp.get_simulations(QueryCriteria().select(['id', 'state']).select_children('hpc_jobs'))
+        return {str(sim.id): sim.hpc_jobs[-1].working_directory for sim in comps_sims}
