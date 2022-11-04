@@ -1,0 +1,38 @@
+name: "build_rocky_image"
+on:
+  workflow_dispatch:
+
+jobs:
+  build_rocky_image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install setuptools wheel twine bump2version coloredlogs idm-buildtools natsort --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+          git config --global user.name "IDM Tools"
+          git config --global user.name "idmtools@idmod.org"
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+      - uses: azure/docker-login@v1
+        with:
+          login-server: idm-docker-staging.packages.idmod.org
+          username: ${{ secrets.PYPI_STAGING_USERNAME }}
+          password: ${{ secrets.PYPI_STAGING_PASSWORD }}
+      - uses: azure/docker-login@v1
+        with:
+          login-server: docker-staging.packages.idmod.org
+          username: ${{ secrets.PYPI_STAGING_USERNAME }}
+          password: ${{ secrets.PYPI_STAGING_PASSWORD }}
+      - name: Build docker image
+        working-directory: examples/singularity/rocky/docker_build
+        env:
+            PYPI_STAGING_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
+            PYPI_STAGING_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
+        run: |
+          python build_docker_image.py --username ${{ secrets.PYPI_STAGING_USERNAME }} --password ${{ secrets.PYPI_STAGING_PASSWORD }}
+          python publish_docker_image.py --username ${{ env.PYPI_STAGING_USERNAME }} --password ${{ env.PYPI_STAGING_PASSWORD }}

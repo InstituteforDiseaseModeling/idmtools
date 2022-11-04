@@ -1,9 +1,9 @@
-.PHONY: clean lint test coverage dist release-staging release-staging-release-commit release-staging-minor changelog start-allure
+.PHONY: clean lint test coverage dist release-staging release-staging-release-commit release-staging-minor changelog start-allure docs
 MKDIR ?= mkdir
 MV ?= mv
 RM ?= rm
 IPY=python3 -c
-PY=python3
+PY=python
 PDS=$(PY) dev_scripts/
 MAKEALL=$(PDS)run_pymake_on_all.py
 PDR=$(PDS)run.py
@@ -147,6 +147,8 @@ bump-major-dry-run: ## bump the major version(dry run)
 
 build-docs: ## build docs
 	$(PDR) -wd 'docs' -ex 'make html'
+
+docs: build-docs ## Alias for build docs
 
 build-docs-server: build-docs ## builds docs and launch a webserver and watches for changes to documentation
 	$(PDS)serve_docs.py

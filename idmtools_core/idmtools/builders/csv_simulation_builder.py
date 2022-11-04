@@ -15,7 +15,7 @@ class CsvExperimentBuilder(SimulationBuilder):
     Class that represents an experiment builder.
 
     Examples:
-        .. literalinclude:: ../examples/builders/csv_builder_python.py
+        .. literalinclude:: ../../examples/builders/csv_builder_python.py
     """
 
     def __init__(self):

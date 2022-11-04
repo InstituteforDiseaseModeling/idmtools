@@ -58,7 +58,7 @@ class PlatformAnalysis:
             pre_run_func: A function (with no arguments) to be executed before analysis starts on the remote server
             wrapper_shell_script: Optional path to a wrapper shell script. This script should redirect all arguments to command passed to it. Mostly useful for development purposes
             verbose: Enables verbose logging remotely
-            extra_args: Optional extra arguments to pass to AnalyzerManager on the server side
+            extra_args: Optional extra arguments to pass to AnalyzerManager on the server side. See :meth:`~idmtools.analysis.analyze_manager.AnalyzeManager.__init__`
 
         See Also:
             :meth:`idmtools.analysis.analyze_manager.AnalyzeManager.__init__`
