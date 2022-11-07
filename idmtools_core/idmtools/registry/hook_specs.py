@@ -53,7 +53,7 @@ def idmtools_platform_post_create_item(item: 'IEntity', kwargs) -> 'IEntity':
 @function_hook_spec
 def idmtools_platform_post_run(item: 'IEntity', kwargs) -> 'IEntity':
     """
-    This is called when item finishes calling the run on the server
+    This is called when item finishes calling the run on the server.
 
     Args:
         item:

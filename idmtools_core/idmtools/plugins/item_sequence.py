@@ -12,8 +12,6 @@ id_format_str = <custom_str_format>     ex: {item_name}{data[item_name]:06d}
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
-from typing import TYPE_CHECKING
-
 import shutil
 import json
 import time
@@ -27,11 +25,7 @@ from filelock import FileLock
 from idmtools import IdmConfigParser
 from idmtools.core import IDMTOOLS_USER_HOME
 from idmtools.registry.hook_specs import function_hook_impl
-if TYPE_CHECKING:
-    from idmtools.core.interfaces.ientity import IEntity
-    from idmtools.entities import Suite
-    from idmtools.entities.experiment import Experiment
-
+from idmtools.core.interfaces.ientity import IEntity
 
 logger = getLogger(__name__)
 SEQUENCE_FILE_DEFAULT_PATH = IDMTOOLS_USER_HOME.joinpath("itemsequence", "index.json")
@@ -147,7 +141,7 @@ def idmtools_generate_id(item: IEntity) -> str:
 
 
 @function_hook_impl
-def idmtools_platform_post_create_item(item: 'IEntity', kwargs) -> 'IEntity':
+def idmtools_platform_post_run(item: 'IEntity', kwargs) -> 'IEntity':
     """
     Do a backup of sequence file if it is the id generator.
 
@@ -158,6 +152,8 @@ def idmtools_platform_post_create_item(item: 'IEntity', kwargs) -> 'IEntity':
     Returns:
         None
     """
+    from idmtools.entities.suite import Suite
+    from idmtools.entities.experiment import Experiment
     if IdmConfigParser.get_option(None, "id_generator", "uuid").lower() == "item_sequence":
         if isinstance(item, (Suite, Experiment)):
             sequence_file = Path(IdmConfigParser.get_option("item_sequence", "sequence_file", SEQUENCE_FILE_DEFAULT_PATH))
