@@ -46,8 +46,11 @@ def load_existing_sequence_data(sequence_file):
         with open(sequence_file, 'r') as file:
             try:
                 data = json.load(file)
-            except JSONDecodeError:
+            except JSONDecodeError as e:
                 return dict()
+                if logger.isEnabledFor(DEBUG):
+                    logger.error("Trouble loading data from sequence_file. Verify that designated sequence_file is not corrupted or deleted.")
+                    logger.exception(e)
     return data
 
 

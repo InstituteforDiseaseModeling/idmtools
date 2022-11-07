@@ -3,14 +3,19 @@ Define a list of function only hook specs. Useful for simple plugins.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+import shutil
 from logging import getLogger
 from typing import TYPE_CHECKING
+from pathlib import Path
 
+from idmtools import IdmConfigParser
 from pluggy import HookspecMarker, HookimplMarker
 
 if TYPE_CHECKING:
     from idmtools.core.interfaces.ientity import IEntity
     from idmtools.core.interfaces.irunnable_entity import IRunnableEntity
+    from idmtools.entities import Suite
+    from idmtools.entities.experiment import Experiment
 logger = getLogger(__name__)
 user_logger = getLogger('user')
 
@@ -38,7 +43,7 @@ def idmtools_platform_pre_create_item(item: 'IEntity', kwargs) -> 'IEntity':
 @function_hook_spec
 def idmtools_platform_post_create_item(item: 'IEntity', kwargs) -> 'IEntity':
     """
-    This callback is called by the pre_create of each object type on a platform. An item can be a suite, workitem, simulation, asset collection or an experiment.
+    This callback is called by the post_create of each object type on a platform. An item can be a suite, workitem, simulation, asset collection or an experiment.
 
     Args:
         item:
@@ -47,6 +52,11 @@ def idmtools_platform_post_create_item(item: 'IEntity', kwargs) -> 'IEntity':
     Returns:
         None
     """
+    if IdmConfigParser.get_option(None, "id_generator", "uuid").lower() == "item_sequence":
+        if isinstance(item, (Suite, Experiment)):
+            sequence_file = Path(IdmConfigParser.get_option("item_sequence", "sequence_file", Path().home().joinpath(".idmtools", "itemsequence", "index.json")))
+            sequence_file_bk = f'{sequence_file}.bak'
+            shutil.copy(sequence_file, sequence_file_bk)
     pass
 
 
