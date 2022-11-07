@@ -37,7 +37,23 @@ def idmtools_platform_pre_create_item(item: 'IEntity', kwargs) -> 'IEntity':
 @function_hook_spec
 def idmtools_platform_post_create_item(item: 'IEntity', kwargs) -> 'IEntity':
     """
-    This callback is called by the post_create of each object type on a platform. An item can be a suite, workitem, simulation, asset collection or an experiment.
+    This callback is called by the post_create of each object type on a platform.
+    An item can be a suite, workitem, simulation, asset collection or an experiment.
+
+    Args:
+        item:
+        kwargs: extra args
+
+    Returns:
+        None
+    """
+    pass
+
+
+@function_hook_spec
+def idmtools_platform_post_run(item: 'IEntity', kwargs) -> 'IEntity':
+    """
+    This is called when item finishes calling the run on the server
 
     Args:
         item:

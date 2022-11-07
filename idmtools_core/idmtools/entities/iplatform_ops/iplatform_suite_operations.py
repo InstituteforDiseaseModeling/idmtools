@@ -179,6 +179,9 @@ class IPlatformSuiteOperations(ABC):
         Returns:
             None
         """
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Calling idmtools_platform_post_run hooks")
+        FunctionPluginManager.instance().hook.idmtools_platform_post_run(item=suite, kwargs=kwargs)
         suite.status = EntityStatus.RUNNING
 
     def run_item(self, suite: Suite, **kwargs):

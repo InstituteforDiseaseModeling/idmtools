@@ -167,7 +167,9 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
         Returns:
             None
         """
-        pass
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Calling idmtools_platform_post_run hooks")
+        FunctionPluginManager.instance().hook.idmtools_platform_post_run(item=workflow_item, kwargs=kwargs)
 
     def run_item(self, workflow_item: IWorkflowItem, **kwargs):
         """

@@ -198,7 +198,9 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         Returns:
             None
         """
-        pass
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Calling idmtools_platform_post_run hooks")
+        FunctionPluginManager.instance().hook.idmtools_platform_post_run(item=simulation, kwargs=kwargs)
 
     def run_item(self, simulation: Simulation, **kwargs):
         """
