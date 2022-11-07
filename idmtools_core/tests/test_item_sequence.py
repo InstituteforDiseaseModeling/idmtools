@@ -207,3 +207,37 @@ class TestItemSequence(unittest.TestCase):
         e.run(wait_until_done=True)
         post_run = e.simulations.items
         self.assertEqual(pre_run, post_run)
+
+    @pytest.mark.serial
+    def test_seq_file_backup(self):
+        clear_id_cache()
+        parser = IdmConfigParser()
+        parser._load_config_file(file_name='idmtools_default_location.ini')
+        parser.ensure_init(file_name='idmtools_default_location.ini', force=True)
+        sequence_file = self.get_sequence_file()
+        mp = Path(COMMON_INPUT_PATH).joinpath("python").joinpath("model3.py")
+        task = JSONConfiguredPythonTask(script_path=str(mp),
+                                        envelope="parameters", parameters=(dict(c=0)))
+        platform = Platform('TestExecute', missing_ok=True)
+        ts = TemplatedSimulations(base_task=task)
+        e = Experiment.from_template(ts)
+        from idmtools.builders import SimulationBuilder
+        builder = SimulationBuilder()
+
+        def param_update(simulation, param, value):
+            return simulation.task.set_parameter(param, value)
+
+        builder.add_sweep_definition(partial(param_update, param="a"), range(3))
+        builder.add_sweep_definition(partial(param_update, param="b"), range(3))
+        e.simulations.add_builder(builder)
+        e.assets.add_asset(str(mp))
+        e.simulations = [s for s in e.simulations]
+
+        with platform:
+            e.run(wait_until_done=True)
+
+        f = open(sequence_file)
+        bak = open(f'{sequence_file}.bak')
+        sequence_file_json = json.load(f)
+        backup_file_json = json.load(bak)
+        self.assertEqual(sequence_file_json, backup_file_json)
