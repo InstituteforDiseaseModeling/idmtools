@@ -56,6 +56,9 @@ class IPlatformAssetCollectionOperations(CacheEnabled, ABC):
             NoReturn
         """
         if logger.isEnabledFor(DEBUG):
+            logger.debug("Calling idmtools_platform_post_create_item hooks")
+        FunctionPluginManager.instance().hook.idmtools_platform_post_create_item(item=asset_collection, kwargs=kwargs)
+        if logger.isEnabledFor(DEBUG):
             logger.debug("Calling post_creation")
         asset_collection.post_creation(self.platform)
 

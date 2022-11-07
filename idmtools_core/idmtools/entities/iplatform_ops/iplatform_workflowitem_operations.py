@@ -87,6 +87,9 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
             NoReturn
         """
         if logger.isEnabledFor(DEBUG):
+            logger.debug("Calling idmtools_platform_post_create_item hooks")
+        FunctionPluginManager.instance().hook.idmtools_platform_post_create_item(item=workflow_item, kwargs=kwargs)
+        if logger.isEnabledFor(DEBUG):
             logger.debug("Calling post_creation")
         workflow_item.post_creation(self.platform)
 

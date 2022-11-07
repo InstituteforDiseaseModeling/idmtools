@@ -70,6 +70,9 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
             NoReturn
         """
         if logger.isEnabledFor(DEBUG):
+            logger.debug("Calling idmtools_platform_post_create_item hooks")
+        FunctionPluginManager.instance().hook.idmtools_platform_post_create_item(item=simulation, kwargs=kwargs)
+        if logger.isEnabledFor(DEBUG):
             logger.debug("Calling post_creation")
         simulation.post_creation(self.platform)
 

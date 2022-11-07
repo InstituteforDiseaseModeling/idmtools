@@ -52,11 +52,6 @@ def idmtools_platform_post_create_item(item: 'IEntity', kwargs) -> 'IEntity':
     Returns:
         None
     """
-    if IdmConfigParser.get_option(None, "id_generator", "uuid").lower() == "item_sequence":
-        if isinstance(item, (Suite, Experiment)):
-            sequence_file = Path(IdmConfigParser.get_option("item_sequence", "sequence_file", Path().home().joinpath(".idmtools", "itemsequence", "index.json")))
-            sequence_file_bk = f'{sequence_file}.bak'
-            shutil.copy(sequence_file, sequence_file_bk)
     pass
 
 

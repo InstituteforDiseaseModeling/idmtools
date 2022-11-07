@@ -86,6 +86,9 @@ class IPlatformSuiteOperations(ABC):
         Returns:
             NoReturn
         """
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Calling idmtools_platform_post_create_item hooks")
+        FunctionPluginManager.instance().hook.idmtools_platform_post_create_item(item=suite, kwargs=kwargs)
         suite.status = EntityStatus.CREATED
         suite.platform = self.platform
         suite.post_creation(self.platform)

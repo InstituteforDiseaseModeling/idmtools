@@ -12,6 +12,7 @@ id_format_str = <custom_str_format>     ex: {item_name}{data[item_name]:06d}
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+import shutil
 import json
 import time
 from functools import lru_cache
@@ -19,15 +20,17 @@ from json import JSONDecodeError
 from logging import getLogger, INFO, DEBUG
 from pathlib import Path
 from random import randint
-
 import jinja2
 from filelock import FileLock
-
 from idmtools import IdmConfigParser
+from idmtools.core import IDMTOOLS_USER_HOME
 from idmtools.core.interfaces.ientity import IEntity
+from idmtools.entities import Suite
+from idmtools.entities.experiment import Experiment
 from idmtools.registry.hook_specs import function_hook_impl
 
 logger = getLogger(__name__)
+SEQUENCE_FILE_DEFAULT_PATH = IDMTOOLS_USER_HOME.joinpath("itemsequence", "index.json")
 
 
 def load_existing_sequence_data(sequence_file):
@@ -47,10 +50,11 @@ def load_existing_sequence_data(sequence_file):
             try:
                 data = json.load(file)
             except JSONDecodeError as e:
-                return dict()
                 if logger.isEnabledFor(DEBUG):
-                    logger.error("Trouble loading data from sequence_file. Verify that designated sequence_file is not corrupted or deleted.")
+                    logger.error("Trouble loading data from sequence_file. Verify that designated sequence_file is "
+                                 "not corrupted or deleted.")
                     logger.exception(e)
+                return dict()
     return data
 
 
@@ -63,7 +67,7 @@ def get_plugin_config():
         sequence_file: specified json file in .ini config in which id generator keeps track of sequential id's
         id_format_str: string specified in .ini config by which id's are formatted when assigned to sequential items
     """
-    sequence_file = Path(IdmConfigParser.get_option("item_sequence", "sequence_file", Path().home().joinpath(".idmtools", "itemsequence", "index.json")))
+    sequence_file = Path(IdmConfigParser.get_option("item_sequence", "sequence_file", SEQUENCE_FILE_DEFAULT_PATH))
     id_format_str = IdmConfigParser.get_option("item_sequence", "id_format_str", None)
     return sequence_file, id_format_str
 
@@ -135,3 +139,22 @@ def idmtools_generate_id(item: IEntity) -> str:
         return _get_template(id_format_str).render(**locals())
     else:
         return f'{item_name}{data[item_name]:07d}'
+
+
+@function_hook_impl
+def idmtools_platform_post_create_item(item: 'IEntity', kwargs) -> 'IEntity':
+    """
+    Do a backup of sequence file if it is the id generator.
+
+    Args:
+        item: Item(we only save on experiments/suites at the moment)
+        kwargs: extra args
+
+    Returns:
+        None
+    """
+    if IdmConfigParser.get_option(None, "id_generator", "uuid").lower() == "item_sequence":
+        if isinstance(item, (Suite, Experiment)):
+            sequence_file = Path(IdmConfigParser.get_option("item_sequence", "sequence_file", SEQUENCE_FILE_DEFAULT_PATH))
+            sequence_file_bk = f'{sequence_file}.bak'
+            shutil.copy(sequence_file, sequence_file_bk)
