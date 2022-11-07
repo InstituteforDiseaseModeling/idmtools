@@ -65,8 +65,7 @@ setup(
         idmtools_hooks=[
             "idmtools_add_git_tag = idmtools.plugins.git_commit",
             "idmtools_id_generate_uuid = idmtools.plugins.uuid_generator",
-            "idmtools_id_generate_item_sequence = idmtools.plugins.item_sequence",
-            "idmtools_backup_generate_item_sequence_hook = idmtools.plugins.item_sequence.idmtools_platform_post_create_item"
+            "idmtools_id_generate_item_sequence = idmtools.plugins.item_sequence"
         ]
     ),
     python_requires='>=3.6.*, !=3.7.0, !=3.7.1, !=3.7.2',

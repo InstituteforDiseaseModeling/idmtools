@@ -12,6 +12,8 @@ id_format_str = <custom_str_format>     ex: {item_name}{data[item_name]:06d}
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+from typing import TYPE_CHECKING
+
 import shutil
 import json
 import time
@@ -24,10 +26,12 @@ import jinja2
 from filelock import FileLock
 from idmtools import IdmConfigParser
 from idmtools.core import IDMTOOLS_USER_HOME
-from idmtools.core.interfaces.ientity import IEntity
-from idmtools.entities import Suite
-from idmtools.entities.experiment import Experiment
 from idmtools.registry.hook_specs import function_hook_impl
+if TYPE_CHECKING:
+    from idmtools.core.interfaces.ientity import IEntity
+    from idmtools.entities import Suite
+    from idmtools.entities.experiment import Experiment
+
 
 logger = getLogger(__name__)
 SEQUENCE_FILE_DEFAULT_PATH = IDMTOOLS_USER_HOME.joinpath("itemsequence", "index.json")
@@ -75,7 +79,8 @@ def get_plugin_config():
 @lru_cache(maxsize=None)
 def _get_template(id_format_str):
     """
-    Get our jinja template. Cache this to reduce work
+    Get our jinja template. Cache this to reduce work.
+
     Args:
         id_format_str: Format string
 
