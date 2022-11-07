@@ -72,7 +72,6 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         run_simulation_script = Path(__file__).parent.parent.joinpath('assets/run_simulation.sh')
         dest_script = Path(self.platform._op_client.get_directory(experiment)).joinpath('run_simulation.sh')
         shutil.copy(str(run_simulation_script), str(dest_script))
-        Path('.idmtools', 'itemsequence')
 
         # Make executable
         self.platform._op_client.update_script_mode(dest_script)
