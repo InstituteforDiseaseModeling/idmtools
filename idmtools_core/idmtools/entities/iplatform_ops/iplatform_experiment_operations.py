@@ -129,8 +129,7 @@ class IPlatformExperimentOperations(ABC):
         """
         pass
 
-    def batch_create(self, experiments: List[Experiment], display_progress: bool = True, **kwargs) -> List[
-        Tuple[Experiment]]:
+    def batch_create(self, experiments: List[Experiment], display_progress: bool = True, **kwargs) -> List[Tuple[Experiment]]:
         """
         Provides a method to batch create experiments.
 

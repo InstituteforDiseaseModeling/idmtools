@@ -13,7 +13,7 @@ if TYPE_CHECKING:  # pragma: no cover
 DEFAULT_ENVIRONMENTS = ["SLURMSTAGE", "CALCULON"]
 
 
-def set_linux_mounts(platform: 'IPlatform', linux_environment: str = None):
+def set_linux_mounts(platform: 'IPlatform', linux_environment: str = None) -> None:
     """
     For COMPS Platform, check and set linux mounts.
     Args:
@@ -23,7 +23,6 @@ def set_linux_mounts(platform: 'IPlatform', linux_environment: str = None):
     Returns:
         None
     """
-
     linux_envs = DEFAULT_ENVIRONMENTS
     if linux_environment is not None:
         linux_envs.append(linux_environment.upper())

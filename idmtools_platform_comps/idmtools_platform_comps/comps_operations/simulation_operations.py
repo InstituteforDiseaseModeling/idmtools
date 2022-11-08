@@ -609,8 +609,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         assets = self.platform._assets.to_entity(metadata).assets
         return assets
 
-    def all_files(self, simulation: Simulation, common_assets: bool = False, outfiles: bool = True, **kwargs) -> List[
-        Asset]:
+    def all_files(self, simulation: Simulation, common_assets: bool = False, outfiles: bool = True, **kwargs) -> List[Asset]:
         """
         Returns all files for a specific simulation including experiments or non-assets.
 
