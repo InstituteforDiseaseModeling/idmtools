@@ -230,8 +230,7 @@ class TestItemSequence(unittest.TestCase):
         builder.add_sweep_definition(partial(param_update, param="a"), range(3))
         builder.add_sweep_definition(partial(param_update, param="b"), range(3))
         e.simulations.add_builder(builder)
-        e.assets.add_asset(str(mp))
-        e.simulations = [s for s in e.simulations]
+
 
         with platform:
             e.run(wait_until_done=True)
