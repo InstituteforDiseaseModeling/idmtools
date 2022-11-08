@@ -48,7 +48,7 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
             Slurm Suite object created
         """
         # Generate Suite folder structure
-        self.platform._op_client.mk_directory(suite)
+        self.platform._op_client.mk_directory(suite, exist_ok=False)
         self.platform._metas.dump(suite)
 
         # Return Slurm Suite

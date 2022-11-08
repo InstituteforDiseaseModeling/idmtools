@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Union, Any
 from uuid import UUID
 
+from idmtools import IdmConfigParser
 from idmtools.core import ItemType, EntityStatus
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
@@ -78,7 +79,7 @@ class LocalSlurmOperations(SlurmOperations):
         raise RuntimeError(f"Not found path for item_id: {item_id} with type: {item_type}.")
 
     def mk_directory(self, item: Union[Suite, Experiment, Simulation] = None, dest: Union[Path, str] = None,
-                     exist_ok: bool = True) -> None:
+                     exist_ok: bool = False) -> None:
         """
         Make a new directory.
         Args:
@@ -94,7 +95,12 @@ class LocalSlurmOperations(SlurmOperations):
             target = self.get_directory(item)
         else:
             raise RuntimeError('Only support Suite/Experiment/Simulation or not None dest.')
-        target.mkdir(parents=True, exist_ok=exist_ok)
+
+        exist_ok = IdmConfigParser.get_option(option="EXIST_ITEM_DIR", fallback=False)
+        if exist_ok == False and os.path.exists(target):
+            raise RuntimeError('Item directory already exists. Exist_ok flag set to false to avoid data being overwritten.')
+        else:
+            target.mkdir(parents=True, exist_ok=exist_ok)
 
     def link_file(self, target: Union[Path, str], link: Union[Path, str]) -> None:
         """

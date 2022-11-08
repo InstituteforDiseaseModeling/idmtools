@@ -63,7 +63,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
             experiment.parent = suite
 
         # Generate Suite/Experiment/Simulation folder structure
-        self.platform._op_client.mk_directory(experiment)
+        self.platform._op_client.mk_directory(experiment, exist_ok=False)
         self.platform._metas.dump(experiment)
         self.platform._assets.dump_assets(experiment)
         self.platform._op_client.create_batch_file(experiment, **kwargs)
