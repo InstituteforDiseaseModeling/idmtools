@@ -638,12 +638,13 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             simulation_id: simulation id
 
         Returns:
-            Dict
+            Dict of simulation id as key and working dir as value
         """
         from idmtools_platform_comps.utils.linux_mounts import set_linux_mounts, clear_linux_mounts
         set_linux_mounts(self.platform)
         comps_sim = self.platform.get_item(simulation_id, ItemType.SIMULATION,
                                            query_criteria=QueryCriteria().select(['id', 'state']).select_children(
                                                'hpc_jobs'), raw=True)
+        sim_map = {str(comps_sim.id): comps_sim.hpc_jobs[-1].working_directory}
         clear_linux_mounts(self.platform)
-        return {str(comps_sim.id): comps_sim.hpc_jobs[-1].working_directory}
+        return sim_map
