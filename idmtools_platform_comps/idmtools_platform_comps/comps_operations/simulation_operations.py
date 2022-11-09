@@ -640,10 +640,10 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         Returns:
             Dict
         """
-        from idmtools_platform_comps.utils.linux_mounts import set_linux_mounts
+        from idmtools_platform_comps.utils.linux_mounts import set_linux_mounts, clear_linux_mounts
         set_linux_mounts(self.platform)
-
         comps_sim = self.platform.get_item(simulation_id, ItemType.SIMULATION,
                                            query_criteria=QueryCriteria().select(['id', 'state']).select_children(
                                                'hpc_jobs'), raw=True)
+        clear_linux_mounts(self.platform)
         return {str(comps_sim.id): comps_sim.hpc_jobs[-1].working_directory}
