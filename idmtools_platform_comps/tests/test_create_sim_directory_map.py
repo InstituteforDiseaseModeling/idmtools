@@ -40,7 +40,6 @@ class TestCreateSimDirectoryMap(ITestWithPersistence):
         comps_exp = platform.get_item(exp_id, ItemType.EXPERIMENT, raw=True)
         comps_sims = comps_exp.get_simulations(QueryCriteria().select_children('hpc_jobs'))
         for comps_sim in comps_sims:
-            self.assertEquals(workdir_dict[str(comps_sim.id)], comps_sim.hpc_jobs[0].working_directory)
             self.assertTrue(workdir_dict[str(comps_sim.id)].startswith(
                 r"/mnt/idm/home/shchen/output/20220801_emodpy_megatrends_sensitiv_20220912_193441/"))
 
@@ -59,8 +58,6 @@ class TestCreateSimDirectoryMap(ITestWithPersistence):
         sim_id = 'bb7793f1-d132-ed11-92ee-f0921c167860'  # comps2 simulation id in slurmstage
         platform = Platform('SlurmStage')
         workdir_dict = platform.create_sim_directory_map(item_id=sim_id, item_type=ItemType.SIMULATION)
-        comps_sim = COMPSSimulation.get(sim_id, QueryCriteria().select_children('hpc_jobs'))
-        self.assertEquals(workdir_dict[sim_id], comps_sim.hpc_jobs[0].working_directory)
         self.assertTrue(workdir_dict[sim_id].startswith(
             r"/mnt/idm/home/shchen/output/20220801_emodpy_megatrends_sensitiv_20220912_193441/"))
 
