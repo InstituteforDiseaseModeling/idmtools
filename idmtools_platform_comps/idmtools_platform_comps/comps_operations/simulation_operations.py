@@ -41,7 +41,8 @@ COMPS_EXPERIMENT_BATCH_COMMISSION_TIMESTAMP = 0
 
 
 def comps_batch_worker(simulations: List[Simulation], interface: 'CompsPlatformSimulationOperations', executor,
-                       num_cores: Optional[int] = None, priority: Optional[str] = None, asset_collection_id: Union[str, UUID] = None,
+                       num_cores: Optional[int] = None, priority: Optional[str] = None,
+                       asset_collection_id: Union[str, UUID] = None,
                        min_time_between_commissions: int = 10, **kwargs) -> List[COMPSSimulation]:
     """
     Run batch worker.
@@ -70,7 +71,8 @@ def comps_batch_worker(simulations: List[Simulation], interface: 'CompsPlatformS
             interface.pre_create(simulation)
             new_sims += 1
             simulation.platform = interface.platform
-            simulation._platform_object = interface.to_comps_sim(simulation, num_cores=num_cores, priority=priority, asset_collection_id=asset_collection_id, **kwargs)
+            simulation._platform_object = interface.to_comps_sim(simulation, num_cores=num_cores, priority=priority,
+                                                                 asset_collection_id=asset_collection_id, **kwargs)
             created_simulations.append(simulation)
     if logger.isEnabledFor(DEBUG):
         logger.debug(f'Finished converting to COMPS. Starting saving of {len(simulations)}')
@@ -134,7 +136,8 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         )
 
     def platform_create(self, simulation: Simulation, num_cores: int = None, priority: str = None,
-                        enable_platform_task_hooks: bool = True, asset_collection_id: Union[str, UUID] = None, **kwargs) -> COMPSSimulation:
+                        enable_platform_task_hooks: bool = True, asset_collection_id: Union[str, UUID] = None,
+                        **kwargs) -> COMPSSimulation:
         """
         Create Simulation on COMPS.
 
@@ -152,7 +155,8 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         from idmtools_platform_comps.utils.python_version import platform_task_hooks
         if enable_platform_task_hooks:
             simulation.task = platform_task_hooks(simulation.task, self.platform)
-        s = self.to_comps_sim(simulation, num_cores=num_cores, priority=priority, asset_collection_id=asset_collection_id, **kwargs)
+        s = self.to_comps_sim(simulation, num_cores=num_cores, priority=priority,
+                              asset_collection_id=asset_collection_id, **kwargs)
         COMPSSimulation.save(s, save_semaphore=COMPSSimulation.get_save_semaphore())
         return s
 
@@ -249,7 +253,8 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
 
         return Configuration(**comps_configuration)
 
-    def batch_create(self, simulations: List[Simulation], num_cores: int = None, priority: str = None, asset_collection_id: Union[str, UUID] = None, **kwargs) -> \
+    def batch_create(self, simulations: List[Simulation], num_cores: int = None, priority: str = None,
+                     asset_collection_id: Union[str, UUID] = None, **kwargs) -> \
             List[COMPSSimulation]:
         """
         Perform batch creation of Simulations.
@@ -266,8 +271,10 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         """
         global COMPS_EXPERIMENT_BATCH_COMMISSION_TIMESTAMP
         executor = ThreadPoolExecutor()
-        thread_func = partial(comps_batch_worker, interface=self, num_cores=num_cores, priority=priority, asset_collection_id=asset_collection_id,
-                              min_time_between_commissions=self.platform.min_time_between_commissions, executor=executor, **kwargs)
+        thread_func = partial(comps_batch_worker, interface=self, num_cores=num_cores, priority=priority,
+                              asset_collection_id=asset_collection_id,
+                              min_time_between_commissions=self.platform.min_time_between_commissions,
+                              executor=executor, **kwargs)
         results = batch_create_items(
             simulations,
             batch_worker_thread_func=thread_func,
@@ -359,7 +366,8 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         simulation.status = convert_comps_status(s.state)
 
     def to_entity(self, simulation: COMPSSimulation, load_task: bool = False, parent: Optional[Experiment] = None,
-                  load_parent: bool = False, load_metadata: bool = False, load_cli_from_workorder: bool = False, **kwargs) -> Simulation:
+                  load_parent: bool = False, load_metadata: bool = False, load_cli_from_workorder: bool = False,
+                  **kwargs) -> Simulation:
         """
         Convert COMPS simulation object to IDM Tools simulation object.
 
@@ -513,7 +521,8 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
                 # filter for workorder
                 workorder_obj = None
                 for a in simulation.assets:
-                    if getattr(a, '_platform_object', None) and isinstance(a._platform_object, SimulationFile) and a._platform_object.file_type == "WorkOrder":
+                    if getattr(a, '_platform_object', None) and isinstance(a._platform_object,
+                                                                           SimulationFile) and a._platform_object.file_type == "WorkOrder":
                         workorder_obj = a
                         break
                 # if assets
@@ -524,13 +533,15 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
                 else:
                     raise ValueError("Could not detect cli")
             else:  # if user doesn't care oabout metadata don't error
-                logger.debug("Could not load the cli from simulation. This is usually due to the use of scheduling config.")
+                logger.debug(
+                    "Could not load the cli from simulation. This is usually due to the use of scheduling config.")
                 cli = "WARNING_CouldNotLoadCLI"
         elif logger.isEnabledFor(DEBUG):
             logger.debug(f"Detected task CLI {cli}")
         return cli
 
-    def get_assets(self, simulation: Simulation, files: List[str], include_experiment_assets: bool = True, **kwargs) -> Dict[str, bytearray]:
+    def get_assets(self, simulation: Simulation, files: List[str], include_experiment_assets: bool = True, **kwargs) -> \
+            Dict[str, bytearray]:
         """
         Fetch the files associated with a simulation.
 
@@ -546,10 +557,12 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         # since assets could be in the common assets, we should check that firs
         # load comps config first
         comps_sim: COMPSSimulation = simulation.get_platform_object(load_children=["files", "configuration"])
-        if include_experiment_assets and (comps_sim.configuration is None or comps_sim.configuration.asset_collection_id is None):
+        if include_experiment_assets and (
+                comps_sim.configuration is None or comps_sim.configuration.asset_collection_id is None):
             if logger.isEnabledFor(DEBUG):
                 logger.debug("Gathering assets from experiment first")
-            exp_assets = get_asset_for_comps_item(self.platform, simulation.experiment, files, self.cache, load_children=["configuration"])
+            exp_assets = get_asset_for_comps_item(self.platform, simulation.experiment, files, self.cache,
+                                                  load_children=["configuration"])
             if exp_assets is None:
                 exp_assets = dict()
         else:
@@ -617,3 +630,20 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             ac.add_assets(self.retrieve_output_files(simulation))
 
         return ac.assets
+
+    def create_sim_directory_map(self, simulation_id: Union[str, UUID]) -> Dict:
+        """
+        Build simulation working directory mapping.
+        Args:
+            simulation_id: simulation id
+
+        Returns:
+            Dict
+        """
+        from idmtools_platform_comps.utils.linux_mounts import set_linux_mounts
+        set_linux_mounts(self.platform)
+
+        comps_sim = self.platform.get_item(simulation_id, ItemType.SIMULATION,
+                                           query_criteria=QueryCriteria().select(['id', 'state']).select_children(
+                                               'hpc_jobs'), raw=True)
+        return {str(comps_sim.id): comps_sim.hpc_jobs[-1].working_directory}

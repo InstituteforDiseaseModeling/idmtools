@@ -28,7 +28,7 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
 
     def get(self, simulation_id: Union[str, UUID], **kwargs) -> Dict:
         """
-        Gets an simulation from the Slurm platform.
+        Gets a simulation from the Slurm platform.
         Args:
             simulation_id: Simulation id
             kwargs: keyword arguments used to expand functionality
@@ -168,3 +168,15 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
             None
         """
         raise NotImplementedError("Refresh simulation status is not called directly on the Slurm Platform")
+
+    def create_sim_directory_map(self, simulation_id: Union[str, UUID]) -> Dict:
+        """
+        Build simulation working directory mapping.
+        Args:
+            simulation_id: simulation id
+
+        Returns:
+            Dict
+        """
+        sim = self.platform.get_item(simulation_id, ItemType.SIMULATION, raw=False)
+        return {str(sim.id): str(self.platform._op_client.get_directory_by_id(simulation_id, ItemType.SIMULATION))}

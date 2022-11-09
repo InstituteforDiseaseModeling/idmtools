@@ -977,6 +977,19 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         """
         return [x for x in self._platform_defaults if isinstance(x, default_type)]
 
+    def create_sim_directory_map(self, item_id: Union[str, UUID], item_type: ItemType) -> Dict:
+        """
+        Build simulation working directory mapping.
+        Args:
+            item_id: Entity id
+            item_type: ItemType
+
+        Returns:
+            Dict
+        """
+        interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item_type]
+        return getattr(self, interface).create_sim_directory_map(item_id)
+
 
 TPlatform = TypeVar("TPlatform", bound=IPlatform)
 TPlatformClass = Type[TPlatform]
