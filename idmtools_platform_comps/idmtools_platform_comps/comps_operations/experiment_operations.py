@@ -475,7 +475,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             experiment_id: experiment id
 
         Returns:
-            Dict
+            Dict of simulation id as key and working dir as value
         """
         from idmtools_platform_comps.utils.linux_mounts import set_linux_mounts, clear_linux_mounts
         set_linux_mounts(self.platform)

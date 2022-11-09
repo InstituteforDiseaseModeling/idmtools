@@ -150,7 +150,7 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
             suite_id: suite id
 
         Returns:
-            Dict
+            Dict of simulation id as key and working dir as value
         """
         # s = Suite.get(suite_id)
         comps_suite = self.platform.get_item(suite_id, ItemType.SUITE, raw=True)
