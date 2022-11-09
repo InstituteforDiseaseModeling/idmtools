@@ -133,7 +133,7 @@ class TestSlurmPlatform(ITestWithPersistence):
         suite = Suite()
         local = LocalSlurmOperations(platform=self.platform)
         dest_dir = tempfile.mkdtemp()
-        local.mk_directory(suite, dest=dest_dir)
+        local.mk_directory(suite, dest=dest_dir, exist_ok=True)
         expected_dir = os.path.join(dest_dir)
         self.assertTrue(os.path.isdir(expected_dir))
 
@@ -229,7 +229,7 @@ class TestSlurmPlatform(ITestWithPersistence):
         local = LocalSlurmOperations(platform=self.platform)
         suite = Suite()
         temp_path = tempfile.mkdtemp()
-        local.mk_directory(suite, dest=temp_path)
+        local.mk_directory(suite, dest=temp_path, exist_ok=True)
         with self.assertRaises(NotImplementedError) as ex:
             local.create_batch_file(suite, item_path=temp_path)
         self.assertEqual(ex.exception.args[0], "Suite is not supported for batch creation.")

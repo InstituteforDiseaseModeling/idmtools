@@ -22,4 +22,4 @@ def idmtools_generate_id(item: IEntity) -> str:
     Returns:
         uuid str as item id
     """
-    return str(uuid4())
+    return uuid4()

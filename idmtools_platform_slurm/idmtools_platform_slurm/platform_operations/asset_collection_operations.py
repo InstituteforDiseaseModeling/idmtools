@@ -149,7 +149,7 @@ class SlurmPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
             exp_asset_dir = Path(self.platform._op_client.get_directory(item), 'Assets')
             self.platform._op_client.mk_directory(dest=exp_asset_dir)
             for asset in item.assets:
-                self.platform._op_client.mk_directory(dest=exp_asset_dir.joinpath(asset.relative_path))
+                self.platform._op_client.mk_directory(dest=exp_asset_dir.joinpath(asset.relative_path), exist_ok=True)
                 self.copy_asset(asset, exp_asset_dir.joinpath(asset.relative_path))
         elif isinstance(item, Simulation):
             exp_dir = self.platform._op_client.get_directory(item.parent)
