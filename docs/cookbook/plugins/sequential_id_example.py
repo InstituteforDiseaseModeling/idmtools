@@ -5,6 +5,7 @@ from typing import Any, Dict
 from pathlib import Path
 from idmtools import IdmConfigParser
 from idmtools.builders import SimulationBuilder
+from idmtools.core import IDMTOOLS_USER_HOME
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
@@ -15,13 +16,13 @@ from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 # You need to define your own SlurmNative configuration block before running this example
 # Please update examples/idmtools.ini accordingly
 platform = Platform('SlurmNative')
+SEQUENCE_FILE_DEFAULT_PATH = IDMTOOLS_USER_HOME.joinpath("itemsequence", "index.json")
 
 with platform:
     parser = IdmConfigParser()
     parser._load_config_file(file_name='idmtools_item_sequence_example.ini')
     parser.ensure_init(file_name='idmtools_item_sequence_example.ini', force=True)
-    sequence_file = Path(
-        IdmConfigParser.get_option("item_sequence", "sequence_file", 'item_sequences.json')).expanduser()
+    sequence_file = Path(IdmConfigParser.get_option("item_sequence", "sequence_file", SEQUENCE_FILE_DEFAULT_PATH))
     if sequence_file.exists():
         sequence_file.unlink()
 
