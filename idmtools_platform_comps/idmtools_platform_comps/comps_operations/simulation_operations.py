@@ -645,5 +645,6 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         comps_sim = self.platform.get_item(simulation_id, ItemType.SIMULATION,
                                            query_criteria=QueryCriteria().select(['id', 'state']).select_children(
                                                'hpc_jobs'), raw=True)
+        sim_map = {str(comps_sim.id): comps_sim.hpc_jobs[-1].working_directory}
         clear_linux_mounts(self.platform)
-        return {str(comps_sim.id): comps_sim.hpc_jobs[-1].working_directory}
+        return sim_map
