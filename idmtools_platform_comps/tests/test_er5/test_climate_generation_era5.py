@@ -15,7 +15,7 @@ from idmtools_test.utils.utils import get_case_name
 
 @pytest.mark.ssmt
 @pytest.mark.comps
-@pytest.skip("no need to run")
+@pytest.mark.skip
 class ClimateGenerationTest(ITestWithPersistence):
 
     def setUp(self):
