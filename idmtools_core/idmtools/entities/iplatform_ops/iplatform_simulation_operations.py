@@ -6,7 +6,7 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from logging import getLogger, DEBUG
-from typing import Type, Any, List, Dict, NoReturn, Optional
+from typing import Type, Any, List, Dict, NoReturn, Optional, Union
 from uuid import UUID
 from idmtools.assets import Asset
 from idmtools.core.cache_enabled import CacheEnabled
@@ -272,9 +272,20 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         List available assets for a simulation.
 
         Args:
-            simulation: Simulation of assets Assets
+            simulation: Simulation of Assets
 
         Returns:
             List of filenames
         """
         pass
+
+    def create_sim_directory_map(self, simulation_id: Union[str, UUID]) -> Dict:
+        """
+        Build simulation working directory mapping.
+        Args:
+            simulation_id: simulation id
+
+        Returns:
+            Dict
+        """
+        return {}

@@ -235,3 +235,16 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         # Refresh status for each simulation
         for sim in experiment.simulations:
             sim.status = self.platform._op_client.get_simulation_status(sim.id, **kwargs)
+
+    def create_sim_directory_map(self, experiment_id: Union[str, UUID]) -> Dict:
+        """
+        Build simulation working directory mapping.
+        Args:
+            experiment_id: experiment id
+
+        Returns:
+            Dict
+        """
+        exp = self.platform.get_item(experiment_id, ItemType.EXPERIMENT, raw=False)
+        sims = exp.simulations
+        return {str(sim.id): str(self.platform._op_client.get_directory(sim)) for sim in sims}
