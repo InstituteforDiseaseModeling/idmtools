@@ -3,9 +3,13 @@ Define our common enums to be used through idmtools.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+from pathlib import Path
+
 from enum import Enum
 
 TRUTHY_VALUES = ['1', 'y', 'yes', 'on', 'true', 't', 1, True]
+# Used to store idmtools user specific config/data
+IDMTOOLS_USER_HOME = Path().home().joinpath(".idmtools")
 
 
 class EntityStatus(Enum):

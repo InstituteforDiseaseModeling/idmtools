@@ -5,7 +5,7 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import shutil
 from pathlib import Path
-from uuid import UUID, uuid4
+from uuid import UUID
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, List, Type, Dict, Optional, Any, Union
 from idmtools.assets import Asset, AssetCollection
@@ -53,6 +53,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
             Slurm Experiment object created
         """
+
         # ensure experiment's parent
         experiment.parent_id = experiment.parent_id or experiment.suite_id
         if experiment.parent_id is None:
@@ -61,10 +62,8 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
             # update parent
             experiment.parent = suite
 
-        if not isinstance(experiment.uid, UUID):
-            experiment.uid = uuid4()
         # Generate Suite/Experiment/Simulation folder structure
-        self.platform._op_client.mk_directory(experiment)
+        self.platform._op_client.mk_directory(experiment, exist_ok=False)
         self.platform._metas.dump(experiment)
         self.platform._assets.dump_assets(experiment)
         self.platform._op_client.create_batch_file(experiment, **kwargs)

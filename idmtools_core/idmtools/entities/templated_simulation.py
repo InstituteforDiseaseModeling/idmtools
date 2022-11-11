@@ -232,6 +232,8 @@ class TemplatedSimulations:
         """
         # TODO: the experiment should be frozen when the first simulation is created
         sim = copy.deepcopy(self.base_simulation)
+        # Set UID=none to ensure it is regenerated
+        sim._uid = None
         sim.assets = copy.deepcopy(self.base_simulation.assets)
         sim.parent = self.parent
         return sim

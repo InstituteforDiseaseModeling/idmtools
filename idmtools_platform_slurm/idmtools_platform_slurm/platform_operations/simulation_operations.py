@@ -53,12 +53,10 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
         Returns:
             Slurm Simulation object created.
         """
-        if not isinstance(simulation.uid, UUID):
-            simulation.uid = uuid4()
         simulation.name = clean_experiment_name(simulation.experiment.name if not simulation.name else simulation.name)
 
         # Generate Simulation folder structure
-        self.platform._op_client.mk_directory(simulation)
+        self.platform._op_client.mk_directory(simulation, exist_ok=False)
         self.platform._metas.dump(simulation)
         self.platform._assets.link_common_assets(simulation)
         self.platform._assets.dump_assets(simulation)

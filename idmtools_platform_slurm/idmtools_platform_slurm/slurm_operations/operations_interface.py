@@ -33,7 +33,7 @@ class SlurmOperations(ABC):
         pass
 
     @abstractmethod
-    def mk_directory(self, item: IEntity) -> None:
+    def mk_directory(self, item: IEntity, exist_ok: bool = False) -> None:
         pass
 
     @abstractmethod

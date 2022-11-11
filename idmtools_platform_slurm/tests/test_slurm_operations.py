@@ -96,6 +96,7 @@ class TestSlurmOperations(ITestWithPersistence):
             children = self.platform.get_children(self.exp.uid, ItemType.EXPERIMENT)
             for child in children:
                 self.assertTrue(isinstance(child, Simulation))
+                # this depends on the config for the op so we need to make this test ensure it uses correct config
                 self.assertTrue(isinstance(child.uid, UUID))
             self.assertEqual(len(self.exp.simulations), len(children))
             for s in self.exp.simulations:

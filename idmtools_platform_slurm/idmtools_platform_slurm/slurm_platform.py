@@ -96,6 +96,9 @@ class SlurmPlatform(IPlatform):
     # modules to be load
     modules: list = field(default_factory=list, metadata=dict(sbatch=True))
 
+    # Specifies default setting of whether slurm should fail if item directory already exists
+    dir_exist_ok: bool = field(default=False)
+
     # endregion
 
     _suites: SlurmPlatformSuiteOperations = field(**op_defaults, repr=False, init=False)
