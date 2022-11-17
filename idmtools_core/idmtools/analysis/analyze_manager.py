@@ -157,8 +157,6 @@ class AnalyzeManager:
 
         # These are leaf items to be ignored in analysis. Make sure they are UUID and then prune them from analysis.
         self.exclude_ids = exclude_ids or []
-        for index, oid in enumerate(self.exclude_ids):
-            self.exclude_ids[index] = oid if isinstance(oid, UUID) else UUID(oid)
         self.potential_items = [item for item in self.potential_items if item.uid not in self.exclude_ids]
         for item in self.potential_items:
             item.platform = self.platform

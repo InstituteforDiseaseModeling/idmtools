@@ -311,8 +311,6 @@ class TestExecutePlatformSimulationOperation(IPlatformSimulationOperations):
                   **kwargs) -> Simulation:
         # convert the dictionary to simulation
         sim: Simulation = Simulation(**{k: v for k, v in dict_sim.items() if k not in ['platform_id', 'item_type']})
-        # str to uid
-        sim._uid = UUID(sim._uid)
         try:
             # load status from str
             sim.status = EntityStatus[sim.status.upper()]

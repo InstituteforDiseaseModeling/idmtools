@@ -145,7 +145,6 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
             parent = self.platform.get_item(slurm_sim.parent_id, ItemType.EXPERIMENT, force=True)
         sim = Simulation(task=None)
         sim.platform = self.platform
-        sim.uid = UUID(slurm_sim.uid)
         sim.name = slurm_sim.name
         sim.parent_id = parent.id
         sim.parent = parent

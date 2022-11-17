@@ -112,7 +112,6 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
         """
         suite = Suite()
         suite.platform = self.platform
-        suite.uid = UUID(slurm_suite.uid)
         suite.name = slurm_suite.name
         suite.parent = None
         suite.tags = slurm_suite.tags
