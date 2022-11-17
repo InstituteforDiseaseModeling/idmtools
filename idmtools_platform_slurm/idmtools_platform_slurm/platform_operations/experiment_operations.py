@@ -9,6 +9,7 @@ from uuid import UUID, uuid4
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, List, Type, Dict, Optional, Any, Union
 from idmtools.assets import Asset, AssetCollection
+from idmtools.core import EntityStatus
 from idmtools.core import ItemType
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
@@ -224,7 +225,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
             experiment: idmtools Experiment
             kwargs: keyword arguments used to expand functionality
         Returns:
-            None
+            Dict of simulation id as key and working dir as value
         """
         # Check if file job_id.txt exists
         job_id_path = self.platform._op_client.get_directory(experiment).joinpath('job_id.txt')
@@ -248,3 +249,22 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         exp = self.platform.get_item(experiment_id, ItemType.EXPERIMENT, raw=False)
         sims = exp.simulations
         return {str(sim.id): str(self.platform._op_client.get_directory(sim)) for sim in sims}
+
+    def platform_kill(self, experiment_id: Union[str, UUID]) -> None:
+        """
+        Kill platform experiment.
+        Args:
+            experiment_id: experiment id
+        Returns:
+            None
+        """
+        experiment = self.platform.get_item(experiment_id, ItemType.EXPERIMENT, raw=False)
+        sims = experiment.simulations
+
+        # TODO: may check experiment.status Succeeded or done???
+        for sim in experiment.get_simulations():
+            # if sim.status == EntityStatus.RUNNING:
+            if sim.status not in (EntityStatus.SUCCEEDED, EntityStatus.FAILED, EntityStatus.CREATED):
+                return
+
+        # TODO: cancel experiment job

@@ -144,13 +144,37 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
             suite_id: suite id
 
         Returns:
-            Dict
+            Dict of simulation id as key and working dir as value
         """
         # s = Suite.get(suite_id)
-        slurm_suite = self.platform.get_item(suite_id, ItemType.SUITE, raw=False)
-        exps = slurm_suite.experiments
+        suite = self.platform.get_item(suite_id, ItemType.SUITE, raw=False)
+        exps = suite.experiments
         sims_map = {}
         for exp in exps:
             d = self.platform._experiments.create_sim_directory_map(exp.id)
             sims_map = {**sims_map, **d}
         return sims_map
+
+    def platform_kill(self, site_ids: List[str] = []) -> None:
+        """
+        Delete platform suites.
+        Args:
+            site_ids: platform suite ids
+        Returns:
+            None
+        """
+        for site_id in site_ids:
+            suite = self.platform.get_item(suite_id, ItemType.SUITE, raw=False)
+            exps = suite.experiments
+            for exp in exps:
+                try:
+                    # TODO: may need to cancel Slurm jobs as well...
+                    shutil.rmtree(self.platform._op_client.get_directory(exp))
+                except RuntimeError:
+                    logger.info("Could not delete the associated experiment...")
+                    return
+            try:
+                shutil.rmtree(self.platform._op_client.get_directory(suite))
+            except RuntimeError:
+                logger.info(f"Could not delete suite ({suite_id})...")
+                return
