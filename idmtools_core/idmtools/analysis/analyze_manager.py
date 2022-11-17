@@ -10,7 +10,6 @@ import time
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 from logging import getLogger, DEBUG
 from typing import NoReturn, List, Dict, Tuple, Optional, Union, TYPE_CHECKING
-from uuid import UUID
 from tqdm import tqdm
 from idmtools import IdmConfigParser
 from idmtools.analysis.map_worker_entry import map_item
@@ -70,11 +69,11 @@ class AnalyzeManager:
         pass
 
     def __init__(self, platform: 'IPlatform' = None, configuration: dict = None,
-                 ids: List[Tuple[Union[str, UUID], ItemType]] = None,
+                 ids: List[Tuple[Union[str], ItemType]] = None,
                  analyzers: List[IAnalyzer] = None, working_dir: str = None,
                  partial_analyze_ok: bool = False, max_items: Optional[int] = None, verbose: bool = True,
                  force_manager_working_directory: bool = False,
-                 exclude_ids: List[Union[str, UUID]] = None, analyze_failed_items: bool = False,
+                 exclude_ids: List[Union[str]] = None, analyze_failed_items: bool = False,
                  max_workers: Optional[int] = None, executor_type: str = 'process'):
         """
         Initialize the AnalyzeManager.
@@ -82,14 +81,14 @@ class AnalyzeManager:
         Args:
             platform (IPlatform): Platform
             configuration (dict, optional): Initial Configuration. Defaults to None.
-            ids (Tuple[UUID, ItemType], optional): List of ids as pair of Tuple and ItemType. Defaults to None.
+            ids (Tuple[ItemType], optional): List of ids as pair of Tuple and ItemType. Defaults to None.
             analyzers (List[IAnalyzer], optional): List of Analyzers. Defaults to None.
             working_dir (str, optional): The working directory. Defaults to os.getcwd().
             partial_analyze_ok (bool, optional): Whether partial analysis is ok. When this is True, Experiments in progress or Failed can be analyzed. Defaults to False.
             max_items (int, optional): Max Items to analyze. Useful when developing and testing an Analyzer. Defaults to None.
             verbose (bool, optional): Print extra information about analysis. Defaults to True.
             force_manager_working_directory (bool, optional): [description]. Defaults to False.
-            exclude_ids (List[UUID], optional): [description]. Defaults to None.
+            exclude_ids (List[st], optional): [description]. Defaults to None.
             analyze_failed_items (bool, optional): Allows analyzing of failed items. Useful when you are trying to aggregate items that have failed. Defaults to False.
             max_workers (int, optional): Set the max workers. If not provided, falls back to the configuration item *max_threads*. If max_workers is not set in configuration, defaults to CPU count
             executor_type: (str): Whether to use process or thread pooling. Process pooling is more efficient but threading might be required in some environments
@@ -146,7 +145,6 @@ class AnalyzeManager:
         for oid, otype in ids:
             logger.debug(f'Getting metadata for {oid} and {otype}')
             item = self.platform.get_item(oid, otype, force=True, raw=True)
-            item.uid = item.id if isinstance(item.id, UUID) else UUID(item.id)
             item.platform = self.platform
             items.append(item)
         self.potential_items: List[IEntity] = []
@@ -202,7 +200,7 @@ class AnalyzeManager:
         """
         self.potential_items.extend(self.platform.flatten_item(item=item, raw=True))
 
-    def _get_items_to_analyze(self) -> Dict[UUID, IEntity]:
+    def _get_items_to_analyze(self) -> Dict[str, IEntity]:
         """
         Get a list of items derived from :meth:`self._items` that are available to analyze.
 
@@ -413,7 +411,7 @@ class AnalyzeManager:
             user_logger.error('No items were provided; cannot run analysis.')
             return False
         # trim processing to those items that are ready and match requested limits
-        self._items: Dict[UUID, IEntity] = self._get_items_to_analyze()
+        self._items: Dict[str, IEntity] = self._get_items_to_analyze()
 
         if len(self._items) == 0:
             user_logger.error('No items are ready; cannot run analysis.')

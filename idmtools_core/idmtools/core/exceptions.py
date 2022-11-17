@@ -6,7 +6,6 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 import sys
 import typing
 from logging import getLogger
-from uuid import UUID
 
 if typing.TYPE_CHECKING:
     from idmtools.entities.iplatform import TPlatform
@@ -20,7 +19,7 @@ class ExperimentNotFound(Exception):
     Thrown when an experiment cannot be found on a platform.
     """
 
-    def __init__(self, experiment_id: UUID, platform: 'TPlatform' = None):
+    def __init__(self, experiment_id: str, platform: 'TPlatform' = None):
         """
         Initialize our ExperimentNotFound.
 

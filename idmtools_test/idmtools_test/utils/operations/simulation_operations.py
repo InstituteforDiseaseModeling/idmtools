@@ -64,7 +64,6 @@ class TestPlatformSimulationOperation(IPlatformSimulationOperations):
             if simulation.status is None:
                 self.pre_create(simulation)
                 experiment_id = simulation.parent_id
-                simulation.uid = uuid4()
                 self.post_create(simulation)
                 simulations.append(simulation)
 

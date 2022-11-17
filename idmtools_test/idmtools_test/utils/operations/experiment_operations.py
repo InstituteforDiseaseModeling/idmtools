@@ -32,12 +32,10 @@ class TestPlatformExperimentOperation(IPlatformExperimentOperations):
     def platform_create(self, experiment: Experiment, **kwargs) -> Experiment:
         if logger.isEnabledFor(DEBUG):
             logger.debug('Creating Experiment')
-        uid = uuid4()
-        experiment.uid = uid
         EXPERIMENTS_LOCK.acquire()
-        self.experiments[uid] = experiment
+        self.experiments[experiment.uid] = experiment
         EXPERIMENTS_LOCK.release()
-        self.platform._simulations._save_simulations_to_cache(uid, list(), overwrite=True)
+        self.platform._simulations._save_simulations_to_cache(experiment.uid, list(), overwrite=True)
         logger.debug(f"Created Experiment {experiment.uid}")
         return experiment
 

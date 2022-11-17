@@ -8,7 +8,6 @@ import warnings
 from abc import ABC
 from dataclasses import dataclass, field, fields, InitVar
 from typing import NoReturn, Dict, Any, TYPE_CHECKING
-from uuid import UUID
 from idmtools.assets import AssetCollection
 from idmtools.assets.file_list import FileList
 from idmtools.core import ItemType
@@ -33,7 +32,7 @@ class IWorkflowItem(IAssetsEnabled, INamedEntity, IRunnableEntity, ABC):
     #: Legacy name for workflow items
     item_name: InitVar[str] = None
     #: Legacy name. Set assets now
-    asset_collection_id: InitVar[UUID] = None
+    asset_collection_id: InitVar[str] = None
     #: Tags associated with the work item
     tags: Dict[str, Any] = field(default_factory=lambda: {})
     #: Common Assets for the workitem
@@ -54,7 +53,7 @@ class IWorkflowItem(IAssetsEnabled, INamedEntity, IRunnableEntity, ABC):
 
     item_type: 'ItemType' = field(default=ItemType.WORKFLOW_ITEM, compare=False, init=False)
 
-    def __post_init__(self, item_name: str, asset_collection_id: UUID, asset_files: FileList, user_files: FileList):
+    def __post_init__(self, item_name: str, asset_collection_id: str, asset_files: FileList, user_files: FileList):
         """
         Constructor.
 

@@ -8,7 +8,6 @@ from functools import lru_cache
 from inspect import signature
 from logging import getLogger, DEBUG
 from typing import List, Callable, TYPE_CHECKING, Any, Dict
-from uuid import UUID
 
 from idmtools import IdmConfigParser
 from idmtools.registry.functions import FunctionPluginManager
@@ -45,7 +44,7 @@ class IItem:
     In addition, IItem facilities pre and post creation hooks through the __pre_creation_hooks, __post_creation_hooks, add_pre_creation_hook, add_post_creation_hook
 
     """
-    _uid: UUID = field(default=None, metadata={"md": True})
+    _uid: str = field(default=None, metadata={"md": True})
     __pre_creation_hooks: List[PRE_POST_CREATION_HOOK] = field(default_factory=list, metadata={"md": True})
     __post_creation_hooks: List[PRE_POST_CREATION_HOOK] = field(default_factory=list, metadata={"md": True})
 

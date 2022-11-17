@@ -7,7 +7,6 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from logging import getLogger, DEBUG
 from typing import Type, Any, List, Dict, NoReturn, Optional
-from uuid import UUID
 from idmtools.assets import Asset
 from idmtools.core.cache_enabled import CacheEnabled
 from idmtools.entities.experiment import Experiment
@@ -27,7 +26,7 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
     platform_type: Type
 
     @abstractmethod
-    def get(self, simulation_id: UUID, **kwargs) -> Any:
+    def get(self, simulation_id: str, **kwargs) -> Any:
         """
         Returns the platform representation of an Simulation.
 
@@ -89,7 +88,7 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
             **kwargs: Optional arguments mainly for extensibility
 
         Returns:
-            Created platform item and the UUID of said item
+            Created platform item and the id of said item
         """
         if simulation.status is not None:
             return simulation
@@ -118,7 +117,7 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
             **kwargs: Optional arguments mainly for extensibility
 
         Returns:
-            Created platform item and the UUID of said item
+            Created platform item and the id of said item
         """
         pass
 

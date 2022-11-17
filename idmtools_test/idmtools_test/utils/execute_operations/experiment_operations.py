@@ -50,8 +50,6 @@ class TestExecutePlatformExperimentOperation(IPlatformExperimentOperations):
     def platform_create(self, experiment: Experiment, **kwargs) -> Any:
         if logger.isEnabledFor(DEBUG):
             logger.debug('Creating Experiment')
-        if experiment.uid is None:
-            experiment.uid = uuid4()
         EXPERIMENTS_LOCK.acquire()
         self.experiments[experiment.uid] = experiment
         EXPERIMENTS_LOCK.release()

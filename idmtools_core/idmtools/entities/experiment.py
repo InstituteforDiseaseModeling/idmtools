@@ -8,7 +8,6 @@ TemplatedSimulations are useful for building large numbers of similar simulation
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import copy
-import uuid
 from dataclasses import dataclass, field, InitVar, fields
 from logging import getLogger, DEBUG
 from types import GeneratorType
@@ -60,7 +59,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         assets: The asset collection for assets global to this experiment.
     """
     #: Suite ID
-    suite_id: uuid = field(default=None)
+    suite_id: str = field(default=None)
     #: Item Item(always an experiment)
     item_type: ItemType = field(default=ItemType.EXPERIMENT, compare=False, init=False)
     #: Task Type(defaults to command)
@@ -580,7 +579,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
 
     # Define this here for better completion in IDEs for end users
     @classmethod
-    def from_id(cls, item_id: Union[str, uuid.UUID], platform: 'IPlatform' = None, copy_assets: bool = False,
+    def from_id(cls, item_id: Union[str], platform: 'IPlatform' = None, copy_assets: bool = False,
                 **kwargs) -> 'Experiment':
         """
         Helper function to provide better intellisense to end users.

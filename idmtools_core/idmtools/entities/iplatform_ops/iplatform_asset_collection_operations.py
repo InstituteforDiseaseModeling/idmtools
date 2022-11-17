@@ -7,7 +7,6 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from logging import DEBUG, getLogger
 from typing import Any, List, Type, NoReturn, TYPE_CHECKING
-from uuid import UUID
 from idmtools.assets import AssetCollection
 from idmtools.core import CacheEnabled
 from idmtools.entities.iplatform_ops.utils import batch_create_items
@@ -75,7 +74,7 @@ class IPlatformAssetCollectionOperations(CacheEnabled, ABC):
             **kwargs: Optional arguments mainly for extensibility
 
         Returns:
-            Created platform item and the UUID of said item
+            Created platform item and the id of said item
         """
         if asset_collection.status is not None:
             return asset_collection._platform_object
@@ -102,7 +101,7 @@ class IPlatformAssetCollectionOperations(CacheEnabled, ABC):
             **kwargs: Optional arguments mainly for extensibility
 
         Returns:
-            Created platform item and the UUID of said item
+            Created platform item and the id of said item
         """
         pass
 
@@ -123,7 +122,7 @@ class IPlatformAssetCollectionOperations(CacheEnabled, ABC):
                                   progress_description="Uploading Assets", unit="asset collection", **kwargs)
 
     @abstractmethod
-    def get(self, asset_collection_id: UUID, **kwargs) -> Any:
+    def get(self, asset_collection_id: str, **kwargs) -> Any:
         """
         Returns the platform representation of an AssetCollection.
 

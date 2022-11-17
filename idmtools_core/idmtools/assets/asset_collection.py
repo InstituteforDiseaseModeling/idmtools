@@ -63,7 +63,7 @@ class AssetCollection(IEntity):
         self.tags = self.tags or tags
 
     @classmethod
-    def from_id(cls, item_id: Union[str, UUID], platform: 'IPlatform' = None, as_copy: bool = False,  # noqa E821
+    def from_id(cls, item_id: Union[str], platform: 'IPlatform' = None, as_copy: bool = False,  # noqa E821
                 **kwargs) -> 'AssetCollection':
         """
         Loads a AssetCollection from id.
