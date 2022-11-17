@@ -484,3 +484,24 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         sim_map = {str(sim.id): sim.hpc_jobs[-1].working_directory for sim in comps_sims}
         clear_linux_mounts(self.platform)
         return sim_map
+
+    def platform_kill(self, experiment_id: Union[str, UUID]) -> None:
+        """
+        Kill platform experiment.
+        Args:
+            experiment_id: experiment id
+        Returns:
+            None
+        """
+        def experiment_is_running(comps_exp):
+            from COMPS.Data.Simulation import SimulationState
+            for sim in comps_exp.get_simulations():
+                if sim.state not in (SimulationState.Succeeded, SimulationState.Failed,
+                                     SimulationState.Canceled, SimulationState.Created,
+                                     SimulationState.CancelRequested):
+                    return True
+            return False
+
+        comps_experiment = self.platform.get_item(experiment_id, ItemType.EXPERIMENT, raw=True)
+        if comps_experiment and experiment_is_running(comps_experiment):
+            comps_experiment.cancel()

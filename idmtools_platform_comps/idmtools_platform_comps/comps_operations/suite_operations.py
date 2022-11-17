@@ -160,3 +160,26 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
             r = self.platform._experiments.create_sim_directory_map(exp.id)
             sims_map = {**sims_map, **r}
         return sims_map
+
+    def platform_kill(self, site_ids: List[str] = []) -> None:
+        """
+        Delete platform suites.
+        Args:
+            site_ids: platform suite ids
+        Returns:
+            None
+        """
+        for site_ids in site_ids:
+            comps_suite = self.platform.get_item(suite_id, ItemType.SUITE, raw=True)
+            comps_exps = comps_suite.get_experiments()
+            for comps_exp in comps_exps:
+                try:
+                    comps_exp.delete()
+                except RuntimeError:
+                    logger.info(f"Could not delete the associated experiment ({comps_exp.id})...")
+                    return
+            try:
+                comps_suite.delete()
+            except RuntimeError:
+                logger.info(f"Could not delete suite ({suite_id})...")
+                return
