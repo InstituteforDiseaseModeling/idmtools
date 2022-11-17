@@ -387,3 +387,13 @@ class IPlatformExperimentOperations(ABC):
             Dict
         """
         return {}
+
+    def platform_kill(self, experiment_id: Union[str, UUID]) -> None:
+        """
+        Kill platform experiment.
+        Args:
+            experiment_id: experiment id
+        Returns:
+            None
+        """
+        pass

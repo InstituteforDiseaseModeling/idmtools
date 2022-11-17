@@ -295,3 +295,13 @@ class IPlatformSuiteOperations(ABC):
             Dict
         """
         return {}
+
+    def platform_kill(self, suite_id: Union[str, UUID]) -> None:
+        """
+        Kill platform suite.
+        Args:
+            suite_id: suite id
+        Returns:
+            None
+        """
+        pass
