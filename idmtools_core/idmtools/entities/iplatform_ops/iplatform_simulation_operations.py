@@ -290,9 +290,19 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         """
         return {}
 
-    def platform_kill(self, simulation_id: Union[str, UUID]) -> None:
+    def platform_delete(self, simulation_id: Union[str, UUID]) -> None:
         """
-        Kill platform simulation.
+        Delete platform simulation.
+        Args:
+            simulation_id: simulation id
+        Returns:
+            None
+        """
+        pass
+
+    def platform_cancel(self, simulation_id: Union[str, UUID]) -> None:
+        """
+        Cancel platform simulation.
         Args:
             simulation_id: simulation id
         Returns:

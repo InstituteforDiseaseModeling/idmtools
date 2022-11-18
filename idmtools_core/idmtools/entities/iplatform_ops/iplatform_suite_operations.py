@@ -296,9 +296,19 @@ class IPlatformSuiteOperations(ABC):
         """
         return {}
 
-    def platform_kill(self, suite_id: Union[str, UUID]) -> None:
+    def platform_delete(self, suite_id: Union[str, UUID]) -> None:
         """
-        Kill platform suite.
+        Delete platform suite.
+        Args:
+            suite_id: suite id
+        Returns:
+            None
+        """
+        pass
+
+    def platform_cancel(self, suite_id: Union[str, UUID]) -> None:
+        """
+        Cancel platform suite.
         Args:
             suite_id: suite id
         Returns:

@@ -129,7 +129,8 @@ class IPlatformExperimentOperations(ABC):
         """
         pass
 
-    def batch_create(self, experiments: List[Experiment], display_progress: bool = True, **kwargs) -> List[Tuple[Experiment]]:
+    def batch_create(self, experiments: List[Experiment], display_progress: bool = True, **kwargs) -> List[
+        Tuple[Experiment]]:
         """
         Provides a method to batch create experiments.
 
@@ -388,9 +389,19 @@ class IPlatformExperimentOperations(ABC):
         """
         return {}
 
-    def platform_kill(self, experiment_id: Union[str, UUID]) -> None:
+    def platform_delete(self, experiment_id: Union[str, UUID]) -> None:
         """
-        Kill platform experiment.
+        Delete platform experiment.
+        Args:
+            experiment_id: experiment id
+        Returns:
+            None
+        """
+        pass
+
+    def platform_cancel(self, experiment_id: Union[str, UUID]) -> None:
+        """
+        Cancel platform experiment.
         Args:
             experiment_id: experiment id
         Returns:
