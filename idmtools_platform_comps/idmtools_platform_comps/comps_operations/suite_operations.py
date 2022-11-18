@@ -5,8 +5,8 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 from dataclasses import dataclass, field
 from typing import Any, List, Dict, Tuple, Union, Type, TYPE_CHECKING, Optional
 from uuid import UUID
+from logging import getLogger
 from COMPS.Data import Suite as COMPSSuite, QueryCriteria, Experiment as COMPSExperiment, WorkItem
-
 from idmtools.core import ItemType
 from idmtools.entities import Suite
 from idmtools.entities.iplatform_ops.iplatform_suite_operations import IPlatformSuiteOperations
@@ -14,6 +14,8 @@ from idmtools.entities.iplatform_ops.iplatform_suite_operations import IPlatform
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools_platform_comps.comps_platform import COMPSPlatform
 
+logger = getLogger(__name__)
+user_logger = getLogger('user')
 
 @dataclass
 class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
@@ -161,25 +163,24 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
             sims_map = {**sims_map, **r}
         return sims_map
 
-    def platform_kill(self, site_ids: List[str] = []) -> None:
+    def platform_kill(self, suite_id: Union[str, UUID]) -> None:
         """
-        Delete platform suites.
+        Delete platform suite.
         Args:
-            site_ids: platform suite ids
+            suite_id: platform suite id
         Returns:
             None
         """
-        for site_ids in site_ids:
-            comps_suite = self.platform.get_item(suite_id, ItemType.SUITE, raw=True)
-            comps_exps = comps_suite.get_experiments()
-            for comps_exp in comps_exps:
-                try:
-                    comps_exp.delete()
-                except RuntimeError:
-                    logger.info(f"Could not delete the associated experiment ({comps_exp.id})...")
-                    return
+        comps_suite = self.platform.get_item(suite_id, ItemType.SUITE, raw=True)
+        comps_exps = comps_suite.get_experiments()
+        for comps_exp in comps_exps:
             try:
-                comps_suite.delete()
+                comps_exp.delete()
             except RuntimeError:
-                logger.info(f"Could not delete suite ({suite_id})...")
+                logger.info(f"Could not delete the associated experiment ({comps_exp.id})...")
                 return
+        try:
+            comps_suite.delete()
+        except RuntimeError:
+            logger.info(f"Could not delete suite ({suite_id})...")
+            return

@@ -3,9 +3,11 @@ Here we implement the SlurmPlatform suite operations.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+import shutil
 from uuid import UUID, uuid4
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, List, Type, Dict, Tuple, Union
+from logging import getLogger
 from idmtools.core import ItemType
 from idmtools.entities import Suite
 from idmtools.entities.iplatform_ops.iplatform_suite_operations import IPlatformSuiteOperations
@@ -14,6 +16,8 @@ from idmtools_platform_slurm.platform_operations.utils import SlurmSuite, SlurmE
 if TYPE_CHECKING:
     from idmtools_platform_slurm.slurm_platform import SlurmPlatform
 
+logger = getLogger(__name__)
+user_logger = getLogger('user')
 
 @dataclass
 class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
@@ -155,26 +159,24 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
             sims_map = {**sims_map, **d}
         return sims_map
 
-    def platform_kill(self, site_ids: List[str] = []) -> None:
+    def platform_kill(self, suite_id: Union[str, UUID]) -> None:
         """
-        Delete platform suites.
+        Delete platform suite.
         Args:
-            site_ids: platform suite ids
+            suite_id: platform suite id
         Returns:
             None
         """
-        for site_id in site_ids:
-            suite = self.platform.get_item(suite_id, ItemType.SUITE, raw=False)
-            exps = suite.experiments
-            for exp in exps:
-                try:
-                    # TODO: may need to cancel Slurm jobs as well...
-                    shutil.rmtree(self.platform._op_client.get_directory(exp))
-                except RuntimeError:
-                    logger.info("Could not delete the associated experiment...")
-                    return
+        suite = self.platform.get_item(suite_id, ItemType.SUITE, raw=False)
+        exps = suite.experiments
+        for exp in exps:
             try:
-                shutil.rmtree(self.platform._op_client.get_directory(suite))
+                shutil.rmtree(self.platform._op_client.get_directory(exp))
             except RuntimeError:
-                logger.info(f"Could not delete suite ({suite_id})...")
+                logger.info("Could not delete the associated experiment...")
                 return
+        try:
+            shutil.rmtree(self.platform._op_client.get_directory(suite))
+        except RuntimeError:
+            logger.info(f"Could not delete suite ({suite_id})...")
+            return
