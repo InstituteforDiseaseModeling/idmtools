@@ -250,21 +250,30 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         sims = exp.simulations
         return {str(sim.id): str(self.platform._op_client.get_directory(sim)) for sim in sims}
 
-    def platform_kill(self, experiment_id: Union[str, UUID]) -> None:
+    def platform_delete(self, experiment_id: Union[str, UUID]) -> None:
         """
-        Kill platform experiment.
+        Delete platform experiment.
+        Args:
+            experiment_id: platform experiment id
+        Returns:
+            None
+        """
+        exp = self.platform.get_item(experiment_id, ItemType.EXPERIMENT, raw=False)
+        try:
+            shutil.rmtree(self.platform._op_client.get_directory(exp))
+        except RuntimeError:
+            logger.info("Could not delete the associated experiment...")
+            return
+
+    def platform_cancel(self, experiment_id: Union[str, UUID]) -> None:
+        """
+        Cancel platform experiment.
         Args:
             experiment_id: experiment id
         Returns:
             None
         """
         experiment = self.platform.get_item(experiment_id, ItemType.EXPERIMENT, raw=False)
-        sims = experiment.simulations
-
-        # TODO: may check experiment.status Succeeded or done???
-        for sim in experiment.get_simulations():
-            # if sim.status == EntityStatus.RUNNING:
-            if sim.status not in (EntityStatus.SUCCEEDED, EntityStatus.FAILED, EntityStatus.CREATED):
-                return
-
-        # TODO: cancel experiment job
+        if experiment.status == EntityStatus.RUNNING:
+            # TODO: cancel experiment job
+            pass

@@ -159,7 +159,7 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
             sims_map = {**sims_map, **d}
         return sims_map
 
-    def platform_kill(self, suite_id: Union[str, UUID]) -> None:
+    def platform_delete(self, suite_id: Union[str, UUID]) -> None:
         """
         Delete platform suite.
         Args:
