@@ -485,14 +485,30 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         clear_linux_mounts(self.platform)
         return sim_map
 
-    def platform_kill(self, experiment_id: Union[str, UUID]) -> None:
+    def platform_delete(self, experiment_id: Union[str, UUID]) -> None:
         """
-        Kill platform experiment.
+        Delete platform experiment.
         Args:
             experiment_id: experiment id
         Returns:
             None
         """
+        comps_exp = self.platform.get_item(experiment_id, ItemType.EXPERIMENT, raw=True)
+        try:
+            comps_exp.delete()
+        except RuntimeError:
+            logger.info(f"Could not delete the experiment ({comps_exp.id})...")
+            return
+
+    def platform_cancel(self, experiment_id: Union[str, UUID]) -> None:
+        """
+        Cancel platform experiment.
+        Args:
+            experiment_id: experiment id
+        Returns:
+            None
+        """
+
         def experiment_is_running(comps_exp):
             from COMPS.Data.Simulation import SimulationState
             for sim in comps_exp.get_simulations():
