@@ -11,7 +11,6 @@ from logging import getLogger
 from pathlib import Path
 from threading import Lock
 from typing import List, Dict, Any, Type, TYPE_CHECKING, Optional
-from uuid import UUID, uuid4
 from idmtools.assets import Asset, AssetCollection
 from idmtools.core import EntityStatus
 from idmtools.core.task_factory import TaskFactory
@@ -37,7 +36,7 @@ class SimulationDict(dict):
     pass
 
 
-def run_simulation(simulation_id: Simulation, command: str, parent_uid: UUID, execute_directory, shell: bool = False):
+def run_simulation(simulation_id: Simulation, command: str, parent_uid: str, execute_directory, shell: bool = False):
     simulation_path = os.path.join(execute_directory, str(parent_uid), str(simulation_id))
     os.makedirs(simulation_path, exist_ok=True)
     with open(os.path.join(simulation_path, "StdOut.txt"), "w") as out, \
@@ -97,7 +96,7 @@ class TestExecutePlatformSimulationOperation(IPlatformSimulationOperations):
     platform: 'TestExecutePlatform'
     platform_type: Type = SimulationDict
 
-    def get(self, simulation_id: UUID, experiment_id: UUID = None, **kwargs) -> Any:
+    def get(self, simulation_id: str, experiment_id: str = None, **kwargs) -> Any:
         if simulation_id and experiment_id:
             exp_path = os.path.join(self.platform.execute_directory, str(experiment_id))
             sim_path = os.path.join(exp_path, str(simulation_id))

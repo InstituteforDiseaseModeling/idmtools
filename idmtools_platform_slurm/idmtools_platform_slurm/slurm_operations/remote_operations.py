@@ -6,7 +6,6 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Union, Any
-from uuid import UUID
 
 from idmtools.core import ItemType
 from idmtools.core.interfaces.ientity import IEntity
@@ -49,5 +48,5 @@ class RemoteSlurmOperations(SlurmOperations):
     def submit_job(self, item: Union[Experiment, Simulation], **kwargs) -> Any:
         pass
 
-    def get_simulation_status(self, sim_id: Union[UUID, str]) -> Any:
+    def get_simulation_status(self, sim_id: Union[str]) -> Any:
         pass

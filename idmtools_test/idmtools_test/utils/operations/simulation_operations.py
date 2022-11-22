@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from logging import getLogger, DEBUG
 from threading import Lock
 from typing import List, Dict, Any, Type, TYPE_CHECKING
-from uuid import UUID, uuid4
+from uuid import uuid4
 import numpy as np
 from idmtools.assets import Asset
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
@@ -27,7 +27,7 @@ class TestPlatformSimulationOperation(IPlatformSimulationOperations):
     platform_type: Type = Simulation
     simulations: dict = field(default_factory=dict, compare=False, metadata={"pickle_ignore": True})
 
-    def get(self, simulation_id: UUID, **kwargs) -> Any:
+    def get(self, simulation_id: str, **kwargs) -> Any:
         obj = None
         for eid in self.simulations:
             sims = self.simulations.get(eid)
@@ -43,7 +43,7 @@ class TestPlatformSimulationOperation(IPlatformSimulationOperations):
 
     def platform_create(self, simulation: Simulation, **kwargs) -> Simulation:
         experiment_id = simulation.parent_id
-        simulation.uid = uuid4()
+        simulation.uid = str(uuid4())
 
         self._save_simulations_to_cache(experiment_id, [simulation])
         return simulation

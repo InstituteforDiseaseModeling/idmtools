@@ -9,7 +9,6 @@ from dataclasses import dataclass, field
 from logging import getLogger
 from os import PathLike
 from typing import List, NoReturn, TypeVar, Union, Any, Dict, TYPE_CHECKING
-from uuid import UUID
 from idmtools.assets import Asset, TAssetList
 from idmtools.assets import TAssetFilterList
 from idmtools.assets.errors import DuplicatedAssetError

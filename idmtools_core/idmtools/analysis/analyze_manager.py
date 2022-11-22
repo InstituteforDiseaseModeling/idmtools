@@ -88,7 +88,7 @@ class AnalyzeManager:
             max_items (int, optional): Max Items to analyze. Useful when developing and testing an Analyzer. Defaults to None.
             verbose (bool, optional): Print extra information about analysis. Defaults to True.
             force_manager_working_directory (bool, optional): [description]. Defaults to False.
-            exclude_ids (List[st], optional): [description]. Defaults to None.
+            exclude_ids (List[str], optional): [description]. Defaults to None.
             analyze_failed_items (bool, optional): Allows analyzing of failed items. Useful when you are trying to aggregate items that have failed. Defaults to False.
             max_workers (int, optional): Set the max workers. If not provided, falls back to the configuration item *max_threads*. If max_workers is not set in configuration, defaults to CPU count
             executor_type: (str): Whether to use process or thread pooling. Process pooling is more efficient but threading might be required in some environments
@@ -153,7 +153,7 @@ class AnalyzeManager:
             logger.debug(f'Flattening items for {i.uid}')
             self.potential_items.extend(self.platform.flatten_item(item=i, raw=True))
 
-        # These are leaf items to be ignored in analysis. Make sure they are UUID and then prune them from analysis.
+        # These are leaf items to be ignored in analysis. Prune them from analysis.
         self.exclude_ids = exclude_ids or []
         self.potential_items = [item for item in self.potential_items if item.uid not in self.exclude_ids]
         for item in self.potential_items:

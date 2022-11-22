@@ -3,7 +3,6 @@ Here we implement the SlurmPlatform simulation operations.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
-from uuid import UUID, uuid4
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, List, Dict, Type, Optional, Union
 from idmtools.assets import Asset
@@ -26,7 +25,7 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
     platform: 'SlurmPlatform'  # noqa: F821
     platform_type: Type = field(default=SlurmSimulation)
 
-    def get(self, simulation_id: Union[str, UUID], **kwargs) -> Dict:
+    def get(self, simulation_id: Union[str], **kwargs) -> Dict:
         """
         Gets an simulation from the Slurm platform.
         Args:

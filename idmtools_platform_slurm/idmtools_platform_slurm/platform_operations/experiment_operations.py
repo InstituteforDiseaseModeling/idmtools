@@ -5,7 +5,6 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import shutil
 from pathlib import Path
-from uuid import UUID
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, List, Type, Dict, Optional, Any, Union
 from idmtools.assets import Asset, AssetCollection
@@ -29,7 +28,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
     platform: 'SlurmPlatform'  # noqa: F821
     platform_type: Type = field(default=SlurmExperiment)
 
-    def get(self, experiment_id: Union[str, UUID], **kwargs) -> Dict:
+    def get(self, experiment_id: Union[str], **kwargs) -> Dict:
         """
         Gets an experiment from the Slurm platform.
         Args:

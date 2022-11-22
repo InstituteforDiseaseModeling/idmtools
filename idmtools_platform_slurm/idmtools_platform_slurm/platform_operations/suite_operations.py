@@ -3,7 +3,6 @@ Here we implement the SlurmPlatform suite operations.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
-from uuid import UUID, uuid4
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, List, Type, Dict, Tuple, Union
 from idmtools.core import ItemType
@@ -23,7 +22,7 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
     platform: 'SlurmPlatform'  # noqa F821
     platform_type: Type = field(default=SlurmSuite)
 
-    def get(self, suite_id: Union[str, UUID], **kwargs) -> Dict:
+    def get(self, suite_id: Union[str], **kwargs) -> Dict:
         """
         Get a suite from the Slurm platform.
         Args:
