@@ -33,7 +33,7 @@ class SlurmPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
     platform: 'SlurmPlatform'  # noqa F821
     platform_type: Type = field(default=None)
 
-    def get(self, asset_collection_id: Optional[UUID], **kwargs) -> AssetCollection:
+    def get(self, asset_collection_id: Optional[str], **kwargs) -> AssetCollection:
         """
         Get an asset collection by id.
         Args:
