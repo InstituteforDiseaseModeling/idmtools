@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, List, Type, Dict, Tuple, Union
 from idmtools.core import ItemType
 from idmtools.entities import Suite
+from uuid import UUID
 from idmtools.entities.iplatform_ops.iplatform_suite_operations import IPlatformSuiteOperations
 from idmtools_platform_slurm.platform_operations.utils import SlurmSuite, SlurmExperiment
 
@@ -22,7 +23,7 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
     platform: 'SlurmPlatform'  # noqa F821
     platform_type: Type = field(default=SlurmSuite)
 
-    def get(self, suite_id: Union[str], **kwargs) -> Dict:
+    def get(self, suite_id: Union[UUID, str], **kwargs) -> Dict:
         """
         Get a suite from the Slurm platform.
         Args:
@@ -111,6 +112,7 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
         """
         suite = Suite()
         suite.platform = self.platform
+        suite.uid = slurm_suite.uid
         suite.name = slurm_suite.name
         suite.parent = None
         suite.tags = slurm_suite.tags

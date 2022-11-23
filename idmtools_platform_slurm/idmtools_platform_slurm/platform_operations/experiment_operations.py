@@ -198,6 +198,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
             parent = self.platform.get_item(slurm_exp.parent_id, ItemType.SUITE, force=True)
         exp = Experiment()
         exp.platform = self.platform
+        exp.uid = slurm_exp.uid
         exp.name = slurm_exp.name
         exp.parent_id = parent.id
         exp.parent = parent
