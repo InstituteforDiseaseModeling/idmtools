@@ -81,7 +81,7 @@ class AnalyzeManager:
         Args:
             platform (IPlatform): Platform
             configuration (dict, optional): Initial Configuration. Defaults to None.
-            ids (Tuple[ItemType], optional): List of ids as pair of Tuple and ItemType. Defaults to None.
+            ids (Tuple[str, ItemType], optional): List of ids as pair of Tuple and ItemType. Defaults to None.
             analyzers (List[IAnalyzer], optional): List of Analyzers. Defaults to None.
             working_dir (str, optional): The working directory. Defaults to os.getcwd().
             partial_analyze_ok (bool, optional): Whether partial analysis is ok. When this is True, Experiments in progress or Failed can be analyzed. Defaults to False.
@@ -145,7 +145,7 @@ class AnalyzeManager:
         for oid, otype in ids:
             logger.debug(f'Getting metadata for {oid} and {otype}')
             item = self.platform.get_item(oid, otype, force=True, raw=True)
-            item.uid = item.id
+            item.uid = str(item.id)
             item.platform = self.platform
             items.append(item)
         self.potential_items: List[IEntity] = []
@@ -156,6 +156,8 @@ class AnalyzeManager:
 
         # These are leaf items to be ignored in analysis. Prune them from analysis.
         self.exclude_ids = exclude_ids or []
+        for index, oid in enumerate(self.exclude_ids):
+            self.exclude_ids[index] = str(oid)
         self.potential_items = [item for item in self.potential_items if item.uid not in self.exclude_ids]
         for item in self.potential_items:
             item.platform = self.platform
