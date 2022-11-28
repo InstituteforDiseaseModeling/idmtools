@@ -244,7 +244,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
             experiment_id: experiment id
 
         Returns:
-            Dict
+            Dict of simulation id as key and working dir as value
         """
         exp = self.platform.get_item(experiment_id, ItemType.EXPERIMENT, raw=False)
         sims = exp.simulations
