@@ -984,7 +984,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             item_id: Entity id
             item_type: ItemType
         Returns:
-            Dict
+            Dict of simulation id as key and working dir as value
         """
         interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item_type]
         return getattr(self, interface).create_sim_directory_map(item_id)
@@ -1004,7 +1004,6 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             sims = self.get_children(exp_id, ItemType.EXPERIMENT)
             for sim in sims:
                 tags = copy.deepcopy(sim.tags)
-                # tags.update(dict(simid=sim.id))
                 tags["simid"] = sim.id
                 tags_list.append(tags)
             tag_df = pd.DataFrame(tags_list)
