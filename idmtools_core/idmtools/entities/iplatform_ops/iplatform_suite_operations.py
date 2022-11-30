@@ -6,7 +6,9 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from logging import getLogger, DEBUG
-from typing import Type, Any, List, Tuple, Dict, NoReturn, TYPE_CHECKING
+from typing import Type, Any, List, Tuple, Dict, NoReturn, TYPE_CHECKING, Union
+from uuid import UUID
+
 from idmtools.core.enums import EntityStatus, ItemType
 from idmtools.entities.iplatform_ops.utils import batch_create_items
 from idmtools.entities.suite import Suite

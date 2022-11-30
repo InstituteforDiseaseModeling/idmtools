@@ -6,7 +6,9 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from logging import getLogger, DEBUG
-from typing import Type, Any, List, Dict, NoReturn, Optional
+from typing import Type, Any, List, Dict, NoReturn, Optional, Union
+from uuid import UUID
+
 from idmtools.assets import Asset
 from idmtools.core.cache_enabled import CacheEnabled
 from idmtools.entities.experiment import Experiment

@@ -10,6 +10,8 @@ from dataclasses import dataclass
 from logging import getLogger, DEBUG
 from types import GeneratorType
 from typing import Type, Any, NoReturn, Tuple, List, Dict, Iterator, Union, TYPE_CHECKING
+from uuid import UUID
+
 from idmtools.assets import Asset
 from idmtools.core.enums import EntityStatus, ItemType
 from idmtools.entities.experiment import Experiment

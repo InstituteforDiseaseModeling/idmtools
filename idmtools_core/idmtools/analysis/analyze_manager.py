@@ -9,7 +9,7 @@ import sys
 import time
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 from logging import getLogger, DEBUG
-from typing import NoReturn, List, Dict, Tuple, Optional, Union, TYPE_CHECKING
+from typing import NoReturn, List, Dict, Tuple, Optional, TYPE_CHECKING
 from tqdm import tqdm
 from idmtools import IdmConfigParser
 from idmtools.analysis.map_worker_entry import map_item
