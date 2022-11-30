@@ -7,7 +7,7 @@ import os
 from dataclasses import dataclass, field
 from itertools import tee
 from logging import getLogger, DEBUG
-from typing import List, Dict, Type, Generator, NoReturn, Optional, TYPE_CHECKING, Union
+from typing import List, Dict, Type, Generator, NoReturn, Optional, TYPE_CHECKING
 from uuid import UUID
 from COMPS.Data import Experiment as COMPSExperiment, QueryCriteria, Configuration, Suite as COMPSSuite, \
     Simulation as COMPSSimulation
