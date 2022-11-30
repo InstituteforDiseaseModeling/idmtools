@@ -16,7 +16,6 @@ from pathlib import PureWindowsPath, PurePath
 from itertools import groupby
 from logging import getLogger, DEBUG
 from typing import Dict, List, NoReturn, Type, TypeVar, Any, Union, Tuple, Set, Iterator, Callable, Optional
-from uuid import UUID
 
 from idmtools import IdmConfigParser
 from idmtools.core import CacheEnabled, UnknownItemException, EntityContainer, UnsupportedPlatformType
@@ -978,7 +977,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         """
         return [x for x in self._platform_defaults if isinstance(x, default_type)]
 
-    def create_sim_directory_map(self, item_id: Union[str, UUID], item_type: ItemType) -> Dict:
+    def create_sim_directory_map(self, item_id: str, item_type: ItemType) -> Dict:
         """
         Build simulation working directory mapping.
         Args:

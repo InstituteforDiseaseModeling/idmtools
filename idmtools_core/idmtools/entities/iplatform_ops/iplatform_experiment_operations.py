@@ -10,7 +10,6 @@ from dataclasses import dataclass
 from logging import getLogger, DEBUG
 from types import GeneratorType
 from typing import Type, Any, NoReturn, Tuple, List, Dict, Iterator, Union, TYPE_CHECKING
-from uuid import UUID
 
 from idmtools.assets import Asset
 from idmtools.core.enums import EntityStatus, ItemType
@@ -384,7 +383,7 @@ class IPlatformExperimentOperations(ABC):
         """
         return experiment
 
-    def create_sim_directory_map(self, experiment_id: Union[str, UUID]) -> Dict:
+    def create_sim_directory_map(self, experiment_id: str) -> Dict:
         """
         Build simulation working directory mapping.
         Args:
