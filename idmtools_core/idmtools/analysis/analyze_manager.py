@@ -69,11 +69,11 @@ class AnalyzeManager:
         pass
 
     def __init__(self, platform: 'IPlatform' = None, configuration: dict = None,
-                 ids: List[Tuple[Union[str], ItemType]] = None,
+                 ids: List[Tuple[str, ItemType]] = None,
                  analyzers: List[IAnalyzer] = None, working_dir: str = None,
                  partial_analyze_ok: bool = False, max_items: Optional[int] = None, verbose: bool = True,
                  force_manager_working_directory: bool = False,
-                 exclude_ids: List[Union[str]] = None, analyze_failed_items: bool = False,
+                 exclude_ids: List[str] = None, analyze_failed_items: bool = False,
                  max_workers: Optional[int] = None, executor_type: str = 'process'):
         """
         Initialize the AnalyzeManager.

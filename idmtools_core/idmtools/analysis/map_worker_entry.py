@@ -19,7 +19,7 @@ if TYPE_CHECKING:  # pragma: no cover
 logger = getLogger(__name__)
 
 
-def map_item(item: IItem) -> Dict[Union[str, str], Dict]:
+def map_item(item: IItem) -> Dict[str, Dict]:
     """
     Initialize some worker-global values; a worker process entry point for analyzer item-mapping.
 
@@ -27,7 +27,7 @@ def map_item(item: IItem) -> Dict[Union[str, str], Dict]:
         item: The item (often simulation) to process.
 
     Returns:
-        Dict[Union[str, str], Dict]
+        Dict[str, Dict]
     """
     # Retrieve the global variables coming from the pool initialization
 
@@ -41,7 +41,7 @@ def map_item(item: IItem) -> Dict[Union[str, str], Dict]:
     return _get_mapped_data_for_item(item, analyzers, platform)
 
 
-def _get_mapped_data_for_item(item: IEntity, analyzers: TAnalyzerList, platform: 'IPlatform') -> Dict[Union[str, str], Dict]:
+def _get_mapped_data_for_item(item: IEntity, analyzers: TAnalyzerList, platform: 'IPlatform') -> Dict[str, Dict]:
     """
     Get mapped data from an item.
 
@@ -53,7 +53,7 @@ def _get_mapped_data_for_item(item: IEntity, analyzers: TAnalyzerList, platform:
         platform: A platform object to query for information.
 
     Returns:
-        Dict[Union[str, str], Dict] - Array mapping file data to from str to contents
+        Dict[str, Dict] - Array mapping file data to from str to contents
 
     """
     try:

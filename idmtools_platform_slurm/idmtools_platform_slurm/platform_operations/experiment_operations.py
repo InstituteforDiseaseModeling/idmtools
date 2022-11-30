@@ -28,7 +28,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
     platform: 'SlurmPlatform'  # noqa: F821
     platform_type: Type = field(default=SlurmExperiment)
 
-    def get(self, experiment_id: Union[str], **kwargs) -> Dict:
+    def get(self, experiment_id: str, **kwargs) -> Dict:
         """
         Gets an experiment from the Slurm platform.
         Args:

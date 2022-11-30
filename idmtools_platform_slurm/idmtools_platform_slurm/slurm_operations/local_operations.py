@@ -210,7 +210,7 @@ class LocalSlurmOperations(SlurmOperations):
         else:
             raise NotImplementedError(f"Submit job is not implemented on SlurmPlatform.")
 
-    def get_simulation_status(self, sim_id: Union[str], **kwargs) -> EntityStatus:
+    def get_simulation_status(self, sim_id: str, **kwargs) -> EntityStatus:
         """
         Retrieve simulation status.
         Args:

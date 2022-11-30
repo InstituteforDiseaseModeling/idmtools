@@ -579,7 +579,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
 
     # Define this here for better completion in IDEs for end users
     @classmethod
-    def from_id(cls, item_id: Union[str], platform: 'IPlatform' = None, copy_assets: bool = False,
+    def from_id(cls, item_id: str, platform: 'IPlatform' = None, copy_assets: bool = False,
                 **kwargs) -> 'Experiment':
         """
         Helper function to provide better intellisense to end users.

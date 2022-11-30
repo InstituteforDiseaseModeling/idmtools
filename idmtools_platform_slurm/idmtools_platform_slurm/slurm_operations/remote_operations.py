@@ -48,5 +48,5 @@ class RemoteSlurmOperations(SlurmOperations):
     def submit_job(self, item: Union[Experiment, Simulation], **kwargs) -> Any:
         pass
 
-    def get_simulation_status(self, sim_id: Union[str]) -> Any:
+    def get_simulation_status(self, sim_id: str) -> Any:
         pass

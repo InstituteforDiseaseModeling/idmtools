@@ -87,7 +87,7 @@ class IEntity(IItem, metaclass=ABCMeta):
         return platform.get_item(item_id, cls.item_type, **kwargs)
 
     @classmethod
-    def from_id(cls, item_id: Union[str], platform: 'IPlatform' = None, **kwargs) -> 'IEntity':  # noqa E821
+    def from_id(cls, item_id: str, platform: 'IPlatform' = None, **kwargs) -> 'IEntity':  # noqa E821
         """
         Load an item from an id.
 

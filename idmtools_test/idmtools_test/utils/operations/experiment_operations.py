@@ -21,7 +21,7 @@ class TestPlatformExperimentOperation(IPlatformExperimentOperations):
     platform_type: Type = Experiment
     experiments: Dict[str, Experiment] = field(default_factory=dict, compare=False, metadata={"pickle_ignore": True})
 
-    def get(self, experiment_id: Union[str], **kwargs) -> Experiment:
+    def get(self, experiment_id: str, **kwargs) -> Experiment:
         e = self.experiments.get(experiment_id)
         if e is None:
             raise UnknownItemException(f"Cannot find the experiment with the ID of: {experiment_id}")
