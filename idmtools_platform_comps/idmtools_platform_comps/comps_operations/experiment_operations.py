@@ -468,7 +468,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             assets = copy.deepcopy(experiment.assets.assets)
         return assets
 
-    def create_sim_directory_map(self, experiment_id: Union[str, UUID]) -> Dict:
+    def create_sim_directory_map(self, experiment_id: str) -> Dict:
         """
         Build simulation working directory mapping.
         Args:
@@ -485,7 +485,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         clear_linux_mounts(self.platform)
         return sim_map
 
-    def platform_delete(self, experiment_id: Union[str, UUID]) -> None:
+    def platform_delete(self, experiment_id: str) -> None:
         """
         Delete platform experiment.
         Args:
@@ -500,7 +500,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             logger.info(f"Could not delete the experiment ({comps_exp.id})...")
             return
 
-    def platform_cancel(self, experiment_id: Union[str, UUID]) -> None:
+    def platform_cancel(self, experiment_id: str) -> None:
         """
         Cancel platform experiment.
         Args:

@@ -977,7 +977,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         """
         return [x for x in self._platform_defaults if isinstance(x, default_type)]
 
-    def create_sim_directory_map(self, item_id: Union[str, UUID], item_type: ItemType) -> Dict:
+    def create_sim_directory_map(self, item_id: str, item_type: ItemType) -> Dict:
         """
         Build simulation working directory mapping.
         Args:
@@ -989,7 +989,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item_type]
         return getattr(self, interface).create_sim_directory_map(item_id)
 
-    def create_sim_directory_df(self, exp_id: Union[str, UUID], include_tags: bool = True) -> pd.DataFrame:
+    def create_sim_directory_df(self, exp_id: str, include_tags: bool = True) -> pd.DataFrame:
         """
         Build simulation working directory mapping.
         Args:
@@ -1020,7 +1020,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         return result_df
 
-    def save_sim_directory_df_to_csv(self, exp_id: Union[str, UUID], include_tags: bool = True,
+    def save_sim_directory_df_to_csv(self, exp_id: str, include_tags: bool = True,
                                      output: str = os.getcwd(), save_header=False, file_name: str = None) -> None:
         """
         Save simulation directory df to csv file.

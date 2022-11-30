@@ -378,7 +378,7 @@ class IPlatformExperimentOperations(ABC):
         """
         return experiment
 
-    def create_sim_directory_map(self, experiment_id: Union[str, UUID]) -> Dict:
+    def create_sim_directory_map(self, experiment_id: str) -> Dict:
         """
         Build simulation working directory mapping.
         Args:
@@ -389,7 +389,7 @@ class IPlatformExperimentOperations(ABC):
         """
         return {}
 
-    def platform_delete(self, experiment_id: Union[str, UUID]) -> None:
+    def platform_delete(self, experiment_id: str) -> None:
         """
         Delete platform experiment.
         Args:
@@ -399,7 +399,7 @@ class IPlatformExperimentOperations(ABC):
         """
         pass
 
-    def platform_cancel(self, experiment_id: Union[str, UUID]) -> None:
+    def platform_cancel(self, experiment_id: str) -> None:
         """
         Cancel platform experiment.
         Args:

@@ -250,7 +250,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         sims = exp.simulations
         return {str(sim.id): str(self.platform._op_client.get_directory(sim)) for sim in sims}
 
-    def platform_delete(self, experiment_id: Union[str, UUID]) -> None:
+    def platform_delete(self, experiment_id: str) -> None:
         """
         Delete platform experiment.
         Args:
@@ -265,7 +265,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
             logger.info("Could not delete the associated experiment...")
             return
 
-    def platform_cancel(self, experiment_id: Union[str, UUID]) -> None:
+    def platform_cancel(self, experiment_id: str) -> None:
         """
         Cancel platform experiment.
         Args:

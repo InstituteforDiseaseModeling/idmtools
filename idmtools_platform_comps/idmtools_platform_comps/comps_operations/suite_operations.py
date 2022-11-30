@@ -145,7 +145,7 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
                 obj.experiments.append(self.platform._experiments.to_entity(exp, parent=obj, **kwargs))
         return obj
 
-    def create_sim_directory_map(self, suite_id: Union[str, UUID]) -> Dict:
+    def create_sim_directory_map(self, suite_id: str) -> Dict:
         """
         Build simulation working directory mapping.
         Args:
@@ -163,7 +163,7 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
             sims_map = {**sims_map, **r}
         return sims_map
 
-    def platform_delete(self, suite_id: Union[str, UUID]) -> None:
+    def platform_delete(self, suite_id: str) -> None:
         """
         Delete platform suite.
         Args:
