@@ -4,7 +4,7 @@ Here we implement the SlurmPlatform simulation operations.
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, List, Dict, Type, Optional, Union
+from typing import TYPE_CHECKING, List, Dict, Type, Optional
 from idmtools.assets import Asset
 from idmtools.core import ItemType, EntityStatus
 from idmtools_platform_slurm.slurm_operations.slurm_constants import SLURM_STATES
@@ -166,7 +166,7 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
         """
         raise NotImplementedError("Refresh simulation status is not called directly on the Slurm Platform")
 
-    def create_sim_directory_map(self, simulation_id: Union[str, UUID]) -> Dict:
+    def create_sim_directory_map(self, simulation_id: str) -> Dict:
         """
         Build simulation working directory mapping.
         Args:

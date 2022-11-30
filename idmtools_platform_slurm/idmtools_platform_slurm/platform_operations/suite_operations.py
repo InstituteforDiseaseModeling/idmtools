@@ -135,7 +135,7 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
         for experiment in suite.experiments:
             self.platform.refresh_status(experiment, **kwargs)
 
-    def create_sim_directory_map(self, suite_id: Union[str, UUID]) -> Dict:
+    def create_sim_directory_map(self, suite_id: str) -> Dict:
         """
         Build simulation working directory mapping.
         Args:

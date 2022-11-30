@@ -6,7 +6,7 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 import shutil
 from pathlib import Path
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, List, Type, Dict, Optional, Any, Union
+from typing import TYPE_CHECKING, List, Type, Dict, Optional, Any
 from idmtools.assets import Asset, AssetCollection
 from idmtools.core import ItemType
 from idmtools.entities import Suite
@@ -234,7 +234,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         for sim in experiment.simulations:
             sim.status = self.platform._op_client.get_simulation_status(sim.id, **kwargs)
 
-    def create_sim_directory_map(self, experiment_id: Union[str, UUID]) -> Dict:
+    def create_sim_directory_map(self, experiment_id: str) -> Dict:
         """
         Build simulation working directory mapping.
         Args:
