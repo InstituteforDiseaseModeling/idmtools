@@ -248,7 +248,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         """
         exp = self.platform.get_item(experiment_id, ItemType.EXPERIMENT, raw=False)
         sims = exp.simulations
-        return {str(sim.id): str(self.platform._op_client.get_directory(sim)) for sim in sims}
+        return {sim.id: str(self.platform._op_client.get_directory(sim)) for sim in sims}
 
     def platform_delete(self, experiment_id: str) -> None:
         """

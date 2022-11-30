@@ -179,4 +179,4 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
             Dict of simulation id as key and working dir as value
         """
         sim = self.platform.get_item(simulation_id, ItemType.SIMULATION, raw=False)
-        return {str(sim.id): str(self.platform._op_client.get_directory_by_id(simulation_id, ItemType.SIMULATION))}
+        return {sim.id: str(self.platform._op_client.get_directory_by_id(simulation_id, ItemType.SIMULATION))}
