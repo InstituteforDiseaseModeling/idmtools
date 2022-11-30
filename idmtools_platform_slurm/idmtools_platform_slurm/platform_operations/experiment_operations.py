@@ -276,4 +276,4 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         experiment = self.platform.get_item(experiment_id, ItemType.EXPERIMENT, raw=False)
         if experiment.status == EntityStatus.RUNNING:
             # TODO: cancel experiment job
-            pass
+            user_logger.info("TODO: cancel slurm job...")
