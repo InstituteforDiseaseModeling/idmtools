@@ -56,11 +56,11 @@ class TemplatedScriptTask(ITask):
     Examples:
         In this example, we add modify the Python Path using TemplatedScriptTask and LINUX_PYTHON_PATH_WRAPPER
 
-        .. literalinclude:: ../examples/cookbook/python/python-path/python-path.py
+        .. literalinclude:: ../../examples/cookbook/python/python-path/python-path.py
 
         In this example, we modify environment variable using TemplatedScriptTask and LINUX_DICT_TO_ENVIRONMENT
 
-        .. literalinclude:: ../examples/cookbook/environment/variables/environment-vars.py
+        .. literalinclude:: ../../examples/cookbook/environment/variables/environment-vars.py
     """
     #: Name of script
     script_path: str = field(default=None, metadata={"md": True})

@@ -78,7 +78,7 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
         """
         return None
 
-    def get_children(self, suite: SlurmSuite, parent: Suite = None, raw = True, **kwargs) -> List[Any]:
+    def get_children(self, suite: SlurmSuite, parent: Suite = None, raw=True, **kwargs) -> List[Any]:
         """
         Fetch Slurm suite's children.
         Args:
@@ -134,3 +134,21 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
         """
         for experiment in suite.experiments:
             self.platform.refresh_status(experiment, **kwargs)
+
+    def create_sim_directory_map(self, suite_id: Union[str, UUID]) -> Dict:
+        """
+        Build simulation working directory mapping.
+        Args:
+            suite_id: suite id
+
+        Returns:
+            Dict
+        """
+        # s = Suite.get(suite_id)
+        slurm_suite = self.platform.get_item(suite_id, ItemType.SUITE, raw=False)
+        exps = slurm_suite.experiments
+        sims_map = {}
+        for exp in exps:
+            d = self.platform._experiments.create_sim_directory_map(exp.id)
+            sims_map = {**sims_map, **d}
+        return sims_map

@@ -289,3 +289,14 @@ class IPlatformSuiteOperations(ABC):
             e = self.platform.get_item(exp.uid, ItemType.EXPERIMENT)
             ret[str(exp.uid)] = self.platform.get_files(e, files, **kwargs)
         return ret
+
+    def create_sim_directory_map(self, suite_id: Union[str, UUID]) -> Dict:
+        """
+        Build simulation working directory mapping.
+        Args:
+            suite_id: suite id
+
+        Returns:
+            Dict
+        """
+        return {}

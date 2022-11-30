@@ -51,7 +51,7 @@ class YamlSimulationBuilder(ArmSimulationBuilder):
     Class that represents an experiment builder.
 
     Examples:
-        .. literalinclude:: ../examples/builders/yaml_builder_python.py
+        .. literalinclude:: ../../examples/builders/yaml_builder_python.py
     """
     def __init__(self):
         """Constructor."""

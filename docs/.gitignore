@@ -1,0 +1,8 @@
+# Sphinx docs
+external/*.rst
+_build
+api/idmtools.*.rst
+api/idmtools*index.rst
+api/idmtools_models*.rst
+api/idmtools_platform*.rst
+api/idmtools_slurm*.rst

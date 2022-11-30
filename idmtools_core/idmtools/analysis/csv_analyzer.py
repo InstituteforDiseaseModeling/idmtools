@@ -21,14 +21,14 @@ class CSVAnalyzer(IAnalyzer):
         Simple Example
           This example covers the basic usage of the CSVAnalyzer
 
-          .. literalinclude:: ../examples/analyzers/example_analysis_CSVAnalyzer.py
+          .. literalinclude:: ../../examples/analyzers/example_analysis_CSVAnalyzer.py
 
         .. _multiple-csvs:
 
         Multiple CSVs
             This example covers analyzing multiple CSVs
 
-            .. literalinclude:: ../examples/analyzers/example_analysis_MultiCSVAnalyzer.py
+            .. literalinclude:: ../../examples/analyzers/example_analysis_MultiCSVAnalyzer.py
     """
     # Arg option for analyzer init are uid, working_dir, parse (True to leverage the :class:`OutputParser`;
     # False to get the raw data in the :meth:`select_simulation_data`), and filenames
