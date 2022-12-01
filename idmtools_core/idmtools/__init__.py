@@ -8,7 +8,7 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 import sys
 from idmtools.core.exceptions import idmtools_error_handler
 from idmtools.config.idm_config_parser import IdmConfigParser
-__version__ = "1.7.1"
+__version__ = "1.7.2"
 
 # only set exception hook if it has not been overridden
 if sys.excepthook == sys.__excepthook__:
