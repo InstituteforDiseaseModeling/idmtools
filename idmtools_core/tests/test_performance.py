@@ -3,6 +3,7 @@ from functools import partial
 from unittest import TestCase
 
 import allure
+import pytest
 from idmtools.builders import SimulationBuilder
 from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
@@ -10,6 +11,7 @@ from idmtools.entities.experiment import Experiment
 
 @allure.story("Core")
 @allure.suite("idmtools_core")
+@pytest.mark.performance
 class TestPerformance(TestCase):
     def test_id_generation(self):
         task = CommandTask('echo')

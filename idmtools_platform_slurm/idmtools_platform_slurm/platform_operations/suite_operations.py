@@ -3,7 +3,6 @@ Here we implement the SlurmPlatform suite operations.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
-from uuid import UUID, uuid4
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, List, Type, Dict, Tuple, Union
 from idmtools.core import ItemType
@@ -23,7 +22,7 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
     platform: 'SlurmPlatform'  # noqa F821
     platform_type: Type = field(default=SlurmSuite)
 
-    def get(self, suite_id: Union[str, UUID], **kwargs) -> Dict:
+    def get(self, suite_id: str, **kwargs) -> Dict:
         """
         Get a suite from the Slurm platform.
         Args:
@@ -112,7 +111,7 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
         """
         suite = Suite()
         suite.platform = self.platform
-        suite.uid = UUID(slurm_suite.uid)
+        suite.uid = slurm_suite.uid
         suite.name = slurm_suite.name
         suite.parent = None
         suite.tags = slurm_suite.tags
@@ -135,7 +134,7 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
         for experiment in suite.experiments:
             self.platform.refresh_status(experiment, **kwargs)
 
-    def create_sim_directory_map(self, suite_id: Union[str, UUID]) -> Dict:
+    def create_sim_directory_map(self, suite_id: str) -> Dict:
         """
         Build simulation working directory mapping.
         Args:

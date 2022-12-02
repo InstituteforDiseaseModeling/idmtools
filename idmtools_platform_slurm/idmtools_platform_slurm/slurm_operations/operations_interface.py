@@ -7,7 +7,6 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Type, Union, Any
-from uuid import UUID
 
 from idmtools.core import ItemType
 from idmtools.core.interfaces.ientity import IEntity
@@ -61,5 +60,5 @@ class SlurmOperations(ABC):
         pass
 
     @abstractmethod
-    def get_simulation_status(self, sim_id: Union[UUID, str]) -> Any:
+    def get_simulation_status(self, sim_id: str) -> Any:
         pass

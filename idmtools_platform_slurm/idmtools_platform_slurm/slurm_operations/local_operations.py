@@ -11,7 +11,6 @@ from dataclasses import dataclass
 from logging import getLogger
 from pathlib import Path
 from typing import Union, Any
-from uuid import UUID
 
 from idmtools import IdmConfigParser
 from idmtools.core import ItemType, EntityStatus
@@ -211,7 +210,7 @@ class LocalSlurmOperations(SlurmOperations):
         else:
             raise NotImplementedError(f"Submit job is not implemented on SlurmPlatform.")
 
-    def get_simulation_status(self, sim_id: Union[UUID, str], **kwargs) -> EntityStatus:
+    def get_simulation_status(self, sim_id: str, **kwargs) -> EntityStatus:
         """
         Retrieve simulation status.
         Args:

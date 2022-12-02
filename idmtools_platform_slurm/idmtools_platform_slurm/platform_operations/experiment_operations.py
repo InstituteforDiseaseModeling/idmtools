@@ -5,9 +5,8 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import shutil
 from pathlib import Path
-from uuid import UUID
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, List, Type, Dict, Optional, Any, Union
+from typing import TYPE_CHECKING, List, Type, Dict, Optional, Any
 from idmtools.assets import Asset, AssetCollection
 from idmtools.core import ItemType
 from idmtools.entities import Suite
@@ -29,7 +28,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
     platform: 'SlurmPlatform'  # noqa: F821
     platform_type: Type = field(default=SlurmExperiment)
 
-    def get(self, experiment_id: Union[str, UUID], **kwargs) -> Dict:
+    def get(self, experiment_id: str, **kwargs) -> Dict:
         """
         Gets an experiment from the Slurm platform.
         Args:
@@ -199,7 +198,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
             parent = self.platform.get_item(slurm_exp.parent_id, ItemType.SUITE, force=True)
         exp = Experiment()
         exp.platform = self.platform
-        exp.uid = UUID(slurm_exp.uid)
+        exp.uid = slurm_exp.uid
         exp.name = slurm_exp.name
         exp.parent_id = parent.id
         exp.parent = parent
@@ -235,7 +234,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         for sim in experiment.simulations:
             sim.status = self.platform._op_client.get_simulation_status(sim.id, **kwargs)
 
-    def create_sim_directory_map(self, experiment_id: Union[str, UUID]) -> Dict:
+    def create_sim_directory_map(self, experiment_id: str) -> Dict:
         """
         Build simulation working directory mapping.
         Args:

@@ -7,7 +7,6 @@ from abc import ABCMeta
 from dataclasses import dataclass, field
 from os import PathLike
 from typing import NoReturn, List, Any, Dict, Union, TYPE_CHECKING
-from uuid import UUID
 from idmtools.core import EntityStatus, ItemType, NoPlatformException
 from idmtools.core.interfaces.iitem import IItem
 from idmtools.core.id_file import read_id_file, write_id_file
@@ -23,11 +22,11 @@ class IEntity(IItem, metaclass=ABCMeta):
     Interface for all entities in the system.
     """
     #: ID of the platform
-    platform_id: UUID = field(default=None, compare=False, metadata={"md": True})
+    platform_id: str = field(default=None, compare=False, metadata={"md": True})
     #: Platform
     _platform: 'IPlatform' = field(default=None, compare=False, metadata={"pickle_ignore": False})  # noqa E821
     #: Parent id
-    parent_id: UUID = field(default=None, metadata={"md": True})
+    parent_id: str = field(default=None, metadata={"md": True})
     #: Parent object
     _parent: 'IEntity' = field(default=None, compare=False, metadata={"pickle_ignore": False})
     #: Status of item
@@ -88,7 +87,7 @@ class IEntity(IItem, metaclass=ABCMeta):
         return platform.get_item(item_id, cls.item_type, **kwargs)
 
     @classmethod
-    def from_id(cls, item_id: Union[str, UUID], platform: 'IPlatform' = None, **kwargs) -> 'IEntity':  # noqa E821
+    def from_id(cls, item_id: str, platform: 'IPlatform' = None, **kwargs) -> 'IEntity':  # noqa E821
         """
         Load an item from an id.
 

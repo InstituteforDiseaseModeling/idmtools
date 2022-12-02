@@ -3,9 +3,8 @@ Here we implement the SlurmPlatform simulation operations.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
-from uuid import UUID, uuid4
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, List, Dict, Type, Optional, Union
+from typing import TYPE_CHECKING, List, Dict, Type, Optional
 from idmtools.assets import Asset
 from idmtools.core import ItemType, EntityStatus
 from idmtools_platform_slurm.slurm_operations.slurm_constants import SLURM_STATES
@@ -26,7 +25,7 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
     platform: 'SlurmPlatform'  # noqa: F821
     platform_type: Type = field(default=SlurmSimulation)
 
-    def get(self, simulation_id: Union[str, UUID], **kwargs) -> Dict:
+    def get(self, simulation_id: str, **kwargs) -> Dict:
         """
         Gets a simulation from the Slurm platform.
         Args:
@@ -145,7 +144,7 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
             parent = self.platform.get_item(slurm_sim.parent_id, ItemType.EXPERIMENT, force=True)
         sim = Simulation(task=None)
         sim.platform = self.platform
-        sim.uid = UUID(slurm_sim.uid)
+        sim.uid = slurm_sim.uid
         sim.name = slurm_sim.name
         sim.parent_id = parent.id
         sim.parent = parent
@@ -167,7 +166,7 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
         """
         raise NotImplementedError("Refresh simulation status is not called directly on the Slurm Platform")
 
-    def create_sim_directory_map(self, simulation_id: Union[str, UUID]) -> Dict:
+    def create_sim_directory_map(self, simulation_id: str) -> Dict:
         """
         Build simulation working directory mapping.
         Args:

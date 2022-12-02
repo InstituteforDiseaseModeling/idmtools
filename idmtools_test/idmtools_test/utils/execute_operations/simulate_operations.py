@@ -11,7 +11,6 @@ from logging import getLogger
 from pathlib import Path
 from threading import Lock
 from typing import List, Dict, Any, Type, TYPE_CHECKING, Optional
-from uuid import UUID, uuid4
 from idmtools.assets import Asset, AssetCollection
 from idmtools.core import EntityStatus
 from idmtools.core.task_factory import TaskFactory
@@ -37,7 +36,7 @@ class SimulationDict(dict):
     pass
 
 
-def run_simulation(simulation_id: Simulation, command: str, parent_uid: UUID, execute_directory, shell: bool = False):
+def run_simulation(simulation_id: Simulation, command: str, parent_uid: str, execute_directory, shell: bool = False):
     simulation_path = os.path.join(execute_directory, str(parent_uid), str(simulation_id))
     os.makedirs(simulation_path, exist_ok=True)
     with open(os.path.join(simulation_path, "StdOut.txt"), "w") as out, \
@@ -97,7 +96,7 @@ class TestExecutePlatformSimulationOperation(IPlatformSimulationOperations):
     platform: 'TestExecutePlatform'
     platform_type: Type = SimulationDict
 
-    def get(self, simulation_id: UUID, experiment_id: UUID = None, **kwargs) -> Any:
+    def get(self, simulation_id: str, experiment_id: str = None, **kwargs) -> Any:
         if simulation_id and experiment_id:
             exp_path = os.path.join(self.platform.execute_directory, str(experiment_id))
             sim_path = os.path.join(exp_path, str(simulation_id))
@@ -112,8 +111,6 @@ class TestExecutePlatformSimulationOperation(IPlatformSimulationOperations):
     def platform_create(self, simulation: Simulation, **kwargs) -> Simulation:
         simulation.platform = self
         experiment_id = simulation.parent_id
-        if simulation.uid is None:
-            simulation.uid = uuid4()
         self.save_metadata(simulation)
         return simulation
 
@@ -125,8 +122,6 @@ class TestExecutePlatformSimulationOperation(IPlatformSimulationOperations):
             if simulation.status is None:
                 self.pre_create(simulation, **kwargs)
                 experiment_id = simulation.parent_id
-                if simulation.uid is None:
-                    simulation.uid = uuid4()
                 self.save_metadata(simulation)
                 self.post_create(simulation, **kwargs)
                 simulations.append(simulation)
@@ -311,8 +306,6 @@ class TestExecutePlatformSimulationOperation(IPlatformSimulationOperations):
                   **kwargs) -> Simulation:
         # convert the dictionary to simulation
         sim: Simulation = Simulation(**{k: v for k, v in dict_sim.items() if k not in ['platform_id', 'item_type']})
-        # str to uid
-        sim._uid = UUID(sim._uid)
         try:
             # load status from str
             sim.status = EntityStatus[sim.status.upper()]

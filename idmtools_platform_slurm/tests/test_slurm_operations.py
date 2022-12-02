@@ -2,7 +2,6 @@ import os
 import tempfile
 from functools import partial
 from pathlib import Path
-from uuid import UUID
 
 import pytest
 from idmtools.builders import SimulationBuilder
@@ -97,7 +96,7 @@ class TestSlurmOperations(ITestWithPersistence):
             for child in children:
                 self.assertTrue(isinstance(child, Simulation))
                 # this depends on the config for the op so we need to make this test ensure it uses correct config
-                self.assertTrue(isinstance(child.uid, UUID))
+                self.assertTrue(isinstance(child.uid, str))
             self.assertEqual(len(self.exp.simulations), len(children))
             for s in self.exp.simulations:
                 self.assertIn(s.uid, [s.uid for s in children])
@@ -107,7 +106,7 @@ class TestSlurmOperations(ITestWithPersistence):
             children = self.platform.get_children(self.suite.uid, ItemType.SUITE)
             for child in children:
                 self.assertTrue(isinstance(child, Experiment))
-                self.assertTrue(isinstance(child.uid, UUID))
+                self.assertTrue(isinstance(child.uid, str))
             self.assertEqual(len(children), 1)
             for e in self.suite.experiments:
                 self.assertIn(e.uid, [e.uid for e in children])

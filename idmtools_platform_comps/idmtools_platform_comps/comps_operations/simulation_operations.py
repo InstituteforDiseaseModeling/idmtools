@@ -41,8 +41,7 @@ COMPS_EXPERIMENT_BATCH_COMMISSION_TIMESTAMP = 0
 
 
 def comps_batch_worker(simulations: List[Simulation], interface: 'CompsPlatformSimulationOperations', executor,
-                       num_cores: Optional[int] = None, priority: Optional[str] = None,
-                       asset_collection_id: Union[str, UUID] = None,
+                       num_cores: Optional[int] = None, priority: Optional[str] = None, asset_collection_id: str = None,
                        min_time_between_commissions: int = 10, **kwargs) -> List[COMPSSimulation]:
     """
     Run batch worker.
@@ -136,8 +135,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         )
 
     def platform_create(self, simulation: Simulation, num_cores: int = None, priority: str = None,
-                        enable_platform_task_hooks: bool = True, asset_collection_id: Union[str, UUID] = None,
-                        **kwargs) -> COMPSSimulation:
+                        enable_platform_task_hooks: bool = True, asset_collection_id: str = None, **kwargs) -> COMPSSimulation:
         """
         Create Simulation on COMPS.
 
@@ -161,7 +159,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         return s
 
     def to_comps_sim(self, simulation: Simulation, num_cores: int = None, priority: str = None,
-                     config: Configuration = None, asset_collection_id: Union[str, UUID] = None, **kwargs):
+                     config: Configuration = None, asset_collection_id: str = None, **kwargs):
         """
         Covert IDMTools object to COMPS Object.
 
@@ -199,7 +197,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         return s
 
     def get_simulation_config_from_simulation(self, simulation: Simulation, num_cores: int = None, priority: str = None,
-                                              asset_collection_id: UUID = None, **kwargs) -> \
+                                              asset_collection_id: str = None, **kwargs) -> \
             Configuration:
         """
         Get the comps configuration for a Simulation Object.
@@ -253,9 +251,9 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
 
         return Configuration(**comps_configuration)
 
-    def batch_create(self, simulations: List[Simulation], num_cores: int = None, priority: str = None,
-                     asset_collection_id: Union[str, UUID] = None, **kwargs) -> \
-            List[COMPSSimulation]:
+
+    def batch_create(self, simulations: List[Simulation], num_cores: int = None, priority: str = None, 
+                     asset_collection_id: str = None, **kwargs) -> List[COMPSSimulation]:
         """
         Perform batch creation of Simulations.
 

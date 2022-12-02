@@ -8,7 +8,6 @@ from functools import partial
 from logging import getLogger, DEBUG
 from threading import Lock
 from typing import Any, List, Type, Dict, Union, TYPE_CHECKING, Optional
-from uuid import UUID, uuid4
 from idmtools.assets import Asset, AssetCollection
 from idmtools.core import EntityStatus, ItemType
 from idmtools.entities.experiment import Experiment
@@ -35,7 +34,7 @@ class TestExecutePlatformExperimentOperation(IPlatformExperimentOperations):
     platform_type: Type = field(default=ExperimentDict)
     experiments: Dict[str, Experiment] = field(default_factory=dict, compare=False, metadata={"pickle_ignore": True})
 
-    def get(self, experiment_id: Union[str, UUID], **kwargs) -> Any:
+    def get(self, experiment_id: str, **kwargs) -> Any:
         exp_path = self.get_experiment_path(experiment_id)
         path = os.path.join(exp_path, "experiment.json")
         if not os.path.exists(path):
@@ -50,8 +49,6 @@ class TestExecutePlatformExperimentOperation(IPlatformExperimentOperations):
     def platform_create(self, experiment: Experiment, **kwargs) -> Any:
         if logger.isEnabledFor(DEBUG):
             logger.debug('Creating Experiment')
-        if experiment.uid is None:
-            experiment.uid = uuid4()
         EXPERIMENTS_LOCK.acquire()
         self.experiments[experiment.uid] = experiment
         EXPERIMENTS_LOCK.release()
@@ -84,7 +81,7 @@ class TestExecutePlatformExperimentOperation(IPlatformExperimentOperations):
             if sim.status in [None, EntityStatus.CREATED]:
                 self.platform._simulations.run_item(sim)
 
-    def get_experiment_path(self, experiment_id: Union[UUID, str]) -> str:
+    def get_experiment_path(self, experiment_id: str) -> str:
         """
         Get path to experiment directory
 
