@@ -43,7 +43,8 @@ suite.add_experiment(exp)
 # exp.suite = suite
 
 # run suite
-exp.run(wait_until_done=True)
+platform.run_items(items=suite, wait_until_done=True, wait_on_done=True)
+#suite.run(wait_until_done=True)
 sys.exit(0 if suite.succeeded else -1)
 
 

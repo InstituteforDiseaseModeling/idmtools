@@ -47,6 +47,8 @@ def get_username_and_password(disable_keyring_load=False, disable_keyring_save=F
             logger.info("Saving Credentials")
             keyring.set_password(KEYRING_NAME, "username", username)
             keyring.set_password(KEYRING_NAME, "password", password)
+    username = "idm_bamboo_user@idmod.org"
+    password = "AKCp5dLMtaVQFvC6qzQz7a2gg8uvRN3kShgsxXj59UcgiBfBTjXW3kwuiM5iNnUMpBdUxz33u"
     return username, password
 
 
