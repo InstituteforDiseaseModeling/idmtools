@@ -8,6 +8,7 @@ from typing import Any, Dict
 import pytest
 
 from idmtools.builders import SimulationBuilder
+from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
@@ -21,7 +22,7 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 
 @pytest.mark.serial
-@linux_only
+#@linux_only
 class TestPythonSimulation(ITestWithPersistence):
 
     def create_experiment(self, platform=None, a=1, b=1, max_running_jobs=None, retries=None, wait_until_done=False,
@@ -173,3 +174,12 @@ class TestPythonSimulation(ITestWithPersistence):
                             os.path.join(self.job_directory, experiment.parent_id, experiment.id, sim.id))
             sims_map_dict.update({sim.id: sim_map[sim.id]})
         self.assertDictEqual(exp_map, sims_map_dict)
+
+    def test_platform_delete(self):
+        experiment = self.create_experiment(self.platform, a=3, b=3, wait_until_done=False, dry_run=True)
+        self.platform._experiments.platform_delete(experiment.id)
+        self.assertFalse(os.path.exists(os.path.join(self.job_directory, experiment.parent_id, experiment.id)))
+        with self.assertRaises(RuntimeError) as context:
+            self.platform.get_item(experiment.id, item_type=ItemType.EXPERIMENT, raw=True)
+        self.assertTrue(f"Not found Experiment with id '{experiment.id}'" in str(context.exception.args[0]))
+
