@@ -21,6 +21,9 @@ from idmtools.utils.filter_simulations import FilterItem
 from idmtools_test.utils.utils import get_case_name
 from COMPS.Data.Priority import Priority
 
+from COMPS.Data import QueryCriteria
+from idmtools.core import ItemType
+
 current_directory = path.dirname(path.realpath(__file__))
 
 
@@ -225,6 +228,29 @@ class TestCOMPSPlatform(ITestWithPersistence):
         name_expected = self.case_name + "_name___________test"
         self.assertEqual(experiment.name, name_expected)
         self.assertEqual(experiment.simulations[0].name, "test_________sim1")
+
+    def test_create_sim_directory_map(self):
+        model_path = os.path.join(COMMON_INPUT_PATH, "compsplatform", 'working_model.py')
+        task = JSONConfiguredPythonTask(script_path=model_path)
+        builder = SimulationBuilder()
+        builder.add_sweep_definition(JSONConfiguredPythonTask.set_parameter_partial('P'), range(3))
+        experiment = Experiment.from_builder(builder, task, name=self.case_name)
+        experiment.run(wait_until_done=True)
+        exp_map = self.platform._experiments.create_sim_directory_map(experiment.id)
+        sims_map_dict = {}
+        for sim in experiment.simulations:
+            sim_map = self.platform._simulations.create_sim_directory_map(sim.id)
+            comps_sim = self.platform.get_item(sim.id, item_type=ItemType.SIMULATION,
+                                               query_criteria=QueryCriteria().select_children(
+                                                   'hpc_jobs'), raw=True)
+            comps_working_dir = comps_sim.hpc_jobs[-1].working_directory.replace("\\", "/")
+            index = comps_working_dir.index('output')
+            # substring of work_directory will look like: output/test_comps_platform.py--test_create_20221205_184542
+            output_postfix = comps_working_dir[-(len(comps_working_dir) - index):]
+            self.assertTrue(sim_map[sim.id].startswith("/mnt/idm/home/"))
+            self.assertTrue(sim_map[sim.id].endswith(output_postfix))
+            sims_map_dict.update({sim.id:sim_map[sim.id]})
+        self.assertDictEqual(exp_map, sims_map_dict)
 
 
 if __name__ == '__main__':
