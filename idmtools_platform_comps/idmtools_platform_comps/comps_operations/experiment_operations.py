@@ -7,7 +7,7 @@ import os
 from dataclasses import dataclass, field
 from itertools import tee
 from logging import getLogger, DEBUG
-from typing import List, Dict, Type, Generator, NoReturn, Optional, TYPE_CHECKING, Union
+from typing import List, Dict, Type, Generator, NoReturn, Optional, TYPE_CHECKING
 from uuid import UUID
 from COMPS.Data import Experiment as COMPSExperiment, QueryCriteria, Configuration, Suite as COMPSSuite, \
     Simulation as COMPSSimulation
@@ -468,7 +468,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             assets = copy.deepcopy(experiment.assets.assets)
         return assets
 
-    def create_sim_directory_map(self, experiment_id: Union[str, UUID]) -> Dict:
+    def create_sim_directory_map(self, experiment_id: str) -> Dict:
         """
         Build simulation working directory mapping.
         Args:
@@ -484,3 +484,40 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         sim_map = {str(sim.id): sim.hpc_jobs[-1].working_directory for sim in comps_sims}
         clear_linux_mounts(self.platform)
         return sim_map
+
+    def platform_delete(self, experiment_id: str) -> None:
+        """
+        Delete platform experiment.
+        Args:
+            experiment_id: experiment id
+        Returns:
+            None
+        """
+        comps_exp = self.platform.get_item(experiment_id, ItemType.EXPERIMENT, raw=True)
+        try:
+            comps_exp.delete()
+        except RuntimeError:
+            logger.info(f"Could not delete the experiment ({comps_exp.id})...")
+            return
+
+    def platform_cancel(self, experiment_id: str) -> None:
+        """
+        Cancel platform experiment.
+        Args:
+            experiment_id: experiment id
+        Returns:
+            None
+        """
+
+        def experiment_is_running(comps_exp):
+            from COMPS.Data.Simulation import SimulationState
+            for sim in comps_exp.get_simulations():
+                if sim.state not in (SimulationState.Succeeded, SimulationState.Failed,
+                                     SimulationState.Canceled, SimulationState.Created,
+                                     SimulationState.CancelRequested):
+                    return True
+            return False
+
+        comps_experiment = self.platform.get_item(experiment_id, ItemType.EXPERIMENT, raw=True)
+        if comps_experiment and experiment_is_running(comps_experiment):
+            comps_experiment.cancel()

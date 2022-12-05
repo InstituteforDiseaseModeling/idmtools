@@ -169,14 +169,14 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
         """
         raise NotImplementedError("Refresh simulation status is not called directly on the Slurm Platform")
 
-    def create_sim_directory_map(self, simulation_id: Union[str, UUID]) -> Dict:
+    def create_sim_directory_map(self, simulation_id: str) -> Dict:
         """
         Build simulation working directory mapping.
         Args:
             simulation_id: simulation id
 
         Returns:
-            Dict
+            Dict of simulation id as key and working dir as value
         """
         sim = self.platform.get_item(simulation_id, ItemType.SIMULATION, raw=False)
-        return {str(sim.id): str(self.platform._op_client.get_directory_by_id(simulation_id, ItemType.SIMULATION))}
+        return {sim.id: str(self.platform._op_client.get_directory_by_id(simulation_id, ItemType.SIMULATION))}

@@ -9,6 +9,7 @@ from uuid import UUID, uuid4
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, List, Type, Dict, Optional, Any, Union
 from idmtools.assets import Asset, AssetCollection
+from idmtools.core import EntityStatus
 from idmtools.core import ItemType
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
@@ -224,7 +225,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
             experiment: idmtools Experiment
             kwargs: keyword arguments used to expand functionality
         Returns:
-            None
+            Dict of simulation id as key and working dir as value
         """
         # Check if file job_id.txt exists
         job_id_path = self.platform._op_client.get_directory(experiment).joinpath('job_id.txt')
@@ -243,8 +244,36 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
             experiment_id: experiment id
 
         Returns:
-            Dict
+            Dict of simulation id as key and working dir as value
         """
         exp = self.platform.get_item(experiment_id, ItemType.EXPERIMENT, raw=False)
         sims = exp.simulations
-        return {str(sim.id): str(self.platform._op_client.get_directory(sim)) for sim in sims}
+        return {sim.id: str(self.platform._op_client.get_directory(sim)) for sim in sims}
+
+    def platform_delete(self, experiment_id: str) -> None:
+        """
+        Delete platform experiment.
+        Args:
+            experiment_id: platform experiment id
+        Returns:
+            None
+        """
+        exp = self.platform.get_item(experiment_id, ItemType.EXPERIMENT, raw=False)
+        try:
+            shutil.rmtree(self.platform._op_client.get_directory(exp))
+        except RuntimeError:
+            logger.info("Could not delete the associated experiment...")
+            return
+
+    def platform_cancel(self, experiment_id: str) -> None:
+        """
+        Cancel platform experiment.
+        Args:
+            experiment_id: experiment id
+        Returns:
+            None
+        """
+        experiment = self.platform.get_item(experiment_id, ItemType.EXPERIMENT, raw=False)
+        if experiment.status == EntityStatus.RUNNING:
+            # TODO: cancel experiment job
+            user_logger.info("TODO: cancel slurm job...")

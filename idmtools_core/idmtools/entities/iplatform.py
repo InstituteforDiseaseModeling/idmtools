@@ -6,12 +6,14 @@ IPlatform is responsible for all the communication to our platform and translati
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import os
+import copy
 import warnings
 from abc import ABCMeta
 from dataclasses import dataclass
 from dataclasses import fields, field
 from functools import partial
 from os import PathLike
+import pandas as pd
 from pathlib import PureWindowsPath, PurePath
 from itertools import groupby
 from logging import getLogger, DEBUG
@@ -966,9 +968,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
     def get_defaults_by_type(self, default_type: Type) -> List[IPlatformDefault]:
         """
-
         Returns any platform defaults for specific types.
-
         Args:
             default_type: Default type
 
@@ -977,18 +977,71 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         """
         return [x for x in self._platform_defaults if isinstance(x, default_type)]
 
-    def create_sim_directory_map(self, item_id: Union[str, UUID], item_type: ItemType) -> Dict:
+    def create_sim_directory_map(self, item_id: str, item_type: ItemType) -> Dict:
         """
         Build simulation working directory mapping.
         Args:
             item_id: Entity id
             item_type: ItemType
-
         Returns:
-            Dict
+            Dict of simulation id as key and working dir as value
         """
         interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item_type]
         return getattr(self, interface).create_sim_directory_map(item_id)
+
+    def create_sim_directory_df(self, exp_id: str, include_tags: bool = True) -> pd.DataFrame:
+        """
+        Build simulation working directory mapping.
+        Args:
+            exp_id: experiment id
+            include_tags: True/False
+        Returns:
+            DataFrame
+        """
+        tag_df = None
+        if include_tags:
+            tags_list = []
+            sims = self.get_children(exp_id, ItemType.EXPERIMENT)
+            for sim in sims:
+                tags = copy.deepcopy(sim.tags)
+                tags["simid"] = sim.id
+                tags_list.append(tags)
+            tag_df = pd.DataFrame(tags_list)
+
+        dir_map = self.create_sim_directory_map(exp_id, ItemType.EXPERIMENT)
+
+        dir_list = [dict(simid=sim_id, outpath=str(path)) for sim_id, path in dir_map.items()]
+        dir_df = pd.DataFrame(dir_list)
+
+        if tag_df is not None and len(tag_df) > 0:
+            result_df = pd.merge(left=tag_df, right=dir_df, on='simid')
+        else:
+            result_df = dir_df
+
+        return result_df
+
+    def save_sim_directory_df_to_csv(self, exp_id: str, include_tags: bool = True,
+                                     output: str = os.getcwd(), save_header=False, file_name: str = None) -> None:
+        """
+        Save simulation directory df to csv file.
+        Args:
+            exp_id: experiment id
+            include_tags: True/False
+            output: output directory
+            save_header: True/False
+            file_name: user csv file name
+        Returns:
+            None
+        """
+        df = self.create_sim_directory_df(exp_id, include_tags=include_tags)
+        try:
+            os.mkdir(output)
+        except WindowsError:
+            pass
+
+        if file_name is None:
+            file_name = f'{exp_id}.csv'
+        df.to_csv(os.path.join(output, file_name), header=save_header, index=False)
 
 
 TPlatform = TypeVar("TPlatform", bound=IPlatform)

@@ -3,9 +3,11 @@ Here we implement the SlurmPlatform suite operations.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+import shutil
 from uuid import UUID, uuid4
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, List, Type, Dict, Tuple, Union
+from logging import getLogger
 from idmtools.core import ItemType
 from idmtools.entities import Suite
 from idmtools.entities.iplatform_ops.iplatform_suite_operations import IPlatformSuiteOperations
@@ -14,6 +16,8 @@ from idmtools_platform_slurm.platform_operations.utils import SlurmSuite, SlurmE
 if TYPE_CHECKING:
     from idmtools_platform_slurm.slurm_platform import SlurmPlatform
 
+logger = getLogger(__name__)
+user_logger = getLogger('user')
 
 @dataclass
 class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
@@ -137,20 +141,42 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
         for experiment in suite.experiments:
             self.platform.refresh_status(experiment, **kwargs)
 
-    def create_sim_directory_map(self, suite_id: Union[str, UUID]) -> Dict:
+    def create_sim_directory_map(self, suite_id: str) -> Dict:
         """
         Build simulation working directory mapping.
         Args:
             suite_id: suite id
 
         Returns:
-            Dict
+            Dict of simulation id as key and working dir as value
         """
         # s = Suite.get(suite_id)
-        slurm_suite = self.platform.get_item(suite_id, ItemType.SUITE, raw=False)
-        exps = slurm_suite.experiments
+        suite = self.platform.get_item(suite_id, ItemType.SUITE, raw=False)
+        exps = suite.experiments
         sims_map = {}
         for exp in exps:
             d = self.platform._experiments.create_sim_directory_map(exp.id)
             sims_map = {**sims_map, **d}
         return sims_map
+
+    def platform_delete(self, suite_id: str) -> None:
+        """
+        Delete platform suite.
+        Args:
+            suite_id: platform suite id
+        Returns:
+            None
+        """
+        suite = self.platform.get_item(suite_id, ItemType.SUITE, raw=False)
+        exps = suite.experiments
+        for exp in exps:
+            try:
+                shutil.rmtree(self.platform._op_client.get_directory(exp))
+            except RuntimeError:
+                logger.info("Could not delete the associated experiment...")
+                return
+        try:
+            shutil.rmtree(self.platform._op_client.get_directory(suite))
+        except RuntimeError:
+            logger.info(f"Could not delete suite ({suite_id})...")
+            return
