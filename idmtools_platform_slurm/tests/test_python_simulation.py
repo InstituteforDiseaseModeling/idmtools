@@ -24,7 +24,8 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 @linux_only
 class TestPythonSimulation(ITestWithPersistence):
 
-    def create_experiment(self, platform=None, a=1, b=1, max_running_jobs=None, retries=None, wait_until_done=False, dry_run=True):
+    def create_experiment(self, platform=None, a=1, b=1, max_running_jobs=None, retries=None, wait_until_done=False,
+                          dry_run=True):
         task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model3.py"),
                                         envelope="parameters", parameters=(dict(c=0)))
         task.python_path = "python3"
@@ -52,7 +53,8 @@ class TestPythonSimulation(ITestWithPersistence):
         # Add experiment to the suite
         suite.add_experiment(experiment)
         # change dry_run=False when run in slurm cluster
-        suite.run(platform=platform, wait_until_done=False, wait_on_done=wait_until_done, max_running_jobs=max_running_jobs,
+        suite.run(platform=platform, wait_until_done=False, wait_on_done=wait_until_done,
+                  max_running_jobs=max_running_jobs,
                   retries=retries, dry_run=dry_run)
         print("suite_id: " + suite.id)
         print("experiment_id: " + experiment.id)
@@ -145,7 +147,7 @@ class TestPythonSimulation(ITestWithPersistence):
                 self.assertEqual(contents['task']['command'], 'python3 Assets/model3.py --config config.json')
                 with open(os.path.join(simulation_dir, 'config.json'), 'r') as j:
                     config_contents = json.loads(j.read())
-                self.assertDictEqual(contents['task']['parameters'],  config_contents['parameters'])
+                self.assertDictEqual(contents['task']['parameters'], config_contents['parameters'])
 
     @pytest.mark.skip("unskip this line when doing real run in local")
     def test_std_status_jobid_files(self):
@@ -160,3 +162,14 @@ class TestPythonSimulation(ITestWithPersistence):
             self.assertTrue(os.path.exists(status_file))
             status = open(status_file, 'r').read().strip()
             self.assertEqual(int(status), 0)
+
+    def test_create_sim_directory_map(self):
+        experiment = self.create_experiment(self.platform, a=3, b=3, wait_until_done=False, dry_run=True)
+        exp_map = self.platform._experiments.create_sim_directory_map(experiment.id)
+        sims_map_dict = {}
+        for sim in experiment.simulations:
+            sim_map = self.platform._simulations.create_sim_directory_map(sim.id)
+            self.assertTrue(sim_map[sim.id],
+                            os.path.join(self.job_directory, experiment.parent_id, experiment.id, sim.id))
+            sims_map_dict.update({sim.id: sim_map[sim.id]})
+        self.assertDictEqual(exp_map, sims_map_dict)
