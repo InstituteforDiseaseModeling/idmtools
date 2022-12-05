@@ -252,6 +252,16 @@ class TestCOMPSPlatform(ITestWithPersistence):
             sims_map_dict.update({sim.id:sim_map[sim.id]})
         self.assertDictEqual(exp_map, sims_map_dict)
 
+    @pytest.mark.skip("do not run this test since we can not control when comps actually delete experiment")
+    def test_platform_delete(self):
+        config = {"a": 1, "b": 2}
+        experiment = self.get_working_model_experiment(config)
+        wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform)
+        self.platform._experiments.platform_delete(experiment.id)
+        with self.assertRaises(RuntimeError) as context:
+            self.platform.get_item(experiment.id, item_type=ItemType.EXPERIMENT, raw=True)
+        self.assertTrue('404 NotFound - Failed to retrieve experiment for given id' in str(context.exception.args[0]))
+
 
 if __name__ == '__main__':
     unittest.main()
