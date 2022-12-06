@@ -156,7 +156,7 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
             Dict of simulation id as key and working dir as value
         """
         # s = Suite.get(suite_id)
-        comps_suite = self.platform.get_item(suite_id, ItemType.SUITE, raw=True)
+        comps_suite = self.platform.get_item(suite_id, ItemType.SUITE, raw=True, force=True)
         comps_exps = comps_suite.get_experiments(QueryCriteria().select('id'))
         sims_map = {}
         for exp in comps_exps:
