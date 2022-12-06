@@ -479,9 +479,9 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         """
         from idmtools_platform_comps.utils.linux_mounts import set_linux_mounts, clear_linux_mounts
         set_linux_mounts(self.platform)
-        comps_exp = self.platform.get_item(experiment_id, ItemType.EXPERIMENT, raw=True)
+        comps_exp = self.platform.get_item(experiment_id, ItemType.EXPERIMENT, raw=True, force=True)
         comps_sims = comps_exp.get_simulations(QueryCriteria().select(['id', 'state']).select_children('hpc_jobs'))
-        sim_map = {str(sim.id): sim.hpc_jobs[-1].working_directory for sim in comps_sims}
+        sim_map = {str(sim.id): sim.hpc_jobs[-1].working_directory for sim in comps_sims if sim.hpc_jobs}
         clear_linux_mounts(self.platform)
         return sim_map
 
