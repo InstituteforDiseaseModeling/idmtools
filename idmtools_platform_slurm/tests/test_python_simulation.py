@@ -169,7 +169,7 @@ class TestPythonSimulation(ITestWithPersistence):
         exp_map = self.platform._experiments.create_sim_directory_map(experiment.id)
         sims_map_dict = {}
         for sim in experiment.simulations:
-            sim_map = self.platform._simulations.create_sim_directory_map(sim.id)
+            sim_map = self.platform.create_sim_directory_map(sim.id, item_type=ItemType.SIMULATION)
             self.assertTrue(sim_map[sim.id],
                             os.path.join(self.job_directory, experiment.parent_id, experiment.id, sim.id))
             sims_map_dict.update({sim.id: sim_map[sim.id]})
