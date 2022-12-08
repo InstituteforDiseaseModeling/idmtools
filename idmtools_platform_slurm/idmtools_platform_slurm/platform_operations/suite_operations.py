@@ -151,7 +151,7 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
             Dict of simulation id as key and working dir as value
         """
         # s = Suite.get(suite_id)
-        suite = self.platform.get_item(suite_id, ItemType.SUITE, raw=False)
+        suite = self.platform.get_item(suite_id, ItemType.SUITE, raw=False, force=True)
         exps = suite.experiments
         sims_map = {}
         for exp in exps:
