@@ -631,7 +631,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
 
         return ac.assets
 
-    def create_sim_directory_map(self, simulation_id: Union[str, UUID]) -> Dict:
+    def create_sim_directory_map(self, simulation_id: str) -> Dict:
         """
         Build simulation working directory mapping.
         Args:
