@@ -1,3 +1,4 @@
+import csv
 import json
 import os
 import pathlib
@@ -5,6 +6,8 @@ import shutil
 from functools import partial
 from typing import Any, Dict
 
+import numpy as np
+import pandas as pd
 import pytest
 
 from idmtools.builders import SimulationBuilder
@@ -22,7 +25,7 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 
 @pytest.mark.serial
-#@linux_only
+@linux_only
 class TestPythonSimulation(ITestWithPersistence):
 
     def create_experiment(self, platform=None, a=1, b=1, max_running_jobs=None, retries=None, wait_until_done=False,
@@ -166,7 +169,7 @@ class TestPythonSimulation(ITestWithPersistence):
 
     def test_create_sim_directory_map(self):
         experiment = self.create_experiment(self.platform, a=3, b=3, wait_until_done=False, dry_run=True)
-        exp_map = self.platform._experiments.create_sim_directory_map(experiment.id)
+        exp_map = self.platform.create_sim_directory_map(experiment.id, item_type=ItemType.EXPERIMENT)
         sims_map_dict = {}
         for sim in experiment.simulations:
             sim_map = self.platform.create_sim_directory_map(sim.id, item_type=ItemType.SIMULATION)
@@ -174,12 +177,57 @@ class TestPythonSimulation(ITestWithPersistence):
                             os.path.join(self.job_directory, experiment.parent_id, experiment.id, sim.id))
             sims_map_dict.update({sim.id: sim_map[sim.id]})
         self.assertDictEqual(exp_map, sims_map_dict)
+        self.assertTrue(len(exp_map) == 9)
 
-    def test_platform_delete(self):
+    def test_create_sim_directory_df(self):
+        experiment = self.create_experiment(self.platform, a=3, b=3, wait_until_done=False, dry_run=True)
+        exp_df = self.platform.create_sim_directory_df(experiment.id)
+        sims_df = pd.DataFrame()
+        for sim in experiment.simulations:
+            sim_map = self.platform.create_sim_directory_map(sim.id, item_type=ItemType.SIMULATION)
+            sim_df = pd.DataFrame()
+            sim_tags = sim.tags
+            sim_df = sim_df.append(sim_tags, ignore_index=True)
+            sim_df['simid'] = sim.id
+            sim_df['outpath'] = sim_map[sim.id]
+            sims_df = sims_df.append(sim_df, ignore_index=True)
+        self.assertTrue(np.all(exp_df.sort_values('simid').values == sims_df.sort_values('simid').values))
+        self.assertTrue(exp_df.shape == (9, 6))
+
+    def test_create_sim_directory_csv(self):
+        experiment = self.create_experiment(self.platform, a=3, b=3, wait_until_done=False, dry_run=True)
+        self.platform.save_sim_directory_df_to_csv(experiment.id)
+        exp_df = self.platform.create_sim_directory_df(experiment.id)
+        import csv
+        sim_list = []
+        with open(f"{experiment.id}.csv", newline='') as csvfile:
+            csvreader = csv.reader(csvfile)
+            for row in csvreader:
+                sim_list.append(row)
+        self.assertTrue(exp_df.values.tolist(), sim_list)
+        self.assertTrue(len(sim_list) == 9)
+        # cleanup
+        os.remove(f"{experiment.id}.csv")
+
+    def test_platform_delete_experiment(self):
         experiment = self.create_experiment(self.platform, a=3, b=3, wait_until_done=False, dry_run=True)
         self.platform._experiments.platform_delete(experiment.id)
+        # make sure we don't delete suite in this case
+        self.assertTrue(os.path.exists(os.path.join(self.job_directory, experiment.parent_id)))
+        # make sure we only delete experiment folder under suite
         self.assertFalse(os.path.exists(os.path.join(self.job_directory, experiment.parent_id, experiment.id)))
         with self.assertRaises(RuntimeError) as context:
             self.platform.get_item(experiment.id, item_type=ItemType.EXPERIMENT, raw=True)
         self.assertTrue(f"Not found Experiment with id '{experiment.id}'" in str(context.exception.args[0]))
+
+    def test_platform_delete_suite(self):
+        experiment = self.create_experiment(self.platform, a=3, b=3, wait_until_done=False, dry_run=True)
+        self.platform._suites.platform_delete(experiment.parent_id)
+        # make sure we delete suite folder
+        self.assertFalse(os.path.exists(os.path.join(self.job_directory, experiment.parent_id)))
+        with self.assertRaises(RuntimeError) as context:
+            self.platform.get_item(experiment.parent_id, item_type=ItemType.SUITE, raw=True)
+        self.assertTrue(f"Not found Suite with id '{experiment.parent_id}'" in str(context.exception.args[0]))
+
+
 
