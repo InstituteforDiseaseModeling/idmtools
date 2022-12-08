@@ -1036,7 +1036,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         df = self.create_sim_directory_df(exp_id, include_tags=include_tags)
         try:
             os.mkdir(output)
-        except WindowsError:
+        except OSError:
             pass
 
         if file_name is None:
