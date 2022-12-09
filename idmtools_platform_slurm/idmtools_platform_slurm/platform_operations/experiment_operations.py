@@ -137,6 +137,8 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         dry_run = kwargs.get('dry_run', False)
         if not dry_run:
             slurm_job_id = self.platform._op_client.submit_job(experiment, **kwargs)
+            working_directory = self.platform._op_client.get_directory(experiment)
+            self.platform._op_client.create_file(working_directory.joinpath('job_id.txt'), slurm_job_id)
         else:
             slurm_job_id = None
         suite_id = experiment.parent_id or experiment.suite_id
@@ -237,7 +239,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         for sim in experiment.simulations:
             sim.status = self.platform._op_client.get_simulation_status(sim.id, **kwargs)
 
-    def create_sim_directory_map(self, experiment_id: Union[str, UUID]) -> Dict:
+    def create_sim_directory_map(self, experiment_id: str) -> Dict:
         """
         Build simulation working directory mapping.
         Args:
@@ -265,15 +267,23 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
             logger.info("Could not delete the associated experiment...")
             return
 
-    def platform_cancel(self, experiment_id: str) -> None:
+    def platform_cancel(self, experiment_id: str, force: bool = False) -> None:
         """
-        Cancel platform experiment.
+        Cancel platform experiment's slurm job.
         Args:
             experiment_id: experiment id
         Returns:
             None
         """
         experiment = self.platform.get_item(experiment_id, ItemType.EXPERIMENT, raw=False)
-        if experiment.status == EntityStatus.RUNNING:
-            # TODO: cancel experiment job
-            user_logger.info("TODO: cancel slurm job...")
+        if force or experiment.status == EntityStatus.RUNNING:
+            logger.debug(f"cancel slurm job for experiment: {experiment_id}...")
+            job_id = self.platform._op_client.get_job_id(experiment_id, ItemType.EXPERIMENT)
+            if job_id is None:
+                logger.debug(f"Slurn job for experiment: {experiment_id} is not available!")
+            else:
+                result = self.platform._op_client.cancel_job(job_id)
+                user_logger.info(result)
+                return result
+        else:
+            user_logger.info(f"Experiment {experiment_id} is not running, no cancel needed...")
