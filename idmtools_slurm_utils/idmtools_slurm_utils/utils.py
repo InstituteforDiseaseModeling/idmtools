@@ -63,7 +63,7 @@ def get_job_result(job_path: PathLike) -> Dict:
                 result = command_sbatch(info)
             elif command == "verify":
                 result = command_verify(info)
-            elif command == "cancel":
+            elif command == "scancel":
                 result = command_scancel(info)
             else:
                 result = dict(
