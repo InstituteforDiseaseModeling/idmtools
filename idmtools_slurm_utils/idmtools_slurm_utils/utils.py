@@ -1,4 +1,8 @@
-"""Utils for slurm bridge."""
+"""
+Utils for slurm bridge.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import json
 import os
 from logging import getLogger, DEBUG

@@ -1,4 +1,8 @@
-"""Handles interaction with scancel command."""
+"""
+Handles interaction with scancel command.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import subprocess
 from logging import DEBUG, getLogger
 from typing import Dict, Tuple, List, Union

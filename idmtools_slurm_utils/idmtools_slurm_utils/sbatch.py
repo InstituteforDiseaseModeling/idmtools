@@ -1,4 +1,8 @@
-"""Handles interaction with sbatch command."""
+"""
+Handles interaction with sbatch command.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import subprocess
 from logging import DEBUG, getLogger
 from pathlib import Path
