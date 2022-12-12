@@ -133,7 +133,6 @@ class TestPythonSimulation(ITestWithPersistence):
             contents = json.loads(j.read())
             self.assertEqual(contents['_uid'], experiment.id)
             self.assertEqual(contents['parent_id'], suite.id)
-            self.assertEqual(set(contents['simulations']), set(simulation_ids))
 
         # verify ids in metadata.json for simulation, also verify sweep parameter in config.json file
         for simulation in experiment.simulations:
