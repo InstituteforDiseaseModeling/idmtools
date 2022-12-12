@@ -18,7 +18,8 @@ from idmtools_platform_slurm.slurm_operations.local_operations import LocalSlurm
 logger = getLogger(__name__)
 
 
-def create_bridged_job(working_directory, bridged_jobs_directory, results_directory, cleanup_results: bool = True):
+def create_bridged_job(working_directory, bridged_jobs_directory, results_directory,
+                       cleanup_results: bool = True) -> Any:
     """
     Creates a bridged job.
 
@@ -63,7 +64,7 @@ def create_bridged_job(working_directory, bridged_jobs_directory, results_direct
 
 
 def cancel_bridged_job(job_ids: Union[str, List[str]], bridged_jobs_directory, results_directory,
-                       cleanup_results: bool = True):
+                       cleanup_results: bool = True) -> Any:
     """
     Cancel a bridged job.
 
@@ -148,7 +149,5 @@ class BridgedLocalSlurmOperations(LocalSlurmOperations):
         Returns:
             Any
         """
-        if isinstance(job_ids, str):
-            job_ids = [job_ids]
         return cancel_bridged_job(job_ids, self.platform.bridged_jobs_directory,
                                   self.platform.bridged_results_directory)

@@ -267,13 +267,14 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
             logger.info("Could not delete the associated experiment...")
             return
 
-    def platform_cancel(self, experiment_id: str, force: bool = False) -> None:
+    def platform_cancel(self, experiment_id: str, force: bool = False) -> Any:
         """
         Cancel platform experiment's slurm job.
         Args:
             experiment_id: experiment id
+            force: bool, True/False
         Returns:
-            None
+            Any
         """
         experiment = self.platform.get_item(experiment_id, ItemType.EXPERIMENT, raw=False)
         if force or experiment.status == EntityStatus.RUNNING:
@@ -281,6 +282,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
             job_id = self.platform._op_client.get_job_id(experiment_id, ItemType.EXPERIMENT)
             if job_id is None:
                 logger.debug(f"Slurn job for experiment: {experiment_id} is not available!")
+                return
             else:
                 result = self.platform._op_client.cancel_job(job_id)
                 user_logger.info(result)
