@@ -97,7 +97,7 @@ class LocalSlurmOperations(SlurmOperations):
 
         exist_ok = exist_ok if exist_ok is not None else IdmConfigParser.get_option(option="EXIST_ITEM_DIR", fallback=self.platform.dir_exist_ok)
         if not exist_ok and os.path.exists(target):
-            raise RuntimeError('Item directory already exists. Exist_ok flag set to false to avoid data being overwritten.')
+            raise RuntimeError(f'Item directory {target} already exists. Exist_ok flag set to false to avoid data being overwritten.')
         else:
             target.mkdir(parents=True, exist_ok=exist_ok)
 
