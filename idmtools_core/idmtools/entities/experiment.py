@@ -573,7 +573,6 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
             if not f.name.startswith("_") and f.name not in ['parent']:
                 result[f.name] = getattr(self, f.name)
 
-        result = result
         result['_uid'] = self.uid
         return result
 
