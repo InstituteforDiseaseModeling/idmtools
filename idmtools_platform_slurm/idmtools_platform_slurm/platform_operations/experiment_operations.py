@@ -267,7 +267,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
             logger.info("Could not delete the associated experiment...")
             return
 
-    def platform_cancel(self, experiment_id: str, force: bool = False) -> Any:
+    def platform_cancel(self, experiment_id: str, force: bool = True) -> Any:
         """
         Cancel platform experiment's slurm job.
         Args:
