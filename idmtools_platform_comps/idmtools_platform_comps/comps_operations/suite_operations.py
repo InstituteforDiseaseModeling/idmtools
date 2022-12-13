@@ -5,14 +5,17 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 from dataclasses import dataclass, field
 from typing import Any, List, Dict, Tuple, Union, Type, TYPE_CHECKING, Optional
 from uuid import UUID
+from logging import getLogger
 from COMPS.Data import Suite as COMPSSuite, QueryCriteria, Experiment as COMPSExperiment, WorkItem
-
 from idmtools.core import ItemType
 from idmtools.entities import Suite
 from idmtools.entities.iplatform_ops.iplatform_suite_operations import IPlatformSuiteOperations
 
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools_platform_comps.comps_platform import COMPSPlatform
+
+logger = getLogger(__name__)
+user_logger = getLogger('user')
 
 
 @dataclass
@@ -143,7 +146,7 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
                 obj.experiments.append(self.platform._experiments.to_entity(exp, parent=obj, **kwargs))
         return obj
 
-    def create_sim_directory_map(self, suite_id: Union[str, UUID]) -> Dict:
+    def create_sim_directory_map(self, suite_id: str) -> Dict:
         """
         Build simulation working directory mapping.
         Args:
@@ -153,10 +156,32 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
             Dict of simulation id as key and working dir as value
         """
         # s = Suite.get(suite_id)
-        comps_suite = self.platform.get_item(suite_id, ItemType.SUITE, raw=True)
+        comps_suite = self.platform.get_item(suite_id, ItemType.SUITE, raw=True, force=True)
         comps_exps = comps_suite.get_experiments(QueryCriteria().select('id'))
         sims_map = {}
         for exp in comps_exps:
             r = self.platform._experiments.create_sim_directory_map(exp.id)
             sims_map = {**sims_map, **r}
         return sims_map
+
+    def platform_delete(self, suite_id: str) -> None:
+        """
+        Delete platform suite.
+        Args:
+            suite_id: platform suite id
+        Returns:
+            None
+        """
+        comps_suite = self.platform.get_item(suite_id, ItemType.SUITE, raw=True)
+        comps_exps = comps_suite.get_experiments()
+        for comps_exp in comps_exps:
+            try:
+                comps_exp.delete()
+            except RuntimeError:
+                logger.info(f"Could not delete the associated experiment ({comps_exp.id})...")
+                return
+        try:
+            comps_suite.delete()
+        except RuntimeError:
+            logger.info(f"Could not delete suite ({suite_id})...")
+            return
