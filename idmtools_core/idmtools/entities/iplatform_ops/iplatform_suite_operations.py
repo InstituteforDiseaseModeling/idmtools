@@ -7,7 +7,6 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from logging import getLogger, DEBUG
 from typing import Type, Any, List, Tuple, Dict, NoReturn, TYPE_CHECKING
-
 from idmtools.core.enums import EntityStatus, ItemType
 from idmtools.entities.iplatform_ops.utils import batch_create_items
 from idmtools.entities.suite import Suite
@@ -301,3 +300,23 @@ class IPlatformSuiteOperations(ABC):
             Dict
         """
         return {}
+
+    def platform_delete(self, suite_id: str) -> None:
+        """
+        Delete platform suite.
+        Args:
+            suite_id: suite id
+        Returns:
+            None
+        """
+        pass
+
+    def platform_cancel(self, suite_id: str) -> None:
+        """
+        Cancel platform suite.
+        Args:
+            suite_id: suite id
+        Returns:
+            None
+        """
+        pass

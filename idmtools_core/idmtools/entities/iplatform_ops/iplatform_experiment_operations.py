@@ -393,3 +393,23 @@ class IPlatformExperimentOperations(ABC):
             Dict
         """
         return {}
+
+    def platform_delete(self, experiment_id: str) -> None:
+        """
+        Delete platform experiment.
+        Args:
+            experiment_id: experiment id
+        Returns:
+            None
+        """
+        pass
+
+    def platform_cancel(self, experiment_id: str) -> None:
+        """
+        Cancel platform experiment.
+        Args:
+            experiment_id: experiment id
+        Returns:
+            None
+        """
+        pass
