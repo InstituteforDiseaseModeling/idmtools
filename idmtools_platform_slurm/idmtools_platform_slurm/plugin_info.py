@@ -1,3 +1,8 @@
+"""
+idmtools slurm platform plugin definition.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 from pathlib import Path
 from typing import Type, Dict
 

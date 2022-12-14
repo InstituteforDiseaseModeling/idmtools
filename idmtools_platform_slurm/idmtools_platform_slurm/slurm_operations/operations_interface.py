@@ -11,6 +11,7 @@ from uuid import UUID
 
 from idmtools.core import ItemType
 from idmtools.core.interfaces.ientity import IEntity
+from idmtools.entities.suite import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 
@@ -61,5 +62,17 @@ class SlurmOperations(ABC):
         pass
 
     @abstractmethod
-    def get_simulation_status(self, sim_id: Union[UUID, str]) -> Any:
+    def get_simulation_status(self, sim_id: str) -> Any:
+        pass
+
+    @abstractmethod
+    def create_file(self, file_path: str, content: str) -> None:
+        pass
+
+    @abstractmethod
+    def get_job_id(self, item_id: str, item_type: ItemType) -> str:
+        pass
+
+    @abstractmethod
+    def cancel_job(self, job_id: str) -> Any:
         pass
