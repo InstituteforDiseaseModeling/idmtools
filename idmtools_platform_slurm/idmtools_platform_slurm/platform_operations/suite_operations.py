@@ -3,8 +3,9 @@ Here we implement the SlurmPlatform suite operations.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+import shutil
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, List, Type, Dict, Tuple, Union
+from typing import TYPE_CHECKING, Any, List, Type, Dict, Tuple
 from logging import getLogger
 from idmtools.core import ItemType
 from idmtools.entities import Suite
