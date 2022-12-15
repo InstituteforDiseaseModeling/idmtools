@@ -8,9 +8,11 @@ from functools import partial
 from logging import getLogger, DEBUG
 from threading import Lock
 from pathlib import Path
-from typing import Any, List, Type, Dict, Union, TYPE_CHECKING, Optional
+from typing import Any, List, Type, Dict, TYPE_CHECKING, Optional
+from idmtools import IdmConfigParser
 from idmtools.assets import Asset, AssetCollection
 from idmtools.core import EntityStatus, ItemType
+from idmtools.core import IDMTOOLS_USER_HOME
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
 from idmtools.utils.file import file_contents_to_generator
@@ -23,6 +25,7 @@ logger = getLogger(__name__)
 current_directory = os.path.dirname(os.path.realpath(__file__))
 data_path = os.path.abspath(os.path.join(current_directory, "..", "..", "data"))
 EXPERIMENTS_LOCK = Lock()
+SEQUENCE_FILE_DEFAULT_PATH = IDMTOOLS_USER_HOME.joinpath("itemsequence", "index.json")
 
 
 class ExperimentDict(dict):
@@ -231,3 +234,9 @@ class TestExecutePlatformExperimentOperation(IPlatformExperimentOperations):
         sim_path = Path(exp_path, "simulation_index.json")
         with open(sim_path, "w") as f:
             json.dump([s.id for s in experiment.simulations], f)
+
+        if IdmConfigParser.get_option(None, "id_generator", "uuid").lower() == "item_sequence":
+            sequence_file = Path(
+                IdmConfigParser.get_option("item_sequence", "sequence_file", SEQUENCE_FILE_DEFAULT_PATH))
+            sequence_file_bk = f'{sequence_file}.bak'
+            shutil.copy(sequence_file, sequence_file_bk)
