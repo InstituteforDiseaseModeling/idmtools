@@ -1,4 +1,8 @@
-"""Provides facility to watch bridge files."""
+"""
+Provides facility to watch bridge files.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import time
 from logging import getLogger
 from os import PathLike

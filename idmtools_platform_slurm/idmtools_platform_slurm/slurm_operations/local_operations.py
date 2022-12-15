@@ -10,9 +10,9 @@ import subprocess
 from dataclasses import dataclass
 from logging import getLogger
 from pathlib import Path
-from typing import Union, Any
-
 from idmtools import IdmConfigParser
+from typing import Union, Any, List
+from uuid import UUID
 from idmtools.core import ItemType, EntityStatus
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
@@ -234,3 +234,56 @@ class LocalSlurmOperations(SlurmOperations):
             status = SLURM_MAPS['None']
 
         return status
+
+    def create_file(self, file_path: str, content: str) -> None:
+        """
+        Create a file with given content and file path.
+
+        Args:
+            file_path: the full path of the file to be created
+            content: file content
+        Returns:
+            Nothing
+        """
+        with open(file_path, 'w') as f:
+            f.write(content)
+
+    # region: Cancel Slurm Job
+    @staticmethod
+    def cancel_job(job_ids: Union[str, List[str]]) -> Any:
+        """
+        Cancel Slurm job for given job ids.
+        Args:
+            job_ids: slurm jobs id
+        Returns:
+            Any
+        """
+        if isinstance(job_ids, str):
+            job_ids = [job_ids]
+        logger.debug(f"Submit slurm cancel job: {job_ids}")
+        result = subprocess.run(['scancel', *job_ids], stdout=subprocess.PIPE)
+        stdout = "Success" if result.returncode == 0 else 'Error'
+        return stdout
+
+    def get_job_id(self, item_id: str, item_type: ItemType) -> str:
+        """
+        Retrieve the job id for item that had been run.
+        Args:
+            item_id: id of experiment/simulation
+            item_type: ItemType (Experiment or Simulation)
+        Returns:
+            str
+        """
+        if item_type not in (ItemType.EXPERIMENT, ItemType.SIMULATION):
+            raise RuntimeError(f"Not support item type: {item_type}")
+
+        item_dir = self.get_directory_by_id(item_id, item_type)
+        job_id_file = item_dir.joinpath('job_id.txt')
+        if not job_id_file.exists():
+            logger.debug(f"{job_id_file} not found.")
+            return None
+
+        job_id = open(job_id_file).read().strip()
+        return job_id
+
+    # endregion

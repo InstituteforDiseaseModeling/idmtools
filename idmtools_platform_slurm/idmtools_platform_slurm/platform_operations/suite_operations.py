@@ -18,6 +18,7 @@ if TYPE_CHECKING:
 logger = getLogger(__name__)
 user_logger = getLogger('user')
 
+
 @dataclass
 class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
     """
@@ -177,3 +178,17 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
         except RuntimeError:
             logger.info(f"Could not delete suite ({suite_id})...")
             return
+
+    def platform_cancel(self, suite_id: str, force: bool = False) -> None:
+        """
+        Cancel platform suite's slurm job.
+        Args:
+            suite_id: suite id
+            force: bool, True/False
+        Returns:
+            None
+        """
+        suite = self.platform.get_item(suite_id, ItemType.SUITE, raw=False)
+        logger.debug(f"cancel slurm job for suite: {suite_id}...")
+        for exp in suite.experiments:
+            self.platform._experiments.platform_cancel(exp.id, force)
