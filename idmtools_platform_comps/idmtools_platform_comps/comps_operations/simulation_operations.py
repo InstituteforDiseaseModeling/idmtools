@@ -12,7 +12,7 @@ from dataclasses import dataclass, field
 from COMPS.Data.Simulation import SimulationState
 from functools import partial
 from logging import getLogger, DEBUG
-from typing import Any, List, Dict, Type, Optional, TYPE_CHECKING, Union
+from typing import Any, List, Dict, Type, Optional, TYPE_CHECKING
 from uuid import UUID
 from COMPS.Data import Simulation as COMPSSimulation, QueryCriteria, Experiment as COMPSExperiment, SimulationFile, \
     Configuration
@@ -250,7 +250,6 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
                                        exclusive=None, simulation_input_args=None)
 
         return Configuration(**comps_configuration)
-
 
     def batch_create(self, simulations: List[Simulation], num_cores: int = None, priority: str = None, 
                      asset_collection_id: str = None, **kwargs) -> List[COMPSSimulation]:

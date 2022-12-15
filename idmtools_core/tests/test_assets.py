@@ -316,6 +316,7 @@ class TestAssets(unittest.TestCase):
             a = Asset(os.path.abspath(os.path.dirname(__file__)))
         self.assertEqual(ex.exception.args[0], "Asset cannot be a directory!")
 
+    @pytest.mark.performance
     @pytest.mark.timeout(15)
     def test_large_asset_merge_speed(self):
         assets1 = AssetCollection()

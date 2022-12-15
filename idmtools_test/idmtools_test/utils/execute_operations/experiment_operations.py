@@ -7,6 +7,7 @@ from dataclasses import field, dataclass
 from functools import partial
 from logging import getLogger, DEBUG
 from threading import Lock
+from pathlib import Path
 from typing import Any, List, Type, Dict, Union, TYPE_CHECKING, Optional
 from idmtools.assets import Asset, AssetCollection
 from idmtools.core import EntityStatus, ItemType
@@ -36,15 +37,23 @@ class TestExecutePlatformExperimentOperation(IPlatformExperimentOperations):
 
     def get(self, experiment_id: str, **kwargs) -> Any:
         exp_path = self.get_experiment_path(experiment_id)
-        path = os.path.join(exp_path, "experiment.json")
-        if not os.path.exists(path):
+        experiment_path = os.path.join(exp_path, "experiment.json")
+        if not os.path.exists(experiment_path):
             logger.error(f"Cannot find experiment with id {experiment_id}")
             raise FileNotFoundError(f"Cannot find experiment with id {experiment_id}")
 
-        logger.info(f"Loading experiment metadata from {path}")
-        with open(path, 'r') as metadata_in:
+        simulation_metadata_path = os.path.join(exp_path, "simulation_index.json")
+        if not os.path.exists(simulation_metadata_path):
+            logger.error(f"Cannot find simulation index for experiment with id {experiment_id}")
+            raise FileNotFoundError(f"Cannot find simulation index for experiment with id {experiment_id}")
+
+        logger.info(f"Loading experiment metadata from {experiment_path}")
+        with open(experiment_path, 'r') as metadata_in:
             metadata = json.load(metadata_in)
-            return ExperimentDict(metadata)
+        logger.info(f"Loading simulation metadata from {simulation_metadata_path}")
+        with open(simulation_metadata_path, 'r') as metadata_in:
+            metadata['simulations'] = json.load(metadata_in)
+        return ExperimentDict(metadata)
 
     def platform_create(self, experiment: Experiment, **kwargs) -> Any:
         if logger.isEnabledFor(DEBUG):
@@ -216,3 +225,9 @@ class TestExecutePlatformExperimentOperation(IPlatformExperimentOperations):
         EXPERIMENTS_LOCK.release()
         self.send_assets(experiment)
         return experiment
+
+    def post_run_item(self, experiment: Experiment, **kwargs):
+        exp_path = self.get_experiment_path(experiment.uid)
+        sim_path = Path(exp_path, "simulation_index.json")
+        with open(sim_path, "w") as f:
+            json.dump([s.id for s in experiment.simulations], f)
