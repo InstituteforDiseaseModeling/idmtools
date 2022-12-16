@@ -9,7 +9,6 @@ from logging import getLogger, DEBUG
 from threading import Lock
 from pathlib import Path
 from typing import Any, List, Type, Dict, TYPE_CHECKING, Optional
-from idmtools import IdmConfigParser
 from idmtools.assets import Asset, AssetCollection
 from idmtools.core import EntityStatus, ItemType
 from idmtools.core import IDMTOOLS_USER_HOME
@@ -235,8 +234,4 @@ class TestExecutePlatformExperimentOperation(IPlatformExperimentOperations):
         with open(sim_path, "w") as f:
             json.dump([s.id for s in experiment.simulations], f)
 
-        if IdmConfigParser.get_option(None, "id_generator", "uuid").lower() == "item_sequence":
-            sequence_file = Path(
-                IdmConfigParser.get_option("item_sequence", "sequence_file", SEQUENCE_FILE_DEFAULT_PATH))
-            sequence_file_bk = f'{sequence_file}.bak'
-            shutil.copy(sequence_file, sequence_file_bk)
+        super().post_run_item(experiment)
