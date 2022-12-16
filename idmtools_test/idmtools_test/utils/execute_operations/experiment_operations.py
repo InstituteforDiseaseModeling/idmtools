@@ -234,4 +234,4 @@ class TestExecutePlatformExperimentOperation(IPlatformExperimentOperations):
         with open(sim_path, "w") as f:
             json.dump([s.id for s in experiment.simulations], f)
 
-        super().post_run_item(experiment)
+        super().post_run_item(experiment, **kwargs)
