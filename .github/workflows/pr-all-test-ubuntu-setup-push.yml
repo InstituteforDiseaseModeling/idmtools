@@ -386,11 +386,11 @@ jobs:
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.slurm == 'true' || steps.filter.outputs.models == 'true'
         run: |
           pip install idm-buildtools flake8 wheel --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
-      - name: Run setup-dev
+      - name: Run setup-dev-no-docker
         # only run if full install for core, slurm changes, or models
         if: steps.filter.outputs.core == 'true' ||  steps.filter.outputs.slurm == 'true' ||  steps.filter.outputs.models == 'true'
         run: |
-          make setup-dev
+          make setup-dev-no-docker
       - name: run idmtools_platform_slurm all tests
         # only run if core and comps changed
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.slurm == 'true' || steps.filter.outputs.models == 'true'
@@ -443,11 +443,11 @@ jobs:
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.slurm == 'true' || steps.filter.outputs.slurm_utils == 'true'
         run: |
           pip install idm-buildtools flake8 wheel --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
-      - name: Run setup-dev
+      - name: Run setup-dev-no-docker
         # only run if full install for core, slurm changes, or models
         if: steps.filter.outputs.core == 'true' ||  steps.filter.outputs.slurm == 'true' ||  steps.filter.outputs.slurm_utils == 'true'
         run: |
-          make setup-dev
+          make setup-dev-no-docker
       - name: run idmtools_slurm_utils all tests
         # only run if core and comps changed
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.slurm == 'true' || steps.filter.outputs.slurm_utils == 'true'

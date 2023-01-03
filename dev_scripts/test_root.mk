@@ -59,6 +59,22 @@ ifneq (1, $(SERIAL_TESTING))
 endif
 endif
 
+test-all-no-ssmt: reports-exist ## Run all our tests without ssmt tests
+ifneq (1, $(PARALLEL_TESTING)) # Only run these tests if Parallel Only Testing is disabled
+	-echo "Running Serial Tests"
+	$(TEST_COMMAND) -m "serial and not performance and not ssmt"
+	$(MAKE) mv-serial-reports
+endif
+ifneq (1, $(SERIAL_TESTING)) # Only run these tests if Serial Only Testing is disabled
+	-echo "Running Parallel Tests"
+	$(TEST_COMMAND) -n $(PARALLEL_TEST_COUNT) -m "not serial and not performance and not ssmt"
+endif
+ifneq (1, $(PARALLEL_TESTING))
+ifneq (1, $(SERIAL_TESTING))
+	$(MAKE) merge-reports
+endif
+endif
+
 test-failed: reports-exist ## Run only previously failed tests
 	$(TEST_COMMAND) --lf
 

@@ -36,6 +36,9 @@ test-all: ## Run all our tests
 test-failed: ## Run only previously failed tests
 	$(MAKE) -C tests $@
 
+test-all-no-ssmt: ## Run all our tests without ssmt tests
+	$(MAKE) -C tests $@
+
 test-long: ## Run any tests that takes more than 30s
 	$(MAKE) -C tests $@
 

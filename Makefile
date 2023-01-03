@@ -40,6 +40,9 @@ test: ## Run default set of tests which exclude comps and docker tests
 test-all: ## Run all our tests
 	$(MAKEALL) test-all
 
+test-all-no-ssmt: ## Run all our tests without ssmt tests
+	$(MAKEALL) test-all-no-ssmt
+
 test-failed: ## Run only previously failed tests
 	$(MAKEALL) test-failed
 
