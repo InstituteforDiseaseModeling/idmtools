@@ -3,17 +3,20 @@ Here we implement the SlurmPlatform simulation operations.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+import shutil
 from uuid import UUID, uuid4
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, List, Dict, Type, Optional, Union
+from typing import TYPE_CHECKING, List, Dict, Type, Optional, Union, Any
 from idmtools.assets import Asset
 from idmtools.core import ItemType, EntityStatus
-from idmtools_platform_slurm.slurm_operations.slurm_constants import SLURM_STATES
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
 from idmtools_platform_slurm.platform_operations.utils import SlurmSimulation, SlurmExperiment, clean_experiment_name
 from logging import getLogger
+
+logger = getLogger(__name__)
+user_logger = getLogger('user')
 
 if TYPE_CHECKING:
     from idmtools_platform_slurm.slurm_platform import SlurmPlatform
@@ -28,7 +31,7 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
 
     def get(self, simulation_id: Union[str, UUID], **kwargs) -> Dict:
         """
-        Gets an simulation from the Slurm platform.
+        Gets a simulation from the Slurm platform.
         Args:
             simulation_id: Simulation id
             kwargs: keyword arguments used to expand functionality
@@ -168,3 +171,53 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
             None
         """
         raise NotImplementedError("Refresh simulation status is not called directly on the Slurm Platform")
+
+    def create_sim_directory_map(self, simulation_id: str) -> Dict:
+        """
+        Build simulation working directory mapping.
+        Args:
+            simulation_id: simulation id
+
+        Returns:
+            Dict of simulation id as key and working dir as value
+        """
+        sim = self.platform.get_item(simulation_id, ItemType.SIMULATION, raw=False)
+        return {sim.id: str(self.platform._op_client.get_directory_by_id(simulation_id, ItemType.SIMULATION))}
+
+    def platform_delete(self, sim_id: str) -> None:
+        """
+        Delete platform simulation.
+        Args:
+            sim_id: platform simulation id
+        Returns:
+            None
+        """
+        sim = self.platform.get_item(sim_id, ItemType.SIMULATION, raw=False)
+        try:
+            shutil.rmtree(self.platform._op_client.get_directory(sim))
+        except RuntimeError:
+            logger.info(f"Could not delete the simulation: {sim_id}..")
+            return
+
+    def platform_cancel(self, sim_id: str, force: bool = False) -> Any:
+        """
+        Cancel platform simulation's slurm job.
+        Args:
+            sim_id: simulation id
+            force: bool, True/False
+        Returns:
+            Any
+        """
+        sim = self.platform.get_item(sim_id, ItemType.SIMULATION, raw=False)
+        if force or sim.status == EntityStatus.RUNNING:
+            logger.debug(f"cancel slurm job for simulation: {sim_id}...")
+            job_id = self.platform._op_client.get_job_id(sim_id, ItemType.SIMULATION)
+            if job_id is None:
+                logger.debug(f"Slurn job for simulation: {sim_id} is not available!")
+                return
+            else:
+                result = self.platform._op_client.cancel_job(job_id)
+                user_logger.info(result)
+                return result
+        else:
+            user_logger.info(f"Simulation {sim_id} is not running, no cancel needed...")

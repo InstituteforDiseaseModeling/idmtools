@@ -1,4 +1,4 @@
-.PHONY: clean lint test coverage dist release-staging release-staging-release-commit release-staging-minor changelog start-allure
+.PHONY: clean lint test coverage dist release-staging release-staging-release-commit release-staging-minor changelog start-allure docs
 MKDIR ?= mkdir
 MV ?= mv
 RM ?= rm
@@ -39,6 +39,9 @@ test: ## Run default set of tests which exclude comps and docker tests
 
 test-all: ## Run all our tests
 	$(MAKEALL) test-all
+
+test-all-no-ssmt: ## Run all our tests without ssmt tests
+	$(MAKEALL) test-all-no-ssmt
 
 test-failed: ## Run only previously failed tests
 	$(MAKEALL) test-failed
@@ -147,6 +150,8 @@ bump-major-dry-run: ## bump the major version(dry run)
 
 build-docs: ## build docs
 	$(PDR) -wd 'docs' -ex 'make html'
+
+docs: build-docs ## Alias for build docs
 
 build-docs-server: build-docs ## builds docs and launch a webserver and watches for changes to documentation
 	$(PDS)serve_docs.py

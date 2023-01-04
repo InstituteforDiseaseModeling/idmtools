@@ -272,9 +272,40 @@ class IPlatformSimulationOperations(CacheEnabled, ABC):
         List available assets for a simulation.
 
         Args:
-            simulation: Simulation of assets Assets
+            simulation: Simulation of Assets
 
         Returns:
             List of filenames
+        """
+        pass
+
+    def create_sim_directory_map(self, simulation_id: str) -> Dict:
+        """
+        Build simulation working directory mapping.
+        Args:
+            simulation_id: simulation id
+
+        Returns:
+            Dict
+        """
+        return {}
+
+    def platform_delete(self, simulation_id: str) -> None:
+        """
+        Delete platform simulation.
+        Args:
+            simulation_id: simulation id
+        Returns:
+            None
+        """
+        pass
+
+    def platform_cancel(self, simulation_id: str) -> None:
+        """
+        Cancel platform simulation.
+        Args:
+            simulation_id: simulation id
+        Returns:
+            None
         """
         pass

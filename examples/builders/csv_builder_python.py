@@ -57,7 +57,7 @@ if __name__ == "__main__":
         file_path = os.path.join(base_path, 'sweeps.csv')
         builder = CsvExperimentBuilder()
         func_map = {'a': setA, 'b': setB, 'c': setC, 'd': setD}
-        type_map = {'a': np.int, 'b': np.int, 'c': np.int, 'd': np.int}
+        type_map = {'a': np.int64, 'b': np.int64, 'c': np.int64, 'd': np.int64}
         builder.add_sweeps_from_file(file_path, func_map, type_map)
 
         # now define we want to create a series of simulations using the base task and the sweep

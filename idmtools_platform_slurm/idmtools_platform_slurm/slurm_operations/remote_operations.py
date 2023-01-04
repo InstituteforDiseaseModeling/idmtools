@@ -10,6 +10,7 @@ from uuid import UUID
 
 from idmtools.core import ItemType
 from idmtools.core.interfaces.ientity import IEntity
+from idmtools.entities.suite import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools_platform_slurm.slurm_operations.operations_interface import SlurmOperations
@@ -49,5 +50,14 @@ class RemoteSlurmOperations(SlurmOperations):
     def submit_job(self, item: Union[Experiment, Simulation], **kwargs) -> Any:
         pass
 
-    def get_simulation_status(self, sim_id: Union[UUID, str]) -> Any:
+    def get_simulation_status(self, sim_id: str) -> Any:
+        pass
+
+    def create_file(self, file_path: str, content: str) -> None:
+        pass
+
+    def get_job_id(self, item_id: str, item_type: ItemType) -> str:
+        pass
+
+    def cancel_job(self, job_id: str) -> Any:
         pass
