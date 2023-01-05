@@ -1,4 +1,8 @@
-"""Utils for slurm bridge."""
+"""
+Utils for slurm bridge.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import json
 import os
 from logging import getLogger, DEBUG
@@ -63,7 +67,7 @@ def get_job_result(job_path: PathLike) -> Dict:
                 result = command_sbatch(info)
             elif command == "verify":
                 result = command_verify(info)
-            elif command == "cancel":
+            elif command == "scancel":
                 result = command_scancel(info)
             else:
                 result = dict(

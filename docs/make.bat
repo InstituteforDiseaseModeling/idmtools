@@ -76,37 +76,37 @@ if errorlevel 9009 (
 
 if "%1" == "generate-api" (
 	set SPHINX_APIDOC_OPTIONS=members,undoc-members,show-inheritance,ignore-module-all
-	del modules.rst >nul 2>&1
-	del idmtools_index.rst >nul 2>&1
-    sphinx-apidoc -f -e -M -o . --templatedir api_templates ../idmtools_core/idmtools
-	REN modules.rst idmtools_index.rst
-	del modules.rst >nul 2>&1
-	del idmtools_models_index.rst >nul 2>&1
-	sphinx-apidoc -f -e -M -o . --templatedir api_templates ../idmtools_models/idmtools_models
-	REN modules.rst idmtools_models_index.rst
+	del ./api/modules.rst >nul 2>&1
+	del ./api/idmtools_index.rst >nul 2>&1
+    sphinx-apidoc -f -e -M -o ./api/ --templatedir api_templates ../idmtools_core/idmtools
+	REN ./api/modules.rst ./api/idmtools_index.rst
+	del ./api/modules.rst >nul 2>&1
+	del ./api/idmtools_models_index.rst >nul 2>&1
+	sphinx-apidoc -f -e -M -o ./api/ --templatedir api_templates ../idmtools_models/idmtools_models
+	REN ./api/modules.rst ./api/idmtools_models_index.rst
 
-	del idmtools_platform_comps_index.rst >nul 2>&1
-	sphinx-apidoc -f -e -M -o . --templatedir api_templates ../idmtools_platform_comps/idmtools_platform_comps
-	REN modules.rst idmtools_platform_comps_index.rst
+	del ./api/idmtools_platform_comps_index.rst >nul 2>&1
+	sphinx-apidoc -f -e -M -o ./api/ --templatedir api_templates ../idmtools_platform_comps/idmtools_platform_comps
+	REN ./api/modules.rst ./api/idmtools_platform_comps_index.rst
 
-	del idmtools_platform_slurm_index.rst >nul 2>&1
-	sphinx-apidoc -f -e -M -o . --templatedir api_templates ../idmtools_platform_slurm/idmtools_platform_slurm
-	REN modules.rst idmtools_platform_slurm_index.rst
+	del ./api/idmtools_platform_slurm_index.rst >nul 2>&1
+	sphinx-apidoc -f -e -M -o ./api/ --templatedir api_templates ../idmtools_platform_slurm/idmtools_platform_slurm
+	REN ./api/modules.rst ./api/idmtools_platform_slurm_index.rst
 
-	del idmtools_slurm_utils_index.rst >nul 2>&1
-	sphinx-apidoc -f -e -M -o . --templatedir api_templates ../idmtools_slurm_utils/idmtools_slurm_utils
-	REN modules.rst idmtools_slurm_utils_index.rst
+	del ./api/idmtools_slurm_utils_index.rst >nul 2>&1
+	sphinx-apidoc -f -e -M -o ./api/ --templatedir api_templates ../idmtools_slurm_utils/idmtools_slurm_utils
+	REN ./api/modules.rst ./api/idmtools_slurm_utils_index.rst
 
-	del idmtools_platform_local_index.rst >nul 2>&1
+	del ./api/idmtools_platform_local_index.rst >nul 2>&1
 	DEL /Q /F /S "*.tmp" >nul 2>&1
-	sphinx-apidoc -f -e -M -o . --templatedir api_templates ../idmtools_platform_local/idmtools_platform_local
-	REN modules.rst idmtools_platform_local_index.rst
+	sphinx-apidoc -f -e -M -o ./api/ --templatedir api_templates ../idmtools_platform_local/idmtools_platform_local
+	REN ./api/modules.rst ./api/idmtools_platform_local_index.rst
 	DEL /Q /F /S "idmtools_platform_local.internals.tasks.*.rst" >nul 2>&1
-	COPY idmtools_platform_local.internals.tasks.template idmtools_platform_local.internals.tasks.rst
+	COPY ./api/idmtools_platform_local.internals.tasks.template ./api/idmtools_platform_local.internals.tasks.rst
 	DEL /Q /F /S "*idmtools_platform_local.internals.workers.brokers.rst" >nul 2>&1
-    COPY idmtools_platform_local.internals.workers.brokers.template idmtools_platform_local.internals.workers.brokers.rst
+    COPY ./api/idmtools_platform_local.internals.workers.brokers.template ./api/idmtools_platform_local.internals.workers.brokers.rst
     DEL /Q /F /S "*idmtools_platform_local.internals.workers.run_broker.rst" >nul 2>&1
-    COPY idmtools_platform_local.internals.workers.run_broker.template idmtools_platform_local.internals.workers.run_broker.rst
+    COPY ./api/idmtools_platform_local.internals.workers.run_broker.template ./api/idmtools_platform_local.internals.workers.run_broker.rst
 	goto end
 )
 

@@ -24,6 +24,14 @@ EXCLUDE_MESSAGES = ['Merge branch', 'Merge pull request', 'Merge remote-tracking
 
 
 def get_tags_from_repo(repo):
+    """
+    Get tags from repo.
+    Args:
+        repo: repo name
+
+    Returns:
+        dictionary
+    """
     regex = re.compile('^refs/tags')
     tags = list(sorted(list(filter(lambda r: regex.match(r), repo.listall_references()))))
     tags.append('HEAD')
@@ -32,6 +40,15 @@ def get_tags_from_repo(repo):
 
 
 def get_release_ranges_and_messages(repo, tags):
+    """
+    Get release ranges and messages.
+    Args:
+        repo: repo name
+        tags: tags
+
+    Returns:
+        tuple
+    """
     release_ranges = dict()
     release_notes = defaultdict(lambda: defaultdict(list))
     for index, tag in enumerate(tags):
@@ -97,7 +114,15 @@ def get_issue_type(issue_types, issue, labels):
         issue_types[issue] = 'Dependencies'
 
 
-def generate_changelog_index(docs_dir):
+def generate_changelog_index(docs_dir) -> None:
+    """
+    Generate changelog index.
+    Args:
+        docs_dir: doc directory
+
+    Returns:
+        None
+    """
     cl_name = docs_dir.joinpath('changelog', 'changelog.rst')
     with open(cl_name, 'w') as out:
         out.write("=========\n")
@@ -112,7 +137,16 @@ def generate_changelog_index(docs_dir):
                 out.write(f'    changelog_{fn}\n')
 
 
-def generate_release_note_files(docs_dir, release_notes_final):
+def generate_release_note_files(docs_dir, release_notes_final) -> None:
+    """
+    Genereate release note files.
+    Args:
+        docs_dir: doc directory
+        release_notes_final: directory
+
+    Returns:
+        None
+    """
     release_templates = '''
     {release_under}
     {release}
@@ -139,7 +173,20 @@ def generate_release_note_files(docs_dir, release_notes_final):
                 out.write(final_out)
 
 
-def generate_release_note_messages(docs_dir, issue_types, issues_to_references, regex_fix, release_notes, release_notes_final):
+def generate_release_note_messages(docs_dir, issue_types, issues_to_references, regex_fix, release_notes, release_notes_final) -> None:
+    """
+    Genereate release node messages.
+    Args:
+        docs_dir: doc directory
+        issue_types: issue types
+        issues_to_references: issues to be referenced
+        regex_fix: regex fix
+        release_notes: release notes
+        release_notes_final: final release notes
+
+    Returns:
+        None
+    """
     for release, contents in release_notes.items():
         for message in contents.keys():
             m = regex_fix.match(message)
@@ -154,6 +201,14 @@ def generate_release_note_messages(docs_dir, issue_types, issues_to_references, 
 
 
 def main(token):
+    """
+    The main function.
+    Args:
+        token: required token
+
+    Returns:
+        None
+    """
     gh = Github(token)
     gh_repo = gh.get_repo("InstituteforDiseaseModeling/idmtools")
     base_dir = Path(__file__).parent.parent

@@ -1,4 +1,8 @@
-"""Handles interaction with sbatch command."""
+"""
+Handles interaction with sbatch command.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import subprocess
 from logging import DEBUG, getLogger
 from pathlib import Path
@@ -54,7 +58,7 @@ def run_sbatch(working_directory: Path):
     if logger.isEnabledFor(DEBUG):
         logger.debug(f"Running 'sbatch sbatch.sh' in {working_directory}")
     result = subprocess.run(['sbatch', '--parsable', 'sbatch.sh'], stdout=subprocess.PIPE, cwd=str(working_directory))
-    stdout = result.stdout.decode('utf-8').strip()
+    slurm_job_id = result.stdout.decode('utf-8').strip().split(';')[0]
     if logger.isEnabledFor(DEBUG):
-        logger.debug(f"Result for {sbp}\n=============\n{stdout}\n=============\n\n")
-    return stdout, result.returncode
+        logger.debug(f"Result for {sbp}\n=============\n{slurm_job_id}\n=============\n\n")
+    return slurm_job_id, result.returncode

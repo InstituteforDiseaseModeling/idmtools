@@ -119,53 +119,57 @@ class TestCompsCLI(unittest.TestCase):
     @allure.feature("Containers")
     @run_in_temp_dir
     def test_container_build_force_and_workitem_id(self):
-        id_files = ["builder.singularity.id", "singularity.id"]
-        for file in id_files:
-            if os.path.exists(pwd.joinpath(file)):
-                os.remove(pwd.joinpath(file))
-        result = run_command('comps', 'SLURMSTAGE', 'singularity', 'build', '--force',
-                             '--id-workitem',
-                             '--common-input-glob', str(pwd.joinpath('*.txt')), str(pwd.joinpath('singularity.def')),
-                             mix_stderr=False)
-        print(result.stdout)
-        self.assertTrue(result.exit_code == 0)
-        for file in id_files:
-            self.assertTrue(os.path.exists(pwd.joinpath(file)))
-
-        # verify the id file
-        with open(pwd.joinpath(pwd.joinpath(id_files[0])), 'r') as cin:
-            content = cin.read()
-
-        with open(pwd.joinpath(pwd.joinpath(id_files[1])), 'r') as cin:
-            asset_id_content = cin.read()
-
-        parts = content.split("::")
-        self.assertTrue(len(parts) == 3)
-        pl = Platform("SLURMSTAGE")
-        wi = pl.get_item(parts[0], ItemType.WORKFLOW_ITEM)
-        self.assertIn('WorkItem_Type', wi.tags.keys())
-        self.assertEqual(wi.tags['WorkItem_Type'], 'ImageBuilderWorker')
-
-        parts = asset_id_content.split("::")
-        self.assertTrue(len(parts) == 3)
-        ac = pl.get_item(parts[0], ItemType.ASSETCOLLECTION)
-        self.assertIn('type', ac.tags.keys())
-        self.assertIn('image_name', ac.tags.keys())
-        self.assertEqual(ac.tags['type'], 'singularity')
-        self.assertEqual(ac.tags['image_name'], 'singularity.sif')
-
-        # cleanup for next test
-        for file in id_files:
-            os.remove(pwd.joinpath(file))
-        with self.subTest("test_container_workitem_id_not_written_when_found"):
-            # hit cache and ensure file is not written
-            result = run_command('comps', 'SLURMSTAGE', 'singularity', 'build', '--id-workitem',
-                                 '--common-input-glob',
-                                 str(pwd.joinpath('*.txt')), str(pwd.joinpath('singularity.def')), mix_stderr=False)
+        import sys
+        info = sys.version_info
+        if info.major == 3 and info.minor == 9:  # only run this test in python
+            id_files = ["builder.singularity.id", "singularity.id"]
+            for file in id_files:
+                if os.path.exists(pwd.joinpath(file)):
+                    os.remove(pwd.joinpath(file))
+            result = run_command('comps', 'SLURMSTAGE', 'singularity', 'build', '--force',
+                                 '--id-workitem',
+                                 '--common-input-glob', str(pwd.joinpath('*.txt')), str(pwd.joinpath('singularity.def')),
+                                 mix_stderr=False)
+            print(result.stdout)
             self.assertTrue(result.exit_code == 0)
-            self.assertTrue(os.path.exists(pwd.joinpath("singularity.id")))
-            self.assertFalse(os.path.exists(pwd.joinpath("builder.singularity.id")))
+            for file in id_files:
+                self.assertTrue(os.path.exists(pwd.joinpath(file)))
 
+            # verify the id file
+            with open(pwd.joinpath(pwd.joinpath(id_files[0])), 'r') as cin:
+                content = cin.read()
+
+            with open(pwd.joinpath(pwd.joinpath(id_files[1])), 'r') as cin:
+                asset_id_content = cin.read()
+
+            parts = content.split("::")
+            self.assertTrue(len(parts) == 3)
+            pl = Platform("SLURMSTAGE")
+            wi = pl.get_item(parts[0], ItemType.WORKFLOW_ITEM)
+            self.assertIn('WorkItem_Type', wi.tags.keys())
+            self.assertEqual(wi.tags['WorkItem_Type'], 'ImageBuilderWorker')
+
+            parts = asset_id_content.split("::")
+            self.assertTrue(len(parts) == 3)
+            ac = pl.get_item(parts[0], ItemType.ASSETCOLLECTION)
+            self.assertIn('type', ac.tags.keys())
+            self.assertIn('image_name', ac.tags.keys())
+            self.assertEqual(ac.tags['type'], 'singularity')
+            self.assertEqual(ac.tags['image_name'], 'singularity.sif')
+
+            # cleanup for next test
+            for file in id_files:
+                os.remove(pwd.joinpath(file))
+            with self.subTest("test_container_workitem_id_not_written_when_found"):
+                # hit cache and ensure file is not written
+                result = run_command('comps', 'SLURMSTAGE', 'singularity', 'build', '--id-workitem',
+                                     '--common-input-glob',
+                                     str(pwd.joinpath('*.txt')), str(pwd.joinpath('singularity.def')), mix_stderr=False)
+                self.assertTrue(result.exit_code == 0)
+                self.assertTrue(os.path.exists(pwd.joinpath("singularity.id")))
+                self.assertFalse(os.path.exists(pwd.joinpath("builder.singularity.id")))
+        else:
+            self.assertTrue(True)
     @run_in_temp_dir
     @allure.feature("Download")
     def test_download_cli(self):

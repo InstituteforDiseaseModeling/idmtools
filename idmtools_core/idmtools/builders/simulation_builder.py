@@ -26,7 +26,7 @@ class SimulationBuilder:
     Class that represents an experiment builder.
 
     Examples:
-        .. literalinclude:: ../examples/builders/simulation_builder.py
+        .. literalinclude:: ../../examples/builders/simulation_builder.py
 
         Add tags with builder callbacks::
 
@@ -199,7 +199,7 @@ class SimulationBuilder:
                     raise ValueError(f"{MULTIPLE_ARGS_MUST_BE_ITERABLE_ERROR} Please correct item at index {key}")
                 elif key not in remaining_parameters:
                     raise ValueError(f"Unknown keyword parameter passed: {key}. Support keyword args are {', '.join(remaining_parameters)}")
-            list(map(self._update_count, values))
+            list(map(self._update_count, values.values()))
             generated_values = product(*values.values())
             self.sweeps.append(partial(function, **self._map_multi_argument_array(values.keys(), v)) for v in generated_values)
 

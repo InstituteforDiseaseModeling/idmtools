@@ -61,7 +61,7 @@ class TestMultipleBuilders(ITestWithPersistence):
         # create CsvExperimentBuilder
         file_path = os.path.join(self.base_path, 'sweeps.csv')
         func_map = {'a': setA, 'b': setB, 'c': setC, 'd': setD}
-        type_map = {'a': np.int, 'b': np.int, 'c': np.int, 'd': np.int}
+        type_map = {'a': np.int64, 'b': np.int64, 'c': np.int64, 'd': np.int64}
         self.csv_builder.add_sweeps_from_file(file_path, func_map, type_map)
 
         # create ArmExperimentBuilder

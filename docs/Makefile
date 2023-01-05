@@ -47,41 +47,41 @@ help:
 .PHONY: clean
 clean:
 	rm -rf $(BUILDDIR)/*
-	rm -rf idmtools*.rst
+	rm -rf api/idmtools*.rst
 
 .PHONY: generate-api
 
 generate-api:
-	-rm modules.rst
-	-rm idmtools_index.rst
-	sphinx-apidoc -f -e -M -o . --templatedir api_templates ../idmtools_core/idmtools
-	mv modules.rst idmtools_index.rst
+	-rm ./api/modules.rst
+	-rm ./api/idmtools_index.rst
+	sphinx-apidoc -f -e -M -o ./api --templatedir api_templates ../idmtools_core/idmtools
+	mv ./api/modules.rst ./api/idmtools_index.rst
 
-	-rm idmtools_models_index.rst
-	sphinx-apidoc -f -e -M -o . --templatedir api_templates ../idmtools_models/idmtools_models
-	mv modules.rst idmtools_models_index.rst
+	-rm ./api/idmtools_models_index.rst
+	sphinx-apidoc -f -e -M -o ./api --templatedir api_templates ../idmtools_models/idmtools_models
+	mv ./api/modules.rst ./api/idmtools_models_index.rst
 
-	-rm idmtools_platform_comps_index.rst
-	sphinx-apidoc -f -e -M -o . --templatedir api_templates ../idmtools_platform_comps/idmtools_platform_comps
-	mv modules.rst idmtools_platform_comps_index.rst
+	-rm ./api/idmtools_platform_comps_index.rst
+	sphinx-apidoc -f -e -M -o ./api --templatedir api_templates ../idmtools_platform_comps/idmtools_platform_comps
+	mv ./api/modules.rst ./api/idmtools_platform_comps_index.rst
 
-	-rm idmtools_platform_slurm_index.rst
-	sphinx-apidoc -f -e -M -o . --templatedir api_templates ../idmtools_platform_slurm/idmtools_platform_slurm
-	mv modules.rst idmtools_platform_slurm_index.rst
+	-rm ./api/idmtools_platform_slurm_index.rst
+	sphinx-apidoc -f -e -M -o ./api --templatedir api_templates ../idmtools_platform_slurm/idmtools_platform_slurm
+	mv ./api/modules.rst ./api/idmtools_platform_slurm_index.rst
 
-	-rm idmtools_slurm_utils_index.rst
-	sphinx-apidoc -f -e -M -o . --templatedir api_templates ../idmtools_slurm_utils/idmtools_slurm_utils
-	mv modules.rst idmtools_slurm_utils_index.rst
+	-rm ./api/idmtools_slurm_utils_index.rst
+	sphinx-apidoc -f -e -M -o ./api --templatedir api_templates ../idmtools_slurm_utils/idmtools_slurm_utils
+	mv ./api/modules.rst ./api/idmtools_slurm_utils_index.rst
 
-	-rm idmtools_platform_local_index.rst
-	SPHINX_APIDOC_OPTIONS=members,undoc-members,show-inheritance,ignore-module-all sphinx-apidoc -f -e -M -o . --templatedir api_templates  ../idmtools_platform_local/idmtools_platform_local
-	mv modules.rst idmtools_platform_local_index.rst
-	rm -rf idmtools_platform_local.internals.tasks.*.rst
-	cp idmtools_platform_local.internals.tasks.template idmtools_platform_local.internals.tasks.rst
-	rm idmtools_platform_local.internals.workers.brokers.rst
-	cp idmtools_platform_local.internals.workers.brokers.template idmtools_platform_local.internals.workers.brokers.rst
-	rm idmtools_platform_local.internals.workers.run_broker.rst
-	cp idmtools_platform_local.internals.workers.run_broker.template idmtools_platform_local.internals.workers.run_broker.rst
+	-rm ./api/idmtools_platform_local_index.rst
+	SPHINX_APIDOC_OPTIONS=members,undoc-members,show-inheritance,ignore-module-all sphinx-apidoc -f -e -M -o ./api --templatedir api_templates  ../idmtools_platform_local/idmtools_platform_local
+	mv ./api/modules.rst ./api/idmtools_platform_local_index.rst
+	rm -rf ./api/idmtools_platform_local.internals.tasks.*.rst
+	cp ./api/idmtools_platform_local.internals.tasks.template ./api/idmtools_platform_local.internals.tasks.rst
+	rm ./api/idmtools_platform_local.internals.workers.brokers.rst
+	cp ./api/idmtools_platform_local.internals.workers.brokers.template ./api/idmtools_platform_local.internals.workers.brokers.rst
+	rm ./api/idmtools_platform_local.internals.workers.run_broker.rst
+	cp ./api/idmtools_platform_local.internals.workers.run_broker.template ./api/idmtools_platform_local.internals.workers.run_broker.rst
 
 .PHONY: html
 html:

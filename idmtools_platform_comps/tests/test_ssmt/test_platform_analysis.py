@@ -128,6 +128,7 @@ def do_platform_analysis_wi(platform: Platform):
 
 
 @pytest.mark.smoke
+@pytest.mark.ssmt
 @warn_amount_ssmt_image_decorator
 @pytest.mark.parametrize('platform',
                          [pytest.lazy_fixture('platform_comps2'), pytest.lazy_fixture('platform_slurm_2')])
@@ -136,6 +137,7 @@ def test_platform_analysis(platform: Platform):
 
 
 @pytest.mark.smoke
+@pytest.mark.ssmt
 @warn_amount_ssmt_image_decorator
 @pytest.mark.parametrize('platform',
                          [pytest.lazy_fixture('platform_comps2'), pytest.lazy_fixture('platform_slurm_2')])
@@ -152,6 +154,7 @@ from idmtools_platform_comps.ssmt_platform import SSMTPlatform
 
 @pytest.mark.comps
 @pytest.mark.serial
+@pytest.mark.ssmt
 class TestSSMTPlatform(unittest.TestCase):
 
     def setUp(self) -> None:
