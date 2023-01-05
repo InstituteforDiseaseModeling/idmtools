@@ -1,4 +1,8 @@
-"""Helps user verify environment information."""
+"""
+Helps user verify environment information.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import os
 import sys
 from typing import Dict

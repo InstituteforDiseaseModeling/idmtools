@@ -66,9 +66,9 @@ API class specifications
 
 
 
-   idmtools_index
-   idmtools_models_index
-   idmtools_platform_comps_index
-   idmtools_platform_local_index
-   idmtools_platform_slurm_index
-   idmtools_slurm_utils_index
+   api/idmtools_index
+   api/idmtools_models_index
+   api/idmtools_platform_comps_index
+   api/idmtools_platform_local_index
+   api/idmtools_platform_slurm_index
+   api/idmtools_slurm_utils_index

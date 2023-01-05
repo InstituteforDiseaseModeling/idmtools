@@ -9,6 +9,7 @@ from uuid import UUID, uuid4
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, List, Type, Dict, Optional, Any, Union
 from idmtools.assets import Asset, AssetCollection
+from idmtools.core import EntityStatus
 from idmtools.core import ItemType
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
@@ -136,6 +137,8 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         dry_run = kwargs.get('dry_run', False)
         if not dry_run:
             slurm_job_id = self.platform._op_client.submit_job(experiment, **kwargs)
+            working_directory = self.platform._op_client.get_directory(experiment)
+            self.platform._op_client.create_file(working_directory.joinpath('job_id.txt'), slurm_job_id)
         else:
             slurm_job_id = None
         suite_id = experiment.parent_id or experiment.suite_id
@@ -224,7 +227,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
             experiment: idmtools Experiment
             kwargs: keyword arguments used to expand functionality
         Returns:
-            None
+            Dict of simulation id as key and working dir as value
         """
         # Check if file job_id.txt exists
         job_id_path = self.platform._op_client.get_directory(experiment).joinpath('job_id.txt')
@@ -235,3 +238,54 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         # Refresh status for each simulation
         for sim in experiment.simulations:
             sim.status = self.platform._op_client.get_simulation_status(sim.id, **kwargs)
+
+    def create_sim_directory_map(self, experiment_id: str) -> Dict:
+        """
+        Build simulation working directory mapping.
+        Args:
+            experiment_id: experiment id
+
+        Returns:
+            Dict of simulation id as key and working dir as value
+        """
+        exp = self.platform.get_item(experiment_id, ItemType.EXPERIMENT, raw=False)
+        sims = exp.simulations
+        return {sim.id: str(self.platform._op_client.get_directory(sim)) for sim in sims}
+
+    def platform_delete(self, experiment_id: str) -> None:
+        """
+        Delete platform experiment.
+        Args:
+            experiment_id: platform experiment id
+        Returns:
+            None
+        """
+        exp = self.platform.get_item(experiment_id, ItemType.EXPERIMENT, raw=False)
+        try:
+            shutil.rmtree(self.platform._op_client.get_directory(exp))
+        except RuntimeError:
+            logger.info("Could not delete the associated experiment...")
+            return
+
+    def platform_cancel(self, experiment_id: str, force: bool = True) -> Any:
+        """
+        Cancel platform experiment's slurm job.
+        Args:
+            experiment_id: experiment id
+            force: bool, True/False
+        Returns:
+            Any
+        """
+        experiment = self.platform.get_item(experiment_id, ItemType.EXPERIMENT, raw=False)
+        if force or experiment.status == EntityStatus.RUNNING:
+            logger.debug(f"cancel slurm job for experiment: {experiment_id}...")
+            job_id = self.platform._op_client.get_job_id(experiment_id, ItemType.EXPERIMENT)
+            if job_id is None:
+                logger.debug(f"Slurn job for experiment: {experiment_id} is not available!")
+                return
+            else:
+                result = self.platform._op_client.cancel_job(job_id)
+                user_logger.info(result)
+                return result
+        else:
+            user_logger.info(f"Experiment {experiment_id} is not running, no cancel needed...")

@@ -1,4 +1,8 @@
-"""Handles CLI portion of idmtools-slurm-bridge."""
+"""
+Handles CLI portion of idmtools-slurm-bridge.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import argparse
 import os
 import signal

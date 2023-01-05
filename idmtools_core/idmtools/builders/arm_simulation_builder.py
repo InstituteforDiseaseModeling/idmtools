@@ -105,7 +105,7 @@ class ArmSimulationBuilder(SimulationBuilder):
     of parameters on population, susceptible with enabled_births set to off but also want to sweep the birth_rate
     we could do that like so
 
-    .. literalinclude:: ../examples/builders/print_builder_values.py
+    .. literalinclude:: ../../examples/builders/print_builder_values.py
 
     This would result in the output
 
@@ -167,7 +167,7 @@ class ArmSimulationBuilder(SimulationBuilder):
          - 0.1
 
     Examples:
-        .. literalinclude:: ../examples/builders/arm_experiment_builder_python.py
+        .. literalinclude:: ../../examples/builders/arm_experiment_builder_python.py
     """
 
     def __init__(self):

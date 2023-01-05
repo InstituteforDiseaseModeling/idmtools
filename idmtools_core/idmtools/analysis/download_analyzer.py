@@ -30,7 +30,7 @@ class DownloadAnalyzer(IAnalyzer):
 
 
     Examples:
-        .. literalinclude:: ../examples/analyzers/example_analysis_DownloadAnalyzer.py
+        .. literalinclude:: ../../examples/analyzers/example_analysis_DownloadAnalyzer.py
     """
 
     def reduce(self, all_data: ANALYSIS_REDUCE_DATA_TYPE):
