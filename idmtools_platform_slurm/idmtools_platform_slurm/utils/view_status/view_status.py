@@ -3,26 +3,17 @@ This is SlurmPlatform operations utils.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
-import sys
-
-from idmtools.entities.experiment import Experiment
-from idmtools.entities.simulation import Simulation
-
-# run from remote
-sys.path.append("/home/zdf1921/venv/ssh_rcd_slurm38/lib/python3.8/site-packages")
-sys.path.append("/home/zdf1921/projects/idmtools/idmtools_platform_slurm")
-sys.path.append("/home/zdf1921/projects/idmtools/idmtools_core")
-
 import os
 import copy
 import json
 from pathlib import Path
 from collections import Counter
 from typing import List, Dict, Tuple, Union, TYPE_CHECKING
-from dataclasses import dataclass, field, InitVar, fields
+from dataclasses import dataclass, field
+from idmtools.entities.experiment import Experiment
+from idmtools.entities.simulation import Simulation
 from idmtools_platform_slurm.slurm_operations.slurm_constants import SLURM_MAPS
 from idmtools.core import ItemType
-# from idmtools.core.platform_factory import Platform
 from logging import getLogger
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -110,18 +101,17 @@ class status_viewer:
             self._simulation_count = len(self._simulations)
 
     def apply_filters(self, platform: 'IPlatform', status_filter: List = None, job_ids: Union[str, List[str]] = None,
-                      verbose: bool = True, root: str = 'job'):
+                      verbose: bool = True, root: str = 'sim'):
         """
-
+        Filter results.
         Args:
-            platform:
-            status_filter:
-            job_ids:
-            verbose:
-            root:
-
+            platform: idmtools Platform
+            status_filter: tuple with target status
+            job_ids: slurm job ids
+            verbose: True/False to include simulation directory
+            root: dictionary root key: 'sim' or 'job'
         Returns:
-
+            None
         """
 
         if status_filter is None:
@@ -170,8 +160,6 @@ class status_viewer:
     def output_definition() -> None:
         """
         Output the status definitions.
-        Returns:
-            None
         """
         slurm_map = copy.deepcopy(SLURM_MAPS)
         slurm_map.pop('None', None)
@@ -200,16 +188,15 @@ class status_viewer:
         Output simulations status with possible override parameters.
 
         Args:
-            platform:
-            status_filter:
-            job_ids:
-            verbose:
-            root:
-            display:
-            display_count:
-
+            platform: idmtools Platform
+            status_filter: tuple with target status
+            job_ids: slurm job ids
+            verbose: True/False to include simulation directory
+            root: dictionary root key: 'sim' or 'job'
+            display: True/False to print the searched results
+            display_count: how many to print
         Returns:
-
+            None
         """
         self.initialize(platform)
         self.apply_filters(platform, status_filter, job_ids, verbose, root)
