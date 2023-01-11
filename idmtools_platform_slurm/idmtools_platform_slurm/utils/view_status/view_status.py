@@ -226,6 +226,7 @@ def check_slurm_job(platform: 'IPlatform', scope: Tuple[str, ItemType] = None, s
     The entry point of status_viewer.
     Args:
         platform: idmtools Platform
+        scope: the search base
         status_filter: tuple with target status
         job_ids: slurm job ids
         verbose: True/False to include simulation directory
