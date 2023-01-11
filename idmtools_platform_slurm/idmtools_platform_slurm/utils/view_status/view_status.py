@@ -22,14 +22,6 @@ if TYPE_CHECKING:  # pragma: no cover
 logger = getLogger(__name__)
 
 
-def check_slurm_job(platform: 'IPlatform', scope: Tuple[str, ItemType] = None, status_filter: List = None,
-                    job_ids: Union[str, List[str]] = None, display_count: int = 20, verbose: bool = True,
-                    root: str = 'sim', display: bool = True):
-    sv = status_viewer(scope=scope)
-    sv.output_status(platform, status_filter=status_filter, job_ids=job_ids, display_count=display_count,
-                     verbose=verbose, root=root, display=display)
-
-
 @dataclass(repr=False)
 class status_viewer:
     """
@@ -47,7 +39,6 @@ class status_viewer:
 
     _simulations: List = field(default_factory=list, init=False, compare=False)
     _status_list: Dict = field(default_factory=list, init=False, compare=False)
-    _simulation_count: int = field(default=None, init=False, compare=False)
 
     def build_summary(self, job_id, suite_id, experiment_id, job_directory):
         return dict(job_id=job_id, suite=suite_id, experiment=experiment_id, job_directory=job_directory)
@@ -95,10 +86,8 @@ class status_viewer:
 
         if self._sim:
             self._simulations = [self._sim]
-            self._simulation_count = len(self._sim.parent.simulations)
         elif self._exp:
             self._simulations = self._exp.simulations
-            self._simulation_count = len(self._simulations)
 
     def apply_filters(self, platform: 'IPlatform', status_filter: List = None, job_ids: Union[str, List[str]] = None,
                       verbose: bool = True, root: str = 'sim'):
@@ -207,14 +196,15 @@ class status_viewer:
                 show_job_dict = self._job_dict
             else:
                 show_job_list = self._job_list[0: display_count]
-                show_job_dict = {id: job for id, job in self._job_dict.items() if id in show_job_list}
+                show_job_dict = {key: job for key, job in self._job_dict.items() if key in show_job_list}
 
             print(json.dumps(show_job_dict, indent=3))
         self.output_definition()
-
-        _simulation_count = len(self._simulations)
         if display and len(self._job_dict) > display_count:
             print(f"ONLY DISPLAY {display_count} ITEMS")
+
+        # print report
+        _simulation_count = len(self._exp.simulations)
         print("status_filter: ".ljust(20), status_filter)
         print("verbose: ".ljust(20), verbose)
         print("display: ".ljust(20), display)
@@ -229,11 +219,13 @@ class status_viewer:
             print('\nExperiment Status: ', self._exp.status.name)
 
 
-# def check_slurm_job(platform, scope: Tuple[str, ItemType] = None, status_filter: List = None,
-#                     job_ids: Union[str, List[str]] = None, display_count: int = 20, verbose: bool = True,
-#                     root: str = 'job', display: bool = True):
-#     sv = status_viewer(scope=scope, status_filter=status_filter, job_ids=job_ids, display_count=display_count, verbose=verbose, root=root, display=display)
-#     sv.output_status(platform)
+def check_slurm_job(platform: 'IPlatform', scope: Tuple[str, ItemType] = None, status_filter: List = None,
+                    job_ids: Union[str, List[str]] = None, display_count: int = 20, verbose: bool = True,
+                    root: str = 'sim', display: bool = True):
+    sv = status_viewer(scope=scope)
+    sv.output_status(platform, status_filter=status_filter, job_ids=job_ids, display_count=display_count,
+                     verbose=verbose, root=root, display=display)
+
 
 if __name__ == "__main__":
     from idmtools.core.platform_factory import Platform
