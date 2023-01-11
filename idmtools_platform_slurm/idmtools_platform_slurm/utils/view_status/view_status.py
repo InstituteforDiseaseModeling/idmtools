@@ -222,54 +222,20 @@ class status_viewer:
 def check_slurm_job(platform: 'IPlatform', scope: Tuple[str, ItemType] = None, status_filter: List = None,
                     job_ids: Union[str, List[str]] = None, display_count: int = 20, verbose: bool = True,
                     root: str = 'sim', display: bool = True):
+    """
+    The entry point of status_viewer.
+    Args:
+        platform: idmtools Platform
+        status_filter: tuple with target status
+        job_ids: slurm job ids
+        verbose: True/False to include simulation directory
+        root: dictionary root key: 'sim' or 'job'
+        display: True/False to print the searched results
+        display_count: how many to print
+
+    Returns:
+        None
+    """
     sv = status_viewer(scope=scope)
     sv.output_status(platform, status_filter=status_filter, job_ids=job_ids, display_count=display_count,
                      verbose=verbose, root=root, display=display)
-
-
-if __name__ == "__main__":
-    from idmtools.core.platform_factory import Platform
-
-    # platform = Platform('SLURM_LOCAL', job_directory=r'C:\Projects\idmtools\examples\python_model\DEST1')
-    platform = Platform('SLURM_LOCAL', job_directory=r'C:\Projects\idmtools_zhaowei\examples\python_model\DEST1')
-    # platform = Platform('SLURM_LOCAL', job_directory='/home/schen/example_mmq')
-    # platform = Platform('SLURM_LOCAL', job_directory='/home/zdf1921/JOB_TEST')
-
-    # # Case: check the latest
-    # sv = status_viewer()
-    #
-    # sv = status_viewer(status_filter=['0', '-1'])
-    #
-    # sv = status_viewer(display_count=10)
-    #
-    # sv = status_viewer(root='sim')
-    #
-    # # Case: given Suite
-    # sv = status_viewer(status_filter=['100', '0'], scope=("821553b4-640b-40ee-80f5-fd20af5f0d7d", ItemType.SUITE), display_count=10)
-    #
-    # # Case: given job_id, Experiment (job_id has higher place)
-    # sv = status_viewer(status_filter=['100', '0'], job_ids=['74892_1', '74892_2'], scope=("d9cda43b-7b6e-4d2f-a302-fde0e38bb840", ItemType.EXPERIMENT), display_count=10)
-    #
-    # # Case: given Experiment
-    # sv = status_viewer(status_filter=['100', '0'], scope=("d9cda43b-7b6e-4d2f-a302-fde0e38bb840", ItemType.EXPERIMENT), display_count=10)
-
-    # # Case: given Simulation
-    # sv = status_viewer(status_filter=['100', '0'], scope=("844062d0-224b-4d55-a043-fc4b00f13d0b", ItemType.SIMULATION), display_count=10)
-    #
-    # # Case: give job_id no scope (find from the latest)
-    # sv = status_viewer(job_ids=['74892_1', '74892_2'], display_count=10, root='sim')  # default: root='job'
-    #
-    # # Case: give job_id with scope
-    # sv = status_viewer(job_ids=['74892_1', '74892_2'], scope=("844062d0-224b-4d55-a043-fc4b00f13d0b", ItemType.SIMULATION), display_count=10, verbose=False)
-
-    # sv = status_viewer()
-    # sv.output_status(platform)
-    # sv.output_status(platform, root='job')
-    # sv.output_status(platform, display_count=1)
-    # sv.output_status(platform, root='job', display_count=1)
-
-    check_slurm_job(platform)
-    # check_slurm_job(platform, job_ids=['74892_1', '74892_2'], display_count=10, root='sim')
-    # check_slurm_job(platform, job_ids=['74892_1', '74892_2'], display_count=10, root='job')
-    # check_slurm_job(platform, job_ids=['74892_100', '74892_200'], display_count=10, root='sim')  # latest experiment
-    # check_slurm_job(platform, scope=("d9cda43b-7b6e-4d2f-a302-fde0e38bb840", ItemType.EXPERIMENT))
