@@ -144,7 +144,7 @@ class StatusViewer:
 
     def output_summary(self) -> None:
         """
-        Output job/experiment id/dir.
+        Output job id, experiment id and job directory.
         Returns:
             None
         """
@@ -179,10 +179,10 @@ class StatusViewer:
 
         if display:
             if display_count is None or len(self._report_dict) <= display_count:
-                view_job_dict = self._report_dict
+                report_view_dict = self._report_dict
             else:
-                view_job_dict = dict(list(self._report_dict.items())[0:display_count])
-            user_logger.info(json.dumps(view_job_dict, indent=3))
+                report_view_dict = dict(list(self._report_dict.items())[0:display_count])
+            user_logger.info(json.dumps(report_view_dict, indent=3))
 
         self.output_definition()
 
@@ -196,7 +196,7 @@ class StatusViewer:
         # print report
         user_logger.info(f"{'status filter: '.ljust(20)} {status_filter}")
         user_logger.info(f"{'job filter: '.ljust(20)} {job_filter}")
-        user_logger.info(f"{'simulation filter: '.ljust(20)} {sim_filter}")
+        user_logger.info(f"{'sim filter: '.ljust(20)} {sim_filter}")
         user_logger.info(f"{'verbose: '.ljust(20)} {verbose}")
         user_logger.info(f"{'display: '.ljust(20)} {display}")
         user_logger.info(f"{'Simulation Count: '.ljust(20)} {_simulation_count}")
@@ -207,7 +207,7 @@ class StatusViewer:
 
 def generate_status_report(platform: 'IPlatform', scope: Tuple[str, ItemType] = None, status_filter: Tuple[str] = None,
                            job_filter: Tuple[str] = None, sim_filter: Tuple[str] = None, verbose: bool = True,
-                           root: str = 'sim', display: bool = True, display_count: int = 20, ):
+                           root: str = 'sim', display: bool = True, display_count: int = 20, ) -> None:
     """
     The entry point of status viewer.
     Args:
@@ -218,9 +218,8 @@ def generate_status_report(platform: 'IPlatform', scope: Tuple[str, ItemType] = 
         sim_filter: tuple with simulation id
         verbose: True/False to include simulation directory
         root: dictionary root key: 'sim' or 'job'
-        display: True/False to print the searched results
+        display: True/False to print the search results
         display_count: how many to print
-
     Returns:
         None
     """
