@@ -91,9 +91,10 @@ class StatusViewer:
         _simulations = self._exp.simulations
 
         for sim in _simulations:
-            # Apply simulation filters
+            # Apply simulation filter
             if sim_filter is not None and sim.id not in sim_filter:
                 continue
+
             sim_dir = self.platform.get_directory(sim)
             job_status_path = sim_dir.joinpath("job_status.txt")
             if not job_status_path.exists():
@@ -106,11 +107,11 @@ class StatusViewer:
                 job_id = None
 
             status = open(job_status_path).read().strip()
-            # Apply status filters
-            if status not in status_filter:
+            # Apply status filter
+            if status_filter is not None and status not in status_filter:
                 continue
 
-            # Apply slurm job filters
+            # Apply slurm job filter
             if job_filter is not None and job_id not in job_filter:
                 continue
 
@@ -131,7 +132,7 @@ class StatusViewer:
     @staticmethod
     def output_definition() -> None:
         """
-        Output the status definitions.
+        Output the status definition.
         """
         slurm_map = copy.deepcopy(SLURM_MAPS)
         slurm_map.pop('None', None)
@@ -154,9 +155,9 @@ class StatusViewer:
             user_logger.info(f"{'experiment: '.ljust(20)} {self._summary['experiment']}")
             user_logger.info(f"{'job_directory: '.ljust(20)} {self._summary['job_directory']}")
 
-    def output_status(self, status_filter: Tuple[str] = None, job_filter: Tuple[str] = None,
-                      sim_filter: Tuple[str] = None, verbose: bool = True, root: str = 'sim',
-                      display: bool = True, display_count: int = 20) -> None:
+    def output_status_report(self, status_filter: Tuple[str] = None, job_filter: Tuple[str] = None,
+                             sim_filter: Tuple[str] = None, verbose: bool = True, root: str = 'sim',
+                             display: bool = True, display_count: int = 20) -> None:
         """
         Output simulations status with possible override parameters.
         Args:
@@ -207,7 +208,7 @@ class StatusViewer:
 
 def generate_status_report(platform: 'IPlatform', scope: Tuple[str, ItemType] = None, status_filter: Tuple[str] = None,
                            job_filter: Tuple[str] = None, sim_filter: Tuple[str] = None, verbose: bool = True,
-                           root: str = 'sim', display: bool = True, display_count: int = 20, ) -> None:
+                           root: str = 'sim', display: bool = True, display_count: int = 20) -> None:
     """
     The entry point of status viewer.
     Args:
@@ -224,5 +225,5 @@ def generate_status_report(platform: 'IPlatform', scope: Tuple[str, ItemType] = 
         None
     """
     sv = StatusViewer(scope=scope, platform=platform)
-    sv.output_status(status_filter=status_filter, job_filter=job_filter, sim_filter=sim_filter,
-                     verbose=verbose, root=root, display=display, display_count=display_count)
+    sv.output_status_report(status_filter=status_filter, job_filter=job_filter, sim_filter=sim_filter,
+                            verbose=verbose, root=root, display=display, display_count=display_count)
