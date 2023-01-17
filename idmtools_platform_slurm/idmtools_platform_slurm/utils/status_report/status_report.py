@@ -63,8 +63,8 @@ class StatusViewer:
             self._exp = self.platform.get_item(exp_id, ItemType.EXPERIMENT)
 
             user_logger.info('------------------------------')
-            user_logger.info(f'last_suite_dir: {last_suite_dir}')
-            user_logger.info(f'last_experiment_dir: {exp_id}')
+            user_logger.info(f'last suite dir: {last_suite_dir}')
+            user_logger.info(f'last experiment dir: {exp_dir}')
             user_logger.info('------------------------------')
 
         job_id_path = self.platform.get_directory(self._exp).joinpath('job_id.txt')
@@ -145,15 +145,15 @@ class StatusViewer:
 
     def output_summary(self) -> None:
         """
-        Output job id, experiment id and job directory.
+        Output slurm job id, suite/experiment id and job directory.
         Returns:
             None
         """
         if self._summary:
-            user_logger.info(f"{'job_id: '.ljust(20)} {self._summary['job_id']}")
+            user_logger.info(f"{'job id: '.ljust(20)} {self._summary['job_id']}")
             user_logger.info(f"{'suite: '.ljust(20)} {self._summary['suite']}")
             user_logger.info(f"{'experiment: '.ljust(20)} {self._summary['experiment']}")
-            user_logger.info(f"{'job_directory: '.ljust(20)} {self._summary['job_directory']}")
+            user_logger.info(f"{'job directory: '.ljust(20)} {self._summary['job_directory']}")
 
     def output_status_report(self, status_filter: Tuple[str] = None, job_filter: Tuple[str] = None,
                              sim_filter: Tuple[str] = None, verbose: bool = True, root: str = 'sim',
@@ -174,8 +174,8 @@ class StatusViewer:
         if status_filter is None:
             status_filter = ('0', '-1', '100')
 
-        # self.initialize()
         self.apply_filters(status_filter, job_filter, sim_filter, verbose, root)
+
         self.output_summary()
 
         if display:
@@ -191,7 +191,7 @@ class StatusViewer:
             user_logger.info(f"ONLY DISPLAY {display_count} ITEMS")
 
         _status_list = [v["status"] for k, v in self._report_dict.items()]
-        _sim_no_status = [sim for sim in self._exp.simulations if sim.status == EntityStatus.CREATED]
+        _sim_not_run_list = [sim for sim in self._exp.simulations if sim.status == EntityStatus.CREATED]
         _simulation_count = len(self._exp.simulations)
 
         # print report
@@ -202,7 +202,7 @@ class StatusViewer:
         user_logger.info(f"{'display: '.ljust(20)} {display}")
         user_logger.info(f"{'Simulation Count: '.ljust(20)} {_simulation_count}")
         user_logger.info(f"{'Match Count: '.ljust(20)} {len(self._report_dict)} ({dict(Counter(_status_list))})")
-        user_logger.info(f"{'Not Running Count: '.ljust(20)} {len(_sim_no_status)}")
+        user_logger.info(f"{'Not Running Count: '.ljust(20)} {len(_sim_not_run_list)}")
         user_logger.info(f'\nExperiment Status: {self._exp.status.name}')
 
 
@@ -218,7 +218,7 @@ def generate_status_report(platform: 'IPlatform', scope: Tuple[str, ItemType] = 
         job_filter: tuple with slurm job id
         sim_filter: tuple with simulation id
         verbose: True/False to include simulation directory
-        root: dictionary root key: 'sim' or 'job'
+        root: dictionary with root key: 'sim' or 'job'
         display: True/False to print the search results
         display_count: how many to print
     Returns:
