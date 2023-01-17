@@ -31,7 +31,7 @@ class StatusViewer:
 
     _exp: Experiment = field(default=None, init=False, compare=False)
     _summary: Dict = field(default_factory=dict, init=False, compare=False)
-    _report_dict: Dict = field(default_factory=dict, init=False, compare=False)
+    _report: Dict = field(default_factory=dict, init=False, compare=False)
 
     def __post_init__(self):
         self.initialize()
@@ -73,23 +73,23 @@ class StatusViewer:
                              job_directory=self.platform.job_directory)
 
     def apply_filters(self, status_filter: List[str] = None, job_filter: List[str] = None,
-                      sim_filter: List[str] = None, verbose: bool = True, root: str = 'sim') -> None:
+                      sim_filter: List[str] = None, root: str = 'sim', verbose: bool = True) -> None:
         """
         Filter simulations.
         Args:
             status_filter: tuple with target status
             job_filter: tuple with slurm job id
             sim_filter: tuple with simulation id
-            verbose: True/False to include simulation directory
             root: dictionary root key: 'sim' or 'job'
+            verbose: True/False to include simulation directory
         Returns:
             None
         """
         # Make sure we get the latest status
         self.platform.refresh_status(self._exp)
 
+        # Filter simulations and format the results
         _simulations = self._exp.simulations
-
         for sim in _simulations:
             # Apply simulation filter
             if sim_filter is not None and sim.id not in sim_filter:
@@ -121,18 +121,20 @@ class StatusViewer:
                 d = dict(sim=sim.id, status=status)
                 if verbose:
                     d["WorkDir"] = str(self.platform.get_directory(sim))
-                self._report_dict[job_id] = d
+                self._report[job_id] = d
             elif root == 'sim':
                 # sim_id as root
                 d = dict(job_id=job_id, status=status)
                 if verbose:
                     d["WorkDir"] = str(self.platform.get_directory(sim))
-                self._report_dict[sim.id] = d
+                self._report[sim.id] = d
 
     @staticmethod
     def output_definition() -> None:
         """
         Output the status definition.
+        Returns:
+            None
         """
         slurm_map = copy.deepcopy(SLURM_MAPS)
         slurm_map.pop('None', None)
@@ -156,7 +158,7 @@ class StatusViewer:
             user_logger.info(f"{'job directory: '.ljust(20)} {self._summary['job_directory']}")
 
     def output_status_report(self, status_filter: Tuple[str] = None, job_filter: Tuple[str] = None,
-                             sim_filter: Tuple[str] = None, verbose: bool = True, root: str = 'sim',
+                             sim_filter: Tuple[str] = None, root: str = 'sim',verbose: bool = True,
                              display: bool = True, display_count: int = 20) -> None:
         """
         Output simulations status with possible override parameters.
@@ -164,8 +166,8 @@ class StatusViewer:
             status_filter: tuple with target status
             job_filter: tuple with slurm job id
             sim_filter: tuple with simulation id
-            verbose: True/False to include simulation directory
             root: dictionary root key: 'sim' or 'job'
+            verbose: True/False to include simulation directory
             display: True/False to print the searched results
             display_count: how many to print
         Returns:
@@ -179,18 +181,18 @@ class StatusViewer:
         self.output_summary()
 
         if display:
-            if display_count is None or len(self._report_dict) <= display_count:
-                report_view_dict = self._report_dict
+            if display_count is None or len(self._report) <= display_count:
+                report_view_dict = self._report
             else:
-                report_view_dict = dict(list(self._report_dict.items())[0:display_count])
+                report_view_dict = dict(list(self._report.items())[0:display_count])
             user_logger.info(json.dumps(report_view_dict, indent=3))
 
         self.output_definition()
 
-        if display and len(self._report_dict) > display_count:
+        if display and len(self._report) > display_count:
             user_logger.info(f"ONLY DISPLAY {display_count} ITEMS")
 
-        _status_list = [v["status"] for k, v in self._report_dict.items()]
+        _status_list = [v["status"] for k, v in self._report.items()]
         _sim_not_run_list = [sim for sim in self._exp.simulations if sim.status == EntityStatus.CREATED]
         _simulation_count = len(self._exp.simulations)
 
@@ -201,14 +203,14 @@ class StatusViewer:
         user_logger.info(f"{'verbose: '.ljust(20)} {verbose}")
         user_logger.info(f"{'display: '.ljust(20)} {display}")
         user_logger.info(f"{'Simulation Count: '.ljust(20)} {_simulation_count}")
-        user_logger.info(f"{'Match Count: '.ljust(20)} {len(self._report_dict)} ({dict(Counter(_status_list))})")
+        user_logger.info(f"{'Match Count: '.ljust(20)} {len(self._report)} ({dict(Counter(_status_list))})")
         user_logger.info(f"{'Not Running Count: '.ljust(20)} {len(_sim_not_run_list)}")
         user_logger.info(f'\nExperiment Status: {self._exp.status.name}')
 
 
 def generate_status_report(platform: 'IPlatform', scope: Tuple[str, ItemType] = None, status_filter: Tuple[str] = None,
-                           job_filter: Tuple[str] = None, sim_filter: Tuple[str] = None, verbose: bool = True,
-                           root: str = 'sim', display: bool = True, display_count: int = 20) -> None:
+                           job_filter: Tuple[str] = None, sim_filter: Tuple[str] = None, root: str = 'sim',
+                           verbose: bool = True, display: bool = True, display_count: int = 20) -> None:
     """
     The entry point of status viewer.
     Args:
@@ -217,8 +219,8 @@ def generate_status_report(platform: 'IPlatform', scope: Tuple[str, ItemType] = 
         status_filter: tuple with target status
         job_filter: tuple with slurm job id
         sim_filter: tuple with simulation id
-        verbose: True/False to include simulation directory
         root: dictionary with root key: 'sim' or 'job'
+        verbose: True/False to include simulation directory
         display: True/False to print the search results
         display_count: how many to print
     Returns:
@@ -226,4 +228,4 @@ def generate_status_report(platform: 'IPlatform', scope: Tuple[str, ItemType] = 
     """
     sv = StatusViewer(scope=scope, platform=platform)
     sv.output_status_report(status_filter=status_filter, job_filter=job_filter, sim_filter=sim_filter,
-                            verbose=verbose, root=root, display=display, display_count=display_count)
+                            root=root, verbose=verbose, display=display, display_count=display_count)
