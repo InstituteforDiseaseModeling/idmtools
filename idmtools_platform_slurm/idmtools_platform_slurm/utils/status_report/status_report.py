@@ -72,8 +72,8 @@ class StatusViewer:
         self._summary = dict(job_id=job_id, suite=self._exp.parent.id, experiment=self._exp.id,
                              job_directory=self.platform.job_directory)
 
-    def apply_filters(self, status_filter: List[str] = None, job_filter: List[str] = None,
-                      sim_filter: List[str] = None, root: str = 'sim', verbose: bool = True) -> None:
+    def apply_filters(self, status_filter: Tuple[str] = None, job_filter: Tuple[str] = None,
+                      sim_filter: Tuple[str] = None, root: str = 'sim', verbose: bool = True) -> None:
         """
         Filter simulations.
         Args:
@@ -176,7 +176,7 @@ class StatusViewer:
         if status_filter is None:
             status_filter = ('0', '-1', '100')
 
-        self.apply_filters(status_filter, job_filter, sim_filter, verbose, root)
+        self.apply_filters(status_filter, job_filter, sim_filter, root, verbose)
 
         self.output_summary()
 
