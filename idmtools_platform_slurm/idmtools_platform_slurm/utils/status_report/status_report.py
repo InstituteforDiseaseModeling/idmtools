@@ -1,5 +1,5 @@
 """
-This is SlurmPlatform operations utils.
+This is a SlurmPlatform simulation status utility.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
@@ -10,7 +10,7 @@ from pathlib import Path
 from logging import getLogger
 from collections import Counter
 from dataclasses import dataclass, field
-from typing import List, Dict, Tuple, TYPE_CHECKING
+from typing import Dict, Tuple, TYPE_CHECKING
 from idmtools.core import ItemType, EntityStatus
 from idmtools.entities.experiment import Experiment
 from idmtools_platform_slurm.slurm_operations.slurm_constants import SLURM_MAPS
@@ -24,7 +24,7 @@ user_logger = getLogger('user')
 @dataclass(repr=False)
 class StatusViewer:
     """
-    A class to wrap the functions involved in retrieve simulations status.
+    A class to wrap the functions involved in retrieving simulations status.
     """
     platform: 'IPlatform'  # noqa F821
     scope: Tuple[str, ItemType] = field(default=None)
@@ -45,14 +45,15 @@ class StatusViewer:
         if self.scope is not None:
             item = self.platform.get_item(self.scope[0], self.scope[1])
             if self.scope[1] == ItemType.SUITE:
-                self._exp = item.experiments[0]  # only consider the first experiment
+                # Only consider the first experiment
+                self._exp = item.experiments[0]
             elif self.scope[1] == ItemType.EXPERIMENT:
                 self._exp = item
             else:
                 raise RuntimeError('Only support Suite/Experiment.')
         else:
-            # take the last suite as the search scope
             try:
+                # take the last suite as the search scope
                 last_suite_dir = max(Path(self.platform.job_directory).glob('*/'), key=os.path.getmtime)
             except:
                 raise FileNotFoundError("Could not find the last Suite!")
@@ -158,7 +159,7 @@ class StatusViewer:
             user_logger.info(f"{'job directory: '.ljust(20)} {self._summary['job_directory']}")
 
     def output_status_report(self, status_filter: Tuple[str] = None, job_filter: Tuple[str] = None,
-                             sim_filter: Tuple[str] = None, root: str = 'sim',verbose: bool = True,
+                             sim_filter: Tuple[str] = None, root: str = 'sim', verbose: bool = True,
                              display: bool = True, display_count: int = 20) -> None:
         """
         Output simulations status with possible override parameters.

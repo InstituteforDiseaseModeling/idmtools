@@ -7,10 +7,6 @@ import click
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools_platform_slurm.utils.status_report.status_report import generate_status_report
-from logging import getLogger
-
-logger = getLogger(__name__)
-user_logger = getLogger('user')
 
 
 @click.group(short_help="SLURM Related Commands")
@@ -42,16 +38,6 @@ def slurm(ctx: click.Context, job_directory):
 def status_report(ctx: click.Context, suite_id, exp_id, status_filter, sim_filter, job_filter, root, verbose, display,
                   display_count):
     job_dir = ctx.obj['job_directory']
-    print('job_dir: ', job_dir)
-    print('suite_id: ', suite_id)
-    print('exp_id: ', exp_id)
-    print('status_filter: ', status_filter)
-    print('sim_filter: ', sim_filter)
-    print('job_filter: ', job_filter)
-    print('root: ', root)
-    print('verbose: ', verbose)
-    print('display: ', display)
-    print('display_count: ', display_count)
 
     if suite_id is not None:
         scope = (suite_id, ItemType.SUITE)
