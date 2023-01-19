@@ -31,17 +31,16 @@ def slurm(ctx: click.Context, job_directory):
 @slurm.command()
 @click.option('--suite-id', default=None, help="Idmtools Suite id")
 @click.option('--exp-id', default=None, help="Idmtools Experiment id")
-@click.option('--status-filter', default=(), type=click.Choice(['0', '-1', '100']), multiple=True,
-              help="list of status")
-@click.option('--sim-filter', default=(), multiple=True, help="list of simulations")
-@click.option('--job-filter', default=(), multiple=True, help="list of slurm jobs")
-@click.option('--verbose', default=True, help="Verbose")
+@click.option('--status-filter', type=click.Choice(['0', '-1', '100']), multiple=True, help="list of status")
+@click.option('--sim-filter', multiple=True, help="list of simulations")
+@click.option('--job-filter', multiple=True, help="list of slurm jobs")
 @click.option('--root', default='sim', type=click.Choice(['job', 'sim']), help="Dictionary root key")
-@click.option('--display', default=True, help="Display")
+@click.option('--verbose/--no-verbose', default=True, help="Enable verbose output in results")
+@click.option('--display/--no-display', default=True, help="Display with working directory or not")
 @click.option('--display-count', default=20, help="Display Count")
 @click.pass_context
-def status_report(ctx: click.Context, suite_id=None, exp_id=None, status_filter=None, sim_filter=None, job_filter=None,
-                  root='sim', verbose=True, display=True, display_count=20):
+def status_report(ctx: click.Context, suite_id, exp_id, status_filter, sim_filter, job_filter, root, verbose, display,
+                  display_count):
     job_dir = ctx.obj['job_directory']
     print('job_dir: ', job_dir)
     print('suite_id: ', suite_id)
@@ -49,10 +48,10 @@ def status_report(ctx: click.Context, suite_id=None, exp_id=None, status_filter=
     print('status_filter: ', status_filter)
     print('sim_filter: ', sim_filter)
     print('job_filter: ', job_filter)
-    print('display_count: ', display_count)
-    print('verbose: ', verbose)
     print('root: ', root)
+    print('verbose: ', verbose)
     print('display: ', display)
+    print('display_count: ', display_count)
 
     if suite_id is not None:
         scope = (suite_id, ItemType.SUITE)
