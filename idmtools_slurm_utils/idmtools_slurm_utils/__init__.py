@@ -1,2 +1,2 @@
 """idmtools slurm utils package."""
-__version__ = "1.7.3+nightly"
+__version__ = "1.7.4"
