@@ -15,11 +15,8 @@ from idmtools_platform_slurm.utils.status_report.status_report import generate_s
 def slurm(ctx: click.Context, job_directory):
     """
     Commands related to managing the SLURM platform.
-    Args:
-        ctx: click.Context
-        job_directory: Slurm Working Directory
-    Returns:
-        None
+
+    job_directory: Slurm Working Directory
     """
     ctx.obj = dict(job_directory=job_directory)
 
@@ -53,3 +50,25 @@ def status_report(ctx: click.Context, suite_id, exp_id, status_filter, sim_filte
                            job_filter=job_filter if len(job_filter) > 0 else None,
                            sim_filter=sim_filter if len(sim_filter) > 0 else None,
                            root=root, verbose=verbose, display=display, display_count=display_count)
+
+
+@slurm.command()
+@click.option('--sim-id', default=None, help="Idmtools Experiment id")
+@click.option('--exp-id', default=None, help="Idmtools Experiment id")
+@click.option('--suite-id', default=None, help="Idmtools Suite id")
+@click.pass_context
+def get_item_path(ctx: click.Context, sim_id, exp_id, suite_id):
+    job_dir = ctx.obj['job_directory']
+    platform = Platform('SLURM_LOCAL', job_directory=job_dir)
+
+    item_dir = None
+    if sim_id is not None:
+        item_dir = platform.get_directory_by_id(sim_id, ItemType.SIMULATION)
+    elif exp_id is not None:
+        item_dir = platform.get_directory_by_id(exp_id, ItemType.EXPERIMENT)
+    elif suite_id is not None:
+        item_dir = platform.get_directory_by_id(suite_id, ItemType.SUITE)
+    else:
+        raise Exception('Must provide at least one: suite-id, exp-id or sim-id!')
+
+    print(item_dir)
