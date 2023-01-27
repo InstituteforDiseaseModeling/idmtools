@@ -163,8 +163,7 @@ class TestSlurmOperations(ITestWithPersistence):
         self.assertEqual(slurm_experiment.uid, idm_experiment.id)
         self.assertEqual(slurm_experiment.name, idm_experiment.name)
         self.assertEqual(slurm_experiment.tags, idm_experiment.tags)
-        self.assertEqual(set(slurm_experiment.simulations),
-                         set([sim.id for sim in idm_experiment.simulations.items]))
+        self.assertFalse(hasattr(slurm_experiment, 'simulations'))
 
         # we only compare asset filenames
         slurm_experiment_assets = [asset['filename'] for asset in slurm_experiment.assets]
