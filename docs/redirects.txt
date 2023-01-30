@@ -228,4 +228,4 @@
 'idmtools_slurm_utils.utils.rst' './api/idmtools_slurm_utils.utils.rst'
 'idmtools_slurm_utils.verify.rst' './api/idmtools_slurm_utils.verify.rst'
 'idmtools_slurm_utils.watcher.rst' './api/idmtools_slurm_utils.watcher.rst'
-'modules.rst' './api/modules.rst'
+'options.rst' 'commands.rst'
