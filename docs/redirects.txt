@@ -176,7 +176,6 @@
 'idmtools_platform_local.internals.data.rst' './api/idmtools_platform_local.internals.data.rst'
 'idmtools_platform_local.internals.rst' './api/idmtools_platform_local.internals.rst'
 'idmtools_platform_local.internals.tasks.rst' './api/idmtools_platform_local.internals.tasks.rst'
-'idmtools_platform_local.internals.tasks.template' './api/idmtools_platform_local.internals.tasks.template'
 'idmtools_platform_local.internals.task_functions.docker_run.rst' './api/idmtools_platform_local.internals.task_functions.docker_run.rst'
 'idmtools_platform_local.internals.task_functions.experiments.rst' './api/idmtools_platform_local.internals.task_functions.experiments.rst'
 'idmtools_platform_local.internals.task_functions.general_task.rst' './api/idmtools_platform_local.internals.task_functions.general_task.rst'
