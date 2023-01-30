@@ -57,7 +57,7 @@ python:
         - test
     - method: pip
       path: idmtools_slurm_utils
-      extra_requirementsma:
+      extra_requirements:
         - test
 
 
