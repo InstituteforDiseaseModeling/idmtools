@@ -9,6 +9,9 @@ The |COMPS_s| platform related commands can be accessed with either
 block or alias to use to configure the connection to |COMPS_s|. See the details
 of the top level command below for detailed help:
 
+.. command-output:: idmtools comps_subcommand --help
+   :returncode: 0
+
 .. command-output:: idmtools comps --help
    :returncode: 2
 
