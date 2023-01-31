@@ -1,4 +1,4 @@
-idmtools~=1.7.4
+idmtools~=1.7.5
 jinja2~=3.1.2
 tqdm>=4.52.0,<5
 pyCOMPS~=2.10

@@ -56,10 +56,9 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
             suite.uid = uuid4()
         # Generate Suite folder structure
         self.platform._op_client.mk_directory(suite)
-        self.platform._metas.dump(suite)
+        meta = self.platform._metas.dump(suite)
 
         # Return Slurm Suite
-        meta = self.platform._metas.get(suite)
         slurm_suite = SlurmSuite(meta)
         return slurm_suite, slurm_suite.id
 
