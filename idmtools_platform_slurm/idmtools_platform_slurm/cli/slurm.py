@@ -8,7 +8,7 @@ import click
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools_platform_slurm.utils.status_report.status_report import generate_status_report
-from idmtools_platform_slurm.utils.status_report.utils import get_latest_experiment, run_experiment_slurm
+from idmtools_platform_slurm.utils.status_report.utils import get_latest_experiment
 from logging import getLogger
 
 logger = getLogger(__name__)
