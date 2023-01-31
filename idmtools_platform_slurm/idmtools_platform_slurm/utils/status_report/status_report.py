@@ -57,8 +57,11 @@ class StatusViewer:
                 last_suite_dir = max(Path(self.platform.job_directory).glob('*/'), key=os.path.getmtime)
             except:
                 raise FileNotFoundError("Could not find the last Suite!")
+            try:
+                batch_dir = max(Path(last_suite_dir).glob('*/sbatch.sh'), key=os.path.getmtime)
+            except:
+                raise FileNotFoundError("Could not find the last Experiment!")
 
-            batch_dir = max(Path(last_suite_dir).glob('*/sbatch.sh'), key=os.path.getmtime)
             exp_dir = Path(batch_dir).parent
             exp_id = exp_dir.name
             self._exp = self.platform.get_item(exp_id, ItemType.EXPERIMENT)
@@ -69,7 +72,10 @@ class StatusViewer:
             user_logger.info('------------------------------')
 
         job_id_path = self.platform.get_directory(self._exp).joinpath('job_id.txt')
-        job_id = open(job_id_path).read().strip()
+        if job_id_path.exists():
+            job_id = open(job_id_path).read().strip()
+        else:
+            job_id = None
         self._summary = dict(job_id=job_id, suite=self._exp.parent.id, experiment=self._exp.id,
                              job_directory=self.platform.job_directory)
 
@@ -206,7 +212,11 @@ class StatusViewer:
         user_logger.info(f"{'Simulation Count: '.ljust(20)} {_simulation_count}")
         user_logger.info(f"{'Match Count: '.ljust(20)} {len(self._report)} ({dict(Counter(_status_list))})")
         user_logger.info(f"{'Not Running Count: '.ljust(20)} {len(_sim_not_run_list)}")
-        user_logger.info(f'\nExperiment Status: {self._exp.status.name}')
+
+        if self._exp.status is None:
+            user_logger.info(f'\nExperiment Status: {None}')
+        else:
+            user_logger.info(f'\nExperiment Status: {self._exp.status.name}')
 
 
 def generate_status_report(platform: 'IPlatform', scope: Tuple[str, ItemType] = None, status_filter: Tuple[str] = None,
