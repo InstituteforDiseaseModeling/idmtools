@@ -1,4 +1,4 @@
-idmtools~=1.7.4
+idmtools~=1.7.5
 pytest
 pytest-runner~=6.0
 xmlrunner~=1.7.7
