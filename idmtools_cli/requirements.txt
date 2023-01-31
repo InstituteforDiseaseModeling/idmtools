@@ -6,4 +6,4 @@ idmtools~=1.7.4
 tabulate>=0.8.9,<0.10
 pyperclip~=1.8
 tqdm>=4.52.0,<5
-yaspin>=1.2.0,<2.3.0
+yaspin>=1.2.0,<2.4.0
