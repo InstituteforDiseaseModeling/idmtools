@@ -66,7 +66,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
             experiment.uid = uuid4()
         # Generate Suite/Experiment/Simulation folder structure
         self.platform._op_client.mk_directory(experiment)
-        self.platform._metas.dump(experiment)
+        meta = self.platform._metas.dump(experiment)
         self.platform._assets.dump_assets(experiment)
         self.platform._op_client.create_batch_file(experiment, **kwargs)
 
@@ -79,7 +79,6 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         self.platform._op_client.update_script_mode(dest_script)
 
         # Return Slurm Experiment
-        meta = self.platform._metas.get(experiment)
         return SlurmExperiment(meta)
 
     def get_children(self, experiment: SlurmExperiment, parent: Experiment = None, raw=True, **kwargs) -> List[Any]:

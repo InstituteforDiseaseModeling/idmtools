@@ -283,7 +283,7 @@ class ITask(metaclass=ABCMeta):
         result = cls.__new__(cls)
         memo[id(self)] = result
         for k, v in self.__dict__.items():
-            if k not in ['_task_log']:
+            if k not in ['_task_log', 'common_assets']:
                 setattr(result, k, copy.deepcopy(v, memo))
         return result
 

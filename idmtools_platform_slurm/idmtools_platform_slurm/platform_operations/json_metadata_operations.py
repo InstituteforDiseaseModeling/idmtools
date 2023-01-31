@@ -80,7 +80,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
             raise RuntimeError(f"Get method supports Suite/Experiment/Simulation only.")
         data = item.to_dict()
         if isinstance(item, Suite):
-            data['experiments'] = [exp.id for exp in item.experiments]
+            data.pop('experiments', None)
         meta = json.loads(json.dumps(data, cls=IDMJSONEncoder))
         meta['id'] = meta['_uid']
         meta['uid'] = meta['_uid']
@@ -100,6 +100,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         dest = self.get_metadata_filepath(item)
         meta = self.get(item)
         self._write_to_file(dest, meta)
+        return meta
 
     def load(self, item: Union[Suite, Experiment, Simulation]) -> Dict:
         """
