@@ -49,7 +49,6 @@ setup(
     name='idmtools-slurm-utils',
     packages=find_packages(),
     setup_requires=[],
-    python_requires='>=3.6.*, !=3.7.0, !=3.7.1, !=3.7.2',
     test_suite='tests',
     extras_require=extras,
     entry_points={
