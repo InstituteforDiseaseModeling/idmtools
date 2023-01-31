@@ -3,10 +3,16 @@ idmtools slurm cli commands.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+import json
 import click
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools_platform_slurm.utils.status_report.status_report import generate_status_report
+from idmtools_platform_slurm.utils.status_report.utils import get_latest_experiment, run_experiment_slurm
+from logging import getLogger
+
+logger = getLogger(__name__)
+user_logger = getLogger('user')
 
 
 @click.group(short_help="SLURM Related Commands")
@@ -21,7 +27,7 @@ def slurm(ctx: click.Context, job_directory):
     ctx.obj = dict(job_directory=job_directory)
 
 
-@slurm.command()
+@slurm.command(help="Get experiment's simulations report")
 @click.option('--suite-id', default=None, help="Idmtools Suite id")
 @click.option('--exp-id', default=None, help="Idmtools Experiment id")
 @click.option('--status-filter', type=click.Choice(['0', '-1', '100']), multiple=True, help="list of status")
@@ -52,7 +58,7 @@ def status_report(ctx: click.Context, suite_id, exp_id, status_filter, sim_filte
                            root=root, verbose=verbose, display=display, display_count=display_count)
 
 
-@slurm.command()
+@slurm.command(help="Get Suite/Experiment/Simulation directory")
 @click.option('--sim-id', default=None, help="Idmtools Experiment id")
 @click.option('--exp-id', default=None, help="Idmtools Experiment id")
 @click.option('--suite-id', default=None, help="Idmtools Suite id")
@@ -61,7 +67,6 @@ def get_item_path(ctx: click.Context, sim_id, exp_id, suite_id):
     job_dir = ctx.obj['job_directory']
     platform = Platform('SLURM_LOCAL', job_directory=job_dir)
 
-    item_dir = None
     if sim_id is not None:
         item_dir = platform.get_directory_by_id(sim_id, ItemType.SIMULATION)
     elif exp_id is not None:
@@ -71,4 +76,14 @@ def get_item_path(ctx: click.Context, sim_id, exp_id, suite_id):
     else:
         raise Exception('Must provide at least one: suite-id, exp-id or sim-id!')
 
-    print(item_dir)
+    user_logger.info(item_dir)
+
+
+@slurm.command(help="Get the latest experiment info")
+@click.pass_context
+def get_latest(ctx: click.Context):
+    job_dir = ctx.obj['job_directory']
+    platform = Platform('SLURM_LOCAL', job_directory=job_dir)
+
+    result = get_latest_experiment(platform)
+    user_logger.info(json.dumps(result, indent=3))
