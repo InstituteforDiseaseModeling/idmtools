@@ -99,14 +99,7 @@ if "%1" == "generate-api" (
 
 	del ./api/idmtools_platform_local_index.rst >nul 2>&1
 	DEL /Q /F /S "*.tmp" >nul 2>&1
-	sphinx-apidoc -f -e -M -o ./api/ --templatedir api_templates ../idmtools_platform_local/idmtools_platform_local
-	REN ./api/modules.rst ./api/idmtools_platform_local_index.rst
-	DEL /Q /F /S "idmtools_platform_local.internals.tasks.*.rst" >nul 2>&1
-	COPY ./api/idmtools_platform_local.internals.tasks.template ./api/idmtools_platform_local.internals.tasks.rst
-	DEL /Q /F /S "*idmtools_platform_local.internals.workers.brokers.rst" >nul 2>&1
-    COPY ./api/idmtools_platform_local.internals.workers.brokers.template ./api/idmtools_platform_local.internals.workers.brokers.rst
-    DEL /Q /F /S "*idmtools_platform_local.internals.workers.run_broker.rst" >nul 2>&1
-    COPY ./api/idmtools_platform_local.internals.workers.run_broker.template ./api/idmtools_platform_local.internals.workers.run_broker.rst
+	sphinx-apidoc -f -e -M -o ./api/ --templatedir api_templates ../idmtools_platform_local/idmtools_platform_local '../idmtools_platform_local/idmtools_platform_local/internals//*'
 	goto end
 )
 
