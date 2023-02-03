@@ -59,11 +59,11 @@ def status_report(ctx: click.Context, suite_id, exp_id, status_filter, sim_filte
 
 
 @slurm.command(help="Get Suite/Experiment/Simulation directory")
-@click.option('--sim-id', default=None, help="Idmtools Experiment id")
+@click.option('--sim-id', default=None, help="Idmtools Simulation id")
 @click.option('--exp-id', default=None, help="Idmtools Experiment id")
 @click.option('--suite-id', default=None, help="Idmtools Suite id")
 @click.pass_context
-def get_item_path(ctx: click.Context, sim_id, exp_id, suite_id):
+def get_path(ctx: click.Context, sim_id, exp_id, suite_id):
     job_dir = ctx.obj['job_directory']
     platform = Platform('SLURM_LOCAL', job_directory=job_dir)
 
@@ -77,6 +77,48 @@ def get_item_path(ctx: click.Context, sim_id, exp_id, suite_id):
         raise Exception('Must provide at least one: suite-id, exp-id or sim-id!')
 
     user_logger.info(item_dir)
+
+
+@slurm.command(help="Get status of Experiment/Simulation")
+@click.option('--sim-id', default=None, help="Idmtools Simulation id")
+@click.option('--exp-id', default=None, help="Idmtools Experiment id")
+@click.pass_context
+def get_status(ctx: click.Context, sim_id, exp_id):
+    job_dir = ctx.obj['job_directory']
+    platform = Platform('SLURM_LOCAL', job_directory=job_dir)
+
+    if sim_id is not None:
+        status = platform._op_client.get_simulation_status(sim_id)
+    elif exp_id is not None:
+        exp = platform.get_item(exp_id, ItemType.EXPERIMENT)
+        status = exp.status
+    else:
+        raise Exception('Must provide at least one: exp-id or sim-id!')
+
+    user_logger.info(status.name if status else None)
+
+
+@slurm.command(help="Get Suite/Experiment/Simulation slurm job")
+@click.option('--sim-id', default=None, help="Idmtools Simulation id")
+@click.option('--exp-id', default=None, help="Idmtools Experiment id")
+@click.option('--suite-id', default=None, help="Idmtools Suite id")
+@click.pass_context
+def get_job(ctx: click.Context, sim_id, exp_id, suite_id):
+    job_dir = ctx.obj['job_directory']
+    platform = Platform('SLURM_LOCAL', job_directory=job_dir)
+
+    if sim_id is not None:
+        job_id = platform._op_client.get_job_id(sim_id, ItemType.SIMULATION)
+    elif exp_id is not None:
+        job_id = platform._op_client.get_job_id(exp_id, ItemType.EXPERIMENT)
+    elif suite_id is not None:
+        suite = platform.get_item(suite_id, ItemType.SUITE)
+        exp_id = suite.experiments[0].id
+        job_id = platform._op_client.get_job_id(exp_id, ItemType.EXPERIMENT)
+    else:
+        raise Exception('Must provide at least one: suite-id, exp-id or sim-id!')
+
+    user_logger.info(job_id)
 
 
 @slurm.command(help="Get the latest experiment info")
