@@ -27,7 +27,7 @@ def slurm(ctx: click.Context, job_directory):
     ctx.obj = dict(job_directory=job_directory)
 
 
-@slurm.command(help="Get experiment's simulations report")
+@slurm.command(help="Get simulation's report")
 @click.option('--suite-id', default=None, help="Idmtools Suite id")
 @click.option('--exp-id', default=None, help="Idmtools Experiment id")
 @click.option('--status-filter', type=click.Choice(['0', '-1', '100']), multiple=True, help="list of status")
