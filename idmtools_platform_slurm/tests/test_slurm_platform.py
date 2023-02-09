@@ -2,8 +2,6 @@ import os
 import pathlib
 import shutil
 import tempfile
-from uuid import uuid4
-
 import pytest
 
 from idmtools import IdmConfigParser
@@ -136,7 +134,7 @@ class TestSlurmPlatform(ITestWithPersistence):
         suite = Suite()
         local = LocalSlurmOperations(platform=self.platform)
         dest_dir = tempfile.mkdtemp()
-        local.mk_directory(suite, dest=dest_dir)
+        local.mk_directory(suite, dest=dest_dir, exist_ok=True)
         expected_dir = os.path.join(dest_dir)
         self.assertTrue(os.path.isdir(expected_dir))
 
@@ -156,8 +154,8 @@ class TestSlurmPlatform(ITestWithPersistence):
         suite = Suite()
         experiment = Experiment()
         experiment.parent = suite
-        simulation1 = Simulation(_uid=uuid4())  # create uniq simulation
-        simulation2 = Simulation(_uid=uuid4())
+        simulation1 = Simulation()  # create uniq simulation
+        simulation2 = Simulation()
         simulation1.parent = experiment
         simulation2.parent = experiment
         local.mk_directory(simulation1)
@@ -175,7 +173,7 @@ class TestSlurmPlatform(ITestWithPersistence):
     def test_localSlurmOperations_create_batch_file_experiment(self):
         local = LocalSlurmOperations(platform=self.platform)
         suite = Suite()
-        experiment = Experiment(_uid=uuid4())
+        experiment = Experiment()
         experiment.parent = suite
         local.mk_directory(experiment)
         local.create_batch_file(experiment)
@@ -197,9 +195,9 @@ class TestSlurmPlatform(ITestWithPersistence):
     def test_localSlurmOperations_create_batch_file_simulation(self):
         local = LocalSlurmOperations(platform=self.platform)
         suite = Suite()
-        experiment = Experiment(_uid=uuid4())
+        experiment = Experiment()
         experiment.parent = suite
-        simulation = Simulation(_uid=uuid4(), task=TestTask())
+        simulation = Simulation(task=TestTask())
         simulation.parent = experiment
         local.mk_directory(simulation)
         local.create_batch_file(simulation)
@@ -215,9 +213,9 @@ class TestSlurmPlatform(ITestWithPersistence):
     def test_localSlurmOperations_create_batch_file_simulation_and_item_path(self):
         local = LocalSlurmOperations(platform=self.platform)
         suite = Suite()
-        experiment = Experiment(_uid=uuid4())
+        experiment = Experiment()
         experiment.parent = suite
-        simulation = Simulation(_uid=uuid4(), task=TestTask())
+        simulation = Simulation(task=TestTask())
         simulation.parent = experiment
         temp_path = tempfile.mkdtemp()
         local.mk_directory(simulation, dest=temp_path)
@@ -232,7 +230,7 @@ class TestSlurmPlatform(ITestWithPersistence):
         local = LocalSlurmOperations(platform=self.platform)
         suite = Suite()
         temp_path = tempfile.mkdtemp()
-        local.mk_directory(suite, dest=temp_path)
+        local.mk_directory(suite, dest=temp_path, exist_ok=True)
         with self.assertRaises(NotImplementedError) as ex:
             local.create_batch_file(suite, item_path=temp_path)
         self.assertEqual(ex.exception.args[0], "Suite is not supported for batch creation.")

@@ -3,10 +3,9 @@ Here we implement the SlurmPlatform simulation operations.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
-import shutil
-from uuid import UUID, uuid4
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, List, Dict, Type, Optional, Union, Any
+import shutil
 from idmtools.assets import Asset
 from idmtools.core import ItemType, EntityStatus
 from idmtools.entities.experiment import Experiment
@@ -29,7 +28,7 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
     platform: 'SlurmPlatform'  # noqa: F821
     platform_type: Type = field(default=SlurmSimulation)
 
-    def get(self, simulation_id: Union[str, UUID], **kwargs) -> Dict:
+    def get(self, simulation_id: str, **kwargs) -> Dict:
         """
         Gets a simulation from the Slurm platform.
         Args:
@@ -56,13 +55,11 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
         Returns:
             Slurm Simulation object created.
         """
-        if not isinstance(simulation.uid, UUID):
-            simulation.uid = uuid4()
         simulation.name = clean_experiment_name(simulation.experiment.name if not simulation.name else simulation.name)
 
         # Generate Simulation folder structure
-        self.platform._op_client.mk_directory(simulation)
-        meta = self.platform._metas.dump(simulation)
+        self.platform._op_client.mk_directory(simulation, exist_ok=False)
+        self.platform._metas.dump(simulation)
         self.platform._assets.link_common_assets(simulation)
         self.platform._assets.dump_assets(simulation)
         self.platform._op_client.create_batch_file(simulation, **kwargs)
@@ -151,7 +148,7 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
             parent = self.platform.get_item(slurm_sim.parent_id, ItemType.EXPERIMENT, force=True)
         sim = Simulation(task=None)
         sim.platform = self.platform
-        sim.uid = UUID(slurm_sim.uid)
+        sim.uid = slurm_sim.uid
         sim.name = slurm_sim.name
         sim.parent_id = parent.id
         sim.parent = parent

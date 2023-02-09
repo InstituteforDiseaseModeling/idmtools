@@ -60,10 +60,6 @@ API class specifications
 
 .. uml:: /diagrams/apis-emod.puml
 
-.. toctree::
-   :maxdepth: 2
-   :titlesonly:
-
 
 
    api/idmtools_index

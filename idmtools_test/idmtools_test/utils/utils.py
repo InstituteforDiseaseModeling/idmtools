@@ -135,3 +135,20 @@ def captured_output():
 def is_global_configuration_enabled() -> bool:
     from idmtools import IdmConfigParser
     return os.path.exists(IdmConfigParser.get_global_configuration_name()) or os.environ.get("IDMTOOLS_CONFIG_FILE", None) is not None
+
+
+def get_performance_scale() -> int:
+    try:
+        scale = int(os.getenv("IDMTOOLS_TEST_SCALE", "1"))
+    except:
+        scale = 1
+    return scale
+
+
+def clear_id_cache():
+    from idmtools.core.interfaces.iitem import get_id_generator
+    from idmtools.plugins.item_sequence import get_plugin_config
+    from idmtools.plugins.item_sequence import _get_template
+    get_id_generator.cache_clear()
+    get_plugin_config.cache_clear()
+    _get_template.cache_clear()

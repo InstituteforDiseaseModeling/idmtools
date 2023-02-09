@@ -1,10 +1,12 @@
 import copy
 import os
+import shutil
 from concurrent.futures._base import as_completed, Executor
 from concurrent.futures.process import ProcessPoolExecutor
 from concurrent.futures.thread import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from enum import Enum
+from pathlib import Path
 from typing import List, Union, Type
 from tqdm import tqdm
 from idmtools.core import ItemType
@@ -28,19 +30,32 @@ class PoolType(Enum):
     process = ProcessPoolExecutor
 
 
+DEFAULT_OUTPUT_PATH = Path(os.getenv("IDMTOOLS_TEST_EXECUTE_PATH", Path().cwd().joinpath(".test_platform")))
+
+
+def clear_execute_platform():
+    if Path.exists(DEFAULT_OUTPUT_PATH):
+        for file in os.listdir(DEFAULT_OUTPUT_PATH):
+            path = Path(DEFAULT_OUTPUT_PATH).joinpath(file)
+            try:
+                shutil.rmtree(path)
+            except OSError:
+                os.remove(path)
+
+
 @dataclass(repr=False)
 class TestExecutePlatform(IPlatform):
     _experiments: TestExecutePlatformExperimentOperation = field(
         default=None, compare=False, metadata={"pickle_ignore": True}, repr=False, init=False
     )
     _simulations: TestExecutePlatformSimulationOperation = field(default=None, compare=False, metadata={"pickle_ignore": True},
-                                                         repr=False, init=False)
+                                                                 repr=False, init=False)
 
     _platform_supports: List[PlatformRequirements] = field(default_factory=lambda: copy.deepcopy(supported_types),
                                                            repr=False, init=False)
 
     __test__ = False  # Hide from test discovery
-    execute_directory: str = field(default=os.path.join(os.getcwd(), '.test_platform'))
+    execute_directory: str = field(default=DEFAULT_OUTPUT_PATH)
     pool: Executor = field(default=None, compare=False, metadata={"pickle_ignore": True}, repr=False, init=False)
     pool_type: PoolType = field(default=PoolType.thread)
     queue: List = field(default_factory=list, compare=False, metadata={"pickle_ignore": True}, repr=False, init=False)

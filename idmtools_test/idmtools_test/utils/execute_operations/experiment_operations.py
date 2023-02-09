@@ -7,10 +7,11 @@ from dataclasses import field, dataclass
 from functools import partial
 from logging import getLogger, DEBUG
 from threading import Lock
-from typing import Any, List, Type, Dict, Union, TYPE_CHECKING, Optional
-from uuid import UUID, uuid4
+from pathlib import Path
+from typing import Any, List, Type, Dict, TYPE_CHECKING, Optional
 from idmtools.assets import Asset, AssetCollection
 from idmtools.core import EntityStatus, ItemType
+from idmtools.core import IDMTOOLS_USER_HOME
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
 from idmtools.utils.file import file_contents_to_generator
@@ -23,6 +24,7 @@ logger = getLogger(__name__)
 current_directory = os.path.dirname(os.path.realpath(__file__))
 data_path = os.path.abspath(os.path.join(current_directory, "..", "..", "data"))
 EXPERIMENTS_LOCK = Lock()
+SEQUENCE_FILE_DEFAULT_PATH = IDMTOOLS_USER_HOME.joinpath("itemsequence", "index.json")
 
 
 class ExperimentDict(dict):
@@ -35,25 +37,31 @@ class TestExecutePlatformExperimentOperation(IPlatformExperimentOperations):
     platform_type: Type = field(default=ExperimentDict)
     experiments: Dict[str, Experiment] = field(default_factory=dict, compare=False, metadata={"pickle_ignore": True})
 
-    def get(self, experiment_id: Union[str, UUID], **kwargs) -> Any:
+    def get(self, experiment_id: str, **kwargs) -> Any:
         exp_path = self.get_experiment_path(experiment_id)
-        path = os.path.join(exp_path, "experiment.json")
-        if not os.path.exists(path):
+        experiment_path = os.path.join(exp_path, "experiment.json")
+        if not os.path.exists(experiment_path):
             logger.error(f"Cannot find experiment with id {experiment_id}")
             raise FileNotFoundError(f"Cannot find experiment with id {experiment_id}")
 
-        logger.info(f"Loading experiment metadata from {path}")
-        with open(path, 'r') as metadata_in:
+        simulation_metadata_path = os.path.join(exp_path, "simulation_index.json")
+        if not os.path.exists(simulation_metadata_path):
+            logger.error(f"Cannot find simulation index for experiment with id {experiment_id}")
+            raise FileNotFoundError(f"Cannot find simulation index for experiment with id {experiment_id}")
+
+        logger.info(f"Loading experiment metadata from {experiment_path}")
+        with open(experiment_path, 'r') as metadata_in:
             metadata = json.load(metadata_in)
-            return ExperimentDict(metadata)
+        logger.info(f"Loading simulation metadata from {simulation_metadata_path}")
+        with open(simulation_metadata_path, 'r') as metadata_in:
+            metadata['simulations'] = json.load(metadata_in)
+        return ExperimentDict(metadata)
 
     def platform_create(self, experiment: Experiment, **kwargs) -> Any:
         if logger.isEnabledFor(DEBUG):
             logger.debug('Creating Experiment')
-        uid = uuid4()
-        experiment.uid = uid
         EXPERIMENTS_LOCK.acquire()
-        self.experiments[uid] = experiment
+        self.experiments[experiment.uid] = experiment
         EXPERIMENTS_LOCK.release()
         logger.debug(f"Created Experiment {experiment.uid}")
         self.send_assets(experiment, **kwargs)
@@ -84,7 +92,7 @@ class TestExecutePlatformExperimentOperation(IPlatformExperimentOperations):
             if sim.status in [None, EntityStatus.CREATED]:
                 self.platform._simulations.run_item(sim)
 
-    def get_experiment_path(self, experiment_id: Union[UUID, str]) -> str:
+    def get_experiment_path(self, experiment_id: str) -> str:
         """
         Get path to experiment directory
 
@@ -219,3 +227,11 @@ class TestExecutePlatformExperimentOperation(IPlatformExperimentOperations):
         EXPERIMENTS_LOCK.release()
         self.send_assets(experiment)
         return experiment
+
+    def post_run_item(self, experiment: Experiment, **kwargs):
+        exp_path = self.get_experiment_path(experiment.uid)
+        sim_path = Path(exp_path, "simulation_index.json")
+        with open(sim_path, "w") as f:
+            json.dump([s.id for s in experiment.simulations], f)
+
+        super().post_run_item(experiment, **kwargs)

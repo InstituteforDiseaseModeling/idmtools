@@ -1,6 +1,7 @@
-from unittest import TestCase
 import allure
 import pytest
+from idmtools import IdmConfigParser
+from unittest import TestCase
 from idmtools.registry.platform_specification import PlatformPlugins
 from idmtools.utils.info import get_packages_from_pip
 
@@ -9,11 +10,14 @@ from idmtools.utils.info import get_packages_from_pip
 @allure.story("Plugins")
 @allure.suite("idmtools_core")
 class TestPlatformPlugins(TestCase):
+    def tearDown(self) -> None:
+        IdmConfigParser.clear_instance()
+        super().tearDown()
+
     def test_get_plugins(self):
         """
         Assumes we have plugins comps and local
         Returns:
-
         """
         pm = PlatformPlugins()
         self.assertGreater(len(pm.get_plugins()), 1)
