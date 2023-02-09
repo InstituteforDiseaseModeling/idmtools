@@ -68,7 +68,8 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
         self.platform._op_client.make_command_executable(simulation)
 
         # Return Slurm Simulation
-        return self.get(simulation.id, **kwargs)
+        slurm_sim = SlurmSimulation(meta)
+        return slurm_sim
 
     def get_parent(self, simulation: SlurmSimulation, **kwargs) -> SlurmExperiment:
         """

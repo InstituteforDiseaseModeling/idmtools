@@ -77,7 +77,6 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         self.platform._op_client.update_script_mode(dest_script)
 
         # Return Slurm Experiment
-        meta = self.platform._metas.get(experiment)
         return SlurmExperiment(meta)
 
     def get_children(self, experiment: SlurmExperiment, parent: Experiment = None, raw=True, **kwargs) -> List[Any]:

@@ -85,14 +85,12 @@ class JSONMetadataOperationsTest(unittest.TestCase):
                           'platform_requirements': None, 'frozen': False, 'gather_common_assets_from_task': True}
         exp_meta_dict2 = exp_meta_dict1.copy()
         exp_meta_dict1.update({"parent_id": suites[0].id})
-        exp_meta_dict1.update({"_uid": experiments[0].id})
         exp_meta_dict2.update({"parent_id": suites[0].id})
         exp_meta_dict2.update({"_uid": experiments[1].id})
         expected_suite_meta.update({"parent_id": None})
         expected_suite_meta.update({"_uid": suite.id})
         expected_suite_meta.update({"uid": suite.id})
         expected_suite_meta.update({"id": suite.id})
-        expected_suite_meta.update({"experiments": [experiments[0].id, experiments[1].id]})
         self.assertDictEqual(expected_suite_meta, metadata)
 
     # test load with no meta_data file

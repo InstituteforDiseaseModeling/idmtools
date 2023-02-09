@@ -28,8 +28,8 @@ logger = getLogger(__name__)
 
 op_defaults = dict(default=None, compare=False, metadata={"pickle_ignore": True})
 CONFIG_PARAMETERS = ['ntasks', 'partition', 'nodes', 'mail_type', 'mail_user', 'ntasks_per_core', 'cpus_per_task',
-                     'mem_per_cpu', 'time',
-                     'account', 'mem', 'exclusive', 'requeue', 'sbatch_custom', 'max_running_jobs']
+                     'mem_per_cpu', 'time', 'constraint', 'account', 'mem', 'exclusive', 'requeue', 'sbatch_custom',
+                     'max_running_jobs']
 
 
 @dataclass(repr=False)
@@ -75,6 +75,9 @@ class SlurmPlatform(IPlatform):
 
     # Which partition to use
     partition: Optional[str] = field(default=None, metadata=dict(sbatch=True))
+
+    # Specify compute node
+    constraint: Optional[str] = field(default=None, metadata=dict(sbatch=True))
 
     # Limit time on this job hrs:min:sec
     time: str = field(default=None, metadata=dict(sbatch=True))

@@ -51,7 +51,7 @@ class CsvExperimentBuilder(SimulationBuilder):
             return np.nan if y == '' else y
 
         # make up our column converter
-        convert_map = {c: strip_column for c, v in type_map.items() if v in (np.int, np.float, np.int64, np.float64)}
+        convert_map = {c: strip_column for c, v in type_map.items() if v in (np.int64, np.float64, np.int64, np.float64)}
 
         # load csv with our converter
         # df_sweeps = pd.read_csv(file_path, sep=sep)

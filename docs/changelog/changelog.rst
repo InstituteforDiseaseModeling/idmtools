@@ -24,3 +24,5 @@ Changelog
     changelog_1.6.6
     changelog_1.6.7
     changelog_1.7.0
+    changelog_1.7.1
+    changelog_1.7.3

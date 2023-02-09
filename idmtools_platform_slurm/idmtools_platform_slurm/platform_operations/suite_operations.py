@@ -56,7 +56,6 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
         self.platform._metas.dump(suite)
 
         # Return Slurm Suite
-        meta = self.platform._metas.get(suite)
         slurm_suite = SlurmSuite(meta)
         return slurm_suite, slurm_suite.id
 

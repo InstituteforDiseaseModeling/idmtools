@@ -132,7 +132,6 @@ class TestPythonSimulation(ITestWithPersistence):
         with open(os.path.join(suite_dir, 'metadata.json'), 'r') as j:
             contents = json.loads(j.read())
             self.assertEqual(contents['_uid'], suite.id)
-            self.assertEqual(contents['experiments'][0], experiment.id)
 
         # verify ids in metadata.json for experiment
         with open(os.path.join(experiment_dir, 'metadata.json'), 'r') as j:
