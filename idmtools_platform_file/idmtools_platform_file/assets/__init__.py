@@ -7,12 +7,13 @@ if TYPE_CHECKING:
     from idmtools_platform_file.file_platform import FilePlatform
 
 DEFAULT_TEMPLATE_FILE = Path(__file__).parent.joinpath("batch.sh.jinja2")
+DEFAULT_SIMULATION_TEMPLATE = Path(__file__).parent.parent.joinpath("assets/_run.sh.jinja2")
 
 
 def generate_script(platform: 'FilePlatform', experiment: Experiment,
                     template: Union[Path, str] = DEFAULT_TEMPLATE_FILE, **kwargs) -> None:
     """
-    Generate batch file sbatch.sh
+    Generate batch file batch.sh
     Args:
         platform: File Platform
         experiment: idmtools Experiment
@@ -32,7 +33,7 @@ def generate_script(platform: 'FilePlatform', experiment: Experiment,
         tout.write(t.render(template_vars))
 
 
-def generate_simulation_script(platform: 'FilePlatform', simulation, retries: Optional[int] = None) -> None:
+def generate_simulation_script(platform: 'FilePlatform', simulation, retries: Optional[int] = None, template: str = DEFAULT_SIMULATION_TEMPLATE) -> None:
     """
     Generate batch file _run.sh
     Args:
@@ -44,7 +45,7 @@ def generate_simulation_script(platform: 'FilePlatform', simulation, retries: Op
     """
     sim_script = platform.get_directory(simulation).joinpath("_run.sh")
     with open(sim_script, "w") as tout:
-        with open(Path(__file__).parent.parent.joinpath("assets/_run.sh.jinja2")) as tin:
+        with open(template) as tin:
             t = Template(tin.read())
             tvars = dict(
                 platform=platform,

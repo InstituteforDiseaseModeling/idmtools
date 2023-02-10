@@ -20,10 +20,40 @@ pip install idmtools-platform-file --index-url=https://packages.idmod.org/api/py
 # Development Tips
 
 There is a Makefile file available for most common development tasks. Here is a list of commands
+
 ```bash
 clean       -   Clean up temproary files
 lint        -   Lint package and tests
 test        -   Run All tests
 coverage    -   Run tests and generate coverage report that is shown in browser
 ```
+
 On Windows, you can use `pymake` instead of `make`
+
+# Use Cases
+
+* Testing
+  * Test core functionality
+  * Performance Testing
+* Integration with other systems
+  * Other HPC Systems
+  * Local Executions Systems
+  * Jupyter notebooks
+* Basis for future local platforms
+  * Process
+  * Thread
+  * Dask
+  * Asyncio
+
+# Feature Roadmap
+
+* First Version
+  * Support for basic provisioning on a linux filesystem
+* Second Version
+  * Support for Windows
+    * Look into documenting/testing Symbolic links on
+      Windows - https://www.howtogeek.com/16226/complete-guide-to-symbolic-links-symlinks-on-windows-or-linux/
+  * Support for Analysis Scripts
+* Future
+  * Support for Workitems
+  * Support for "True Asset Collections"

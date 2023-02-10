@@ -29,6 +29,13 @@ class FilePlatform(IPlatform):
     _simulations: FilePlatformSimulationOperations = field(**op_defaults, repr=False, init=False)
     _assets: FilePlatformAssetCollectionOperations = field(**op_defaults, repr=False, init=False)
 
+    _metas: JSONMetadataOperations = field(**op_defaults, repr=False, init=False)
+
+    # Which batch script to use by default
+    batch_template: str = field(default="batch.sh.jinja2")
+
+    simulation_template: str = field(default="_run.sh.jinja2")
+
     def __post_init__(self):
         self.__init_interfaces()
         self.supported_types = {ItemType.SUITE, ItemType.EXPERIMENT, ItemType.SIMULATION}
@@ -153,9 +160,9 @@ class FilePlatform(IPlatform):
             None
         """
         if isinstance(item, Experiment):
-            generate_script(self, item)
+            generate_script(self, item, template=self.batch_template)
         elif isinstance(item, Simulation):
             retries = kwargs.get('retries', None)
-            generate_simulation_script(self, item, retries)
+            generate_simulation_script(self, item, retries, template=self.simulation_template)
         else:
             raise NotImplementedError(f"{item.__class__.__name__} is not supported for batch creation.")
