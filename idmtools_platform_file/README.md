@@ -54,6 +54,6 @@ On Windows, you can use `pymake` instead of `make`
     * Look into documenting/testing Symbolic links on
       Windows - https://www.howtogeek.com/16226/complete-guide-to-symbolic-links-symlinks-on-windows-or-linux/
   * Support for Analysis Scripts
-* Future
   * Support for Workitems
+* Future
   * Support for "True Asset Collections"
