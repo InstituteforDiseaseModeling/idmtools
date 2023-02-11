@@ -1,7 +1,6 @@
-from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Union
-
+from dataclasses import dataclass, field
 from idmtools.core import ItemType
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
@@ -28,12 +27,10 @@ class FilePlatform(IPlatform):
     _experiments: FilePlatformExperimentOperations = field(**op_defaults, repr=False, init=False)
     _simulations: FilePlatformSimulationOperations = field(**op_defaults, repr=False, init=False)
     _assets: FilePlatformAssetCollectionOperations = field(**op_defaults, repr=False, init=False)
-
     _metas: JSONMetadataOperations = field(**op_defaults, repr=False, init=False)
 
     # Which batch script to use by default
     batch_template: str = field(default="batch.sh.jinja2")
-
     simulation_template: str = field(default="_run.sh.jinja2")
 
     def __post_init__(self):

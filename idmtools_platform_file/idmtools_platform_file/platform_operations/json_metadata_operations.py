@@ -13,7 +13,7 @@ from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.utils.json import IDMJSONEncoder
-from idmtools_platform_file.utils import FileSuite, FileExperiment
+from idmtools_platform_file.utils import FileSuite, FileExperiment, FileSimulation
 
 if TYPE_CHECKING:
     from idmtools_platform_file.file_platform import FilePlatform
@@ -80,7 +80,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
             raise RuntimeError(f"Get method supports Suite/Experiment/Simulation only.")
         data = item.to_dict()
         if isinstance(item, Suite):
-            data['experiments'] = [exp.id for exp in item.experiments]
+            data.pop('experiments', None)
         meta = json.loads(json.dumps(data, cls=IDMJSONEncoder))
         meta['id'] = meta['_uid']
         meta['uid'] = meta['_uid']
@@ -100,6 +100,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         dest = self.get_metadata_filepath(item)
         meta = self.get(item)
         self._write_to_file(dest, meta)
+        return meta
 
     def load(self, item: Union[Suite, Experiment, Simulation]) -> Dict:
         """
@@ -128,7 +129,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         meta = self._read_from_file(metadata_filepath)
         return meta
 
-    def update(self, item: Union[Suite, Experiment, Simulation], metadata=None, replace=True) -> None:
+    def update(self, item: Union[Suite, Experiment, Simulation], metadata: Dict = None, replace=True) -> None:
         """
         Update or replace item's metadata file.
         Args:

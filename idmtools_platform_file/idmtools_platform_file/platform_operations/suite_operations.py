@@ -56,10 +56,9 @@ class FilePlatformSuiteOperations(IPlatformSuiteOperations):
             suite.uid = uuid4()
         # Generate Suite folder structure
         self.platform.mk_directory(suite)
-        self.platform._metas.dump(suite)
+        meta = self.platform._metas.dump(suite)
 
         # Return File Suite
-        meta = self.platform._metas.get(suite)
         file_suite = FileSuite(meta)
         return file_suite, file_suite.id
 
@@ -139,6 +138,8 @@ class FilePlatformSuiteOperations(IPlatformSuiteOperations):
         Returns:
             None
         """
+        # for experiment in suite.experiments:
+        #     self.platform.refresh_status(experiment, **kwargs)
         pass
 
     def create_sim_directory_map(self, suite_id: str) -> Dict:
