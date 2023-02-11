@@ -45,10 +45,10 @@ class TestCreateSimDirectoryMap(ITestWithPersistence):
     # test create_sim_directory_map from platform for experiment
     def test_create_sim_directory_map(self):
         workdir_dict = self.platform.create_sim_directory_map(item_id=self.exp.id, item_type=ItemType.EXPERIMENT)
-        slurm_experiment = self.platform.get_item(self.exp.uid, ItemType.EXPERIMENT, raw=True)
-        sims = slurm_experiment.simulations
+        experiment = self.platform.get_item(self.exp.uid, ItemType.EXPERIMENT, raw=False)
+        sims = experiment.simulations
         for sim in sims:
-            self.assertEqual(workdir_dict[sim].replace("\\", "/"), f'DEST/{self.suite.id}/{self.exp.id}/{sim}')
+            self.assertEqual(workdir_dict[sim.id].replace("\\", "/"), f'DEST/{self.suite.id}/{self.exp.id}/{sim.id}')
 
     # test create_sim_directory_map from platform for simulation
     def test_create_sim_directory_map_sim(self):
@@ -59,9 +59,9 @@ class TestCreateSimDirectoryMap(ITestWithPersistence):
     # test create_sim_directory_map from platform for suite
     def test_create_sim_directory_map_suite(self):
         workdir_dict = self.platform.create_sim_directory_map(item_id=self.suite.id, item_type=ItemType.SUITE)
-        slurm_experiment = self.platform.get_item(self.exp.uid, ItemType.EXPERIMENT, raw=True)
-        sims = slurm_experiment.simulations
+        experiment = self.platform.get_item(self.exp.uid, ItemType.EXPERIMENT, raw=False)
+        sims = experiment.simulations
         for sim in sims:
-            self.assertEqual(workdir_dict[sim].replace("\\", "/"), f'DEST/{self.suite.id}/{self.exp.id}/{sim}')
+            self.assertEqual(workdir_dict[sim.id].replace("\\", "/"), f'DEST/{self.suite.id}/{self.exp.id}/{sim.id}')
 
 

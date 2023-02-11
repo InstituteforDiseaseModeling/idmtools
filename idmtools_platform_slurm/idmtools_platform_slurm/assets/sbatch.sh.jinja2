@@ -14,6 +14,9 @@
 {% if mail_user is defined and mail_user is not none %}
 #SBATCH --mail-user={{mail_user}}
 {% endif %}
+{% if constraint is defined and constraint is not none %}
+#SBATCH --constraint={{constraint}}
+{% endif %}
 {% if ntasks_per_core is defined and ntasks_per_core  is not none %}
 #SBATCH --ntasks-per-core={{ntasks_per_core}}
 {% endif %}

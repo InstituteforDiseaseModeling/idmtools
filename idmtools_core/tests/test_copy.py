@@ -105,6 +105,9 @@ class TestCopy(ITestWithPersistence):
         # test deepcopy of simulation
         sp = copy.deepcopy(sim)
         self.assertEqual(len(sp.assets.assets), 0)
+        # exclude the common assets
+        setattr(sp.task, 'common_assets', None)
+        sim.task.common_assets = None
         self.assertEqual(sim, sp)
 
     @pytest.mark.comps

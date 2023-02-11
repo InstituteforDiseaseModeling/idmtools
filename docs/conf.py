@@ -52,7 +52,8 @@ extensions = [
     # intersphinx to allow cross-reference
     'sphinx.ext.intersphinx',
     # automatic section names so linking between section is easy
-    'sphinx.ext.autosectionlabel'
+    'sphinx.ext.autosectionlabel',
+    'sphinxext.rediraffe'
 ]
 
 plantuml = 'plantweb'
@@ -404,3 +405,5 @@ intersphinx_mapping = {'python': ('https://docs.python.org/3', None),
                        'pycomps': ('https://docs.idmod.org/projects/pycomps/en/latest/', None)
                        }
 
+rediraffe_redirects = "redirects.txt"
+rediraffe_branch = "dev"
