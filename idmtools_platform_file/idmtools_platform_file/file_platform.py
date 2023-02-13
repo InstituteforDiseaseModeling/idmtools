@@ -1,5 +1,6 @@
+import subprocess
 from pathlib import Path
-from typing import Union
+from typing import Union, Any
 from dataclasses import dataclass, field
 from idmtools.core import ItemType
 from idmtools.entities import Suite
@@ -163,3 +164,38 @@ class FilePlatform(IPlatform):
             generate_simulation_script(self, item, retries, template=self.simulation_template)
         else:
             raise NotImplementedError(f"{item.__class__.__name__} is not supported for batch creation.")
+
+    @staticmethod
+    def update_script_mode(script_path: Union[Path, str], mode: int = 0o777) -> None:
+        """
+        Change file mode.
+        Args:
+            script_path: script path
+            mode: permission mode
+        Returns:
+            None
+        """
+        script_path = Path(script_path)
+        script_path.chmod(mode)
+
+    def submit_job(self, item: Union[Experiment, Simulation], **kwargs) -> Any:
+        """
+        Submit a File job.
+        Args:
+            item: idmtools Experiment or Simulation
+            kwargs: keyword arguments used to expand functionality
+        Returns:
+            Any
+        """
+        raise NotImplementedError("submit_job has not been implemented on the File Platform")
+
+        # if isinstance(item, Experiment):
+        #     working_directory = self.get_directory(item)
+        #     result = subprocess.run(['sbatch', '--parsable', 'sbatch.sh'], stdout=subprocess.PIPE,
+        #                             cwd=str(working_directory))
+        #     slurm_job_id = result.stdout.decode('utf-8').strip().split(';')[0]
+        #     return slurm_job_id
+        # elif isinstance(item, Simulation):
+        #     pass
+        # else:
+        #     raise NotImplementedError(f"Submit job is not implemented on SlurmPlatform.")

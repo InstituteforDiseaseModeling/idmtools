@@ -74,9 +74,9 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         shutil.copy(str(run_simulation_script), str(dest_script))
 
         # Make executable
-        # self.platform.update_script_mode(dest_script)
+        self.platform.update_script_mode(dest_script)
 
-        # Return Slurm Experiment
+        # Return File Experiment
         return FileExperiment(meta)
 
     def get_children(self, experiment: FileExperiment, parent: Experiment = None, raw=True, **kwargs) -> List[Any]:
@@ -133,8 +133,7 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         # Commission
         dry_run = kwargs.get('dry_run', False)
         if not dry_run:
-            # self.platform.submit_job(experiment, **kwargs)
-            pass
+            self.platform.submit_job(experiment, **kwargs)
         else:
             pass
         suite_id = experiment.parent_id or experiment.suite_id

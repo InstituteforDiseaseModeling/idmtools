@@ -68,9 +68,9 @@ class FilePlatformSimulationOperations(IPlatformSimulationOperations):
         self.platform.create_batch_file(simulation, **kwargs)
 
         # Make command executable
-        # self.platform.make_command_executable(simulation)
+        self.platform.make_command_executable(simulation)
 
-        # Return Slurm Simulation
+        # Return File Simulation
         file_sim = FileSimulation(meta)
         return file_sim
 
