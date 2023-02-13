@@ -1,3 +1,8 @@
+"""
+This is FilePlatform operations utils.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 from typing import Dict
 from idmtools.core import ItemType
 from idmtools.entities import Suite

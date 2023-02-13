@@ -1,3 +1,8 @@
+"""
+Here we implement the FilePlatform object.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import subprocess
 from pathlib import Path
 from typing import Union, Any
