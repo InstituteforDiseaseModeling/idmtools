@@ -3,8 +3,12 @@ Here we implement the FilePlatform object.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+import os
+import shlex
+import shutil
 import subprocess
 from pathlib import Path
+from logging import getLogger
 from typing import Union, Any
 from dataclasses import dataclass, field
 from idmtools.core import ItemType
@@ -18,6 +22,8 @@ from idmtools_platform_file.platform_operations.experiment_operations import Fil
 from idmtools_platform_file.platform_operations.json_metadata_operations import JSONMetadataOperations
 from idmtools_platform_file.platform_operations.simulation_operations import FilePlatformSimulationOperations
 from idmtools_platform_file.platform_operations.suite_operations import FilePlatformSuiteOperations
+
+logger = getLogger(__name__)
 
 op_defaults = dict(default=None, compare=False, metadata={"pickle_ignore": True})
 
@@ -182,6 +188,38 @@ class FilePlatform(IPlatform):
         """
         script_path = Path(script_path)
         script_path.chmod(mode)
+
+    def make_command_executable(self, simulation: Simulation) -> None:
+        """
+        Make simulation command executable
+        Args:
+            simulation: idmtools Simulation
+        Returns:
+            None
+        """
+        exe = simulation.task.command.executable
+        if exe == 'singularity':
+            # split the command
+            cmd = shlex.split(simulation.task.command.cmd.replace("\\", "/"))
+            # get real executable
+            exe = cmd[3]
+
+        sim_dir = self.get_directory(simulation)
+        exe_path = sim_dir.joinpath(exe)
+
+        # see if it is a file
+        if exe_path.exists():
+            exe = exe_path
+        elif shutil.which(exe) is not None:
+            exe = Path(shutil.which(exe))
+        else:
+            logger.debug(f"Failed to find executable: {exe}")
+            exe = None
+        try:
+            if exe and not os.access(exe, os.X_OK):
+                self.update_script_mode(exe)
+        except:
+            logger.debug(f"Failed to change file mode for executable: {exe}")
 
     def submit_job(self, item: Union[Experiment, Simulation], **kwargs) -> Any:
         """
