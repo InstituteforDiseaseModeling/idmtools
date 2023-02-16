@@ -53,7 +53,7 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
         """
         # Generate Suite folder structure
         self.platform._op_client.mk_directory(suite, exist_ok=False)
-        self.platform._metas.dump(suite)
+        meta = self.platform._metas.dump(suite)
 
         # Return Slurm Suite
         slurm_suite = SlurmSuite(meta)

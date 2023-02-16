@@ -66,7 +66,7 @@ def get_plugin_config():
         sequence_file: specified json file in .ini config in which id generator keeps track of sequential id's
         id_format_str: string specified in .ini config by which id's are formatted when assigned to sequential items
     """
-    warnings.warn('This feature us currently under development')
+    warnings.warn('This feature is currently under development')
     sequence_file = Path(IdmConfigParser.get_option("item_sequence", "sequence_file", SEQUENCE_FILE_DEFAULT_PATH))
     id_format_str = IdmConfigParser.get_option("item_sequence", "id_format_str", None)
     return sequence_file, id_format_str
