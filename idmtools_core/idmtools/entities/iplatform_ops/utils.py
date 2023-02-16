@@ -85,8 +85,14 @@ def batch_create_items(items: Union[Iterable, Generator], batch_worker_thread_fu
     from idmtools.config import IdmConfigParser
     from idmtools.utils.collections import ExperimentParentIterator
 
+    max_workers = kwargs.get('max_workers', None)
+
     # Consider values from the block that Platform uses
     _batch_size = int(IdmConfigParser.get_option(None, "batch_size", fallback=16))
+
+    batch_size = kwargs.get('batch_size', None)
+    if batch_size is not None:
+        _batch_size = batch_size
 
     if display_progress and not IdmConfigParser.is_progress_bar_disabled():
         from tqdm import tqdm
@@ -103,6 +109,10 @@ def batch_create_items(items: Union[Iterable, Generator], batch_worker_thread_fu
                 logger.debug(f"workers set by cpu: {_workers_per_cpu} * {cpu_count()}")
         else:
             _max_workers = int(IdmConfigParser.get_option(None, "max_workers", fallback=16))
+
+        if max_workers is not None:
+            _max_workers = max_workers
+
         logger.info(f'Creating {_max_workers} Platform Workers')
         default_pool_executor = IdmConfigParser.get_option(None, "default_pool_executor", fallback="thread").lower()
         if default_pool_executor == "process":

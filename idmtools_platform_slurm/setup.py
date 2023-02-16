@@ -45,11 +45,12 @@ setup(
     name='idmtools_platform_slurm',
     packages=find_packages(),
     setup_requires=setup_requirements,
-    entry_points=dict(idmtools_platform=  # noqa: E251
-                      ["idmtools_platform_slurm = idmtools_platform_slurm.plugin_info:SlurmPlatformSpecification"]
-                      ),
+    entry_points={"idmtools_platform": [
+        "idmtools_platform_slurm = idmtools_platform_slurm.plugin_info:SlurmPlatformSpecification"],
+        "idmtools_cli.cli_plugins": ["slurm=idmtools_platform_slurm.cli.slurm:slurm"]
+    },
     test_suite='tests',
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='1.7.2+nightly'
+    version='1.7.5'
 )

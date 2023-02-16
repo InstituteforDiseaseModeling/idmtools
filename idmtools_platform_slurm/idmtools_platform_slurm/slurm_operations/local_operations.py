@@ -12,7 +12,6 @@ from logging import getLogger
 from pathlib import Path
 from idmtools import IdmConfigParser
 from typing import Union, Any, List
-from uuid import UUID
 from idmtools.core import ItemType, EntityStatus
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment

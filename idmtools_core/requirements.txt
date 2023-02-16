@@ -10,6 +10,6 @@ pluggy~=1.0.0
 PyYaml>=5.3.0,<6.1
 tabulate>=0.8.9,<0.10
 tqdm>=4.52.0,<5
-packaging>=20.4,<22.0
 jinja2~=3.1.2
-pygit2>=1.4.0,<=1.10.1
+packaging>=20.4
+pygit2>=1.4.0,<=1.12.0

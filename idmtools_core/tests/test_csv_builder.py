@@ -37,7 +37,7 @@ class TestCsvBuilder(ITestWithPersistence):
     def test_simple_csv(self):
         file_path = os.path.join(self.base_path, 'sweeps.csv')
         func_map = {'a': setA, 'b': setB, 'c': setC, 'd': setD}
-        type_map = {'a': np.int, 'b': np.int, 'c': np.int, 'd': np.int}
+        type_map = {'a': np.int64, 'b': np.int64, 'c': np.int64, 'd': np.int64}
         self.builder.add_sweeps_from_file(file_path, func_map, type_map)
 
         # expected_values = list(itertools.product(range(5), [1, 2, 3]))

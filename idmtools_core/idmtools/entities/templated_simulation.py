@@ -236,6 +236,7 @@ class TemplatedSimulations:
         sim._uid = None
         sim.assets = copy.deepcopy(self.base_simulation.assets)
         sim.parent = self.parent
+        sim.task.common_assets = self.base_simulation.task.common_assets
         return sim
 
     @property
