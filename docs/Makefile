@@ -74,14 +74,8 @@ generate-api:
 	mv ./api/modules.rst ./api/idmtools_slurm_utils_index.rst
 
 	-rm ./api/idmtools_platform_local_index.rst
-	SPHINX_APIDOC_OPTIONS=members,undoc-members,show-inheritance,ignore-module-all sphinx-apidoc -f -e -M -o ./api --templatedir api_templates  ../idmtools_platform_local/idmtools_platform_local
+	SPHINX_APIDOC_OPTIONS=members,undoc-members,show-inheritance,ignore-module-all sphinx-apidoc -f -e -M -o ./api --templatedir api_templates  ../idmtools_platform_local/idmtools_platform_local '../idmtools_platform_local/idmtools_platform_local/internals//*'
 	mv ./api/modules.rst ./api/idmtools_platform_local_index.rst
-	rm -rf ./api/idmtools_platform_local.internals.tasks.*.rst
-	cp ./api/idmtools_platform_local.internals.tasks.template ./api/idmtools_platform_local.internals.tasks.rst
-	rm ./api/idmtools_platform_local.internals.workers.brokers.rst
-	cp ./api/idmtools_platform_local.internals.workers.brokers.template ./api/idmtools_platform_local.internals.workers.brokers.rst
-	rm ./api/idmtools_platform_local.internals.workers.run_broker.rst
-	cp ./api/idmtools_platform_local.internals.workers.run_broker.template ./api/idmtools_platform_local.internals.workers.run_broker.rst
 
 .PHONY: html
 html:
