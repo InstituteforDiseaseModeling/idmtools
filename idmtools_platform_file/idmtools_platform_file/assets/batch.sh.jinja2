@@ -1,0 +1,4 @@
+#!/bin/bash
+
+MAX_JOBS=4
+find $(pwd) -maxdepth 1 -name "_run.sh" | xargs -P $MAX_JOBS -I {} bash {} &
