@@ -65,7 +65,7 @@ class NewInfectionsAnalyzer(BaseAnalyzer):
             trace.append(t)
         layout = go.Layout(
             title='New Infections Chart',
-            xaxis={'title': 'time step'},
+            xaxis={'title': 'Time Step'},
             yaxis={'title': 'New Infections'}
         )
         fig = go.Figure(data=trace, layout=layout)
