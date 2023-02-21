@@ -7,7 +7,6 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from logging import getLogger, DEBUG
 from typing import Type, Any, List, Tuple, Dict, NoReturn, TYPE_CHECKING
-from uuid import UUID
 from idmtools.core.enums import EntityStatus, ItemType
 from idmtools.entities.iplatform_ops.utils import batch_create_items
 from idmtools.entities.suite import Suite
@@ -28,7 +27,7 @@ class IPlatformSuiteOperations(ABC):
     platform_type: Type
 
     @abstractmethod
-    def get(self, suite_id: UUID, **kwargs) -> Any:
+    def get(self, suite_id: str, **kwargs) -> Any:
         """
         Returns the platform representation of an Suite.
 
@@ -41,7 +40,7 @@ class IPlatformSuiteOperations(ABC):
         """
         pass
 
-    def batch_create(self, suites: List[Suite], display_progress: bool = True, **kwargs) -> List[Tuple[Any, UUID]]:
+    def batch_create(self, suites: List[Suite], display_progress: bool = True, **kwargs) -> List[Tuple[Any, str]]:
         """
         Provides a method to batch create suites.
 
@@ -86,13 +85,16 @@ class IPlatformSuiteOperations(ABC):
         Returns:
             NoReturn
         """
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Calling idmtools_platform_post_create_item hooks")
+        FunctionPluginManager.instance().hook.idmtools_platform_post_create_item(item=suite, kwargs=kwargs)
         suite.status = EntityStatus.CREATED
         suite.platform = self.platform
         suite.post_creation(self.platform)
         for experiment in suite.experiments:
             experiment.parent_id = suite.id
 
-    def create(self, suite: Suite, do_pre: bool = True, do_post: bool = True, **kwargs) -> Tuple[Any, UUID]:
+    def create(self, suite: Suite, do_pre: bool = True, do_post: bool = True, **kwargs) -> Tuple[Any, str]:
         """
         Creates an simulation from an IDMTools suite object.
 
@@ -105,7 +107,7 @@ class IPlatformSuiteOperations(ABC):
             **kwargs: Optional arguments mainly for extensibility
 
         Returns:
-            Created platform item and the UUID of said item
+            Created platform item and the id of said item
         """
         if suite.status == EntityStatus.CREATED:
             return suite._platform_object, suite.uid
@@ -125,7 +127,7 @@ class IPlatformSuiteOperations(ABC):
         return ret
 
     @abstractmethod
-    def platform_create(self, suite: Suite, **kwargs) -> Tuple[Any, UUID]:
+    def platform_create(self, suite: Suite, **kwargs) -> Tuple[Any, str]:
         """
         Creates an suite from an IDMTools suite object.
 
@@ -134,7 +136,7 @@ class IPlatformSuiteOperations(ABC):
             **kwargs: Optional arguments mainly for extensibility
 
         Returns:
-            Created platform item and the UUID of said item
+            Created platform item and the id of said item
         """
         pass
 
@@ -176,6 +178,9 @@ class IPlatformSuiteOperations(ABC):
         Returns:
             None
         """
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Calling idmtools_platform_post_run hooks")
+        FunctionPluginManager.instance().hook.idmtools_platform_post_run(item=suite, kwargs=kwargs)
         suite.status = EntityStatus.RUNNING
 
     def run_item(self, suite: Suite, **kwargs):

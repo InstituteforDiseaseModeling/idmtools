@@ -9,6 +9,7 @@ from idmtools.entities.simulation import Simulation
 from idmtools.services.platforms import PlatformPersistService
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.test_task import TestTask
+from idmtools.config import IdmConfigParser
 
 
 @pytest.mark.smoke
@@ -17,6 +18,12 @@ from idmtools_test.utils.test_task import TestTask
 @allure.story("Cache")
 @allure.suite("idmtools_core")
 class TestPersistenceServices(ITestWithPersistence):
+    def setUp(self):
+        super().setUp()
+        IdmConfigParser.clear_instance()
+
+    def tearDown(self):
+        super().tearDown()
 
     def test_persist_retrieve_platform(self):
         p = Platform('Test')

@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from logging import getLogger, DEBUG
 from types import GeneratorType
 from typing import Type, Any, NoReturn, Tuple, List, Dict, Iterator, Union, TYPE_CHECKING
-from uuid import UUID
+
 from idmtools.assets import Asset
 from idmtools.core.enums import EntityStatus, ItemType
 from idmtools.entities.experiment import Experiment
@@ -31,7 +31,7 @@ class IPlatformExperimentOperations(ABC):
     platform_type: Type
 
     @abstractmethod
-    def get(self, experiment_id: UUID, **kwargs) -> Any:
+    def get(self, experiment_id: str, **kwargs) -> Any:
         """
         Returns the platform representation of an Experiment.
 
@@ -74,6 +74,9 @@ class IPlatformExperimentOperations(ABC):
             NoReturn
         """
         if logger.isEnabledFor(DEBUG):
+            logger.debug("Calling idmtools_platform_post_create_item hooks")
+        FunctionPluginManager.instance().hook.idmtools_platform_post_create_item(item=experiment, kwargs=kwargs)
+        if logger.isEnabledFor(DEBUG):
             logger.debug("Calling experiment post_creation")
         experiment.post_creation(self.platform)
 
@@ -90,7 +93,7 @@ class IPlatformExperimentOperations(ABC):
             **kwargs: Optional arguments mainly for extensibility
 
         Returns:
-            Created platform item and the UUID of said item
+            Created platform item and the id of said item
         """
         if experiment.status is not None:
             if logger.isEnabledFor(DEBUG):
@@ -125,7 +128,7 @@ class IPlatformExperimentOperations(ABC):
             **kwargs: Optional arguments mainly for extensibility
 
         Returns:
-            Created platform item and the UUID of said item
+            Created platform item and the id of said item
         """
         pass
 
@@ -244,6 +247,9 @@ class IPlatformExperimentOperations(ABC):
         Returns:
             None
         """
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Calling idmtools_platform_post_run hooks")
+        FunctionPluginManager.instance().hook.idmtools_platform_post_run(item=experiment, kwargs=kwargs)
         experiment.post_run(self.platform)
 
     def run_item(self, experiment: Experiment, **kwargs):

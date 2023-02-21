@@ -5,7 +5,6 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 from logging import getLogger
 from typing import TYPE_CHECKING
-
 from pluggy import HookspecMarker, HookimplMarker
 
 if TYPE_CHECKING:
@@ -36,9 +35,51 @@ def idmtools_platform_pre_create_item(item: 'IEntity', kwargs) -> 'IEntity':
 
 
 @function_hook_spec
+def idmtools_platform_post_create_item(item: 'IEntity', kwargs) -> 'IEntity':
+    """
+    This callback is called by the post_create of each object type on a platform.
+    An item can be a suite, workitem, simulation, asset collection or an experiment.
+
+    Args:
+        item:
+        kwargs: extra args
+
+    Returns:
+        None
+    """
+    pass
+
+
+@function_hook_spec
+def idmtools_platform_post_run(item: 'IEntity', kwargs) -> 'IEntity':
+    """
+    This is called when item finishes calling the run on the server.
+
+    Args:
+        item:
+        kwargs: extra args
+
+    Returns:
+        None
+    """
+    pass
+
+
+@function_hook_spec
 def idmtools_on_start():
     """
     Execute on startup when idmtools is first imported.
+
+    Returns:
+        None
+    """
+    pass
+
+
+@function_hook_spec
+def idmtools_generate_id(item: 'IEntity') -> str:
+    """
+    Generates an id for an IItem.
 
     Returns:
         None

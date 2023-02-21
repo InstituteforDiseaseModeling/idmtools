@@ -6,11 +6,19 @@ import pytest
 from idmtools.analysis.download_analyzer import DownloadAnalyzer as SampleAnalyzer
 from idmtools.analysis.platform_anaylsis import PlatformAnalysis
 from idmtools.core.platform_factory import Platform
+from idmtools.config import IdmConfigParser
 
 
 @pytest.mark.smoke
 @pytest.mark.serial
 class TestPlatformAnalysis(TestCase):
+    def setUp(self):
+        super().setUp()
+        IdmConfigParser.clear_instance()
+
+    def tearDown(self):
+        super().tearDown()
+
     def test_basic_functionality(self):
         platform = Platform('Test')
         platform_analysis = PlatformAnalysis(platform=platform, experiment_ids=['3f46b433-1c8b-400f-a0df-f252c8a47329'], analyzers=[SampleAnalyzer])

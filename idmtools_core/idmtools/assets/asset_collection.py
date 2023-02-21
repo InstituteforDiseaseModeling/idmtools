@@ -9,7 +9,6 @@ from dataclasses import dataclass, field
 from logging import getLogger
 from os import PathLike
 from typing import List, NoReturn, TypeVar, Union, Any, Dict, TYPE_CHECKING
-from uuid import UUID
 from idmtools.assets import Asset, TAssetList
 from idmtools.assets import TAssetFilterList
 from idmtools.assets.errors import DuplicatedAssetError
@@ -63,7 +62,7 @@ class AssetCollection(IEntity):
         self.tags = self.tags or tags
 
     @classmethod
-    def from_id(cls, item_id: Union[str, UUID], platform: 'IPlatform' = None, as_copy: bool = False,  # noqa E821
+    def from_id(cls, item_id: str, platform: 'IPlatform' = None, as_copy: bool = False,  # noqa E821
                 **kwargs) -> 'AssetCollection':
         """
         Loads a AssetCollection from id.

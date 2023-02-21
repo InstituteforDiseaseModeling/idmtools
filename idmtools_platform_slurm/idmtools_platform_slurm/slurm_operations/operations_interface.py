@@ -7,7 +7,6 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Type, Union, Any
-from uuid import UUID
 
 from idmtools.core import ItemType
 from idmtools.core.interfaces.ientity import IEntity
@@ -34,7 +33,7 @@ class SlurmOperations(ABC):
         pass
 
     @abstractmethod
-    def mk_directory(self, item: IEntity) -> None:
+    def mk_directory(self, item: IEntity, exist_ok: bool = False) -> None:
         pass
 
     @abstractmethod
