@@ -12,6 +12,8 @@ from multiprocessing import cpu_count
 import diskcache
 from abc import ABCMeta
 
+from idmtools.core import IDMTOOLS_USER_HOME
+
 logger = logging.getLogger(__name__)
 
 
@@ -33,7 +35,7 @@ class IPersistenceService(metaclass=ABCMeta):
         import sqlite3
         from idmtools import IdmConfigParser
         cls.cache_directory = Path(
-            IdmConfigParser.get_option(option="cache_directory", fallback=Path.home().joinpath(".idmtools").joinpath("cache")))
+            IdmConfigParser.get_option(option="cache_directory", fallback=IDMTOOLS_USER_HOME.joinpath("cache")))
 
         # the more the cpus, the more likely we are to encounter a scaling issue. Let's try to scale with that up to
         # one second. above one second, we are introducing to much lag in processes

@@ -7,7 +7,6 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from logging import DEBUG
 from typing import Type, Any, List, Tuple, Dict, NoReturn, TYPE_CHECKING
-from uuid import UUID
 from idmtools.assets import Asset
 from idmtools.core import CacheEnabled, getLogger
 from idmtools.entities.iplatform_ops.utils import batch_create_items
@@ -29,7 +28,7 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
     platform_type: Type
 
     @abstractmethod
-    def get(self, workflow_item_id: UUID, **kwargs) -> Any:
+    def get(self, workflow_item_id: str, **kwargs) -> Any:
         """
         Returns the platform representation of an WorkflowItem.
 
@@ -87,6 +86,9 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
             NoReturn
         """
         if logger.isEnabledFor(DEBUG):
+            logger.debug("Calling idmtools_platform_post_create_item hooks")
+        FunctionPluginManager.instance().hook.idmtools_platform_post_create_item(item=workflow_item, kwargs=kwargs)
+        if logger.isEnabledFor(DEBUG):
             logger.debug("Calling post_creation")
         workflow_item.post_creation(self.platform)
 
@@ -122,7 +124,7 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
         return ret
 
     @abstractmethod
-    def platform_create(self, workflow_item: IWorkflowItem, **kwargs) -> Tuple[Any, UUID]:
+    def platform_create(self, workflow_item: IWorkflowItem, **kwargs) -> Tuple[Any, str]:
         """
         Creates an workflow_item from an IDMTools workflow_item object.
 
@@ -131,7 +133,7 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
             **kwargs: Optional arguments mainly for extensibility
 
         Returns:
-            Created platform item and the UUID of said item
+            Created platform item and the id of said item
         """
         pass
 
@@ -164,7 +166,9 @@ class IPlatformWorkflowItemOperations(CacheEnabled, ABC):
         Returns:
             None
         """
-        pass
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Calling idmtools_platform_post_run hooks")
+        FunctionPluginManager.instance().hook.idmtools_platform_post_run(item=workflow_item, kwargs=kwargs)
 
     def run_item(self, workflow_item: IWorkflowItem, **kwargs):
         """
