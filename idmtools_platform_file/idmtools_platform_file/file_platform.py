@@ -1,7 +1,16 @@
-from dataclasses import dataclass, field
-from pathlib import Path
-from typing import Union
+"""
+Here we implement the FilePlatform object.
 
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
+import os
+import shlex
+import shutil
+import subprocess
+from pathlib import Path
+from logging import getLogger
+from typing import Union, Any
+from dataclasses import dataclass, field
 from idmtools.core import ItemType
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
@@ -13,6 +22,8 @@ from idmtools_platform_file.platform_operations.experiment_operations import Fil
 from idmtools_platform_file.platform_operations.json_metadata_operations import JSONMetadataOperations
 from idmtools_platform_file.platform_operations.simulation_operations import FilePlatformSimulationOperations
 from idmtools_platform_file.platform_operations.suite_operations import FilePlatformSuiteOperations
+
+logger = getLogger(__name__)
 
 op_defaults = dict(default=None, compare=False, metadata={"pickle_ignore": True})
 
@@ -28,12 +39,10 @@ class FilePlatform(IPlatform):
     _experiments: FilePlatformExperimentOperations = field(**op_defaults, repr=False, init=False)
     _simulations: FilePlatformSimulationOperations = field(**op_defaults, repr=False, init=False)
     _assets: FilePlatformAssetCollectionOperations = field(**op_defaults, repr=False, init=False)
-
     _metas: JSONMetadataOperations = field(**op_defaults, repr=False, init=False)
 
     # Which batch script to use by default
     batch_template: str = field(default="batch.sh.jinja2")
-
     simulation_template: str = field(default="_run.sh.jinja2")
 
     def __post_init__(self):
@@ -166,3 +175,70 @@ class FilePlatform(IPlatform):
             generate_simulation_script(self, item, retries, template=self.simulation_template)
         else:
             raise NotImplementedError(f"{item.__class__.__name__} is not supported for batch creation.")
+
+    @staticmethod
+    def update_script_mode(script_path: Union[Path, str], mode: int = 0o777) -> None:
+        """
+        Change file mode.
+        Args:
+            script_path: script path
+            mode: permission mode
+        Returns:
+            None
+        """
+        script_path = Path(script_path)
+        script_path.chmod(mode)
+
+    def make_command_executable(self, simulation: Simulation) -> None:
+        """
+        Make simulation command executable
+        Args:
+            simulation: idmtools Simulation
+        Returns:
+            None
+        """
+        exe = simulation.task.command.executable
+        if exe == 'singularity':
+            # split the command
+            cmd = shlex.split(simulation.task.command.cmd.replace("\\", "/"))
+            # get real executable
+            exe = cmd[3]
+
+        sim_dir = self.get_directory(simulation)
+        exe_path = sim_dir.joinpath(exe)
+
+        # see if it is a file
+        if exe_path.exists():
+            exe = exe_path
+        elif shutil.which(exe) is not None:
+            exe = Path(shutil.which(exe))
+        else:
+            logger.debug(f"Failed to find executable: {exe}")
+            exe = None
+        try:
+            if exe and not os.access(exe, os.X_OK):
+                self.update_script_mode(exe)
+        except:
+            logger.debug(f"Failed to change file mode for executable: {exe}")
+
+    def submit_job(self, item: Union[Experiment, Simulation], **kwargs) -> Any:
+        """
+        Submit a File job.
+        Args:
+            item: idmtools Experiment or Simulation
+            kwargs: keyword arguments used to expand functionality
+        Returns:
+            Any
+        """
+        raise NotImplementedError("submit_job has not been implemented on the File Platform")
+
+        # if isinstance(item, Experiment):
+        #     working_directory = self.get_directory(item)
+        #     result = subprocess.run(['sbatch', '--parsable', 'sbatch.sh'], stdout=subprocess.PIPE,
+        #                             cwd=str(working_directory))
+        #     slurm_job_id = result.stdout.decode('utf-8').strip().split(';')[0]
+        #     return slurm_job_id
+        # elif isinstance(item, Simulation):
+        #     pass
+        # else:
+        #     raise NotImplementedError(f"Submit job is not implemented on SlurmPlatform.")

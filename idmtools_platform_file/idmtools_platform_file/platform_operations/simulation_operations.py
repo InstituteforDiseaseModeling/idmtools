@@ -42,6 +42,7 @@ class FilePlatformSimulationOperations(IPlatformSimulationOperations):
         if len(metas) > 0:
             # update status - data analysis may need this
             file_sim = FileSimulation(metas[0])
+            # file_sim.status = self.platform.get_simulation_status(file_sim.id)
             return file_sim
         else:
             raise RuntimeError(f"Not found Simulation with id '{simulation_id}'")
@@ -61,14 +62,16 @@ class FilePlatformSimulationOperations(IPlatformSimulationOperations):
 
         # Generate Simulation folder structure
         self.platform.mk_directory(simulation)
-        self.platform._metas.dump(simulation)
+        meta = self.platform._metas.dump(simulation)
         self.platform._assets.link_common_assets(simulation)
         self.platform._assets.dump_assets(simulation)
         self.platform.create_batch_file(simulation, **kwargs)
 
+        # Make command executable
+        self.platform.make_command_executable(simulation)
+
         # Return File Simulation
-        metas = self.platform._metas.get(simulation)
-        file_sim = FileSimulation(metas)
+        file_sim = FileSimulation(meta)
         return file_sim
 
     def get_parent(self, simulation: FileSimulation, **kwargs) -> FileExperiment:

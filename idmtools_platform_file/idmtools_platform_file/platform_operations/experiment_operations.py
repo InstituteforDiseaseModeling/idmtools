@@ -26,7 +26,7 @@ if TYPE_CHECKING:
 @dataclass
 class FilePlatformExperimentOperations(IPlatformExperimentOperations):
     platform: 'FilePlatform'  # noqa: F821
-    platform_type: Type = field(default=FilePlatform)
+    platform_type: Type = field(default=FileExperiment)
 
     def get(self, experiment_id: Union[str, UUID], **kwargs) -> Dict:
         """
@@ -64,7 +64,7 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
             experiment.uid = uuid4()
         # Generate Suite/Experiment/Simulation folder structure
         self.platform.mk_directory(experiment)
-        self.platform._metas.dump(experiment)
+        meta = self.platform._metas.dump(experiment)
         self.platform._assets.dump_assets(experiment)
         self.platform.create_batch_file(experiment, **kwargs)
 
@@ -73,8 +73,10 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         dest_script = Path(self.platform.get_directory(experiment)).joinpath('run_simulation.sh')
         shutil.copy(str(run_simulation_script), str(dest_script))
 
+        # Make executable
+        self.platform.update_script_mode(dest_script)
+
         # Return File Experiment
-        meta = self.platform._metas.get(experiment)
         return FileExperiment(meta)
 
     def get_children(self, experiment: FileExperiment, parent: Experiment = None, raw=True, **kwargs) -> List[Any]:
@@ -92,6 +94,7 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         sim_meta_list = self.platform._metas.get_children(parent)
         for meta in sim_meta_list:
             file_sim = FileSimulation(meta)
+            # file_sim.status = self.platform._op_client.get_simulation_status(file_sim.id)
             if raw:
                 sim_list.append(file_sim)
             else:
@@ -127,6 +130,12 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         self.platform._metas.dump(experiment.parent)
         # Generate/update metadata
         self.platform._metas.dump(experiment)
+        # Commission
+        dry_run = kwargs.get('dry_run', False)
+        if not dry_run:
+            self.platform.submit_job(experiment, **kwargs)
+        else:
+            pass
         suite_id = experiment.parent_id or experiment.suite_id
 
         user_logger.info(f'job_directory: {Path(self.platform.job_directory).resolve()}')

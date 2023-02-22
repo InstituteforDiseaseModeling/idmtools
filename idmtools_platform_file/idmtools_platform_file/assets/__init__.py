@@ -24,7 +24,8 @@ def generate_script(platform: 'FilePlatform', experiment: Experiment,
     """
     template_vars=dict()
 
-    with open(template) as file_:
+    # with open(template) as file_:     # TODO: take input template
+    with open(DEFAULT_TEMPLATE_FILE) as file_:
         t = Template(file_.read())
 
     # Write our file
@@ -45,7 +46,8 @@ def generate_simulation_script(platform: 'FilePlatform', simulation, retries: Op
     """
     sim_script = platform.get_directory(simulation).joinpath("_run.sh")
     with open(sim_script, "w") as tout:
-        with open(template) as tin:
+        # with open(template) as tin:         # TODO: take input template
+        with open(DEFAULT_SIMULATION_TEMPLATE) as tin:
             t = Template(tin.read())
             tvars = dict(
                 platform=platform,

@@ -9,6 +9,7 @@
 - [Overview](#overview)
 - [Installing](#installing)
 - [Development Tips](#development-tips)
+- [Future Work](#future-work)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
