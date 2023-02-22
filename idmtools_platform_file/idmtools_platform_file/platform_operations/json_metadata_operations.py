@@ -13,7 +13,7 @@ from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.utils.json import IDMJSONEncoder
-from idmtools_platform_file.utils import FileSuite, FileExperiment, FileSimulation
+from idmtools_platform_file.utils import FileSuite, FileExperiment
 
 if TYPE_CHECKING:
     from idmtools_platform_file.file_platform import FilePlatform
@@ -21,6 +21,9 @@ if TYPE_CHECKING:
 
 @dataclass
 class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
+    """
+    JSON operations used in File Platform.
+    """
     platform: 'FilePlatform'  # noqa: F821
     platform_type: Type = field(default=None)
     metadata_filename: str = field(default='metadata.json')
@@ -63,7 +66,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
             item's metadata file path
         """
         if not isinstance(item, (Suite, Experiment, Simulation)):
-            raise RuntimeError(f"get_metadata_filepath method supports Suite/Experiment/Simulation only.")
+            raise RuntimeError("get_metadata_filepath method supports Suite/Experiment/Simulation only.")
         item_dir = self.platform.get_directory(item)
         filepath = Path(item_dir, self.metadata_filename)
         return filepath
@@ -77,7 +80,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
              key/value dict of metadata from the given item
         """
         if not isinstance(item, (Suite, Experiment, Simulation)):
-            raise RuntimeError(f"Get method supports Suite/Experiment/Simulation only.")
+            raise RuntimeError("Get method supports Suite/Experiment/Simulation only.")
         data = item.to_dict()
         if isinstance(item, Suite):
             data.pop('experiments', None)
@@ -96,7 +99,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
             None
         """
         if not isinstance(item, (Suite, Experiment, Simulation)):
-            raise RuntimeError(f"Dump method supports Suite/Experiment/Simulation only.")
+            raise RuntimeError("Dump method supports Suite/Experiment/Simulation only.")
         dest = self.get_metadata_filepath(item)
         meta = self.get(item)
         self._write_to_file(dest, meta)
@@ -111,7 +114,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
              key/value dict of metadata from the given item
         """
         if not isinstance(item, (Suite, Experiment, Simulation)):
-            raise RuntimeError(f"Load method supports Suite/Experiment/Simulation only.")
+            raise RuntimeError("Load method supports Suite/Experiment/Simulation only.")
         meta_file = self.get_metadata_filepath(item)
         meta = self._read_from_file(meta_file)
         return meta
@@ -142,7 +145,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         if metadata is None:
             metadata = {}
         if not isinstance(item, (Suite, Experiment, Simulation)):
-            raise RuntimeError(f"Set method supports Suite/Experiment/Simulation only.")
+            raise RuntimeError("Set method supports Suite/Experiment/Simulation only.")
         meta = metadata
         if not replace:
             meta = self.load(item)
@@ -159,7 +162,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
             None
         """
         if not isinstance(item, (Suite, Experiment, Simulation)):
-            raise RuntimeError(f"Clear method supports Suite/Experiment/Simulation only.")
+            raise RuntimeError("Clear method supports Suite/Experiment/Simulation only.")
         self.update(item=item, metadata={}, replace=True)
 
     def get_children(self, item: Union[Suite, Experiment]) -> List[Dict]:
@@ -171,7 +174,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
             Lis of metadata
         """
         if not isinstance(item, (Suite, FileSuite, Experiment, FileExperiment)):
-            raise RuntimeError(f"Get children method supports [File]Suite and [File]Experiment only.")
+            raise RuntimeError("Get children method supports [File]Suite and [File]Experiment only.")
         item_list = []
         item_dir = self.platform.get_directory_by_id(item.id, item.item_type)
         pattern = f'*/{self.metadata_filename}'
