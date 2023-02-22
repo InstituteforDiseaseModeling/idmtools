@@ -9,6 +9,6 @@ echo "Installing custom packages"
 
 {% for package in packages %}
     echo "Installing {{ package }}"
-    pip install {{ package }} --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+    pip install {{ package }} --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple --upgrade
 {% endfor %}
 $@

@@ -1,9 +1,9 @@
+
 import tempfile
 from pathlib import Path
 from typing import List
 from jinja2 import Environment, FileSystemLoader
-from examples.ssmt.simple_analysis.analyzers.AdultVectorsAnalyzer import AdultVectorsAnalyzer
-from examples.ssmt.simple_analysis.analyzers.PopulationAnalyzer import PopulationAnalyzer
+from examples.ssmt.ssmt_with_custom_packages.NewInfectionsAnalyzer import NewInfectionsAnalyzer
 from idmtools.core.platform_factory import Platform
 from idmtools.analysis.platform_anaylsis import PlatformAnalysis
 
@@ -18,12 +18,12 @@ def write_wrapper_script(list_of_packages: List[str]):
 
 
 if __name__ == "__main__":
-    platform = Platform('BELEGOST')
+    platform = Platform('Calculon')
     analysis = PlatformAnalysis(
-        platform=platform, experiment_ids=["b716f387-cb04-eb11-a2c7-c4346bcb1553"],
-        analyzers=[PopulationAnalyzer, AdultVectorsAnalyzer], analyzers_args=[{'title': 'idm'}, {'name': 'global good'}],
-        analysis_name="SSMT Analysis Simple 1",
-        wrapper_shell_script=write_wrapper_script(['networkx']),
+        platform=platform, experiment_ids=["d66a72ee-74a9-ed11-aa02-b88303911bc1"],
+        analyzers=[NewInfectionsAnalyzer], #analyzers_args=[{'name': 'plot new infections'}],
+        analysis_name="Example to use extra packages",
+        wrapper_shell_script=write_wrapper_script(['kaleido', 'plotly']),
         # You can pass any additional arguments needed to AnalyzerManager through the extra_args parameter
         extra_args=dict(max_workers=8)
     )
