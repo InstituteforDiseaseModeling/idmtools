@@ -7,7 +7,7 @@ from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.suite import Suite
-from idmtools_platform_slurm.platform_operations.json_metadata_operations import JSONMetadataOperations
+from idmtools_platform_file.platform_operations.json_metadata_operations import JSONMetadataOperations
 
 
 class JSONMetadataOperationsTest(unittest.TestCase):
