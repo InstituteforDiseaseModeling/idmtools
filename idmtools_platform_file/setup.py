@@ -49,5 +49,5 @@ idmtools_platform_file = idmtools_platform_file.plugin_info:FilePlatformSpecific
 """,
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='1.7.5'
+    version='1.7.5+nightly'
 )
