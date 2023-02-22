@@ -71,7 +71,7 @@ class TestPythonSimulation(ITestWithPersistence):
 
     def test_sweeping_and_local_folders_creation(self):
         experiment = self.create_experiment(self.platform, a=3, b=3)
-        experiment_dir = self.platform._op_client.get_directory(experiment)
+        experiment_dir = self.platform.get_directory(experiment)
         files = []
         for (dirpath, dirnames, filenames) in os.walk(experiment_dir):
             files.extend(filenames)
@@ -82,7 +82,7 @@ class TestPythonSimulation(ITestWithPersistence):
         self.assertEqual(experiment.simulation_count, 9)
         count = 0
         for simulation in experiment.simulations:
-            simulation_dir = self.platform._op_client.get_directory(simulation)
+            simulation_dir = self.platform.get_directory(simulation)
             asserts_dir = simulation_dir.joinpath("Assets")
             files = []
             for (dirpath, dirnames, filenames) in os.walk(simulation_dir):
@@ -99,7 +99,7 @@ class TestPythonSimulation(ITestWithPersistence):
     def test_scripts(self):
         platform = Platform('SLURM_LOCAL', job_directory=self.job_directory, max_running_jobs=8, retries=5)
         experiment = self.create_experiment(platform=platform, a=5, b=5)
-        experiment_dir = self.platform._op_client.get_directory(experiment)
+        experiment_dir = self.platform.get_directory(experiment)
         # verify sbatch.sh script content in experiment level
         with open(os.path.join(experiment_dir, 'sbatch.sh'), 'r') as fpr:
             contents = fpr.read()
@@ -120,7 +120,7 @@ class TestPythonSimulation(ITestWithPersistence):
         simulation_ids = []
         for simulation in experiment.simulations:
             simulation_ids.append(simulation.id)
-            simulation_dir = platform._op_client.get_directory(simulation)
+            simulation_dir = platform.get_directory(simulation)
             with open(os.path.join(simulation_dir, '_run.sh'), 'r') as fpr:
                 contents = fpr.read()
             self.assertIn("until [ \"$n\" -ge 5 ]", contents)  # 5 here is from retries=5 in platform
@@ -128,7 +128,7 @@ class TestPythonSimulation(ITestWithPersistence):
 
         # verify ids in metadata.json  for suite
         suite = experiment.suite
-        suite_dir = platform._op_client.get_directory(suite)
+        suite_dir = platform.get_directory(suite)
         with open(os.path.join(suite_dir, 'metadata.json'), 'r') as j:
             contents = json.loads(j.read())
             self.assertEqual(contents['_uid'], suite.id)
@@ -141,7 +141,7 @@ class TestPythonSimulation(ITestWithPersistence):
 
         # verify ids in metadata.json for simulation, also verify sweep parameter in config.json file
         for simulation in experiment.simulations:
-            simulation_dir = platform._op_client.get_directory(simulation)
+            simulation_dir = platform.get_directory(simulation)
             with open(os.path.join(simulation_dir, 'metadata.json'), 'r') as j:
                 contents = json.loads(j.read())
                 self.assertEqual(contents['_uid'], simulation.id)
@@ -154,12 +154,12 @@ class TestPythonSimulation(ITestWithPersistence):
     @pytest.mark.skip("unskip this line when doing real run in local")
     def test_std_status_jobid_files(self):
         experiment = self.create_experiment(self.platform, a=3, b=3, wait_until_done=True, dry_run=False)
-        experiment_dir = self.platform._op_client.get_directory(experiment)
+        experiment_dir = self.platform.get_directory(experiment)
         self.assertTrue(os.path.exists(os.path.join(experiment_dir, "job_id.txt")))
         job_id = open(os.path.join(experiment_dir, 'job_id.txt'), 'r').read().strip()
         self.assertTrue(len(job_id) > 0)
         for simulation in experiment.simulations:
-            simulation_dir = self.platform._op_client.get_directory(simulation)
+            simulation_dir = self.platform.get_directory(simulation)
             status_file = os.path.join(simulation_dir, "job_status.txt")
             self.assertTrue(os.path.exists(status_file))
             status = open(status_file, 'r').read().strip()

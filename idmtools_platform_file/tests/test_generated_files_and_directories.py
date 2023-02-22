@@ -210,12 +210,11 @@ class TestFilesAndDirectories(ITestWithPersistence):
         sims_df = pd.DataFrame()
         for sim in experiment.simulations:
             sim_map = self.platform.create_sim_directory_map(sim.id, item_type=ItemType.SIMULATION)
-            sim_df = pd.DataFrame()
             sim_tags = sim.tags
-            sim_df = sim_df.append(sim_tags, ignore_index=True)
+            sim_df = pd.DataFrame(sim_tags, index=[0])
             sim_df['simid'] = sim.id
             sim_df['outpath'] = sim_map[sim.id]
-            sims_df = sims_df.append(sim_df, ignore_index=True)
+            sims_df = pd.concat([sims_df, sim_df], ignore_index=True)
         self.assertTrue(np.all(exp_df.sort_values('simid').values == sims_df.sort_values('simid').values))
         self.assertTrue(exp_df.shape == (9, 6))
 
