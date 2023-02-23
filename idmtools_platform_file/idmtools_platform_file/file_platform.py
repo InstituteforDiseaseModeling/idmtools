@@ -243,12 +243,12 @@ class FilePlatform(IPlatform):
             working_directory = self.get_directory(item)
             result = subprocess.run(['bash', 'batch.sh'], stdout=subprocess.PIPE,
                                     cwd=str(working_directory))
-            r = result.stdout.decode('utf-8').strip().split(';')[0]
+            r = result.stdout.decode('utf-8').strip()
             return r
         elif isinstance(item, Simulation):
-            pass
+            raise NotImplementedError("submit_job directly for simulation is not implemented on FilePlatform.")
         else:
-            raise NotImplementedError("Submit job is not implemented on SlurmPlatform.")
+            raise NotImplementedError(f"Submit job is not implemented for {item.__class__.__name__} on FilePlatform.")
 
     def get_simulation_status(self, sim_id: str, **kwargs) -> EntityStatus:
         """
