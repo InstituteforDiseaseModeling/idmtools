@@ -1,4 +1,7 @@
 #!/bin/bash
 
-MAX_JOBS=4
-find $(pwd) -maxdepth 1 -name "_run.sh" | xargs -P $MAX_JOBS -I {} bash {} &
+{% if run_sequence is defined and run_sequence %}
+    find $(pwd) -maxdepth 2 -name "_run.sh" -print0 | xargs -0 -I% dirname % | xargs -d "\n" -I% bash -c 'cd $(pwd) && $(pwd)/run_simulation.sh %  1>> stdout.txt 2>> stderr.txt'
+{% else %}
+    find $(pwd) -maxdepth 2 -name "_run.sh" -print0 | xargs -0 -I% dirname % | xargs -d "\n" -P {{ max_job }} -I% bash -c 'cd $(pwd) && $(pwd)/run_simulation.sh %  1>> stdout.txt 2>> stderr.txt'
+{% endif %}

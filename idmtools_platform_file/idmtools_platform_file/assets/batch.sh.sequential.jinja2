@@ -1,5 +1,11 @@
 #!/bin/bash
 
-for file in $(find $(pwd) -maxdepth 1 -name "_run.sh");do
+for file in $(find $(pwd) -maxdepth 2 -name "_run.sh");do
+echo $file
+DIR="$( dirname "$file" )"
+echo $DIR
+cd $DIR
 bash $file;
 done
+
+## find $(pwd) -maxdepth 2 -name "_run_test.sh" -print0 | xargs -0 -I% dirname % | xargs -d "\n" -I% -exec sh -c 'cd % && bash %/_run.sh'

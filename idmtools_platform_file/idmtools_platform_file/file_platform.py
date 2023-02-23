@@ -11,11 +11,12 @@ from pathlib import Path
 from logging import getLogger
 from typing import Union, Any
 from dataclasses import dataclass, field
-from idmtools.core import ItemType
+from idmtools.core import ItemType, EntityStatus
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
-from idmtools.entities.iplatform import IPlatform
 from idmtools.entities.simulation import Simulation
+from idmtools.entities.iplatform import IPlatform
+from idmtools_platform_file.utils import FILE_MAPS
 from idmtools_platform_file.assets import generate_script, generate_simulation_script
 from idmtools_platform_file.platform_operations.asset_collection_operations import FilePlatformAssetCollectionOperations
 from idmtools_platform_file.platform_operations.experiment_operations import FilePlatformExperimentOperations
@@ -30,20 +31,21 @@ op_defaults = dict(default=None, compare=False, metadata={"pickle_ignore": True}
 
 @dataclass(repr=False)
 class FilePlatform(IPlatform):
+    """
+    File Platform definition.
+    """
     job_directory: str = field(default=None)
+    max_job: int = field(default=4)
+    run_sequence: bool = field(default=True)
 
     # Default retries for jobs
-    retries: int = field(default=1, metadata=dict(sbatch=False))
+    retries: int = field(default=1)
 
     _suites: FilePlatformSuiteOperations = field(**op_defaults, repr=False, init=False)
     _experiments: FilePlatformExperimentOperations = field(**op_defaults, repr=False, init=False)
     _simulations: FilePlatformSimulationOperations = field(**op_defaults, repr=False, init=False)
     _assets: FilePlatformAssetCollectionOperations = field(**op_defaults, repr=False, init=False)
     _metas: JSONMetadataOperations = field(**op_defaults, repr=False, init=False)
-
-    # Which batch script to use by default
-    batch_template: str = field(default="batch.sh.jinja2")
-    simulation_template: str = field(default="_run.sh.jinja2")
 
     def __post_init__(self):
         self.__init_interfaces()
@@ -60,6 +62,10 @@ class FilePlatform(IPlatform):
         self._metas = JSONMetadataOperations(platform=self)
 
     def post_setstate(self):
+        """
+        Utility function.
+        Returns: None
+        """
         self.__init_interfaces()
 
     def get_directory(self, item: Union[Suite, Experiment, Simulation]) -> Path:
@@ -169,10 +175,9 @@ class FilePlatform(IPlatform):
             None
         """
         if isinstance(item, Experiment):
-            generate_script(self, item, template=self.batch_template)
+            generate_script(self, item, **kwargs)
         elif isinstance(item, Simulation):
-            retries = kwargs.get('retries', None)
-            generate_simulation_script(self, item, retries, template=self.simulation_template)
+            generate_simulation_script(self, item, **kwargs)
         else:
             raise NotImplementedError(f"{item.__class__.__name__} is not supported for batch creation.")
 
@@ -191,7 +196,7 @@ class FilePlatform(IPlatform):
 
     def make_command_executable(self, simulation: Simulation) -> None:
         """
-        Make simulation command executable
+        Make simulation command executable.
         Args:
             simulation: idmtools Simulation
         Returns:
@@ -230,15 +235,39 @@ class FilePlatform(IPlatform):
         Returns:
             Any
         """
-        raise NotImplementedError("submit_job has not been implemented on the File Platform")
+        # raise NotImplementedError("submit_job has not been implemented on the File Platform")
 
-        # if isinstance(item, Experiment):
-        #     working_directory = self.get_directory(item)
-        #     result = subprocess.run(['sbatch', '--parsable', 'sbatch.sh'], stdout=subprocess.PIPE,
-        #                             cwd=str(working_directory))
-        #     slurm_job_id = result.stdout.decode('utf-8').strip().split(';')[0]
-        #     return slurm_job_id
-        # elif isinstance(item, Simulation):
-        #     pass
-        # else:
-        #     raise NotImplementedError(f"Submit job is not implemented on SlurmPlatform.")
+        if isinstance(item, Experiment):
+            working_directory = self.get_directory(item)
+            result = subprocess.run(['bash', 'batch.sh'], stdout=subprocess.PIPE,
+                                    cwd=str(working_directory))
+            r = result.stdout.decode('utf-8').strip().split(';')[0]
+            return r
+        elif isinstance(item, Simulation):
+            pass
+        else:
+            raise NotImplementedError("Submit job is not implemented on SlurmPlatform.")
+
+    def get_simulation_status(self, sim_id: str, **kwargs) -> EntityStatus:
+        """
+        Retrieve simulation status.
+        Args:
+            sim_id: Simulation ID
+            kwargs: keyword arguments used to expand functionality
+        Returns:
+            EntityStatus
+        """
+        sim_dir = self.get_directory_by_id(sim_id, ItemType.SIMULATION)
+
+        # Check process status
+        job_status_path = sim_dir.joinpath('job_status.txt')
+        if job_status_path.exists():
+            status = open(job_status_path).read().strip()
+            if status in ['100', '0', '-1']:
+                status = FILE_MAPS[status]
+            else:
+                status = FILE_MAPS['100']  # To be safe
+        else:
+            status = FILE_MAPS['None']
+
+        return status
