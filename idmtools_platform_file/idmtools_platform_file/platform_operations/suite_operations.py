@@ -189,7 +189,3 @@ class FilePlatformSuiteOperations(IPlatformSuiteOperations):
             None
         """
         pass
-        # suite = self.platform.get_item(suite_id, ItemType.SUITE, raw=False)
-        # logger.debug(f"cancel file job for suite: {suite_id}...")
-        # for exp in suite.experiments:
-        #     self.platform._experiments.platform_cancel(exp.id, force)

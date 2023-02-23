@@ -271,19 +271,6 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
             Any
         """
         pass
-        # experiment = self.platform.get_item(experiment_id, ItemType.EXPERIMENT, raw=False)
-        # if force or experiment.status == EntityStatus.RUNNING:
-        #     logger.debug(f"cancel slurm job for experiment: {experiment_id}...")
-        #     job_id = self.platform.get_job_id(experiment_id, ItemType.EXPERIMENT)
-        #     if job_id is None:
-        #         logger.debug(f"File job for experiment: {experiment_id} is not available!")
-        #         return
-        #     else:
-        #         result = self.platform.cancel_job(job_id)
-        #         user_logger.info(result)
-        #         return result
-        # else:
-        #     user_logger.info(f"Experiment {experiment_id} is not running, no cancel needed...")
 
     def post_run_item(self, experiment: Experiment, dry_run: bool = False, **kwargs):
         """

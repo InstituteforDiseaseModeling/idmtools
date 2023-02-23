@@ -210,16 +210,3 @@ class FilePlatformSimulationOperations(IPlatformSimulationOperations):
             Any
         """
         pass
-        # sim = self.platform.get_item(sim_id, ItemType.SIMULATION, raw=False)
-        # if force or sim.status == EntityStatus.RUNNING:
-        #     logger.debug(f"cancel slurm job for simulation: {sim_id}...")
-        #     job_id = self.platform.get_job_id(sim_id, ItemType.SIMULATION)
-        #     if job_id is None:
-        #         logger.debug(f"File job for simulation: {sim_id} is not available!")
-        #         return
-        #     else:
-        #         result = self.platform.cancel_job(job_id)
-        #         user_logger.info(result)
-        #         return result
-        # else:
-        #     user_logger.info(f"Simulation {sim_id} is not running, no cancel needed...")
