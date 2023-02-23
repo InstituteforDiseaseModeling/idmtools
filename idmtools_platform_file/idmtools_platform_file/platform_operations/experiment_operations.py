@@ -118,11 +118,12 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         else:
             return self.platform._suites.get(experiment.parent_id, raw=True, **kwargs)
 
-    def platform_run_item(self, experiment: Experiment, **kwargs):
+    def platform_run_item(self, experiment: Experiment, dry_run: bool = False, **kwargs):
         """
         Run experiment.
         Args:
             experiment: idmtools Experiment
+            dry_run: True/False
             kwargs: keyword arguments used to expand functionality
         Returns:
             None
@@ -133,8 +134,11 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         # Generate/update metadata
         self.platform._metas.dump(experiment)
         # Commission
-        dry_run = kwargs.get('dry_run', False)
         if not dry_run:
+            if platform.system() in ["Windows"]:
+                user_logger.warning(
+                    "\n/!\\ WARNING: The current FilePlatform only support running Experiment/Simulation on Linux!")
+                exit(-1)
             self.platform.submit_job(experiment, **kwargs)
         else:
             pass
@@ -281,25 +285,25 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         # else:
         #     user_logger.info(f"Experiment {experiment_id} is not running, no cancel needed...")
 
-    def post_run_item(self, experiment: Experiment, **kwargs):
+    def post_run_item(self, experiment: Experiment, dry_run: bool = False, **kwargs):
         """
         Trigger right after commissioning experiment on platform.
 
         Args:
             experiment: Experiment just commissioned
+            dry_run: True/False
             kwargs: keyword arguments used to expand functionality
         Returns:
             None
         """
         super().post_run_item(experiment)
 
-        dry_run = kwargs.get('dry_run', False)
+        # dry_run = kwargs.get('dry_run', False)
         if not dry_run:
             if platform.system() in ["Windows"]:
-                user_logger.warning(
-                    "\n/!\\ WARNING: The current FilePlatform only support running Experiment/Simulation on Linux!")
-                exit(-1)
+                pass  # handled this case in platform_run_item
             else:
+                # TODO:
                 # user_logger.info(
                 #     f'\nYou can try the following command to check simulation running status: \n  idmtools file {os.path.abspath(self.platform.job_directory)} status f{experiment.id}')
                 pass
