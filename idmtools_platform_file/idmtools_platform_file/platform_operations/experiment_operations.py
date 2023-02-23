@@ -8,7 +8,7 @@ import shutil
 import platform
 from pathlib import Path
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, List, Type, Dict, Optional, Any, Union
+from typing import TYPE_CHECKING, List, Type, Dict, Optional, Any
 from idmtools.assets import Asset, AssetCollection
 from idmtools.core import ItemType
 from idmtools.entities import Suite
@@ -267,6 +267,19 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
             Any
         """
         pass
+        # experiment = self.platform.get_item(experiment_id, ItemType.EXPERIMENT, raw=False)
+        # if force or experiment.status == EntityStatus.RUNNING:
+        #     logger.debug(f"cancel slurm job for experiment: {experiment_id}...")
+        #     job_id = self.platform.get_job_id(experiment_id, ItemType.EXPERIMENT)
+        #     if job_id is None:
+        #         logger.debug(f"File job for experiment: {experiment_id} is not available!")
+        #         return
+        #     else:
+        #         result = self.platform.cancel_job(job_id)
+        #         user_logger.info(result)
+        #         return result
+        # else:
+        #     user_logger.info(f"Experiment {experiment_id} is not running, no cancel needed...")
 
     def post_run_item(self, experiment: Experiment, **kwargs):
         """
@@ -287,7 +300,8 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
                     "\n/!\\ WARNING: The current FilePlatform only support running Experiment/Simulation on Linux!")
                 exit(-1)
             else:
-                user_logger.info(
-                    f'\nYou can try the following command to check simulation running status: \n  idmtools file {os.path.abspath(self.platform.job_directory)} status f{experiment.id}')
+                # user_logger.info(
+                #     f'\nYou can try the following command to check simulation running status: \n  idmtools file {os.path.abspath(self.platform.job_directory)} status f{experiment.id}')
+                pass
         else:
             user_logger.warning("\nYou are running with dry_true=True")

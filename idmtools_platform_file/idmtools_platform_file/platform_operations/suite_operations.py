@@ -5,7 +5,7 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import shutil
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, List, Type, Dict, Tuple, Union
+from typing import TYPE_CHECKING, Any, List, Type, Dict, Tuple
 from logging import getLogger
 from idmtools.core import ItemType
 from idmtools.entities import Suite
@@ -189,3 +189,7 @@ class FilePlatformSuiteOperations(IPlatformSuiteOperations):
             None
         """
         pass
+        # suite = self.platform.get_item(suite_id, ItemType.SUITE, raw=False)
+        # logger.debug(f"cancel file job for suite: {suite_id}...")
+        # for exp in suite.experiments:
+        #     self.platform._experiments.platform_cancel(exp.id, force)
