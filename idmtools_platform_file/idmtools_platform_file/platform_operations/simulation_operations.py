@@ -4,7 +4,6 @@ Here we implement the FilePlatform simulation operations.
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import shutil
-from uuid import UUID, uuid4
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, List, Dict, Type, Optional, Union, Any
 from idmtools.assets import Asset
@@ -26,10 +25,13 @@ logger = getLogger(__name__)
 
 @dataclass
 class FilePlatformSimulationOperations(IPlatformSimulationOperations):
+    """
+    Simulation Operation for File Platform.
+    """
     platform: 'FilePlatform'  # noqa: F821
     platform_type: Type = field(default=FileSimulation)
 
-    def get(self, simulation_id: Union[str, UUID], **kwargs) -> Dict:
+    def get(self, simulation_id: str, **kwargs) -> Dict:
         """
         Gets a simulation from the File platform.
         Args:
@@ -42,7 +44,7 @@ class FilePlatformSimulationOperations(IPlatformSimulationOperations):
         if len(metas) > 0:
             # update status - data analysis may need this
             file_sim = FileSimulation(metas[0])
-            # file_sim.status = self.platform.get_simulation_status(file_sim.id)
+            file_sim.status = self.platform.get_simulation_status(file_sim.id)
             return file_sim
         else:
             raise RuntimeError(f"Not found Simulation with id '{simulation_id}'")
@@ -56,8 +58,6 @@ class FilePlatformSimulationOperations(IPlatformSimulationOperations):
         Returns:
             File Simulation object created.
         """
-        if not isinstance(simulation.uid, UUID):
-            simulation.uid = uuid4()
         simulation.name = clean_experiment_name(simulation.experiment.name if not simulation.name else simulation.name)
 
         # Generate Simulation folder structure
@@ -90,7 +90,7 @@ class FilePlatformSimulationOperations(IPlatformSimulationOperations):
 
     def platform_run_item(self, simulation: Simulation, **kwargs):
         """
-        For simulations on file, we let the experiment execute with sbatch
+        For simulations on file, we let the experiment execute with batch.
         Args:
             simulation: idmtools Simulation
             kwargs: keyword arguments used to expand functionality
@@ -151,7 +151,7 @@ class FilePlatformSimulationOperations(IPlatformSimulationOperations):
             parent = self.platform.get_item(file_sim.parent_id, ItemType.EXPERIMENT, force=True)
         sim = Simulation(task=None)
         sim.platform = self.platform
-        sim.uid = UUID(file_sim.uid)
+        sim.uid = file_sim.uid
         sim.name = file_sim.name
         sim.parent_id = parent.id
         sim.parent = parent

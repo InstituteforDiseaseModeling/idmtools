@@ -4,7 +4,6 @@ Here we implement the FilePlatform suite operations.
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import shutil
-from uuid import UUID, uuid4
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, List, Type, Dict, Tuple, Union
 from logging import getLogger
@@ -28,7 +27,7 @@ class FilePlatformSuiteOperations(IPlatformSuiteOperations):
     platform: 'FilePlatform'  # noqa F821
     platform_type: Type = field(default=FileSuite)
 
-    def get(self, suite_id: Union[str, UUID], **kwargs) -> Dict:
+    def get(self, suite_id: str, **kwargs) -> Dict:
         """
         Get a suite from the File platform.
         Args:
@@ -52,8 +51,6 @@ class FilePlatformSuiteOperations(IPlatformSuiteOperations):
         Returns:
             File Suite object created
         """
-        if not isinstance(suite.uid, UUID):
-            suite.uid = uuid4()
         # Generate Suite folder structure
         self.platform.mk_directory(suite)
         meta = self.platform._metas.dump(suite)
@@ -66,7 +63,8 @@ class FilePlatformSuiteOperations(IPlatformSuiteOperations):
         """
         Called during commissioning of an item. This should perform what is needed to commission job on platform.
         Args:
-            suite:
+            suite: Suite
+            kwargs: keyword arguments used to expand functionality
         Returns:
             None
         """
@@ -118,7 +116,7 @@ class FilePlatformSuiteOperations(IPlatformSuiteOperations):
         """
         suite = Suite()
         suite.platform = self.platform
-        suite.uid = UUID(file_suite.uid)
+        suite.uid = file_suite.uid
         suite.name = file_suite.name
         suite.parent = None
         suite.tags = file_suite.tags
@@ -138,9 +136,8 @@ class FilePlatformSuiteOperations(IPlatformSuiteOperations):
         Returns:
             None
         """
-        # for experiment in suite.experiments:
-        #     self.platform.refresh_status(experiment, **kwargs)
-        pass
+        for experiment in suite.experiments:
+            self.platform.refresh_status(experiment, **kwargs)
 
     def create_sim_directory_map(self, suite_id: str) -> Dict:
         """
