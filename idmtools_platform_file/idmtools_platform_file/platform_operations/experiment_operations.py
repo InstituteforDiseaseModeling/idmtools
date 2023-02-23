@@ -3,7 +3,6 @@ Here we implement the FilePlatform experiment operations.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
-import os
 import shutil
 import platform
 from pathlib import Path
