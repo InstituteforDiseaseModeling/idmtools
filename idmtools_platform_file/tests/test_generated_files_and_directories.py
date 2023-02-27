@@ -117,15 +117,15 @@ class TestFilesAndDirectories(ITestWithPersistence):
         # verify sbatch.sh script content in experiment level
         with open(os.path.join(experiment_dir, 'batch.sh'), 'r') as fpr:
             contents = fpr.read()
-        self.assertIn('find $(pwd) -maxdepth 1 -name "_run.sh" | xargs -P $MAX_JOBS -I {} bash {} &', contents)  # 25=a*b=5*5, 8=max_running_jobs
-        self.assertIn("MAX_JOBS=4", contents)
+        self.assertIn(
+            'find $(pwd) -maxdepth 2 -name "_run.sh" -print0 | xargs -0 -I% dirname % | xargs -d "\\n" -I% bash -c \'cd $(pwd) && $(pwd)/run_simulation.sh %  1>> stdout.txt 2>> stderr.txt\'',
+            contents)
 
         # verify run_simulation.sh script content in experiment level
         with open(os.path.join(experiment_dir, 'run_simulation.sh'), 'r') as fpr:
             contents = fpr.read()
         self.assertIn(
-            "JOB_DIRECTORY=$(find . -type d -maxdepth 1 -mindepth 1  | grep -v Assets | head -${FILE_ARRAY_TASK_ID} | tail -1)",
-            contents)
+            "JOB_DIRECTORY=$1\necho \"enter directory: \'$JOB_DIRECTORY\'\"", contents)
         self.assertIn("cd $JOB_DIRECTORY", contents)
         self.assertIn("bash _run.sh 1> stdout.txt 2> stderr.txt", contents)
 
