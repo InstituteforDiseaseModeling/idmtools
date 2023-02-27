@@ -1,0 +1,51 @@
+@startuml
+'https://plantuml.com/deployment-diagram
+
+
+cloud "Compute Environment" as ce {
+    node "Master Node" as mn {
+        file "user platform analysis script" as pas
+        agent "Platform Analysis manager" as pam
+    }
+    node "Execution Node 1" as n1 {
+        component "Execution Environment" as ee {
+            file "Boostrap script" as bs
+
+            folder "Analysis Assets" as aa {
+                file "Analysis script" as ans
+                file "Reference Data" as rd
+            }
+        }
+    }
+    node "Execution Node N+..." as n2
+}
+
+pas --> pam
+pam --> bs: Creates bootstrap script
+pam ..> aa : Uploads analysis assets
+pam --> ans: Platform analysis uploads user analysis script\n and executes it
+bs --> ans: Execute user script in our execution environment
+
+
+note top of mn
+  In Comps, this is SSMT work manager
+  In Slurm, this Slurm head node or any node executing
+  the platform analysis script.
+end note
+
+note left of ee
+  In Comps, this is a container image.
+  In Slurm, this could be a singularity image.
+  That is platform dependent config.
+end note
+
+note bottom of n1
+  In Comps, this is SSMT execution worker
+  In Slurm, this could be any worker node
+end note
+
+
+note right of bs
+  "Boostrap script" is platform dependent
+end note
+@enduml

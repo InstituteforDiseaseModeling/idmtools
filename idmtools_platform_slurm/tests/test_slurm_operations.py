@@ -131,7 +131,7 @@ class TestSlurmOperations(ITestWithPersistence):
             assets = self.platform._experiments.list_assets(self.exp)
             self.assertEqual(2, len(assets))
             self.assertEqual(set([asset.filename for asset in assets]), set(['model1.py', 'hello.sh']))
-            experiment_dir = Path.resolve(self.platform._op_client.get_directory(self.exp))
+            experiment_dir = Path.resolve(self.platform.get_directory(self.exp))
             expected_assets_path = [str(experiment_dir.joinpath('Assets/model1.py')),
                                     str(experiment_dir.joinpath('Assets/hello.sh'))]
             self.assertEqual(set([asset.absolute_path for asset in assets]), set(expected_assets_path))
@@ -148,7 +148,7 @@ class TestSlurmOperations(ITestWithPersistence):
             self.assertEqual(3, len(assets))
             self.assertEqual(set([asset.filename for asset in assets]),
                              set(['model1.py', 'hello.sh', 'config.json']))
-            simulation_dir = Path.resolve(self.platform._op_client.get_directory(sim))
+            simulation_dir = Path.resolve(self.platform.get_directory(sim))
             expected_assets_path = [str(simulation_dir.joinpath('Assets/model1.py')),
                                     str(simulation_dir.joinpath('Assets/hello.sh')),
                                     str(simulation_dir.joinpath('config.json'))]

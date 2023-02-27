@@ -9,6 +9,7 @@
 - [Overview](#overview)
 - [Installing](#installing)
 - [Development Tips](#development-tips)
+- [Future Work](#future-work)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -28,6 +29,7 @@ pip install idmtools --index-url=https://packages.idmod.org/api/pypi/pypi-produc
 # Development Tips
 
 There is a Makefile file available for most common development tasks. Here is a list of commands
+
 ```bash
 clean       -   Clean up temproary files
 lint        -   Lint package and tests
@@ -36,3 +38,10 @@ coverage    -   Run tests and generate coverage report that is shown in browser
 ```
 
 On Windows, you can use `pymake` instead of `make`
+
+# Future Work
+
+* Add new analyze api to platform
+    * Where does this go?
+    * Move current code to Comps
+    * Add support for platform specific bootstrap scripts

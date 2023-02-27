@@ -1,0 +1,5 @@
+#!/bin/bash
+
+for file in $(find $(pwd) -maxdepth 1 -name "_run.sh");do
+bash $file;
+done

@@ -49,7 +49,7 @@ class TestSuiteExperiment(ITestWithPersistence):
     def verify_result(self, suite):
         experiments = self.platform.get_children(suite.id, item_type=ItemType.SUITE)
         experiment = experiments[0]
-        suite_dir = self.platform._op_client.get_directory(suite)
+        suite_dir = self.platform.get_directory(suite)
         suite_sub_dirs, suite_files = self.get_dirs_and_files(suite_dir)
         # Verify all files under suite
         self.assertTrue(len(suite_files) == 1)
@@ -59,7 +59,7 @@ class TestSuiteExperiment(ITestWithPersistence):
         self.assertEqual(suite_sub_dirs[0], pathlib.Path(self.job_directory + "/" + suite.id + "/" + experiment.id))
 
         for experiment in suite.experiments:
-            experiment_dir = self.platform._op_client.get_directory(experiment)
+            experiment_dir = self.platform.get_directory(experiment)
             experiment_sub_dirs, experiment_files = self.get_dirs_and_files(experiment_dir)
             # Verify all files under experiment
             self.assertTrue(len(experiment_files) == 3)
@@ -75,7 +75,7 @@ class TestSuiteExperiment(ITestWithPersistence):
                 pathlib.Path(experiment_path_prefix + "Assets")]))
 
     def verify_suite_only_case(self, suite):
-        suite_dir = self.platform._op_client.get_directory(suite)
+        suite_dir = self.platform.get_directory(suite)
         suite_sub_dirs, suite_files = self.get_dirs_and_files(suite_dir)
         self.assertTrue(len(suite_files) == 1)
         self.assertEqual(suite_files[0], pathlib.Path(self.job_directory + "/" + suite.id + "/metadata.json"))
