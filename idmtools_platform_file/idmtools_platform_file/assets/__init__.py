@@ -41,6 +41,8 @@ def generate_script(platform: 'FilePlatform', experiment: Experiment, max_job: i
                 max_job=max_job if max_job is not None else platform.max_job,
                 run_sequence=run_sequence if run_sequence is not None else platform.run_sequence
             )
+            if platform.modules:
+                tvars['modules'] = platform.modules
             tout.write(t.render(tvars))
 
     # Make executable

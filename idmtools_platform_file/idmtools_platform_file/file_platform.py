@@ -43,6 +43,9 @@ class FilePlatform(IPlatform):
     # Default retries for jobs
     retries: int = field(default=1)
 
+    # modules to be load
+    modules: list = field(default_factory=list, metadata=dict(sbatch=True))
+
     _suites: FilePlatformSuiteOperations = field(**op_defaults, repr=False, init=False)
     _experiments: FilePlatformExperimentOperations = field(**op_defaults, repr=False, init=False)
     _simulations: FilePlatformSimulationOperations = field(**op_defaults, repr=False, init=False)

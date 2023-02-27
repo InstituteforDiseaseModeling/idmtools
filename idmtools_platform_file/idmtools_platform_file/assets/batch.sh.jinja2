@@ -1,5 +1,12 @@
 #!/bin/bash
 
+
+{% if modules is defined and modules is not none and modules|length > 0 %}
+{% for m in modules %}
+module load {{m}}
+{% endfor %}
+{% endif %}
+
 {% if run_sequence is defined and run_sequence %}
     find $(pwd) -maxdepth 2 -name "_run.sh" -print0 | xargs -0 -I% dirname % | xargs -d "\n" -I% bash -c 'cd $(pwd) && $(pwd)/run_simulation.sh %  1>> stdout.txt 2>> stderr.txt'
 {% else %}
