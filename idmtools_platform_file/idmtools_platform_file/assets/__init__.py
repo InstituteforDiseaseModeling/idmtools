@@ -13,7 +13,7 @@ DEFAULT_SIMULATION_TEMPLATE = Path(__file__).parent.parent.joinpath("assets/_run
 def generate_script(platform: 'FilePlatform', experiment: Experiment,
                     template: Union[Path, str] = DEFAULT_TEMPLATE_FILE, **kwargs) -> None:
     """
-    Generate batch file batch.sh
+    Generate batch file batch.sh.
     Args:
         platform: File Platform
         experiment: idmtools Experiment
@@ -22,7 +22,7 @@ def generate_script(platform: 'FilePlatform', experiment: Experiment,
     Returns:
         None
     """
-    template_vars=dict()
+    template_vars = dict()
 
     # with open(template) as file_:     # TODO: take input template
     with open(DEFAULT_TEMPLATE_FILE) as file_:
@@ -34,13 +34,15 @@ def generate_script(platform: 'FilePlatform', experiment: Experiment,
         tout.write(t.render(template_vars))
 
 
-def generate_simulation_script(platform: 'FilePlatform', simulation, retries: Optional[int] = None, template: str = DEFAULT_SIMULATION_TEMPLATE) -> None:
+def generate_simulation_script(platform: 'FilePlatform', simulation, retries: Optional[int] = None,
+                               template: str = DEFAULT_SIMULATION_TEMPLATE) -> None:
     """
-    Generate batch file _run.sh
+    Generate batch file _run.sh.
     Args:
         platform: File Platform
         simulation: idmtools Simulation
         retries: int
+        template: user template
     Returns:
         None
     """

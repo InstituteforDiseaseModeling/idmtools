@@ -19,38 +19,53 @@ job_directory = /data
 
 
 class FilePlatformSpecification(PlatformSpecification):
+    """
+    File Platform Specification definition.
+    """
 
     @get_description_impl
     def get_description(self) -> str:
+        """
+        Retrieve description.
+        """
         return "Provides access to the Local Platform to IDM Tools"
 
     @get_platform_impl
     def get(self, **configuration) -> IPlatform:
         """
-        Build our file platform from the passed in configuration object
+        Build our file platform from the passed in configuration object.
 
         We do our import of platform here to avoid any weirdness
         Args:
             configuration:
 
         Returns:
-
+            IPlatform
         """
         from idmtools_platform_file.file_platform import FilePlatform
         return FilePlatform(**configuration)
 
     @example_configuration_impl
     def example_configuration(self):
+        """
+        Retrieve example configuration.
+        """
         return FILE_EXAMPLE_CONFIG
 
     @get_platform_type_impl
     def get_type(self) -> Type['FilePlatform']:  # noqa: F821
+        """
+        Get type.
+
+        Returns:
+            Type
+        """
         from idmtools_platform_file.file_platform import FilePlatform
         return FilePlatform
 
     def get_version(self) -> str:
         """
-        Returns the version of the plugin
+        Returns the version of the plugin.
 
         Returns:
             Plugin Version

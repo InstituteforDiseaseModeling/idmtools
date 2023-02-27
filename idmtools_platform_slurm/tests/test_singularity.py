@@ -34,7 +34,7 @@ class TestSingularity(ITestWithPersistence):
                   max_running_jobs=10,
                   retries=5, dry_run=True)
         for simulation in experiment.simulations:
-            simulation_dir = self.platform._op_client.get_directory(simulation)
+            simulation_dir = self.platform.get_directory(simulation)
             exe = simulation_dir.joinpath(command)
             self.assertTrue(os.access(exe, os.X_OK))
             with open(os.path.join(simulation_dir, '_run.sh'), 'r') as fpr:
@@ -56,7 +56,7 @@ class TestSingularity(ITestWithPersistence):
                   max_running_jobs=10,
                   retries=5, dry_run=True)
         for simulation in experiment.simulations:
-            simulation_dir = self.platform._op_client.get_directory(simulation)
+            simulation_dir = self.platform.get_directory(simulation)
             exe = simulation_dir.joinpath("Assets/hello.sh")
             self.assertTrue(os.access(exe, os.X_OK))
             with open(os.path.join(simulation_dir, '_run.sh'), 'r') as fpr:

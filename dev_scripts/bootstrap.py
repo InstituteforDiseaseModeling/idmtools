@@ -46,6 +46,7 @@ packages = dict(
     idmtools_platform_comps=data_class_default,
     idmtools_models=data_class_default,
     idmtools_platform_slurm=data_class_default,
+    idmtools_platform_file=data_class_default,
     idmtools_slurm_utils=[],
     idmtools_test=[]
 )

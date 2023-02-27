@@ -9,6 +9,7 @@ from typing import Any, Dict
 import numpy as np
 import pandas as pd
 import pytest
+from pathlib import Path
 
 from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType
@@ -26,7 +27,7 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 @pytest.mark.serial
 @linux_only
-class TestPythonSimulation(ITestWithPersistence):
+class TestFilesAndDirectories(ITestWithPersistence):
 
     def create_experiment(self, platform=None, a=1, b=1, max_running_jobs=None, retries=None, wait_until_done=False,
                           dry_run=True):
@@ -67,16 +68,29 @@ class TestPythonSimulation(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         self.job_directory = "DEST"
-        self.platform = Platform('SLURM_LOCAL', job_directory=self.job_directory)
+        self.platform = Platform('FILE', job_directory=self.job_directory)
 
-    def test_sweeping_and_local_folders_creation(self):
+    def test_suite_experiment_simulation_files(self):
         experiment = self.create_experiment(self.platform, a=3, b=3)
+        # first verify files and dirs under suite
+        suite = experiment.parent
+        suite_dir = self.platform.get_directory(suite)
+        self.assertEqual(Path(suite_dir), Path(f'{self.job_directory}/{suite.id}'))
+        files = []
+        dirs = []
+        for (dirpath, dirnames, filenames) in os.walk(suite_dir):
+            files.extend(filenames)
+            dirs.extend(dirnames)
+            break
+        self.assertSetEqual(set(files), set(["metadata.json"]))
+        self.assertEqual(dirs[0], experiment.id)
+        # second verify files and dirs under experiment
         experiment_dir = self.platform.get_directory(experiment)
         files = []
         for (dirpath, dirnames, filenames) in os.walk(experiment_dir):
             files.extend(filenames)
             break
-        self.assertSetEqual(set(files), set(["metadata.json", "run_simulation.sh", "sbatch.sh"]))
+        self.assertSetEqual(set(files), set(["metadata.json", "run_simulation.sh", "batch.sh"]))
 
         # verify all files under simulations
         self.assertEqual(experiment.simulation_count, 9)
@@ -96,24 +110,23 @@ class TestPythonSimulation(ITestWithPersistence):
             self.assertSetEqual(set(files), set(["metadata.json", "_run.sh", "config.json"]))
         self.assertEqual(count, 9)  # make sure we found total 9 symlinks for Assets folder
 
-    def test_scripts(self):
-        platform = Platform('SLURM_LOCAL', job_directory=self.job_directory, max_running_jobs=8, retries=5)
+    def test_generated_scripts(self):
+        platform = Platform('FILE', job_directory=self.job_directory, max_running_jobs=8, retries=5)
         experiment = self.create_experiment(platform=platform, a=5, b=5)
         experiment_dir = self.platform.get_directory(experiment)
         # verify sbatch.sh script content in experiment level
-        with open(os.path.join(experiment_dir, 'sbatch.sh'), 'r') as fpr:
+        with open(os.path.join(experiment_dir, 'batch.sh'), 'r') as fpr:
             contents = fpr.read()
-        self.assertIn("#SBATCH --array=1-25%8", contents)  # 25=a*b=5*5, 8=max_running_jobs
-        self.assertIn("echo $SLURM_ARRAY_JOB_ID > job_id.txt", contents)
-        self.assertIn("srun run_simulation.sh", contents)
+        self.assertIn('find $(pwd) -maxdepth 1 -name "_run.sh" | xargs -P $MAX_JOBS -I {} bash {} &', contents)  # 25=a*b=5*5, 8=max_running_jobs
+        self.assertIn("MAX_JOBS=4", contents)
 
         # verify run_simulation.sh script content in experiment level
         with open(os.path.join(experiment_dir, 'run_simulation.sh'), 'r') as fpr:
             contents = fpr.read()
         self.assertIn(
-            "JOB_DIRECTORY=$(find . -type d -maxdepth 1 -mindepth 1  | grep -v Assets | head -${SLURM_ARRAY_TASK_ID} | tail -1)",
+            "JOB_DIRECTORY=$(find . -type d -maxdepth 1 -mindepth 1  | grep -v Assets | head -${FILE_ARRAY_TASK_ID} | tail -1)",
             contents)
-        self.assertIn("JOB_DIRECTORY", contents)
+        self.assertIn("cd $JOB_DIRECTORY", contents)
         self.assertIn("bash _run.sh 1> stdout.txt 2> stderr.txt", contents)
 
         # verify _run.sh script content under simulation level
@@ -123,7 +136,7 @@ class TestPythonSimulation(ITestWithPersistence):
             simulation_dir = platform.get_directory(simulation)
             with open(os.path.join(simulation_dir, '_run.sh'), 'r') as fpr:
                 contents = fpr.read()
-            self.assertIn("until [ \"$n\" -ge 5 ]", contents)  # 5 here is from retries=5 in platform
+
             self.assertIn("python3 Assets/model3.py --config config.json", contents)
 
         # verify ids in metadata.json  for suite
@@ -132,12 +145,24 @@ class TestPythonSimulation(ITestWithPersistence):
         with open(os.path.join(suite_dir, 'metadata.json'), 'r') as j:
             contents = json.loads(j.read())
             self.assertEqual(contents['_uid'], suite.id)
+            self.assertEqual(contents['uid'], suite.id)
+            self.assertEqual(contents['id'], suite.id)
+            self.assertEqual(contents['parent_id'], None)
+            self.assertEqual(contents['tags'], {'name': 'suite_tag', 'idmtools': '123'})
+            self.assertEqual(contents['item_type'], 'Suite')
 
         # verify ids in metadata.json for experiment
         with open(os.path.join(experiment_dir, 'metadata.json'), 'r') as j:
             contents = json.loads(j.read())
             self.assertEqual(contents['_uid'], experiment.id)
+            self.assertEqual(contents['uid'], experiment.id)
+            self.assertEqual(contents['id'], experiment.id)
             self.assertEqual(contents['parent_id'], suite.id)
+            self.assertEqual(contents['item_type'], 'Experiment')
+            self.assertEqual(contents['status'], 'CREATED')
+            self.assertEqual(len(contents['assets']), 6)
+            self.assertEqual(contents['name'], 'test_generated_files_and_directories.py--test_generated_scripts')
+            self.assertEqual(contents['task_type'], 'idmtools.entities.command_task.CommandTask')
 
         # verify ids in metadata.json for simulation, also verify sweep parameter in config.json file
         for simulation in experiment.simulations:
@@ -145,6 +170,8 @@ class TestPythonSimulation(ITestWithPersistence):
             with open(os.path.join(simulation_dir, 'metadata.json'), 'r') as j:
                 contents = json.loads(j.read())
                 self.assertEqual(contents['_uid'], simulation.id)
+                self.assertEqual(contents['uid'], simulation.id)
+                self.assertEqual(contents['id'], simulation.id)
                 self.assertEqual(contents['parent_id'], experiment.id)
                 self.assertEqual(contents['task']['command'], 'python3 Assets/model3.py --config config.json')
                 with open(os.path.join(simulation_dir, 'config.json'), 'r') as j:
@@ -183,12 +210,11 @@ class TestPythonSimulation(ITestWithPersistence):
         sims_df = pd.DataFrame()
         for sim in experiment.simulations:
             sim_map = self.platform.create_sim_directory_map(sim.id, item_type=ItemType.SIMULATION)
-            sim_df = pd.DataFrame()
             sim_tags = sim.tags
-            sim_df = sim_df.append(sim_tags, ignore_index=True)
+            sim_df = pd.DataFrame(sim_tags, index=[0])
             sim_df['simid'] = sim.id
             sim_df['outpath'] = sim_map[sim.id]
-            sims_df = sims_df.append(sim_df, ignore_index=True)
+            sims_df = pd.concat([sims_df, sim_df], ignore_index=True)
         self.assertTrue(np.all(exp_df.sort_values('simid').values == sims_df.sort_values('simid').values))
         self.assertTrue(exp_df.shape == (9, 6))
 
