@@ -4,10 +4,10 @@ Here we implement the FilePlatform experiment operations.
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import shutil
+import platform
 from pathlib import Path
-from uuid import UUID, uuid4
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, List, Type, Dict, Optional, Any, Union
+from typing import TYPE_CHECKING, List, Type, Dict, Optional, Any
 from idmtools.assets import Asset, AssetCollection
 from idmtools.core import ItemType
 from idmtools.entities import Suite
@@ -25,10 +25,13 @@ if TYPE_CHECKING:
 
 @dataclass
 class FilePlatformExperimentOperations(IPlatformExperimentOperations):
+    """
+    Experiment Operations for File Platform.
+    """
     platform: 'FilePlatform'  # noqa: F821
     platform_type: Type = field(default=FileExperiment)
 
-    def get(self, experiment_id: Union[str, UUID], **kwargs) -> Dict:
+    def get(self, experiment_id: str, **kwargs) -> Dict:
         """
         Gets an experiment from the File platform.
         Args:
@@ -60,8 +63,6 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
             # update parent
             experiment.parent = suite
 
-        if not isinstance(experiment.uid, UUID):
-            experiment.uid = uuid4()
         # Generate Suite/Experiment/Simulation folder structure
         self.platform.mk_directory(experiment)
         meta = self.platform._metas.dump(experiment)
@@ -94,7 +95,7 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         sim_meta_list = self.platform._metas.get_children(parent)
         for meta in sim_meta_list:
             file_sim = FileSimulation(meta)
-            # file_sim.status = self.platform._op_client.get_simulation_status(file_sim.id)
+            file_sim.status = self.platform.get_simulation_status(file_sim.id)
             if raw:
                 sim_list.append(file_sim)
             else:
@@ -116,11 +117,12 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         else:
             return self.platform._suites.get(experiment.parent_id, raw=True, **kwargs)
 
-    def platform_run_item(self, experiment: Experiment, **kwargs):
+    def platform_run_item(self, experiment: Experiment, dry_run: bool = False, **kwargs):
         """
         Run experiment.
         Args:
             experiment: idmtools Experiment
+            dry_run: True/False
             kwargs: keyword arguments used to expand functionality
         Returns:
             None
@@ -131,8 +133,11 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         # Generate/update metadata
         self.platform._metas.dump(experiment)
         # Commission
-        dry_run = kwargs.get('dry_run', False)
         if not dry_run:
+            if platform.system() in ["Windows"]:
+                user_logger.warning(
+                    "\n/!\\ WARNING: The current FilePlatform only support running Experiment/Simulation on Linux!")
+                exit(-1)
             self.platform.submit_job(experiment, **kwargs)
         else:
             pass
@@ -197,7 +202,7 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
             parent = self.platform.get_item(file_exp.parent_id, ItemType.SUITE, force=True)
         exp = Experiment()
         exp.platform = self.platform
-        exp.uid = UUID(file_exp.uid)
+        exp.uid = file_exp.uid
         exp.name = file_exp.name
         exp.parent_id = parent.id
         exp.parent = parent
@@ -223,7 +228,9 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
             Dict of simulation id as key and working dir as value
         """
-        pass
+        # Refresh status for each simulation
+        for sim in experiment.simulations:
+            sim.status = self.platform.get_simulation_status(sim.id, **kwargs)
 
     def create_sim_directory_map(self, experiment_id: str) -> Dict:
         """
@@ -263,3 +270,28 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
             Any
         """
         pass
+
+    def post_run_item(self, experiment: Experiment, dry_run: bool = False, **kwargs):
+        """
+        Trigger right after commissioning experiment on platform.
+
+        Args:
+            experiment: Experiment just commissioned
+            dry_run: True/False
+            kwargs: keyword arguments used to expand functionality
+        Returns:
+            None
+        """
+        super().post_run_item(experiment)
+
+        # dry_run = kwargs.get('dry_run', False)
+        if not dry_run:
+            if platform.system() in ["Windows"]:
+                pass  # handled this case in platform_run_item
+            else:
+                # TODO:
+                # user_logger.info(
+                #     f'\nYou can try the following command to check simulation running status: \n  idmtools file {os.path.abspath(self.platform.job_directory)} status f{experiment.id}')
+                pass
+        else:
+            user_logger.warning("\nYou are running with dry_true=True")

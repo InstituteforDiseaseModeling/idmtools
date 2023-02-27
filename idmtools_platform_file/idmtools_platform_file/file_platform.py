@@ -9,19 +9,22 @@ import shutil
 import subprocess
 from pathlib import Path
 from logging import getLogger
-from typing import Union, Any
+from typing import Union, Any, List
 from dataclasses import dataclass, field
-from idmtools.core import ItemType
+from idmtools.core import ItemType, EntityStatus
+from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
-from idmtools.entities.iplatform import IPlatform
 from idmtools.entities.simulation import Simulation
+from idmtools.entities.iplatform import IPlatform, ITEM_TYPE_TO_OBJECT_INTERFACE
+from idmtools_platform_file.utils import FILE_MAPS
 from idmtools_platform_file.assets import generate_script, generate_simulation_script
 from idmtools_platform_file.platform_operations.asset_collection_operations import FilePlatformAssetCollectionOperations
 from idmtools_platform_file.platform_operations.experiment_operations import FilePlatformExperimentOperations
 from idmtools_platform_file.platform_operations.json_metadata_operations import JSONMetadataOperations
 from idmtools_platform_file.platform_operations.simulation_operations import FilePlatformSimulationOperations
 from idmtools_platform_file.platform_operations.suite_operations import FilePlatformSuiteOperations
+from idmtools_platform_file.utils import FileExperiment, FileSimulation, FileSuite
 
 logger = getLogger(__name__)
 
@@ -30,20 +33,24 @@ op_defaults = dict(default=None, compare=False, metadata={"pickle_ignore": True}
 
 @dataclass(repr=False)
 class FilePlatform(IPlatform):
+    """
+    File Platform definition.
+    """
     job_directory: str = field(default=None)
+    max_job: int = field(default=4)
+    run_sequence: bool = field(default=True)
 
     # Default retries for jobs
-    retries: int = field(default=1, metadata=dict(sbatch=False))
+    retries: int = field(default=1)
+
+    # modules to be load
+    modules: list = field(default_factory=list, metadata=dict(sbatch=True))
 
     _suites: FilePlatformSuiteOperations = field(**op_defaults, repr=False, init=False)
     _experiments: FilePlatformExperimentOperations = field(**op_defaults, repr=False, init=False)
     _simulations: FilePlatformSimulationOperations = field(**op_defaults, repr=False, init=False)
     _assets: FilePlatformAssetCollectionOperations = field(**op_defaults, repr=False, init=False)
     _metas: JSONMetadataOperations = field(**op_defaults, repr=False, init=False)
-
-    # Which batch script to use by default
-    batch_template: str = field(default="batch.sh.jinja2")
-    simulation_template: str = field(default="_run.sh.jinja2")
 
     def __post_init__(self):
         self.__init_interfaces()
@@ -60,6 +67,10 @@ class FilePlatform(IPlatform):
         self._metas = JSONMetadataOperations(platform=self)
 
     def post_setstate(self):
+        """
+        Utility function.
+        Returns: None
+        """
         self.__init_interfaces()
 
     def get_directory(self, item: Union[Suite, Experiment, Simulation]) -> Path:
@@ -169,10 +180,9 @@ class FilePlatform(IPlatform):
             None
         """
         if isinstance(item, Experiment):
-            generate_script(self, item, template=self.batch_template)
+            generate_script(self, item, **kwargs)
         elif isinstance(item, Simulation):
-            retries = kwargs.get('retries', None)
-            generate_simulation_script(self, item, retries, template=self.simulation_template)
+            generate_simulation_script(self, item, **kwargs)
         else:
             raise NotImplementedError(f"{item.__class__.__name__} is not supported for batch creation.")
 
@@ -191,7 +201,7 @@ class FilePlatform(IPlatform):
 
     def make_command_executable(self, simulation: Simulation) -> None:
         """
-        Make simulation command executable
+        Make simulation command executable.
         Args:
             simulation: idmtools Simulation
         Returns:
@@ -230,15 +240,127 @@ class FilePlatform(IPlatform):
         Returns:
             Any
         """
-        raise NotImplementedError("submit_job has not been implemented on the File Platform")
+        # raise NotImplementedError("submit_job has not been implemented on the File Platform")
 
-        # if isinstance(item, Experiment):
-        #     working_directory = self.get_directory(item)
-        #     result = subprocess.run(['sbatch', '--parsable', 'sbatch.sh'], stdout=subprocess.PIPE,
-        #                             cwd=str(working_directory))
-        #     slurm_job_id = result.stdout.decode('utf-8').strip().split(';')[0]
-        #     return slurm_job_id
-        # elif isinstance(item, Simulation):
-        #     pass
-        # else:
-        #     raise NotImplementedError(f"Submit job is not implemented on SlurmPlatform.")
+        if isinstance(item, Experiment):
+            working_directory = self.get_directory(item)
+            result = subprocess.run(['bash', 'batch.sh'], stdout=subprocess.PIPE,
+                                    cwd=str(working_directory))
+            r = result.stdout.decode('utf-8').strip()
+            return r
+        elif isinstance(item, Simulation):
+            raise NotImplementedError("submit_job directly for simulation is not implemented on FilePlatform.")
+        else:
+            raise NotImplementedError(f"Submit job is not implemented for {item.__class__.__name__} on FilePlatform.")
+
+    def get_simulation_status(self, sim_id: str, **kwargs) -> EntityStatus:
+        """
+        Retrieve simulation status.
+        Args:
+            sim_id: Simulation ID
+            kwargs: keyword arguments used to expand functionality
+        Returns:
+            EntityStatus
+        """
+        sim_dir = self.get_directory_by_id(sim_id, ItemType.SIMULATION)
+
+        # Check process status
+        job_status_path = sim_dir.joinpath('job_status.txt')
+        if job_status_path.exists():
+            status = open(job_status_path).read().strip()
+            if status in ['100', '0', '-1']:
+                status = FILE_MAPS[status]
+            else:
+                status = FILE_MAPS['100']  # To be safe
+        else:
+            status = FILE_MAPS['None']
+
+        return status
+
+    def flatten_item(self, item: IEntity, raw=False, **kwargs) -> List[object]:
+        """
+        Flatten an item: resolve the children until getting to the leaves.
+
+        For example, for an experiment, will return all the simulations.
+        For a suite, will return all the simulations contained in the suites experiments.
+
+        Args:
+            item: Which item to flatten
+            raw: bool
+            kwargs: extra parameters
+
+        Returns:
+            List of leaves
+        """
+        if not raw:
+            interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
+            idm_item = getattr(self, interface).to_entity(item)
+            return super().flatten_item(idm_item)
+
+        if isinstance(item, FileSuite):
+            experiments = self._suites.get_children(item, parent=item, raw=True)
+            children = list()
+            for file_exp in experiments:
+                children += self.flatten_item(item=file_exp, raw=raw)
+        elif isinstance(item, FileExperiment):
+            children = self._experiments.get_children(item, parent=item, raw=True)
+            exp = Experiment()
+            exp.uid = item.id
+            exp.platform = self
+            exp._platform_object = item
+            exp.tags = item.tags
+
+            for file_sim in children:
+                file_sim.experiment = exp
+                file_sim.platform = self
+        elif isinstance(item, FileSimulation):
+            if raw:
+                children = [item]
+            else:
+                exp = Experiment()
+                exp.uid = item.id
+                exp.platform = self
+                exp._platform_object = item
+                exp.tags = item.tags
+                sim = self._simulations.to_entity(item, parent=exp)
+                sim.experiment = exp
+                children = [sim]
+        elif isinstance(item, Suite):
+            file_suite = item.get_platform_object()
+            file_suite.platform = self
+            children = self.flatten_item(item=file_suite)
+        elif isinstance(item, Experiment):
+            children = item.simulations.items
+        elif isinstance(item, Simulation):
+            children = [item]
+        else:
+            raise Exception(f'Item Type: {type(item)} is not supported!')
+
+        return children
+
+    def validate_item_for_analysis(self, item: Union[Simulation, FileSimulation], analyze_failed_items=False):
+        """
+        Check if item is valid for analysis.
+
+        Args:
+            item: which item to verify status
+            analyze_failed_items: bool
+
+        Returns: bool
+        """
+        result = False
+
+        # TODO: we may consolidate two cases into one
+        if isinstance(item, FileSimulation):
+            if item.status == EntityStatus.SUCCEEDED:
+                result = True
+            else:
+                if analyze_failed_items and item.status == EntityStatus.FAILED:
+                    result = True
+        elif isinstance(item, Simulation):
+            if item.succeeded:
+                result = True
+            else:
+                if analyze_failed_items and item.status == EntityStatus.FAILED:
+                    result = True
+        return result
