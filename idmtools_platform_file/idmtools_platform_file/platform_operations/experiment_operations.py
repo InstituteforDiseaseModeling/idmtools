@@ -284,7 +284,6 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         """
         super().post_run_item(experiment)
 
-        # dry_run = kwargs.get('dry_run', False)
         if not dry_run:
             if platform.system() in ["Windows"]:
                 pass  # handled this case in platform_run_item
