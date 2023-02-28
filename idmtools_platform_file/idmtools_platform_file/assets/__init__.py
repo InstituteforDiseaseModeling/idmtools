@@ -29,9 +29,6 @@ def generate_script(platform: 'FilePlatform', experiment: Experiment, max_job: i
     Returns:
         None
     """
-    # max_job = kwargs.get('max_job', None)
-    # run_sequence = kwargs.get('run_sequence', False)
-
     output_target = platform.get_directory(experiment).joinpath("batch.sh")
     with open(output_target, "w") as tout:
         with open(DEFAULT_TEMPLATE_FILE) as tin:
