@@ -6,7 +6,6 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 import os
 import shlex
 import shutil
-import subprocess
 from pathlib import Path
 from logging import getLogger
 from typing import Union, Any, List
@@ -230,28 +229,6 @@ class FilePlatform(IPlatform):
                 self.update_script_mode(exe)
         except:
             logger.debug(f"Failed to change file mode for executable: {exe}")
-
-    def submit_job(self, item: Union[Experiment, Simulation], **kwargs) -> Any:
-        """
-        Submit a File job.
-        Args:
-            item: idmtools Experiment or Simulation
-            kwargs: keyword arguments used to expand functionality
-        Returns:
-            Any
-        """
-        # raise NotImplementedError("submit_job has not been implemented on the File Platform")
-
-        if isinstance(item, Experiment):
-            working_directory = self.get_directory(item)
-            result = subprocess.run(['bash', 'batch.sh'], stdout=subprocess.PIPE,
-                                    cwd=str(working_directory))
-            r = result.stdout.decode('utf-8').strip()
-            return r
-        elif isinstance(item, Simulation):
-            raise NotImplementedError("submit_job directly for simulation is not implemented on FilePlatform.")
-        else:
-            raise NotImplementedError(f"Submit job is not implemented for {item.__class__.__name__} on FilePlatform.")
 
     def get_simulation_status(self, sim_id: str, **kwargs) -> EntityStatus:
         """
