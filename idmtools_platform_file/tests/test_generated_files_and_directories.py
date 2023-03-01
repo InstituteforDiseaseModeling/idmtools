@@ -29,7 +29,7 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 @linux_only
 class TestFilesAndDirectories(ITestWithPersistence):
 
-    def create_experiment(self, platform=None, a=1, b=1, retries=None, wait_until_done=False):
+    def create_experiment(self, platform=None, a=1, b=1, retries=None, wait_until_done=False, wait_on_done=False):
         task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model3.py"),
                                         envelope="parameters", parameters=(dict(c=0)))
         task.python_path = "python3"
@@ -57,7 +57,7 @@ class TestFilesAndDirectories(ITestWithPersistence):
         # Add experiment to the suite
         suite.add_experiment(experiment)
         # Commission
-        suite.run(platform=platform, wait_until_done=False, wait_on_done=wait_until_done, retries=retries)
+        suite.run(platform=platform, wait_until_done=wait_until_done, wait_on_done=wait_on_done, retries=retries)
         print("suite_id: " + suite.id)
         print("experiment_id: " + experiment.id)
         return experiment
@@ -175,22 +175,8 @@ class TestFilesAndDirectories(ITestWithPersistence):
                     config_contents = json.loads(j.read())
                 self.assertDictEqual(contents['task']['parameters'], config_contents['parameters'])
 
-    @pytest.mark.skip("unskip this line when doing real run in local")
-    def test_std_status_jobid_files(self):
-        experiment = self.create_experiment(self.platform, a=3, b=3, wait_until_done=True)
-        experiment_dir = self.platform.get_directory(experiment)
-        self.assertTrue(os.path.exists(os.path.join(experiment_dir, "job_id.txt")))
-        job_id = open(os.path.join(experiment_dir, 'job_id.txt'), 'r').read().strip()
-        self.assertTrue(len(job_id) > 0)
-        for simulation in experiment.simulations:
-            simulation_dir = self.platform.get_directory(simulation)
-            status_file = os.path.join(simulation_dir, "job_status.txt")
-            self.assertTrue(os.path.exists(status_file))
-            status = open(status_file, 'r').read().strip()
-            self.assertEqual(int(status), 0)
-
     def test_create_sim_directory_map(self):
-        experiment = self.create_experiment(self.platform, a=3, b=3, wait_until_done=False)
+        experiment = self.create_experiment(self.platform, a=3, b=3)
         exp_map = self.platform.create_sim_directory_map(experiment.id, item_type=ItemType.EXPERIMENT)
         sims_map_dict = {}
         for sim in experiment.simulations:
@@ -202,7 +188,7 @@ class TestFilesAndDirectories(ITestWithPersistence):
         self.assertTrue(len(exp_map) == 9)
 
     def test_create_sim_directory_df(self):
-        experiment = self.create_experiment(self.platform, a=3, b=3, wait_until_done=False)
+        experiment = self.create_experiment(self.platform, a=3, b=3)
         exp_df = self.platform.create_sim_directory_df(experiment.id)
         sims_df = pd.DataFrame()
         for sim in experiment.simulations:
@@ -216,7 +202,7 @@ class TestFilesAndDirectories(ITestWithPersistence):
         self.assertTrue(exp_df.shape == (9, 6))
 
     def test_create_sim_directory_csv(self):
-        experiment = self.create_experiment(self.platform, a=3, b=3, wait_until_done=False)
+        experiment = self.create_experiment(self.platform, a=3, b=3)
         self.platform.save_sim_directory_df_to_csv(experiment.id)
         exp_df = self.platform.create_sim_directory_df(experiment.id)
         import csv
@@ -231,7 +217,7 @@ class TestFilesAndDirectories(ITestWithPersistence):
         os.remove(f"{experiment.id}.csv")
 
     def test_platform_delete_experiment(self):
-        experiment = self.create_experiment(self.platform, a=3, b=3, wait_until_done=False)
+        experiment = self.create_experiment(self.platform, a=3, b=3)
         self.platform._experiments.platform_delete(experiment.id)
         # make sure we don't delete suite in this case
         self.assertTrue(os.path.exists(os.path.join(self.job_directory, experiment.parent_id)))
@@ -242,13 +228,10 @@ class TestFilesAndDirectories(ITestWithPersistence):
         self.assertTrue(f"Not found Experiment with id '{experiment.id}'" in str(context.exception.args[0]))
 
     def test_platform_delete_suite(self):
-        experiment = self.create_experiment(self.platform, a=3, b=3, wait_until_done=False)
+        experiment = self.create_experiment(self.platform, a=3, b=3)
         self.platform._suites.platform_delete(experiment.parent_id)
         # make sure we delete suite folder
         self.assertFalse(os.path.exists(os.path.join(self.job_directory, experiment.parent_id)))
         with self.assertRaises(RuntimeError) as context:
             self.platform.get_item(experiment.parent_id, item_type=ItemType.SUITE, raw=True)
         self.assertTrue(f"Not found Suite with id '{experiment.parent_id}'" in str(context.exception.args[0]))
-
-
-
