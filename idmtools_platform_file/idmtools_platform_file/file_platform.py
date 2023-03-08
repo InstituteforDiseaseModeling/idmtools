@@ -8,7 +8,7 @@ import shlex
 import shutil
 from pathlib import Path
 from logging import getLogger
-from typing import Union, Any, List
+from typing import Union, List
 from dataclasses import dataclass, field
 from idmtools.core import ItemType, EntityStatus
 from idmtools.core.interfaces.ientity import IEntity
