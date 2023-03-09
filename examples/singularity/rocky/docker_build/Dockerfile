@@ -19,4 +19,4 @@ RUN pip3 install --upgrade pip \
  && python3 -m pip install emod-api --extra-index-url https://packages.idmod.org/api/pypi/pypi-production/simple
 
 ENV PATH ${PATH}:/usr/lib64/mpich/bin
-ENV LD_LIBRARY_PATH /usr/lib64/mpich/lib:${LD_LIBRARY_PATH}
+ENV LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:/usr/lib64/mpich/lib

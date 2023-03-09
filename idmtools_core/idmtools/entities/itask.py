@@ -285,6 +285,8 @@ class ITask(metaclass=ABCMeta):
         for k, v in self.__dict__.items():
             if k not in ['_task_log', 'common_assets']:
                 setattr(result, k, copy.deepcopy(v, memo))
+            elif k == 'common_assets':
+                setattr(result, k, v)
         return result
 
     def to_dict(self) -> Dict:

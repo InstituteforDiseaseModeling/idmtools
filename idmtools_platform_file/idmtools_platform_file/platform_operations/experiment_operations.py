@@ -5,9 +5,8 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import shutil
 from pathlib import Path
-from uuid import UUID, uuid4
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, List, Type, Dict, Optional, Any, Union
+from typing import TYPE_CHECKING, List, Type, Dict, Optional, Any
 from idmtools.assets import Asset, AssetCollection
 from idmtools.core import ItemType
 from idmtools.entities import Suite
@@ -25,10 +24,13 @@ if TYPE_CHECKING:
 
 @dataclass
 class FilePlatformExperimentOperations(IPlatformExperimentOperations):
+    """
+    Experiment Operations for File Platform.
+    """
     platform: 'FilePlatform'  # noqa: F821
     platform_type: Type = field(default=FileExperiment)
 
-    def get(self, experiment_id: Union[str, UUID], **kwargs) -> Dict:
+    def get(self, experiment_id: str, **kwargs) -> Dict:
         """
         Gets an experiment from the File platform.
         Args:
@@ -60,8 +62,6 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
             # update parent
             experiment.parent = suite
 
-        if not isinstance(experiment.uid, UUID):
-            experiment.uid = uuid4()
         # Generate Suite/Experiment/Simulation folder structure
         self.platform.mk_directory(experiment)
         meta = self.platform._metas.dump(experiment)
@@ -94,7 +94,7 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         sim_meta_list = self.platform._metas.get_children(parent)
         for meta in sim_meta_list:
             file_sim = FileSimulation(meta)
-            # file_sim.status = self.platform._op_client.get_simulation_status(file_sim.id)
+            file_sim.status = self.platform.get_simulation_status(file_sim.id)
             if raw:
                 sim_list.append(file_sim)
             else:
@@ -130,14 +130,8 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         self.platform._metas.dump(experiment.parent)
         # Generate/update metadata
         self.platform._metas.dump(experiment)
-        # Commission
-        dry_run = kwargs.get('dry_run', False)
-        if not dry_run:
-            self.platform.submit_job(experiment, **kwargs)
-        else:
-            pass
+        # Output
         suite_id = experiment.parent_id or experiment.suite_id
-
         user_logger.info(f'job_directory: {Path(self.platform.job_directory).resolve()}')
         user_logger.info(f'suite: {str(suite_id)}')
         user_logger.info(f'experiment: {experiment.id}')
@@ -197,7 +191,7 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
             parent = self.platform.get_item(file_exp.parent_id, ItemType.SUITE, force=True)
         exp = Experiment()
         exp.platform = self.platform
-        exp.uid = UUID(file_exp.uid)
+        exp.uid = file_exp.uid
         exp.name = file_exp.name
         exp.parent_id = parent.id
         exp.parent = parent
@@ -223,7 +217,9 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
             Dict of simulation id as key and working dir as value
         """
-        pass
+        # Refresh status for each simulation
+        for sim in experiment.simulations:
+            sim.status = self.platform.get_simulation_status(sim.id, **kwargs)
 
     def create_sim_directory_map(self, experiment_id: str) -> Dict:
         """

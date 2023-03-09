@@ -29,8 +29,7 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 @linux_only
 class TestFilesAndDirectories(ITestWithPersistence):
 
-    def create_experiment(self, platform=None, a=1, b=1, max_running_jobs=None, retries=None, wait_until_done=False,
-                          dry_run=True):
+    def create_experiment(self, platform=None, a=1, b=1, retries=None, wait_until_done=False, wait_on_done=False):
         task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model3.py"),
                                         envelope="parameters", parameters=(dict(c=0)))
         task.python_path = "python3"
@@ -57,10 +56,8 @@ class TestFilesAndDirectories(ITestWithPersistence):
         suite.update_tags({'name': 'suite_tag', 'idmtools': '123'})
         # Add experiment to the suite
         suite.add_experiment(experiment)
-        # change dry_run=False when run in slurm cluster
-        suite.run(platform=platform, wait_until_done=False, wait_on_done=wait_until_done,
-                  max_running_jobs=max_running_jobs,
-                  retries=retries, dry_run=dry_run)
+        # Commission
+        suite.run(platform=platform, wait_until_done=wait_until_done, wait_on_done=wait_on_done, retries=retries)
         print("suite_id: " + suite.id)
         print("experiment_id: " + experiment.id)
         return experiment
@@ -111,21 +108,21 @@ class TestFilesAndDirectories(ITestWithPersistence):
         self.assertEqual(count, 9)  # make sure we found total 9 symlinks for Assets folder
 
     def test_generated_scripts(self):
-        platform = Platform('FILE', job_directory=self.job_directory, max_running_jobs=8, retries=5)
+        platform = Platform('FILE', job_directory=self.job_directory, retries=5)
         experiment = self.create_experiment(platform=platform, a=5, b=5)
         experiment_dir = self.platform.get_directory(experiment)
         # verify sbatch.sh script content in experiment level
         with open(os.path.join(experiment_dir, 'batch.sh'), 'r') as fpr:
             contents = fpr.read()
-        self.assertIn('find $(pwd) -maxdepth 1 -name "_run.sh" | xargs -P $MAX_JOBS -I {} bash {} &', contents)  # 25=a*b=5*5, 8=max_running_jobs
-        self.assertIn("MAX_JOBS=4", contents)
+        self.assertIn(
+            'find $(pwd) -maxdepth 2 -name "_run.sh" -print0 | xargs -0 -I% dirname % | xargs -d "\\n" -I% bash -c \'cd $(pwd) && $(pwd)/run_simulation.sh %  1>> stdout.txt 2>> stderr.txt\'',
+            contents)
 
         # verify run_simulation.sh script content in experiment level
         with open(os.path.join(experiment_dir, 'run_simulation.sh'), 'r') as fpr:
             contents = fpr.read()
         self.assertIn(
-            "JOB_DIRECTORY=$(find . -type d -maxdepth 1 -mindepth 1  | grep -v Assets | head -${FILE_ARRAY_TASK_ID} | tail -1)",
-            contents)
+            "JOB_DIRECTORY=$1\necho \"enter directory: \'$JOB_DIRECTORY\'\"", contents)
         self.assertIn("cd $JOB_DIRECTORY", contents)
         self.assertIn("bash _run.sh 1> stdout.txt 2> stderr.txt", contents)
 
@@ -178,22 +175,8 @@ class TestFilesAndDirectories(ITestWithPersistence):
                     config_contents = json.loads(j.read())
                 self.assertDictEqual(contents['task']['parameters'], config_contents['parameters'])
 
-    @pytest.mark.skip("unskip this line when doing real run in local")
-    def test_std_status_jobid_files(self):
-        experiment = self.create_experiment(self.platform, a=3, b=3, wait_until_done=True, dry_run=False)
-        experiment_dir = self.platform.get_directory(experiment)
-        self.assertTrue(os.path.exists(os.path.join(experiment_dir, "job_id.txt")))
-        job_id = open(os.path.join(experiment_dir, 'job_id.txt'), 'r').read().strip()
-        self.assertTrue(len(job_id) > 0)
-        for simulation in experiment.simulations:
-            simulation_dir = self.platform.get_directory(simulation)
-            status_file = os.path.join(simulation_dir, "job_status.txt")
-            self.assertTrue(os.path.exists(status_file))
-            status = open(status_file, 'r').read().strip()
-            self.assertEqual(int(status), 0)
-
     def test_create_sim_directory_map(self):
-        experiment = self.create_experiment(self.platform, a=3, b=3, wait_until_done=False, dry_run=True)
+        experiment = self.create_experiment(self.platform, a=3, b=3)
         exp_map = self.platform.create_sim_directory_map(experiment.id, item_type=ItemType.EXPERIMENT)
         sims_map_dict = {}
         for sim in experiment.simulations:
@@ -205,7 +188,7 @@ class TestFilesAndDirectories(ITestWithPersistence):
         self.assertTrue(len(exp_map) == 9)
 
     def test_create_sim_directory_df(self):
-        experiment = self.create_experiment(self.platform, a=3, b=3, wait_until_done=False, dry_run=True)
+        experiment = self.create_experiment(self.platform, a=3, b=3)
         exp_df = self.platform.create_sim_directory_df(experiment.id)
         sims_df = pd.DataFrame()
         for sim in experiment.simulations:
@@ -219,7 +202,7 @@ class TestFilesAndDirectories(ITestWithPersistence):
         self.assertTrue(exp_df.shape == (9, 6))
 
     def test_create_sim_directory_csv(self):
-        experiment = self.create_experiment(self.platform, a=3, b=3, wait_until_done=False, dry_run=True)
+        experiment = self.create_experiment(self.platform, a=3, b=3)
         self.platform.save_sim_directory_df_to_csv(experiment.id)
         exp_df = self.platform.create_sim_directory_df(experiment.id)
         import csv
@@ -234,7 +217,7 @@ class TestFilesAndDirectories(ITestWithPersistence):
         os.remove(f"{experiment.id}.csv")
 
     def test_platform_delete_experiment(self):
-        experiment = self.create_experiment(self.platform, a=3, b=3, wait_until_done=False, dry_run=True)
+        experiment = self.create_experiment(self.platform, a=3, b=3)
         self.platform._experiments.platform_delete(experiment.id)
         # make sure we don't delete suite in this case
         self.assertTrue(os.path.exists(os.path.join(self.job_directory, experiment.parent_id)))
@@ -245,13 +228,10 @@ class TestFilesAndDirectories(ITestWithPersistence):
         self.assertTrue(f"Not found Experiment with id '{experiment.id}'" in str(context.exception.args[0]))
 
     def test_platform_delete_suite(self):
-        experiment = self.create_experiment(self.platform, a=3, b=3, wait_until_done=False, dry_run=True)
+        experiment = self.create_experiment(self.platform, a=3, b=3)
         self.platform._suites.platform_delete(experiment.parent_id)
         # make sure we delete suite folder
         self.assertFalse(os.path.exists(os.path.join(self.job_directory, experiment.parent_id)))
         with self.assertRaises(RuntimeError) as context:
             self.platform.get_item(experiment.parent_id, item_type=ItemType.SUITE, raw=True)
         self.assertTrue(f"Not found Suite with id '{experiment.parent_id}'" in str(context.exception.args[0]))
-
-
-

@@ -1,4 +1,5 @@
 #!/bin/bash
+
 # define the handler function
 term_handler()
 {
@@ -7,6 +8,10 @@ term_handler()
     exit -1
 }
 
+n=0
+until [ "$n" -ge {{retries}} ]
+do
+    echo "100" > job_status.txt
     {% if simulation.task.sif_path is defined and simulation.task.sif_path %}
         {% if simulation.task.command.cmd.startswith('singularity') %}
             {{simulation.task.command.cmd}}
