@@ -8,7 +8,7 @@ import click
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools_platform_file.tools.status_report.status_report import generate_status_report
-from idmtools_platform_file.tools.status_report.utils import get_latest_experiment, check_status
+from idmtools_platform_file.tools.status_report.utils import get_latest_experiment, check_status, clear_history
 from logging import getLogger
 
 logger = getLogger(__name__)
@@ -162,3 +162,25 @@ def status(ctx: click.Context, exp_id, display):
     platform = Platform('FILE', job_directory=job_dir)
 
     check_status(platform=platform, exp_id=exp_id, display=display)
+
+
+@file.command(help="Clear generated files/folders")
+@click.option('--exp-id', default=None, help="Idmtools Experiment id")
+@click.option('--sim-id', multiple=True, help="Idmtools Simulation id")
+@click.option('--remove', multiple=True, help="list of files/folders to be removed")
+@click.pass_context
+def clear_files(ctx: click.Context, exp_id, sim_id, remove):
+    """
+    Clear running history.
+    Args:
+        ctx: click.Context
+        exp_id: experiment id
+        sim_id: simulation id
+        remove: list of files/folders
+    Returns:
+        None
+    """
+    job_dir = ctx.obj['job_directory']
+    platform = Platform('FILE', job_directory=job_dir)
+
+    clear_history(platform=platform, exp_id=exp_id, sim_id=sim_id, remove_list=remove)

@@ -4,15 +4,19 @@ Utility functions used by File Platform.
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import os
+import shutil
 from pathlib import Path
 from logging import getLogger
-from typing import Dict, TYPE_CHECKING
+from typing import Dict, Tuple, TYPE_CHECKING
 from idmtools.core import ItemType
 
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
 
 user_logger = getLogger('user')
+
+EXPERIMENT_FILES = ['stdout.txt', 'stderr.txt']
+SIMULATION_FILES = ['stdout.txt', 'stderr.txt', 'job_status.txt']
 
 
 def get_latest_experiment(platform: 'IPlatform') -> Dict:
@@ -90,3 +94,47 @@ def check_status(platform: 'IPlatform', exp_id: str = None, display: bool = Fals
         user_logger.info(f'\nExperiment Status: {None}')
     else:
         user_logger.info(f'\nExperiment Status: {_exp.status.name}\n')
+
+
+def clear_history(platform: 'IPlatform', exp_id: str = None, sim_id: Tuple = None, remove_list=None) -> None:
+    """
+    Clear the history files generated from running experiment.
+    Args:
+        platform: Platform
+        exp_id: experiment id
+        sim_id: simulation id
+        remove_list: list of files/folders
+    Returns:
+        None
+    """
+
+    def _clear_simulation(sim_id, remove_list):
+        sim_dir = platform.get_directory_by_id(sim_id, ItemType.SIMULATION)
+        for fi in SIMULATION_FILES + list(remove_list):
+            if sim_dir.joinpath(fi).exists():
+                if sim_dir.joinpath(fi).is_dir():
+                    shutil.rmtree(sim_dir.joinpath(fi))
+                else:
+                    sim_dir.joinpath(fi).unlink(missing_ok=True)
+
+    if sim_id is not None and len(sim_id) > 0:
+        for sid in sim_id:
+            _clear_simulation(sid, remove_list)
+    elif exp_id is not None:
+        exp = platform.get_item(exp_id, ItemType.EXPERIMENT)
+        exp_dir = platform.get_directory(exp)
+
+        # Delete generated files from experiment past run
+        for fi in EXPERIMENT_FILES:
+            if exp_dir.joinpath(fi).exists():
+                if exp_dir.joinpath(fi).is_dir():
+                    shutil.rmtree(exp_dir.joinpath(fi))
+                else:
+                    exp_dir.joinpath(fi).unlink(missing_ok=True)
+
+        # Delete generated files from simulations
+        for sim in exp.simulations:
+            _clear_simulation(sim.id, remove_list)
+    else:
+        user_logger.warning("Must provide exp_id or sim_id!")
+        exit(-1)
