@@ -166,7 +166,7 @@ def status(ctx: click.Context, exp_id, display):
 @file.command(help="Clear generated files/folders")
 @click.option('--exp-id', default=None, help="Idmtools Experiment id")
 @click.option('--sim-id', multiple=True, help="Idmtools Simulation id")
-@click.option('--remove', multiple=True, help="list of files/folders to be removed")
+@click.option('--remove', multiple=True, help="list of files/folders to be removed from simulation")
 @click.pass_context
 def clear_files(ctx: click.Context, exp_id, sim_id, remove):
     """
