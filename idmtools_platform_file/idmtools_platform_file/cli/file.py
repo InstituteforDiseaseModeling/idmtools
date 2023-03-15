@@ -11,7 +11,6 @@ from idmtools_platform_file.tools.status_report.status_report import generate_st
 from idmtools_platform_file.tools.status_report.utils import get_latest_experiment, check_status, clear_history
 from logging import getLogger
 
-logger = getLogger(__name__)
 user_logger = getLogger('user')
 
 

@@ -106,7 +106,7 @@ def check_status(platform: 'IPlatform', exp_id: str = None, display: bool = Fals
 
 def clear_history(platform: 'IPlatform', exp_id: str = None, sim_id: Tuple = None, remove_list=None) -> None:
     """
-    Clear the history files generated from running experiment.
+    Clear the history files generated from running experiment/simulation.
     Args:
         platform: Platform
         exp_id: experiment id
