@@ -139,9 +139,21 @@ class TestCli(unittest.TestCase):
         result = run_command('file', self.job_directory, 'get-path', '--exp-id', self.experiment.id)
         self.assertTrue(result.exit_code == 0, msg=result.output)
         print(result.stdout)
+        # for suite-id
+        result = run_command('file', self.job_directory, 'get-path', '--suite-id', self.suite.id)
+        self.assertTrue(result.exit_code == 0, msg=result.output)
+        print(result.stdout)
+        # for sim-id
+        result = run_command('file', self.job_directory, 'get-path', '--sim-id', self.experiment.simulations[0].id)
+        self.assertTrue(result.exit_code == 0, msg=result.output)
+        print(result.stdout)
 
     def test_get_status(self):
         result = run_command('file', self.job_directory, 'get-status', '--exp-id', self.experiment.id)
+        self.assertTrue(result.exit_code == 0, msg=result.output)
+        print(result.stdout)
+        # for sim-id
+        result = run_command('file', self.job_directory, 'get-status', '--sim-id', self.experiment.simulations[0].id)
         self.assertTrue(result.exit_code == 0, msg=result.output)
         print(result.stdout)
 
@@ -151,7 +163,7 @@ class TestCli(unittest.TestCase):
         print(result.stdout)
 
         # for --display
-        result = run_command('file', self.job_directory, 'status', '--exp-id', self.experiment.id,  '--display')
+        result = run_command('file', self.job_directory, 'status', '--exp-id', self.experiment.id, '--display')
         self.assertTrue(result.exit_code == 0, msg=result.output)
         print(result.stdout)
 
@@ -161,6 +173,11 @@ class TestCli(unittest.TestCase):
         print(result.stdout)
         # suite id
         result = run_command('file', self.job_directory, 'status-report', '--suite-id', self.suite.id)
+        self.assertTrue(result.exit_code == 0, msg=result.output)
+        print(result.stdout)
+        # with status-filter
+        result = run_command('file', self.job_directory, 'status-report', '--exp-id', self.experiment.id,
+                             '--status-filter', '0')
         self.assertTrue(result.exit_code == 0, msg=result.output)
         print(result.stdout)
 
