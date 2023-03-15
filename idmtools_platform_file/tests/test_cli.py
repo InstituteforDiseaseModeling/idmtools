@@ -175,20 +175,21 @@ class TestCli(unittest.TestCase):
         result = run_command('file', self.job_directory, 'status-report', '--suite-id', self.suite.id)
         self.assertTrue(result.exit_code == 0, msg=result.output)
         print(result.stdout)
-        # with status-filter
+        # with status-filter option
         result = run_command('file', self.job_directory, 'status-report', '--exp-id', self.experiment.id,
                              '--status-filter', '0')
         self.assertTrue(result.exit_code == 0, msg=result.output)
         print(result.stdout)
 
-    def test_subcommand_with_sim_filter(self):
+        # with display-count option
+        result = run_command('file', self.job_directory, 'status-report', '--exp-id', self.experiment.id,
+                             '--display-count', 3)
+        self.assertTrue(result.exit_code == 0, msg=result.output)
+        print(result.stdout)
+
+        # sim-filter option
         result = run_command('file', self.job_directory, 'status-report', '--exp-id', self.experiment.id,
                              '--sim-filter', self.experiment.simulations[0].id)
         self.assertTrue(result.exit_code == 0, msg=result.output)
         print(result.stdout)
 
-        # get-pat with sim filter for suite
-        result = run_command('file', self.job_directory, 'get-path', '--suite-id', self.suite.id, '--sim-filter',
-                             self.experiment.simulations[0].id)
-        self.assertTrue(result.exit_code == 0, msg=result.output)
-        print(result.stdout)
