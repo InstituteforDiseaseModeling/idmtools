@@ -42,7 +42,16 @@ def get_latest_experiment(platform: 'IPlatform') -> Dict:
         raise FileNotFoundError("Could not find the last Experiment")
 
 
-def check_status(platform: 'IPlatform', exp_id: str = None, display: bool = False):
+def check_status(platform: 'IPlatform', exp_id: str = None, display: bool = False) -> None:
+    """
+    List simulations status.
+    Args:
+        platform: Platform
+        exp_id: experiment id
+        display: True/False
+    Returns:
+        None
+    """
     if exp_id is None:
         exp_dic = get_latest_experiment(platform)
         exp_id = exp_dic['experiment_id']
