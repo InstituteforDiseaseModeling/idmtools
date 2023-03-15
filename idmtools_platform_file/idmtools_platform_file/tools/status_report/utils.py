@@ -57,7 +57,6 @@ def check_status(platform: 'IPlatform', exp_id: str = None, display: bool = Fals
         exp_id = exp_dic['experiment_id']
 
     _exp = platform.get_item(exp_id, ItemType.EXPERIMENT)
-    print(_exp)
 
     _pending = []
     _running = []
@@ -118,6 +117,14 @@ def clear_history(platform: 'IPlatform', exp_id: str = None, sim_id: Tuple = Non
     """
 
     def _clear_simulation(sim_id, remove_list):
+        """
+        Delete generated output files for simulation.
+        Args:
+            sim_id: simulation id
+            remove_list: extra files to be deleted
+        Returns:
+            None
+        """
         sim_dir = platform.get_directory_by_id(sim_id, ItemType.SIMULATION)
         for fi in SIMULATION_FILES + list(remove_list):
             if sim_dir.joinpath(fi).exists():
