@@ -21,7 +21,7 @@ from idmtools_test.utils.decorators import linux_only
 
 
 @pytest.mark.serial
-@linux_only
+#@linux_only
 class TestCli(unittest.TestCase):
 
     def create_experiment(self, platform=None, a=1, b=1, retries=None, wait_until_done=False, wait_on_done=False):
@@ -150,8 +150,8 @@ class TestCli(unittest.TestCase):
         self.assertTrue(result.exit_code == 0, msg=result.output)
         print(result.stdout)
 
-        # for sim-id
-        result = run_command('file', self.job_directory, 'status', '--sim-id', self.experiment.simulations[0].id)
+        # for --display
+        result = run_command('file', self.job_directory, 'status', '--exp-id', self.experiment.id,  '--display')
         self.assertTrue(result.exit_code == 0, msg=result.output)
         print(result.stdout)
 
