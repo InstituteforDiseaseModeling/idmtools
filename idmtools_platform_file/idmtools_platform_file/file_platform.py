@@ -16,14 +16,14 @@ from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.iplatform import IPlatform, ITEM_TYPE_TO_OBJECT_INTERFACE
-from idmtools_platform_file.utils import FILE_MAPS
+from idmtools_platform_file.platform_operations.utils import FILE_MAPS
 from idmtools_platform_file.assets import generate_script, generate_simulation_script
 from idmtools_platform_file.platform_operations.asset_collection_operations import FilePlatformAssetCollectionOperations
 from idmtools_platform_file.platform_operations.experiment_operations import FilePlatformExperimentOperations
 from idmtools_platform_file.platform_operations.json_metadata_operations import JSONMetadataOperations
 from idmtools_platform_file.platform_operations.simulation_operations import FilePlatformSimulationOperations
 from idmtools_platform_file.platform_operations.suite_operations import FilePlatformSuiteOperations
-from idmtools_platform_file.utils import FileExperiment, FileSimulation, FileSuite
+from idmtools_platform_file.platform_operations.utils import FileExperiment, FileSimulation, FileSuite
 
 logger = getLogger(__name__)
 
