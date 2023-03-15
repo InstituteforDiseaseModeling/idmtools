@@ -13,7 +13,7 @@ from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.utils.json import IDMJSONEncoder
-from idmtools_platform_file.utils import FileSuite, FileExperiment
+from idmtools_platform_file.platform_operations.utils import FileSuite, FileExperiment
 
 if TYPE_CHECKING:
     from idmtools_platform_file.file_platform import FilePlatform
