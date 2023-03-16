@@ -14,7 +14,7 @@ from idmtools.assets import AssetCollection, Asset
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.iplatform_ops.iplatform_asset_collection_operations import IPlatformAssetCollectionOperations
-from idmtools_platform_file.utils import FileSimulation
+from idmtools_platform_file.platform_operations.utils import FileSimulation
 
 if TYPE_CHECKING:
     from idmtools_platform_file.file_platform import FilePlatform

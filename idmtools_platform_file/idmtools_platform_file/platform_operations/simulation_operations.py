@@ -11,7 +11,7 @@ from idmtools.core import ItemType
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
-from idmtools_platform_file.utils import FileSimulation, FileExperiment, clean_experiment_name
+from idmtools_platform_file.platform_operations.utils import FileSimulation, FileExperiment, clean_experiment_name
 from logging import getLogger
 
 logger = getLogger(__name__)

@@ -42,11 +42,10 @@ setup(
     name='idmtools_platform_file',
     packages=find_packages(),
     test_suite='tests',
-
-    entry_points="""
-[idmtools_platform]
-idmtools_platform_file = idmtools_platform_file.plugin_info:FilePlatformSpecification
-""",
+    entry_points={"idmtools_platform": [
+        "idmtools_platform_file = idmtools_platform_file.plugin_info:FilePlatformSpecification"],
+        "idmtools_cli.cli_plugins": ["file=idmtools_platform_file.cli.file:file"]
+    },
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
     version='1.7.5+nightly'
