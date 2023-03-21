@@ -66,4 +66,4 @@ class ProcessPlatformExperimentOperations(FilePlatformExperimentOperations):
                 user_logger.info(
                     f'\nYou may try the following command to check simulations running status: \n  idmtools file {os.path.abspath(self.platform.job_directory)} status --exp-id {experiment.id}')
         else:
-            user_logger.warning("\nYou are running with dry_true=True")
+            user_logger.warning("\nYou are running with dry_run=True")
