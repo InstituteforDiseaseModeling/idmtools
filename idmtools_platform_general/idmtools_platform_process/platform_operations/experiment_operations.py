@@ -55,7 +55,7 @@ class ProcessPlatformExperimentOperations(FilePlatformExperimentOperations):
         Returns:
             None
         """
-        super().post_run_item(experiment)
+        super().post_run_item(experiment, **kwargs)
 
         if not dry_run:
             if platform.system() in ["Windows"]:
