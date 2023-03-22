@@ -1,12 +1,12 @@
 ![Staging: idmtools-platform-file](https://github.com/InstituteforDiseaseModeling/idmtools/workflows/Staging:%20idmtools-platform-file/badge.svg?branch=dev)
 
-# idmtools-platform-file
+# idmtools-platform-general
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-  - [Installing](#installing)
+- [Installing](#installing)
 - [Development Tips](#development-tips)
 - [Use Cases](#use-cases)
 - [Feature Roadmap](#feature-roadmap)
