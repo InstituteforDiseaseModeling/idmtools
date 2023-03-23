@@ -4,15 +4,12 @@ Here we implement the ProcessPlatform object.
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import subprocess
-from logging import getLogger
 from typing import Union, Any
 from dataclasses import dataclass
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools_platform_file.file_platform import FilePlatform
 from idmtools_platform_process.platform_operations.experiment_operations import ProcessPlatformExperimentOperations
-
-logger = getLogger(__name__)
 
 
 @dataclass(repr=False)
