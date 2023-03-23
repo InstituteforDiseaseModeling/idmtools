@@ -6,7 +6,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Installing](#installing)
+  - [Installing](#installing)
 - [Development Tips](#development-tips)
 - [Use Cases](#use-cases)
 - [Feature Roadmap](#feature-roadmap)
