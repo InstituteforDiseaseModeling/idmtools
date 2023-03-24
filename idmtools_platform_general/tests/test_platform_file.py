@@ -158,7 +158,7 @@ class TestFilePlatform(ITestWithPersistence):
             self.assertEqual(contents['item_type'], 'Experiment')
             self.assertEqual(contents['status'], 'CREATED')
             self.assertEqual(len(contents['assets']), 6)
-            self.assertEqual(contents['name'], 'test_generated_files_and_directories.py--test_generated_scripts')
+            self.assertEqual(contents['name'], 'test_platform_file.py--test_generated_scripts')
             self.assertEqual(contents['task_type'], 'idmtools.entities.command_task.CommandTask')
 
         # verify ids in metadata.json for simulation, also verify sweep parameter in config.json file
