@@ -19,12 +19,11 @@ class ProcessPlatformExperimentOperations(FilePlatformExperimentOperations):
     Experiment Operations for Process Platform.
     """
 
-    def platform_run_item(self, experiment: Experiment, dry_run: bool = False, **kwargs):
+    def platform_run_item(self, experiment: Experiment, **kwargs):
         """
         Run experiment.
         Args:
             experiment: idmtools Experiment
-            dry_run: True/False
             kwargs: keyword arguments used to expand functionality
         Returns:
             None
