@@ -18,31 +18,10 @@ class TestSingularity(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         self.job_directory = "DEST"
-        self.platform = Platform('SLURM_LOCAL', job_directory=self.job_directory)
+        self.platform = Platform('FILE', job_directory=self.job_directory)
 
-    def testExecutableMode(self):
-        command = "Assets/hello.sh"
-        task = CommandTask(command=command)
-        task.common_assets.add_asset("input/hello.sh")
-
-        # create experiment from task
-        experiment = Experiment.from_task(task, name="run_task")
-        suite = Suite(name='Idm Suite')
-        suite.update_tags({'name': 'suite_tag', 'idmtools': '123'})
-        suite.add_experiment(experiment)
-        suite.run(platform=self.platform, wait_until_done=False, wait_on_done=False,
-                  max_running_jobs=10,
-                  retries=5, dry_run=True)
-        for simulation in experiment.simulations:
-            simulation_dir = self.platform.get_directory(simulation)
-            exe = simulation_dir.joinpath(command)
-            self.assertTrue(os.access(exe, os.X_OK))
-            with open(os.path.join(simulation_dir, '_run.sh'), 'r') as fpr:
-                contents = fpr.read()
-            self.assertIn(command, contents)
-
-    def testSingularity(self):
-        command = "singularity exec /shared/rocky_dtk_runner_py39.sif Assets/hello.sh"
+    def test_command_build_singularity(self):
+        command = "singularity exec my.sif Assets/hello.sh"
         task = CommandTask(command=command)
         task.common_assets.add_asset("input/hello.sh")
 
@@ -52,9 +31,7 @@ class TestSingularity(ITestWithPersistence):
         suite.update_tags({'name': 'suite_tag', 'idmtools': '123'})
         # Add experiment to the suite
         suite.add_experiment(experiment)
-        suite.run(platform=self.platform, wait_until_done=False, wait_on_done=False,
-                  max_running_jobs=10,
-                  retries=5, dry_run=True)
+        suite.run(platform=self.platform, wait_on_done=False, wait_until_done=False)
         for simulation in experiment.simulations:
             simulation_dir = self.platform.get_directory(simulation)
             exe = simulation_dir.joinpath("Assets/hello.sh")
@@ -63,6 +40,8 @@ class TestSingularity(ITestWithPersistence):
                 contents = fpr.read()
             self.assertIn(command, contents)
 
+    # To test command line with extra command option for singularity case in _run.sh for each simulation
+    # note, we do not need to test run successfully, since we do not have actually sif file to test
     def test_extra_command_build_singularity(self):
         command = "Assets/hello.sh"  # assume hello.sh is our executable
         task = CommandTask(command=command)
@@ -76,9 +55,7 @@ class TestSingularity(ITestWithPersistence):
         suite.update_tags({'name': 'suite_tag', 'idmtools': '123'})
         # Add experiment to the suite
         suite.add_experiment(experiment)
-        suite.run(platform=self.platform, wait_until_done=False, wait_on_done=False,
-                  max_running_jobs=10,
-                  retries=5, dry_run=True)
+        suite.run(platform=self.platform, wait_on_done=False, wait_until_done=False)
         for simulation in experiment.simulations:
             simulation_dir = self.platform.get_directory(simulation)
             exe = simulation_dir.joinpath(command)

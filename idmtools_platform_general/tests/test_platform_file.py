@@ -27,7 +27,7 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 @pytest.mark.serial
 @linux_only
-class TestFilesAndDirectories(ITestWithPersistence):
+class TestFilePlatform(ITestWithPersistence):
 
     def create_experiment(self, platform=None, a=1, b=1, retries=None, wait_until_done=False, wait_on_done=False):
         task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model3.py"),
@@ -158,7 +158,7 @@ class TestFilesAndDirectories(ITestWithPersistence):
             self.assertEqual(contents['item_type'], 'Experiment')
             self.assertEqual(contents['status'], 'CREATED')
             self.assertEqual(len(contents['assets']), 6)
-            self.assertEqual(contents['name'], 'test_generated_files_and_directories.py--test_generated_scripts')
+            self.assertEqual(contents['name'], 'test_platform_file.py--test_generated_scripts')
             self.assertEqual(contents['task_type'], 'idmtools.entities.command_task.CommandTask')
 
         # verify ids in metadata.json for simulation, also verify sweep parameter in config.json file
