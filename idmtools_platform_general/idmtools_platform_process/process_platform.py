@@ -3,6 +3,7 @@ Here we implement the ProcessPlatform object.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+import platform
 import subprocess
 from typing import Union, Any
 from dataclasses import dataclass
@@ -10,6 +11,9 @@ from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools_platform_file.file_platform import FilePlatform
 from idmtools_platform_process.platform_operations.experiment_operations import ProcessPlatformExperimentOperations
+from logging import getLogger
+
+user_logger = getLogger('user')
 
 
 @dataclass(repr=False)
@@ -31,6 +35,11 @@ class ProcessPlatform(FilePlatform):
         Returns:
             Any
         """
+        if platform.system() in ["Windows"]:
+            user_logger.warning(
+                "\n/!\\ WARNING: The current ProcessPlatform only support running Experiment/Simulation on Linux!")
+            exit(-1)
+
         if isinstance(item, Experiment):
             working_directory = self.get_directory(item)
             result = subprocess.run(['bash', 'batch.sh'], stdout=subprocess.PIPE, cwd=str(working_directory))
