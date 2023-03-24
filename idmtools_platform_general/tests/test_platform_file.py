@@ -27,7 +27,7 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 @pytest.mark.serial
 @linux_only
-class TestFilesAndDirectories(ITestWithPersistence):
+class TestFilePlatform(ITestWithPersistence):
 
     def create_experiment(self, platform=None, a=1, b=1, retries=None, wait_until_done=False, wait_on_done=False):
         task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model3.py"),
