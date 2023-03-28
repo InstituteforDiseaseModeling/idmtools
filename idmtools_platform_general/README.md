@@ -1,6 +1,6 @@
 ![Staging: idmtools-platform-file](https://github.com/InstituteforDiseaseModeling/idmtools/workflows/Staging:%20idmtools-platform-file/badge.svg?branch=dev)
 
-# idmtools-platform-file
+# idmtools-platform-general
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -16,7 +16,7 @@
 ## Installing
 
 ```bash
-pip install idmtools-platform-file --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+pip install idmtools-platform-general --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
 ```
 
 # Development Tips
@@ -51,11 +51,3 @@ On Windows, you can use `pymake` instead of `make`
 
 * First Version
   * Support for basic provisioning on a linux filesystem
-* Second Version
-  * Support for Windows
-    * Look into documenting/testing Symbolic links on
-      Windows - https://www.howtogeek.com/16226/complete-guide-to-symbolic-links-symlinks-on-windows-or-linux/
-  * Support for Analysis Scripts
-  * Support for Workitems
-* Future
-  * Support for "True Asset Collections"

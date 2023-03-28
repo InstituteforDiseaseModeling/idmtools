@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-"""Runs a commnad in all the idmtools modules in this repo.
+"""
+Runs a command in all the idmtools modules in this repo.
 
 This is used in build processes to parallelize some operations.
 """
@@ -15,12 +16,13 @@ from typing import List, Optional, Dict
 base_directory = abspath(join(dirname(__file__), '..'))
 modules = ['idmtools_core', 'idmtools_cli', 'idmtools_platform_comps', 'idmtools_platform_local',
            'idmtools_models', 'idmtools_test', 'idmtools_platform_slurm', 'idmtools_slurm_utils',
-           'idmtools_platform_file']
+           'idmtools_platform_general']
 
 
 def run_command_on_all(idm_modules: List[str], command: str, parallel: bool = False, subdir: Optional[str] = None,
                        env_override: Dict[str, str] = None):
-    """Runs a command in all the idmtools packages.
+    """
+    Runs a command in all the idmtools packages.
 
     Args:
         idm_modules: List of modules to execute against
