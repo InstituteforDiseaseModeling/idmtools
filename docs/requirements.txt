@@ -4,5 +4,6 @@ sphinx-copybutton==0.5.1
 sphinx-rtd-theme==0.5.2
 sphinxcontrib-napoleon~=0.7
 sphinxcontrib-programoutput~=0.17
+sphinxext-rediraffe
 sphinx~=5.2.3
 pygithub~=1.57

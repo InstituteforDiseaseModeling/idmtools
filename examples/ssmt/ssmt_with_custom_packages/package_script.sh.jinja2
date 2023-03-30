@@ -1,0 +1,14 @@
+set -o noglob
+echo Running $@
+
+echo after install of newer idmtools
+
+export PYTHONPATH=$(pwd)/Assets/site-packages:$(pwd)/Assets/:$PYTHONPATH
+
+echo "Installing custom packages"
+
+{% for package in packages %}
+    echo "Installing {{ package }}"
+    pip install {{ package }} --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple --upgrade
+{% endfor %}
+$@

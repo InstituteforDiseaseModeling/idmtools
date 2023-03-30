@@ -7,10 +7,9 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import itertools
 from logging import getLogger, DEBUG
-from uuid import UUID
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.utils.file_parser import FileParser
-from typing import TYPE_CHECKING, Union, Dict
+from typing import TYPE_CHECKING, Dict
 from idmtools.core.interfaces.iitem import IItem
 from idmtools.entities.ianalyzer import TAnalyzerList
 
@@ -20,7 +19,7 @@ if TYPE_CHECKING:  # pragma: no cover
 logger = getLogger(__name__)
 
 
-def map_item(item: IItem) -> Dict[Union[str, UUID], Dict]:
+def map_item(item: IItem) -> Dict[str, Dict]:
     """
     Initialize some worker-global values; a worker process entry point for analyzer item-mapping.
 
@@ -28,7 +27,7 @@ def map_item(item: IItem) -> Dict[Union[str, UUID], Dict]:
         item: The item (often simulation) to process.
 
     Returns:
-        Dict[Union[str, UUID], Dict]
+        Dict[str, Dict]
     """
     # Retrieve the global variables coming from the pool initialization
 
@@ -42,7 +41,7 @@ def map_item(item: IItem) -> Dict[Union[str, UUID], Dict]:
     return _get_mapped_data_for_item(item, analyzers, platform)
 
 
-def _get_mapped_data_for_item(item: IEntity, analyzers: TAnalyzerList, platform: 'IPlatform') -> Dict[Union[str, UUID], Dict]:
+def _get_mapped_data_for_item(item: IEntity, analyzers: TAnalyzerList, platform: 'IPlatform') -> Dict[str, Dict]:
     """
     Get mapped data from an item.
 
@@ -54,7 +53,7 @@ def _get_mapped_data_for_item(item: IEntity, analyzers: TAnalyzerList, platform:
         platform: A platform object to query for information.
 
     Returns:
-        Dict[Union[str, UUID], Dict] - Array mapping file data to from UUID/string to contents
+        Dict[str, Dict] - Array mapping file data to from str to contents
 
     """
     try:

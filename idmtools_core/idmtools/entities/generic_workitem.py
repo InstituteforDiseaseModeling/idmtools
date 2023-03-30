@@ -4,7 +4,6 @@ The GenericWorkitem when fetches workitems from a server.
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 from dataclasses import dataclass, InitVar
-from uuid import UUID
 from idmtools.assets.file_list import FileList
 from idmtools.entities.command_task import CommandTask
 from idmtools.entities.iworkflow_item import IWorkflowItem
@@ -17,7 +16,7 @@ class GenericWorkItem(IWorkflowItem):
     """
     command: InitVar[str] = None
 
-    def __post_init__(self, item_name: str, asset_collection_id: UUID, asset_files: FileList, user_files: FileList, command: str):
+    def __post_init__(self, item_name: str, asset_collection_id: str, asset_files: FileList, user_files: FileList, command: str):
         """
         Initialize item.
 

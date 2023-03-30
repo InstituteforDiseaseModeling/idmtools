@@ -3,7 +3,6 @@ from dataclasses import field, dataclass
 from logging import getLogger, DEBUG
 from threading import Lock
 from typing import List, Any, Type, Dict, Union, TYPE_CHECKING
-from uuid import UUID, uuid4
 from idmtools.core import EntityStatus, UnknownItemException
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
@@ -22,8 +21,8 @@ class TestPlatformExperimentOperation(IPlatformExperimentOperations):
     platform_type: Type = Experiment
     experiments: Dict[str, Experiment] = field(default_factory=dict, compare=False, metadata={"pickle_ignore": True})
 
-    def get(self, experiment_id: Union[str,UUID], **kwargs) -> Experiment:
-        e = self.experiments.get(experiment_id if isinstance(experiment_id, UUID) else UUID(experiment_id))
+    def get(self, experiment_id: str, **kwargs) -> Experiment:
+        e = self.experiments.get(experiment_id)
         if e is None:
             raise UnknownItemException(f"Cannot find the experiment with the ID of: {experiment_id}")
         e.platform = self.platform
@@ -32,12 +31,10 @@ class TestPlatformExperimentOperation(IPlatformExperimentOperations):
     def platform_create(self, experiment: Experiment, **kwargs) -> Experiment:
         if logger.isEnabledFor(DEBUG):
             logger.debug('Creating Experiment')
-        uid = uuid4()
-        experiment.uid = uid
         EXPERIMENTS_LOCK.acquire()
-        self.experiments[uid] = experiment
+        self.experiments[experiment.uid] = experiment
         EXPERIMENTS_LOCK.release()
-        self.platform._simulations._save_simulations_to_cache(uid, list(), overwrite=True)
+        self.platform._simulations._save_simulations_to_cache(experiment.uid, list(), overwrite=True)
         logger.debug(f"Created Experiment {experiment.uid}")
         return experiment
 

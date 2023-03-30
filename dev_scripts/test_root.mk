@@ -46,12 +46,12 @@ reports-exist:
 test-all: reports-exist ## Run all our tests
 ifneq (1, $(PARALLEL_TESTING)) # Only run these tests if Parallel Only Testing is disabled
 	-echo "Running Serial Tests"
-	$(TEST_COMMAND) -m "serial"
+	$(TEST_COMMAND) -m "serial and not performance"
 	$(MAKE) mv-serial-reports
 endif
 ifneq (1, $(SERIAL_TESTING)) # Only run these tests if Serial Only Testing is disabled
 	-echo "Running Parallel Tests"
-	$(TEST_COMMAND) -n $(PARALLEL_TEST_COUNT) -m "not serial"
+	$(TEST_COMMAND) -n $(PARALLEL_TEST_COUNT) -m "not serial and not performance"
 endif
 ifneq (1, $(PARALLEL_TESTING))
 ifneq (1, $(SERIAL_TESTING))
@@ -99,12 +99,12 @@ test-ssmt: reports-exist ## Run our ssmt tests
 test-smoke: reports-exist ## Run our smoke tests
 ifneq (1, $(PARALLEL_TESTING)) # Only run these tests if Parallel Only Testing is disabled
 	-echo "Running Serial Tests"
-	$(TEST_COMMAND) -m "smoke and serial"
+	$(TEST_COMMAND) -m "smoke and serial and not performance"
 	$(MAKE) mv-serial-reports
 endif
 ifneq (1, $(SERIAL_TESTING)) # Only run these tests if Serial Only Testing is disabled
 	-echo "Running Parallel Tests"
-	$(TEST_COMMAND) -n $(PARALLEL_TEST_COUNT) -m "smoke and not serial"
+	$(TEST_COMMAND) -n $(PARALLEL_TEST_COUNT) -m "smoke and not serial and not performance"
 endif
 ifneq (1, $(PARALLEL_TESTING))
 ifneq (1, $(SERIAL_TESTING))
@@ -123,24 +123,24 @@ coverage-report-view: coverage-report ## Launch coverage report. Require running
 	$(PDS)/launch_dir_in_browser.py $(REPORT_DIR)/coverage/index.html
 
 coverage: clean ## Generate a code-coverage report
-	$(TEST_COMMAND) $(COVERAGE_OPTS) -m "not comps and not docker"
+	$(TEST_COMMAND) $(COVERAGE_OPTS) -m "not comps and not docker and not performance"
 
 coverage-smoke: clean ## Generate a code-coverage report
 ifneq (1, $(PARALLEL_TESTING)) # Only run these tests if Parallel Only Testing is disabled
 	-echo "Running Serial Tests"
-	$(TEST_COMMAND) $(COVERAGE_OPTS) -m "smoke and serial"
+	$(TEST_COMMAND) $(COVERAGE_OPTS) -m "smoke and serial and not performance"
 endif
 ifneq (1, $(SERIAL_TESTING)) # Only run these tests if Serial Only Testing is disabled
 	-echo "Running Parallel Tests"
-	$(TEST_COMMAND) $(COVERAGE_OPTS) -n $(PARALLEL_TEST_COUNT) -m "smoke and not serial"
+	$(TEST_COMMAND) $(COVERAGE_OPTS) -n $(PARALLEL_TEST_COUNT) -m "smoke and not serial and not performance"
 endif
 
 coverage-all: ## Generate a code-coverage report using all tests
 ifneq (1, $(PARALLEL_TESTING)) # Only run these tests if Parallel Only Testing is disabled
 	-echo "Running Serial Tests"
-	$(TEST_COMMAND) $(COVERAGE_OPTS) -m "serial"
+	$(TEST_COMMAND) $(COVERAGE_OPTS) -m "serial and not performance"
 endif
 ifneq (1, $(SERIAL_TESTING)) # Only run these tests if Serial Only Testing is disabled
 	-echo "Running Parallel Tests"
-	$(TEST_COMMAND) $(COVERAGE_OPTS) -n $(PARALLEL_TEST_COUNT) -m "not serial"
+	$(TEST_COMMAND) $(COVERAGE_OPTS) -n $(PARALLEL_TEST_COUNT) -m "not serial and not performance"
 endif

@@ -34,7 +34,7 @@ class TestSingularity(ITestWithPersistence):
                   max_running_jobs=10,
                   retries=5, dry_run=True)
         for simulation in experiment.simulations:
-            simulation_dir = self.platform._op_client.get_directory(simulation)
+            simulation_dir = self.platform.get_directory(simulation)
             exe = simulation_dir.joinpath(command)
             self.assertTrue(os.access(exe, os.X_OK))
             with open(os.path.join(simulation_dir, '_run.sh'), 'r') as fpr:
@@ -56,9 +56,33 @@ class TestSingularity(ITestWithPersistence):
                   max_running_jobs=10,
                   retries=5, dry_run=True)
         for simulation in experiment.simulations:
-            simulation_dir = self.platform._op_client.get_directory(simulation)
+            simulation_dir = self.platform.get_directory(simulation)
             exe = simulation_dir.joinpath("Assets/hello.sh")
             self.assertTrue(os.access(exe, os.X_OK))
             with open(os.path.join(simulation_dir, '_run.sh'), 'r') as fpr:
                 contents = fpr.read()
             self.assertIn(command, contents)
+
+    def test_extra_command_build_singularity(self):
+        command = "Assets/hello.sh"  # assume hello.sh is our executable
+        task = CommandTask(command=command)
+        task.sif_path = "my_sif.sif"
+        task.common_assets.add_asset("input/hello.sh")
+        task.command._options.update({"--python-script-path": "./Assets/python"})
+
+        # create experiment from task
+        experiment = Experiment.from_task(task, name="run_task_in_singularity")
+        suite = Suite(name='Idm Suite')
+        suite.update_tags({'name': 'suite_tag', 'idmtools': '123'})
+        # Add experiment to the suite
+        suite.add_experiment(experiment)
+        suite.run(platform=self.platform, wait_until_done=False, wait_on_done=False,
+                  max_running_jobs=10,
+                  retries=5, dry_run=True)
+        for simulation in experiment.simulations:
+            simulation_dir = self.platform.get_directory(simulation)
+            exe = simulation_dir.joinpath(command)
+            self.assertTrue(os.access(exe, os.X_OK))
+            with open(os.path.join(simulation_dir, '_run.sh'), 'r') as fpr:
+                contents = fpr.read()
+            self.assertIn("singularity exec " + task.sif_path + " " + command + " --python-script-path ./Assets/python", contents)

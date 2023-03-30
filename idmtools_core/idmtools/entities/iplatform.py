@@ -18,7 +18,7 @@ from pathlib import PureWindowsPath, PurePath
 from itertools import groupby
 from logging import getLogger, DEBUG
 from typing import Dict, List, NoReturn, Type, TypeVar, Any, Union, Tuple, Set, Iterator, Callable, Optional
-from uuid import UUID
+
 from idmtools import IdmConfigParser
 from idmtools.core import CacheEnabled, UnknownItemException, EntityContainer, UnsupportedPlatformType
 from idmtools.core.enums import ItemType, EntityStatus
@@ -165,7 +165,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         for fn in fs_kwargs:
             setattr(self, fn, field_value[fn])
 
-    def _get_platform_item(self, item_id: UUID, item_type: ItemType, **kwargs) -> Any:
+    def _get_platform_item(self, item_id: str, item_type: ItemType, **kwargs) -> Any:
         """
         Get an item by its ID.
 
@@ -187,7 +187,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item_type]
         return getattr(self, interface).get(item_id, **kwargs)
 
-    def get_item(self, item_id: Union[str, UUID], item_type: ItemType = None, force: bool = False, raw: bool = False,
+    def get_item(self, item_id: str, item_type: ItemType = None, force: bool = False, raw: bool = False,
                  **kwargs) -> Union[Experiment, Suite, Simulation, IWorkflowItem, AssetCollection, None]:
         """
         Retrieve an object from the platform.
@@ -303,7 +303,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
                     return item_type, ITEM_TYPE_TO_OBJECT_INTERFACE[item_type]
         raise ValueError(f"{self.__class__.__name__} has no mapping for {item.__class__.__name__}")
 
-    def get_children(self, item_id: UUID, item_type: ItemType,
+    def get_children(self, item_id: str, item_type: ItemType,
                      force: bool = False, raw: bool = False, item: Any = None, **kwargs) -> Any:
         """
         Retrieve the children of a given object.
@@ -379,7 +379,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
                 return getattr(self, parent_interface).to_entity(obj)
         return obj
 
-    def get_parent(self, item_id: UUID, item_type: ItemType = None, force: bool = False,
+    def get_parent(self, item_id: str, item_type: ItemType = None, force: bool = False,
                    raw: bool = False, **kwargs):
         """
         Retrieve the parent of a given object.
@@ -625,11 +625,11 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         return ret
 
-    def get_files_by_id(self, item_id: UUID, item_type: ItemType, files: Union[Set[str], List[str]],
+    def get_files_by_id(self, item_id: str, item_type: ItemType, files: Union[Set[str], List[str]],
                         output: str = None) -> \
             Union[Dict[str, Dict[str, bytearray]], Dict[str, bytearray]]:
         """
-        Get files by item id (UUID).
+        Get files by item id (str).
 
         Args:
             item_id: COMPS Item, say, Simulation Id or WorkItem Id
