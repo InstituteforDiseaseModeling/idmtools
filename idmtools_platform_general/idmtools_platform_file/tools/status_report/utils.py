@@ -30,7 +30,7 @@ def get_latest_experiment(platform: 'IPlatform') -> Dict:
     try:
         # take the last suite as the search scope
         last_suite_dir = max(Path(platform.job_directory).glob('*/'), key=os.path.getmtime)
-        batch_dir = max(Path(last_suite_dir).glob('*/batch.sh'), key=os.path.getmtime)
+        batch_dir = max(Path(last_suite_dir).glob('*/sbatch.sh'), key=os.path.getmtime)
         exp_dir = Path(batch_dir).parent
         exp_id = exp_dir.name
         suite_id = exp_dir.parent.name
@@ -78,6 +78,8 @@ def check_status(platform: 'IPlatform', exp_id: str = None, display: bool = Fals
                 _failed.append(f"    {sim.id}")
             else:
                 _running.append(f"    {sim.id}")
+
+    user_logger.info(f'\nExperiment Directory: \n{str(platform.get_directory(_exp))}')
 
     # Output report
     user_logger.info(f"\n{'Simulation Count: '.ljust(20)} {len(_simulations)}\n")
