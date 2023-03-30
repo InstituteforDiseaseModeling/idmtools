@@ -30,7 +30,7 @@ def get_latest_experiment(platform: 'IPlatform') -> Dict:
     try:
         # take the last suite as the search scope
         last_suite_dir = max(Path(platform.job_directory).glob('*/'), key=os.path.getmtime)
-        batch_dir = max(Path(last_suite_dir).glob('*/sbatch.sh'), key=os.path.getmtime)
+        batch_dir = max(Path(last_suite_dir).glob('*/batch.sh'), key=os.path.getmtime)
         exp_dir = Path(batch_dir).parent
         exp_id = exp_dir.name
         suite_id = exp_dir.parent.name
