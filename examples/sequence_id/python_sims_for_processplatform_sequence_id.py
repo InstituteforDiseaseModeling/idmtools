@@ -96,7 +96,7 @@ suite.add_experiment(experiment)
 
 suite.run(platform=platform, wait_on_done=True)
 # run following command to check status
-print("idmtools process " + job_directory + " status --exp-id " + experiment.id)
+print("idmtools file " + job_directory + " status --exp-id " + experiment.id)
 sys.exit(0 if experiment.succeeded else -1)
 
 
