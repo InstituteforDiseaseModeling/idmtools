@@ -1,6 +1,6 @@
 # This workflows will upload a Python Package using Twine when a release is created
 
-name: "Staging: idmtools-platform-file"
+name: "Staging: idmtools-platform-general"
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
       - dev
       - 'release**'
     paths:
-      - 'idmtools_platform_file/**'
+      - 'idmtools_platform_general/**'
 
 jobs:
   deploy-slurm-staging:
@@ -28,7 +28,7 @@ jobs:
           git config --global user.email "idmtools@idmod.org"
       - uses: actions/checkout@v2
       - name: Build and publish
-        working-directory: idmtools_platform_file
+        working-directory: idmtools_platform_general
         env:
           TWINE_REPOSITORY_URL: https://packages.idmod.org/api/pypi/idm-pypi-staging/
           TWINE_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}

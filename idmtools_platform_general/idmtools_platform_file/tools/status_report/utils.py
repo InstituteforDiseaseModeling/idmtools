@@ -79,6 +79,8 @@ def check_status(platform: 'IPlatform', exp_id: str = None, display: bool = Fals
             else:
                 _running.append(f"    {sim.id}")
 
+    user_logger.info(f'\nExperiment Directory: \n{str(platform.get_directory(_exp))}')
+
     # Output report
     user_logger.info(f"\n{'Simulation Count: '.ljust(20)} {len(_simulations)}\n")
 
