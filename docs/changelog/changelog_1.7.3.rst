@@ -13,7 +13,7 @@ Additional Changes
 * `#1858 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1858>`_ - Complete basic use of idmtools-slurm-bridge docs
 * `#1863 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1863>`_ - Presentation for Jaline
 * `#1876 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1876>`_ - Build new singularity image
-
+* `#1947 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1947>`_ - Utility code to support running on COMPS/Slurm
 
 Bugs
 ----
@@ -71,9 +71,10 @@ Platforms
 * `#1853 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1853>`_ - Add utils to platform-comps Utils
 * `#1854 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1854>`_ - Add utils to platform-slurm utils
 * `#1864 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1864>`_ - Document user installed packages in Singularity images
-
+* `#1963 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1963>`_ - slurm job count issue with add_multiple_parameter_sweep_definition
 
 User Experience
 ---------------
 * `#1804 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1804>`_ - Default root for run/job directories in slurm local platform is '.'
 * `#1805 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1805>`_ - Slurm local platform should make containing experiments/suites as needed
+
