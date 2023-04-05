@@ -7,7 +7,7 @@
 **Table of Contents**
 
 - [Development Tips](#development-tips)
-- [Future Work](#future-work)
+- [Manually run a script as a Slurm job](#manually-run-a-script-as-a-slurm-job)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
