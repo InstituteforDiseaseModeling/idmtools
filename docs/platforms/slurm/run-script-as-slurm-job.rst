@@ -46,5 +46,7 @@ Assume user has virtual environment created and activated.
 
     >cd <path to script folder>
 
-    >sbatch batch.sh
+    then::
+
+    >sbatch sbatch.sh
 
