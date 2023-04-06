@@ -70,3 +70,6 @@ Note: the content here is based on Northwestern University QUEST Slurm system. F
 then
 
    >sbatch sbatch.sh
+
+Note: any output information from my_script.py is stored in file stdout.txt under the current folder. For example, if my_script.py kicks out another Slurm job, then its Slurm id information can be found in file stdout.txt.
+

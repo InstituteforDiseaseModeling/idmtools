@@ -50,3 +50,6 @@ Assume user has virtual environment created and activated.
 
     >sbatch sbatch.sh
 
+.. note::
+
+    any output information from my_script.py is stored in file stdout.txt under the current folder. For example, if my_script.py kicks out another Slurm job, then its Slurm id information can be found in file stdout.txt.
