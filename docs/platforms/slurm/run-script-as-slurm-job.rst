@@ -44,7 +44,7 @@ Assume user has virtual environment created and activated.
 3.Run target script as SLURM job
     execute the following command from console (under virtual environment)::
 
-    cd <path to script folder>
+    cd path_to_script_folder
 
     then::
 

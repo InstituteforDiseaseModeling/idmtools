@@ -65,7 +65,7 @@ Note: the content here is based on Northwestern University QUEST Slurm system. F
 2. run your target script as SLURM job
    execute the following commands from console (under virtual environment):
 
-   cd <path to script_folder>
+   cd path_to_script_folder
 
 then
 
