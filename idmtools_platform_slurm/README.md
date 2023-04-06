@@ -65,11 +65,11 @@ Note: the content here is based on Northwestern University QUEST Slurm system. F
 2. run your target script as SLURM job
    execute the following commands from console (under virtual environment):
 
-   >cd <path to script_folder>
+   cd <path to script_folder>
 
 then
 
-   >sbatch sbatch.sh
+   sbatch sbatch.sh
 
 Note: any output information from my_script.py is stored in file stdout.txt under the current folder. For example, if my_script.py kicks out another Slurm job, then its Slurm id information can be found in file stdout.txt.
 
