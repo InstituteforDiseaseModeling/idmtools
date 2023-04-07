@@ -1,10 +1,15 @@
 """
 There are 2 ways to run this example for analyzer.
-1. Option1: run "python3 analyzer_example.py". This will first run python script (i.e analyzer_example.py) in slurm head
-   node, it then triggers slurm job for experiment/simulations, then run analyzer in head node.
-2. Option2, run "sbatch sbatch_for_analyzer_example.sh". This will trigger a slurm job to run python script
-   (i.e analyzer_example.py) in computation node. Then inside slurm, it will kick another slurm job (different jobid) to
-   create experiment/simulations and then analyzer code in first slurm job
+
+Option1: run "python3 analyzer_example.py".
+- This will run python script (i.e analyzer_example.py) on Slurm head node
+- analyzer_example.py first build experiment/simulations, and then triggers a Slurm job to run experiment/simulations
+- Next, analyzer_example.py continue to run AnalyzeManager for data analysis on Slurm head node
+
+Option2, run "sbatch sbatch_for_analyzer_example.sh".
+- This will trigger a slurm job to run python script (i.e analyzer_example.py) in computation node.
+- analyzer_example.py first build experiment/simulations, and then triggers a Slurm job to run experiment/simulations
+- Next, analyzer_example.py continue to run AnalyzeManager to do data analysis on computation node
 """
 from functools import partial
 

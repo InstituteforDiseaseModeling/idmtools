@@ -1,9 +1,20 @@
 """
 There are 2 ways to run this example.
-1. Option1: run "python3 example2.py". This will run python script on head node, then python script will trigger a slurm
-   job for creating experiment/simulations
-2. Option2, run "sbatch sbatch_for_example2.sh". This will trigger a slurm job for example2.py script immediately.
-   then examples2.py kicks another slurm job (different jobid) to create experiment/simulations
+Option1: run "python3 example2.py".
+- This will run python script (i.e example2.py) on Slurm head node .
+- example2.py first build experiment/simulations on head node
+- example2.py then triggers a Slurm job to run experiment/simulations
+
+Option2, run "sbatch sbatch_for_example2.sh".
+- This will trigger a Slurm job to run example2.py script on computation node.
+- example2.py first build experiment/simulations on Computation node
+- example2.py then kicks out another slurm job (different jobid) to run experiment/simulations
+
+Note: about QUEST Slurm environment - batch files (#SBATCH parameters...)
+These two samples takes Northwestern University Slurm environment QUEST as a demonstration and the samples are supposed
+ to run on QUEST head nodes. If you want to run these samples on other Slurm environments, based on their Slurm setup
+ configuration or requirements, you may have to pass different Slurm parameters (here, partition, time and account are
+ required Slurm parameters in QUEST).
 """
 import os
 import sys
