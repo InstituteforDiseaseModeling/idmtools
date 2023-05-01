@@ -66,10 +66,10 @@ def run_script_on_slurm(platform: 'SlurmPlatform', run_on_slurm: bool = False,
         True/False
     """
     from idmtools_platform_slurm.utils.slurm_job.slurm_job import SlurmJob
+    from idmtools_platform_slurm.slurm_platform import SlurmPlatform
 
-    # TODO: may check SlurmPlatform type instead
-    p = platform.__class__.__name__.lower()
-    if not p.startswith('slurm'):
+    # Double make sure it is Slurm Platform
+    if not isinstance(platform, SlurmPlatform):
         return False
 
     if run_on_slurm and not check_slurm_indicator():
