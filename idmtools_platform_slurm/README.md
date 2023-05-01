@@ -73,3 +73,26 @@ then
 
 Note: any output information from my_script.py is stored in file stdout.txt under the current folder. For example, if my_script.py kicks out another Slurm job, then its Slurm id information can be found in file stdout.txt.
 
+
+# Use SlurmJob to run a script as a Slurm job
+
+The example can be simple as the following:
+
+from idmtools.core.platform_factory import Platform
+from idmtools_platform_slurm.utils.slurm_job.slurm_job import SlurmJob
+
+run_script = '<user script path>'
+platform = Platform('SLURM_LOCAL', job_directory='<job_directory>')
+sj = SlurmJob(script_path=run_script, platform=platform)
+sj.run()
+
+
+# With SlurmPlaform to run a script as a Slurm job
+
+We have SlurmJob integrated into SlurmPlatform and any Python script can run as a Slurm job simply doing:
+
+from idmtools.core.platform_factory import Platform
+platform = Platform('SLURM_LOCAL', job_directory='<job_directory>', run_on_slurm=True)
+print('below content will run on Slurm as a job.')
+......
+
