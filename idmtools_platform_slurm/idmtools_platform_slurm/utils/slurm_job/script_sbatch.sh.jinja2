@@ -68,7 +68,7 @@ trap 'term_handler' TERM
 echo $SLURM_JOB_ID > job_id.txt
 
 echo "100" > job_status.txt
-{{ simulation.task.command.cmd }}
+{{ command }}
 RESULT=$?
 if [ $RESULT -eq 0 ]; then
 echo "0" > job_status.txt

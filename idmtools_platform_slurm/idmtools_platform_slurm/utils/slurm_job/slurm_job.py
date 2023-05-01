@@ -27,13 +27,13 @@ MSG = """Note: any output information from your script is stored in file stdout.
 TEMP_FILES = ['job_id.txt', 'job_status.txt', 'stdout.txt', 'stderr.txt', 'idmtools.log', 'COMPS_log.log']
 
 
-def generate_script(platform: 'SlurmPlatform', simulation: Simulation,
+def generate_script(platform: 'SlurmPlatform', command: str,
                     template: Union[Path, str] = DEFAULT_TEMPLATE_FILE, batch_dir: str = None, **kwargs) -> None:
     """
     Generate batch file sbatch.sh
     Args:
         platform: Slurm Platform
-        simulation: idmtools Simulation
+        command: execution command
         template: template to be used to build batch file
         kwargs: keyword arguments used to expand functionality
     Returns:
@@ -42,7 +42,7 @@ def generate_script(platform: 'SlurmPlatform', simulation: Simulation,
     from idmtools_platform_slurm.slurm_platform import CONFIG_PARAMETERS
     template_vars = dict(
         platform=platform,
-        simulation=simulation
+        command=command
     )
     # Populate from our platform config vars
     for p in CONFIG_PARAMETERS:
@@ -93,10 +93,8 @@ class SlurmJob:
             command = f"{self.executable} {Path(self.script_path).name} {' '.join(self.script_params)}"
         else:
             command = f"{self.executable} {Path(self.script_path).name}"
-        task = CommandTask(command=command)
-        simulation = task.to_simulation()
 
-        generate_script(self.platform, simulation, batch_dir=self.working_directory)
+        generate_script(self.platform, command, batch_dir=self.working_directory)
 
     def run(self, dry_run: bool = False, **kwargs) -> NoReturn:
         self.initialization()
