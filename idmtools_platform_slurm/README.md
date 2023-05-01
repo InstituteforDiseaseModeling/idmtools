@@ -8,6 +8,8 @@
 
 - [Development Tips](#development-tips)
 - [Manually run a script as a Slurm job](#manually-run-a-script-as-a-slurm-job)
+- [Use SlurmJob to run a script as a Slurm job](#use-slurmjob-to-run-a-script-as-a-slurm-job)
+- [With SlurmPlaform to run a script as a Slurm job](#with-slurmplaform-to-run-a-script-as-a-slurm-job)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
