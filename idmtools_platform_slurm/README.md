@@ -80,6 +80,8 @@ Note: any output information from my_script.py is stored in file stdout.txt unde
 
 The example can be simple as the following:
 
+--script.py--
+
 from idmtools.core.platform_factory import Platform
 from idmtools_platform_slurm.utils.slurm_job.slurm_job import SlurmJob
 
@@ -93,6 +95,8 @@ sj.run()
 # With SlurmPlaform to run a script as a Slurm job
 
 We have SlurmJob integrated into SlurmPlatform and any Python script can run as a Slurm job simply doing:
+
+--script.py--
 
 from idmtools.core.platform_factory import Platform
 platform = Platform('SLURM_LOCAL', job_directory='<job_directory>', run_on_slurm=True)
