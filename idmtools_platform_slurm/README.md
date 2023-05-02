@@ -9,6 +9,7 @@
 - [Development Tips](#development-tips)
 - [Manually run a script as a Slurm job](#manually-run-a-script-as-a-slurm-job)
 - [Use SlurmJob to run a script as a Slurm job](#use-slurmjob-to-run-a-script-as-a-slurm-job)
+- [script = 'example_path/python_sim_slurm.py'   &#035; example](#script--example_pathpython_sim_slurmpy----example)
 - [With SlurmPlaform to run a script as a Slurm job](#with-slurmplaform-to-run-a-script-as-a-slurm-job)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
