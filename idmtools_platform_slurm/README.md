@@ -81,7 +81,8 @@ The example can be simple as the following:
 from idmtools.core.platform_factory import Platform
 from idmtools_platform_slurm.utils.slurm_job.slurm_job import SlurmJob
 
-run_script = '<user script path>'
+script = '<user script path>'
+# script = 'example_path/python_sim_slurm.py'   # example
 platform = Platform('SLURM_LOCAL', job_directory='<job_directory>')
 sj = SlurmJob(script_path=run_script, platform=platform)
 sj.run()
