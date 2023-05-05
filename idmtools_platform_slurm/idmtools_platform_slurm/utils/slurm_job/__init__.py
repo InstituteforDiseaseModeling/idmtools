@@ -6,6 +6,7 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 import os
 import sys
 import subprocess
+from pathlib import Path
 from typing import TYPE_CHECKING, NoReturn
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -74,7 +75,10 @@ def run_script_on_slurm(platform: 'SlurmPlatform', run_on_slurm: bool = False,
 
     if run_on_slurm and not check_slurm_indicator():
         # Locate the script
-        script = os.path.abspath(sys.argv[0])
+        # Wrong path due to emod_malaria bug:
+        # script = os.path.abspath(sys.argv[0])
+        # Workaround: manually build full path
+        script = Path(sys.path[0]).joinpath(Path(sys.argv[0]).name)
         # Collect script input parameters
         script_params = sys.argv[1:]
         # Run script as Slurm job

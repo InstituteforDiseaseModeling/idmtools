@@ -5,6 +5,7 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import os
 import subprocess
+from os import PathLike
 from pathlib import Path
 from dataclasses import dataclass, field, InitVar, fields
 from typing import NoReturn, Optional, Union, Dict, List, TYPE_CHECKING
@@ -72,7 +73,7 @@ def generate_script(platform: 'SlurmPlatform', command: str,
 
 @dataclass(repr=False)
 class SlurmJob:
-    script_path: str = field(init=True)
+    script_path: PathLike = field(init=True)
     platform: 'SlurmPlatform' = field(default=None, init=True)
     executable: str = field(default='python3', init=True)
     script_params: List = field(default=None, init=True)
