@@ -1,6 +1,6 @@
 """
  This example shows how to run 'script.py' on slurm job with SlurmJob class
- Originally, script.py runs job on headnode then run experiment/simulation on slurm job
+ Originally, script.py build experiment on headnode then run experiment/simulation on slurm job.
  With SlurmJob as a wrapper, we can directly run script.py on slurm job.
  Note, actual experiment is created by nested slurm job which you can find job id in stdout.out of current running dir
 """
