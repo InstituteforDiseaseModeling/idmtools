@@ -1,10 +1,5 @@
 """
-example.py shows how to run everything on slurm job in computation nodes
-- First, it will run a slurm job for example.py to build experiment/simulations folder structure
-- Second, another slurm job will be triggered by first slurm job to run experiment/simulations
-
-Note, this example only run on Northwestern University QUEST cluster. if you want to run different slurm cluster, you
-may need to change Platform parameters (i.e partition, account, etc.)
+The required script for exampe_run_script.py which runs on slurm job
 """
 import os
 import sys
