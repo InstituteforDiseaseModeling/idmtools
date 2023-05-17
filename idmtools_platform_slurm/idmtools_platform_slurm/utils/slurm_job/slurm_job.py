@@ -98,9 +98,10 @@ class SlurmJob:
         generate_script(self.platform, command, batch_dir=self.working_directory)
 
     def run(self, dry_run: bool = False, **kwargs) -> NoReturn:
-        self.initialization()
         if self.cleanup:
             self.clean(self.working_directory)
+
+        self.initialization()
 
         if not dry_run:
             if not slurm_installed():
