@@ -25,7 +25,7 @@ if TYPE_CHECKING:
 DEFAULT_TEMPLATE_FILE = "script_sbatch.sh.jinja2"
 MSG = """Note: any output information from your script is stored in file stdout.txt under the script folder. For example, if you are running a script under current directory which kicks out another Slurm job, then the second Slurm job id is stored in stdout.txt under the current directory."""
 
-TEMP_FILES = ['job_id.txt', 'job_status.txt', 'stdout.txt', 'stderr.txt', 'idmtools.log', 'COMPS_log.log']
+TEMP_FILES = ['sbatch.sh', 'job_id.txt', 'job_status.txt', 'stdout.txt', 'stderr.txt']
 
 
 def generate_script(platform: 'SlurmPlatform', command: str,
@@ -76,7 +76,7 @@ class SlurmJob:
     script_path: PathLike = field(init=True)
     platform: 'SlurmPlatform' = field(default=None, init=True)
     executable: str = field(default='python3', init=True)
-    script_params: List = field(default=None, init=True)
+    script_params: List[str] = field(default=None, init=True)
     cleanup: bool = field(default=True, init=True)
 
     def __post_init__(self):
@@ -90,6 +90,10 @@ class SlurmJob:
         self.slurm_job_id = None
 
     def initialization(self):
+        # make str list so that we may join them together
+        if self.script_params is not None:
+            self.script_params = [str(i) for i in self.script_params]
+
         if self.script_params is not None:
             command = f"{self.executable} {Path(self.script_path).name} {' '.join(self.script_params)}"
         else:
@@ -98,9 +102,10 @@ class SlurmJob:
         generate_script(self.platform, command, batch_dir=self.working_directory)
 
     def run(self, dry_run: bool = False, **kwargs) -> NoReturn:
-        self.initialization()
         if self.cleanup:
             self.clean(self.working_directory)
+
+        self.initialization()
 
         if not dry_run:
             if not slurm_installed():
