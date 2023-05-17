@@ -25,7 +25,7 @@ if TYPE_CHECKING:
 DEFAULT_TEMPLATE_FILE = "script_sbatch.sh.jinja2"
 MSG = """Note: any output information from your script is stored in file stdout.txt under the script folder. For example, if you are running a script under current directory which kicks out another Slurm job, then the second Slurm job id is stored in stdout.txt under the current directory."""
 
-TEMP_FILES = ['job_id.txt', 'job_status.txt', 'stdout.txt', 'stderr.txt', 'idmtools.log', 'COMPS_log.log']
+TEMP_FILES = ['sbatch.sh', 'job_id.txt', 'job_status.txt', 'stdout.txt', 'stderr.txt']
 
 
 def generate_script(platform: 'SlurmPlatform', command: str,
