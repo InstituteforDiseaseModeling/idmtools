@@ -76,7 +76,7 @@ class SlurmJob:
     script_path: PathLike = field(init=True)
     platform: 'SlurmPlatform' = field(default=None, init=True)
     executable: str = field(default='python3', init=True)
-    script_params: List = field(default=None, init=True)
+    script_params: List[str] = field(default=None, init=True)
     cleanup: bool = field(default=True, init=True)
 
     def __post_init__(self):
@@ -90,6 +90,10 @@ class SlurmJob:
         self.slurm_job_id = None
 
     def initialization(self):
+        # make str list so that we may join them together
+        if self.script_params is not None:
+            self.script_params = [str(i) for i in self.script_params]
+
         if self.script_params is not None:
             command = f"{self.executable} {Path(self.script_path).name} {' '.join(self.script_params)}"
         else:
