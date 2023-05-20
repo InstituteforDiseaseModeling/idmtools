@@ -10,7 +10,7 @@ Option2, run "sbatch sbatch_for_example2.sh".
 - example2.py first build experiment/simulations on Computation node
 - example2.py then kicks out another slurm job (different jobid) to run experiment/simulations
 
-These two samples takes Northwestern University Slurm environment QUEST as a demonstration and the samples are supposed
+These two examples takes Northwestern University Slurm environment QUEST as a demonstration and the examples are supposed
  to run on QUEST head nodes. If you want to run these samples on other Slurm environments, based on their Slurm setup
  configuration or requirements, you may have to pass different Slurm parameters (here, partition, time and account are
  required Slurm parameters in QUEST).

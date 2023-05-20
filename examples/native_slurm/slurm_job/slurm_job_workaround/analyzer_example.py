@@ -11,7 +11,7 @@ Option2, run "sbatch sbatch_for_analyzer_example.sh".
 - analyzer_example.py first build experiment/simulations, and then triggers a Slurm job to run experiment/simulations
 - Next, analyzer_example.py continue to run AnalyzeManager to do data analysis on computation node
 
-These two samples takes Northwestern University Slurm environment QUEST as a demonstration and the samples are supposed
+These two examples takes Northwestern University Slurm environment QUEST as a demonstration and the examples are supposed
  to run on QUEST head nodes. If you want to run these samples on other Slurm environments, based on their Slurm setup
  configuration or requirements, you may have to pass different Slurm parameters (here, partition, time and account are
  required Slurm parameters in QUEST).
