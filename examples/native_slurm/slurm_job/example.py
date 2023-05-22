@@ -1,19 +1,10 @@
 """
-There are 2 ways to run this example.
-Option1: run "python3 example2.py".
-- This will run python script (i.e example2.py) on Slurm head node .
-- example2.py first build experiment/simulations on head node
-- example2.py then triggers a Slurm job to run experiment/simulations
+example.py shows how to run everything on slurm job in computation nodes with platform flag 'run_on_slurm=True'
+- First, it will run a slurm job for example.py to build experiment/simulations folder structure
+- Second, another slurm job will be triggered by first slurm job to run experiment/simulations
 
-Option2, run "sbatch sbatch_for_example2.sh".
-- This will trigger a Slurm job to run example2.py script on computation node.
-- example2.py first build experiment/simulations on Computation node
-- example2.py then kicks out another slurm job (different jobid) to run experiment/simulations
-
-These two samples takes Northwestern University Slurm environment QUEST as a demonstration and the samples are supposed
- to run on QUEST head nodes. If you want to run these samples on other Slurm environments, based on their Slurm setup
- configuration or requirements, you may have to pass different Slurm parameters (here, partition, time and account are
- required Slurm parameters in QUEST).
+Note, this example only run on Northwestern University QUEST cluster. if you want to run different slurm cluster, you
+may need to change Platform parameters (i.e partition, account, etc.)
 """
 import os
 import sys
@@ -35,7 +26,7 @@ job_directory = os.path.join(os.path.expanduser('~'), "example/slurm_job")
 
 # Note, this example only runs on NU with their partition and acct
 platform = Platform('SLURM_LOCAL', job_directory=job_directory, partition='b1139', time='10:00:00',
-                        account='b1139')
+                        account='b1139', run_on_slurm=True)
 
 task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model3.py"),
                                 envelope="parameters", parameters=(dict(c=0)))
