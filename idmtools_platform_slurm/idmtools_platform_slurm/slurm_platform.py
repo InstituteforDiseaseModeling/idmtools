@@ -23,6 +23,7 @@ from idmtools_platform_slurm.slurm_operations.operations_interface import SlurmO
 from idmtools_platform_slurm.slurm_operations.slurm_constants import SlurmOperationalMode
 from idmtools_platform_slurm.platform_operations.suite_operations import SlurmPlatformSuiteOperations
 from idmtools_platform_slurm.platform_operations.utils import SlurmSuite, SlurmExperiment, SlurmSimulation
+from idmtools_platform_slurm.utils.slurm_job import run_script_on_slurm
 
 logger = getLogger(__name__)
 
@@ -101,7 +102,10 @@ class SlurmPlatform(IPlatform):
     modules: list = field(default_factory=list, metadata=dict(sbatch=True))
 
     # Specifies default setting of whether slurm should fail if item directory already exists
-    dir_exist_ok: bool = field(default=False)
+    dir_exist_ok: bool = field(default=False, repr=False, compare=False)
+
+    # determine if run script as Slurm job
+    run_on_slurm: bool = field(default=False, repr=False, compare=False)
 
     # endregion
 
@@ -122,6 +126,11 @@ class SlurmPlatform(IPlatform):
         if self.job_directory is None:
             raise ValueError("Job Directory is required.")
         super().__post_init__()
+
+        # check if run script as a slurm job
+        r = run_script_on_slurm(self, run_on_slurm=self.run_on_slurm)
+        if r:
+            exit(0)     # finish the current workflow
 
     def __init_interfaces(self):
         if self.mode == SlurmOperationalMode.SSH:

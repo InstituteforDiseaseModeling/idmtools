@@ -3,6 +3,7 @@ Here we implement the SlurmPlatform experiment operations.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+import os
 import shutil
 from pathlib import Path
 from dataclasses import dataclass, field
@@ -286,3 +287,17 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
                 return result
         else:
             user_logger.info(f"Experiment {experiment_id} is not running, no cancel needed...")
+
+    def post_run_item(self, experiment: Experiment, **kwargs):
+        """
+        Trigger right after commissioning experiment on platform.
+
+        Args:
+            experiment: Experiment just commissioned
+            kwargs: keyword arguments used to expand functionality
+        Returns:
+            None
+        """
+        super().post_run_item(experiment, **kwargs)
+        user_logger.info(
+            f'\nYou may try the following command to check simulations running status: \n  idmtools slurm {os.path.abspath(self.platform.job_directory)} status --exp-id {experiment.id}')

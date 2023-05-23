@@ -8,6 +8,9 @@
 
 - [Development Tips](#development-tips)
 - [Manually run a script as a Slurm job](#manually-run-a-script-as-a-slurm-job)
+- [Use SlurmJob to run a script as a Slurm job](#use-slurmjob-to-run-a-script-as-a-slurm-job)
+- [script = 'example_path/python_sim_slurm.py'   &#035; example](#script--example_pathpython_sim_slurmpy----example)
+- [With SlurmPlaform to run a script as a Slurm job](#with-slurmplaform-to-run-a-script-as-a-slurm-job)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -72,4 +75,32 @@ then
    sbatch sbatch.sh
 
 Note: any output information from my_script.py is stored in file stdout.txt under the current folder. For example, if my_script.py kicks out another Slurm job, then its Slurm id information can be found in file stdout.txt.
+
+
+# Use SlurmJob to run a script as a Slurm job
+
+The example can be simple as the following:
+
+--script.py--
+
+from idmtools.core.platform_factory import Platform
+from idmtools_platform_slurm.utils.slurm_job.slurm_job import SlurmJob
+
+script = '<user script path>'
+# script = 'example_path/python_sim_slurm.py'   # example
+platform = Platform('SLURM_LOCAL', job_directory='<job_directory>')
+sj = SlurmJob(script_path=script, platform=platform)
+sj.run()
+
+
+# With SlurmPlaform to run a script as a Slurm job
+
+We have SlurmJob integrated into SlurmPlatform and any Python script can run as a Slurm job simply doing:
+
+--script.py--
+
+from idmtools.core.platform_factory import Platform
+platform = Platform('SLURM_LOCAL', job_directory='<job_directory>', run_on_slurm=True)
+print('below content will run on Slurm as a job.')
+......
 
