@@ -109,7 +109,7 @@ class SlurmJob:
 
         if not dry_run:
             if not slurm_installed():
-                user_logger.warn('Slurm is not installed/available!')
+                user_logger.warnning('Slurm is not installed/available!')
                 exit(-1)
 
             user_logger.info('Script is running as a slurm job!\n')
@@ -122,7 +122,7 @@ class SlurmJob:
 
             user_logger.info(f"{'job_id: '.ljust(20)} {self.slurm_job_id}")
             user_logger.info(f"{'job_directory: '.ljust(20)} {self.platform.job_directory}\n")
-            user_logger.warn(MSG)
+            user_logger.warnning(MSG)
         else:
             print('Script run with dry_run = True')
 
