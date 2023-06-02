@@ -1,3 +1,8 @@
+"""
+SlurmPlatform utilities.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 from pathlib import Path
 from jinja2 import Template
 from typing import TYPE_CHECKING, Optional, Union
@@ -7,6 +12,70 @@ if TYPE_CHECKING:
     from idmtools_platform_slurm.slurm_platform import SlurmPlatform, CONFIG_PARAMETERS
 
 DEFAULT_TEMPLATE_FILE = Path(__file__).parent.joinpath("sbatch.sh.jinja2")
+BATCH_TEMPLATE_FILE = Path(__file__).parent.joinpath("batch.sh.jinja2")
+
+
+def generate_batch(platform: 'SlurmPlatform', experiment: Experiment,
+                   max_running_jobs: Optional[int] = None, array_size: Optional[int] = None,
+                   dependency: Optional[bool] = None,
+                   template: Union[Path, str] = BATCH_TEMPLATE_FILE, **kwargs) -> None:
+    """
+    Generate bash script file batch.sh
+    Args:
+        platform: Slurm Platform
+        experiment: idmtools Experiment
+        max_running_jobs: int, how many allowed to run
+        array_size: INT, array size for slurm job
+        dependency: bool, determine if Slurm jobs depend on each other
+        template: template to be used to build batch file
+        kwargs: keyword arguments used to expand functionality
+    Returns:
+        None
+    """
+    template_vars = dict(njobs=experiment.simulation_count)
+
+    # Set max_running_jobs
+    if max_running_jobs is not None:
+        if platform.max_running_jobs is not None:
+            template_vars['max_running_jobs'] = min(max_running_jobs, platform.max_running_jobs)
+        else:
+            template_vars['max_running_jobs'] = max_running_jobs
+    else:
+        if platform.max_running_jobs is not None:
+            template_vars['max_running_jobs'] = platform.max_running_jobs
+        else:
+            template_vars['max_running_jobs'] = 1
+
+    # Set array_size
+    if array_size is not None:
+        if platform.max_array_size is None:
+            template_vars['array_size'] = min(array_size, experiment.simulation_count)
+        else:
+            template_vars['array_size'] = min(array_size, platform.max_array_size, experiment.simulation_count)
+    elif platform.max_array_size is not None:
+        template_vars['array_size'] = min(platform.max_array_size, experiment.simulation_count)
+    else:
+        template_vars['array_size'] = experiment.simulation_count
+
+    # Consider dependency
+    if dependency is None:
+        dependency = True
+    template_vars['dependency'] = dependency
+
+    # Update with possible override values
+    template_vars.update(kwargs)
+
+    # Build batch based on the given template
+    with open(template) as file_:
+        t = Template(file_.read())
+
+    # Write out file
+    output_target = platform._op_client.get_directory(experiment).joinpath("batch.sh")
+    with open(output_target, "w") as tout:
+        tout.write(t.render(template_vars))
+
+    # Make executable
+    platform._op_client.update_script_mode(output_target)
 
 
 def generate_script(platform: 'SlurmPlatform', experiment: Experiment, max_running_jobs: Optional[int] = None,
@@ -16,7 +85,7 @@ def generate_script(platform: 'SlurmPlatform', experiment: Experiment, max_runni
     Args:
         platform: Slurm Platform
         experiment: idmtools Experiment
-        max_running_jobs: int
+        max_running_jobs: int, how many allowed to run at the same time
         template: template to be used to build batch file
         kwargs: keyword arguments used to expand functionality
     Returns:
@@ -35,7 +104,7 @@ def generate_script(platform: 'SlurmPlatform', experiment: Experiment, max_runni
     if max_running_jobs is None and platform.max_running_jobs is None:
         template_vars['max_running_jobs'] = 1
 
-    # add any overides. We need some validation here later
+    # Add any overides. We need some validation here later
     # TODO add validation for valid config options
     template_vars.update(kwargs)
 
@@ -45,7 +114,7 @@ def generate_script(platform: 'SlurmPlatform', experiment: Experiment, max_runni
     with open(template) as file_:
         t = Template(file_.read())
 
-    # Write our file
+    # Write out file
     output_target = platform._op_client.get_directory(experiment).joinpath("sbatch.sh")
     with open(output_target, "w") as tout:
         tout.write(t.render(template_vars))

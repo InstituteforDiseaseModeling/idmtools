@@ -1,0 +1,50 @@
+#!/bin/bash
+
+
+get_min() {
+    if [ $1 -lt $2 ]
+    then
+        echo $1
+    else
+        echo $2
+    fi
+}
+
+# Set the total number of tasks
+total_tasks={{njobs}}
+
+# Set the number of tasks per array job
+tasks_per_job={{array_size}}
+
+# Set max running jobs
+max_jobs={{max_running_jobs}}
+
+# Submit the first array job with tasks 1-array_size
+job_id=$(sbatch --array=1-$tasks_per_job%$max_jobs sbatch.sh | awk '{print $4}')
+echo $job_id >> job_id.txt
+
+# Submit additional array jobs that depend on the first job
+for (( i=$tasks_per_job+1; i<=$total_tasks; i+=$tasks_per_job ))
+do
+    # Calculate the task range for the current array job
+    start_task=$i
+    end_task=$((i + tasks_per_job - 1))
+
+    # Get the min
+    end_task=$(get_min $end_task $total_tasks)
+
+    # Submit the array job with the current task range and a dependency on the previous job
+    {% if dependency is defined and dependency %}
+        new_job_id=$(sbatch --array=$start_task-$end_task%$max_jobs --dependency=afterok:$job_id sbatch.sh | awk '{print $4}')
+    {% else %}
+        new_job_id=$(sbatch --array=$start_task-$end_task%$max_jobs sbatch.sh | awk '{print $4}')
+    {% endif %}
+
+    # Keep the job id
+    echo $new_job_id >> job_id.txt
+
+    # Update the job ID to use as a dependency for the next array job
+    job_id=$new_job_id
+done
+
+wait
