@@ -280,7 +280,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
                 return
             else:
                 result = self.platform._op_client.cancel_job(job_id)
-                user_logger.info(result)
+                user_logger.info(f"Cancel Experiment {experiment_id}: {result}")
                 return result
         else:
             user_logger.info(f"Experiment {experiment_id} is not running, no cancel needed...")

@@ -215,7 +215,7 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
                 return
             else:
                 result = self.platform._op_client.cancel_job(job_id)
-                user_logger.info(result)
+                user_logger.info(f"Cancel Simulation: {sim_id}: {result}")
                 return result
         else:
             user_logger.info(f"Simulation {sim_id} is not running, no cancel needed...")
