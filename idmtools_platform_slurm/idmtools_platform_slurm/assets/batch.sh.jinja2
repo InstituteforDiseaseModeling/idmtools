@@ -1,6 +1,6 @@
 #!/bin/bash
 
-
+# Utility function
 get_min() {
     if [ $1 -lt $2 ]
     then
@@ -21,6 +21,7 @@ max_jobs={{max_running_jobs}}
 
 # Submit the first array job with tasks 1-array_size
 job_id=$(sbatch --array=1-$tasks_per_job%$max_jobs sbatch.sh | awk '{print $4}')
+# Store the job id
 echo $job_id >> job_id.txt
 
 # Submit additional array jobs that depend on the first job
@@ -40,9 +41,8 @@ do
         new_job_id=$(sbatch --array=$start_task-$end_task%$max_jobs sbatch.sh | awk '{print $4}')
     {% endif %}
 
-    # Keep the job id
+    # Store the job id
     echo $new_job_id >> job_id.txt
-
     # Update the job ID to use as a dependency for the next array job
     job_id=$new_job_id
 done
