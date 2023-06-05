@@ -95,6 +95,11 @@ def add_dummy_suite(experiment: Experiment, suite_name: str = None, tags: Dict =
 
 
 def get_max_array_size():
+    """
+    Get Slurm MaxArraySize from configuration.
+    Returns:
+        Slurm system MaxArraySize
+    """
     try:
         output = subprocess.check_output(['scontrol', 'show', 'config'])
         for line in output.decode().splitlines():
