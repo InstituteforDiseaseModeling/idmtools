@@ -105,7 +105,7 @@ def get_max_array_size():
         for line in output.decode().splitlines():
             if line.startswith("MaxArraySize"):
                 max_array_size = int(line.split("=")[1])
-                return max_array_size
+                return max_array_size - 1
     except (subprocess.CalledProcessError, IndexError, ValueError):
         pass
 

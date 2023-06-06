@@ -1,50 +1,54 @@
 #!/bin/bash
 
-# Utility function
-get_min() {
-    if [ $1 -lt $2 ]
-    then
-        echo $1
-    else
-        echo $2
-    fi
-}
-
 # Set the total number of tasks
 total_tasks={{njobs}}
 
 # Set the number of tasks per array job
-tasks_per_job={{array_size}}
+batch_size={{array_size}}
 
 # Set max running jobs
 max_jobs={{max_running_jobs}}
 
+num_batches=$((total_tasks / batch_size))
+remainder=$((total_tasks % batch_size))
+
+echo "num_batches: $num_batches"
+echo "remainder: $remainder"
+
 # Submit the first array job with tasks 1-array_size
-job_id=$(sbatch --array=1-$tasks_per_job%$max_jobs sbatch.sh | awk '{print $4}')
-# Store the job id
+job_id=$(sbatch --array=1-$batch_size%$max_jobs sbatch.sh 0 | awk '{print $4}')
 echo $job_id >> job_id.txt
 
 # Submit additional array jobs that depend on the first job
-for (( i=$tasks_per_job+1; i<=$total_tasks; i+=$tasks_per_job ))
+for (( i=1; i<$num_batches; i+=1 ))
 do
     # Calculate the task range for the current array job
-    start_task=$i
-    end_task=$((i + tasks_per_job - 1))
-
-    # Get the min
-    end_task=$(get_min $end_task $total_tasks)
+    start_task=$((i * $batch_size))
 
     # Submit the array job with the current task range and a dependency on the previous job
-    {% if dependency is defined and dependency %}
-        new_job_id=$(sbatch --array=$start_task-$end_task%$max_jobs --dependency=afterok:$job_id sbatch.sh | awk '{print $4}')
-    {% else %}
-        new_job_id=$(sbatch --array=$start_task-$end_task%$max_jobs sbatch.sh | awk '{print $4}')
-    {% endif %}
-
-    # Store the job id
+    if [ $dependency ]; then
+        new_job_id=$(sbatch --array=1-$batch_size%$max_jobs --dependency=afterok:$job_id sbatch.sh $start_task | awk '{print $4}')
+    else
+        new_job_id=$(sbatch --array=1-$batch_size%$max_jobs sbatch.sh $start_task | awk '{print $4}')
+    fi
     echo $new_job_id >> job_id.txt
+
     # Update the job ID to use as a dependency for the next array job
     job_id=$new_job_id
 done
+
+# Submit the remaining tasks as a separate batch
+if [ $remainder -gt 0 ]
+then
+    start_task=$(($num_batches * $batch_size))
+
+    # Submit the array job with the current task range and a dependency on the previous job
+    if [ $dependency ]; then
+        new_job_id=$(sbatch --array=1-$remainder%$max_jobs --dependency=afterok:$job_id sbatch.sh $start_task | awk '{print $4}')
+    else
+        new_job_id=$(sbatch --array=1-$remainder%$max_jobs sbatch.sh $start_task | awk '{print $4}')
+    fi
+    echo $new_job_id >> job_id.txt
+fi
 
 wait
