@@ -26,11 +26,11 @@ do
     start_task=$((i * $batch_size))
 
     # Submit the array job with the current task range and a dependency on the previous job
-    if [ $dependency ]; then
+    {% if dependency is defined and dependency %}
         new_job_id=$(sbatch --array=1-$batch_size%$max_jobs --dependency=afterok:$job_id sbatch.sh $start_task | awk '{print $4}')
-    else
+    {% else %}
         new_job_id=$(sbatch --array=1-$batch_size%$max_jobs sbatch.sh $start_task | awk '{print $4}')
-    fi
+    {% endif %}
     echo $new_job_id >> job_id.txt
 
     # Update the job ID to use as a dependency for the next array job
@@ -43,11 +43,11 @@ then
     start_task=$(($num_batches * $batch_size))
 
     # Submit the array job with the current task range and a dependency on the previous job
-    if [ $dependency ]; then
+    {% if dependency is defined and dependency %}
         new_job_id=$(sbatch --array=1-$remainder%$max_jobs --dependency=afterok:$job_id sbatch.sh $start_task | awk '{print $4}')
-    else
+    {% else %}
         new_job_id=$(sbatch --array=1-$remainder%$max_jobs sbatch.sh $start_task | awk '{print $4}')
-    fi
+    {% endif %}
     echo $new_job_id >> job_id.txt
 fi
 
