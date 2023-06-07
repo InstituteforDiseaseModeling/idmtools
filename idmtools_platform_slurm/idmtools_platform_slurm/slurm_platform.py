@@ -31,7 +31,7 @@ logger = getLogger(__name__)
 op_defaults = dict(default=None, compare=False, metadata={"pickle_ignore": True})
 CONFIG_PARAMETERS = ['ntasks', 'partition', 'nodes', 'mail_type', 'mail_user', 'ntasks_per_core', 'cpus_per_task',
                      'mem_per_cpu', 'time', 'constraint', 'account', 'mem', 'exclusive', 'requeue', 'sbatch_custom',
-                     'max_running_jobs', 'max_array_size']
+                     'max_running_jobs', 'array_batch_size']
 
 
 @dataclass(repr=False)
@@ -106,7 +106,7 @@ class SlurmPlatform(IPlatform):
     dir_exist_ok: bool = field(default=False, repr=False, compare=False)
 
     # Set array max size for Slurm job
-    max_array_size: int = field(default=1000, metadata=dict(sbatch=False))
+    array_batch_size: int = field(default=None, metadata=dict(sbatch=False))
 
     # determine if run script as Slurm job
     run_on_slurm: bool = field(default=False, repr=False, compare=False)
@@ -131,11 +131,9 @@ class SlurmPlatform(IPlatform):
             raise ValueError("Job Directory is required.")
 
         # check max_array_size from slurm configuration
+        self._max_array_size = None
         if slurm_installed():
-            _max_array_size = get_max_array_size()
-            if _max_array_size is not None:
-                if self.max_array_size > _max_array_size:
-                    self.max_array_size = _max_array_size
+            self._max_array_size = get_max_array_size()
 
         super().__post_init__()
 

@@ -16,7 +16,7 @@ BATCH_TEMPLATE_FILE = Path(__file__).parent.joinpath("batch.sh.jinja2")
 
 
 def generate_batch(platform: 'SlurmPlatform', experiment: Experiment,
-                   max_running_jobs: Optional[int] = None, array_size: Optional[int] = None,
+                   max_running_jobs: Optional[int] = None, array_batch_size: Optional[int] = None,
                    dependency: Optional[bool] = None,
                    template: Union[Path, str] = BATCH_TEMPLATE_FILE, **kwargs) -> None:
     """
@@ -47,15 +47,19 @@ def generate_batch(platform: 'SlurmPlatform', experiment: Experiment,
             template_vars['max_running_jobs'] = 1
 
     # Set array_size
-    if array_size is not None:
-        if platform.max_array_size is None:
-            template_vars['array_size'] = min(array_size, experiment.simulation_count)
+    if array_batch_size is not None:
+        platform.array_batch_size = array_batch_size
+
+    if platform._max_array_size is not None:
+        if platform.array_batch_size is not None:
+            template_vars['array_batch_size'] = min(platform._max_array_size, platform.array_batch_size,
+                                                    experiment.simulation_count)
         else:
-            template_vars['array_size'] = min(array_size, platform.max_array_size, experiment.simulation_count)
-    elif platform.max_array_size is not None:
-        template_vars['array_size'] = min(platform.max_array_size, experiment.simulation_count)
+            template_vars['array_batch_size'] = min(platform._max_array_size, experiment.simulation_count)
+    elif platform.array_batch_size is not None:
+        template_vars['array_batch_size'] = min(platform.array_batch_size, experiment.simulation_count)
     else:
-        template_vars['array_size'] = experiment.simulation_count
+        template_vars['array_batch_size'] = experiment.simulation_count
 
     # Consider dependency
     if dependency is None:

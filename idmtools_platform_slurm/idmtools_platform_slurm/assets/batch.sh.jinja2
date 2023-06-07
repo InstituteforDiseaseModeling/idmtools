@@ -4,7 +4,7 @@
 total_tasks={{njobs}}
 
 # Set the number of tasks per array job
-batch_size={{array_size}}
+batch_size={{array_batch_size}}
 
 # Set max running jobs
 max_jobs={{max_running_jobs}}
@@ -15,7 +15,7 @@ remainder=$((total_tasks % batch_size))
 echo "num_batches: $num_batches"
 echo "remainder: $remainder"
 
-# Submit the first array job with tasks 1-array_size
+# Submit the first array job with tasks 1-batch_size
 job_id=$(sbatch --array=1-$batch_size%$max_jobs sbatch.sh 0 | awk '{print $4}')
 echo $job_id >> job_id.txt
 

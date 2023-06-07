@@ -174,7 +174,7 @@ class LocalSlurmOperations(SlurmOperations):
             logger.debug(f"Failed to change file mode for executable: {exe}")
 
     def create_batch_file(self, item: Union[Experiment, Simulation], max_running_jobs: int = None, retries: int = None,
-                          array_size: int = None, dependency: bool = True, **kwargs) -> None:
+                          array_batch_size: int = None, dependency: bool = True, **kwargs) -> None:
         """
         Create batch file.
         Args:
@@ -184,7 +184,7 @@ class LocalSlurmOperations(SlurmOperations):
             None
         """
         if isinstance(item, Experiment):
-            generate_batch(self.platform, item, max_running_jobs, array_size, dependency)
+            generate_batch(self.platform, item, max_running_jobs, array_batch_size, dependency)
             generate_script(self.platform, item, max_running_jobs)
         elif isinstance(item, Simulation):
             generate_simulation_script(self.platform, item, retries)
