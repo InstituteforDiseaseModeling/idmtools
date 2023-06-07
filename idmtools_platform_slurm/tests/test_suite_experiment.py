@@ -62,11 +62,12 @@ class TestSuiteExperiment(ITestWithPersistence):
             experiment_dir = self.platform.get_directory(experiment)
             experiment_sub_dirs, experiment_files = self.get_dirs_and_files(experiment_dir)
             # Verify all files under experiment
-            self.assertTrue(len(experiment_files) == 3)
+            self.assertTrue(len(experiment_files) == 4)
             experiment_path_prefix = self.job_directory + "/" + suite.id + "/" + experiment.id + "/"
             expected_files = set([pathlib.Path(experiment_path_prefix + "metadata.json"),
                                   pathlib.Path(experiment_path_prefix + "run_simulation.sh"),
-                                  pathlib.Path(experiment_path_prefix + "sbatch.sh")])
+                                  pathlib.Path(experiment_path_prefix + "sbatch.sh"),
+                                  pathlib.Path(experiment_path_prefix + "batch.sh")])
             self.assertSetEqual(set(experiment_files), expected_files)
             # Verify all sub directories under experiment
             self.assertTrue(len(experiment_sub_dirs) == 2)
