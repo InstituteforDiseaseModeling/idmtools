@@ -79,9 +79,8 @@ suite = Suite(name='Idm Suite')
 suite.update_tags({'name': 'suite_tag', 'idmtools': '123'})
 # Add experiment to the suite
 suite.add_experiment(experiment)
-# platform._max_array_size = 10
-# With array_batch_size=50, it should create 3 slurm jobs for this example with total 150 simulations
-experiment.run(platform=platform, wait_until_done=True, array_batch_size=50, dependency=True, dry_run=False)
+# With array_batch_size=45, it should create 4 slurm jobs for this example with total 150 simulations
+experiment.run(platform=platform, wait_until_done=True, array_batch_size=45, dependency=True)
 sys.exit(0 if experiment.succeeded else -1)
 
 
