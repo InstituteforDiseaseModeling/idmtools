@@ -36,7 +36,7 @@ def create_bridged_job(working_directory, bridged_jobs_directory, results_direct
     jn = Path(bridged_jobs_directory).joinpath(f'{bridged_id}.json')
     rf = Path(results_directory).joinpath(f'{bridged_id}.json.result')
     with open(jn, "w") as jout:
-        info = dict(command='sbatch', working_directory=str(working_directory))
+        info = dict(command='bash', working_directory=str(working_directory))
         if logger.isEnabledFor(DEBUG):
             logger.debug(f"Requesting job: {jn} in {working_directory}")
         json.dump(info, jout)

@@ -5,10 +5,11 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import json
 import os
-from logging import getLogger, DEBUG
 from os import PathLike
 from pathlib import Path
 from typing import Dict
+from logging import getLogger, DEBUG
+from idmtools_slurm_utils.bash import command_bash
 from idmtools_slurm_utils.sbatch import command_sbatch
 from idmtools_slurm_utils.scancel import command_scancel
 from idmtools_slurm_utils.verify import command_verify
@@ -65,6 +66,8 @@ def get_job_result(job_path: PathLike) -> Dict:
             command = info['command'].lower()
             if command == "sbatch":
                 result = command_sbatch(info)
+            elif command == "bash":
+                result = command_bash(info)
             elif command == "verify":
                 result = command_verify(info)
             elif command == "scancel":
