@@ -3,6 +3,7 @@ This is SlurmPlatform operations utils.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+import subprocess
 from typing import Dict
 from idmtools.core import ItemType
 from idmtools.entities import Suite
@@ -91,3 +92,21 @@ def add_dummy_suite(experiment: Experiment, suite_name: str = None, tags: Dict =
     suite.add_experiment(experiment)
 
     return suite
+
+
+def get_max_array_size():
+    """
+    Get Slurm MaxArraySize from configuration.
+    Returns:
+        Slurm system MaxArraySize
+    """
+    try:
+        output = subprocess.check_output(['scontrol', 'show', 'config'])
+        for line in output.decode().splitlines():
+            if line.startswith("MaxArraySize"):
+                max_array_size = int(line.split("=")[1])
+                return max_array_size - 1
+    except (subprocess.CalledProcessError, IndexError, ValueError):
+        pass
+
+    return None

@@ -76,7 +76,7 @@ class TestPythonSimulation(ITestWithPersistence):
         for (dirpath, dirnames, filenames) in os.walk(experiment_dir):
             files.extend(filenames)
             break
-        self.assertSetEqual(set(files), set(["metadata.json", "run_simulation.sh", "sbatch.sh"]))
+        self.assertSetEqual(set(files), set(["metadata.json", "run_simulation.sh", "sbatch.sh", "batch.sh"]))
 
         # verify all files under simulations
         self.assertEqual(experiment.simulation_count, 9)
@@ -103,15 +103,14 @@ class TestPythonSimulation(ITestWithPersistence):
         # verify sbatch.sh script content in experiment level
         with open(os.path.join(experiment_dir, 'sbatch.sh'), 'r') as fpr:
             contents = fpr.read()
-        self.assertIn("#SBATCH --array=1-25%8", contents)  # 25=a*b=5*5, 8=max_running_jobs
-        self.assertIn("echo $SLURM_ARRAY_JOB_ID > job_id.txt", contents)
-        self.assertIn("srun run_simulation.sh", contents)
+        self.assertIn("#SBATCH --open-mode=append", contents)
+        self.assertIn("srun run_simulation.sh $1", contents)
 
         # verify run_simulation.sh script content in experiment level
         with open(os.path.join(experiment_dir, 'run_simulation.sh'), 'r') as fpr:
             contents = fpr.read()
         self.assertIn(
-            "JOB_DIRECTORY=$(find . -type d -maxdepth 1 -mindepth 1  | grep -v Assets | head -${SLURM_ARRAY_TASK_ID} | tail -1)",
+            "JOB_DIRECTORY=$(find . -type d -maxdepth 1 -mindepth 1  | grep -v Assets | head -$SIMULATION_INDEX | tail -1)",
             contents)
         self.assertIn("JOB_DIRECTORY", contents)
         self.assertIn("bash _run.sh 1> stdout.txt 2> stderr.txt", contents)
@@ -184,11 +183,11 @@ class TestPythonSimulation(ITestWithPersistence):
         for sim in experiment.simulations:
             sim_map = self.platform.create_sim_directory_map(sim.id, item_type=ItemType.SIMULATION)
             sim_df = pd.DataFrame()
-            sim_tags = sim.tags
-            sim_df = sim_df.append(sim_tags, ignore_index=True)
+            sim_tag = pd.DataFrame([sim.tags])
+            sim_df = pd.concat([sim_df, sim_tag], ignore_index=True)
             sim_df['simid'] = sim.id
             sim_df['outpath'] = sim_map[sim.id]
-            sims_df = sims_df.append(sim_df, ignore_index=True)
+            sims_df = pd.concat([sims_df, sim_df], ignore_index=True)
         self.assertTrue(np.all(exp_df.sort_values('simid').values == sims_df.sort_values('simid').values))
         self.assertTrue(exp_df.shape == (9, 6))
 

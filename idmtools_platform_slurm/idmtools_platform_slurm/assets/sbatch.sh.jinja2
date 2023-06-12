@@ -44,7 +44,6 @@
 {% if sbatch_custom is defined and sbatch_custom is not none %}
 #SBATCH {{sbatch_custom}}
 {% endif %}
-#SBATCH --array=1-{{njobs}}%{{max_running_jobs}}
 #SBATCH --open-mode=append
 #SBATCH --output=stdout.txt
 #SBATCH --error=stderr.txt
@@ -57,6 +56,7 @@ module load {{m}}
 {% endif %}
 
 # All submissions happen at the experiment level
-echo $SLURM_ARRAY_JOB_ID > job_id.txt
-srun run_simulation.sh
+srun run_simulation.sh $1
 wait
+
+

@@ -7,14 +7,11 @@ import os
 import subprocess
 from os import PathLike
 from pathlib import Path
-from dataclasses import dataclass, field, InitVar, fields
-from typing import NoReturn, Optional, Union, Dict, List, TYPE_CHECKING
+from dataclasses import dataclass, field
+from typing import NoReturn, Union, List, TYPE_CHECKING
 from idmtools.core import NoPlatformException
-from idmtools.core.platform_factory import Platform
-from idmtools.entities.command_task import CommandTask
-from idmtools.entities.simulation import Simulation
 from jinja2 import Template
-from logging import getLogger, DEBUG
+from logging import getLogger
 from idmtools_platform_slurm.utils.slurm_job import create_slurm_indicator, slurm_installed
 
 user_logger = getLogger('user')
@@ -109,7 +106,7 @@ class SlurmJob:
 
         if not dry_run:
             if not slurm_installed():
-                user_logger.warn('Slurm is not installed/available!')
+                user_logger.warning('Slurm is not installed/available!')
                 exit(-1)
 
             user_logger.info('Script is running as a slurm job!\n')
@@ -122,7 +119,7 @@ class SlurmJob:
 
             user_logger.info(f"{'job_id: '.ljust(20)} {self.slurm_job_id}")
             user_logger.info(f"{'job_directory: '.ljust(20)} {self.platform.job_directory}\n")
-            user_logger.warn(MSG)
+            user_logger.warning(MSG)
         else:
             print('Script run with dry_run = True')
 
