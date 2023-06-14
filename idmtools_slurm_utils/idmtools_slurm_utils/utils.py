@@ -14,11 +14,11 @@ from idmtools_slurm_utils.sbatch import command_sbatch
 from idmtools_slurm_utils.scancel import command_scancel
 from idmtools_slurm_utils.verify import command_verify
 
-ERROR_INVALID_COMMAND = "No command specified. You must specify either sbatch, scancel, or verify"
+ERROR_INVALID_COMMAND = "No command specified. You must specify either bash, scancel, or verify"
 
 logger = getLogger()
 
-VALID_COMMANDS = ['sbatch', 'scancel', 'verify']
+VALID_COMMANDS = ['bash', 'sbatch', 'scancel', 'verify']
 
 
 def process_job(job_path, result_dir, cleanup_job: bool = True):
