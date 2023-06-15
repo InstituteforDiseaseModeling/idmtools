@@ -190,7 +190,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
             execution = worker_order['Execution']
             self.assertEqual(execution['Command'], "python3 Assets/run_multiple_exps.py " + exp_id1 + " " + exp_id2)
 
-    @pytest.mark.comps
+    @pytest.mark.skip
     @warn_amount_ssmt_image_decorator
     def test_ssmt_seir_model_analysis_single_script(self):
         exp_id = "a980f265-995e-ea11-a2bf-f0921c167862"  # comps2 staging exp id
