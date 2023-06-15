@@ -12,9 +12,12 @@ from idmtools_models.json_configured_task import JSONConfiguredTask
 
 @dataclass
 class ExampleExtendedJSONConfiguredTask(JSONConfiguredTask):
-    command: CommandLine = field(default=CommandLine.from_string("python -m json.tool --infile my_config.json"))
+    command: CommandLine = field(default=None)
     config_file_name: str = field(default='my_config.json')
 
+    def __post_init__(self):
+        if self.command is None:
+            self.command = CommandLine.from_string('python -m json.tool --infile my_config.json')
 
 @pytest.mark.tasks
 @pytest.mark.smoke
