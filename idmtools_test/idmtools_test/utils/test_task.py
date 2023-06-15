@@ -53,6 +53,10 @@ class TestTask(ITask):
     def reload_from_simulation(self, simulation: 'Simulation'):
         pass
 
+    def __post_init__(self):
+        if self.command is None:
+            self.command = CommandLine.from_string('echo this is a test')
+
 
 class TestTaskSpecification(TaskSpecification):
 
