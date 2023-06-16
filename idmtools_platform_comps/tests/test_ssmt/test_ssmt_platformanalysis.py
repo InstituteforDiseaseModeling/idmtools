@@ -14,7 +14,7 @@ from idmtools.core.platform_factory import Platform
 from idmtools_test.utils.comps import COMPS_LOCAL_PACKAGE, CORE_LOCAL_PACKAGE, COMPS_LOAD_SSMT_PACKAGES_WRAPPER
 from idmtools_test.utils.decorators import run_in_temp_dir, warn_amount_ssmt_image_decorator
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
-from idmtools.core import ItemType, TRUTHY_VALUES
+from idmtools.core import ItemType, TRUTHY_VALUES, EntityStatus
 from idmtools_test.utils.utils import get_case_name
 from .get_latest_ssmt_image import get_latest_image_stage
 
@@ -76,7 +76,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
 
         analysis.analyze(check_status=True)
         wi = analysis.get_work_item()
-
+        self.assertTrue(wi.succeeded)
         # verify workitem result
         local_output_path = "output"
         out_filenames = ["output/aggregated_config.json", "WorkOrder.json"]
@@ -148,7 +148,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
 
         analysis.analyze(check_status=True)
         wi = analysis.get_work_item()
-
+        self.assertTrue(wi.succeeded)
         # verify workitem result
         local_output_path = "output"
         out_filenames = ["output/aggregated_c.csv", "WorkOrder.json"]
@@ -192,7 +192,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
 
         analysis.analyze(check_status=True)
         wi = analysis.get_work_item()
-
+        self.assertTrue(wi.succeeded)
         # Verify workitem results
         local_output_path = "output"
         out_filenames = [exp_id + "/InfectiousnessCSVAnalyzer.csv", exp_id + "/NodeCSVAnalyzer.csv", "WorkOrder.json"]
@@ -240,7 +240,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
 
         analysis.analyze(check_status=True)
         wi = analysis.get_work_item()
-
+        self.assertTrue(wi.succeeded)
         # Verify workitem results
         local_output_path = "output"
         out_filenames = [exp_id + "/InfectiousnessCSVAnalyzer.csv", exp_id + "/NodeCSVAnalyzer.csv", "WorkOrder.json"]
