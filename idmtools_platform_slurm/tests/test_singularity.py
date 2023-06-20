@@ -85,5 +85,5 @@ class TestSingularity(ITestWithPersistence):
             self.assertTrue(os.access(exe, os.X_OK))
             with open(os.path.join(simulation_dir, '_run.sh'), 'r') as fpr:
                 contents = fpr.read()
-            bind_path = os.path.join(self.job_directory, suite.id, experiment.id)
+            bind_path = os.path.join(os.getcwd(), self.job_directory, suite.id, experiment.id)
             self.assertIn(f"singularity exec --bind {bind_path} " + task.sif_path + " " + command + " --python-script-path ./Assets/python", contents)
