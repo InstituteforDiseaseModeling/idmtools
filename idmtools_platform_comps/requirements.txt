@@ -2,4 +2,4 @@ idmtools~=1.7.6
 jinja2~=3.1.2
 tqdm>=4.52.0,<5
 pyCOMPS~=2.10
-natsort~=8.2.0
+natsort~=8.4.0
