@@ -12,7 +12,7 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 
 @pytest.mark.serial
-#@linux_only
+@linux_only
 class TestSingularity(ITestWithPersistence):
 
     def setUp(self) -> None:
