@@ -123,6 +123,7 @@ def check_home(directory: str) -> bool:
         True/False
     """
     home = os.path.expanduser("~").replace('\\', '/')
+    directory = directory.replace('\\', '/')
     if directory.startswith(home):
         return True
     else:
