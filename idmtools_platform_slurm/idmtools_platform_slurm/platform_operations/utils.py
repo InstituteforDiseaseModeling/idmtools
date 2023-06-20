@@ -3,6 +3,7 @@ This is SlurmPlatform operations utils.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+import os
 import subprocess
 from typing import Dict
 from idmtools.core import ItemType
@@ -110,3 +111,19 @@ def get_max_array_size():
         pass
 
     return None
+
+
+def check_home(directory: str) -> bool:
+    """
+    Check if a directory is under HOME.
+    Args:
+        directory: a directory
+
+    Returns:
+        True/False
+    """
+    home = os.path.expanduser("~").replace('\\', '/')
+    if directory.startswith(home):
+        return True
+    else:
+        return False

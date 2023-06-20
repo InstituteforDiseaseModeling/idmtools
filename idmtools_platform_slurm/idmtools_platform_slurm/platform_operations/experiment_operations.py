@@ -262,7 +262,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
             logger.info("Could not delete the associated experiment...")
             return
 
-    def platform_cancel(self, experiment_id: str, force: bool = True) -> Any:
+    def platform_cancel(self, experiment_id: str, force: bool = True) -> None:
         """
         Cancel platform experiment's slurm job.
         Args:
@@ -277,11 +277,9 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
             job_id = self.platform._op_client.get_job_id(experiment_id, ItemType.EXPERIMENT)
             if job_id is None:
                 logger.debug(f"Slurm job for experiment: {experiment_id} is not available!")
-                return
             else:
                 result = self.platform._op_client.cancel_job(job_id)
                 user_logger.info(f"Cancel Experiment {experiment_id}: {result}")
-                return result
         else:
             user_logger.info(f"Experiment {experiment_id} is not running, no cancel needed...")
 
@@ -299,11 +297,11 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
 
         job_ids = self.platform._op_client.get_job_id(experiment.id, ItemType.EXPERIMENT)
         if job_ids is None:
-            logger.debug(f"Slurn job for experiment: {experiment.id} is not available!")
+            logger.debug(f"Slurm job for experiment: {experiment.id} is not available!")
             user_logger.info("Slurm Job Ids: None")
         else:
-            job_ids = [f'    {id}' for id in job_ids]
-            user_logger.info("Slurm Job Ids:")
+            job_ids = [f'{" ".ljust(3)}{id}' for id in job_ids]
+            user_logger.info(f"Slurm Job Ids ({len(job_ids)}):")
             user_logger.info('\n'.join(job_ids))
 
         user_logger.info(
