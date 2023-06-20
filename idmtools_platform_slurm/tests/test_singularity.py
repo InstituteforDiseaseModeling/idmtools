@@ -12,7 +12,7 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 
 @pytest.mark.serial
-@linux_only
+#@linux_only
 class TestSingularity(ITestWithPersistence):
 
     def setUp(self) -> None:
@@ -85,4 +85,7 @@ class TestSingularity(ITestWithPersistence):
             self.assertTrue(os.access(exe, os.X_OK))
             with open(os.path.join(simulation_dir, '_run.sh'), 'r') as fpr:
                 contents = fpr.read()
-            self.assertIn("singularity exec " + task.sif_path + " " + command + " --python-script-path ./Assets/python", contents)
+            bind_path = os.path.join(os.getcwd(), self.job_directory, suite.id, experiment.id).replace("\\", "/")
+            self.assertIn(
+                f"singularity exec --bind {bind_path} " + task.sif_path + " " + command + " --python-script-path ./Assets/python",
+                contents)
