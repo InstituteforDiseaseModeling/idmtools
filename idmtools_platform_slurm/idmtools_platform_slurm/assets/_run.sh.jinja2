@@ -23,7 +23,11 @@ do
         {% if simulation.task.command.cmd.startswith('singularity') %}
             {{simulation.task.command.cmd}}
         {% else %}
-            singularity exec {{simulation.task.sif_path}} {{simulation.task.command.cmd}}
+                {% if experiment_dir is defined and experiment_dir %}
+                    singularity exec --bind {{experiment_dir}} {{simulation.task.sif_path}} {{simulation.task.command.cmd}}
+                {% else %}
+                    singularity exec {{simulation.task.sif_path}} {{simulation.task.command.cmd}}
+                {% endif %}
         {% endif %}
     {% else %}
         {{simulation.task.command.cmd}}
