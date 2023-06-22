@@ -14,7 +14,7 @@ from idmtools.core.platform_factory import Platform
 from idmtools_test.utils.comps import COMPS_LOCAL_PACKAGE, CORE_LOCAL_PACKAGE, COMPS_LOAD_SSMT_PACKAGES_WRAPPER
 from idmtools_test.utils.decorators import run_in_temp_dir, warn_amount_ssmt_image_decorator
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
-from idmtools.core import ItemType, TRUTHY_VALUES, EntityStatus
+from idmtools.core import ItemType, TRUTHY_VALUES
 from idmtools_test.utils.utils import get_case_name
 from .get_latest_ssmt_image import get_latest_image_stage
 
