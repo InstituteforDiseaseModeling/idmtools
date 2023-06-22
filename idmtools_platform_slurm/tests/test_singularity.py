@@ -63,6 +63,7 @@ class TestSingularity(ITestWithPersistence):
                 contents = fpr.read()
             self.assertIn(command, contents)
 
+    @pytest.mark.skip("binding is sensitive to environment.")
     def test_extra_command_build_singularity(self):
         command = "Assets/hello.sh"  # assume hello.sh is our executable
         task = CommandTask(command=command)
@@ -90,6 +91,7 @@ class TestSingularity(ITestWithPersistence):
                 f"singularity exec --bind {bind_path} " + task.sif_path + " " + command + " --python-script-path ./Assets/python",
                 contents)
 
+    @pytest.mark.skip("binding is sensitive to environment.")
     def test_command_build_singularity_with_home_dir(self):
         job_directory = os.path.join(os.path.expanduser('~'), "DEST")
         platform = Platform('SLURM_LOCAL', job_directory=job_directory)
