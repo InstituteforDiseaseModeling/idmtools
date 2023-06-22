@@ -191,14 +191,14 @@ class LocalSlurmOperations(SlurmOperations):
         else:
             raise NotImplementedError(f"{item.__class__.__name__} is not supported for batch creation.")
 
-    def submit_job(self, item: Union[Experiment, Simulation], **kwargs) -> Any:
+    def submit_job(self, item: Union[Experiment, Simulation], **kwargs) -> None:
         """
         Submit a Slurm job.
         Args:
             item: idmtools Experiment or Simulation
             kwargs: keyword arguments used to expand functionality
         Returns:
-            Any
+            None
         """
         if isinstance(item, Experiment):
             working_directory = self.get_directory(item)

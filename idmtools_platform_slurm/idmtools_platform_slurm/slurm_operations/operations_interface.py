@@ -57,7 +57,7 @@ class SlurmOperations(ABC):
         pass
 
     @abstractmethod
-    def submit_job(self, item: Union[Experiment, Simulation], **kwargs) -> Any:
+    def submit_job(self, item: Union[Experiment, Simulation], **kwargs) -> None:
         pass
 
     @abstractmethod

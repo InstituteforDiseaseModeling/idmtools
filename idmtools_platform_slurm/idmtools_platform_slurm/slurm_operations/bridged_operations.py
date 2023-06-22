@@ -19,7 +19,7 @@ logger = getLogger(__name__)
 
 
 def create_bridged_job(working_directory, bridged_jobs_directory, results_directory,
-                       cleanup_results: bool = True) -> Any:
+                       cleanup_results: bool = True) -> None:
     """
     Creates a bridged job.
 
@@ -30,13 +30,13 @@ def create_bridged_job(working_directory, bridged_jobs_directory, results_direct
         cleanup_results: Should we clean up results file
 
     Returns:
-        Result from job run
+        None
     """
     bridged_id = str(uuid4())
     jn = Path(bridged_jobs_directory).joinpath(f'{bridged_id}.json')
     rf = Path(results_directory).joinpath(f'{bridged_id}.json.result')
     with open(jn, "w") as jout:
-        info = dict(command='sbatch', working_directory=str(working_directory))
+        info = dict(command='bash', working_directory=str(working_directory))
         if logger.isEnabledFor(DEBUG):
             logger.debug(f"Requesting job: {jn} in {working_directory}")
         json.dump(info, jout)
@@ -56,11 +56,11 @@ def create_bridged_job(working_directory, bridged_jobs_directory, results_direct
                     os.unlink(rf)
                 except:
                     pass
-            return result['output']
+            return
         tries += 1
     if logger.isEnabledFor(DEBUG):
         logger.debug(f"Failed to get result from bridge")
-    return "FAILED: Bridge never reported result"
+    raise ValueError("FAILED: Bridge never reported result")
 
 
 def cancel_bridged_job(job_ids: Union[str, List[str]], bridged_jobs_directory, results_directory,
@@ -122,19 +122,19 @@ class BridgedLocalSlurmOperations(LocalSlurmOperations):
                 logger.info(f'Creating directory {self.platform.bridged_jobs_directory}')
             self.platform.bridged_jobs_directory.mkdir(parents=True, exist_ok=True)
 
-    def submit_job(self, item: Union[Experiment, Simulation], **kwargs) -> Any:
+    def submit_job(self, item: Union[Experiment, Simulation], **kwargs) -> None:
         """
         Submit a Slurm job.
         Args:
             item: idmtools Experiment or Simulation
             kwargs: keyword arguments used to expand functionality
         Returns:
-            Any
+            None
         """
         if isinstance(item, Experiment):
             working_directory = self.get_directory(item)
-            return create_bridged_job(working_directory, self.platform.bridged_jobs_directory,
-                                      self.platform.bridged_results_directory)
+            create_bridged_job(working_directory, self.platform.bridged_jobs_directory,
+                               self.platform.bridged_results_directory)
         elif isinstance(item, Simulation):
             pass
         else:

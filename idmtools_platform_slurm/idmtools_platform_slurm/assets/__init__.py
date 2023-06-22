@@ -7,6 +7,7 @@ from pathlib import Path
 from jinja2 import Template
 from typing import TYPE_CHECKING, Optional, Union
 from idmtools.entities.experiment import Experiment
+from idmtools_platform_slurm.platform_operations.utils import check_home
 
 if TYPE_CHECKING:
     from idmtools_platform_slurm.slurm_platform import SlurmPlatform, CONFIG_PARAMETERS
@@ -119,7 +120,7 @@ def generate_script(platform: 'SlurmPlatform', experiment: Experiment, max_runni
         t = Template(file_.read())
 
     # Write out file
-    output_target = platform._op_client.get_directory(experiment).joinpath("sbatch.sh")
+    output_target = platform.get_directory(experiment).joinpath("sbatch.sh")
     with open(output_target, "w") as tout:
         tout.write(t.render(template_vars))
     # Make executable
@@ -136,15 +137,21 @@ def generate_simulation_script(platform: 'SlurmPlatform', simulation, retries: O
     Returns:
         None
     """
-    sim_script = platform._op_client.get_directory(simulation).joinpath("_run.sh")
+    experiment_dir = platform.get_directory(simulation.parent).absolute()
+    experiment_dir = str(experiment_dir).replace('\\', '/')
+    check = check_home(experiment_dir)
+    sim_script = platform.get_directory(simulation).joinpath("_run.sh")
     with open(sim_script, "w") as tout:
         with open(Path(__file__).parent.parent.joinpath("assets/_run.sh.jinja2")) as tin:
-            t = Template(tin.read())
             tvars = dict(
                 platform=platform,
                 simulation=simulation,
                 retries=retries if retries else platform.retries
             )
+            if not check:
+                tvars['experiment_dir'] = str(experiment_dir)
+
+            t = Template(tin.read())
             tout.write(t.render(tvars))
     # Make executable
     platform._op_client.update_script_mode(sim_script)
