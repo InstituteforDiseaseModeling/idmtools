@@ -56,6 +56,7 @@ def do_platform_analysis_experiment(platform: Platform):
 
     analysis.analyze(check_status=True)
     wi = analysis.get_work_item()
+    assert wi.succeeded == True
 
     # Verify PlatformAnalysis workitem result
     try:
@@ -99,7 +100,7 @@ def do_platform_analysis_wi(platform: Platform):
 
     analysis.analyze(check_status=True)
     wi = analysis.get_work_item()
-
+    assert wi.succeeded == True
     # Verify PlatformAnalysis result
     try:
         # Retrieve files to local temp dir
