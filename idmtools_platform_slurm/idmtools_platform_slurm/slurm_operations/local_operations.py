@@ -16,7 +16,7 @@ from idmtools.core import ItemType, EntityStatus
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
-from idmtools_platform_slurm.assets import generate_script, generate_simulation_script
+from idmtools_platform_slurm.assets import generate_batch, generate_script, generate_simulation_script
 from idmtools_platform_slurm.slurm_operations.operations_interface import SlurmOperations
 from idmtools_platform_slurm.slurm_operations.slurm_constants import SLURM_MAPS
 
@@ -94,9 +94,11 @@ class LocalSlurmOperations(SlurmOperations):
         else:
             raise RuntimeError('Only support Suite/Experiment/Simulation or not None dest.')
 
-        exist_ok = exist_ok if exist_ok is not None else IdmConfigParser.get_option(option="EXIST_ITEM_DIR", fallback=self.platform.dir_exist_ok)
+        exist_ok = exist_ok if exist_ok is not None else IdmConfigParser.get_option(option="EXIST_ITEM_DIR",
+                                                                                    fallback=self.platform.dir_exist_ok)
         if not exist_ok and os.path.exists(target):
-            raise RuntimeError(f'Item directory {target} already exists. Exist_ok flag set to false to avoid data being overwritten.')
+            raise RuntimeError(
+                f'Item directory {target} already exists. Exist_ok flag set to false to avoid data being overwritten.')
         else:
             target.mkdir(parents=True, exist_ok=exist_ok)
 
@@ -171,7 +173,8 @@ class LocalSlurmOperations(SlurmOperations):
         except:
             logger.debug(f"Failed to change file mode for executable: {exe}")
 
-    def create_batch_file(self, item: Union[Experiment, Simulation], **kwargs) -> None:
+    def create_batch_file(self, item: Union[Experiment, Simulation], max_running_jobs: int = None, retries: int = None,
+                          array_batch_size: int = None, dependency: bool = True, **kwargs) -> None:
         """
         Create batch file.
         Args:
@@ -181,29 +184,25 @@ class LocalSlurmOperations(SlurmOperations):
             None
         """
         if isinstance(item, Experiment):
-            max_running_jobs = kwargs.get('max_running_jobs', None)
+            generate_batch(self.platform, item, max_running_jobs, array_batch_size, dependency)
             generate_script(self.platform, item, max_running_jobs)
         elif isinstance(item, Simulation):
-            retries = kwargs.get('retries', None)
             generate_simulation_script(self.platform, item, retries)
         else:
             raise NotImplementedError(f"{item.__class__.__name__} is not supported for batch creation.")
 
-    def submit_job(self, item: Union[Experiment, Simulation], **kwargs) -> Any:
+    def submit_job(self, item: Union[Experiment, Simulation], **kwargs) -> None:
         """
         Submit a Slurm job.
         Args:
             item: idmtools Experiment or Simulation
             kwargs: keyword arguments used to expand functionality
         Returns:
-            Any
+            None
         """
         if isinstance(item, Experiment):
             working_directory = self.get_directory(item)
-            result = subprocess.run(['sbatch', '--parsable', 'sbatch.sh'], stdout=subprocess.PIPE,
-                                    cwd=str(working_directory))
-            slurm_job_id = result.stdout.decode('utf-8').strip().split(';')[0]
-            return slurm_job_id
+            subprocess.run(['bash', 'batch.sh'], stdout=subprocess.PIPE, cwd=str(working_directory))
         elif isinstance(item, Simulation):
             pass
         else:
@@ -264,14 +263,14 @@ class LocalSlurmOperations(SlurmOperations):
         stdout = "Success" if result.returncode == 0 else 'Error'
         return stdout
 
-    def get_job_id(self, item_id: str, item_type: ItemType) -> str:
+    def get_job_id(self, item_id: str, item_type: ItemType) -> List:
         """
         Retrieve the job id for item that had been run.
         Args:
             item_id: id of experiment/simulation
             item_type: ItemType (Experiment or Simulation)
         Returns:
-            str
+            List of slurm job ids
         """
         if item_type not in (ItemType.EXPERIMENT, ItemType.SIMULATION):
             raise RuntimeError(f"Not support item type: {item_type}")
@@ -283,6 +282,5 @@ class LocalSlurmOperations(SlurmOperations):
             return None
 
         job_id = open(job_id_file).read().strip()
-        return job_id
-
+        return job_id.split('\n')
     # endregion
