@@ -27,3 +27,4 @@ Feature Request
 * `#2043 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2043>`_ - Write Python utility to run main script as SLURM job
 * `#2041 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2041>`_ - Write workaround steps: run main script as SLURM job
 * `#2095 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2095>`_ - Add singularity bind experiment by default for slurm
+* `#2096 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2096>`_ - Add few more COMPS server aliases
