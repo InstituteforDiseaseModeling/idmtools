@@ -26,3 +26,4 @@ Feature Request
 * `#1998 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1998>`_ - Potential issue with max count of simulations in slurm platform
 * `#2043 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2043>`_ - Write Python utility to run main script as SLURM job
 * `#2041 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2041>`_ - Write workaround steps: run main script as SLURM job
+* `#2095 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2095>`_ - Add singularity bind experiment by default for slurm
