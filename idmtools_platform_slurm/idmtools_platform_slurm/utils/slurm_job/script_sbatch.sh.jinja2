@@ -1,0 +1,78 @@
+#!/bin/bash
+{% if ntasks is defined and ntasks is not none %}
+#SBATCH --ntasks={{ntasks}}
+{% endif %}
+{% if partition is defined and partition is not none %}
+#SBATCH --partition={{partition}}
+{% endif %}
+{% if nodes is defined and nodes is not none %}
+#SBATCH --nodes={{nodes}}
+{% endif %}
+{% if mail_type is defined and mail_type is not none %}
+#SBATCH --mail-type={{mail_type}}
+{% endif %}
+{% if mail_user is defined and mail_user is not none %}
+#SBATCH --mail-user={{mail_user}}
+{% endif %}
+{% if constraint is defined and constraint is not none %}
+#SBATCH --constraint={{constraint}}
+{% endif %}
+{% if ntasks_per_core is defined and ntasks_per_core  is not none %}
+#SBATCH --ntasks-per-core={{ntasks_per_core}}
+{% endif %}
+{% if cpus_per_task is defined and cpus_per_task  is not none %}
+#SBATCH --cpus-per-task={{cpus_per_task}}
+{% endif %}
+{% if mem_per_cpu is defined and mem_per_cpu is not none %}
+#SBATCH --mem-per-cpu={{mem_per_cpu}}
+{% endif %}
+{% if time is defined and time is not none %}
+#SBATCH --time={{time}}
+{% endif %}
+{% if account is defined and account is not none %}
+#SBATCH --account={{account}}
+{% endif %}
+{% if exclusive is defined and exclusive is not none and exclusive %}
+#SBATCH --exclusive
+{% endif %}
+{% if mem is defined and mem is not none %}
+#SBATCH --mem={{mem}}
+{% endif %}
+{% if requeue is defined and requeue is not none and requeue %}
+#SBATCH --requeue
+{% endif %}
+{% if sbatch_custom is defined and sbatch_custom is not none %}
+#SBATCH {{sbatch_custom}}
+{% endif %}
+#SBATCH --open-mode=append
+#SBATCH --output=stdout.txt
+#SBATCH --error=stderr.txt
+
+{% if modules is defined and modules is not none and modules|length > 0 %}
+    {% for m in modules %}
+        module load {{ m }}
+    {% endfor %}
+{% endif %}
+
+# define the handler function
+term_handler()
+{
+# do whatever cleanup you want here
+echo "-1" > job_status.txt
+exit -1
+}
+
+# associate the function "term_handler" with the TERM signal
+trap 'term_handler' TERM
+
+echo $SLURM_JOB_ID > job_id.txt
+
+echo "100" > job_status.txt
+{{ command }}
+RESULT=$?
+if [ $RESULT -eq 0 ]; then
+echo "0" > job_status.txt
+exit $RESULT
+fi
+echo "-1" > job_status.txt
+exit $RESULT

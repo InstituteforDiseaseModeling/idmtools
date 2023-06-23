@@ -22,14 +22,16 @@ from idmtools_platform_slurm.platform_operations.simulation_operations import Sl
 from idmtools_platform_slurm.slurm_operations.operations_interface import SlurmOperations
 from idmtools_platform_slurm.slurm_operations.slurm_constants import SlurmOperationalMode
 from idmtools_platform_slurm.platform_operations.suite_operations import SlurmPlatformSuiteOperations
-from idmtools_platform_slurm.platform_operations.utils import SlurmSuite, SlurmExperiment, SlurmSimulation
+from idmtools_platform_slurm.platform_operations.utils import SlurmSuite, SlurmExperiment, SlurmSimulation, \
+    get_max_array_size
+from idmtools_platform_slurm.utils.slurm_job import run_script_on_slurm, slurm_installed
 
 logger = getLogger(__name__)
 
 op_defaults = dict(default=None, compare=False, metadata={"pickle_ignore": True})
 CONFIG_PARAMETERS = ['ntasks', 'partition', 'nodes', 'mail_type', 'mail_user', 'ntasks_per_core', 'cpus_per_task',
                      'mem_per_cpu', 'time', 'constraint', 'account', 'mem', 'exclusive', 'requeue', 'sbatch_custom',
-                     'max_running_jobs']
+                     'max_running_jobs', 'array_batch_size']
 
 
 @dataclass(repr=False)
@@ -101,7 +103,13 @@ class SlurmPlatform(IPlatform):
     modules: list = field(default_factory=list, metadata=dict(sbatch=True))
 
     # Specifies default setting of whether slurm should fail if item directory already exists
-    dir_exist_ok: bool = field(default=False)
+    dir_exist_ok: bool = field(default=False, repr=False, compare=False)
+
+    # Set array max size for Slurm job
+    array_batch_size: int = field(default=None, metadata=dict(sbatch=False))
+
+    # determine if run script as Slurm job
+    run_on_slurm: bool = field(default=False, repr=False, compare=False)
 
     # endregion
 
@@ -121,11 +129,21 @@ class SlurmPlatform(IPlatform):
         self.supported_types = {ItemType.SUITE, ItemType.EXPERIMENT, ItemType.SIMULATION}
         if self.job_directory is None:
             raise ValueError("Job Directory is required.")
+
+        # check max_array_size from slurm configuration
+        self._max_array_size = None
+        if slurm_installed():
+            self._max_array_size = get_max_array_size()
+
         super().__post_init__()
+
+        # check if run script as a slurm job
+        r = run_script_on_slurm(self, run_on_slurm=self.run_on_slurm)
+        if r:
+            exit(0)  # finish the current workflow
 
     def __init_interfaces(self):
         if self.mode == SlurmOperationalMode.SSH:
-            # from idmtools_platform_slurm.slurm_operations.remote_operations import RemoteSlurmOperations
             raise NotImplementedError("SSH mode has not been implemented on the Slurm Platform")
         elif self.mode == SlurmOperationalMode.BRIDGED:
             from idmtools_platform_slurm.slurm_operations.bridged_operations import BridgedLocalSlurmOperations

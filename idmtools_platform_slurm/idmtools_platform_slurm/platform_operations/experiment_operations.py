@@ -3,6 +3,7 @@ Here we implement the SlurmPlatform experiment operations.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+import os
 import shutil
 from pathlib import Path
 from dataclasses import dataclass, field
@@ -116,11 +117,12 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         else:
             return self.platform._suites.get(experiment.parent_id, raw=True, **kwargs)
 
-    def platform_run_item(self, experiment: Experiment, **kwargs):
+    def platform_run_item(self, experiment: Experiment, dry_run: bool = False, **kwargs):
         """
         Run experiment.
         Args:
             experiment: idmtools Experiment
+            dry_run: True/False
             kwargs: keyword arguments used to expand functionality
         Returns:
             None
@@ -131,16 +133,12 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         # Generate/update metadata
         self.platform._metas.dump(experiment)
         # Commission
-        dry_run = kwargs.get('dry_run', False)
         if not dry_run:
-            slurm_job_id = self.platform._op_client.submit_job(experiment, **kwargs)
-            working_directory = self.platform._op_client.get_directory(experiment)
-            self.platform._op_client.create_file(working_directory.joinpath('job_id.txt'), slurm_job_id)
-        else:
-            slurm_job_id = None
+            self.platform._op_client.submit_job(experiment, **kwargs)
+
         suite_id = experiment.parent_id or experiment.suite_id
 
-        user_logger.info(f'job_id: {slurm_job_id}')
+        # user_logger.info(f'job_id: {slurm_job_id}')
         user_logger.info(f'job_directory: {Path(self.platform.job_directory).resolve()}')
         user_logger.info(f'suite: {str(suite_id)}')
         user_logger.info(f'experiment: {experiment.id}')
@@ -264,7 +262,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
             logger.info("Could not delete the associated experiment...")
             return
 
-    def platform_cancel(self, experiment_id: str, force: bool = True) -> Any:
+    def platform_cancel(self, experiment_id: str, force: bool = True) -> None:
         """
         Cancel platform experiment's slurm job.
         Args:
@@ -278,11 +276,33 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
             logger.debug(f"cancel slurm job for experiment: {experiment_id}...")
             job_id = self.platform._op_client.get_job_id(experiment_id, ItemType.EXPERIMENT)
             if job_id is None:
-                logger.debug(f"Slurn job for experiment: {experiment_id} is not available!")
-                return
+                logger.debug(f"Slurm job for experiment: {experiment_id} is not available!")
             else:
                 result = self.platform._op_client.cancel_job(job_id)
-                user_logger.info(result)
-                return result
+                user_logger.info(f"Cancel Experiment {experiment_id}: {result}")
         else:
             user_logger.info(f"Experiment {experiment_id} is not running, no cancel needed...")
+
+    def post_run_item(self, experiment: Experiment, **kwargs):
+        """
+        Trigger right after commissioning experiment on platform.
+
+        Args:
+            experiment: Experiment just commissioned
+            kwargs: keyword arguments used to expand functionality
+        Returns:
+            None
+        """
+        super().post_run_item(experiment, **kwargs)
+
+        job_ids = self.platform._op_client.get_job_id(experiment.id, ItemType.EXPERIMENT)
+        if job_ids is None:
+            logger.debug(f"Slurm job for experiment: {experiment.id} is not available!")
+            user_logger.info("Slurm Job Ids: None")
+        else:
+            job_ids = [f'{" ".ljust(3)}{id}' for id in job_ids]
+            user_logger.info(f"Slurm Job Ids ({len(job_ids)}):")
+            user_logger.info('\n'.join(job_ids))
+
+        user_logger.info(
+            f'\nYou may try the following command to check simulations running status: \n  idmtools slurm {os.path.abspath(self.platform.job_directory)} status --exp-id {experiment.id}')

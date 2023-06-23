@@ -8,7 +8,7 @@ import click
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools_platform_slurm.utils.status_report.status_report import generate_status_report
-from idmtools_platform_slurm.utils.status_report.utils import get_latest_experiment
+from idmtools_platform_slurm.utils.status_report.utils import get_latest_experiment, check_status
 from logging import getLogger
 
 logger = getLogger(__name__)
@@ -129,3 +129,23 @@ def get_latest(ctx: click.Context):
 
     result = get_latest_experiment(platform)
     user_logger.info(json.dumps(result, indent=3))
+
+
+@slurm.command(help="Get simulation's status")
+@click.option('--exp-id', default=None, help="Idmtools Experiment id")
+@click.option('--display/--no-display', default=False, help="Display with working directory or not")
+@click.pass_context
+def status(ctx: click.Context, exp_id, display):
+    """
+    Get job status.
+    Args:
+        ctx: click.Context
+        exp_id: experiment id
+        display: bool True/False
+    Returns:
+        None
+    """
+    job_dir = ctx.obj['job_directory']
+    platform = Platform('SLURM_LOCAL', job_directory=job_dir)
+
+    check_status(platform=platform, exp_id=exp_id, display=display)

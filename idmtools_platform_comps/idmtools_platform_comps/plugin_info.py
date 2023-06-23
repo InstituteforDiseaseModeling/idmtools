@@ -81,6 +81,26 @@ class COMPSPlatformSpecification(PlatformSpecification):
                 endpoint="https://comps.idmod.org",
                 environment="Belegost"
             ),
+            CALCULON=dict(
+                endpoint="https://comps.idmod.org",
+                environment="Calculon"
+            ),
+            IDMCLOUD=dict(
+                endpoint="https://comps.idmod.org",
+                environment="IDMcloud"
+            ),
+            NDCLOUD=dict(
+                endpoint="https://comps.idmod.org",
+                environment="NDcloud"
+            ),
+            BMGF_IPMCLOUD=dict(
+                endpoint="https://comps.idmod.org",
+                environment="BMGF_IPMcloud"
+            ),
+            QSTART=dict(
+                endpoint="https://comps.idmod.org",
+                environment="Qstart"
+            ),
             BAYESIAN=dict(
                 endpoint="https://comps2.idmod.org",
                 environment="Bayesian"
@@ -89,9 +109,9 @@ class COMPSPlatformSpecification(PlatformSpecification):
                 endpoint="https://comps2.idmod.org",
                 environment="SlurmStage"
             ),
-            CALCULON=dict(
-                endpoint="https://comps.idmod.org",
-                environment="Calculon"
+            CUMULUS=dict(
+                endpoint="https://comps2.idmod.org",
+                environment="Cumulus"
             )
         )
         config_aliases['SLURM'] = config_aliases['CALCULON']

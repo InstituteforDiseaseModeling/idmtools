@@ -211,11 +211,11 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
             logger.debug(f"cancel slurm job for simulation: {sim_id}...")
             job_id = self.platform._op_client.get_job_id(sim_id, ItemType.SIMULATION)
             if job_id is None:
-                logger.debug(f"Slurn job for simulation: {sim_id} is not available!")
+                logger.debug(f"Slurm job for simulation: {sim_id} is not available!")
                 return
             else:
                 result = self.platform._op_client.cancel_job(job_id)
-                user_logger.info(result)
+                user_logger.info(f"Cancel Simulation: {sim_id}: {result}")
                 return result
         else:
             user_logger.info(f"Simulation {sim_id} is not running, no cancel needed...")
