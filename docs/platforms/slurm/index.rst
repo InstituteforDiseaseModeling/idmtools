@@ -152,3 +152,4 @@ Run the following included Python script to submit and run a job on your |SLURM_
 
     options
     cancel
+    run-script-as-slurm-job
