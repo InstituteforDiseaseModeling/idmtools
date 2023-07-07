@@ -76,7 +76,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
 
         analysis.analyze(check_status=True)
         wi = analysis.get_work_item()
-
+        self.assertTrue(wi.succeeded)
         # verify workitem result
         local_output_path = "output"
         out_filenames = ["output/aggregated_config.json", "WorkOrder.json"]
@@ -148,7 +148,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
 
         analysis.analyze(check_status=True)
         wi = analysis.get_work_item()
-
+        self.assertTrue(wi.succeeded)
         # verify workitem result
         local_output_path = "output"
         out_filenames = ["output/aggregated_c.csv", "WorkOrder.json"]
@@ -192,7 +192,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
 
         analysis.analyze(check_status=True)
         wi = analysis.get_work_item()
-
+        self.assertTrue(wi.succeeded)
         # Verify workitem results
         local_output_path = "output"
         out_filenames = [exp_id + "/InfectiousnessCSVAnalyzer.csv", exp_id + "/NodeCSVAnalyzer.csv", "WorkOrder.json"]
@@ -240,7 +240,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
 
         analysis.analyze(check_status=True)
         wi = analysis.get_work_item()
-
+        self.assertTrue(wi.succeeded)
         # Verify workitem results
         local_output_path = "output"
         out_filenames = [exp_id + "/InfectiousnessCSVAnalyzer.csv", exp_id + "/NodeCSVAnalyzer.csv", "WorkOrder.json"]
