@@ -130,7 +130,7 @@ class TestWorkOrder(ITestWithPersistence):
         Returns:
 
         """
-        cmd = "python3.7 --version"
+        cmd = "python3.6 --version"
         task = CommandTask(cmd)
 
         task.common_assets.add_asset(
@@ -154,7 +154,7 @@ class TestWorkOrder(ITestWithPersistence):
                 if asset.filename in ["stdout.txt"]:
                     content = asset.content.decode('utf-8').replace("\\\\", "\\")
                     # don't check full version in case comps updates system
-                    self.assertIn('Python 3.7', content)
+                    self.assertIn('Python 3.6', content)
 
     def test_workorder_hpc(self):
         """
