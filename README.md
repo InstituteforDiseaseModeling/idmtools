@@ -66,10 +66,6 @@ pip install idmtools[idm] --index-url=https://packages.idmod.org/api/pypi/pypi-p
 ```
 This will install the core tools, the cli, the comps, support for EMOD models, and python models
 
-If you are Python 3.6, you will also need to run
-```bash
-pip install dataclasses
-```
 ## Advanced Install
 You can also install just the individual packages to create minimal environments
 
@@ -93,9 +89,9 @@ If you have your authentication defined in your pip.conf or pip.ini file, you ca
 - `pip install idmtools-models --index-url=https://<USERNAME>:<PASSWORD>@packages.idmod.org/api/pypi/pypi-staging/simple` - Python and generic models
 
 ## Pre-requisites
-- Python 3.6/3.7/3.8 x64
+- Python 3.7/3.8/3.9/3.10 x64
 - Docker(Required for the local platform)
-  On Windows, please use Docker Desktop 2.1.0.5 or 2.2.0.1
+  On Windows or Mac, please use Docker Desktop 2.1.0.5 or 2.2.0.1
 
 # Reporting issues
 

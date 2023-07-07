@@ -37,19 +37,18 @@ authors = [
     ("Clark Kirkman IV", "ckirkman@idmod.org"),
     ("Benoit Raybaud", "braybaud@idmod.org"),
     ("Jen Schripsema", "jschripsema@idmod.org"),
-    ("Lauren George", "lgeorge@idmod.org")
+    ("Lauren George", "lgeorge@idmod.org"),
+    ("Emily Claps", "emily.claps@gatesfoundation.org")
 ]
-
-# check for python 3.6
-if sys.version_info <= (3, 6):
-    extra_require_files['requirements'].append('dataclasses')
 
 setup(
     author=", ".join([author[0] for author in authors]),
     author_email=", ".join([author[1] for author in authors]),
     classifiers=[
-        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
         'Framework:: IDM-Tools'
     ],
     description="Core tools for modeling",
@@ -68,7 +67,7 @@ setup(
             "idmtools_id_generate_item_sequence = idmtools.plugins.item_sequence"
         ]
     ),
-    python_requires='>=3.6.*, !=3.7.0, !=3.7.1, !=3.7.2',
+    python_requires='>=3.7.3',
     test_suite='tests',
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',

@@ -190,7 +190,7 @@ echo Hello
         Returns:
 
         """
-        cmd = "python3.6 --version"
+        cmd = "python3.7 --version"
         task = CommandTask(cmd)
         task.common_assets.add_asset(
             Asset(relative_path=os.path.join("site-packages", "test-package"), filename="__init__.py", content="a=\'123\'"))
@@ -209,7 +209,7 @@ echo Hello
                     # check for echo
                     self.assertIn('Running', content)
                     # don't check full version in case comps updates system
-                    self.assertIn('Python 3.6', content)
+                    self.assertIn('Python 3.7', content)
 
     @pytest.mark.comps
     def test_wrapper_script_python_execute_site_packages_comps(self):
@@ -220,7 +220,7 @@ echo Hello
         Returns:
 
         """
-        cmd = "python3.6 -c \"import test_package as tp;print(tp.a)\""
+        cmd = "python3.7 -c \"import test_package as tp;print(tp.a)\""
         task = CommandTask(cmd)
         task.common_assets.add_asset(Asset(relative_path=os.path.join("site-packages", "test_package"), filename="__init__.py", content="a=\'123\'"))
         pl_slurm = Platform("SLURM")
@@ -249,7 +249,7 @@ echo Hello
         Returns:
 
         """
-        cmd = "python3.6 -c \"import test_package as tp;print(tp.a)\""
+        cmd = "python3.7 -c \"import test_package as tp;print(tp.a)\""
         task = CommandTask(cmd)
         task.common_assets.add_asset(Asset(filename="test_package.py", content="a=\'123\'"))
         pl_slurm = Platform("SLURM")

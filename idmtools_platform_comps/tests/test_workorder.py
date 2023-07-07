@@ -130,7 +130,7 @@ class TestWorkOrder(ITestWithPersistence):
         Returns:
 
         """
-        cmd = "python3.6 --version"
+        cmd = "python3.7 --version"
         task = CommandTask(cmd)
 
         task.common_assets.add_asset(
@@ -154,7 +154,7 @@ class TestWorkOrder(ITestWithPersistence):
                 if asset.filename in ["stdout.txt"]:
                     content = asset.content.decode('utf-8').replace("\\\\", "\\")
                     # don't check full version in case comps updates system
-                    self.assertIn('Python 3.6', content)
+                    self.assertIn('Python 3.7', content)
 
     def test_workorder_hpc(self):
         """
@@ -315,7 +315,7 @@ class TestWorkOrder(ITestWithPersistence):
         Returns:
 
         """
-        cmd = "python3.6 --version"
+        cmd = "python3.7 --version"
         task = CommandTask(cmd)
 
         task.common_assets.add_asset(
@@ -328,7 +328,7 @@ class TestWorkOrder(ITestWithPersistence):
         experiment = Experiment.from_task(wrapper_task, name=self.case_name)
 
         # upload dynamic WorkOrder.json to simulation root dir
-        add_schedule_config(experiment, command="python3.6 --version", node_group_name='idm_abcd', num_cores=1,
+        add_schedule_config(experiment, command="python3.7 --version", node_group_name='idm_abcd', num_cores=1,
                             NumProcesses=1, NumNodes=1, Environment={"key1": "value1", "key2": "value2"})
 
         wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform, scheduling=True)
@@ -340,7 +340,7 @@ class TestWorkOrder(ITestWithPersistence):
                 if asset.filename in ["stdout.txt"]:
                     content = asset.content.decode('utf-8').replace("\\\\", "\\")
                     # don't check full version in case comps updates system
-                    self.assertIn('Python 3.6', content)
+                    self.assertIn('Python 3.7', content)
 
     def test_schedule_config_hpc(self):
         """
