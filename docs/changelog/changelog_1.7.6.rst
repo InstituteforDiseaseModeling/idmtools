@@ -16,7 +16,7 @@ Core
 
 
 Dependencies
-----
+------------
 * `#1943 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1943>`_ - Update pygithub requirement from ~=1.56 to ~=1.57
 * `#1946 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1946>`_ - Update pygit2 requirement from <1.11.0,>=1.4.0 to >=1.4.0,<1.12.0
 * `#1948 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1948>`_ - Update sqlalchemy requirement from ~=1.4.43 to ~=1.4.44

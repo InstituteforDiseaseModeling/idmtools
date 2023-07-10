@@ -33,9 +33,6 @@ extras = dict(test=test_requirements, dev=['Pympler'],
               server=server_requirements,
               # these are only needed when not running UI
               ui=ui_requirements)
-# check for python 3.6
-if sys.version_info[1] == 6:
-    requirements.append('dataclasses')
 
 authors = [
     ("Ross Carter", "rcarter@idmod.org"),
@@ -63,7 +60,7 @@ setup(
     name='idmtools_platform_local',
     # At the moment, docker python doesn't work with python 3.10 on Windows
     # See https://github.com/docker/docker-py/issues/2967
-    python_requires=">=3.6,<3.11.0",
+    python_requires=">=3.7,<3.11.0",
     packages=find_packages(),
     setup_requires=setup_requirements,
     entry_points=dict(idmtools_platform=  # noqa: E251
@@ -74,5 +71,5 @@ setup(
     test_suite='tests',
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='1.7.7'
+    version='1.7.7+nightly'
 )

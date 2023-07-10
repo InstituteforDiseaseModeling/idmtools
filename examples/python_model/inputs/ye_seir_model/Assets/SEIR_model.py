@@ -10,10 +10,8 @@ p_version = sys.version_info
 if p_version.major == 3:
     if p_version.minor == 7:
         sys.path.append(str(Path(os.path.join(assets_dir, './MyExternalLibrary/Python37')).resolve().absolute()))
-    elif p_version.minor == 6:
-        sys.path.append(str(Path(os.path.join(assets_dir, './MyExternalLibrary/Python36')).resolve().absolute()))
 else:
-    print("Sorry, this model only support Python 3.6 and 3.7")
+    print("Sorry, this model only supports Python 3.7")
     sys.exit(1)
 import dtk_nodedemog as nd
 import dtk_generic_intrahost as gi

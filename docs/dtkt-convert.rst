@@ -26,10 +26,6 @@ used in |IT_s|.
 
     hide circle
 
-    note top of simtools
-    DTK-Tools
-    end note
-
     class simtools{
         [DEFAULT]
         max_threads = 1
@@ -42,8 +38,8 @@ used in |IT_s|.
         type = HPC
     }
 
-    note top of idmtools
-    idmtools
+    note top of simtools
+    DTK-Tools
     end note
 
     class idmtools{
@@ -61,6 +57,10 @@ used in |IT_s|.
         max_workers = 1
         batch_size = 10
     }
+
+    note top of idmtools
+    idmtools
+    end note
 
     idmtools -left[hidden]-> simtools
 
@@ -97,10 +97,6 @@ when using |EMODPY_s| the :py:class:`~emodpy.emod_task.EMODTask` class is used.
 
     hide circle
 
-    note top of DTKConfigBuilder
-    DTK-Tools
-    end note
-
     class DTKConfigBuilder{
         config
         campaign
@@ -108,8 +104,8 @@ when using |EMODPY_s| the :py:class:`~emodpy.emod_task.EMODTask` class is used.
         report
     }
 
-    note top of EMODTask
-    idmtools/emodpy
+    note top of DTKConfigBuilder
+    DTK-Tools
     end note
 
     class EMODTask{
@@ -119,8 +115,11 @@ when using |EMODPY_s| the :py:class:`~emodpy.emod_task.EMODTask` class is used.
         task.reporter
     }
 
-    EMODTask -left[hidden]-> DTKConfigBuilder
+    note top of EMODTask
+    idmtools/emodpy
+    end note
 
+    EMODTask -left[hidden]-> DTKConfigBuilder
 
 Example
 =======

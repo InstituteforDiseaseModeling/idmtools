@@ -1,9 +1,5 @@
 @startuml
 
-note top of BaseAnalyzer
-DTK-Tools
-end note
-
 class BaseAnalyzer {
     initialize()
     per_experiment()
@@ -13,8 +9,8 @@ class BaseAnalyzer {
     destroy()
 }
 
-note top of IAnalyzer
-idmtools
+note top of BaseAnalyzer
+DTK-Tools
 end note
 
 class IAnalyzer {
@@ -25,6 +21,10 @@ class IAnalyzer {
     reduce()
     destroy()
 }
+
+note top of IAnalyzer
+idmtools
+end note
 
 IAnalyzer -left[hidden]-> BaseAnalyzer
 
