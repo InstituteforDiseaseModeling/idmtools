@@ -56,11 +56,16 @@ API class specifications
 |EMOD_s|
 ^^^^^^^^
 
-|EMOD_s| support with |IT_s| is provided with the **emodpy** package, which leverages |IT_s| plugin architecture:
-
 .. uml:: /diagrams/apis-emod.puml
 
+|EMOD_s| support with |IT_s| is provided with the **emodpy** package, which leverages |IT_s| plugin architecture.
 
+
+API Documentation
+=================
+.. toctree::
+   :maxdepth: 3
+   :titlesonly:
 
    api/idmtools_index
    api/idmtools_models_index

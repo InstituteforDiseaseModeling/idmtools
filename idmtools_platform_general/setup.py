@@ -35,6 +35,10 @@ setup(
     author=", ".join([author[0] for author in authors]),
     author_email=", ".join([author[1] for author in authors]),
     classifiers=[
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
         'Framework:: IDM-Tools :: Platform',
     ],
     description="General platform for IDM-Tools",
@@ -52,5 +56,5 @@ setup(
     },
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='1.7.7'
+    version='1.7.8'
 )

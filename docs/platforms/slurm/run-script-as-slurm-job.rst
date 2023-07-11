@@ -7,7 +7,7 @@ This is a temporary workaround solution and user can follow the steps to run a P
 In the future we may develop a utility tool which will run a Python script as a Slurm job automatically.
 
 Steps
-....
+.....
 This guide takes Northwestern University QUEST Slurm system as an example. For general case, users may need to modify the steps based on their own Slurm environment.
 
 Assume user has virtual environment created and activated.
@@ -44,11 +44,11 @@ Assume user has virtual environment created and activated.
 3.Run target script as SLURM job
     execute the following command from console (under virtual environment)::
 
-    cd path_to_script_folder
+        cd path_to_script_folder
 
     then::
 
-    sbatch sbatch.sh
+        sbatch sbatch.sh
 
 .. note::
 

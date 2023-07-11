@@ -38,8 +38,10 @@ setup(
     author=", ".join([author[0] for author in authors]),
     author_email=", ".join([author[1] for author in authors]),
     classifiers=[
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7'
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
     ],
     description="idmtools slurm utils",
     install_requires=extra_require_files['requirements'],
@@ -56,5 +58,5 @@ setup(
             'idmtools-slurm-bridge = idmtools_slurm_utils.singularity_bridge:main',
         ],
     },
-    version='1.7.7'
+    version='1.7.8'
 )

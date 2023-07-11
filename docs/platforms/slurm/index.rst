@@ -22,7 +22,7 @@ Prerequisites
     another and give you the option to run multiple versions of Python on the same computer. When using a
     virtual environment, you can indicate the version of Python you want to use and the packages you
     want to install, which will remain separate from other Python environments. You may use
-    ``virtualenv``, which requires a separate installation, but ``venv`` is recommended and included with Python 3.3+.
+    ``virtualenv``, which requires a separate installation, but ``venv`` is recommended and included with Python 3.7+.
 
 Configuration
 =============
@@ -152,3 +152,4 @@ Run the following included Python script to submit and run a job on your |SLURM_
 
     options
     cancel
+    run-script-as-slurm-job

@@ -13,8 +13,9 @@ if p_version.major == 3:
     elif p_version.minor == 6:
         sys.path.append(str(Path(os.path.join(assets_dir, './MyExternalLibrary/Python36')).resolve().absolute()))
 else:
-    print("Sorry, this model only support Python 3.6 and 3.7")
+    print("Sorry, this model only supports Python 3.6, 3.7")
     sys.exit(1)
+
 import dtk_nodedemog as nd
 import dtk_generic_intrahost as gi
 from config_sim import configure_simulation
