@@ -13,7 +13,7 @@ for file_prefix in ['', 'dev_', 'build_']:
     with open(f'{filename}.txt') as requirements_file:
         extra_require_files[file_prefix.strip("_") if file_prefix else filename] = [dependency for dependency in requirements_file.read().split("\n") if not dependency.startswith("--")]
 
-version = '1.7.7+nightly'
+version = '1.7.8'
 
 extras = {
     'test': extra_require_files['build'] + extra_require_files['dev'],
@@ -47,6 +47,7 @@ setup(
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
         'Framework:: IDM-Tools'
     ],
     description="Core tools for modeling",
