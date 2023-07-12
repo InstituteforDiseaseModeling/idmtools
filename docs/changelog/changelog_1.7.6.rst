@@ -13,10 +13,11 @@ Additional Changes
 Core
 ----
 * `#1810 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1810>`_ - Support alternate id generators
-
+* `#1930 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1930>`_ - Add idmtools_platform_post_create_item to plugin registry
+* `#1939 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1939>`_ - Add idmtools_platform_post_create_item hook
 
 Dependencies
-----
+------------
 * `#1943 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1943>`_ - Update pygithub requirement from ~=1.56 to ~=1.57
 * `#1946 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1946>`_ - Update pygit2 requirement from <1.11.0,>=1.4.0 to >=1.4.0,<1.12.0
 * `#1948 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1948>`_ - Update sqlalchemy requirement from ~=1.4.43 to ~=1.4.44

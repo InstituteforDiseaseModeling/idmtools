@@ -11,11 +11,15 @@ from idmtools.registry.task_specification import TaskSpecification
 
 @dataclass(repr=False)
 class TestTask(ITask):
-    command: CommandLine = field(default=CommandLine.from_string('echo this is a test'), metadata={"md": True})
+    command: CommandLine = field(default=None, metadata={"md": True})
     parameters: dict = field(default_factory=lambda: {}, metadata={"md": True})
     common_asset_paths: list = field(default_factory=lambda: [])
 
     __test__ = False  # Hide from test discovery
+
+    def __post_init__(self):
+        if self.command is None:
+            self.command = CommandLine.from_string('echo this is a test')
 
     def set_parameter(self, name: str, value: any) -> dict:
         self.parameters[name] = value

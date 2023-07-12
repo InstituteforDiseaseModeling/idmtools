@@ -19,6 +19,6 @@ Feature Request
 Platforms
 ---------
 * `#1829 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1829>`_ - Performance issue: slurm commission is too slow
-* `#1829 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1996>`_ - Hotfix Slurm commission performance issue
+* `#1996 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1996>`_ - Hotfix Slurm commission performance issue
 
 
