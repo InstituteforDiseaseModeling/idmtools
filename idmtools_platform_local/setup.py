@@ -50,7 +50,7 @@ setup(
     author=", ".join([author[0] for author in authors]),
     author_email=", ".join([author[1] for author in authors]),
     classifiers=[
-        'Framework:: IDM-Tools :: Platform',
+        'Framework:: IDM-Tools :: Platform'
     ],
     description="Provides ability to run models locally using docker containers to IDM-Tools",
     install_requires=requirements,
