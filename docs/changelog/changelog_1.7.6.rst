@@ -13,7 +13,8 @@ Additional Changes
 Core
 ----
 * `#1810 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1810>`_ - Support alternate id generators
-
+* `#1930 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1930>`_ - Add idmtools_platform_post_create_item to plugin registry
+* `#1939 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/1939>`_ - Add idmtools_platform_post_create_item hook
 
 Dependencies
 ------------
