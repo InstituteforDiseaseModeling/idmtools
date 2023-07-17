@@ -21,13 +21,13 @@ class TestGithubUrlParse(TestCase):
         gr = GitRepo()
         self.assertEqual(gr.repo_owner, 'institutefordiseasemodeling')
         self.assertEqual(gr.repo_name, 'idmtools')
-        self.assertEqual(gr.branch, 'master')
+        self.assertEqual(gr.branch, 'main')
 
     def test_owner_and_repo(self):
         gr = GitRepo(repo_owner='test_owner', repo_name='test_repo')
         self.assertEqual(gr.repo_owner, 'test_owner')
         self.assertEqual(gr.repo_name, 'test_repo')
-        self.assertEqual(gr.branch, 'master')
+        self.assertEqual(gr.branch, 'main')
         self.assertEqual(gr.path, '')
 
     def test_owner_and_repo_with_url_parse(self):
@@ -57,17 +57,17 @@ class TestGithubUrlParse(TestCase):
         gr.parse_url(url)
         self.assertEqual(gr.repo_owner, 'institutefordiseasemodeling')
         self.assertEqual(gr.repo_name, 'corvid-idmtools')
-        self.assertEqual(gr.branch, 'master')
+        self.assertEqual(gr.branch, 'main')
         self.assertEqual(gr.path, '')
 
     def test_full_url_with_branch(self):
         url = "https://github.com/InstituteforDiseaseModeling/idmtools/tree/dev/examples/ssmt"
 
         gr = GitRepo()
-        gr.parse_url(url, branch='master')
+        gr.parse_url(url, branch='main')
         self.assertEqual(gr.repo_owner, 'institutefordiseasemodeling')
         self.assertEqual(gr.repo_name, 'idmtools')
-        self.assertEqual(gr.branch, 'master')
+        self.assertEqual(gr.branch, 'main')
         self.assertEqual(gr.path, 'examples/ssmt')
 
     def test_short_url_with_branch(self):
@@ -91,13 +91,13 @@ class TestGithubUrlParse(TestCase):
         self.assertEqual(gr.path, 'examples/ssmt/__init__.py')
 
     def test_general_url(self):
-        url = "https://github.com/test_owner/test_repo/tree/master/test_example_path"
+        url = "https://github.com/test_owner/test_repo/tree/main/test_example_path"
 
         gr = GitRepo()
         gr.parse_url(url)
         self.assertEqual(gr.repo_owner, 'test_owner')
         self.assertEqual(gr.repo_name, 'test_repo')
-        self.assertEqual(gr.branch, 'master')
+        self.assertEqual(gr.branch, 'main')
         self.assertEqual(gr.path, 'test_example_path')
 
 

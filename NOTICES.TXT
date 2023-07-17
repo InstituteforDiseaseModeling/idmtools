@@ -24,7 +24,7 @@ Python/requests	https://pypi.org/project/requests/	Apache 2.0
 Python/sqlalchemy	https://pypi.org/project/SQLAlchemy/	MIT
 Python/flask	https://pypi.org/project/Flask/	BSD-3-clause
 Python/stringcase	https://pypi.org/project/stringcase/	MIT
-@amcharts/amcharts4	https://www.npmjs.com/package/@amcharts/amcharts4	Linkware license (https://github.com/amcharts/amcharts4/blob/master/dist/script/LICENSE)
+@amcharts/amcharts4	https://www.npmjs.com/package/@amcharts/amcharts4	Linkware license (https://github.com/amcharts/amcharts4/blob/main/dist/script/LICENSE)
 @material-ui/core	https://www.npmjs.com/package/@material-ui/core	MIT
 @material-ui/icons	https://www.npmjs.com/package/@material-ui/icons	MIT
 moment	https://www.npmjs.com/package/moment	MIT
