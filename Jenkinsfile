@@ -1,11 +1,7 @@
 def repo_ssh_url
-def default_branch
-def repo_dir = 'idmtools-mp-repo'
+def default_branch ='main'
 
 pipeline {
-    parameters {
-        choice(choices: ['python3.10', 'python3.7', 'python3.8', 'python3.9', 'python3.11'], name: 'PYTHON', description: 'python version')
-    }
     environment {
         user = credentials('Comps_emodpy_user')
         COMPS_PASS = credentials('Comps_emodpy_password')
@@ -20,10 +16,9 @@ pipeline {
     stages {
         stage("Clean previous dir and virtual environment") {
             steps {
-                dir(repo_dir) {
+                dir(${WORKSPACE}) {
                     deleteDir()
                 }
-                echo "pwd is ${PWD}"
                 sh 'ls -lart'
                 echo 'Remove disk_cache to avoid pickle issue'
                 sh 'rm -fr ~/.idmtools/cache/disk_cache/platforms/'
@@ -56,7 +51,6 @@ pipeline {
 						credentialsId: '704061ca-54ca-4aec-b5ce-ddc7e9eab0f2',
 						url: repo_ssh_url
 					}
-					echo 'pwd'
 					sh 'ls -lart'
 				}
 			}
@@ -65,57 +59,43 @@ pipeline {
         stage('Create virtual environment'){
             steps {
                 script {
-                        withPythonEnv("/usr/bin/python3.10") {
-                            //sh 'pip install pytest'
-                            sh 'pip list'
-                        }
+                    withPythonEnv("/usr/bin/python3.10") {
+                        sh 'pip list'
+                    }
                 }
             }
         }
         stage("Prepare") {
             steps {
                 script {
-
-                        //withPythonEnv("/usr/bin/${params.PYTHON}") {
-                        withPythonEnv("/usr/bin/python3.10") {
-                            echo 'pwd'
-                            sh 'ls -lart'
-                            sh 'pip install idm-buildtools flake8 wheel pygit2 matplotlib sqlalchemy natsort pytest --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple'
-                            echo 'pwd'
-                            sh 'ls -lart'
-                            sh 'ls -lart dev_scripts/*'
-                            sh 'python dev_scripts/bootstrap.py'
-                            sh 'python dev_scripts/create_auth_token_args.py --comps_url https://comps2.idmod.org --username idmtools_bamboo'
-                            sh 'pip list'
-                        }
-
+                     withPythonEnv("/usr/bin/python3.10") {
+                        sh 'pip install idm-buildtools flake8 wheel pygit2 matplotlib sqlalchemy natsort pytest --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple'
+                        sh 'make setup-dev-no-docker'
+                        sh 'pip list'
+                        sh 'python dev_scripts/create_auth_token_args.py --comps_url https://comps2.idmod.org --username idmtools_bamboo'
+                    }
                 }
             }
         }
         stage('Run idmtools slurm example') {
             steps {
                 script {
-
-                        withPythonEnv("/usr/bin/python3.10") {
-                            sh 'python examples/native_slurm/python_sims.py'
-                            sh 'ls -lart ~/example/'
-                        }
+                    withPythonEnv("/usr/bin/python3.10") {
+                        sh 'python examples/native_slurm/python_sims.py'
+                        sh 'ls -lart ~/example/'
                     }
-
+                }
             }
         }
         stage('run cli tests') {
             steps {
                 script {
                     withPythonEnv("/usr/bin/python3.10") {
-                        //def cli_test_dir = repo_dir + '/idmtools_cli/'
-                        //dir(repo_dir + '/idmtools_cli/') {
-                            sh '''#!/bin/bash
-                            cd idmtools_cli
-                            PARALLEL_TEST_COUNT=2 make test-all
-                            '''
-                        }
-
+                        sh '''#!/bin/bash
+                        cd idmtools_cli
+                        PARALLEL_TEST_COUNT=2 make test-all
+                        '''
+                    }
                 }
             }
         }
@@ -123,13 +103,11 @@ pipeline {
             steps {
                 script {
                     withPythonEnv("/usr/bin/python3.10") {
-                        //dir(repo_dir + '/idmtools_core/') {
-                            sh '''#!/bin/bash
-                            cd idmtools_core
-                            PARALLEL_TEST_COUNT=2 make test-all
-                            '''
-                        }
-                   // }
+                        sh '''#!/bin/bash
+                        cd idmtools_core
+                        PARALLEL_TEST_COUNT=2 make test-all
+                        '''
+                    }
                 }
             }
         }
@@ -137,13 +115,11 @@ pipeline {
             steps {
                 script {
                     withPythonEnv("/usr/bin/python3.10") {
-                        //dir(repo_dir + '/idmtools_platform_slurm/') {
-                            sh '''#!/bin/bash
-                            cd idmtools_platform_slurm
-                            make test-all
-                            '''
-                        }
-                    //}
+                        sh '''#!/bin/bash
+                        cd idmtools_platform_slurm
+                        make test-all
+                        '''
+                    }
                 }
             }
         }
@@ -151,12 +127,10 @@ pipeline {
             steps {
                 script {
                     withPythonEnv("/usr/bin/python3.10") {
-                        //dir(repo_dir + '/idmtools_models/') {
-                            sh '''#!/bin/bash
-                            cd idmtools_models
-                            PARALLEL_TEST_COUNT=2 make test-all
-                            '''
-                        //}
+                        sh '''#!/bin/bash
+                        cd idmtools_models
+                        PARALLEL_TEST_COUNT=2 make test-all
+                        '''
                     }
                 }
             }
@@ -165,12 +139,10 @@ pipeline {
             steps {
                 script {
                     withPythonEnv("/usr/bin/python3.10") {
-                       // dir(repo_dir + '/idmtools_slurm_utils/') {
-                            sh '''#!/bin/bash
-                            cd idmtools_slurm_utils
-                            make test-all
-                            '''
-                       // }
+                        sh '''#!/bin/bash
+                        cd idmtools_slurm_utils
+                        make test-all
+                        '''
                     }
                 }
             }
@@ -179,12 +151,10 @@ pipeline {
             steps {
                 script {
                     withPythonEnv("/usr/bin/python3.10") {
-                        //dir(repo_dir + '/idmtools_platform_general/') {
-                            sh '''#!/bin/bash
-                            cd idmtools_platform_general
-                            make test-all
-                            '''
-                        //}
+                        sh '''#!/bin/bash
+                        cd idmtools_platform_general
+                        make test-all
+                        '''
                     }
                 }
             }
@@ -193,12 +163,10 @@ pipeline {
             steps {
                 script {
                     withPythonEnv("/usr/bin/python3.10") {
-                        //dir(repo_dir + '/idmtools_platform_comps/') {
-                            sh '''#!/bin/bash
-                            idmtools_platform_comps
-                            PARALLEL_TEST_COUNT=2  make test-all
-                            '''
-                        //}
+                        sh '''#!/bin/bash
+                        idmtools_platform_comps
+                        PARALLEL_TEST_COUNT=2  make test-all
+                        '''
                     }
                 }
             }
@@ -212,7 +180,7 @@ pipeline {
                 testResults: '**/*test_results.xml',
                 skipPublishingChecks: true
             )
-            //cleanWs()
+            cleanWs()
             dir("/home/jenkins/example") {
                 deleteDir()  //this is slurm example result
             }
