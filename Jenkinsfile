@@ -39,20 +39,22 @@ pipeline {
         }
 		stage('Code Checkout') {
 			steps {
-				if (env.CHANGE_ID) {
-					echo "I execute on the pull request ${env.CHANGE_ID}"
-					checkout([$class: 'GitSCM',
-					branches: [[name: "pr/${env.CHANGE_ID}/head"]],
-					doGenerateSubmoduleConfigurations: false,
-					extensions: [],
-					gitTool: 'Default',
-					submoduleCfg: [],
-					userRemoteConfigs: [[refspec: '+refs/pull/*:refs/remotes/origin/pr/*', credentialsId: '704061ca-54ca-4aec-b5ce-ddc7e9eab0f2', url: 'git@github.com:shchen-idmod/idmtools-1.git.git']]])
-				} else {
-					echo "I execute on the ${env.BRANCH_NAME} branch"
-					git branch: "${env.BRANCH_NAME}",
-					credentialsId: '704061ca-54ca-4aec-b5ce-ddc7e9eab0f2',
-					url: 'git@github.com:shchen-idmod/idmtools-1.git.git'
+				script {
+					if (env.CHANGE_ID) {
+						echo "I execute on the pull request ${env.CHANGE_ID}"
+						checkout([$class: 'GitSCM',
+						branches: [[name: "pr/${env.CHANGE_ID}/head"]],
+						doGenerateSubmoduleConfigurations: false,
+						extensions: [],
+						gitTool: 'Default',
+						submoduleCfg: [],
+						userRemoteConfigs: [[refspec: '+refs/pull/*:refs/remotes/origin/pr/*', credentialsId: '704061ca-54ca-4aec-b5ce-ddc7e9eab0f2', url: 'git@github.com:shchen-idmod/idmtools-1.git.git']]])
+					} else {
+						echo "I execute on the ${env.BRANCH_NAME} branch"
+						git branch: "${env.BRANCH_NAME}",
+						credentialsId: '704061ca-54ca-4aec-b5ce-ddc7e9eab0f2',
+						url: 'git@github.com:shchen-idmod/idmtools-1.git.git'
+					}
 				}
 			}
 		}
