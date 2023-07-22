@@ -33,7 +33,7 @@ pipeline {
                 script {
                     repo_ssh_url = "git@github.com:shchen-idmod/idmtools-1.git"
                     default_branch = "main"
-                    echo "workspace is ${WORKSPACE}"  //~/idmtools_build/test_new_build
+                    echo "workspace is ${WORKSPACE}"
                 }
             }
         }
