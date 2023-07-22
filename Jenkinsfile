@@ -191,18 +191,18 @@ pipeline {
             }
         }
     }
-//     post {
-//         // Clean after build
-//         always {
-//             junit(
-//                 allowEmptyResults: true,
-//                 testResults: '**/*test_results.xml',
-//                 skipPublishingChecks: true
-//             )
-//             cleanWs()
-//             dir("/home/jenkins/example") {
-//             deleteDir()  //this is slurm example result
-//         }
-//         }
-//     }
+    post {
+        // Clean after build
+        always {
+            junit(
+                allowEmptyResults: true,
+                testResults: '**/*test_results.xml',
+                skipPublishingChecks: true
+            )
+            cleanWs()
+            dir("/home/jenkins/example") {
+            deleteDir()  //this is slurm example result
+        }
+        }
+    }
 }
