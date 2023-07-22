@@ -23,6 +23,7 @@ pipeline {
                 dir(repo_dir) {
                     deleteDir()
                 }
+                echo 'pwd'
                 sh 'ls -lart'
                 echo 'Remove disk_cache to avoid pickle issue'
                 sh 'rm -fr ~/.idmtools/cache/disk_cache/platforms/'
