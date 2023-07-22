@@ -10,7 +10,7 @@ pipeline {
     }
     agent {
         node {
-            label "idmtools_slurm"  # build machine
+            label "idmtools_slurm"
         }
     }
     stages {
