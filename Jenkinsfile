@@ -46,7 +46,7 @@ pipeline {
 						checkout([$class: 'GitSCM',
 						branches: [[name: "pr/${env.CHANGE_ID}/head"]],
 						doGenerateSubmoduleConfigurations: false,
-						extensions: [$class: "RelativeTargetDirectory", relativeTargetDir: repo_dir]],
+						extensions: [[$class: "RelativeTargetDirectory", relativeTargetDir: repo_dir]],
 						gitTool: 'Default',
 						submoduleCfg: [],
 						userRemoteConfigs: [[refspec: '+refs/pull/*:refs/remotes/origin/pr/*', credentialsId: '704061ca-54ca-4aec-b5ce-ddc7e9eab0f2', url: repo_ssh_url]])
