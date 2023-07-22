@@ -16,7 +16,7 @@ pipeline {
     stages {
         stage("Clean previous dir and virtual environment") {
             steps {
-                dir(${WORKSPACE}) {
+                dir("${WORKSPACE}") {
                     deleteDir()
                 }
                 sh 'ls -lart'
