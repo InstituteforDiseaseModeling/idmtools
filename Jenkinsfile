@@ -54,6 +54,7 @@ pipeline {
 						git branch: "${env.BRANCH_NAME}",
 						credentialsId: '704061ca-54ca-4aec-b5ce-ddc7e9eab0f2',
 						url: repo_ssh_url
+					}
 				}
 			}
 		}
