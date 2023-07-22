@@ -31,7 +31,7 @@ pipeline {
         stage("Build URL and path") {
             steps {
                 script {
-                    repo_ssh_url = "git@github.com:shchen-idmod/idmtools-1.git.git"
+                    repo_ssh_url = "git@github.com:shchen-idmod/idmtools-1.git"
                     default_branch = "main"
                     echo "workspace is ${WORKSPACE}"  //~/idmtools_build/test_new_build
                 }
@@ -48,12 +48,12 @@ pipeline {
 						extensions: [],
 						gitTool: 'Default',
 						submoduleCfg: [],
-						userRemoteConfigs: [[refspec: '+refs/pull/*:refs/remotes/origin/pr/*', credentialsId: '704061ca-54ca-4aec-b5ce-ddc7e9eab0f2', url: 'git@github.com:shchen-idmod/idmtools-1.git.git']]])
+						userRemoteConfigs: [[refspec: '+refs/pull/*:refs/remotes/origin/pr/*', credentialsId: '704061ca-54ca-4aec-b5ce-ddc7e9eab0f2', url: 'git@github.com:shchen-idmod/idmtools-1.git']]])
 					} else {
 						echo "I execute on the ${env.BRANCH_NAME} branch"
 						git branch: "${env.BRANCH_NAME}",
 						credentialsId: '704061ca-54ca-4aec-b5ce-ddc7e9eab0f2',
-						url: 'git@github.com:shchen-idmod/idmtools-1.git.git'
+						url: 'git@github.com:shchen-idmod/idmtools-1.git'
 					}
 				}
 			}
