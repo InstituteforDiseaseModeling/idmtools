@@ -207,10 +207,10 @@ pipeline {
                 testResults: '**/*test_results.xml',
                 skipPublishingChecks: true
             )
-            cleanWs()
+            //cleanWs()
             dir("/home/jenkins/example") {
-            deleteDir()  //this is slurm example result
-        }
+                deleteDir()  //this is slurm example result
+            }
         }
     }
 }
