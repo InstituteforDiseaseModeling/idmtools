@@ -1,6 +1,6 @@
 def repo_ssh_url
 def default_branch
-def repo_dir = 'idmtools-repo'
+def repo_dir = 'idmtools-mp-repo'
 
 pipeline {
     parameters {
@@ -33,7 +33,7 @@ pipeline {
                 script {
                     repo_ssh_url = "git@github.com:shchen-idmod/idmtools-1.git"
                     default_branch = "main"
-                    echo "workspace is ${WORKSPACE}"  //~/idmtools_build/test_new_build
+                    echo "workspace is ${WORKSPACE}"
                 }
             }
         }
@@ -45,15 +45,15 @@ pipeline {
 						checkout([$class: 'GitSCM',
 						branches: [[name: "pr/${env.CHANGE_ID}/head"]],
 						doGenerateSubmoduleConfigurations: false,
-						extensions: [],
+						extensions: [$class: "RelativeTargetDirectory", relativeTargetDir: repo_dir]],
 						gitTool: 'Default',
 						submoduleCfg: [],
-						userRemoteConfigs: [[refspec: '+refs/pull/*:refs/remotes/origin/pr/*', credentialsId: '704061ca-54ca-4aec-b5ce-ddc7e9eab0f2', url: 'git@github.com:shchen-idmod/idmtools-1.git']]])
+						userRemoteConfigs: [[refspec: '+refs/pull/*:refs/remotes/origin/pr/*', credentialsId: '704061ca-54ca-4aec-b5ce-ddc7e9eab0f2', url: repo_ssh_url]])
 					} else {
 						echo "I execute on the ${env.BRANCH_NAME} branch"
 						git branch: "${env.BRANCH_NAME}",
 						credentialsId: '704061ca-54ca-4aec-b5ce-ddc7e9eab0f2',
-						url: 'git@github.com:shchen-idmod/idmtools-1.git'
+						url: repo_ssh_url
 					}
 				}
 			}
