@@ -38,6 +38,7 @@ pipeline {
             }
         }
 		stage('Code Checkout') {
+			steps {
 				if (env.CHANGE_ID) {
 					echo "I execute on the pull request ${env.CHANGE_ID}"
 					checkout([$class: 'GitSCM',
@@ -54,6 +55,7 @@ pipeline {
 					url: 'git@github.com:shchen-idmod/idmtools-1.git.git'
 				}
 			}
+		}
 
         stage('Create virtual environment'){
             steps {
