@@ -80,6 +80,9 @@ pipeline {
                         //withPythonEnv("/usr/bin/${params.PYTHON}") {
                         withPythonEnv("/usr/bin/python3.10") {
                             sh 'pip install idm-buildtools flake8 wheel pygit2 matplotlib sqlalchemy natsort pytest --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple'
+                            echo 'pwd'
+                            sh 'ls -lart'
+                            sh 'ls -lart dev_scripts/*'
                             sh 'python dev_scripts/bootstrap.py'
                             sh 'python dev_scripts/create_auth_token_args.py --comps_url https://comps2.idmod.org --username idmtools_bamboo'
                             sh 'pip list'
