@@ -46,7 +46,7 @@ pipeline {
 						checkout([$class: 'GitSCM',
 						branches: [[name: "pr/${env.CHANGE_ID}/head"]],
 						doGenerateSubmoduleConfigurations: false,
-						extensions: [[$class: "RelativeTargetDirectory", relativeTargetDir: repo_dir]],
+						extensions: [],
 						gitTool: 'Default',
 						submoduleCfg: [],
 						userRemoteConfigs: [[refspec: '+refs/pull/*:refs/remotes/origin/pr/*', credentialsId: '704061ca-54ca-4aec-b5ce-ddc7e9eab0f2', url: repo_ssh_url]]])
@@ -65,19 +65,17 @@ pipeline {
         stage('Create virtual environment'){
             steps {
                 script {
-                    dir(repo_dir) {
                         withPythonEnv("/usr/bin/python3.10") {
                             //sh 'pip install pytest'
                             sh 'pip list'
                         }
-                    }
                 }
             }
         }
         stage("Prepare") {
             steps {
                 script {
-                    dir(repo_dir) {
+
                         //withPythonEnv("/usr/bin/${params.PYTHON}") {
                         withPythonEnv("/usr/bin/python3.10") {
                             echo 'pwd'
@@ -90,20 +88,20 @@ pipeline {
                             sh 'python dev_scripts/create_auth_token_args.py --comps_url https://comps2.idmod.org --username idmtools_bamboo'
                             sh 'pip list'
                         }
-                    }
+
                 }
             }
         }
         stage('Run idmtools slurm example') {
             steps {
                 script {
-                    dir(repo_dir) {
+
                         withPythonEnv("/usr/bin/python3.10") {
                             sh 'python examples/native_slurm/python_sims.py'
                             sh 'ls -lart ~/example/'
                         }
                     }
-                }
+
             }
         }
         stage('run cli tests') {
@@ -111,12 +109,13 @@ pipeline {
                 script {
                     withPythonEnv("/usr/bin/python3.10") {
                         //def cli_test_dir = repo_dir + '/idmtools_cli/'
-                        dir(repo_dir + '/idmtools_cli/') {
+                        //dir(repo_dir + '/idmtools_cli/') {
                             sh '''#!/bin/bash
+                            cd idmtools_cli
                             PARALLEL_TEST_COUNT=2 make test-all
                             '''
                         }
-                    }
+
                 }
             }
         }
@@ -124,12 +123,13 @@ pipeline {
             steps {
                 script {
                     withPythonEnv("/usr/bin/python3.10") {
-                        dir(repo_dir + '/idmtools_core/') {
+                        //dir(repo_dir + '/idmtools_core/') {
                             sh '''#!/bin/bash
+                            cd idmtools_core
                             PARALLEL_TEST_COUNT=2 make test-all
                             '''
                         }
-                    }
+                   // }
                 }
             }
         }
@@ -137,12 +137,13 @@ pipeline {
             steps {
                 script {
                     withPythonEnv("/usr/bin/python3.10") {
-                        dir(repo_dir + '/idmtools_platform_slurm/') {
+                        //dir(repo_dir + '/idmtools_platform_slurm/') {
                             sh '''#!/bin/bash
+                            cd idmtools_platform_slurm
                             make test-all
                             '''
                         }
-                    }
+                    //}
                 }
             }
         }
@@ -150,11 +151,12 @@ pipeline {
             steps {
                 script {
                     withPythonEnv("/usr/bin/python3.10") {
-                        dir(repo_dir + '/idmtools_models/') {
+                        //dir(repo_dir + '/idmtools_models/') {
                             sh '''#!/bin/bash
+                            cd idmtools_models
                             PARALLEL_TEST_COUNT=2 make test-all
                             '''
-                        }
+                        //}
                     }
                 }
             }
@@ -163,11 +165,12 @@ pipeline {
             steps {
                 script {
                     withPythonEnv("/usr/bin/python3.10") {
-                        dir(repo_dir + '/idmtools_slurm_utils/') {
+                       // dir(repo_dir + '/idmtools_slurm_utils/') {
                             sh '''#!/bin/bash
+                            cd idmtools_slurm_utils
                             make test-all
                             '''
-                        }
+                       // }
                     }
                 }
             }
@@ -176,11 +179,12 @@ pipeline {
             steps {
                 script {
                     withPythonEnv("/usr/bin/python3.10") {
-                        dir(repo_dir + '/idmtools_platform_general/') {
+                        //dir(repo_dir + '/idmtools_platform_general/') {
                             sh '''#!/bin/bash
+                            cd idmtools_platform_general
                             make test-all
                             '''
-                        }
+                        //}
                     }
                 }
             }
@@ -189,11 +193,12 @@ pipeline {
             steps {
                 script {
                     withPythonEnv("/usr/bin/python3.10") {
-                        dir(repo_dir + '/idmtools_platform_comps/') {
+                        //dir(repo_dir + '/idmtools_platform_comps/') {
                             sh '''#!/bin/bash
+                            idmtools_platform_comps
                             PARALLEL_TEST_COUNT=2  make test-all
                             '''
-                        }
+                        //}
                     }
                 }
             }
