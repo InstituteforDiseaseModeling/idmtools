@@ -90,8 +90,9 @@ pipeline {
                             sh 'python examples/native_slurm/python_sims.py'
                             sh 'ls -lart ~/example/'
                         }
-                    }catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                        sh "exit 1"
+                    } catch (Exception err) {
+                        unstable 'slurm example failed'
+                        //sh "exit 1"
 					}
                 }
             }
@@ -106,8 +107,9 @@ pipeline {
                             PARALLEL_TEST_COUNT=2 make test-all
                             '''
                         }
-                    }catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                        sh "exit 1"
+                    } catch (Exception err) {
+                        unstable 'cli test failed'
+                        //sh "exit 1"
 					}
                 }
             }
@@ -122,8 +124,9 @@ pipeline {
                             PARALLEL_TEST_COUNT=2 make test-all
                             '''
                         }
-                    }catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                        sh "exit 1"
+                    } catch (Exception err) {
+                        unstable 'core tests failed'
+                        //sh "exit 1"
 					}
                 }
             }
@@ -138,8 +141,9 @@ pipeline {
                             make test-all
                             '''
                         }
-                     }catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                        sh "exit 1"
+                     } catch (Exception err) {
+                        unstable 'slurm tests failed'
+                        //sh "exit 1"
 					}
                 }
             }
@@ -154,8 +158,9 @@ pipeline {
                             PARALLEL_TEST_COUNT=2 make test-all
                             '''
                         }
-                    }catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                        sh "exit 1"
+                    } catch (Exception err) {
+                        unstable 'models tests failed'
+                        //sh "exit 1"
 					}
                 }
             }
@@ -170,8 +175,9 @@ pipeline {
                             make test-all
                             '''
                         }
-                    }catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                        sh "exit 1"
+                    } catch (Exception err) {
+                        unstable 'slurm utils tests failed'
+                        //sh "exit 1"
 					}
                 }
             }
@@ -186,8 +192,9 @@ pipeline {
                             make test-all
                             '''
                         }
-                    }catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                        sh "exit 1"
+                    } catch (Exception err) {
+                        unstable 'general platform tests failed'
+                        //sh "exit 1"
 					}
                 }
             }
@@ -202,8 +209,9 @@ pipeline {
                             PARALLEL_TEST_COUNT=2  make test-all
                             '''
                         }
-                    }catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                        sh "exit 1"
+                    } catch (Exception err) {
+                        unstable 'comps tests failed'
+                        //sh "exit 1"
 					}
                 }
             }
