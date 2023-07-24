@@ -1,6 +1,5 @@
 def repo_ssh_url
 def default_branch ='main'
-def build_ok = true
 
 pipeline {
     environment {
@@ -91,9 +90,8 @@ pipeline {
                             sh 'python examples/native_slurm/python_sims.py'
                             sh 'ls -lart ~/example/'
                         }
-                    }catch(e) {
-						build_ok = false
-						echo e.toString()
+                    }catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                        sh "exit 1"
 					}
                 }
             }
@@ -108,9 +106,8 @@ pipeline {
                             PARALLEL_TEST_COUNT=2 make test-all
                             '''
                         }
-                    }catch(e) {
-						build_ok = false
-						echo e.toString()
+                    }catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                        sh "exit 1"
 					}
                 }
             }
@@ -125,9 +122,8 @@ pipeline {
                             PARALLEL_TEST_COUNT=2 make test-all
                             '''
                         }
-                    }catch(e) {
-						build_ok = false
-						echo e.toString()
+                    }catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                        sh "exit 1"
 					}
                 }
             }
@@ -142,9 +138,8 @@ pipeline {
                             make test-all
                             '''
                         }
-                     }catch(e) {
-						build_ok = false
-						echo e.toString()
+                     }catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                        sh "exit 1"
 					}
                 }
             }
@@ -159,9 +154,8 @@ pipeline {
                             PARALLEL_TEST_COUNT=2 make test-all
                             '''
                         }
-                    }catch(e) {
-						build_ok = false
-						echo e.toString()
+                    }catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                        sh "exit 1"
 					}
                 }
             }
@@ -176,9 +170,8 @@ pipeline {
                             make test-all
                             '''
                         }
-                    }catch(e) {
-						build_ok = false
-						echo e.toString()
+                    }catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                        sh "exit 1"
 					}
                 }
             }
@@ -193,9 +186,8 @@ pipeline {
                             make test-all
                             '''
                         }
-                    }catch(e) {
-						build_ok = false
-						echo e.toString()
+                    }catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                        sh "exit 1"
 					}
                 }
             }
@@ -210,22 +202,10 @@ pipeline {
                             PARALLEL_TEST_COUNT=2  make test-all
                             '''
                         }
-                    }catch(e) {
-						build_ok = false
-						echo e.toString()
+                    }catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                        sh "exit 1"
 					}
                 }
-            }
-        }
-        stage ('Final') {
-            steps {
-                script{
-                    if(build_ok) {
-    		            currentBuild.result = "SUCCESS"
-    	            } else {
-    		            currentBuild.result = "FAILURE"
-    	            }
-    	        }
             }
         }
     }
