@@ -220,7 +220,6 @@ pipeline {
         stage ('Final') {
             steps {
                 script{
-                try {
                     if(build_ok) {
     		            currentBuild.result = "SUCCESS"
     	            } else {
