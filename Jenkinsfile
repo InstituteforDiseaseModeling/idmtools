@@ -86,100 +86,141 @@ pipeline {
         stage('Run idmtools slurm example') {
             steps {
                 script {
-                    withPythonEnv("/usr/bin/python3.10") {
-                        sh 'python examples/native_slurm/python_sims.py'
-                        sh 'ls -lart ~/example/'
-                    }
+                    try {
+                        withPythonEnv("/usr/bin/python3.10") {
+                            sh 'python examples/native_slurm/python_sims.py'
+                            sh 'ls -lart ~/example/'
+                        }
+                    }catch(e) {
+						build_ok = false
+						echo e.toString()
+					}
                 }
             }
         }
         stage('run cli tests') {
             steps {
                 script {
-                    withPythonEnv("/usr/bin/python3.10") {
-                        sh '''#!/bin/bash
-                        cd idmtools_cli
-                        PARALLEL_TEST_COUNT=2 make test-all
-                        '''
-                    }
+                    try {
+                        withPythonEnv("/usr/bin/python3.10") {
+                            sh '''#!/bin/bash
+                            cd idmtools_cli
+                            PARALLEL_TEST_COUNT=2 make test-all
+                            '''
+                        }
+                    }catch(e) {
+						build_ok = false
+						echo e.toString()
+					}
                 }
             }
         }
         stage('run core tests') {
             steps {
                 script {
-                    withPythonEnv("/usr/bin/python3.10") {
-                        sh '''#!/bin/bash
-                        cd idmtools_core
-                        PARALLEL_TEST_COUNT=2 make test-all
-                        '''
-                    }
+                    try {
+                        withPythonEnv("/usr/bin/python3.10") {
+                            sh '''#!/bin/bash
+                            cd idmtools_core
+                            PARALLEL_TEST_COUNT=2 make test-all
+                            '''
+                        }
+                    }catch(e) {
+						build_ok = false
+						echo e.toString()
+					}
                 }
             }
         }
         stage('run platform_slurm tests') {
             steps {
                 script {
-                    withPythonEnv("/usr/bin/python3.10") {
-                        sh '''#!/bin/bash
-                        cd idmtools_platform_slurm
-                        make test-all
-                        '''
-                    }
+                    try {
+                        withPythonEnv("/usr/bin/python3.10") {
+                            sh '''#!/bin/bash
+                            cd idmtools_platform_slurm
+                            make test-all
+                            '''
+                        }
+                     }catch(e) {
+						build_ok = false
+						echo e.toString()
+					}
                 }
             }
         }
         stage('run models tests') {
             steps {
                 script {
-                    withPythonEnv("/usr/bin/python3.10") {
-                        sh '''#!/bin/bash
-                        cd idmtools_models
-                        PARALLEL_TEST_COUNT=2 make test-all
-                        '''
-                    }
+                    try {
+                        withPythonEnv("/usr/bin/python3.10") {
+                            sh '''#!/bin/bash
+                            cd idmtools_models
+                            PARALLEL_TEST_COUNT=2 make test-all
+                            '''
+                        }
+                    }catch(e) {
+						build_ok = false
+						echo e.toString()
+					}
                 }
             }
         }
         stage('run slurm utils tests') {
             steps {
                 script {
-                    withPythonEnv("/usr/bin/python3.10") {
-                        sh '''#!/bin/bash
-                        cd idmtools_slurm_utils
-                        make test-all
-                        '''
-                    }
+                    try {
+                        withPythonEnv("/usr/bin/python3.10") {
+                            sh '''#!/bin/bash
+                            cd idmtools_slurm_utils
+                            make test-all
+                            '''
+                        }
+                    }catch(e) {
+						build_ok = false
+						echo e.toString()
+					}
                 }
             }
         }
         stage('run platform_general tests') {
             steps {
                 script {
-                    withPythonEnv("/usr/bin/python3.10") {
-                        sh '''#!/bin/bash
-                        cd idmtools_platform_general
-                        make test-all
-                        '''
-                    }
+                    try {
+                        withPythonEnv("/usr/bin/python3.10") {
+                            sh '''#!/bin/bash
+                            cd idmtools_platform_general
+                            make test-all
+                            '''
+                        }
+                    }catch(e) {
+						build_ok = false
+						echo e.toString()
+					}
                 }
             }
         }
         stage('Run idmtools platform comps tests') {
             steps {
                 script {
-                    withPythonEnv("/usr/bin/python3.10") {
-                        sh '''#!/bin/bash
-                        idmtools_platform_comps
-                        PARALLEL_TEST_COUNT=2  make test-all
-                        '''
-                    }
+                    try {
+                        withPythonEnv("/usr/bin/python3.10") {
+                            sh '''#!/bin/bash
+                            idmtools_platform_comps
+                            PARALLEL_TEST_COUNT=2  make test-all
+                            '''
+                        }
+                    }catch(e) {
+						build_ok = false
+						echo e.toString()
+					}
                 }
             }
         }
         stage ('Final') {
             steps {
                 script{
+                try {
                     if(build_ok) {
     		            currentBuild.result = "SUCCESS"
     	            } else {
