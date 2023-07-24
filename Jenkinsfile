@@ -14,6 +14,7 @@ pipeline {
         }
     }
     stages {
+    def build_ok = true
         stage("Clean previous dir and virtual environment") {
             steps {
                 dir("${WORKSPACE}") {
@@ -68,12 +69,17 @@ pipeline {
         stage("Prepare") {
             steps {
                 script {
-                     withPythonEnv("/usr/bin/python3.10") {
-                        sh 'pip install idm-buildtools flake8 wheel pygit2 matplotlib sqlalchemy natsort pytest --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple'
-                        sh 'make setup-dev-no-docker'
-                        sh 'pip list'
-                        sh 'python dev_scripts/create_auth_token_args.py --comps_url https://comps2.idmod.org --username idmtools_bamboo'
-                    }
+                    try {
+                        withPythonEnv("/usr/bin/python3.10") {
+                            sh 'pip install idm-buildtools flake8 wheel pygit2 matplotlib sqlalchemy natsort pytest --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple'
+                            sh 'make setup-dev-no-docker'
+                            sh 'pip list'
+                            sh 'python dev_scripts/create_auth_token_args.py --comps_url https://comps2.idmod.org --username idmtools_bamboo'
+                        }
+                    }catch(e) {
+						build_ok = false
+						echo e.toString()
+					}
                 }
             }
         }
@@ -169,6 +175,17 @@ pipeline {
                         '''
                     }
                 }
+            }
+        }
+        stage ('Final') {
+            steps {
+                script{
+                    if(build_ok) {
+    		            currentBuild.result = "SUCCESS"
+    	            } else {
+    		            currentBuild.result = "FAILURE"
+    	            }
+    	        }
             }
         }
     }
