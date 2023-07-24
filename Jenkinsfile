@@ -1,5 +1,6 @@
 def repo_ssh_url
 def default_branch ='main'
+def build_ok = true
 
 pipeline {
     environment {
@@ -14,7 +15,6 @@ pipeline {
         }
     }
     stages {
-    def build_ok = true
         stage("Clean previous dir and virtual environment") {
             steps {
                 dir("${WORKSPACE}") {
