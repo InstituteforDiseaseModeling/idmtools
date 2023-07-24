@@ -17,7 +17,7 @@ class TestConfigFile(unittest.TestCase):
     def test_slugify(self):
         from idmtools_cli.cli.config_file import slugify
         self.assertEqual(slugify("abc"), "ABC")
-        self.assertEqual(slugify("abc def"), "ABC_DEF")
+        self.assertEqual(slugify("abc deff"), "ABC_DEF")
 
     def test_create_command(self):
         runner = CliRunner()
