@@ -92,13 +92,14 @@ pipeline {
                         }
                     } catch (Exception err) {
                         unstable 'slurm example failed'
-                        sh "exit 1"
 					}
                 }
             }
         }
         stage('run cli tests') {
+            //success = false
             steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                 script {
                     try {
                         withPythonEnv("/usr/bin/python3.10") {
@@ -107,9 +108,9 @@ pipeline {
                             PARALLEL_TEST_COUNT=2 make test-all
                             '''
                         }
-                    } catch (Exception err) {
-                        unstable 'cli test failed'
-                        sh "exit 1"
+                    } catch (Exception e) {
+                        throw e
+					}
 					}
                 }
             }
@@ -126,7 +127,6 @@ pipeline {
                         }
                     } catch (Exception err) {
                         unstable 'core tests failed'
-                        sh "exit 1"
 					}
                 }
             }
@@ -143,7 +143,6 @@ pipeline {
                         }
                      } catch (Exception err) {
                         unstable 'slurm tests failed'
-                        sh "exit 1"
 					}
                 }
             }
@@ -160,7 +159,6 @@ pipeline {
                         }
                     } catch (Exception err) {
                         unstable 'models tests failed'
-                        sh "exit 1"
 					}
                 }
             }
@@ -177,7 +175,6 @@ pipeline {
                         }
                     } catch (Exception err) {
                         unstable 'slurm utils tests failed'
-                        sh "exit 1"
 					}
                 }
             }
@@ -194,7 +191,6 @@ pipeline {
                         }
                     } catch (Exception err) {
                         unstable 'general platform tests failed'
-                        sh "exit 1"
 					}
                 }
             }
@@ -211,7 +207,6 @@ pipeline {
                         }
                     } catch (Exception err) {
                         unstable 'comps tests failed'
-                        sh "exit 1"
 					}
                 }
             }
