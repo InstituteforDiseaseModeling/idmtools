@@ -23,7 +23,7 @@ Simulation example
 
 Many additional examples can be found in the `/examples`_ folder of the GitHub repository.
 
-.. _/examples: https://github.com/InstituteforDiseaseModeling/idmtools/tree/master/examples
+.. _/examples: https://github.com/InstituteforDiseaseModeling/idmtools/tree/main/examples
 
 .. toctree::
 
