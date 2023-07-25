@@ -101,16 +101,16 @@ pipeline {
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                 script {
-                    try {
+                    //try {
                         withPythonEnv("/usr/bin/python3.10") {
                             sh '''#!/bin/bash
                             cd idmtools_cli
                             PARALLEL_TEST_COUNT=2 make test-all
                             '''
                         }
-                    } catch (Exception e) {
-                        throw e
-					}
+                   // } catch (Exception e) {
+                   //     throw e
+					//}
 					}
                 }
             }
