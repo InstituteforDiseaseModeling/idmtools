@@ -27,7 +27,7 @@ class GitRepo:
     """
     repo_owner: str = field(default=None)
     repo_name: str = field(default=None)
-    _branch: str = field(default='master', init=False, repr=False)
+    _branch: str = field(default='main', init=False, repr=False)
     _path: str = field(default='', init=False, repr=False)
     _verbose: bool = field(default=False, init=False, repr=False)
 
@@ -111,7 +111,7 @@ class GitRepo:
 
         Returns: None
         """
-        default_branch = 'master'
+        default_branch = 'main'
         ex_text = 'Please Verify URL Format: \nhttps://github.com/<owner>/<repo>/(tree|blob)/<branch>/<path>\nor\nhttps://github.com/<owner>/<repo>/'
 
         example_url = url.lower().strip().rstrip('/')
@@ -194,7 +194,7 @@ class GitRepo:
         else:
             return [f"{r['tag_name']} at {r['published_at']}" for r in repo_list]
 
-    def download(self, path: str = '', output_dir: str = "./", branch: str = 'master') -> int:
+    def download(self, path: str = '', output_dir: str = "./", branch: str = 'main') -> int:
         """
         Download files with example url provided.
 
@@ -291,7 +291,7 @@ class GitRepo:
 
         return total_files
 
-    def peep(self, path: str = '', branch: str = 'master'):
+    def peep(self, path: str = '', branch: str = 'main'):
         """
         Download files with example url provided.
 

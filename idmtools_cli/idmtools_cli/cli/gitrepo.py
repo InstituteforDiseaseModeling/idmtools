@@ -261,11 +261,11 @@ def get_plugins_examples():
 
     Notes:
         test_examples = {
-         'TestA': 'https://github.com/dustin/py-github/tree/master/github/data',
-         'TestB': 'https://github.com/dustin/py-github/tree/master/github',
-         'TestC': 'https://github.com/dustin/py-github/tree/master/github/__init__.py',
-         'TestD': ['https://github.com/dustin/py-github/tree/master/github',
-                   'https://github.com/dustin/py-github/tree/master/github/data']
+         'TestA': 'https://github.com/dustin/py-github/tree/main/github/data',
+         'TestB': 'https://github.com/dustin/py-github/tree/main/github',
+         'TestC': 'https://github.com/dustin/py-github/tree/main/github/__init__.py',
+         'TestD': ['https://github.com/dustin/py-github/tree/main/github',
+                   'https://github.com/dustin/py-github/tree/main/github/data']
         }
     """
     # Collect all idmtools examples
