@@ -27,7 +27,7 @@ pipeline {
         stage("Build URL and path") {
             steps {
                 script {
-                    repo_ssh_url = "git@github.com:shchen-idmod/idmtools-1.git"
+                    repo_ssh_url = "git@github.com:InstituteforDiseaseModeling/idmtools.git"
                     default_branch = "main"
                     echo "workspace is ${WORKSPACE}"
                 }
