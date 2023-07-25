@@ -67,31 +67,26 @@ pipeline {
         }
         stage("Prepare") {
             steps {
-                script {
-                    try {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    script {
                         withPythonEnv("/usr/bin/python3.10") {
                             sh 'pip install idm-buildtools flake8 wheel pygit2 matplotlib sqlalchemy natsort pytest --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple'
                             sh 'make setup-dev-no-docker'
                             sh 'pip list'
                             sh 'python dev_scripts/create_auth_token_args.py --comps_url https://comps2.idmod.org --username idmtools_bamboo'
                         }
-                    }catch(e) {
-						build_ok = false
-						echo e.toString()
-					}
+                    }
                 }
             }
         }
         stage('Run idmtools slurm example') {
             steps {
-                script {
-                    try {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    script {
                         withPythonEnv("/usr/bin/python3.10") {
                             sh 'python examples/native_slurm/python_sims.py'
                             sh 'ls -lart ~/example/'
                         }
-                    } catch (Exception err) {
-                        unstable 'slurm example failed'
 					}
                 }
             }
@@ -187,7 +182,7 @@ pipeline {
                 script {
                         withPythonEnv("/usr/bin/python3.10") {
                             sh '''#!/bin/bash
-                            idmtools_platform_comps
+                            cd idmtools_platform_comps
                             PARALLEL_TEST_COUNT=2  make test-all
                             '''
                         }
