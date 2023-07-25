@@ -100,113 +100,97 @@ pipeline {
             //success = false
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                script {
-                    //try {
+                    script {
                         withPythonEnv("/usr/bin/python3.10") {
                             sh '''#!/bin/bash
                             cd idmtools_cli
                             PARALLEL_TEST_COUNT=2 make test-all
                             '''
                         }
-                   // } catch (Exception e) {
-                   //     throw e
-					//}
 					}
                 }
             }
         }
         stage('run core tests') {
             steps {
-                script {
-                    try {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    script {
                         withPythonEnv("/usr/bin/python3.10") {
                             sh '''#!/bin/bash
                             cd idmtools_core
                             PARALLEL_TEST_COUNT=2 make test-all
                             '''
                         }
-                    } catch (Exception err) {
-                        unstable 'core tests failed'
 					}
                 }
             }
         }
         stage('run platform_slurm tests') {
             steps {
-                script {
-                    try {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    script {
                         withPythonEnv("/usr/bin/python3.10") {
                             sh '''#!/bin/bash
                             cd idmtools_platform_slurm
                             make test-all
                             '''
                         }
-                     } catch (Exception err) {
-                        unstable 'slurm tests failed'
-					}
+                    }
                 }
             }
         }
         stage('run models tests') {
             steps {
-                script {
-                    try {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    script {
                         withPythonEnv("/usr/bin/python3.10") {
                             sh '''#!/bin/bash
                             cd idmtools_models
                             PARALLEL_TEST_COUNT=2 make test-all
                             '''
                         }
-                    } catch (Exception err) {
-                        unstable 'models tests failed'
 					}
                 }
             }
         }
         stage('run slurm utils tests') {
             steps {
-                script {
-                    try {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    script {
                         withPythonEnv("/usr/bin/python3.10") {
                             sh '''#!/bin/bash
                             cd idmtools_slurm_utils
                             make test-all
                             '''
                         }
-                    } catch (Exception err) {
-                        unstable 'slurm utils tests failed'
-					}
+                    }
                 }
             }
         }
         stage('run platform_general tests') {
             steps {
-                script {
-                    try {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    script {
                         withPythonEnv("/usr/bin/python3.10") {
                             sh '''#!/bin/bash
                             cd idmtools_platform_general
                             make test-all
                             '''
                         }
-                    } catch (Exception err) {
-                        unstable 'general platform tests failed'
 					}
                 }
             }
         }
         stage('Run idmtools platform comps tests') {
             steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                 script {
-                    try {
                         withPythonEnv("/usr/bin/python3.10") {
                             sh '''#!/bin/bash
                             idmtools_platform_comps
                             PARALLEL_TEST_COUNT=2  make test-all
                             '''
                         }
-                    } catch (Exception err) {
-                        unstable 'comps tests failed'
 					}
                 }
             }
