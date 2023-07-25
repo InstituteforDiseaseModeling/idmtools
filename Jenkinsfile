@@ -1,4 +1,4 @@
-def repo_ssh_url 
+def repo_ssh_url
 def default_branch ='main'
 
 pipeline {
