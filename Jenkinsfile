@@ -92,7 +92,7 @@ pipeline {
                         }
                     } catch (Exception err) {
                         unstable 'slurm example failed'
-                        //sh "exit 1"
+                        sh "exit 1"
 					}
                 }
             }
@@ -109,7 +109,7 @@ pipeline {
                         }
                     } catch (Exception err) {
                         unstable 'cli test failed'
-                        //sh "exit 1"
+                        sh "exit 1"
 					}
                 }
             }
@@ -126,7 +126,7 @@ pipeline {
                         }
                     } catch (Exception err) {
                         unstable 'core tests failed'
-                        //sh "exit 1"
+                        sh "exit 1"
 					}
                 }
             }
@@ -143,7 +143,7 @@ pipeline {
                         }
                      } catch (Exception err) {
                         unstable 'slurm tests failed'
-                        //sh "exit 1"
+                        sh "exit 1"
 					}
                 }
             }
@@ -160,7 +160,7 @@ pipeline {
                         }
                     } catch (Exception err) {
                         unstable 'models tests failed'
-                        //sh "exit 1"
+                        sh "exit 1"
 					}
                 }
             }
@@ -177,7 +177,7 @@ pipeline {
                         }
                     } catch (Exception err) {
                         unstable 'slurm utils tests failed'
-                        //sh "exit 1"
+                        sh "exit 1"
 					}
                 }
             }
@@ -194,7 +194,7 @@ pipeline {
                         }
                     } catch (Exception err) {
                         unstable 'general platform tests failed'
-                        //sh "exit 1"
+                        sh "exit 1"
 					}
                 }
             }
@@ -211,7 +211,7 @@ pipeline {
                         }
                     } catch (Exception err) {
                         unstable 'comps tests failed'
-                        //sh "exit 1"
+                        sh "exit 1"
 					}
                 }
             }
