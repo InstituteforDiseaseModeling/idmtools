@@ -14,7 +14,7 @@ from sqlalchemy import String, func, or_, and_
 from sqlalchemy.exc import ProgrammingError, ResourceClosedError, OperationalError, DatabaseError
 from idmtools_platform_local.config import DATA_PATH
 from idmtools_platform_local.internals.data.job_status import JobStatus
-from idmtools_platform_local.internals.ui.controllers.utils import validate_tags
+from idmtools_platform_local.internals.ui.controllers.utils import validate_tags, LocalArgument
 from idmtools_platform_local.status import Status
 from idmtools_platform_local.internals.ui.config import db
 
@@ -71,7 +71,7 @@ def experiment_filter(id: Optional[str], tags: Optional[List[Tuple[str, str]]], 
         for tag in tags:
             criteria.append((JobStatus.tags[tag[0]].astext.cast(String) == tag[1]))
 
-    query = session.query(JobStatus).filter(*criteria).order_by(JobStatus.uuid.desc()).paginate(page, per_page)
+    query = session.query(JobStatus).filter(*criteria).order_by(JobStatus.uuid.desc()).paginate(page=page, per_page=per_page)
     items = query.items
     total = query.total
 
@@ -103,9 +103,8 @@ def experiment_filter(id: Optional[str], tags: Optional[List[Tuple[str, str]]], 
     return items, total
 
 
-idx_parser = reqparse.RequestParser()
-idx_parser.add_argument('tags', action='append', default=None,
-                        help="Tags tio filter by. Tags must be in format name,value")
+idx_parser = reqparse.RequestParser(argument_class=LocalArgument)
+idx_parser.add_argument('tags', action='append', default=None, help="Tags tio filter by. Tags must be in format name,value")
 idx_parser.add_argument('page', type=int, default=1, help="Page")
 idx_parser.add_argument('per_page', type=int, default=10, help="Per Page")
 delete_args = reqparse.RequestParser()

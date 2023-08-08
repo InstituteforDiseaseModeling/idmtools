@@ -56,7 +56,7 @@ class TestAPI(unittest.TestCase):
         import idmtools_platform_local.internals.workers.brokers
         reload(idmtools_platform_local.internals.workers.brokers)
         reset_db()
-        reset_local_broker()
+        #reset_local_broker()
 
     @staticmethod
     def create_test_data():
@@ -77,7 +77,7 @@ class TestAPI(unittest.TestCase):
         # ensure we have some phony data
 
         result = self.app.get('/api/experiments')
-        self.assertEqual(200, result.status_code)
+        self.assertEqual(200, result.status_code, result.text)
 
         data = result.json
         self.assertIsInstance(data, list)

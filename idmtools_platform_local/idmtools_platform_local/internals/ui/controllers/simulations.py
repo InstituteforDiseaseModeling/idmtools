@@ -15,7 +15,7 @@ from sqlalchemy import String
 from sqlalchemy.exc import ResourceClosedError, ProgrammingError, OperationalError, DatabaseError
 
 from idmtools_platform_local.internals.data.job_status import JobStatus
-from idmtools_platform_local.internals.ui.controllers.utils import validate_tags
+from idmtools_platform_local.internals.ui.controllers.utils import validate_tags, LocalArgument
 from idmtools_platform_local.status import Status
 from idmtools_platform_local.internals.ui.config import db
 
@@ -58,14 +58,14 @@ def sim_status(simulation_id: Optional[str], experiment_id: Optional[str], statu
         for tag in tags:
             criteria.append((JobStatus.tags[tag[0]].astext.cast(String) == tag[1]))
 
-    query = session.query(JobStatus).filter(*criteria).order_by(JobStatus.uuid.desc(), JobStatus.parent_uuid.desc()).paginate(page, per_page)
+    query = session.query(JobStatus).filter(*criteria).order_by(JobStatus.uuid.desc(), JobStatus.parent_uuid.desc()).paginate(page=page, per_page=per_page)
     total = query.total
     items = list(map(lambda x: x.to_dict(False), query.items))
     return items, total
 
 
 status_strs = [str(status) for status in Status]
-idx_parser = reqparse.RequestParser()
+idx_parser = reqparse.RequestParser(argument_class=LocalArgument)
 idx_parser.add_argument('experiment_id', help='Experiment ID', default=None)
 idx_parser.add_argument('status', help='Status to filter by. Should be one of the following '
                                        '{}'.format(','.join(status_strs)),
@@ -80,6 +80,7 @@ class Simulations(Resource):
     """Simulation API controller."""
     def get(self, id=None):
         """Get simulation."""
+        """Get experiment."""
         args = idx_parser.parse_args()
         args['simulation_id'] = id
 
