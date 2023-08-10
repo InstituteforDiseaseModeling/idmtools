@@ -107,7 +107,7 @@ idx_parser = reqparse.RequestParser(argument_class=LocalArgument)
 idx_parser.add_argument('tags', action='append', default=None, help="Tags tio filter by. Tags must be in format name,value")
 idx_parser.add_argument('page', type=int, default=1, help="Page")
 idx_parser.add_argument('per_page', type=int, default=10, help="Per Page")
-delete_args = reqparse.RequestParser()
+delete_args = reqparse.RequestParser(argument_class=LocalArgument)
 delete_args.add_argument('data', help='Should the data for the experiment and all simulations be deleted as well?',
                          type=bool,
                          default=False)

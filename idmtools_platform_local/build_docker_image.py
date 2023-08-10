@@ -3,6 +3,7 @@ This script is currently a workaround so that we can use bump2version with docke
 """
 import glob
 import os
+import platform
 import shutil
 import subprocess
 import sys
@@ -58,8 +59,10 @@ for package in ['idmtools_core']:
     for file in glob.glob(os.path.join(BASE_DIR, package, 'dist', '**.gz')):
         shutil.copy(file, os.path.join(LOCAL_PACKAGE_DIR, '.depends', os.path.basename(file)))
 
-cmd = ['docker', 'build', '--network=host', '--tag',
-       f'{REPO_KEY}.{BASE_REPO}/{IMAGE_NAME}:{version}', '.']
+cmd = ['docker', 'build', '--network=host']
+if platform.processor() == "arm":
+    cmd.extend(["--platform", "linux/amd64"])
+cmd.extend(['--tag', f'{REPO_KEY}.{BASE_REPO}/{IMAGE_NAME}:{version}', '.'])
 print(f'Running: {" ".join(cmd)}')
 p = subprocess.Popen(" ".join(cmd), cwd=os.path.abspath(os.path.dirname(__file__)), shell=True)
 p.wait()

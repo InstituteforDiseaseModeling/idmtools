@@ -1,4 +1,4 @@
-FROM python:3.8.11-buster
+FROM python:3.8-bullseye
 ARG S6_VERSION
 ENV S6_VERSION=${S6_VERSION:-v1.21.7.0} \
     S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
@@ -13,15 +13,14 @@ RUN apt-get update \
     gnupg2 \
     software-properties-common \
     # install docker-cli
-    && curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - \
-    && add-apt-repository \
-    "deb [arch=amd64] https://download.docker.com/linux/debian \
-    $(lsb_release -cs) \
-    stable" \
-    && wget -O- http://neuro.debian.net/lists/buster.us-nh.full | sudo tee /etc/apt/sources.list.d/neurodebian.sources.list \
+    && install -m 0755 -d /etc/apt/keyrings \
+    && curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg  \
+    && chmod a+r /etc/apt/keyrings/docker.gpg
+RUN echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian bullseye stable" | tee  /etc/apt/sources.list.d/docker.sources.list \
+    && wget -O- http://neuro.debian.net/lists/bullseye.us-tn.full | tee /etc/apt/sources.list.d/neurodebian.sources.list \
     && apt-key adv --recv-keys --keyserver hkps://keyserver.ubuntu.com 0xA5D32F012649A5A9 \
     && apt-get update \
-    && apt-get install -y --no-install-recommends docker-ce-cli nginx singularity-container \
+    && apt-get install -y --no-install-recommends docker-buildx-plugin nginx singularity-container \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
     && useradd -s /bin/bash idmtools \

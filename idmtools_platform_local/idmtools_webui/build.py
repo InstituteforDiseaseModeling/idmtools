@@ -21,3 +21,4 @@ else:
     cmd = f'docker-compose -f build.yml run --rm -e "CURRENT_UID={uid}" buildenv "yarn install && npm run build"'
     print(cmd)
     sys.exit(os.system(cmd))
+locals()

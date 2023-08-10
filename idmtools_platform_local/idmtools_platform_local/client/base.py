@@ -70,6 +70,9 @@ class BaseClient:
     def get(cls, path, **kwargs) -> requests.Response:
         """Get request."""
         url = f'{cls.base_url}/{path}' if path is not None else cls.base_url
+        if 'headers' not in kwargs:
+            kwargs['headers'] = dict()
+        kwargs['headers']['Content-Type'] = 'application/json'
         return requests.get(url, **kwargs)
 
     @classmethod
