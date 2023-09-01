@@ -30,3 +30,4 @@ Changelog
     changelog_1.7.5
     changelog_1.7.6
     changelog_1.7.7
+    changelog_1.7.8

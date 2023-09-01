@@ -9,7 +9,7 @@ from idmtools_models.templated_script_task import TemplatedScriptTask, get_scrip
 platform = Platform("CALCULON")
 # This task can be anytype of task that would run python. Here we are running a simple model script that consumes the example
 # package "a_package"
-task = PythonTask(script_path="model.py", python_path='python3.7')
+task = PythonTask(script_path="model.py", python_path='python3.6')
 # add our library. On Comps, you could use RequirementsToAssetCollection as well
 task.common_assets.add_asset("a_package.py")
 # we request a wrapper script for Unix. The wrapper should match the computation platform's OS

@@ -38,6 +38,7 @@ setup(
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
         'Framework:: IDM-Tools :: CLI'
     ],
     description="CLI for IDM-Tools",
@@ -52,5 +53,5 @@ setup(
     entry_points={"console_scripts": ["idmtools=idmtools_cli.main:main"]},
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='1.7.7+nightly'
+    version='1.7.8'
 )

@@ -35,7 +35,8 @@ setup(
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
-        'Framework:: IDM-Tools :: Platform',
+        'Programming Language :: Python :: 3.11',
+        'Framework:: IDM-Tools :: Platform'
     ],
     description="Provides ability to run against Slurm",
     install_requires=requirements,
@@ -52,5 +53,5 @@ setup(
     test_suite='tests',
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='1.7.7+nightly'
+    version='1.7.8'
 )
