@@ -18,7 +18,7 @@ from idmtools.core import ItemType, TRUTHY_VALUES
 from idmtools_test.utils.utils import get_case_name
 from .get_latest_ssmt_image import get_latest_image_stage
 
-TARGET_EXPERIMENT_ID = '9311af40-1337-ea11-a2be-f0921c167861'
+TARGET_EXPERIMENT_ID = '73ba8f3b-8848-ee11-92fb-f0921c167864'
 analyzer_path = os.path.join(os.path.dirname(__file__), "..", "inputs")
 sys.path.insert(0, analyzer_path)
 from simple_analyzer import SimpleAnalyzer  # noqa
@@ -54,7 +54,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
         print(self._testMethodName)
         self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
         print(self.case_name)
-        self.platform = Platform('BAYESIAN',
+        self.platform = Platform('SlurmStage',
                                  docker_image="idm-docker-staging.packages.idmod.org/idmtools/comps_ssmt_worker:" +
                                               get_latest_image_stage())
         self.tags = {'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}
@@ -107,7 +107,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
     @pytest.mark.smoke
     @run_in_temp_dir
     def test_platform_analysis_analyzer_manager_args_validation(self):
-        platform = Platform('BAYESIAN')
+        platform = Platform('CUMULUS')
         with self.assertRaises(ValueError) as cxt:
             analysis = PlatformAnalysis(
                 platform=platform, experiment_ids=[TARGET_EXPERIMENT_ID],
@@ -125,8 +125,8 @@ class TestPlatformAnalysis(ITestWithPersistence):
     def test_ssmt_using_aliases(self):
         # check if comps has a docker image to use new images for this run. This does not effect remote system, just
         # what image we run on. We have to do this because config is coming from alias
-        if IdmConfigParser().get_option("Bayesian", "docker_image", None):
-            self.platform.docker_image = IdmConfigParser().get_option("Bayesian", "docker_image")
+        if IdmConfigParser().get_option("Cumulus", "docker_image", None):
+            self.platform.docker_image = IdmConfigParser().get_option("Cumulus", "docker_image")
             print(f"Setting docker image to {self.platform.docker_image}")
         self.do_simple_python_analysis(self.platform)
 
@@ -175,6 +175,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
     @pytest.mark.comps
     @warn_amount_ssmt_image_decorator
     def test_ssmt_seir_model_analysis(self):
+        platform = Platform("Cumulus")
         exp_id = "a980f265-995e-ea11-a2bf-f0921c167862"  # comps2 exp id
         # exp_id = "b2a31828-78ed-ea11-941f-0050569e0ef3"  # idmtvapp17
         filenames = {'filenames': ['output/individual.csv']}
@@ -185,7 +186,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
             wrapper = write_wrapper_script()
             extra_args['wrapper_shell_script'] = wrapper
             extra_args['asset_files'] = [CORE_LOCAL_PACKAGE, COMPS_LOCAL_PACKAGE]
-        analysis = PlatformAnalysis(platform=self.platform, experiment_ids=[exp_id],
+        analysis = PlatformAnalysis(platform=platform, experiment_ids=[exp_id],
                                     analyzers=[InfectiousnessCSVAnalyzer, NodeCSVAnalyzer],
                                     analyzers_args=[filenames, filenames_2], analysis_name=self.case_name,
                                     tags={'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}, **extra_args)
@@ -233,8 +234,8 @@ class TestPlatformAnalysis(ITestWithPersistence):
             wrapper = write_wrapper_script()
             extra_args['wrapper_shell_script'] = wrapper
             extra_args['asset_files'] = [CORE_LOCAL_PACKAGE, COMPS_LOCAL_PACKAGE]
-        platform = Platform('SlurmStage')
-        analysis = PlatformAnalysis(platform=self.platform, experiment_ids=[exp_id], analyzers=analyzers,
+        platform = Platform('Cumulus')
+        analysis = PlatformAnalysis(platform=platform, experiment_ids=[exp_id], analyzers=analyzers,
                                     analyzers_args=[filenames, filenames_2], analysis_name=self.case_name,
                                     tags={'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}, **extra_args)
 

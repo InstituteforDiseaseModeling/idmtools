@@ -12,6 +12,7 @@ from idmtools import IdmConfigParser
 from idmtools.core.platform_factory import Platform
 
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
+#from tests import logger_demo
 from tests import logger_demo
 
 
@@ -48,7 +49,7 @@ class TestConfig(ITestWithPersistence):
         """
         self.create_temp_ini(ini_content)
         IdmConfigParser(file_name=self.tempfile_ini.name)
-        self.platform = Platform('BAYESIAN')
+        self.platform = Platform('SLURMSTAGE')
 
         sys.stdout = mock_stdout
         logger_demo.write_some_logs(user=True, root=True, comps=True, exp=True)
@@ -91,7 +92,7 @@ class TestConfig(ITestWithPersistence):
         """
         self.create_temp_ini(ini_content)
         IdmConfigParser(file_name=self.tempfile_ini.name)
-        self.platform = Platform('BAYESIAN')
+        self.platform = Platform('SLURMSTAGE')
 
         sys.stdout = mock_stdout
         logger_demo.write_some_logs(user=True, root=True, comps=True, exp=True)
@@ -135,7 +136,7 @@ class TestConfig(ITestWithPersistence):
         """
         self.create_temp_ini(ini_content)
         IdmConfigParser(file_name=self.tempfile_ini.name)
-        self.platform = Platform('BAYESIAN')
+        self.platform = Platform('SLURMSTAGE')
 
         sys.stdout = mock_stdout
         logger_demo.write_some_logs(user=True, root=True, comps=True, exp=True)
@@ -155,7 +156,7 @@ class TestConfig(ITestWithPersistence):
         """
         self.create_temp_ini(ini_content)
         IdmConfigParser(file_name=self.tempfile_ini.name)
-        self.platform = Platform('BAYESIAN')
+        self.platform = Platform('SLURMSTAGE')
 
         sys.stdout = mock_stdout
         logger_demo.write_some_logs(user=True, root=True, comps=True, exp=True)
@@ -176,7 +177,7 @@ class TestConfig(ITestWithPersistence):
         """
         self.create_temp_ini(ini_content)
         IdmConfigParser(file_name=self.tempfile_ini.name)
-        self.platform = Platform('BAYESIAN')
+        self.platform = Platform('SLURMSTAGE')
 
         sys.stdout = mock_stdout
         logger_demo.write_some_logs(user=True, root=True, comps=True, exp=True)
@@ -200,14 +201,14 @@ class TestConfig(ITestWithPersistence):
         """
         self.create_temp_ini(ini_content)
         IdmConfigParser(file_name=self.tempfile_ini.name)
-        self.platform = Platform('BAYESIAN')
+        self.platform = Platform('SLURMSTAGE')
 
         sys.stdout = mock_stdout
         logger_demo.write_some_logs(user=True, root=True, comps=True, exp=True)
         self.assertFalse(os.path.exists(f"{self.case_name}.log"))
 
         stdout = mock_stdout.getvalue()
-        #self.validate_color_console(stdout)
+        self.validate_color_console(stdout)
 
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
     def test_use_colored_logs_off(self, mock_stdout):
@@ -220,7 +221,7 @@ class TestConfig(ITestWithPersistence):
         """
         self.create_temp_ini(ini_content)
         IdmConfigParser(file_name=self.tempfile_ini.name)
-        self.platform = Platform('BAYESIAN')
+        self.platform = Platform('SLURMSTAGE')
 
         sys.stdout = mock_stdout
         logger_demo.write_some_logs(user=True, root=True, comps=True, exp=True)
@@ -237,7 +238,7 @@ class TestConfig(ITestWithPersistence):
         """
         self.create_temp_ini(ini_content)
         IdmConfigParser(file_name=self.tempfile_ini.name)
-        self.platform = Platform('BAYESIAN')
+        self.platform = Platform('SLURMSTAGE')
 
         sys.stdout = mock_stdout
         logger_demo.write_some_logs(user=True, root=True, comps=True, exp=True)

@@ -169,7 +169,7 @@ class TestWorkOrder(ITestWithPersistence):
         experiment = Experiment.from_task(task, name=self.case_name)
         add_work_order(experiment, file_path=os.path.join(COMMON_INPUT_PATH, "scheduling", "hpc", "WorkOrder.json"))
 
-        with Platform('Bayesian') as platform:
+        with Platform('Cumulus') as platform:
             experiment.run(wait_on_done=True, scheduling=True)
             self.assertTrue(experiment.succeeded)
 
@@ -356,7 +356,7 @@ class TestWorkOrder(ITestWithPersistence):
         add_schedule_config(experiment, command="python -c \"print('hello test')\"", node_group_name='emod_abcd',
                             num_cores=1, SingleNode=False, Exclusive=False)
 
-        with Platform('Bayesian') as platform:
+        with Platform('Cumulus') as platform:
             experiment.run(wait_on_done=True, scheduling=True)
             self.assertTrue(experiment.succeeded)
 
@@ -429,4 +429,20 @@ class TestWorkOrder(ITestWithPersistence):
         files = self.platform.get_files(item=wi, files=out_filenames)
         stdout_content = files['stdout.txt'].decode('utf-8')
         self.assertIn("/dtk/Eradication version: 2.17.4463.0", stdout_content)
+
+    def test_workorder_in_workitem1(self):
+        """
+          To test WorkItem's WorkOrder.json, user can dynamically pull docker image from idm's production artifactory directly
+          instead of old way which had to deploy docker image to docker worker host machine
+          in this example, we pull nyu dtk docker image to docker worker, then execute Eradication command in comps's
+          WorkItem
+          Returns:
+          """
+        command = "ls -lart"  # anything since it will be override with WorkOrder.json file
+        from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
+        wi = SSMTWorkItem(name=self.case_name, command=command,tags={'idmtools': self.case_name})
+        # overrode workorder.json with user provide file
+        wi.load_work_order(os.path.join("inputs", "workitems", "ssmt", "WorkOrder1.json"))
+        wi.run(wait_on_done=True)
+
 

@@ -72,8 +72,8 @@ class TestCompsCLI(unittest.TestCase):
 
     @allure.feature("AssetizeOutputs")
     def test_assetize_dry_run_json(self):
-        result = run_command('comps', 'Bayesian', 'assetize-outputs', '--name', self.case_name, '--experiment',
-                             '9311af40-1337-ea11-a2be-f0921c167861', '--dry-run', '--json', mix_stderr=False)
+        result = run_command('comps', 'SLURMSTAGE', 'assetize-outputs', '--name', self.case_name, '--experiment',
+                             '73ba8f3b-8848-ee11-92fb-f0921c167864', '--dry-run', '--json', mix_stderr=False)
         self.assertTrue(result.exit_code == 0, msg=result.output)
         print(result.stdout)
 
@@ -83,16 +83,16 @@ class TestCompsCLI(unittest.TestCase):
         op = PurePath(__file__).parent
         if os.path.exists(op.joinpath(fn)):
             os.remove(op.joinpath(fn))
-        result = run_command('comps', 'Bayesian', 'assetize-outputs', '--name', self.case_name, '--experiment',
-                             '9311af40-1337-ea11-a2be-f0921c167861', '--json', '--id-file', '--id-filename', fn,
+        result = run_command('comps', 'SLURMSTAGE', 'assetize-outputs', '--name', self.case_name, '--experiment',
+                             '73ba8f3b-8848-ee11-92fb-f0921c167864', '--json', '--id-file', '--id-filename', fn,
                              mix_stderr=False)
         print(result.stdout)
         self.assertTrue(result.exit_code == 0)
 
     @allure.feature("AssetizeOutputs")
     def test_cli_error(self):
-        result = run_command('comps', 'Bayesian', 'assetize-outputs', '--name', self.case_name, '--experiment',
-                             '9311af40-1337-ea11-a2be-f0921c167861', '--pattern', '34234234')
+        result = run_command('comps', 'SLURMSTAGE', 'assetize-outputs', '--name', self.case_name, '--experiment',
+                             '73ba8f3b-8848-ee11-92fb-f0921c167864', '--pattern', '34234234')
         print(result.stdout)
         self.assertTrue(result.exit_code == -1)
 

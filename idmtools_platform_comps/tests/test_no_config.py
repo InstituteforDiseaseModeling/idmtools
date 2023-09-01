@@ -53,17 +53,17 @@ class TestNoConfig(unittest.TestCase):
         sim_root_dir = os.path.join('$COMPS_PATH(USER)', 'output')
         plat_obj = Platform('COMPS',
                             endpoint='https://comps2.idmod.org',
-                            environment='Bayesian',
+                            environment='SlurmStage',
                             priority='Normal',
                             simulation_root=sim_root_dir,
-                            node_group='emod_abcd',
+                            node_group='idm_abcd',
                             num_cores='1',
                             num_retries='0',
                             exclusive='False', missing_ok=True)
 
         # we don't care if we find experiment, only that the platform initialized
         try:
-            experiment = Experiment.from_id('a7ea2ac2-a068-ea11-a2c5-c4346bcb1550')
+            experiment = Experiment.from_id('73ba8f3b-8848-ee11-92fb-f0921c167864')
         except:  # noqa: E722
             pass
         self.assertIn("File 'idmtools.ini' Not Found!", output.getvalue())
@@ -77,14 +77,14 @@ class TestNoConfig(unittest.TestCase):
         with self.assertRaises(ValueError) as a:
             plat_obj = Platform('COMPS',
                                 endpoint='https://comps2.idmod.org',
-                                environment='Bayesian',
+                                environment='SlurmStage',
                                 priority='Normal',
                                 simulation_root=sim_root_dir,
-                                node_group='emod_abcd',
+                                node_group='idm_abcd',
                                 num_cores='abc',
                                 num_retries='0',
                                 exclusive='False', missing_ok=True)
-            experiment = Experiment.from_id('a7ea2ac2-a068-ea11-a2c5-c4346bcb1550')
+            experiment = Experiment.from_id('73ba8f3b-8848-ee11-92fb-f0921c167864')
         self.assertIn("File 'idmtools.ini' Not Found!", output.getvalue())
         # Need to identify how to capture output after log changes
         # self.assertIn("The field num_cores requires a value of type int. You provided <abc>", output.getvalue())
@@ -97,17 +97,17 @@ class TestNoConfig(unittest.TestCase):
         sim_root_dir = os.path.join('$COMPS_PATH(USER)', 'output')
         plat_obj = Platform('COMPS',
                             endpoint='https://comps2.idmod.org',
-                            environment='Bayesian',
+                            environment='SlurmStage',
                             priority='Normal',
                             simulation_root=sim_root_dir,
-                            node_group='emod_abcd',
+                            node_group='idm_abcd',
                             num_cores='1',
                             num_retries='0',
                             exclusive='False',
                             missing_ok=True
                             )
         try:
-            experiment = Experiment.from_id('a7ea2ac2-a068-ea11-a2c5-c4346bcb1550')
+            experiment = Experiment.from_id('73ba8f3b-8848-ee11-92fb-f0921c167864')
         except RuntimeError as ex:
             # ignore error is it is comps error about not finding id
             if "404 Not Found" in ex.args[0]:
