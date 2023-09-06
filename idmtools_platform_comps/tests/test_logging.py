@@ -268,7 +268,7 @@ class TestConfig(ITestWithPersistence):
         self.assertTrue(matched)
         matched = re.search(r"user: 44", stdout)
         self.assertTrue(matched)
-        matched = re.search(r"muser: 55", stdout)
+        matched = re.search(r"user: 55", stdout)
         self.assertTrue(matched)
 
     def validate_default_user_console_on(self, stdout):
