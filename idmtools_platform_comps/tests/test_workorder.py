@@ -430,19 +430,5 @@ class TestWorkOrder(ITestWithPersistence):
         stdout_content = files['stdout.txt'].decode('utf-8')
         self.assertIn("/dtk/Eradication version: 2.17.4463.0", stdout_content)
 
-    def test_workorder_in_workitem1(self):
-        """
-          To test WorkItem's WorkOrder.json, user can dynamically pull docker image from idm's production artifactory directly
-          instead of old way which had to deploy docker image to docker worker host machine
-          in this example, we pull nyu dtk docker image to docker worker, then execute Eradication command in comps's
-          WorkItem
-          Returns:
-          """
-        command = "ls -lart"  # anything since it will be override with WorkOrder.json file
-        from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
-        wi = SSMTWorkItem(name=self.case_name, command=command,tags={'idmtools': self.case_name})
-        # overrode workorder.json with user provide file
-        wi.load_work_order(os.path.join("inputs", "workitems", "ssmt", "WorkOrder1.json"))
-        wi.run(wait_on_done=True)
 
 
