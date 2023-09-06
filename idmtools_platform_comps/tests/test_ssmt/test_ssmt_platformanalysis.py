@@ -174,6 +174,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
 
     @pytest.mark.comps
     @warn_amount_ssmt_image_decorator
+    @pytest.mark.skip("temp disable test until find good experiment in cumulus")
     def test_ssmt_seir_model_analysis(self):
         platform = Platform("Cumulus")
         exp_id = "a980f265-995e-ea11-a2bf-f0921c167862"  # comps2 exp id
@@ -219,6 +220,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
 
     @pytest.mark.comps
     @warn_amount_ssmt_image_decorator
+    @pytest.mark.skip("temp disable test until find good experiment in cumulus")
     def test_ssmt_seir_model_analysis_single_script(self):
         exp_id = "a980f265-995e-ea11-a2bf-f0921c167862"  # comps2 exp id
         # exp_id = "b2a31828-78ed-ea11-941f-0050569e0ef3"  # idmtvapp17
