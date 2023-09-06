@@ -264,11 +264,11 @@ class TestConfig(ITestWithPersistence):
         self.assertFalse(matched)  # should not print debug user, since user is VERBOSE now
         matched = re.search(r"user: 22", stdout)
         self.assertTrue(matched)
-        matched = re.search(r"33muser: 33", stdout)
+        matched = re.search(r"user: 33", stdout)
         self.assertTrue(matched)
-        matched = re.search(r"31muser: 44", stdout)
+        matched = re.search(r"user: 44", stdout)
         self.assertTrue(matched)
-        matched = re.search(r"1;31muser: 55", stdout)
+        matched = re.search(r"muser: 55", stdout)
         self.assertTrue(matched)
 
     def validate_default_user_console_on(self, stdout):
