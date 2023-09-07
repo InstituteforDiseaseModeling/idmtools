@@ -19,7 +19,7 @@ with Platform("SlurmStage") as platform:
     task.common_assets.add_assets(AssetCollection.from_id(result[0].id))
     experiment = Experiment.from_task(
         task,
-        name="test python version",
-        tags=dict(type='singularity', description='run test')
+        name="generate sif ac",
+        tags=dict(type='singularity', description='run test', sif_ac=result[0].id)
     )
     experiment.run(wait_until_done=True)
