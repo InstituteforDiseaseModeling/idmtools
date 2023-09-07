@@ -13,6 +13,7 @@ with Platform("SlurmStage") as platform:
     result = platform.create_items(ac)
     print(result[0].id)
 
+    # option code to keep ac in system
     command = CommandLine("singularity exec ./Assets/rocky_dtk_runner_py39.sif python3 --version")
     task = CommandTask(command=command)
     task.common_assets.add_assets(AssetCollection.from_id(result[0].id))
@@ -21,8 +22,4 @@ with Platform("SlurmStage") as platform:
         name="test python version",
         tags=dict(type='singularity', description='run test')
     )
-
     experiment.run(wait_until_done=True)
-    # If we succeed, mark the experiment with an id file
-    if experiment.succeeded:
-        experiment.to_id_file("exp.id")
