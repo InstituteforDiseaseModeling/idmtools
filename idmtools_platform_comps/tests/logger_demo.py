@@ -96,7 +96,7 @@ def write_some_logs(fake=False, exp=False, comps=False, root=False, user=False, 
 
 def main():
     from idmtools.core.platform_factory import Platform
-    platform = Platform('BAYESIAN')
+    platform = Platform('SLURMSTAGE')
 
     check_comps_logger(full=False)
     write_some_logs(user=True, root=True, comps=True, exp=True, full=False)

@@ -20,7 +20,7 @@ class ClimateGenerationTest(ITestWithPersistence):
 
     def setUp(self):
         self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
-        self.platform = Platform('BAYESIAN')
+        self.platform = Platform('SlurmStage')
 
     # ------------------------------------------
     # test generate ERA5 climate files

@@ -169,7 +169,7 @@ class TestWorkOrder(ITestWithPersistence):
         experiment = Experiment.from_task(task, name=self.case_name)
         add_work_order(experiment, file_path=os.path.join(COMMON_INPUT_PATH, "scheduling", "hpc", "WorkOrder.json"))
 
-        with Platform('Bayesian') as platform:
+        with Platform('Cumulus') as platform:
             experiment.run(wait_on_done=True, scheduling=True)
             self.assertTrue(experiment.succeeded)
 
@@ -356,7 +356,7 @@ class TestWorkOrder(ITestWithPersistence):
         add_schedule_config(experiment, command="python -c \"print('hello test')\"", node_group_name='emod_abcd',
                             num_cores=1, SingleNode=False, Exclusive=False)
 
-        with Platform('Bayesian') as platform:
+        with Platform('Cumulus') as platform:
             experiment.run(wait_on_done=True, scheduling=True)
             self.assertTrue(experiment.succeeded)
 
@@ -429,4 +429,6 @@ class TestWorkOrder(ITestWithPersistence):
         files = self.platform.get_files(item=wi, files=out_filenames)
         stdout_content = files['stdout.txt'].decode('utf-8')
         self.assertIn("/dtk/Eradication version: 2.17.4463.0", stdout_content)
+
+
 

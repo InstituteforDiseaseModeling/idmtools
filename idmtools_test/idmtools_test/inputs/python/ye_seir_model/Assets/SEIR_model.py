@@ -1,12 +1,17 @@
 import sys
 import os
 import random
+current_directory = os.path.dirname(__file__)
+LIBRARY_PATH = os.path.join(current_directory, 'site-packages')  # Need to site-packages level!!!
+
+sys.path.insert(0, LIBRARY_PATH)
+sys.path.append(os.path.join(current_directory))
 import pandas as pd
 from pathlib import Path
 # import utils
 
 assets_dir = os.path.abspath(os.path.dirname(__file__))
-current_directory = os.getcwd()
+#current_directory = os.getcwd()
 p_version = sys.version_info
 if p_version.major == 3:
     if p_version.minor == 7:

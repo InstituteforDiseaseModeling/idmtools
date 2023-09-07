@@ -15,7 +15,7 @@ from custom_csv_analyzer import NodeCSVAnalyzer  # noqa
 from custom_csv_analyzer import InfectiousnessCSVAnalyzer  # noqa
 
 if __name__ == "__main__":
-    platform = Platform('BAYESIAN')
+    platform = Platform('cumulus')
     filenames = ['output/individual.csv']
     filenames_2 = ['output/node.csv']
     analyzers = [InfectiousnessCSVAnalyzer(filenames=filenames), NodeCSVAnalyzer(filenames=filenames_2)]

@@ -23,7 +23,7 @@ from idmtools_test.utils.utils import del_folder, get_case_name
 class TestRExperiment(ITestWithPersistence):
 
     def setUp(self) -> None:
-        self.platform = Platform('Bayesian')
+        self.platform = Platform('Cumulus')
         self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
         self.input_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "inputs")
 
