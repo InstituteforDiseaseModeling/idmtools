@@ -53,7 +53,9 @@ extensions = [
     'sphinx.ext.intersphinx',
     # automatic section names so linking between section is easy
     'sphinx.ext.autosectionlabel',
-    'sphinxext.rediraffe'
+    'sphinxext.rediraffe',
+    'sphinx_search.extension', # search across multiple docsets in domain
+
 ]
 
 plantuml = 'plantweb'
@@ -295,6 +297,21 @@ html_use_opensearch = 'www.idmod.org/docs/'
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'idmtools'
+
+# -- RTD Sphinx search for searching across the entire domain, default parent -------------
+
+if os.environ.get('READTHEDOCS') == 'True':
+
+    search_project_parent = "institute-for-disease-modeling-idm"
+    search_project = os.environ["READTHEDOCS_PROJECT"]
+    search_version = os.environ["READTHEDOCS_VERSION"]
+
+    rtd_sphinx_search_default_filter = f"subprojects:{search_project_parent}/{search_version}"
+
+    rtd_sphinx_search_filters = {
+        "Search this project": f"project:{search_project}/{search_version}",
+        "Search all IDM docs": f"subprojects:{search_project_parent}/{search_version}",
+    }
 
 # -- Options for LaTeX output ---------------------------------------------
 
