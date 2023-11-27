@@ -69,8 +69,7 @@ class FilePlatformAssetCollectionOperations(IPlatformAssetCollectionOperations):
         link_dir = Path(self.platform.get_directory(simulation), 'Assets')
         self.platform.link_dir(common_asset_dir, link_dir)
 
-    def get_assets(self, simulation: Union[Simulation, FileSimulation], files: List[str], **kwargs) -> Dict[
-        str, bytearray]:
+    def get_assets(self, simulation: Union[Simulation, FileSimulation], files: List[str], **kwargs) -> Dict[str, bytearray]:
         """
         Get assets for simulation.
         Args:
