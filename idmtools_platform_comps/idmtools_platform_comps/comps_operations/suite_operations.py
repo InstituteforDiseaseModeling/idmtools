@@ -143,7 +143,7 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
             comps_exps = suite.get_experiments()
             obj.experiments = []
             for exp in comps_exps:
-                obj.experiments.append(self.platform._experiments.to_entity(exp, parent=obj, **kwargs))
+                self.platform._experiments.to_entity(exp, parent=obj, **kwargs)
         return obj
 
     def create_sim_directory_map(self, suite_id: str) -> Dict:
