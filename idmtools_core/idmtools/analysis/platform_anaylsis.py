@@ -33,7 +33,7 @@ class PlatformAnalysis:
     """
 
     def __init__(self, platform: IPlatform, analyzers: List[Type[IAnalyzer]],
-                 experiment_ids: List['str'] = [], simulaiton_ids: List['str'] = [], work_item_ids: List['str'] = [],
+                 experiment_ids: List['str'] = [], simulation_ids: List['str'] = [], work_item_ids: List['str'] = [],
                  analyzers_args=None, analysis_name: str = 'WorkItem Test', tags=None,
                  additional_files: Union[FileList, AssetCollection, List[str]] = None, asset_collection_id=None,
                  asset_files: Union[FileList, AssetCollection, List[str]] = None, wait_till_done: bool = True,
@@ -45,7 +45,7 @@ class PlatformAnalysis:
         Args:
             platform: Platform
             experiment_ids: Experiment ids
-            simulaiton_ids: Simulation ids
+            simulation_ids: Simulation ids
             work_item_ids: WorkItem ids
             analyzers: Analyzers to run
             analyzers_args: Arguments for our analyzers
@@ -66,7 +66,7 @@ class PlatformAnalysis:
         """
         self.platform = platform
         self.experiment_ids = experiment_ids or []
-        self.simulaiton_ids = simulaiton_ids or []
+        self.simulation_ids = simulation_ids or []
         self.work_item_ids = work_item_ids or []
         self.analyzers = analyzers
         self.analyzers_args = analyzers_args
