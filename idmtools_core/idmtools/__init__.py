@@ -13,4 +13,3 @@ __version__ = "1.7.8+nightly"
 # only set exception hook if it has not been overridden
 if sys.excepthook == sys.__excepthook__:
     sys.excepthook = idmtools_error_handler
-IdmConfigParser.ensure_init()
