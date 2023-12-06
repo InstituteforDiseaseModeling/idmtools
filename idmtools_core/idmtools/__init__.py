@@ -7,6 +7,7 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import sys
 from idmtools.core.exceptions import idmtools_error_handler
+from idmtools.config.idm_config_parser import IdmConfigParser   # noqa: F401
 
 __version__ = "1.7.8+nightly"
 
