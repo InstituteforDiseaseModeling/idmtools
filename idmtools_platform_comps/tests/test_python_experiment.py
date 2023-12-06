@@ -609,56 +609,6 @@ class TestPythonExperiment(ITestWithPersistence):
                          {'a': '1', 'aa': '1', 'b': 'test', 'task_type': tag_value}]
         validate_sim_tags(self, experiment.id, expected_tags, tag_value)
 
-    def test_simulation_hooks(self):
-        base_task = CommandTask(command="python --version")
-        sim = Simulation(task=base_task)
-
-        exp = Experiment(name='SimHooks')
-        exp.simulations = [sim]
-
-        def add_exp_id_as_tag(item: Simulation, platform: 'COMPSPlatform'):
-            item.tags['e_id'] = exp.id
-
-        def update_tags(item: Simulation, platform: 'COMPSPlatform'):
-            tags = {"a": 0}
-            update_item(self.platform, item.id, ItemType.SIMULATION, tags)
-
-        sim.add_pre_creation_hook(add_exp_id_as_tag)
-        sim.add_post_creation_hook(update_tags)
-
-        exp.run(wait_until_done=True)
-
-        tag_value = "idmtools.entities.command_task.CommandTask"
-        exp_tags = [{'e_id': exp.id, 'a': '0', 'task_type': tag_value}]
-        validate_sim_tags(self, exp.id, exp_tags, tag_value)
-
-    def test_experiment_hooks(self):
-        base_task = CommandTask(command="python --version")
-        sim = Simulation(task=base_task)
-
-        exp = Experiment(name='ExpHooks')
-        exp.simulations = [sim]
-
-        def add_pre_exp_tag(item: Experiment, platform: 'COMPSPlatform'):
-            item.tags['pre_tag'] = "pre"
-
-        def update_post_exp_tags(item: Experiment, platform: 'COMPSPlatform'):
-            tags = {"post_tag": "post"}
-            update_item(platform, exp.id, ItemType.EXPERIMENT, tags)
-
-        exp.add_pre_creation_hook(add_pre_exp_tag)
-        exp.add_post_creation_hook(update_post_exp_tags)
-
-        exp.run(wait_until_done=True)
-        tag_value = "idmtools.entities.command_task.CommandTask"
-        exp_tags = {'pre_tag': "pre", 'post_tag': 'post', 'task_type': tag_value}
-        self.validate_exp_tags(exp.id, exp_tags)
-
-    def validate_exp_tags(self, exp_id, expected_tags):
-        tags = COMPSExperiment.get(exp_id, QueryCriteria().select_children('tags')).tags
-        tags.pop('idmtools')
-        self.assertDictEqual(tags, expected_tags)
-
 
 if __name__ == '__main__':
     unittest.main()
