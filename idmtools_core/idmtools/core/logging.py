@@ -366,8 +366,7 @@ def reset_logging_handlers():
     # Clean up file handler now
     LOGGING_FILE_STARTED = False
     LOGGING_STARTED = False
-    if LOGGING_FILE_HANDLER is not None:
-        del LOGGING_FILE_HANDLER
+    LOGGING_FILE_HANDLER = None
 
 
 def exclude_logging_classes(items_to_exclude=None):
