@@ -14,6 +14,7 @@ from idmtools.core.platform_factory import Platform
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 #from tests import logger_demo
 from tests import logger_demo
+from idmtools.core.logging import reset_logging_handlers
 
 
 @pytest.mark.serial
@@ -22,6 +23,7 @@ class TestConfig(ITestWithPersistence):
     def setUp(self):
         super().setUp()
         IdmConfigParser.clear_instance()
+        reset_logging_handlers()
         self.case_name = self._testMethodName
         self.tempfile_ini = None
         if os.path.exists(f"{self.case_name}.log"):
