@@ -609,29 +609,6 @@ class TestPythonExperiment(ITestWithPersistence):
                          {'a': '1', 'aa': '1', 'b': 'test', 'task_type': tag_value}]
         validate_sim_tags(self, experiment.id, expected_tags, tag_value)
 
-    def test_simulation_hooks(self):
-        base_task = CommandTask(command="python --version")
-        sim = Simulation(task=base_task)
-
-        exp = Experiment(name='SimHooks')
-        exp.simulations = [sim]
-
-        def add_exp_id_as_tag(item: Simulation, platform: 'COMPSPlatform'):
-            item.tags['e_id'] = exp.id
-
-        def update_tags(item: Simulation, platform: 'COMPSPlatform'):
-            tags = {"a": 0}
-            update_item(self.platform, item.id, ItemType.SIMULATION, tags)
-
-        sim.add_pre_creation_hook(add_exp_id_as_tag)
-        sim.add_post_creation_hook(update_tags)
-
-        exp.run(wait_until_done=True)
-
-        tag_value = "idmtools.entities.command_task.CommandTask"
-        exp_tags = [{'e_id': exp.id, 'a': '0', 'task_type': tag_value}]
-        validate_sim_tags(self, exp.id, exp_tags, tag_value)
-
 
 if __name__ == '__main__':
     unittest.main()

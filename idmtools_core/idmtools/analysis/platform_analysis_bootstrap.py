@@ -18,6 +18,7 @@ sys.path.append(os.path.dirname(__file__))
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("PlatformAnalysis bootstrap")
     parser.add_argument("--experiment-ids", default=None, help="A comma separated list of experiments to analyze")
+    parser.add_argument("--simulation-ids", default=None, help="A comma separated list of simulations to analyze")
     parser.add_argument("--work-item-ids", default=None, help="A comma separated list of work items to analyze")
     parser.add_argument("--analyzers", help="Commas separated list of analyzers")
     parser.add_argument("--block", help="Configuration block to use")
@@ -50,6 +51,13 @@ if __name__ == "__main__":
         for experiment in experiments:
             experiment_tuple = (experiment, ItemType.EXPERIMENT)
             item_ids.append(experiment_tuple)
+
+    # Get the simulations, analyzers and platform
+    if args.simulation_ids:
+        simulations = args.simulation_ids.split(",")
+        for simulation in simulations:
+            simulation_tuple = (simulation, ItemType.SIMULATION)
+            item_ids.append(simulation_tuple)
 
     # Get the experiments, analyzers and platform
     if args.work_item_ids:
