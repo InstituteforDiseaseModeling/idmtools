@@ -351,6 +351,11 @@ venv.bak/
 # mkdocs docs
 /site
 
+# sphinx docs
+docs/api/
+docs/_build
+docs/idmtools.log*
+
 # mypy
 .mypy_cache/
 .dmypy.json

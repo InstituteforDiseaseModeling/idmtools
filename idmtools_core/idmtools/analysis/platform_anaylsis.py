@@ -33,7 +33,7 @@ class PlatformAnalysis:
     """
 
     def __init__(self, platform: IPlatform, analyzers: List[Type[IAnalyzer]],
-                 experiment_ids: List['str'] = [], work_item_ids: List['str'] = [],
+                 experiment_ids: List['str'] = [], simulation_ids: List['str'] = [], work_item_ids: List['str'] = [],
                  analyzers_args=None, analysis_name: str = 'WorkItem Test', tags=None,
                  additional_files: Union[FileList, AssetCollection, List[str]] = None, asset_collection_id=None,
                  asset_files: Union[FileList, AssetCollection, List[str]] = None, wait_till_done: bool = True,
@@ -45,6 +45,7 @@ class PlatformAnalysis:
         Args:
             platform: Platform
             experiment_ids: Experiment ids
+            simulation_ids: Simulation ids
             work_item_ids: WorkItem ids
             analyzers: Analyzers to run
             analyzers_args: Arguments for our analyzers
@@ -65,6 +66,7 @@ class PlatformAnalysis:
         """
         self.platform = platform
         self.experiment_ids = experiment_ids or []
+        self.simulation_ids = simulation_ids or []
         self.work_item_ids = work_item_ids or []
         self.analyzers = analyzers
         self.analyzers_args = analyzers_args
@@ -116,6 +118,7 @@ class PlatformAnalysis:
         self.wi = SSMTWorkItem(name=self.analysis_name, command=command, tags=self.tags,
                                transient_assets=self.additional_files, assets=ac,
                                related_experiments=self.experiment_ids,
+                               related_simulations=self.simulation_ids,
                                related_work_items=self.work_item_ids
                                )
 
@@ -178,6 +181,9 @@ class PlatformAnalysis:
         # Add the experiments
         if self.experiment_ids:
             command += f' --experiment-ids {",".join(self.experiment_ids)}'
+        # Add the simulations
+        if self.simulation_ids:
+            command += f' --simulation-ids {",".join(self.simulation_ids)}'
         # Add the work items
         if self.work_item_ids:
             command += f' --work-item-ids {",".join(self.work_item_ids)}'

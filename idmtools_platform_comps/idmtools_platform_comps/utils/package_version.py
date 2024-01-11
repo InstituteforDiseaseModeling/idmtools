@@ -202,8 +202,7 @@ def get_digest_from_docker_hub(repo, tag='latest'):
         tag:  string, tag of the repository (e.g. 'latest')
     """
     response = requests.get(
-        MANIFEST_URL.format(repository=repo, tag=tag),
-        json=True,
+        MANIFEST_URL.format(repository=repo, tag=tag)
     )
     manifest = response.json()
     if response.ok and manifest['count']:
