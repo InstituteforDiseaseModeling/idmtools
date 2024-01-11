@@ -52,7 +52,7 @@ class TestCompsPlugin(unittest.TestCase):
     @pytest.mark.comps
     @pytest.mark.smoke
     def test_comps_requirements(self):
-        with Platform("BAYESIAN") as platform:
+        with Platform("CUMULUS") as platform:
             self.assertTrue(platform.are_requirements_met(PlatformRequirements.NativeBinary))
             self.assertTrue(platform.are_requirements_met(PlatformRequirements.PYTHON))
             self.assertTrue(platform.are_requirements_met(PlatformRequirements.WINDOWS))
@@ -79,9 +79,9 @@ class TestCompsPlugin(unittest.TestCase):
                 os.chdir(tmpdirname)
                 IdmConfigParser.clear_instance()
 
-                with Platform("BAYESIAN") as comps2:
+                with Platform("CUMULUS") as comps2:
                     self.assertEqual(comps2.endpoint, "https://comps2.idmod.org")
-                    self.assertEqual(comps2.environment.upper(), "BAYESIAN")
+                    self.assertEqual(comps2.environment.upper(), "CUMULUS")
 
                 with Platform("SlurmStage") as comps2:
                     self.assertEqual(comps2.endpoint, "https://comps2.idmod.org")

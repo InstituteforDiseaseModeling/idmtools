@@ -143,7 +143,7 @@ class FileParser:
             We should move this to a plugin in emodpy. We need to figure out how to structure that.
         """
         try:
-            from dtk.tools.output.SpatialOutput import SpatialOutput
+            from idmtools_platform_comps.utils.spatial_output import SpatialOutput
             so = SpatialOutput.from_bytes(content.read(), 'Filtered' in filename)
             return so.to_dict()
         except ImportError as ex:

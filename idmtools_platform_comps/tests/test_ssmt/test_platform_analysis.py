@@ -29,19 +29,9 @@ def platform_slurm_2():
                                                get_latest_image_stage())
 
 
-@pytest.fixture
-def platform_comps2():
-    """
-    Provide slurm 2 platform to tests
-    Returns:
-
-    """
-    return Platform('BAYESIAN', docker_image="idm-docker-staging.packages.idmod.org/idmtools/comps_ssmt_worker:" + get_latest_image_stage())
-
-
 # Test PlatformAnalysis with PopulationAnalyzer for experiment id
 def do_platform_analysis_experiment(platform: Platform):
-    if platform.environment.lower() == "bayesian":
+    if platform.environment.lower() == "cumulus":
         experiment_id = 'd0b75dba-0e18-ec11-92df-f0921c167864' # comps2 exp id
     elif platform.environment.lower() == "slurmstage":
         experiment_id = 'c348452d-921c-ec11-92e0-f0921c167864'  # comps2 exp id
@@ -86,7 +76,7 @@ def do_platform_analysis_experiment(platform: Platform):
 
 # Test PlatformAnalysis with DownloadAnalyzer for workitem id
 def do_platform_analysis_wi(platform: Platform):
-    if platform.environment.lower() == "bayesian":
+    if platform.environment.lower() == "cumulus":
         workitem_id = '22afccb1-d31f-ec11-92e0-f0921c167864'  # comps2 exp id
     elif platform.environment.lower() == "slurmstage":
         workitem_id = 'fe6a80b9-d31f-ec11-92e0-f0921c167864'  # comps2 exp id
@@ -132,7 +122,7 @@ def do_platform_analysis_wi(platform: Platform):
 @pytest.mark.ssmt
 @warn_amount_ssmt_image_decorator
 @pytest.mark.parametrize('platform',
-                         [pytest.lazy_fixture('platform_comps2'), pytest.lazy_fixture('platform_slurm_2')])
+                         [pytest.lazy_fixture('platform_slurm_2')])
 def test_platform_analysis(platform: Platform):
     do_platform_analysis_experiment(platform)
 
@@ -141,7 +131,7 @@ def test_platform_analysis(platform: Platform):
 @pytest.mark.ssmt
 @warn_amount_ssmt_image_decorator
 @pytest.mark.parametrize('platform',
-                         [pytest.lazy_fixture('platform_comps2'), pytest.lazy_fixture('platform_slurm_2')])
+                         [pytest.lazy_fixture('platform_slurm_2')])
 def test_platform_analysis_workitem(platform: Platform):
     do_platform_analysis_wi(platform)
 
@@ -161,18 +151,18 @@ class TestSSMTPlatform(unittest.TestCase):
     def setUp(self) -> None:
         super().setUp()
         self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
-        self.platform = Platform('BAYESIAN')
+        self.platform = Platform('SLURMSTAGE')
 
     def tearDown(self):
         super().tearDown()
 
     @allure.feature("ssmt platform")
     def test_ssmt_platform(self):
-        ssmt_platform = Platform("BAYESIAN_SSMT")
+        ssmt_platform = Platform("CUMULUS_SSMT")
         self.assertTrue(isinstance(ssmt_platform, SSMTPlatform))
         self.assertTrue(isinstance(ssmt_platform, COMPSPlatform))
 
-        comps_platform = Platform("BAYESIAN")
+        comps_platform = Platform("CUMULUS")
         self.assertTrue(isinstance(comps_platform, COMPSPlatform))
         self.assertFalse(isinstance(comps_platform, SSMTPlatform))
 
@@ -181,20 +171,20 @@ class TestSSMTPlatform(unittest.TestCase):
         from idmtools_platform_comps.plugin_info import SSMTPlatformSpecification
         ssmt_spec = SSMTPlatformSpecification()
         _aliases = ssmt_spec.get_configuration_aliases()
-        self.assertIn("BAYESIAN_SSMT", _aliases)
+        self.assertIn("CUMULUS_SSMT", _aliases)
 
     @allure.feature("ssmt platform")
     def test_comps_platform_pecification(self):
         from idmtools_platform_comps.plugin_info import COMPSPlatformSpecification
         comps_spec = COMPSPlatformSpecification()
         _aliases = comps_spec.get_configuration_aliases()
-        self.assertNotIn("BAYESIAN_SSMT", _aliases)
+        self.assertNotIn("CUMULUS_SSMT", _aliases)
 
     @allure.feature("ssmt platform")
-    def test_platformP_ugins(self):
+    def test_platform_plugins(self):
         from idmtools.registry.platform_specification import PlatformPlugins
         _platforms = PlatformPlugins().get_plugin_map()
         _aliases = PlatformPlugins().get_aliases()
 
         self.assertIn("SSMT", _platforms)
-        self.assertIn("BAYESIAN_SSMT", _aliases)
+        self.assertIn("CUMULUS_SSMT", _aliases)
