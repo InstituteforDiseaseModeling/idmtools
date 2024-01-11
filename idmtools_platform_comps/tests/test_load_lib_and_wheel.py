@@ -148,7 +148,7 @@ class TestLoadLibWheel(ITestWithPersistence):
         # First NOT load 'zipp' package to test negative case, (to see if zipp_file.py script will fail in comps)
         # xmlrunner==1.7.7 here is loading a unrelated package to avoid empty packages for RequirementsToAssetCollection
         # ------------------------------------------------------
-        platform = Platform("Bayesian")
+        platform = Platform("Cumulus")
         pl = RequirementsToAssetCollection(name=self.case_name, platform=platform, requirements_path="", pkg_list=["xmlrunner==1.7.7"])
         ac_id = pl.run()
         common_assets = AssetCollection.from_id(ac_id, platform=platform, as_copy=True)
@@ -181,7 +181,7 @@ class TestLoadLibWheel(ITestWithPersistence):
         # ------------------------------------------------------
         # First load custom wheel with RequirementsToAssetCollection
         # ------------------------------------------------------
-        platform = Platform("Bayesian")
+        platform = Platform("Cumulus")
         requirements_path = os.path.join(model_path, 'requirements1.txt')
         local_wheels_path = [os.path.join(model_path, 'seaborn-0.7.1-py2.py3-none-any.whl')]
         pl = RequirementsToAssetCollection(name=self.case_name, platform=platform, requirements_path=requirements_path, local_wheels=local_wheels_path)
@@ -275,7 +275,7 @@ class TestLoadLibWheel(ITestWithPersistence):
         # ------------------------------------------------------
         # First load custom wheel with RequirementsToAssetCollection
         # ------------------------------------------------------
-        platform = Platform('Bayesian')
+        platform = Platform('Cumulus')
         requirements_path = os.path.join(model_path, 'requirements3.txt')
         pl = RequirementsToAssetCollection(name=self.case_name, platform=platform, requirements_path=requirements_path)
         ac_id = pl.run()
@@ -302,7 +302,7 @@ class TestLoadLibWheel(ITestWithPersistence):
         # ------------------------------------------------------
         # First load custom wheel with RequirementsToAssetCollection
         # ------------------------------------------------------
-        platform = Platform("Bayesian")
+        platform = Platform("Cumulus")
         requirements_path = os.path.join(model_path, 'requirements3.txt')
         pl = RequirementsToAssetCollection(name=self.case_name, platform=platform, requirements_path=requirements_path)
         ac_id = pl.run(rerun=False)

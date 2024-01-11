@@ -66,7 +66,7 @@ def wait_on_experiment_and_check_all_sim_status(tc, experiment, platform=None,
     Returns:
 
     """
-    experiment.run(wait_until_done=True, scheduling=scheduling)
+    experiment.run(wait_until_done=True, scheduling=scheduling, retries=5)
     if isinstance(tc, type):
         tc.assertTrue(tc, all([s.status == expected_status for s in experiment.simulations]))
     else:

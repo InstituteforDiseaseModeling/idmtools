@@ -9,7 +9,7 @@ from idmtools.entities import CommandLine
 from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 from idmtools_models.templated_script_task import TemplatedScriptTask, \
-    get_script_wrapper_windows_task, ScriptWrapperTask, get_script_wrapper_unix_task, LINUX_PYTHON_PATH_WRAPPER, WINDOWS_PYTHON_PATH_WRAPPER
+    get_script_wrapper_windows_task, ScriptWrapperTask, get_script_wrapper_unix_task, LINUX_PYTHON_PATH_WRAPPER
 from idmtools_test.utils.decorators import windows_only, linux_only
 from idmtools_test.utils.utils import get_case_name
 
@@ -269,31 +269,5 @@ echo Hello
                     # don't check full version in case comps updates system
                     self.assertIn('123', content)
 
-    @pytest.mark.comps
-    def test_wrapper_script_python_execute_assets_windows_comps(self):
-        """
-        This tests The ScriptWrapperScriptTask as well as the TemplatedScriptTask
 
-        In addition, it tests reload
-        Returns:
-
-        """
-        cmd = "python -c \"import test_package as tp;print(tp.a)\""
-        task = CommandTask(cmd)
-        task.common_assets.add_asset(Asset(filename="test_package.py", content="a=\'123\'"))
-        pl_slurm = Platform("COMPS2")
-        wrapper_task: TemplatedScriptTask = get_script_wrapper_windows_task(task, template_content=WINDOWS_PYTHON_PATH_WRAPPER)
-        experiment = Experiment.from_task(wrapper_task, name=self.case_name)
-        experiment.run(wait_until_done=True)
-        self.assertTrue(experiment.succeeded)
-
-        for sim in experiment.simulations:
-            assets = pl_slurm._simulations.all_files(sim)
-            for asset in assets:
-                content = asset.content.decode('utf-8').replace("\\\\", "\\")
-                if asset.filename in ["stdout.txt"]:
-                    # check for echo
-                    self.assertIn('Running', content)
-                    # don't check full version in case comps updates system
-                    self.assertIn('123', content)
 

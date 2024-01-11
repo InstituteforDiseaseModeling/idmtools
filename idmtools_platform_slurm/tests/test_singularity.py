@@ -73,6 +73,7 @@ class TestSingularity(ITestWithPersistence):
 
         # create experiment from task
         experiment = Experiment.from_task(task, name="run_task_in_singularity")
+
         suite = Suite(name='Idm Suite')
         suite.update_tags({'name': 'suite_tag', 'idmtools': '123'})
         # Add experiment to the suite
@@ -80,6 +81,9 @@ class TestSingularity(ITestWithPersistence):
         suite.run(platform=self.platform, wait_until_done=False, wait_on_done=False,
                   max_running_jobs=10,
                   retries=5, dry_run=True)
+        exp_dir = self.platform.get_directory(experiment)
+        print(str(exp_dir))
+        print(os.path.expanduser("~"))
         for simulation in experiment.simulations:
             simulation_dir = self.platform.get_directory(simulation)
             exe = simulation_dir.joinpath(command)
