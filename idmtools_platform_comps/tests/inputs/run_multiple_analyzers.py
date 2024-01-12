@@ -16,7 +16,7 @@ from population_analyzer import PopulationAnalyzer  # noqa
 from adult_vectors_analyzer import AdultVectorsAnalyzer  # noqa
 
 if __name__ == "__main__":
-    platform = Platform('BAYESIAN')
+    platform = Platform('cumulus')
     analyzers = [PopulationAnalyzer(), AdultVectorsAnalyzer()]
 
     # Set the experiment id you want to analyze

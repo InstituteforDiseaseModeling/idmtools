@@ -27,7 +27,7 @@ class TestAssetizeOutput(unittest.TestCase):
     def setUp(self) -> None:
         super().setUp()
         self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
-        self.platform = Platform("Bayesian")
+        self.platform = Platform("SlurmStage")
 
     @classmethod
     def setUpClass(cls) -> None:
@@ -75,7 +75,7 @@ class TestAssetizeOutput(unittest.TestCase):
     @pytest.mark.smoke
     @pytest.mark.serial
     def test_experiment_default_pattern_if_none_specified(self):
-        exp_id = "9311af40-1337-ea11-a2be-f0921c167861"
+        exp_id = "73ba8f3b-8848-ee11-92fb-f0921c167864"
         e = Experiment.from_id(f'{exp_id}', platform=self.platform)
         e.simulations[0].status = EntityStatus.CREATED
         ao = AssetizeOutput()
@@ -144,7 +144,7 @@ class TestAssetizeOutput(unittest.TestCase):
         self.assertIn('1/output/result.json', assets)
 
     def test_experiment_all(self):
-        ao = AssetizeOutput(name=self.case_name, related_experiments=['9311af40-1337-ea11-a2be-f0921c167861'], verbose=True)
+        ao = AssetizeOutput(name=self.case_name, related_experiments=['73ba8f3b-8848-ee11-92fb-f0921c167864'], verbose=True)
         ac = ao.run(wait_on_done=True, platform=self.platform)
 
         self.assertTrue(ao.succeeded)
@@ -155,7 +155,7 @@ class TestAssetizeOutput(unittest.TestCase):
         self.assertEqual(36, len(filelist))
 
     def test_experiment_duplicate_error(self):
-        ao = AssetizeOutput(name=self.case_name, related_experiments=['9311af40-1337-ea11-a2be-f0921c167861'], no_simulation_prefix=True)
+        ao = AssetizeOutput(name=self.case_name, related_experiments=['73ba8f3b-8848-ee11-92fb-f0921c167864'], no_simulation_prefix=True)
         ao.run(wait_on_done=True, platform=self.platform)
 
         self.assertTrue(ao.failed)
@@ -165,7 +165,7 @@ class TestAssetizeOutput(unittest.TestCase):
         self.assertEqual(error_info["doc_link"], "platforms/comps/assetize_output.html#errors")
 
     def test_experiment(self):
-        ao = AssetizeOutput(name=self.case_name, related_experiments=['9311af40-1337-ea11-a2be-f0921c167861'], file_patterns=["**/a.csv"], verbose=True)
+        ao = AssetizeOutput(name=self.case_name, related_experiments=['73ba8f3b-8848-ee11-92fb-f0921c167864'], file_patterns=["**/a.csv"], verbose=True)
         ac = ao.run(wait_on_done=True, platform=self.platform)
 
         self.assertTrue(ao.succeeded)
@@ -176,14 +176,14 @@ class TestAssetizeOutput(unittest.TestCase):
         self.assertEqual(9, len(filelist))
 
     def test_experiment_cross_environment_fail(self):
-        ao = AssetizeOutput(name=self.case_name, related_experiments=['9311af40-1337-ea11-a2be-f0921c167861'], file_patterns=["**/a.csv"], verbose=True)
+        ao = AssetizeOutput(name=self.case_name, related_experiments=['73ba8f3b-8848-ee11-92fb-f0921c167864'], file_patterns=["**/a.csv"], verbose=True)
         with self.assertRaises(CrossEnvironmentFilterNotSupport) as err:
-            ac = ao.run(wait_on_done=True, platform=Platform("SLURMSTAGE"))
+            ac = ao.run(wait_on_done=True, platform=Platform("Cumulus"))
 
-        self.assertEqual('You cannot filter files between environment. In this case, the Experiment 9311af40-1337-ea11-a2be-f0921c167861 is in Bayesian but you are running your workitem in SlurmStage', err.exception.args[0])
+        self.assertEqual('You cannot filter files between environment. In this case, the Experiment 73ba8f3b-8848-ee11-92fb-f0921c167864 is in SLURMStage but you are running your workitem in Cumulus', err.exception.args[0])
 
     def test_experiment_sim_prefix(self):
-        ao = AssetizeOutput(name=self.case_name, related_experiments=['9311af40-1337-ea11-a2be-f0921c167861'], simulation_prefix_format_str="{simulation.state}/{simulation.id}", file_patterns=["**/a.csv"], verbose=True)
+        ao = AssetizeOutput(name=self.case_name, related_experiments=['73ba8f3b-8848-ee11-92fb-f0921c167864'], simulation_prefix_format_str="{simulation.state}/{simulation.id}", file_patterns=["**/a.csv"], verbose=True)
         ac = ao.run(wait_on_done=True, platform=self.platform)
 
         self.assertTrue(ao.succeeded)
@@ -194,7 +194,7 @@ class TestAssetizeOutput(unittest.TestCase):
         self.assertEqual(9, len(filelist))
 
     def test_simulation(self):
-        ao = AssetizeOutput(name=self.case_name, related_simulations=['9d11af40-1337-ea11-a2be-f0921c167861'], file_patterns=["**/*.csv"], verbose=True)
+        ao = AssetizeOutput(name=self.case_name, related_simulations=['7dba8f3b-8848-ee11-92fb-f0921c167864'], file_patterns=["**/*.csv"], verbose=True)
         ac = ao.run(wait_on_done=True, platform=self.platform)
 
         self.assertTrue(ao.succeeded)
@@ -205,7 +205,7 @@ class TestAssetizeOutput(unittest.TestCase):
         self.assertEqual(3, len(filelist))
 
     def test_workitem(self):
-        ao = AssetizeOutput(name=self.case_name, related_work_items=['a6d11db7-1603-e911-80ca-f0921c167866'], file_patterns=["*.png"], verbose=True)
+        ao = AssetizeOutput(name=self.case_name, related_work_items=['eb898d82-2048-ee11-92fb-f0921c167864'], file_patterns=["*.pkl"], verbose=True)
         ac = ao.run(wait_on_done=True, platform=self.platform)
 
         self.assertTrue(ao.succeeded)
@@ -213,11 +213,11 @@ class TestAssetizeOutput(unittest.TestCase):
 
         self.assertEqual(ac, ao.asset_collection)
         filelist = [f.filename for f in ac]
-        self.assertEqual(1, len(filelist))
+        self.assertEqual(3, len(filelist))
 
         with self.subTest("test_workitem_prefix"):
 
-            ao2 = AssetizeOutput(name=self.case_name, related_work_items=['a6d11db7-1603-e911-80ca-f0921c167866', ao], file_patterns=["**.txt"], exclude_patterns=['WorkOrder.json'], verbose=True, work_item_prefix_format_str="{work_item.name}")
+            ao2 = AssetizeOutput(name=self.case_name, related_work_items=['eb898d82-2048-ee11-92fb-f0921c167864', ao], file_patterns=["**.log"], exclude_patterns=['WorkOrder.json'], verbose=True, work_item_prefix_format_str="{work_item.name}")
             ac = ao2.run(wait_on_done=True, platform=self.platform)
             self.assertTrue(ao2.succeeded)
             self.assertIsNotNone(ac)
@@ -227,7 +227,7 @@ class TestAssetizeOutput(unittest.TestCase):
             self.assertEqual(4, len(filelist))
 
     def test_filter_ac(self):
-        ao = AssetizeOutput(name=self.case_name, related_asset_collections=['2b53af74-2b4a-e711-80c1-f0921c167860'], file_patterns=["**/libvectorstats.dll"], verbose=True)
+        ao = AssetizeOutput(name=self.case_name, related_asset_collections=['e7c7b775-9948-ee11-92fb-f0921c167864'], file_patterns=["**/*.json"], verbose=True)
         ac = ao.run(wait_on_done=True, platform=self.platform)
 
         self.assertTrue(ao.succeeded)
@@ -235,17 +235,17 @@ class TestAssetizeOutput(unittest.TestCase):
 
         self.assertEqual(ac, ao.asset_collection)
         filelist = [f.filename for f in ac]
-        self.assertEqual(1, len(filelist))
+        self.assertEqual(4, len(filelist))
 
     def test_dry_run(self):
-        ao = AssetizeOutput(name=self.case_name, related_simulations=['9d11af40-1337-ea11-a2be-f0921c167861'], related_asset_collections=['2b53af74-2b4a-e711-80c1-f0921c167860'], verbose=True, dry_run=True)
+        ao = AssetizeOutput(name=self.case_name, related_simulations=['4b16b125-8248-ee11-92fb-f0921c167864'], verbose=True, dry_run=True)
         ac = ao.run(wait_on_done=True, platform=self.platform)
 
         self.assertTrue(ao.succeeded)
         self.assertIsNone(ac)
 
     def test_simulation_include_assets(self):
-        ao = AssetizeOutput(name=self.case_name, related_experiments=['874586c5-860a-eb11-a2c2-f0921c167862'], file_patterns=["**/*.py"], verbose=True, include_assets=True)
+        ao = AssetizeOutput(name=self.case_name, related_experiments=['4a16b125-8248-ee11-92fb-f0921c167864'], file_patterns=["**/*.json"], verbose=True, include_assets=True)
         ac = ao.run(wait_on_done=True, platform=self.platform)
 
         self.assertTrue(ao.succeeded)
@@ -253,15 +253,15 @@ class TestAssetizeOutput(unittest.TestCase):
 
         self.assertEqual(ac, ao.asset_collection)
         filelist = [f.filename for f in ac]
-        self.assertEqual(60, len(filelist))
-        py_files = [f for f in ac if f.filename.endswith('.py')]
-        self.assertEqual(60, len(py_files))
+        self.assertEqual(4, len(filelist))
+        py_files = [f for f in ac if f.filename.endswith('.json')]
+        self.assertEqual(4, len(py_files))
 
     def test_simulation_include_assets_custom_func(self):
         def rename_func(filename):
             return filename.replace("Assets/", "")
 
-        ao = AssetizeOutput(name=self.case_name, related_experiments=['874586c5-860a-eb11-a2c2-f0921c167862'], file_patterns=["**/*.py"], verbose=True, include_assets=True, filename_format_function=rename_func)
+        ao = AssetizeOutput(name=self.case_name, related_experiments=['79c8b289-8c48-ee11-92fb-f0921c167864'], file_patterns=["**/*.py"], verbose=True, include_assets=True, filename_format_function=rename_func)
         ac = ao.run(wait_on_done=True, platform=self.platform)
 
         self.assertTrue(ao.succeeded)
@@ -269,9 +269,9 @@ class TestAssetizeOutput(unittest.TestCase):
 
         self.assertEqual(ac, ao.asset_collection)
         filelist = [f.filename for f in ac]
-        self.assertEqual(60, len(filelist))
+        self.assertEqual(72, len(filelist))
         py_files = [f for f in ac if f.filename.endswith('.py')]
-        self.assertEqual(60, len(py_files))
+        self.assertEqual(72, len(py_files))
 
     @skipIf(os.getenv("IDMTOOLS_BENCHMARKS", "f") not in TRUTHY_VALUES, reason="Benchmarks not enabled. Enabled with IDMTOOLS_BENCHMARKS")
     def test_benchmark(self):
