@@ -11,8 +11,7 @@ if __name__ == "__main__":
     os.makedirs(os.path.join(current_directory, "output"))
     with open(os.path.join(current_directory, "output", "output.json"), 'w') as fp:
         json.dump({"a": run_number}, fp)
-
-    print(f"Simulation running with Run_Number = {run_number}")
+    print("Simulation running with Run_Number = " + str(run_number))
 
     # The local platform needs to know the resulting status of a work item. We provide it through a return code
     # print(f"Simulation running with Run_Number = {run_number}")

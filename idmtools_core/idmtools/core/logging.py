@@ -119,7 +119,8 @@ class MultiProcessSafeRotatingFileHandler(RotatingFileHandler):
             encoding: Encoding
             delay: Delay
         """
-        super().__init__(filename, mode=mode, maxBytes=maxBytes, backupCount=backupCount, encoding=encoding, delay=delay)
+        super().__init__(filename, mode=mode, maxBytes=maxBytes, backupCount=backupCount, encoding=encoding,
+                         delay=delay)
         self.logger_lock = threading.Lock()
 
     def handle(self, record: logging.LogRecord) -> None:
@@ -230,8 +231,10 @@ def setup_logging(logging_config: IdmToolsLoggingConfig) -> None:
         if len(root.handlers) == 0:
             root.addHandler(logging.NullHandler())
 
-        # set logging stated
+        # set file logging stated
         LOGGING_FILE_STARTED = True
+        # set logging stated
+        LOGGING_STARTED = True
 
 
 def setup_handlers(logging_config: IdmToolsLoggingConfig):
@@ -315,11 +318,13 @@ def set_file_logging(logging_config: IdmToolsLoggingConfig, formatter: logging.F
     if file_handler is None:
         # We had an issue creating file handler, so let's try using default name + pids
         for i in range(64):  # We go to 64. This is a reasonable max id for any computer we might actually run item.
-            file_handler = create_file_handler(logging_config.file_level, formatter, f"{logging_config.filename}.{i}.log")
+            file_handler = create_file_handler(logging_config.file_level, formatter,
+                                               f"{logging_config.filename}.{i}.log")
             if file_handler:
                 break
         if file_handler is None:
-            raise ValueError("Could not file a valid log. Either all the files are opened or you are on a read-only filesystem. You can disable file-based logging by setting")
+            raise ValueError(
+                "Could not file a valid log. Either all the files are opened or you are on a read-only filesystem. You can disable file-based logging by setting")
     logging.root.addHandler(file_handler)
     return file_handler
 
@@ -361,8 +366,7 @@ def reset_logging_handlers():
     # Clean up file handler now
     LOGGING_FILE_STARTED = False
     LOGGING_STARTED = False
-    if LOGGING_FILE_HANDLER is not None:
-        del LOGGING_FILE_HANDLER
+    LOGGING_FILE_HANDLER = None
 
 
 def exclude_logging_classes(items_to_exclude=None):

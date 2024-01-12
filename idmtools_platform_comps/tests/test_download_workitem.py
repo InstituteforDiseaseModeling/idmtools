@@ -21,7 +21,7 @@ class TestDownloadWorkItem(unittest.TestCase):
     def setUp(self) -> None:
         super().setUp()
         self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
-        self.platform = Platform("Bayesian")
+        self.platform = Platform("SlurmStage")
 
     @classmethod
     def setUpClass(cls) -> None:
@@ -50,7 +50,7 @@ class TestDownloadWorkItem(unittest.TestCase):
         try:
             dirpath = tempfile.mkdtemp()
             dl_wi = DownloadWorkItem(name=self.case_name,
-                                     related_experiments=['9311af40-1337-ea11-a2be-f0921c167861'], file_patterns=["output/*.csv"],
+                                     related_experiments=['73ba8f3b-8848-ee11-92fb-f0921c167864'], file_patterns=["output/*.csv"],
                                      simulation_prefix_format_str='{simulation.tags["a"]}_{simulation.tags["b"]}', verbose=True, output_path=dirpath, delete_after_download=False, compress_type=CompressType.deflate
                                      )
             dl_wi.run(wait_on_done=True, platform=self.platform)
@@ -63,7 +63,7 @@ class TestDownloadWorkItem(unittest.TestCase):
             shutil.rmtree(dirpath)
 
     def test_inputs_as_id_files(self):
-        id_file = PurePath(COMMON_INPUT_PATH).joinpath('id_files/bayesian.example_python_experiment.id')
+        id_file = PurePath(COMMON_INPUT_PATH).joinpath('id_files/slurm.example_python_experiment.id')
         try:
             dirpath = tempfile.mkdtemp()
             dl_wi = DownloadWorkItem(name=self.case_name,

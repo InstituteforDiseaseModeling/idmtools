@@ -19,7 +19,7 @@ class TestCleanup(ITestWithPersistence):
     @pytest.mark.comps
     @unittest.skipIf(not os.getenv('CLEANUP_COMPS_TESTS', '0') == '1', reason="CLEANUP_COMPS_TESTS set to false")
     def test_delete_experiment_by_name_owner_date_tags(self):
-        Platform('Bayesian', endpoint="https://comps2.idmod.org", environment="Bayesian")
+        Platform('Cumulus', endpoint="https://comps2.idmod.org", environment="Cumulus")
         name = '%%,Owner=shchen'
         # name = '%Test%,Owner=shchen'  # name contains Test, and Owner is shchen
         opr = '~' if '%' in name else '='

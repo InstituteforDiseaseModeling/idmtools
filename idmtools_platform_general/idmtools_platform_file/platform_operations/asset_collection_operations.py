@@ -145,15 +145,19 @@ class FilePlatformAssetCollectionOperations(IPlatformAssetCollectionOperations):
             None
         """
         if isinstance(item, Experiment):
+            self.pre_create(item.assets)
             exp_asset_dir = Path(self.platform.get_directory(item), 'Assets')
             self.platform.mk_directory(dest=exp_asset_dir)
             for asset in item.assets:
                 self.platform.mk_directory(dest=exp_asset_dir.joinpath(asset.relative_path))
                 self.copy_asset(asset, exp_asset_dir.joinpath(asset.relative_path))
+            self.post_create(item.assets)
         elif isinstance(item, Simulation):
+            self.pre_create(item.assets)
             exp_dir = self.platform.get_directory(item.parent)
             for asset in item.assets:
                 sim_dir = Path(exp_dir, item.id)
                 self.copy_asset(asset, sim_dir)
+            self.post_create(item.assets)
         else:
             raise NotImplementedError(f"dump_assets() for item of type {type(item)} is not supported on FilePlatform.")
