@@ -15,8 +15,8 @@ from idmtools.builders import SimulationBuilder
 from idmtools.core.platform_factory import Platform
 # In order to run the experiment, we need to create a `Platform` and an `ExperimentManager`.
 # The `Platform` defines where we want to run our simulation.
-# You can easily switch platforms by changing the Platform to for example 'Local'
-# with Platform('Local'):
+# You can easily switch platforms by changing the Platform to for example 'CALCULON'
+# with Platform('CALCULON'):
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask

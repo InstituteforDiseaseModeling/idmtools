@@ -76,17 +76,14 @@ idmtools-models                      Version: 1.4.0+nightly.0
 idmtools-platform-comps              Version: 1.4.0+nightly.0                 
   Plugins:
     COMPSPlatform             
-    SSMTPlatform              
-idmtools-platform-local              Version: 1.4.0+nightly                   
-  Plugins:
-    LocalPlatform             
+    SSMTPlatform                        
 idmtools-platform-slurm              Version: 1.0.0+nightly                   
   Plugins:
     SlurmPlatform             
 ```
 
 
-## Experiment commands
+## Experiment commands for Local Platform
 
 ### Status
 
@@ -95,13 +92,9 @@ the experiment as a progress bar with green section for completed tasks, yellow 
 white for queued. 
 
 ```
-> idmtools experiment status
+> idmtools experiment --platform Local status --help
 ```
-
-Alternatively, you can run from anywhere using
-```
-> idmtools experiment status
-``` 
+ 
 
 In addition, we used in conjunction with a console that supports auto-highlighting of hyperlinks, you will be able to
 easily open up the asset directories by clicking on the data path URLs.
@@ -118,17 +111,17 @@ You can delete experiments and their child simulations using the following comma
 the associated data directories as well by using the *--data* option.
 
 ```
->idmtools experiment delete <experiment_id>
+>idmtools experiment --platform Local delete <experiment_id>
 ```
 
-## Simulation commands
+## Simulation commands for Local Platform
 
 ## Status 
 
 You can check the status of simulations use the follow command.
 
 ```
->idmtools simulation status
+>idmtools simulation --platform Local status
 ```
 
 You can also filter by a either id, experiment id, status, and tags or any combination of the aforementioned

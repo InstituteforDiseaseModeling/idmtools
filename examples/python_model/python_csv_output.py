@@ -18,7 +18,7 @@ from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 
 # In order to run the experiment, we need to create a `Platform` and an `ExperimentManager`.
 # The `Platform` defines where we want to run our simulation.
-# You can easily switch platforms by changing the Platform to for example 'Local'
+# You can easily switch platforms by changing the Platform to for example 'CALCULON'
 with platform('BELEGOST'):
     # define our base task as a python model with json config
     base_task = JSONConfiguredPythonTask(

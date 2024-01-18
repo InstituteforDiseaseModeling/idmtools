@@ -93,7 +93,7 @@ class EndpointsAnalyzer(IAnalyzer):
 if __name__ == "__main__":
 
     # Set the platform where you want to run your analysis
-    # In this case we are running in BELEGOST, but this can be changed to run 'Local'
+    # In this case we are running in BELEGOST, but this can be changed to run 'CALCULON'
     with Platform('BELEGOST') as platform:
 
         # Set the experiment you want to analyze

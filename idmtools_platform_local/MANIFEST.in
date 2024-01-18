@@ -1,6 +1,0 @@
-include requirements.txt
-include ui_requirements.txt
-include workers_requirements.txt
-include README.md
-recursive-include idmtools_platform_local/internals/ui/static *
-prune tests

@@ -91,8 +91,6 @@ class TestSystemInfoBasics(unittest.TestCase):
         if any(['idmtools-platform-comps' in p for p in packages]):
             for task in ['COMPS', 'SSMT']:
                 self.assertIn(task, result.output)
-        if any(['idmtools-platform-local' in p for p in packages]):
-            self.assertIn('Local', result.output)
 
     def test_tasks_plugin(self):
         """
