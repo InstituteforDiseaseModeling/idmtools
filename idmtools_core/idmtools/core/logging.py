@@ -234,7 +234,7 @@ def setup_logging(logging_config: IdmToolsLoggingConfig) -> None:
         # set file logging stated
         LOGGING_FILE_STARTED = True
         # set logging stated
-        #LOGGING_STARTED = True
+        # LOGGING_STARTED = True
 
 
 def setup_handlers(logging_config: IdmToolsLoggingConfig):
