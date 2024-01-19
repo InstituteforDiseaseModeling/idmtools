@@ -31,7 +31,5 @@ class TestPlatformPlugins(TestCase):
             self.assertGreater(len(examples), 1)
             self.assertIn('COMPS', pm.get_plugin_map().keys())
             self.assertIn('SSMT', pm.get_plugin_map().keys())
-        if any(['idmtools-platform-local' in p for p in packages]):
-            self.assertIn('Local', pm.get_plugin_map().keys())
         if any(['idmtools-platform-slurm' in p for p in packages]):
             self.assertIn('Slurm', pm.get_plugin_map().keys())
