@@ -9,11 +9,10 @@ from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 
 
-def LD_LIBRARY_PATH():
-    command = "C:\Python36\python.exe -c \"import os, sys; print(os.environ['PYTHONPATH']); print(sys.path) if 'PYTHONPATH' in sorted(os.environ) else print('PYTHONPATH is not defined')\""
-    #command = "where python"
+def run_python_version():
+    command = "python3 --version"
     task = CommandTask(command=command)
-    experiment = Experiment.from_task(task, name="PYTHONPATH_cumulus")
+    experiment = Experiment.from_task(task, name="run_python_version")
     return experiment
 
 
@@ -32,14 +31,14 @@ def run_sif_python_version():
 
 
 if __name__ == '__main__':
-    platform = Platform('cumulus')
-    suite = Suite(name='LD_LIBRARY_PATH')
+    platform = Platform('Calculon')
+    suite = Suite(name='python versions')
     platform.create_items([suite])
-    exp1 = LD_LIBRARY_PATH()
-    # exp2 = run_sif_python_version()
-    # # add experiment to suite
-    # suite.add_experiment(exp1)
-    # suite.add_experiment(exp2)
+    exp1 = run_python_version()
+    exp2 = run_sif_python_version()
+    # add experiment to suite
+    suite.add_experiment(exp1)
+    suite.add_experiment(exp2)
     exp1.run(wait_until_done=True)
-    #exp2.run(wait_until_done=True)
+    exp2.run(wait_until_done=True)
     sys.exit(0 if suite.succeeded else -1)
