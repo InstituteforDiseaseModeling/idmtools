@@ -5,7 +5,7 @@ import pytest
 from time import time
 from pathlib import Path
 from idmtools.analysis.download_analyzer import DownloadAnalyzer
-from idmtools.assets import AssetCollection, Asset
+from idmtools.assets import AssetCollection
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.command_task import CommandTask
@@ -332,37 +332,3 @@ class TestSSMTWorkItem(ITestWithPersistence):
         wi = SSMTWorkItem(task=task, name=self.case_name, tags=self.tags)
         wi.run(wait_on_done=True)
         self.assertTrue(wi.succeeded)
-
-    def test_ac_hook(self):
-
-        ran_at = str(time())
-        ac = AssetCollection([os.path.join(self.input_file_path, "hello.py")])
-
-        def add_date_as_tag(ac: AssetCollection, platform: 'COMPSPlatform'):
-            ac.tags['date'] = ran_at
-
-        def add_post_tag(ac: AssetCollection, platform: 'COMPSPlatform'):
-            ac.tags['post_tag'] = "post_tag"
-
-        ac.add_pre_creation_hook(add_date_as_tag)
-        ac.add_post_creation_hook(add_post_tag)
-        result = self.platform.create_items(ac)
-        print(result[0].id)
-        #command = "python3 hello.py"
-        # task = CommandTask(command=command,
-        #                    transient_assets=ac)
-        # wi = SSMTWorkItem(task=task, name=self.case_name, tags=self.tags)
-        # id_file = Path(f"{wi.item_type}.{wi.name}.id")
-        #
-        # # test pre create hook
-        # ran_at = str(time())
-        #
-        # def add_date_as_tag(ac: AssetCollection, platform: 'COMPSPlatform'):
-        #     ac.tags['date'] = ran_at
-        #
-        # def add_post_tag(ac: AssetCollection, platform: 'COMPSPlatform'):
-        #     ac.tags['post_tag'] = "post_tag"
-        #
-        # ac.add_pre_creation_hook(add_date_as_tag)
-        # ac.add_post_creation_hook(add_post_tag)
-        # wi.run(wait_on_done=True)

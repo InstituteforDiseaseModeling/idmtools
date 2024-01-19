@@ -30,25 +30,23 @@ def get_username_and_password(disable_keyring_load=False, disable_keyring_save=F
     Returns:
         Username password
     """
-    # if 'PYPI_STAGING_USERNAME' in os.environ:
-    #     logger.info("Loading Credentials from environment")
-    #     if 'PYPI_STAGING_PASSWORD' not in os.environ:
-    #         logger.error("When specifying username from environment variable, you must also specify password")
-    #         sys.exit(-1)
-    #     username = os.environ['PYPI_STAGING_USERNAME']
-    #     password = os.environ['PYPI_STAGING_PASSWORD']
-    # elif not disable_keyring_load and keyring.get_credential(KEYRING_NAME, "username"):
-    #     username = keyring.get_password(KEYRING_NAME, "username")
-    #     password = keyring.get_password(KEYRING_NAME, "password")
-    # else:
-    #     username = input('Username:')
-    #     password = getpass(prompt='Password:')
-    #     if not disable_keyring_save:
-    #         logger.info("Saving Credentials")
-    #         keyring.set_password(KEYRING_NAME, "username", username)
-    #         keyring.set_password(KEYRING_NAME, "password", password)
-    username="idm_bamboo_user@idmod.org"
-    password='AKCp5dLMtaVQFvC6qzQz7a2gg8uvRN3kShgsxXj59UcgiBfBTjXW3kwuiM5iNnUMpBdUxz33u'
+    if 'PYPI_STAGING_USERNAME' in os.environ:
+        logger.info("Loading Credentials from environment")
+        if 'PYPI_STAGING_PASSWORD' not in os.environ:
+            logger.error("When specifying username from environment variable, you must also specify password")
+            sys.exit(-1)
+        username = os.environ['PYPI_STAGING_USERNAME']
+        password = os.environ['PYPI_STAGING_PASSWORD']
+    elif not disable_keyring_load and keyring.get_credential(KEYRING_NAME, "username"):
+        username = keyring.get_password(KEYRING_NAME, "username")
+        password = keyring.get_password(KEYRING_NAME, "password")
+    else:
+        username = input('Username:')
+        password = getpass(prompt='Password:')
+        if not disable_keyring_save:
+            logger.info("Saving Credentials")
+            keyring.set_password(KEYRING_NAME, "username", username)
+            keyring.set_password(KEYRING_NAME, "password", password)
     return username, password
 
 

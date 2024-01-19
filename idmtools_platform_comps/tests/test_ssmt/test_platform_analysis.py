@@ -35,10 +35,9 @@ def do_platform_analysis_experiment(platform: Platform):
         experiment_id = 'd0b75dba-0e18-ec11-92df-f0921c167864' # comps2 exp id
     elif platform.environment.lower() == "slurmstage":
         experiment_id = 'c348452d-921c-ec11-92e0-f0921c167864'  # comps2 exp id
-        sim_id = '92a0f236-921c-ec11-92e0-f0921c167864'
 
     # Run ssmt PlatformAnalysis with an experiment id which will run PopulationAnalyzer in COMPS docker worker
-    analysis = PlatformAnalysis(platform=platform, simulation_ids=[sim_id],
+    analysis = PlatformAnalysis(platform=platform, experiment_id=[experiment_id],
                                 analyzers=[PopulationAnalyzer],
                                 analyzers_args=[{'name': ['anything']}],
                                 analysis_name='test platformanalysis with experiment',
