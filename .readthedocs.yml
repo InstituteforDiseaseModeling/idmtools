@@ -32,7 +32,7 @@ python:
     - requirements: dev_scripts/package_requirements.txt
     - requirements: docs/requirements.txt
     - method: pip
-        path: .
+      path: .
     - method: pip
       path: idmtools_core
       extra_requirements:
