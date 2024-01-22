@@ -37,7 +37,7 @@ def do_platform_analysis_experiment(platform: Platform):
         experiment_id = 'c348452d-921c-ec11-92e0-f0921c167864'  # comps2 exp id
 
     # Run ssmt PlatformAnalysis with an experiment id which will run PopulationAnalyzer in COMPS docker worker
-    analysis = PlatformAnalysis(platform=platform, experiment_id=[experiment_id],
+    analysis = PlatformAnalysis(platform=platform, experiment_ids=[experiment_id],
                                 analyzers=[PopulationAnalyzer],
                                 analyzers_args=[{'name': ['anything']}],
                                 analysis_name='test platformanalysis with experiment',
