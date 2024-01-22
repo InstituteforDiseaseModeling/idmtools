@@ -73,3 +73,4 @@ setup(
     version=version,
     zip_safe=False
 )
+
