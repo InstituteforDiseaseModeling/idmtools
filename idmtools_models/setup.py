@@ -68,3 +68,4 @@ setup(
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
     version='1.7.9+nightly'
 )
+
