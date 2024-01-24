@@ -8,4 +8,4 @@ command = "python3 run_analysis.py"
 if __name__ == "__main__":
     platform = Platform('BELEGOST')
     wi = SSMTWorkItem(name=wi_name, command=command, transient_assets=AssetCollection.from_directory('files'), related_experiments=["b716f387-cb04-eb11-a2c7-c4346bcb1553"])  # COMPS exp_id
-    wi.run(wait_on_done=True)
+    wi.run(wait_until_done=True)

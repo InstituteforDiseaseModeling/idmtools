@@ -17,4 +17,4 @@ if __name__ == "__main__":
         # Or user can use his won docker image like this
         # wi = SSMTWorkItem(name=wi_name, command=command, transient_assets=user_files, tags=tags, docker_image='User_docker_image')
 
-        wi.run(wait_on_done=True)
+        wi.run(wait_until_done=True)

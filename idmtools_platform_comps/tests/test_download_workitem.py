@@ -53,7 +53,7 @@ class TestDownloadWorkItem(unittest.TestCase):
                                      related_experiments=['73ba8f3b-8848-ee11-92fb-f0921c167864'], file_patterns=["output/*.csv"],
                                      simulation_prefix_format_str='{simulation.tags["a"]}_{simulation.tags["b"]}', verbose=True, output_path=dirpath, delete_after_download=False, compress_type=CompressType.deflate
                                      )
-            dl_wi.run(wait_on_done=True, platform=self.platform)
+            dl_wi.run(wait_until_done=True, platform=self.platform)
             self.assertTrue(dl_wi.succeeded)
             files_downloaded = list(glob(os.path.join(dirpath, "**"), recursive=True))
             self.assertEqual(len([x for x in files_downloaded if os.path.isfile(x) and x.endswith(".csv")]), 27)
@@ -70,7 +70,7 @@ class TestDownloadWorkItem(unittest.TestCase):
                                      related_experiments=[id_file], file_patterns=["output/*.csv"],
                                      simulation_prefix_format_str='{simulation.tags["a"]}_{simulation.tags["b"]}', verbose=True, output_path=dirpath,
                                      )
-            dl_wi.run(wait_on_done=True, platform=self.platform)
+            dl_wi.run(wait_until_done=True, platform=self.platform)
             self.assertTrue(dl_wi.succeeded)
             files_downloaded = list(glob(os.path.join(dirpath, "**"), recursive=True))
             self.assertEqual(len([x for x in files_downloaded if os.path.isfile(x)]), 27)

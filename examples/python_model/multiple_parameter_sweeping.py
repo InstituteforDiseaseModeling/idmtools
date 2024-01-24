@@ -38,6 +38,6 @@ ts.add_builder(sb)
 experiment = Experiment.from_template(ts, name=os.path.split(sys.argv[0])[1])
 experiment.add_asset(os.path.join("inputs", "scheduling", "commandline_model.py"))
 with Platform('CALCULON') as platform:
-    experiment.run(wait_on_done=True, scheduling=True)
+    experiment.run(wait_until_done=True, scheduling=True)
     # use system status as the exit code
     sys.exit(0 if experiment.succeeded else -1)

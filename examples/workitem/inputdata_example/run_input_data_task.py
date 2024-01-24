@@ -10,4 +10,4 @@ if __name__ == "__main__":
     platform = Platform('BELEGOST')
     wi = InputDataWorkItem(name=wi_name, tags=tags)
     wi.load_work_order(os.path.join('..', 'files', 'inputdataworker_workorder.json'))
-    wi.run(wait_on_done=True)
+    wi.run(wait_until_done=True)
