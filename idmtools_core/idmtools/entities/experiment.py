@@ -8,6 +8,7 @@ TemplatedSimulations are useful for building large numbers of similar simulation
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import copy
+import warnings
 from dataclasses import dataclass, field, InitVar, fields
 from logging import getLogger, DEBUG
 from types import GeneratorType
@@ -546,6 +547,9 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
             None
         """
         p = super()._check_for_platform_from_context(platform)
+        if wait_on_done or wait_on_done in run_opts:
+            warnings.warn("wait_on_done will be deprecated soon. Please use wait_until_done instead.", DeprecationWarning, 2)
+            user_logger.warning("wait_on_done will be deprecated soon. Please use wait_until_done instead.")
         if regather_common_assets is None:
             regather_common_assets = p.is_regather_assets_on_modify()
         if regather_common_assets and not self.assets.is_editable():
