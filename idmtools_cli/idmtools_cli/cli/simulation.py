@@ -9,7 +9,8 @@ from idmtools_cli.cli.utils import tags_help, get_platform_from_config_or_name, 
 
 
 @cli.group()
-@click.option('--platform', default=None, type=click.Choice(supported_platforms.keys()))
+@click.option('--platform', default=None, type=click.Choice(supported_platforms.keys()),
+              help='Currently only support Local Platform')
 @click.option('--config-block', default=None, type=str, help='Name of platform section in our idmtools.ini to use as '
                                                              'configuration')
 @click.pass_context
@@ -43,9 +44,9 @@ def status(platform_cli: IPlatformCLI, id: Optional[str], experiment_id: Optiona
     idmtools simulation --platform Local status
 
     Another example would be to use a platform defined in a configuration block while also filtering tags where a == 0
-    idmtools simulation --config-block COMPS2 status --tags a 0
+    idmtools simulation --config-block Local status --tags a 0
 
     Multiple tags
-    idmtools simulation --config-block COMPS2 status --tags a 0 --tags a 3
+    idmtools simulation --config-block Local status --tags a 0 --tags a 3
     """
     platform_cli.get_simulation_status(id, experiment_id, None, tags)

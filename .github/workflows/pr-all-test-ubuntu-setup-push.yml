@@ -32,8 +32,6 @@ jobs:
               - 'idmtools_models/**'
             comps:
               - 'idmtools_platform_comps/**'
-            local:
-              - 'idmtools_platform_local/**'
       - uses: actions/cache@v3
         if: steps.filter.outputs.core == 'true'
         with:
@@ -161,8 +159,6 @@ jobs:
               - 'idmtools_models/**'
             comps:
               - 'idmtools_platform_comps/**'
-            local:
-              - 'idmtools_platform_local/**'
       - uses: actions/cache@v3
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.models == 'true'
         with:
@@ -230,8 +226,6 @@ jobs:
               - 'idmtools_models/**'
             comps:
               - 'idmtools_platform_comps/**'
-            local:
-              - 'idmtools_platform_local/**'
       - uses: actions/cache@v3
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.comps == 'true' || steps.filter.outputs.models == 'true'
         with:
@@ -298,8 +292,6 @@ jobs:
               - 'idmtools_models/**'
             comps:
               - 'idmtools_platform_comps/**'
-            local:
-              - 'idmtools_platform_local/**'
       - uses: actions/cache@v3
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.local == 'true' || steps.filter.outputs.models == 'true'
         with:
@@ -332,18 +324,6 @@ jobs:
         run: |
           echo '${{ env.PYPI_STAGING_PASSWORD }}' | docker login idm-docker-staging.packages.idmod.org --username ${{ env.PYPI_STAGING_USERNAME }} --password-stdin
           echo '${{ env.PYPI_STAGING_PASSWORD }}' | docker login docker-staging.packages.idmod.org --username ${{ env.PYPI_STAGING_USERNAME }} --password-stdin
-      - name: run idmtools_platform_local all tests
-        # only run if core and comps changed
-        if: steps.filter.outputs.core == 'true' || steps.filter.outputs.local == 'true' || steps.filter.outputs.models == 'true'
-        run: |
-          cd idmtools_platform_local
-           make test-all
-      - name: Upload idmtools_platform_local all test results
-        uses: actions/upload-artifact@v2
-        if: failure() && (steps.filter.outputs.core == 'true' || steps.filter.outputs.local == 'true' || steps.filter.outputs.models == 'true')
-        with:
-          name: idmtools_platform_local_test_results
-          path: idmtools_platform_local/tests/reports/
   pr-test-slurm-linux:
     runs-on: ${{ matrix.os }}
     env:

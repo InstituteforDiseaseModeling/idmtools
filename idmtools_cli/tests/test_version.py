@@ -45,13 +45,6 @@ class TestSystemInfoBasics(unittest.TestCase):
             pass
 
         try:
-            from idmtools_platform_local import __version__ as local_version
-            self.assertIn(f'idmtools-platform-local              Version: {local_version}', result.output)
-            self.assertIn(f'LocalPlatform', result.output)
-        except ImportError:
-            pass
-
-        try:
             from idmtools_platform_slurm import __version__ as slurm_version
             self.assertIn(f'idmtools-platform-slurm              Version: {slurm_version}', result.output)
             self.assertIn(f'SlurmPlatform', result.output)

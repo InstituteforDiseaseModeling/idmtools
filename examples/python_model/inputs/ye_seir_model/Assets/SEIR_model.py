@@ -242,5 +242,4 @@ if __name__ == "__main__":
                  outbreak_demographic_coverage=float(args.outbreak_coverage),
                  outbreak_ignore_immunity=args.outbreak_ignore_immunity)
     model.run()
-    # The local platform needs to know the resulting status of a work item. We provide it through a return code
     sys.exit(0)
