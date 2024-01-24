@@ -27,6 +27,9 @@ clean-all: ## Clean most common outputs(Logs, Test Results, etc) as well as loca
 setup-dev: ## Setup packages in dev mode
 	python dev_scripts/bootstrap.py
 
+setup-dev-no-docker: ## Setup packages in dev mode
+	python dev_scripts/bootstrap.py
+
 lint: ## check style with flake8
 	flake8
 
