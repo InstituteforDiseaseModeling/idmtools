@@ -529,7 +529,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         return p._experiments.list_assets(self, children, **kwargs)
 
     def run(self, wait_until_done: bool = False, platform: 'IPlatform' = None, regather_common_assets: bool = None,
-            wait_on_done_progress: bool = True, wait_on_done: bool = False,
+            wait_on_done_progress: bool = True, wait_on_done=None,
             **run_opts) -> NoReturn:
         """
         Runs an experiment on a platform.
@@ -547,7 +547,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
             None
         """
         p = super()._check_for_platform_from_context(platform)
-        if wait_on_done or wait_on_done in run_opts:
+        if wait_on_done is not None:
             warnings.warn("wait_on_done will be deprecated soon. Please use wait_until_done instead.", DeprecationWarning, 2)
             user_logger.warning("wait_on_done will be deprecated soon. Please use wait_until_done instead.")
         if regather_common_assets is None:
