@@ -47,4 +47,3 @@ setup(
     version='1.7.9+nightly',
     zip_safe=False
 )
-
