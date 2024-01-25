@@ -2,10 +2,15 @@
 # -*- coding: utf-8 -*-
 
 """The setup script for the idmtools_core platform, the core tools for modeling and analysis."""
+import sys
+
 from setuptools import setup, find_packages
 
 with open('README.md') as readme_file:
     readme = readme_file.read()
+
+with open('requirements.txt') as requirements_file:
+    requirements = requirements_file.read().split("\n")
 
 extra_require_files = dict()
 for file_prefix in ['', 'dev_', 'build_']:
@@ -24,6 +29,10 @@ extras = {
     # our full install include all common plugins
     'full': ['idmtools_platform_comps', 'idmtools_cli', 'idmtools_models', 'idmtools_platform_slurm', 'idmtools_slurm_utils', 'idmtools_platform_general']
 }
+
+if sys.platform in ["win32", "cygwin"]:
+    requirements.append('pypiwin32==223')
+    requirements.append('pywin32')
 
 authors = [
     ("Ross Carter", "rcarter@idmod.org"),
