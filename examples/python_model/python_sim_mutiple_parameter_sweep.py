@@ -42,7 +42,6 @@ experiment.assets.add_directory(assets_directory=os.path.join("inputs", "python_
 
 # In order to run the experiment, we need to create a `Platform`
 # The `Platform` defines where we want to run our simulation.
-# You can easily switch platforms by changing the Platform to for example 'Local'
 with Platform('CALCULON'):
 
     # The last step is to call run() on the ExperimentManager to run the simulations.

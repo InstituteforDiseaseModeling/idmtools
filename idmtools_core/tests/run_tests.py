@@ -6,7 +6,6 @@ import xmlrunner
 
 root_idmtools = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
-sys.path.insert(0, os.path.abspath(os.path.join(root_idmtools, "idmtools_platform_local")))
 sys.path.insert(0, os.path.abspath(os.path.join(root_idmtools, "idmtools_models")))
 sys.path.insert(0, os.path.abspath(os.path.join(root_idmtools, "idmtools_core")))
 

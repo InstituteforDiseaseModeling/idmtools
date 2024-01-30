@@ -7,9 +7,6 @@ CLI reference
    :titlesonly:
    
    cli-templates
-   cli-simulations
-   cli-experiments
-   cli-local-platform
    cli-comps
    cli-examples
    cli-troubleshoot

@@ -27,8 +27,6 @@ jobs:
               - 'idmtools_models/**'
             comps:
               - 'idmtools_platform_comps/**'
-            local:
-              - 'idmtools_platform_local/**'
       - uses: actions/cache@v3
         if: steps.filter.outputs.core == 'true'
         with:
@@ -156,8 +154,6 @@ jobs:
               - 'idmtools_models/**'
             comps:
               - 'idmtools_platform_comps/**'
-            local:
-              - 'idmtools_platform_local/**'
       - uses: actions/cache@v3
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.models == 'true'
         with:
@@ -225,8 +221,6 @@ jobs:
               - 'idmtools_models/**'
             comps:
               - 'idmtools_platform_comps/**'
-            local:
-              - 'idmtools_platform_local/**'
       - uses: actions/cache@v3
         if: steps.filter.outputs.core == 'true' || steps.filter.outputs.comps == 'true' || steps.filter.outputs.models == 'true'
         with:
@@ -268,77 +262,6 @@ jobs:
         with:
           name: idmtools_platform_comps_test_results
           path: idmtools_platform_comps/tests/reports/
-  pr-test-local-linux:
-    runs-on: ${{ matrix.os }}
-    env:
-      PYPI_STAGING_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
-      PYPI_STAGING_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
-    strategy:
-      matrix:
-        os: [ self-docker ]
-        python-version: [ '3.7.x', '3.8.x', '3.9.x' ]
-    steps:
-      - name: Check out Git repository
-        uses: actions/checkout@v2
-      - uses: dorny/paths-filter@v2
-        id: filter
-        with:
-          base: dev
-          filters: |
-            core:
-              - 'idmtools_core/**'
-            cli:
-              - 'idmtools_cli/**'
-            models:
-              - 'idmtools_models/**'
-            comps:
-              - 'idmtools_platform_comps/**'
-            local:
-              - 'idmtools_platform_local/**'
-      - uses: actions/cache@v3
-        if: steps.filter.outputs.core == 'true' || steps.filter.outputs.local == 'true' || steps.filter.outputs.models == 'true'
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-${{ runner.python-version }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/*_requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ runner.python-version }}-pip-
-      - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
-        if: steps.filter.outputs.core == 'true' || steps.filter.outputs.local == 'true' || steps.filter.outputs.models == 'true'
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-          architecture: x64
-      - name: Install Python dependencies
-        if: steps.filter.outputs.core == 'true' || steps.filter.outputs.local == 'true' || steps.filter.outputs.models == 'true'
-        run: |
-          pip install idm-buildtools flake8 wheel --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
-      - name: Run setup-dev
-        # only run if full install for core, local changes, or models
-        if: steps.filter.outputs.core == 'true' ||  steps.filter.outputs.local == 'true' ||  steps.filter.outputs.models == 'true'
-        run: |
-          make setup-dev
-      - name: login to comps2
-        if: steps.filter.outputs.core == 'true' || steps.filter.outputs.local == 'true' || steps.filter.outputs.models == 'true'
-        env:
-          COMPS_PASS: ${{ secrets.COMPS_PASSWORD }}
-        run: |
-          python dev_scripts/create_auth_token_args.py --username "${{ secrets.COMPS_USER }}"
-      - name: login to docker staging
-        run: |
-          echo '${{ env.PYPI_STAGING_PASSWORD }}' | docker login idm-docker-staging.packages.idmod.org --username ${{ env.PYPI_STAGING_USERNAME }} --password-stdin
-          echo '${{ env.PYPI_STAGING_PASSWORD }}' | docker login docker-staging.packages.idmod.org --username ${{ env.PYPI_STAGING_USERNAME }} --password-stdin
-      - name: run idmtools_platform_local all tests
-        # only run if core and comps changed
-        if: steps.filter.outputs.core == 'true' || steps.filter.outputs.local == 'true' || steps.filter.outputs.models == 'true'
-        run: |
-          cd idmtools_platform_local
-           make test-all
-      - name: Upload idmtools_platform_local all test results
-        uses: actions/upload-artifact@v2
-        if: failure() && (steps.filter.outputs.core == 'true' || steps.filter.outputs.local == 'true' || steps.filter.outputs.models == 'true')
-        with:
-          name: idmtools_platform_local_test_results
-          path: idmtools_platform_local/tests/reports/
   pr-test-slurm-linux:
     runs-on: ${{ matrix.os }}
     env:
