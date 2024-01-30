@@ -9,7 +9,7 @@ from typing import Optional, List
 
 from idmtools.core.logging import SUCCESS
 from idmtools_cli.cli.entrypoint import cli
-from idmtools_cli.utils.gitrepo import GitRepo, REPO_OWNER, GITHUB_HOME, REPO_NAME
+from idmtools.utils.gitrepo import GitRepo, REPO_OWNER, GITHUB_HOME, REPO_NAME
 from idmtools.registry.master_plugin_registry import MasterPluginRegistry
 
 user_logger = getLogger('user')
