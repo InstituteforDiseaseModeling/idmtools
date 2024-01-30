@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import allure
 import tempfile
 from shutil import copyfile
@@ -39,23 +41,7 @@ class TestConfig(ITestWithPersistence):
             IdmConfigParser().get_section('NotReallyASection')
         self.assertIn("Block 'NotReallyASection' doesn't exist!", context.exception.args[0])
 
-    @pytest.mark.comps
-    @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
-    @pytest.mark.serial
-    def test_simple_comps_platform_use_config(self, mock_login):
-        platform = Platform("COMPS2")
-        self.assertEqual(platform.endpoint, 'https://comps2.idmod.org')
-        self.assertEqual(platform.environment, 'Bayesian')
-        self.assertEqual(mock_login.call_count, 1)
 
-    @pytest.mark.comps
-    @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
-    @pytest.mark.serial
-    def test_simple_comps_platform_use_code(self, mock_login):
-        platform = Platform("COMPS2", endpoint='https://abc', environment='Bayesian')
-        self.assertEqual(platform.endpoint, 'https://abc')
-        self.assertEqual(platform.environment, 'Bayesian')
-        self.assertEqual(mock_login.call_count, 1)
 
     def test_idmtools_ini(self):
         config_file = IdmConfigParser.get_config_path()
@@ -85,14 +71,13 @@ class TestConfig(ITestWithPersistence):
         batch_size = idm.get_option("COMMON", 'batch_size')
         self.assertEqual(int(batch_size), 10)
 
-    @pytest.mark.comps
-    @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
+    @skip_if_global_configuration_is_enabled
     @pytest.mark.serial
-    def test_idmtools_ini_option(self, login_mock):
+    def test_idmtools_ini_option(self):
         config_file = IdmConfigParser.get_config_path()
         self.assertEqual(os.path.basename(config_file), 'idmtools.ini')
 
-        Platform('COMPS')
+        Platform('Test')
         max_workers = IdmConfigParser.get_option(None, 'max_workers')
         self.assertEqual(int(max_workers), 16)
 
@@ -143,17 +128,12 @@ class TestConfig(ITestWithPersistence):
         finally:
             del os.environ['IDMTOOLS_CONFIG_FILE']
 
-    @pytest.mark.comps
-    @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
     @pytest.mark.serial
-    @skip_if_global_configuration_is_enabled
-    def test_idmtools_path(self, login_mock):
-        IdmConfigParser(os.path.join(COMMON_INPUT_PATH, "configuration"), "idmtools_test.ini")
-        platform = Platform('COMPS')
-        self.assertEqual(platform.num_retries, int(IdmConfigParser.get_option('COMPS', 'num_retries')))
-
+    def test_idmtools_path(self):
+        IdmConfigParser.clear_instance()
         file_path = os.path.join(COMMON_INPUT_PATH, "configuration", "idmtools_test.ini")
-        self.assertEqual(IdmConfigParser.get_config_path(), os.path.abspath(file_path))
+        conf_parser = IdmConfigParser(Path(file_path).parent, Path(file_path).name)
+        self.assertEqual(conf_parser.get_config_path(), os.path.abspath(file_path))
 
     def test_IdmConfigParser_singleton(self):
         p1 = IdmConfigParser()
@@ -182,11 +162,9 @@ class TestConfig(ITestWithPersistence):
         self.assertIsNone(max_workers)
         self.assertIsNone(batch_size)
 
-    @pytest.mark.comps
-    @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
     @pytest.mark.serial
-    def test_idmtools_values(self, login_mock):
-        Platform('COMPS')
+    def test_idmtools_values(self):
+        Platform('Test')
         max_workers = IdmConfigParser.get_option(None, 'max_workers')
         batch_size = IdmConfigParser.get_option(None, 'batch_size')
         not_exist_option = IdmConfigParser.get_option(None, 'not_exist_option')
@@ -194,10 +172,8 @@ class TestConfig(ITestWithPersistence):
         self.assertEqual(int(batch_size), 10)
         self.assertIsNone(not_exist_option)
 
-    @pytest.mark.comps
-    @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
-    def test_idmtools_no_section(self, login_mock):
-        Platform('COMPS')
+    def test_idmtools_no_section(self):
+        Platform('Test')
         max_workers = IdmConfigParser.get_option('NotExistSection', 'max_workers')
         batch_size = IdmConfigParser.get_option('NotExistSection', 'batch_size')
         self.assertIsNone(max_workers)

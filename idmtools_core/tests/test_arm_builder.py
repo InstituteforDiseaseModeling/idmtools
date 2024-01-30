@@ -4,14 +4,27 @@ from functools import partial
 
 import pytest
 from idmtools.builders.arm_simulation_builder import ArmSimulationBuilder, SweepArm, ArmType
+from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
-from idmtools_models.json_configured_task import JSONConfiguredTask
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.test_task import TestTask
 from idmtools_test.utils.utils import verify_simulation
 
-setA = partial(JSONConfiguredTask.set_parameter_sweep_callback, param="a")
-setB = partial(JSONConfiguredTask.set_parameter_sweep_callback, param="b")
+
+class TestTestTask(TestTask):
+    @staticmethod
+    def set_parameter_sweep_callback(simulation: Simulation, param: str, value):
+        if not hasattr(simulation.task, 'set_parameter'):
+            raise ValueError("update_task_with_set_parameter can only be used on tasks with a set_parameter")
+        return simulation.task.set_parameter(param, value)
+
+    @classmethod
+    def set_parameter_partial(cls, parameter: str):
+        return partial(cls.set_parameter_sweep_callback, param=parameter)
+
+
+setA = partial(TestTestTask.set_parameter_sweep_callback, param="a")
+setB = partial(TestTestTask.set_parameter_sweep_callback, param="b")
 
 
 @pytest.mark.smoke

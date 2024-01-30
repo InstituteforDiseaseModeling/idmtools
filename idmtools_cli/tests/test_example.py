@@ -61,7 +61,7 @@ class TestExample(unittest.TestCase):
     def test_get_plugins_example_urls(self):
         examples = get_plugins_examples()
         self.assertTrue(isinstance(examples, dict))
-        self.assertTrue('COMPSPlatform' in examples)
+        self.assertTrue('CommandTask' in examples)
 
     def test_public_repos(self):
         # because of weirdness in testing, the log output even when set to stdout appears as stderr. We workaround by capturing both independently
