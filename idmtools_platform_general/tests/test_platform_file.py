@@ -29,7 +29,7 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 @linux_only
 class TestFilePlatform(ITestWithPersistence):
 
-    def create_experiment(self, platform=None, a=1, b=1, retries=None, wait_until_done=False, wait_on_done=False):
+    def create_experiment(self, platform=None, a=1, b=1, retries=None, wait_until_done=False):
         task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model3.py"),
                                         envelope="parameters", parameters=(dict(c=0)))
         task.python_path = "python3"
@@ -57,7 +57,7 @@ class TestFilePlatform(ITestWithPersistence):
         # Add experiment to the suite
         suite.add_experiment(experiment)
         # Commission
-        suite.run(platform=platform, wait_until_done=wait_until_done, wait_on_done=wait_on_done, retries=retries)
+        suite.run(platform=platform, wait_until_done=wait_until_done, retries=retries)
         print("suite_id: " + suite.id)
         print("experiment_id: " + experiment.id)
         return experiment

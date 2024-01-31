@@ -57,7 +57,7 @@ class TestPythonSimulation(ITestWithPersistence):
         # Add experiment to the suite
         suite.add_experiment(experiment)
         # change dry_run=False when run in slurm cluster
-        suite.run(platform=platform, wait_until_done=False, wait_on_done=wait_until_done,
+        suite.run(platform=platform, wait_until_done=wait_until_done,
                   max_running_jobs=max_running_jobs,
                   retries=retries, dry_run=dry_run)
         print("suite_id: " + suite.id)

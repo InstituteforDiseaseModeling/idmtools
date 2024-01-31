@@ -31,7 +31,7 @@ class TestSingularity(ITestWithPersistence):
         suite.update_tags({'name': 'suite_tag', 'idmtools': '123'})
         # Add experiment to the suite
         suite.add_experiment(experiment)
-        suite.run(platform=self.platform, wait_on_done=False, wait_until_done=False)
+        suite.run(platform=self.platform, wait_until_done=False)
         for simulation in experiment.simulations:
             simulation_dir = self.platform.get_directory(simulation)
             exe = simulation_dir.joinpath("Assets/hello.sh")
@@ -55,7 +55,7 @@ class TestSingularity(ITestWithPersistence):
         suite.update_tags({'name': 'suite_tag', 'idmtools': '123'})
         # Add experiment to the suite
         suite.add_experiment(experiment)
-        suite.run(platform=self.platform, wait_on_done=False, wait_until_done=False)
+        suite.run(platform=self.platform, wait_until_done=False)
         for simulation in experiment.simulations:
             simulation_dir = self.platform.get_directory(simulation)
             exe = simulation_dir.joinpath(command)

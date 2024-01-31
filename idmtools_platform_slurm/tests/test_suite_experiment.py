@@ -86,7 +86,7 @@ class TestSuiteExperiment(ITestWithPersistence):
     # Verify no suite needed case, we can directory call experiment.run which will create suite for you
     def test_0(self):
         experiment = Experiment.from_task(self.task, name="run_task")
-        experiment.run(platform=self.platform, wait_until_done=False, wait_on_done=False, dry_run=True)
+        experiment.run(platform=self.platform, wait_until_done=False, dry_run=True)
         self.verify_result(experiment.parent)
 
     # Case 1,2,3,4 test with suite.add_experiment(experiment)
@@ -95,7 +95,7 @@ class TestSuiteExperiment(ITestWithPersistence):
         experiment = Experiment.from_task(self.task, name="run_task")
         suite = Suite(name='Idm Suite')
         suite.add_experiment(experiment)
-        suite.run(platform=self.platform, wait_until_done=False, wait_on_done=False, dry_run=True)
+        suite.run(platform=self.platform, wait_until_done=False, dry_run=True)
         self.verify_result(suite)
 
     # Verify experiment.run with new suite
@@ -103,7 +103,7 @@ class TestSuiteExperiment(ITestWithPersistence):
         experiment = Experiment.from_task(self.task, name="run_task")
         suite = Suite(name='Idm Suite')
         suite.add_experiment(experiment)
-        experiment.run(platform=self.platform, wait_until_done=False, wait_on_done=False, dry_run=True)
+        experiment.run(platform=self.platform, wait_until_done=False, dry_run=True)
         self.verify_result(suite)
 
     # Verify suite.run with existing suite
@@ -115,7 +115,7 @@ class TestSuiteExperiment(ITestWithPersistence):
         self.verify_suite_only_case(suite)
         experiment = Experiment.from_task(self.task, name="run_task")
         suite.add_experiment(experiment)
-        suite.run(platform=self.platform, wait_until_done=False, wait_on_done=False, dry_run=True)
+        suite.run(platform=self.platform, wait_until_done=False, dry_run=True)
         self.verify_result(suite)
 
     # Verify experiment.run with existing suite,
@@ -126,7 +126,7 @@ class TestSuiteExperiment(ITestWithPersistence):
         self.verify_suite_only_case(suite)
         experiment = Experiment.from_task(self.task, name="run_task")
         suite.add_experiment(experiment)
-        experiment.run(platform=self.platform, wait_until_done=False, wait_on_done=False, dry_run=True)
+        experiment.run(platform=self.platform, wait_until_done=False, dry_run=True)
         self.verify_result(suite)
 
     # Case 5,6,7, 8 test with experiment.suite = suite
@@ -135,7 +135,7 @@ class TestSuiteExperiment(ITestWithPersistence):
         experiment = Experiment.from_task(self.task, name="run_task")
         suite = Suite(name='Idm Suite')
         experiment.suite = suite
-        suite.run(platform=self.platform, wait_until_done=False, wait_on_done=False, dry_run=True)
+        suite.run(platform=self.platform, wait_until_done=False, dry_run=True)
         self.verify_result(suite)
 
     # Verify experiment.run with new suite
@@ -143,7 +143,7 @@ class TestSuiteExperiment(ITestWithPersistence):
         experiment = Experiment.from_task(self.task, name="run_task")
         suite = Suite(name='Idm Suite')
         experiment.suite = suite
-        experiment.run(platform=self.platform, wait_until_done=False, wait_on_done=False, dry_run=True)
+        experiment.run(platform=self.platform, wait_until_done=False, dry_run=True)
         self.verify_result(suite)
 
     # Verify experiment.run with existing suite
@@ -154,7 +154,7 @@ class TestSuiteExperiment(ITestWithPersistence):
         # create experiment and add suite to experiment and run with experiment
         experiment = Experiment.from_task(self.task, name="run_task")
         experiment.suite = suite
-        experiment.run(platform=self.platform, wait_until_done=False, wait_on_done=False, dry_run=True)
+        experiment.run(platform=self.platform, wait_until_done=False, dry_run=True)
         self.verify_result(suite)
 
     # Verify suite.run with existing suite
@@ -165,7 +165,7 @@ class TestSuiteExperiment(ITestWithPersistence):
         # create experiment and add suite to experiment and run with experiment
         experiment = Experiment.from_task(self.task, name="run_task")
         experiment.suite = suite
-        suite.run(platform=self.platform, wait_until_done=False, wait_on_done=False, dry_run=True)
+        suite.run(platform=self.platform, wait_until_done=False, dry_run=True)
         self.verify_result(suite)
 
     # Case 9, 10, 11, 12 test with  experiment.parent = suite
@@ -174,7 +174,7 @@ class TestSuiteExperiment(ITestWithPersistence):
         experiment = Experiment.from_task(self.task, name="run_task")
         suite = Suite(name='Idm Suite')
         experiment.parent = suite
-        suite.run(platform=self.platform, wait_until_done=False, wait_on_done=False, dry_run=True)
+        suite.run(platform=self.platform, wait_until_done=False, dry_run=True)
         self.verify_result(suite)
 
     # Verify experiment.run with new suite
@@ -182,7 +182,7 @@ class TestSuiteExperiment(ITestWithPersistence):
         experiment = Experiment.from_task(self.task, name="run_task")
         suite = Suite(name='Idm Suite')
         experiment.parent = suite
-        experiment.run(platform=self.platform, wait_until_done=False, wait_on_done=False, dry_run=True)
+        experiment.run(platform=self.platform, wait_until_done=False, dry_run=True)
         self.verify_result(suite)
 
     # Verify suite.run with existing suite
@@ -192,7 +192,7 @@ class TestSuiteExperiment(ITestWithPersistence):
         self.platform.create_items(suite)
         experiment = Experiment.from_task(self.task, name="run_task")
         experiment.parent = suite
-        suite.run(platform=self.platform, wait_until_done=False, wait_on_done=False, dry_run=True)
+        suite.run(platform=self.platform, wait_until_done=False, dry_run=True)
         self.verify_result(suite)
 
     # Verify experiment.run with existing suite
@@ -202,7 +202,7 @@ class TestSuiteExperiment(ITestWithPersistence):
         self.platform.create_items(suite)
         experiment = Experiment.from_task(self.task, name="run_task")
         experiment.parent = suite
-        experiment.run(platform=self.platform, wait_until_done=False, wait_on_done=False, dry_run=True)
+        experiment.run(platform=self.platform, wait_until_done=False, dry_run=True)
         self.verify_result(suite)
 
     # case 13, 14 ,15, 16 test with experiment.parent_id = suite.id
@@ -210,12 +210,12 @@ class TestSuiteExperiment(ITestWithPersistence):
     def test_13(self):
         # create suite first
         suite = Suite(name='Idm Suite')
-        suite.run(platform=self.platform, wait_until_done=False, wait_on_done=False, dry_run=True)
+        suite.run(platform=self.platform, wait_until_done=False, dry_run=True)
         self.verify_suite_only_case(suite)
         # add suite.id as experiment.parent_id
         experiment = Experiment.from_task(self.task, name="run_task")
         experiment.parent_id = suite.id
-        experiment.run(platform=self.platform, wait_until_done=False, wait_on_done=False, dry_run=True)
+        experiment.run(platform=self.platform, wait_until_done=False, dry_run=True)
         self.verify_result(suite)
 
     # Verify experiment.run with suite not existing yet
@@ -223,19 +223,19 @@ class TestSuiteExperiment(ITestWithPersistence):
         experiment = Experiment.from_task(self.task, name="run_task")
         suite = Suite(name='Idm Suite')
         experiment.parent_id = suite.id
-        suite.run(platform=self.platform, wait_until_done=False, wait_on_done=False, dry_run=True)
+        suite.run(platform=self.platform, wait_until_done=False, dry_run=True)
         self.verify_suite_only_case(suite)
 
     # Verify experiment.run with existing suite
     def test_15(self):
         # create suite first in folder
         suite = Suite(name='Idm Suite')
-        suite.run(platform=self.platform, wait_until_done=False, wait_on_done=False, dry_run=True)
+        suite.run(platform=self.platform, wait_until_done=False, dry_run=True)
         self.verify_suite_only_case(suite)
         # add suite.id as experiment.parent_id
         experiment = Experiment.from_task(self.task, name="run_task")
         experiment.parent_id = suite.id
-        suite.run(platform=self.platform, wait_until_done=False, wait_on_done=False, dry_run=True)
+        suite.run(platform=self.platform, wait_until_done=False, dry_run=True)
         self.verify_suite_only_case(suite)
 
     # Verify experiment.run with suite not existing yet, it will throw RunTimeError
@@ -244,7 +244,7 @@ class TestSuiteExperiment(ITestWithPersistence):
         suite = Suite(name='Idm Suite')
         experiment.parent_id = suite.id
         with self.assertRaises(RuntimeError) as ex:
-            experiment.run(platform=self.platform, wait_until_done=False, wait_on_done=False, dry_run=True)
+            experiment.run(platform=self.platform, wait_until_done=False, wdry_run=True)
         self.assertEqual(ex.exception.args[0], f"Not found Suite with id '{suite.id}'")
 
     # Case 17, 18 test with experiment.suite_id = suite.id
@@ -252,10 +252,10 @@ class TestSuiteExperiment(ITestWithPersistence):
     def test_17(self):
         # create suite first in folder
         suite = Suite(name='Idm Suite')
-        suite.run(platform=self.platform, wait_until_done=False, wait_on_done=False, dry_run=True)
+        suite.run(platform=self.platform, wait_until_done=False, dry_run=True)
         experiment = Experiment.from_task(self.task, name="run_task")
         experiment.suite_id = suite.id  # this only works with existing suite (i.e after run)
-        experiment.run(platform=self.platform, wait_until_done=False, wait_on_done=False, dry_run=True)
+        experiment.run(platform=self.platform, wait_until_done=False, dry_run=True)
         self.verify_result(suite)
 
     # Verify suite.run with non-existing suite, this case only create suite
@@ -263,7 +263,7 @@ class TestSuiteExperiment(ITestWithPersistence):
         experiment = Experiment.from_task(self.task, name="run_task")
         suite = Suite(name='Idm Suite')
         experiment.suite_id = suite.id
-        suite.run(platform=self.platform, wait_until_done=False, wait_on_done=False, dry_run=True)
+        suite.run(platform=self.platform, wait_until_done=False, dry_run=True)
         self.verify_suite_only_case(suite)
 
     # Case 19, 20 test with add_dummy_suite method
@@ -271,26 +271,26 @@ class TestSuiteExperiment(ITestWithPersistence):
     def test_19(self):
         exp = Experiment.from_task(self.task, name="run_task")
         suite = add_dummy_suite(exp)
-        suite.run(platform=self.platform, wait_until_done=False, wait_on_done=False, dry_run=True)
+        suite.run(platform=self.platform, wait_until_done=False, dry_run=True)
         self.verify_result(suite)
 
     # Verify create dummy suite first, then run experiment.run
     def test_20(self):
         experiment = Experiment.from_task(self.task, name="run_task")
         suite = add_dummy_suite(experiment)
-        experiment.run(platform=self.platform, wait_until_done=False, wait_on_done=False, dry_run=True)
+        experiment.run(platform=self.platform, wait_until_done=False, dry_run=True)
         self.verify_result(suite)
 
     # Verify create suite/experiment with platform.run_items(experiment)
     def test_21(self):
         experiment = Experiment.from_task(self.task, name="run_task")
-        self.platform.run_items(items=experiment, wait_until_done=False, wait_on_done=False, dry_run=True)
+        self.platform.run_items(items=experiment, wait_until_done=False, dry_run=True)
         self.verify_result(experiment.suite)
 
     # Verify create suite/experiment with platform.run_items(suite)
     def test_22(self):
         experiment = Experiment.from_task(self.task, name="run_task")
         suite = add_dummy_suite(experiment)
-        self.platform.run_items(items=suite, wait_until_done=False, wait_on_done=False, dry_run=True)
+        self.platform.run_items(items=suite, wait_until_done=False, dry_run=True)
         self.verify_result(suite)
 

@@ -77,7 +77,7 @@ class TestFilePlatform(ITestWithPersistence):
         base_sim = experiment.simulations.items.base_simulation
         base_sim.assets.add_pre_creation_hook(add_sim_pre_creation_hook)
         base_sim.assets.add_post_creation_hook(add_sim_post_creation_hook)
-        suite.run(platform=self.platform, wait_until_done=False, wait_on_done=False, retries=2)
+        suite.run(platform=self.platform, wait_until_done=False, retries=2)
         stdout = mock_stdout.getvalue()
         self.assertTrue("hello add_pre_creation_hook! succeeded = False" in stdout)
         self.assertTrue("hello add_post_creation_hook! succeeded = EntityStatus.CREATED" in stdout)

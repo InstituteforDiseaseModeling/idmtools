@@ -529,8 +529,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         return p._experiments.list_assets(self, children, **kwargs)
 
     def run(self, wait_until_done: bool = False, platform: 'IPlatform' = None, regather_common_assets: bool = None,
-            wait_on_done_progress: bool = True, wait_on_done=None,
-            **run_opts) -> NoReturn:
+            wait_on_done_progress: bool = True, **run_opts) -> NoReturn:
         """
         Runs an experiment on a platform.
 
@@ -540,14 +539,13 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
             regather_common_assets: Triggers gathering of assets for *existing* experiments. If not provided, we use the platforms default behaviour. See platform details for performance implications of this. For most platforms, it should be ok but for others, it could decrease performance when assets are not changing.
               It is important to note that when using this feature, ensure the previous simulations have finished provisioning. Failure to do so can lead to unexpected behaviour
             wait_on_done_progress: Should experiment status be shown when waiting
-            wait_on_done: extra name for backward compatibility for wait_until_done
             **run_opts: Options to pass to the platform
 
         Returns:
             None
         """
         p = super()._check_for_platform_from_context(platform)
-        if wait_on_done is not None:
+        if 'wait_on_done' in run_opts:
             warnings.warn("wait_on_done will be deprecated soon. Please use wait_until_done instead.", DeprecationWarning, 2)
             user_logger.warning("wait_on_done will be deprecated soon. Please use wait_until_done instead.")
         if regather_common_assets is None:
@@ -562,7 +560,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
                 "You are modifying and existing experiment by using a template without gathering common assets. Ensure your Template configuration is the same as existing experiments or enable gathering of new common assets through regather_common_assets.")
         run_opts['regather_common_assets'] = regather_common_assets
         p.run_items(self, **run_opts)
-        if wait_until_done or wait_on_done:
+        if wait_until_done or run_opts.get('wait_on_done', False):
             self.wait(wait_on_done_progress=wait_on_done_progress)
 
     def to_dict(self):

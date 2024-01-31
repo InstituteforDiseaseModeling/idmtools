@@ -379,7 +379,7 @@ class SingularityBuildWorkItem(InputDataWorkItem):
             return self.asset_collection
         return None
 
-    def run(self, wait_until_done: bool = True, platform: 'IPlatform' = None, wait_on_done_progress: bool = True, wait_on_done: bool = True, **run_opts) -> Optional[AssetCollection]:
+    def run(self, wait_until_done: bool = True, platform: 'IPlatform' = None, wait_on_done_progress: bool = True, **run_opts) -> Optional[AssetCollection]:
         """
         Run the build.
 
@@ -387,14 +387,13 @@ class SingularityBuildWorkItem(InputDataWorkItem):
             wait_until_done: Wait until build completes
             platform: Platform to run on
             wait_on_done_progress: Show progress while waiting
-            wait_on_done: Overload of wait_until_done
             **run_opts: Extra run options
 
         Returns:
             Asset collection that was created if successful
         """
         p = super()._check_for_platform_from_context(platform)
-        opts = dict(wait_on_done_progress=wait_on_done_progress, wait_until_done=wait_until_done, wait_on_done=wait_on_done, platform=p, wait_progress_desc=f"Waiting for build of Singularity container: {self.name}")
+        opts = dict(wait_on_done_progress=wait_on_done_progress, wait_until_done=wait_until_done, platform=p, wait_progress_desc=f"Waiting for build of Singularity container: {self.name}")
         ac = self.find_existing_container(self, platform=p)
         if ac is None or self.force:
             super().run(**opts)
