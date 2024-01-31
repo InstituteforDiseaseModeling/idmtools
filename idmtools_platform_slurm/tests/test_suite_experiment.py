@@ -244,7 +244,7 @@ class TestSuiteExperiment(ITestWithPersistence):
         suite = Suite(name='Idm Suite')
         experiment.parent_id = suite.id
         with self.assertRaises(RuntimeError) as ex:
-            experiment.run(platform=self.platform, wait_until_done=False, wdry_run=True)
+            experiment.run(platform=self.platform, wait_until_done=False, dry_run=True)
         self.assertEqual(ex.exception.args[0], f"Not found Suite with id '{suite.id}'")
 
     # Case 17, 18 test with experiment.suite_id = suite.id
