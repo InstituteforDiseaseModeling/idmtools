@@ -19,7 +19,7 @@ class TestTemplatedScriptTask(TestCase):
 
     def setUp(self) -> None:
         self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
-        print(self.case_name)
+        self.platform = Platform('SlurmStage')
 
     @pytest.mark.comps
     @pytest.mark.timeout(60)
@@ -35,7 +35,6 @@ class TestTemplatedScriptTask(TestCase):
         task = CommandTask(cmd)
         task.common_assets.add_asset(
             Asset(relative_path=os.path.join("site-packages", "test-package"), filename="__init__.py", content="a=\'123\'"))
-        pl_slurm = Platform("SLURM")
         wrapper_task: TemplatedScriptTask = get_script_wrapper_unix_task(task, template_content=LINUX_PYTHON_PATH_WRAPPER)
         wrapper_task.script_binary = "/bin/bash"
         experiment = Experiment.from_task(wrapper_task, name=self.case_name)
@@ -43,7 +42,7 @@ class TestTemplatedScriptTask(TestCase):
         self.assertTrue(experiment.succeeded)
 
         for sim in experiment.simulations:
-            assets = pl_slurm._simulations.all_files(sim)
+            assets = self.platform._simulations.all_files(sim)
             for asset in assets:
                 content = asset.content.decode('utf-8').replace("\\\\", "\\")
                 if asset.filename in ["stdout.txt"]:
@@ -64,7 +63,6 @@ class TestTemplatedScriptTask(TestCase):
         cmd = "python3.6 -c \"import test_package as tp;print(tp.a)\""
         task = CommandTask(cmd)
         task.common_assets.add_asset(Asset(relative_path=os.path.join("site-packages", "test_package"), filename="__init__.py", content="a=\'123\'"))
-        pl_slurm = Platform("SLURM")
         wrapper_task: TemplatedScriptTask = get_script_wrapper_unix_task(task, template_content=LINUX_PYTHON_PATH_WRAPPER)
         wrapper_task.script_binary = "/bin/bash"
         experiment = Experiment.from_task(wrapper_task, name=self.case_name)
@@ -72,7 +70,7 @@ class TestTemplatedScriptTask(TestCase):
         self.assertTrue(experiment.succeeded)
 
         for sim in experiment.simulations:
-            assets = pl_slurm._simulations.all_files(sim)
+            assets = self.platform._simulations.all_files(sim)
             for asset in assets:
                 content = asset.content.decode('utf-8').replace("\\\\", "\\")
                 if asset.filename in ["stdout.txt"]:
@@ -93,7 +91,6 @@ class TestTemplatedScriptTask(TestCase):
         cmd = "python3.6 -c \"import test_package as tp;print(tp.a)\""
         task = CommandTask(cmd)
         task.common_assets.add_asset(Asset(filename="test_package.py", content="a=\'123\'"))
-        pl_slurm = Platform("SLURM")
         wrapper_task: TemplatedScriptTask = get_script_wrapper_unix_task(task, template_content=LINUX_PYTHON_PATH_WRAPPER)
         wrapper_task.script_binary = "/bin/bash"
         experiment = Experiment.from_task(wrapper_task, name=self.case_name)
@@ -101,7 +98,7 @@ class TestTemplatedScriptTask(TestCase):
         self.assertTrue(experiment.succeeded)
 
         for sim in experiment.simulations:
-            assets = pl_slurm._simulations.all_files(sim)
+            assets = self.platform._simulations.all_files(sim)
             for asset in assets:
                 content = asset.content.decode('utf-8').replace("\\\\", "\\")
                 if asset.filename in ["stdout.txt"]:
