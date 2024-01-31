@@ -21,6 +21,7 @@ from idmtools_platform_comps.utils.file_filter_workitem import FileFilterWorkIte
 logger = getLogger(__name__)
 user_logger = getLogger('user')
 
+
 @dataclass(repr=False)
 class AssetizeOutput(FileFilterWorkItem):
     """
