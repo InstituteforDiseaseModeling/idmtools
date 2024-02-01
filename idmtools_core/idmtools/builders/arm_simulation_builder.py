@@ -28,18 +28,43 @@ class SweepArm:
     def __init__(self, type=ArmType.cross, funcs: List[Tuple[Callable, Iterable]] = None):
         """
         Constructor.
-
         Args:
             type: Type of Arm(Cross or Pair)
             funcs: Functions to add as sweeps
         """
+        self.type = type
+        self.sweeps = []
+        self.__count = 0
+
         if funcs is None:
             funcs = []
-        self.sweep_functions = []
-        self.type = type
-
         for func, values in funcs:
             self.add_sweep_definition(func, values)
+
+    @property
+    def count(self):
+        return self.__count
+
+    @count.setter
+    def count(self, cnt):
+        """
+        Set the count property.
+        Args:
+            cnt: count set
+        Returns:
+            int
+        """
+        # print('cnt: ', cnt)
+        if self.__count == 0:
+            self.__count = cnt
+        elif self.type == ArmType.cross:
+            self.__count = self.__count * cnt
+        elif self.type == ArmType.pair:
+            if self.__count != cnt:
+                raise ValueError(
+                    f"For pair case, all function inputs must have the save size/length: {cnt} != {self.__count}")
+            else:
+                self.__count = cnt
 
     def add_sweep_definition(self, func: Callable, values: Iterable[Any]):  # noqa F821
         """
