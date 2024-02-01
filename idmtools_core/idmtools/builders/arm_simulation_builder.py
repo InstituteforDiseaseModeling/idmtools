@@ -3,13 +3,11 @@ idmtools arm builder definition.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
-import copy
-import collections
 from enum import Enum
 from itertools import product
-from typing import Tuple, List, Callable, Iterable, Any
-
+from typing import Tuple, List, Callable, Iterable
 from idmtools.builders import SimulationBuilder
+from idmtools.builders.simulation_builder import TSweepFunction
 
 
 class ArmType(Enum):
@@ -252,44 +250,30 @@ class ArmSimulationBuilder(SimulationBuilder):
         self.arms = []
         self.sweep_definitions = []
 
-    def add_arm(self, arm):
+    def add_arm(self, arm: ArmType):
         """
         Add arm sweep definition.
-
         Args:
             arm: Arm to add
-
         Returns:
             None
         """
-        arm_list = arm if isinstance(arm, collections.abc.Iterable) else [arm]
-        for a in arm_list:
-            self.arms.append(a)
-            self._apply(a)
-
-    def _apply(self, arm):
-        """
-        Apply our arm.
-
-        Args:
-            arm: Arm to apply
-
-        Returns:
-            None
-        """
-        self.sweeps = []
-        for func, values in arm.sweep_functions:
-            self.add_sweep_definition(func, values)
-
+        self.arms.append(arm)
         if arm.type == ArmType.cross:
-            self.sweep_definitions.extend(product(*self.sweeps))
+            self.sweep_definitions.extend(product(*arm.sweeps))
         elif arm.type == ArmType.pair:
-            self.sweep_definitions.extend(zip(*self.sweeps))
+            self.sweep_definitions.extend(zip(*arm.sweeps))
+        self.count = sum([arm.count for arm in self.arms])
+
+    def add_sweep_definition(self, function: TSweepFunction, values):
+        raise ValueError(f"Please use SweepArm instead, or use SimulationBuilder directly!")
+
+    def add_multiple_parameter_sweep_definition(self, function: TSweepFunction, *args, **kwargs):
+        raise ValueError(f"Please use SweepArm instead, or use SimulationBuilder directly!")
 
     def __iter__(self):
         """
         Iterator for the simulations defined.
-
         Returns:
             Iterator
         """
