@@ -41,6 +41,11 @@ class SweepArm:
 
     @property
     def count(self):
+        """
+        Simulation count.
+        Returns:
+            count
+        """
         return self.__count
 
     @count.setter
@@ -266,10 +271,37 @@ class ArmSimulationBuilder(SimulationBuilder):
         self.count = sum([arm.count for arm in self.arms])
 
     def add_sweep_definition(self, function: TSweepFunction, values):
-        raise ValueError(f"Please use SweepArm instead, or use SimulationBuilder directly!")
+        """
+        Add a parameter sweep definition.
+
+        A sweep definition is composed of a function and a list of values to call the function with.
+
+        Args:
+            function: The sweep function, which must include a **simulation** parameter (or
+                whatever is specified in :attr:`~idmtools.builders.ExperimentBuilder.SIMULATION_ATTR`).
+                The function also must include EXACTLY ONE free parameter, which the values will be passed to.
+                The function can also be a partial--any Callable type will work.
+            values: The list of values to call the function with.
+        Returns:
+            None
+        """
+        raise ValueError("Please use SweepArm instead, or use SimulationBuilder directly!")
 
     def add_multiple_parameter_sweep_definition(self, function: TSweepFunction, *args, **kwargs):
-        raise ValueError(f"Please use SweepArm instead, or use SimulationBuilder directly!")
+        """
+        Add a sweep definition callback that takes multiple parameters.
+
+        The sweep will be defined as a cross-product between the parameters passed.
+
+        Args:
+            function: The sweep function, which must include a **simulation** parameter (or
+                whatever is specified in :attr:`~idmtools.builders.ExperimentBuilder.SIMULATION_ATTR`).
+            args: List of arguments to be passed
+            kwargs: List of keyword arguments to be passed
+        Returns:
+            None
+        """
+        raise ValueError("Please use SweepArm instead, or use SimulationBuilder directly!")
 
     def __iter__(self):
         """
