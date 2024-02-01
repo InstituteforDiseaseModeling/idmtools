@@ -66,52 +66,101 @@ class SweepArm:
             else:
                 self.__count = cnt
 
-    def add_sweep_definition(self, func: Callable, values: Iterable[Any]):  # noqa F821
+    def add_sweep_definition(self, function: TSweepFunction, values):
         """
-        Add Sweep definition.
+        Add a parameter sweep definition.
+
+        A sweep definition is composed of a function and a list of values to call the function with.
 
         Args:
-            func: Sweep callback
-            values: Values to Sweep
+            function: The sweep function, which must include a **simulation** parameter (or
+                whatever is specified in :attr:`~idmtools.builders.ExperimentBuilder.SIMULATION_ATTR`).
+                The function also must include EXACTLY ONE free parameter, which the values will be passed to.
+                The function can also be a partial--any Callable type will work.
+            values: The list of values to call the function with.
+
+        Examples:
+            Examples of valid function::
+
+                def myFunction(simulation, parameter):
+                    pass
+
+            How to deal with functions requiring more than one parameter?
+            Consider the following function::
+
+                python
+                def myFunction(simulation, a, b):
+                    pass
+
+            Partial solution::
+
+                python
+                from functools import partial
+                func = partial(myFunction, a=3)
+                eb.add_sweep_definition(func, [1,2,3])
+
+            Callable class solution::
+
+                class setP:
+                    def __init__(self, a):
+                        self.a = a
+
+                    def __call__(self, simulation, b):
+                        return param_update(simulation, self.a, b)
+
+                eb.add_sweep_definition(setP(3), [1,2,3])
+        """
+        builder = SimulationBuilder()
+        builder.add_sweep_definition(function, values)
+        self.sweeps.extend(builder.sweeps)
+        self.count = builder.count
+
+    def add_multiple_parameter_sweep_definition(self, function: TSweepFunction, *args, **kwargs):
+        """
+        Add a sweep definition callback that takes multiple parameters.
+
+        The sweep will be defined as a cross-product between the parameters passed.
+
+        Args:
+            function: The sweep function, which must include a **simulation** parameter (or
+                whatever is specified in :attr:`~idmtools.builders.ExperimentBuilder.SIMULATION_ATTR`).
+            args: List of arguments to be passed
+            kwargs: List of keyword arguments to be passed
 
         Returns:
-            None
+            None. Updates the Sweeps
+
+        Examples:
+            Examples of valid functions::
+
+                # This function takes two parameters
+                def myFunction(simulation, parameter_a, parameter_b):
+                    pass
+
+                # Function that takes three parameters
+                def three_param_callback(simulation, parameter_a, parameter_b, parameter_c):
+                    pass
+
+            Calling Sweeps that take multiple parameters::
+
+                # This example references the above valid function example
+                sb = SimulationBuilder()
+
+                # Add a sweep on the myFunction that takes two parameters.
+                # Here we sweep the values 1-4 on parameter_a and a,b on parameter_b
+                sb.add_multiple_parameter_sweep_definition(myFunction, range(1,5), ["a", "b"])
+
+                sb2 = SimulationBuilder()
+                # Example calling using a dictionary instead
+                sb.add_multiple_parameter_sweep_definition(three_param_callback, dict(parameter_a=range(1,5), parameter_b=["a", "b"], parameter_c=range(4,5))
+                # The following is equivalent
+                sb.add_multiple_parameter_sweep_definition(three_param_callback, **dict(parameter_a=range(1,5), parameter_b=["a", "b"], parameter_c=range(4,5))
+
         """
-        self.sweep_functions.append((func, values if isinstance(values, collections.abc.Iterable) and not (
-            isinstance(values, str)) else [values]))
-
-        if self.type == ArmType.pair:
-            self.adjust_values_length()
-
-    def get_max_values_count(self):
-        """
-        Get the max values count from different sweep functions.
-
-        Returns:
-            Max values
-        """
-        cnts = [len(values) for _, values in self.sweep_functions]
-        return max(cnts)
-
-    def adjust_values_length(self):
-        """
-        Adjust values length.
-
-        Returns:
-            None
-        """
-        if self.type != ArmType.pair:
-            return
-
-        count_max = self.get_max_values_count()
-        temp_sweep_functions = []
-        for func, values in self.sweep_functions:
-            values_new = copy.deepcopy(values)
-            values_new = list(values_new)
-            values_new.extend([values[-1]] * (count_max - len(values)))
-            temp_sweep_functions.append((func, values_new))
-
-        self.sweep_functions = temp_sweep_functions
+        builder = SimulationBuilder()
+        builder.add_multiple_parameter_sweep_definition(function, *args, **kwargs)
+        self.sweeps.extend(builder.sweeps)
+        self.count = builder.count
 
 
 class ArmSimulationBuilder(SimulationBuilder):
