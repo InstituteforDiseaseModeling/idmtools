@@ -102,13 +102,8 @@ class SimulationBuilder:
             raise ValueError(f"The function {function} passed to SweepBuilder.add_sweep_definition "
                              f"needs to only have {self.SIMULATION_ATTR} and exactly one free parameter.")
 
-        # Specially handle string case
-        if isinstance(values, str):
-            values = [values]
-        elif not isinstance(values, Iterable):
-            values = [values]
-        elif not hasattr(values, '__len__'):
-            values = list(values)
+        # validate input values
+        values = self.validate_item(values)
 
         # Everything is OK, create a partial to have everything set in the signature except `simulation` and add
         self.sweeps.append((partial(function, **{remaining_parameters[0]: v})) for v in values)
@@ -187,27 +182,13 @@ class SimulationBuilder:
                 "This method expects either a list of lists or a dictionary that defines the sweeps. In addition, currently we do not support over-riding default values for parameters")
 
         if isinstance(values, (list, tuple)):
-            # make sure len is available
-            _values = []
-            for vals in values:
-                if isinstance(vals, str):
-                    _values.append([vals])
-                elif not isinstance(vals, Iterable):
-                    _values.append([vals])
-                elif hasattr(vals, '__len__'):
-                    _values.append(vals)
-                else:
-                    _values.append(list(vals))
+            # validate each values is a list
+            _values = [self.validate_item(vals) for vals in values]
 
-            if len(values) == len(remaining_parameters):
-                # validate each values is a list
-                for idx, value in enumerate(values):
-                    if not isinstance(value, Iterable):
-                        raise ValueError(f"{MULTIPLE_ARGS_MUST_BE_ITERABLE_ERROR} Please correct item at index {value}")
-
+            if len(_values) == len(remaining_parameters):
                 # create sweeps using the multi-index
-                list(map(self._update_count, values))
-                generated_values = product(*values)
+                list(map(self._update_count, _values))
+                generated_values = product(*_values)
                 self.sweeps.append(partial(function, **self._map_multi_argument_array(remaining_parameters, v)) for v in
                                    generated_values)
             else:
@@ -218,27 +199,34 @@ class SimulationBuilder:
                 raise ValueError(
                     f"{PARAMETER_LENGTH_MUST_MATCH_ERROR}. Currently the callback has {len(remaining_parameters)} parameters and there were {len(values.keys())} arguments passed.")
 
-            _values = {}
-            for key, vals in values.items():
-                if isinstance(vals, str):
-                    _values[key] = [vals]
-                elif not isinstance(vals, Iterable):
-                    _values[key] = [vals]
-                elif hasattr(vals, '__len__'):
-                    _values[key] = vals
-                else:
-                    _values[key] = list(vals)
+            # validate each values is a dict
+            _values = {key: self.validate_item(vals) for key, vals in values.items()}
 
             for key, vals in _values.items():
-                if not isinstance(vals, Iterable):
-                    raise ValueError(f"{MULTIPLE_ARGS_MUST_BE_ITERABLE_ERROR} Please correct item at index {key}")
-                elif key not in remaining_parameters:
+                if key not in remaining_parameters:
                     raise ValueError(
                         f"Unknown keyword parameter passed: {key}. Support keyword args are {', '.join(remaining_parameters)}")
             list(map(self._update_count, _values.values()))
             generated_values = product(*_values.values())
             self.sweeps.append(
                 partial(function, **self._map_multi_argument_array(values.keys(), v)) for v in generated_values)
+
+    def validate_item(self, item):
+        """
+        Validate inputs.
+        Args:
+            item: input
+        Returns:
+            validated item
+        """
+        if isinstance(item, str):
+            return [item]
+        elif not isinstance(item, Iterable):
+            return [item]
+        elif hasattr(item, '__len__'):
+            return item
+        else:
+            return list(item)
 
     @staticmethod
     def _map_multi_argument_array(parameters, value_set) -> Dict[str, Iterable]:
