@@ -105,9 +105,9 @@ class SimulationBuilder:
         # Specially handle string case
         if isinstance(values, str):
             values = [values]
-
-        # make sure len is available
-        if not hasattr(values, '__len__'):
+        elif not isinstance(values, Iterable):
+            values = [values]
+        elif not hasattr(values, '__len__'):
             values = list(values)
 
         # Everything is OK, create a partial to have everything set in the signature except `simulation` and add
@@ -122,7 +122,9 @@ class SimulationBuilder:
             raise ValueError(f"The function {function} passed to SweepBuilder.add_sweep_definition "
                              f"needs to take a {self.SIMULATION_ATTR} argument!")
         # Retrieve all the free parameters of the signature (other than `simulation`)
-        remaining_parameters = [name for name, param in parameters.items() if name != self.SIMULATION_ATTR and not isinstance(param.default, pd.DataFrame) and param.default == inspect.Parameter.empty]
+        remaining_parameters = [name for name, param in parameters.items() if
+                                name != self.SIMULATION_ATTR and not isinstance(param.default,
+                                                                                pd.DataFrame) and param.default == inspect.Parameter.empty]
         return remaining_parameters
 
     def add_multiple_parameter_sweep_definition(self, function: TSweepFunction, *args, **kwargs):
@@ -169,7 +171,8 @@ class SimulationBuilder:
         """
         remaining_parameters = self._extract_remaining_parameters(function)
         if len(args) > 0 and len(kwargs) > 0:
-            raise ValueError("Currently in multi-argument sweep definitions, you have to supply either a arguments or keyword arguments, but not both.")
+            raise ValueError(
+                "Currently in multi-argument sweep definitions, you have to supply either a arguments or keyword arguments, but not both.")
         if len(args) > 0:
             values = args
             if isinstance(values, (list, tuple)) and len(values) == 1 and isinstance(values[0], dict):
@@ -180,11 +183,21 @@ class SimulationBuilder:
             raise ValueError("This method expects either a list of lists or a dictionary that defines the sweeps")
 
         if len(remaining_parameters) <= 1:
-            raise ValueError("This method expects either a list of lists or a dictionary that defines the sweeps. In addition, currently we do not support over-riding default values for parameters")
+            raise ValueError(
+                "This method expects either a list of lists or a dictionary that defines the sweeps. In addition, currently we do not support over-riding default values for parameters")
 
         if isinstance(values, (list, tuple)):
             # make sure len is available
-            values = [vals if hasattr(vals, '__len__') else list(vals) for vals in values]
+            _values = []
+            for vals in values:
+                if isinstance(vals, str):
+                    _values.append([vals])
+                elif not isinstance(vals, Iterable):
+                    _values.append([vals])
+                elif hasattr(vals, '__len__'):
+                    _values.append(vals)
+                else:
+                    _values.append(list(vals))
 
             if len(values) == len(remaining_parameters):
                 # validate each values is a list
@@ -195,20 +208,37 @@ class SimulationBuilder:
                 # create sweeps using the multi-index
                 list(map(self._update_count, values))
                 generated_values = product(*values)
-                self.sweeps.append(partial(function, **self._map_multi_argument_array(remaining_parameters, v)) for v in generated_values)
+                self.sweeps.append(partial(function, **self._map_multi_argument_array(remaining_parameters, v)) for v in
+                                   generated_values)
             else:
-                raise ValueError(f"{PARAMETER_LENGTH_MUST_MATCH_ERROR} Currently the callback has {len(remaining_parameters)} parameters and there were {len(values)} arguments passed.")
+                raise ValueError(
+                    f"{PARAMETER_LENGTH_MUST_MATCH_ERROR} Currently the callback has {len(remaining_parameters)} parameters and there were {len(values)} arguments passed.")
         elif isinstance(values, dict):
             if len(values.keys()) != len(remaining_parameters):
-                raise ValueError(f"{PARAMETER_LENGTH_MUST_MATCH_ERROR}. Currently the callback has {len(remaining_parameters)} parameters and there were {len(values.keys())} arguments passed.")
+                raise ValueError(
+                    f"{PARAMETER_LENGTH_MUST_MATCH_ERROR}. Currently the callback has {len(remaining_parameters)} parameters and there were {len(values.keys())} arguments passed.")
+
+            _values = {}
             for key, vals in values.items():
+                if isinstance(vals, str):
+                    _values[key] = [vals]
+                elif not isinstance(vals, Iterable):
+                    _values[key] = [vals]
+                elif hasattr(vals, '__len__'):
+                    _values[key] = vals
+                else:
+                    _values[key] = list(vals)
+
+            for key, vals in _values.items():
                 if not isinstance(vals, Iterable):
                     raise ValueError(f"{MULTIPLE_ARGS_MUST_BE_ITERABLE_ERROR} Please correct item at index {key}")
                 elif key not in remaining_parameters:
-                    raise ValueError(f"Unknown keyword parameter passed: {key}. Support keyword args are {', '.join(remaining_parameters)}")
-            list(map(self._update_count, values.values()))
-            generated_values = product(*values.values())
-            self.sweeps.append(partial(function, **self._map_multi_argument_array(values.keys(), v)) for v in generated_values)
+                    raise ValueError(
+                        f"Unknown keyword parameter passed: {key}. Support keyword args are {', '.join(remaining_parameters)}")
+            list(map(self._update_count, _values.values()))
+            generated_values = product(*_values.values())
+            self.sweeps.append(
+                partial(function, **self._map_multi_argument_array(values.keys(), v)) for v in generated_values)
 
     @staticmethod
     def _map_multi_argument_array(parameters, value_set) -> Dict[str, Iterable]:
