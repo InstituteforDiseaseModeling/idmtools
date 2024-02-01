@@ -106,6 +106,10 @@ class SimulationBuilder:
         if isinstance(values, str):
             values = [values]
 
+        # make sure len is available
+        if not hasattr(values, '__len__'):
+            values = list(values)
+
         # Everything is OK, create a partial to have everything set in the signature except `simulation` and add
         self.sweeps.append((partial(function, **{remaining_parameters[0]: v})) for v in values)
         self._update_count(values)
@@ -179,6 +183,9 @@ class SimulationBuilder:
             raise ValueError("This method expects either a list of lists or a dictionary that defines the sweeps. In addition, currently we do not support over-riding default values for parameters")
 
         if isinstance(values, (list, tuple)):
+            # make sure len is available
+            values = [vals if hasattr(vals, '__len__') else list(vals) for vals in values]
+
             if len(values) == len(remaining_parameters):
                 # validate each values is a list
                 for idx, value in enumerate(values):
