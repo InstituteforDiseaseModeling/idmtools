@@ -28,6 +28,7 @@ from idmtools.entities.simulation import Simulation
 from idmtools.registry.functions import FunctionPluginManager
 from idmtools.registry.hook_specs import function_hook_impl
 
+
 def initialize_plugins(**kwargs):
     """
     Setup plugins.
@@ -43,6 +44,9 @@ def initialize_plugins(**kwargs):
 
 class Plugin_create_hook:
     """A 2nd hook implementation namespace."""
+
+    def __init__(self, **kwargs):
+        self.kwargs = kwargs
 
     @function_hook_impl
     def idmtools_platform_pre_create_item(self, item, **kwargs):
@@ -67,7 +71,7 @@ class Plugin_create_hook:
         Returns:
             None
         """
-        if isinstance(item, Simulation):
+        if isinstance(item, Simulation) and self.kwargs.get('my_test') == 1:
             item.tags.update({"sim_tag_post_key": "sim_tag_post_value"})
 
 @pytest.mark.comps
@@ -238,7 +242,7 @@ class TestHooks(ITestWithPersistence):
 
         exp = Experiment(name=self.case_name)
         exp.simulations = [sim]
-        kwargs = {}
+        kwargs = {"my_test": 1}
 
         def _pre_run(**kwargs):
             initialize_plugins(**kwargs)
