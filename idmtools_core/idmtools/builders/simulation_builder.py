@@ -199,7 +199,7 @@ class SimulationBuilder:
                 raise ValueError(
                     f"{PARAMETER_LENGTH_MUST_MATCH_ERROR}. Currently the callback has {len(remaining_parameters)} parameters and there were {len(values.keys())} arguments passed.")
 
-            # validate each values is a dict
+            # validate each values in a dict
             _values = {key: self.validate_item(vals) for key, vals in values.items()}
 
             for key, vals in _values.items():
