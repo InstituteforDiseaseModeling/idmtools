@@ -10,7 +10,7 @@ from COMPS.Data import Experiment as COMPSExperiment
 from COMPS.Data import Simulation as COMPSSimulation
 from COMPS.Data import QueryCriteria
 
-from idmtools.assets import Asset, AssetCollection
+from idmtools.assets import AssetCollection
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.command_task import CommandTask
@@ -18,7 +18,7 @@ from idmtools.utils.entities import save_id_as_file_as_hook
 
 from idmtools_platform_comps.utils.general import update_item
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
-from idmtools_test.utils.shared_functions import validate_output, validate_sim_tags
+from idmtools_test.utils.shared_functions import validate_sim_tags
 from idmtools_test.utils.utils import get_case_name
 
 from idmtools_platform_comps.comps_platform import COMPSPlatform
