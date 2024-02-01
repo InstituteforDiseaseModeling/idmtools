@@ -103,7 +103,7 @@ class SimulationBuilder:
                              f"needs to only have {self.SIMULATION_ATTR} and exactly one free parameter.")
 
         # validate input values
-        values = self.validate_item(values)
+        values = self._validate_item(values)
 
         # Everything is OK, create a partial to have everything set in the signature except `simulation` and add
         self.sweeps.append((partial(function, **{remaining_parameters[0]: v})) for v in values)
@@ -183,7 +183,7 @@ class SimulationBuilder:
 
         if isinstance(values, (list, tuple)):
             # validate each values is a list
-            _values = [self.validate_item(vals) for vals in values]
+            _values = [self._validate_item(vals) for vals in values]
 
             if len(_values) == len(remaining_parameters):
                 # create sweeps using the multi-index
@@ -200,7 +200,7 @@ class SimulationBuilder:
                     f"{PARAMETER_LENGTH_MUST_MATCH_ERROR}. Currently the callback has {len(remaining_parameters)} parameters and there were {len(values.keys())} arguments passed.")
 
             # validate each values in a dict
-            _values = {key: self.validate_item(vals) for key, vals in values.items()}
+            _values = {key: self._validate_item(vals) for key, vals in values.items()}
 
             for key, vals in _values.items():
                 if key not in remaining_parameters:
@@ -211,7 +211,7 @@ class SimulationBuilder:
             self.sweeps.append(
                 partial(function, **self._map_multi_argument_array(values.keys(), v)) for v in generated_values)
 
-    def validate_item(self, item):
+    def _validate_item(self, item):
         """
         Validate inputs.
         Args:
