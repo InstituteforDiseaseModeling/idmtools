@@ -1,4 +1,4 @@
-pygit2>=1.4.0,<1.12.0
+pygit2>=1.4.0,<1.15.0
 sphinxext-rediraffe
 sphinx~=6.2.1
 sphinx-rtd-theme~=1.2.2
