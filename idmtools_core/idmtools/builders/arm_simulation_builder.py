@@ -255,7 +255,7 @@ class ArmSimulationBuilder(SimulationBuilder):
         self.arms = []
         self.sweep_definitions = []
 
-    def add_arm(self, arm: ArmType):
+    def add_arm(self, arm: SweepArm):
         """
         Add arm sweep definition.
         Args:
