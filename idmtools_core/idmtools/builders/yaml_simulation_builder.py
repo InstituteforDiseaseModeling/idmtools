@@ -3,11 +3,11 @@ idmtools YamlSimulationBuilder definition.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+import yaml
 from logging import getLogger
 from typing import Union, Callable, Dict, Any
-import yaml
 from idmtools.builders import ArmSimulationBuilder
-from idmtools.builders.arm_simulation_builder import SweepArm, ArmType
+from idmtools.builders.arm_simulation_builder import SweepArm
 
 logger = getLogger(__name__)
 
@@ -23,7 +23,6 @@ class DefaultParamFuncDict(dict):
     def __init__(self, default):
         """
         Initialize our DefaultParamFuncDict.
-
         Args:
             default: Default function to use
         """
@@ -33,10 +32,8 @@ class DefaultParamFuncDict(dict):
     def __getitem__(self, item):
         """
         Get item from the DefaultParamFuncDict. It proxies most calls to the function we wrap.
-
         Args:
             item: Item to lookup
-
         Returns:
             None
         """
@@ -57,12 +54,9 @@ class YamlSimulationBuilder(ArmSimulationBuilder):
     def add_sweeps_from_file(self, file_path, func_map: Union[Dict[str, Callable], Callable[[Any], Dict]] = None):
         """
         Add sweeps from a file.
-
         Args:
             file_path: Path to file
             func_map: Optional function map
-            sweep_type: Type of sweep
-
         Returns:
             None
         """

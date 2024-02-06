@@ -13,7 +13,6 @@ from idmtools.builders.arm_simulation_builder import SweepArm
 class CsvExperimentBuilder(ArmSimulationBuilder):
     """
     Class that represents an experiment builder.
-
     Examples:
         .. literalinclude:: ../../examples/builders/csv_builder_python.py
     """
@@ -21,13 +20,11 @@ class CsvExperimentBuilder(ArmSimulationBuilder):
     def add_sweeps_from_file(self, file_path, func_map=None, type_map=None, sep=","):
         """
         Create sweeps from a CSV file.
-
         Args:
             file_path: Path to file
             func_map: Function map
             type_map: Type
             sep: CSV Seperator
-
         Returns:
             None
         """
