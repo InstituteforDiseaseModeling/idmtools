@@ -53,11 +53,9 @@ class YamlSimulationBuilder(ArmSimulationBuilder):
     Examples:
         .. literalinclude:: ../../examples/builders/yaml_builder_python.py
     """
-    def __init__(self):
-        """Constructor."""
-        super().__init__()
 
-    def add_sweeps_from_file(self, file_path, func_map: Union[Dict[str, Callable], Callable[[Any], Dict]] = None, sweep_type=ArmType.cross):
+    def add_sweeps_from_file(self, file_path, func_map: Union[Dict[str, Callable], Callable[[Any], Dict]] = None,
+                             sweep_type=ArmType.cross):
         """
         Add sweeps from a file.
 
@@ -91,12 +89,3 @@ class YamlSimulationBuilder(ArmSimulationBuilder):
 
             arm = SweepArm(sweep_type, funcs)
             self.add_arm(arm)
-
-    def __iter__(self):
-        """
-        Iterator the sweep definitions.
-
-        Returns:
-            Iterator
-        """
-        yield from self.sweep_definitions
