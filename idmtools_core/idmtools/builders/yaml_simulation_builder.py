@@ -54,8 +54,7 @@ class YamlSimulationBuilder(ArmSimulationBuilder):
         .. literalinclude:: ../../examples/builders/yaml_builder_python.py
     """
 
-    def add_sweeps_from_file(self, file_path, func_map: Union[Dict[str, Callable], Callable[[Any], Dict]] = None,
-                             sweep_type=ArmType.cross):
+    def add_sweeps_from_file(self, file_path, func_map: Union[Dict[str, Callable], Callable[[Any], Dict]] = None):
         """
         Add sweeps from a file.
 
@@ -87,5 +86,5 @@ class YamlSimulationBuilder(ArmSimulationBuilder):
             for func, values in sweeps_tuples:
                 funcs.append((func_map[func], values))
 
-            arm = SweepArm(sweep_type, funcs)
+            arm = SweepArm(funcs=funcs)
             self.add_arm(arm)
