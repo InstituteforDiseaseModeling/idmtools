@@ -3,7 +3,8 @@ import itertools
 from functools import partial
 
 import pytest
-from idmtools.builders.arm_simulation_builder import ArmSimulationBuilder, SweepArm, ArmType
+
+from idmtools.builders import SimulationBuilder
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.json_configured_task import JSONConfiguredTask
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
@@ -14,9 +15,9 @@ setB = partial(JSONConfiguredTask.set_parameter_sweep_callback, param="b")
 
 
 def update_parameter_callback(simulation, a, b, c):
-    simulation.task.command.add_argument(a)
-    simulation.task.command.add_argument(b)
-    simulation.task.command.add_argument(c)
+    simulation.task.set_parameter("param_a", a)
+    simulation.task.set_parameter("param_b", b)
+    simulation.task.set_parameter("param_c", c)
     return {"a": a, "b": b, "c": c}
 
 
@@ -27,17 +28,24 @@ class TestArmBuilder(ITestWithPersistence):
 
     def setUp(self):
         super().setUp()
-        self.builder = ArmSimulationBuilder()
+        self.builder = SimulationBuilder()
 
     def tearDown(self):
         super().tearDown()
 
-    def test_simple_arm_cross(self):
-        self.create_simple_arm()
+    def get_templated_sim_builder(self):
+        templated_sim = TemplatedSimulations(base_task=TestTask())
+        templated_sim.builder = self.builder
+        return templated_sim
 
+    def create_simple_sweep(self):
+        self.builder.add_sweep_definition(setA, range(5))
+        self.builder.add_sweep_definition(setB, [1, 2, 3])
+
+    def test_simple_simulation_builder(self):
+        self.create_simple_sweep()
         expected_values = list(itertools.product(range(5), [1, 2, 3]))
         templated_sim = self.get_templated_sim_builder()
-
         # convert template to a fully realized list
         simulations = list(templated_sim)
 
@@ -49,36 +57,21 @@ class TestArmBuilder(ITestWithPersistence):
             expected_dict = {"a": expected_values[i][0], "b": expected_values[i][1]}
             self.assertEqual(simulation.task.parameters, expected_dict)
 
-    def get_templated_sim_builder(self):
-        templated_sim = TemplatedSimulations(base_task=TestTask())
-        templated_sim.builder = self.builder
-        return templated_sim
-
-    def create_simple_arm(self):
-        arm = SweepArm(type=ArmType.cross)
-        arm.add_sweep_definition(setA, range(5))
-        arm.add_sweep_definition(setB, [1, 2, 3])
-        self.builder.add_arm(arm)
-
     def test_reverse_order(self):
-        self.create_simple_arm()
+        self.create_simple_sweep()
 
         templated_sim = self.get_templated_sim_builder()
 
         # convert template to a fully realized list
         simulations_cfgs = list([s.task.parameters for s in templated_sim])
 
-        builder2 = ArmSimulationBuilder()
-
-        arm = SweepArm(type=ArmType.cross)
-        a = [1, 2, 3]
-        b = range(5)
-        arm.add_sweep_definition(setB, a)
-        arm.add_sweep_definition(setA, b)
-        builder2.add_arm(arm)
-        self.assertEqual(builder2.count, a.__len__() * b.__len__())
-
-        # convert template to a fully realized list
+        # reverse
+        builder2 = SimulationBuilder()
+        first = [1, 2, 3]
+        second = range(5)
+        builder2.add_sweep_definition(setB, first)
+        builder2.add_sweep_definition(setA, second)
+        self.assertEqual(builder2.count, first.__len__() * second.__len__())
         templated_sim2 = TemplatedSimulations(base_task=TestTask())
         templated_sim2.builder = builder2
 
@@ -87,68 +80,22 @@ class TestArmBuilder(ITestWithPersistence):
         for cfg in simulations_cfgs:
             self.assertIn(dict(b=cfg['b'], a=cfg['a']), simulations2_cfgs)
 
-    def test_simple_arm_pair_uneven_pairs(self):
-        with self.assertRaises(ValueError) as ex:
-            arm = SweepArm(type=ArmType.pair)
-            a = range(5)
-            b = [1, 2, 3]
-            arm.add_sweep_definition(setA, a)
-            arm.add_sweep_definition(setB, b)  # Adding different length of list, expect throw exception
-            self.builder.add_arm(arm)
-        self.assertEqual(ex.exception.args[0],
-                         f"For pair case, all function inputs must have the save size/length: {b.__len__()} != {a.__len__()}")
-
-    def test_simple_arm_pair(self):
-        arm = SweepArm(type=ArmType.pair)
-        a = range(5)
-        # Add same length pair
-        b = [1, 2, 3, 4, 5]
-        arm.add_sweep_definition(setA, a)
-        arm.add_sweep_definition(setB, b)
-        self.builder.add_arm(arm)
-        self.assertEqual(self.builder.count, 5)
-
-        expected_values = list(zip(a, b))
-
-        templated_sim = self.get_templated_sim_builder()
-        simulations = list(templated_sim)
-        # Test if we have correct number of simulations
-        self.assertEqual(len(simulations), 5)
-
-        # Verify simulations individually
-        for i, simulation in enumerate(simulations):
-            expected_dict = {"a": expected_values[i][0], "b": expected_values[i][1]}
-            self.assertEqual(simulation.task.parameters, expected_dict)
-
-    def test_add_multiple_parameter_sweep_definition(self):
-        a = [True, False]
-        b = [1, 2, 3, 4, 5]
-        c = "test"
-        with self.assertRaises(ValueError) as ex:
-            self.builder.add_multiple_parameter_sweep_definition(update_parameter_callback, a, b, c)
-        self.assertEqual(ex.exception.args[0], "Please use SweepArm instead, or use SimulationBuilder directly!")
-
-    def test_single_item_arm_builder(self):
-        arm = SweepArm()
+    def test_single_item_simulation_builder(self):
         a = 10  # test only one item not list
-        b = [1, 2, 3, 4, 5]
-        arm.add_sweep_definition(setA, a)
-        arm.add_sweep_definition(setB, b)
-        self.builder.add_arm(arm)
-        self.assertEqual(self.builder.count, 5)
+        self.builder.add_sweep_definition(setA, a)
+        self.assertEqual(self.builder.count, 1)
 
-    def test_dict_arm_builder(self):
-        arm = SweepArm()
+    def test_dict_list(self):
         a = [{"first": 10}, {"second": 20}]
         b = [1, 2, 3]
-        arm.add_sweep_definition(setA, a)
-        arm.add_sweep_definition(setB, b)
-        self.builder.add_arm(arm)
+        self.builder.add_sweep_definition(setA, a)
+        self.builder.add_sweep_definition(setB, b)
         self.assertEqual(self.builder.count, 6)
         templated_sim = self.get_templated_sim_builder()
         simulations = list(templated_sim)
         # Test if we have correct number of simulations
         self.assertEqual(len(simulations), 6)
+
         expected_values = [{'a': {'first': 10}, 'b': 1},
                            {'a': {'first': 10}, 'b': 2},
                            {'a': {'first': 10}, 'b': 3},
@@ -160,22 +107,11 @@ class TestArmBuilder(ITestWithPersistence):
         for i, simulation in enumerate(simulations):
             self.assertEqual(simulation.task.parameters, expected_values[i])
 
-    def test_single_item_arm_builder(self):
-        arm = SweepArm()
-        a = 10  # test only one item not list
-        b = [1, 2, 3, 4, 5]
-        arm.add_sweep_definition(setA, a)
-        arm.add_sweep_definition(setB, b)
-        self.builder.add_arm(arm)
-        self.assertEqual(self.builder.count, 5)
-
-    def test_single_dict_arm_builder(self):
-        arm = SweepArm()
+    def test_single_dict(self):
         a = {"first": 10}  # test only one dict
         b = [1, 2, 3]
-        arm.add_sweep_definition(setA, a)
-        arm.add_sweep_definition(setB, b)
-        self.builder.add_arm(arm)
+        self.builder.add_sweep_definition(setA, a)
+        self.builder.add_sweep_definition(setB, b)
         self.assertEqual(self.builder.count, 3)
         templated_sim = self.get_templated_sim_builder()
         simulations = list(templated_sim)
@@ -189,15 +125,14 @@ class TestArmBuilder(ITestWithPersistence):
         for i, simulation in enumerate(simulations):
             self.assertEqual(simulation.task.parameters, expected_values[i])
 
-    def test_single_string_arm_builder(self):
-        arm = SweepArm()
-        a = "test"  # test only 1 string
+    def test_single_string(self):
+        a = "test"  # test string instead of list of string
         b = [1, 2, 3]
-        arm.add_sweep_definition(setA, a)
-        arm.add_sweep_definition(setB, b)
-        self.builder.add_arm(arm)
+        self.builder.add_sweep_definition(setA, a)
+        self.builder.add_sweep_definition(setB, b)
         self.assertEqual(self.builder.count, 3)
         templated_sim = self.get_templated_sim_builder()
+        # convert template to a fully realized list
         simulations = list(templated_sim)
         # Test if we have correct number of simulations
         self.assertEqual(len(simulations), 3)
@@ -209,13 +144,11 @@ class TestArmBuilder(ITestWithPersistence):
         for i, simulation in enumerate(simulations):
             self.assertEqual(simulation.task.parameters, expected_values[i])
 
-    def test_single_list_arm_builder(self):
-        arm = SweepArm()
-        a = [10]  # test only one item in list
+    def test_single_list(self):
+        a = [10]  # test single item list
         b = [1, 2, 3]
-        arm.add_sweep_definition(setA, a)
-        arm.add_sweep_definition(setB, b)
-        self.builder.add_arm(arm)
+        self.builder.add_sweep_definition(setA, a)
+        self.builder.add_sweep_definition(setB, b)
         self.assertEqual(self.builder.count, 3)
         templated_sim = self.get_templated_sim_builder()
         simulations = list(templated_sim)
@@ -229,13 +162,11 @@ class TestArmBuilder(ITestWithPersistence):
         for i, simulation in enumerate(simulations):
             self.assertEqual(simulation.task.parameters, expected_values[i])
 
-    def test_tuple_arm_builder(self):
-        arm = SweepArm()
-        a = (4, 5, 6)  # test tuple
-        b = [1, 2, 3]
-        arm.add_sweep_definition(setA, a)
-        arm.add_sweep_definition(setB, b)
-        self.builder.add_arm(arm)
+    def test_tuple(self):
+        a = (4, 5, 6)
+        b = (1, 2, 3)
+        self.builder.add_sweep_definition(setA, a)
+        self.builder.add_sweep_definition(setB, b)
         self.assertEqual(self.builder.count, 9)
         templated_sim = self.get_templated_sim_builder()
         simulations = list(templated_sim)
@@ -254,3 +185,32 @@ class TestArmBuilder(ITestWithPersistence):
         # Verify simulations individually
         for i, simulation in enumerate(simulations):
             self.assertEqual(simulation.task.parameters, expected_values[i])
+
+    def test_add_multiple_parameter_sweep_definition(self):
+        a = [True, False]
+        b = [1, 2, 3, 4, 5]
+        c = ["test"]
+        self.builder.add_multiple_parameter_sweep_definition(update_parameter_callback, a, b, c)
+        templated_sim = self.get_templated_sim_builder()
+        # convert template to a fully realized list
+        simulations = list(templated_sim)
+        # Test if we have correct number of simulations
+        self.assertEqual(len(simulations), 10)
+        expected_values = list(itertools.product(a, b, c))
+        for i, simulation in enumerate(simulations):
+            expected_parameter = {"param_a": expected_values[i][0], "param_b": expected_values[i][1],
+                                  "param_c": expected_values[i][2]}
+            self.assertEqual(simulation.task.parameters, expected_parameter)
+
+        # test with single string for c instead of list of string as ["test"]
+        c = "test"
+        builder2 = SimulationBuilder()
+        builder2.add_multiple_parameter_sweep_definition(update_parameter_callback, a, b, c)
+        templated_sim2 = self.get_templated_sim_builder()
+        simulations2 = list(templated_sim2)
+        # Test if we have correct number of simulations
+        self.assertEqual(len(simulations2), 10)
+        for i, simulation in enumerate(simulations2):
+            expected_parameter = {"param_a": expected_values[i][0], "param_b": expected_values[i][1],
+                                  "param_c": expected_values[i][2]}
+            self.assertEqual(simulation.task.parameters, expected_parameter)

@@ -9,7 +9,8 @@ import pytest
 from idmtools.builders import ArmSimulationBuilder, SweepArm, ArmType, SimulationBuilder
 from idmtools.builders import CsvExperimentBuilder
 from idmtools.builders import YamlSimulationBuilder
-from idmtools.entities.templated_simulation import TemplatedSimulations
+from idmtools.entities.simulation import Simulation
+from idmtools.entities.templated_simulation import TemplatedSimulations, simulation_generator
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.test_task import TestTask
@@ -22,6 +23,12 @@ def param_update(simulation, param, value):
 def update_command_task(simulation, a, b):
     simulation.task.config["a"] = a
     simulation.task.config["b"] = b
+    return {"a": a, "b": b}
+
+
+def update_command_task1(simulation, a, b):
+    simulation.task.set_parameter("a", a)
+    simulation.task.set_parameter("b", b)
     return {"a": a, "b": b}
 
 
@@ -124,24 +131,27 @@ class TestMultipleBuilders(ITestWithPersistence):
             sb.add_multiple_parameter_sweep_definition(update_command_task_with_defaults, a_values, b_values)
         self.assertIn("In addition, currently we do not support over-riding default values for parameters", context.exception.args[0])
 
-    def test_simulation_builder_args_not_iterable_error_as_second(self):
-        """Test simulation builder using multiple arguments
-
-        here b is not iterable and throws an error
+    def test_simulation_builder_args_spec_case(self):
+        """
+        Test simulation builder using multiple arguments
         """
         sb = SimulationBuilder()
-        a_values = 'c'
+        a_values = 'test'
         b_values = 1
-        with self.assertRaises(ValueError) as context:
-            sb.add_multiple_parameter_sweep_definition(update_command_task, a_values, b_values)
-        self.assertIn("defining a sweep across multiple parameters, they must be specified either in a Dict in the form of {{ KeyWork: Values }} where values is a list or [ Param1-Vals, Param2-Vals]", context.exception.args[0])
+        sb.add_multiple_parameter_sweep_definition(update_command_task1, a_values, b_values)
+        self.assertEqual(sb.count, 1)
+        templated_sim = TemplatedSimulations(base_task=TestTask())
+        templated_sim.builder = sb
+        sims = list(templated_sim)
+        self.assertEqual(len(sims), 1)
+        tags = [s.tags for s in sims]
+        self.assertEqual(tags[0]['a'], a_values)
+        self.assertEqual(tags[0]['b'], b_values)
 
     def test_simulation_builder_args_pandas(self):
         """
         Test to ensure #1593 is working
         """
-        from idmtools.entities.simulation import Simulation
-        from idmtools.entities.templated_simulation import simulation_generator
 
         def test_pandas_callback(simulation, value, df=pd.DataFrame()):
             return {'t': value}
