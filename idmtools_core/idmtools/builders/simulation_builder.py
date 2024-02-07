@@ -224,6 +224,10 @@ class SimulationBuilder:
         elif not isinstance(item, Iterable):
             return [item]
         elif hasattr(item, '__len__'):
+            if isinstance(item, dict):
+                return [item]
+            else:
+                return item
             return item
         else:
             return list(item)
