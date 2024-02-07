@@ -7,7 +7,7 @@ import yaml
 from logging import getLogger
 from typing import Union, Callable, Dict, Any
 from idmtools.builders import ArmSimulationBuilder
-from idmtools.builders.arm_simulation_builder import SweepArm, ArmType
+from idmtools.builders.arm_simulation_builder import SweepArm
 
 logger = getLogger(__name__)
 
@@ -51,14 +51,12 @@ class YamlSimulationBuilder(ArmSimulationBuilder):
         .. literalinclude:: ../../examples/builders/yaml_builder_python.py
     """
 
-    def add_sweeps_from_file(self, file_path, func_map: Union[Dict[str, Callable], Callable[[Any], Dict]] = None,
-                             sweep_type=ArmType.cross):
+    def add_sweeps_from_file(self, file_path, func_map: Union[Dict[str, Callable], Callable[[Any], Dict]] = None):
         """
         Add sweeps from a file.
         Args:
             file_path: Path to file
             func_map: Optional function map
-            sweep_type: Type of sweep
         Returns:
             None
         """
@@ -82,5 +80,5 @@ class YamlSimulationBuilder(ArmSimulationBuilder):
             for func, values in sweeps_tuples:
                 funcs.append((func_map[func], values))
 
-            arm = SweepArm(sweep_type, funcs)
+            arm = SweepArm(funcs=funcs)
             self.add_arm(arm)
