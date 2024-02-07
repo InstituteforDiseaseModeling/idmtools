@@ -46,7 +46,6 @@ class DefaultParamFuncDict(dict):
 class YamlSimulationBuilder(ArmSimulationBuilder):
     """
     Class that represents an experiment builder.
-
     Examples:
         .. literalinclude:: ../../examples/builders/yaml_builder_python.py
     """
