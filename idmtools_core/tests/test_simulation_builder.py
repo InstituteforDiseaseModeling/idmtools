@@ -197,9 +197,6 @@ class TestArmBuilder(ITestWithPersistence):
 
     def test_add_multiple_parameter_sweep_definition_dict(self):
         test_dict = {"a": [True, False], "b": [1, 2, 3, 4, 5], "c": ["test"]}
-        # a = [True, False]
-        # b = [1, 2, 3, 4, 5]
-        # c = ["test"]
         self.builder.add_multiple_parameter_sweep_definition(update_parameter_callback, test_dict)
         templated_sim = self.get_templated_sim_builder()
         # convert template to a fully realized list
