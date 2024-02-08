@@ -148,6 +148,41 @@ class TestArmBuilder(ITestWithPersistence):
         self.builder.add_arm(arm2)
         self.assertEqual(self.builder.count, (len(a) * len(b) * len([c])) * (len(a) * len(b) * len([c])))
 
+    def test_add_multiple_parameter_sweep_definition_pair(self):
+        a = [True, False]
+        b = [1, 2, 3, 4, 5]
+        c = "test"
+        with self.subTest("test_multiple_single_parameter_pair"):
+            arm = SweepArm(type=ArmType.pair)
+            arm.add_multiple_parameter_sweep_definition(update_parameter_callback, a, b, c)
+            self.assertEqual(arm.count, len(a) * len(b) * len([c]))
+            d = range(10)
+            setD = partial(JSONConfiguredTask.set_parameter_sweep_callback, param="d")
+            arm.add_sweep_definition(setD, d)
+            self.builder.add_arm(arm)
+            self.assertEqual(self.builder.count, len(d))  # for pair, count equals each arm's count
+
+        # case2: add 2 multiple_parameter_definitions
+        with self.subTest("test_multiple_multiple_parameter_pair"):
+            self.builder = ArmSimulationBuilder()
+            arm2 = SweepArm(type=ArmType.pair)
+            arm2.add_multiple_parameter_sweep_definition(update_parameter_callback, a, b, c)
+            arm2.add_multiple_parameter_sweep_definition(update_parameter_callback, a, b, c)
+            self.builder.add_arm(arm2)
+            self.assertEqual(self.builder.count, (len(a) * len(b) * len([c])))
+
+        # case3: two pairs not match with length
+        with self.subTest("test_mismatch_length_pair"):
+            self.builder = ArmSimulationBuilder()
+            arm3 = SweepArm(type=ArmType.pair)
+            arm3.add_multiple_parameter_sweep_definition(update_parameter_callback, a, b, c)
+            e = [1,2,3]
+            setE = partial(JSONConfiguredTask.set_parameter_sweep_callback, param="e")
+            with self.assertRaises(ValueError) as ex:
+                arm3.add_sweep_definition(setE, e)
+            self.assertEqual(ex.exception.args[0],
+                             f"For pair case, all function inputs must have the save size/length: {len(e)} != {len(a) * len(b) * len([c])}")
+
     def test_single_item_arm_builder(self):
         arm = SweepArm()
         a = 10  # test only one item not list

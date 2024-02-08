@@ -195,3 +195,34 @@ class TestArmBuilder(ITestWithPersistence):
             expected_dict = {"param_a": value[0], "param_b": value[1], "param_c": value[2]}
             self.assertEqual(simulation.task.parameters, expected_dict)
 
+    def test_add_multiple_parameter_sweep_definition_dict(self):
+        test_dict = {"a": [True, False], "b": [1, 2, 3, 4, 5], "c": ["test"]}
+        # a = [True, False]
+        # b = [1, 2, 3, 4, 5]
+        # c = ["test"]
+        self.builder.add_multiple_parameter_sweep_definition(update_parameter_callback, test_dict)
+        templated_sim = self.get_templated_sim_builder()
+        # convert template to a fully realized list
+        simulations = list(templated_sim)
+        # Test if we have correct number of simulations
+        expected_values = list(itertools.product(test_dict['a'], test_dict['b'], test_dict['c']))
+        self.assertEqual(len(simulations), len(expected_values))
+
+        # Verify simulations individually
+        for simulation, value in zip(simulations, expected_values):
+            expected_dict = {"param_a": value[0], "param_b": value[1], "param_c": value[2]}
+            self.assertEqual(simulation.task.parameters, expected_dict)
+
+        # test with single string for c instead of list of string as ["test"]
+        test_dict2 = {"a": [True, False], "b": [1, 2, 3, 4, 5], "c": "test"}
+        builder2 = SimulationBuilder()
+        builder2.add_multiple_parameter_sweep_definition(update_parameter_callback, test_dict2)
+        templated_sim2 = self.get_templated_sim_builder()
+        simulations2 = list(templated_sim2)
+        expected_values2 = list(itertools.product(test_dict2['a'], test_dict2['b'], [test_dict2['c']]))
+        # Test if we have correct number of simulations
+        self.assertEqual(len(simulations2), len(expected_values2))
+        # Verify simulations individually
+        for simulation, value in zip(simulations2, expected_values2):
+            expected_dict = {"param_a": value[0], "param_b": value[1], "param_c": value[2]}
+            self.assertEqual(simulation.task.parameters, expected_dict)
