@@ -170,6 +170,8 @@ class SimulationBuilder:
                 "Currently in multi-argument sweep definitions, you have to supply either a arguments or keyword arguments, but not both.")
         if len(args) > 0:
             values = args
+            # if len(remaining_parameters) == 1 and not isinstance(values[0], dict):
+            #     raise ValueError("This method expects either a list of lists or a dictionary that defines the sweeps")
             if isinstance(values, (list, tuple)) and len(values) == 1 and isinstance(values[0], dict):
                 values = values[0]
         elif len(kwargs) > 0:
@@ -177,7 +179,7 @@ class SimulationBuilder:
         else:
             raise ValueError("This method expects either a list of lists or a dictionary that defines the sweeps")
 
-        if len(remaining_parameters) <= 1:
+        if len(remaining_parameters) == 0:
             raise ValueError(
                 "This method expects either a list of lists or a dictionary that defines the sweeps. In addition, currently we do not support over-riding default values for parameters")
 
@@ -195,21 +197,26 @@ class SimulationBuilder:
                 raise ValueError(
                     f"{PARAMETER_LENGTH_MUST_MATCH_ERROR} Currently the callback has {len(remaining_parameters)} parameters and there were {len(values)} arguments passed.")
         elif isinstance(values, dict):
-            if len(values.keys()) != len(remaining_parameters):
+            if len(remaining_parameters) > 1 and len(values.keys()) != len(remaining_parameters):
                 raise ValueError(
                     f"{PARAMETER_LENGTH_MUST_MATCH_ERROR}. Currently the callback has {len(remaining_parameters)} parameters and there were {len(values.keys())} arguments passed.")
 
             # validate each values in a dict
             _values = {key: self._validate_item(vals) for key, vals in values.items()}
 
-            for key, vals in _values.items():
-                if key not in remaining_parameters:
-                    raise ValueError(
-                        f"Unknown keyword parameter passed: {key}. Support keyword args are {', '.join(remaining_parameters)}")
+            if len(remaining_parameters) > 1:
+                for key, vals in _values.items():
+                    if key not in remaining_parameters:
+                        raise ValueError(
+                            f"Unknown keyword parameter passed: {key}. Support keyword args are {', '.join(remaining_parameters)}")
             list(map(self._update_count, _values.values()))
             generated_values = product(*_values.values())
-            self.sweeps.append(
-                partial(function, **self._map_multi_argument_array(values.keys(), v)) for v in generated_values)
+            if len(remaining_parameters) == 1:
+                self.sweeps.append(
+                    partial(function, **self._map_multi_argument_array(values.keys(), v, remaining_parameters[0])) for v in generated_values)
+            else:
+                self.sweeps.append(
+                    partial(function, **self._map_multi_argument_array(values.keys(), v)) for v in generated_values)
 
     def _validate_item(self, item):
         """
@@ -233,7 +240,7 @@ class SimulationBuilder:
             return list(item)
 
     @staticmethod
-    def _map_multi_argument_array(parameters, value_set) -> Dict[str, Iterable]:
+    def _map_multi_argument_array(parameters, value_set, remainder: str=None) -> Dict[str, Iterable]:
         """
         Map multi-argument calls to parameters in a callback.
 
@@ -247,7 +254,11 @@ class SimulationBuilder:
         call_args = dict()
         for idx, parameter in enumerate(parameters):
             call_args[parameter] = value_set[idx]
-        return call_args
+
+        if remainder:
+            return {remainder: call_args}
+        else:
+            return call_args
 
     def _update_count(self, values):
         """
