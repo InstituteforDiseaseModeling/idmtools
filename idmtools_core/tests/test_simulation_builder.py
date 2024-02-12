@@ -277,17 +277,17 @@ class TestArmBuilder(ITestWithPersistence):
                 self.assertEqual(simulation.task.parameters, expected_dict)
 
         # Case4: len(kwargs) = 1
-        with self.subTest("test_args_len_eqs_1"):
+        with self.subTest("test_kwargs_len_eqs_1"):
             def update_parameter_callback4(simulation, d):
                 simulation.task.set_parameter("param_a", d)
                 return {"a": d}
 
             self.builder = SimulationBuilder()
-            self.builder.add_multiple_parameter_sweep_definition(update_parameter_callback4, test_dict="a")
+            self.builder.add_multiple_parameter_sweep_definition(update_parameter_callback4, test_dict={"a": "b"})
             templated_sim4 = self.get_templated_sim_builder()
             # convert template to a fully realized list
             simulations4 = list(templated_sim4)
             # Test if we have correct number of simulations
             self.assertEqual(len(simulations4), 1)
-            expected_dict = {"param_a": {'test_dict': 'a'}}
+            expected_dict = {"param_a": {'test_dict': {'a': 'b'}}}
             self.assertEqual(simulations4[0].task.parameters, expected_dict)
