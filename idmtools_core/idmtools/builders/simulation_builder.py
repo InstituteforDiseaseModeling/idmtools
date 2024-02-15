@@ -3,12 +3,11 @@ idmtools SimulationBuilder definition.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
-import copy
 import inspect
 from functools import partial
 from inspect import signature
 from itertools import product
-from typing import Callable, Any, Iterable, Union, Dict
+from typing import Callable, Any, Iterable, Union, Dict, Sized
 from idmtools.entities.simulation import Simulation
 from idmtools.utils.collections import duplicate_list_of_generators
 
@@ -16,9 +15,6 @@ TSweepFunction = Union[
     Callable[[Simulation, Any], Dict[str, Any]],
     partial
 ]
-
-MULTIPLE_ARGS_MUST_BE_ITERABLE_ERROR = "When defining a sweep across multiple parameters, they must be specified either in a Dict in the form of {{ KeyWork: Values }} where values is a list or [ Param1-Vals, Param2-Vals] where Param1-Vals and Param2-Vals are lists/iterables."
-PARAMETER_LENGTH_MUST_MATCH_ERROR = "The parameters in the callback must match the length of the arguments/keyword arguments passed."
 
 
 class SimulationBuilder:
@@ -149,26 +145,12 @@ class SimulationBuilder:
             self.sweeps.append((function,))
             self._update_count([])
 
-    @staticmethod
-    def _map_argument_array(parameters, value, param) -> Dict[str, Iterable]:
-        """
-        Map multi-argument calls to parameters in a callback.
-        Args:
-            parameters: Parameters
-            value_set: List of values that should be sent to parameter in calls
-        Returns:
-            Dictionary to map our call to our callbacks
-        """
-        call_args = copy.deepcopy(parameters)
-        call_args[param] = value
-        return call_args
-
     def _extract_remaining_parameters(self, function):
         # Retrieve all the parameters in the signature of the function
         parameters = signature(function).parameters
         # Ensure `simulation` is part of the parameter list
         if self.SIMULATION_ATTR not in parameters:
-            raise ValueError(f"The function {function} passed to SweepBuilder.add_sweep_definition "
+            raise ValueError(f"The callback function passed to SweepBuilder.add_sweep_definition "
                              f"needs to take a {self.SIMULATION_ATTR} argument!")
         # Retrieve all the free parameters of the signature (other than `simulation`)
         remaining_parameters = {name: param.default for name, param in parameters.items() if
@@ -178,7 +160,7 @@ class SimulationBuilder:
     def case_args_tuple(self, function: TSweepFunction, remaining_parameters, values):
         # this is len(values) > 0 case
         required_params = {k: v for k, v in remaining_parameters.items() if v == inspect.Parameter.empty}
-        _values = [self._validate_item(vals) for vals in values]
+        _values = [self._validate_value(vals) for vals in values]
 
         if len(required_params) > 0 and len(required_params) != len(values):
             raise ValueError(
@@ -192,7 +174,9 @@ class SimulationBuilder:
             raise ValueError(
                 f"Currently the callback has {len(remaining_parameters)} parameters (all have default values) and there were {len(values)} arguments passed.")
 
-        # Now we are in the case: len(required_params) == len(values)
+        # Now we come to two cases
+        # 1. len(required_params) > 0 and len(required_params) == len(values)
+        # 2. len(required_params) == 0 and len(remaining_parameters) == 1 and len(values) == 1
         # create sweeps using the multi-index
         generated_values = product(*_values)
         if len(required_params) > 0:
@@ -219,7 +203,7 @@ class SimulationBuilder:
                 f"Missing arguments: {missing_params if len(missing_params) > 1 else missing_params[0]}.")
 
         # validate each values in a dict
-        _values = {key: self._validate_item(vals) for key, vals in values.items()}
+        _values = {key: self._validate_value(vals) for key, vals in values.items()}
         generated_values = product(*_values.values())
         self.sweeps.append(
             partial(function, **self._map_multi_argument_array(_values.keys(), v)) for v in generated_values)
@@ -301,26 +285,26 @@ class SimulationBuilder:
         """
         self.add_sweep_definition(function, *args, **kwargs)
 
-    def _validate_item(self, item):
+    def _validate_value(self, value):
         """
         Validate inputs.
         Args:
-            item: input
+            value: input
         Returns:
-            validated item
+            validated value
         """
-        if isinstance(item, str):
-            return [item]
-        elif not isinstance(item, Iterable):
-            return [item]
-        elif hasattr(item, '__len__'):
-            if isinstance(item, dict):
-                return [item]
+        if isinstance(value, str):
+            return [value]
+        elif not isinstance(value, Iterable):
+            return [value]
+        # elif hasattr(value, '__len__'):
+        elif isinstance(value, Sized):
+            if isinstance(value, dict):
+                return [value]
             else:
-                return item
-            return item
+                return value
         else:
-            return list(item)
+            return list(value)
 
     @staticmethod
     def _map_multi_argument_array(parameters, value_set, remainder: str = None) -> Dict[str, Iterable]:
