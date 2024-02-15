@@ -141,7 +141,7 @@ class SimulationBuilder:
                              f"needs to take a {self.SIMULATION_ATTR} argument!")
         # Retrieve all the free parameters of the signature (other than `simulation`)
         remaining_parameters = {name: param.default for name, param in parameters.items() if
-                                name != self.SIMULATION_ATTR and not isinstance(param.default, pd.DataFrame)}
+                                name != self.SIMULATION_ATTR}
         return remaining_parameters
 
     def case_args_tuple(self, function: TSweepFunction, remaining_parameters, values):
