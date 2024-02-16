@@ -163,8 +163,17 @@ class SimulationBuilder:
         _values = [self._validate_value(vals) for vals in values]
 
         if len(required_params) > 0 and len(required_params) != len(values):
-            raise ValueError(
-                f"Currently the callback has {len(required_params)} required parameters and there were {len(values)} arguments passed.")
+            if  len(remaining_parameters) != len(values):
+                raise ValueError(
+                    f"Currently the callback has {len(required_params)} required parameters and callback has {len(remaining_parameters)} parameters but there were {len(values)} arguments passed.")
+            else:
+                # Handle special case
+                generated_values = product(*_values)
+                self.sweeps.append(
+                    partial(function, **self._map_multi_argument_array(list(remaining_parameters), v)) for v in
+                    generated_values)
+                list(map(self._update_count, _values))
+                return
 
         if len(required_params) == 0 and len(values) > 1:
             raise ValueError(
