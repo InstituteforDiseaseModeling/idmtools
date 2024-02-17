@@ -129,7 +129,7 @@ class TestMultipleBuilders(ITestWithPersistence):
         b_values = ["c", "d"]
         with self.assertRaises(ValueError) as context:
             sb.add_multiple_parameter_sweep_definition(update_command_task_with_defaults, a_values, b_values)
-        self.assertIn("In addition, currently we do not support over-riding default values for parameters", context.exception.args[0])
+        self.assertIn("Currently the callback 2 parameters (all have default values) and there were 2 arguments passed.", context.exception.args[0])
 
     def test_simulation_builder_args_spec_case(self):
         """
@@ -194,7 +194,7 @@ class TestMultipleBuilders(ITestWithPersistence):
         c_values = range(1, 2)
         with self.assertRaises(ValueError) as context:
             sb.add_multiple_parameter_sweep_definition(update_command_task, a_values, b_values, c_values)
-        self.assertIn("2 parameters and there were 3 arguments", context.exception.args[0])
+        self.assertIn("Currently the callback has 2 required parameters and callback has 2 parameters but there were 3 arguments passed.", context.exception.args[0])
 
     def test_simulation_builder_args_single_dict(self):
 
@@ -236,7 +236,7 @@ class TestMultipleBuilders(ITestWithPersistence):
         b_values = ["c", "d"]
         with self.assertRaises(ValueError) as context:
             sb.add_multiple_parameter_sweep_definition(update_command_task, **dict(a=a_values, b=b_values, c=range(1, 2)))
-        self.assertIn("2 parameters and there were 3 arguments", context.exception.args[0])
+            self.assertIn("2 parameters and there were 3 arguments", context.exception.args[0])
 
     def test_simulation_builder_kwargs_mismatch_name(self):
         """Test simulation builder using kwargs but with arguments that don't match parameters"""
@@ -245,7 +245,7 @@ class TestMultipleBuilders(ITestWithPersistence):
         b_values = ["c", "d"]
         with self.assertRaises(ValueError) as context:
             sb.add_multiple_parameter_sweep_definition(update_command_task, **dict(a=a_values, b2=b_values))
-        self.assertIn("Unknown keyword parameter passed: b2", context.exception.args[0])
+        self.assertIn("Extra arguments passed: b2.", context.exception.args[0])
 
     def __validate_a_b_sb_test(self, a_values, b_values, sb):
         tt = TestTask()
@@ -300,15 +300,14 @@ class TestMultipleBuilders(ITestWithPersistence):
         builder = SimulationBuilder()
         with self.assertRaises(ValueError) as context:
             # test 'sim' (should be 'simulation') is bad parameter for add_sweep_definition()
-            builder.add_sweep_definition(lambda sim, value: {"p": value}, range(0, 2))
+            builder.add_sweep_definition(lambda sim, value: {"p": value}, )
         self.assertTrue('passed to SweepBuilder.add_sweep_definition needs to take a simulation argument!' in str(
             context.exception.args[0]))
 
     def test_bad_experiment_builder1(self):
         builder = SimulationBuilder()
         with self.assertRaises(ValueError) as context:
-            # test 'sim' is bad extra parameter for add_sweep_definition()
             builder.add_sweep_definition(lambda simulation, sim, value: {"p": value}, range(0, 2))
-        self.assertTrue(
-            'passed to SweepBuilder.add_sweep_definition needs to only have simulation and exactly one free parameter.' in str(
-                context.exception.args[0]))
+        self.assertEqual(context.exception.args[0],
+            'Currently the callback has 2 required parameters and callback has 2 parameters but there were 1 arguments passed.')
+
