@@ -40,7 +40,7 @@ class SweepArm:
             self.add_sweep_definition(func, values)
 
     @property
-    def count(self):
+    def count(self) -> int:
         """
         Simulation count.
         Returns:
@@ -49,13 +49,13 @@ class SweepArm:
         return self.__count
 
     @count.setter
-    def count(self, cnt):
+    def count(self, cnt: int):
         """
         Set the count property.
         Args:
             cnt: count set
         Returns:
-            int
+            None
         """
         # print('cnt: ', cnt)
         if self.__count == 0:
