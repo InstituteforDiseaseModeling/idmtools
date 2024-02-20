@@ -25,7 +25,7 @@ task = CommandTask(command=command)
 ts = TemplatedSimulations(base_task=task)
 
 sb = SimulationBuilder()
-sb.add_multiple_parameter_sweep_definition(update_parameter_callback, pop_size=[10000, 20000], pop_infected=[10, 100],
+sb.add_sweep_definition(update_parameter_callback, pop_size=[10000, 20000], pop_infected=[10, 100],
                                            n_days=[100, 110], rand_seed=[1234, 4567])
 # has to add workorder.json with simulation to update cmd arguments
 # for command line task sweep with workorder, DO NOT use since it will not update arguments:
