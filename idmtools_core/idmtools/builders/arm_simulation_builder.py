@@ -333,9 +333,33 @@ class ArmSimulationBuilder(SimulationBuilder):
         self.count = sum([arm.count for arm in self.arms])
 
     def add_sweep_definition(self, function: TSweepFunction, *args, **kwargs):
+        """
+        Add parameters sweep definition.
+        Args:
+            function: The sweep function, which must include a **simulation** parameter (or
+                whatever is specified in :attr:`~idmtools.builders.ExperimentBuilder.SIMULATION_ATTR`).
+                The function also must include EXACTLY ONE free parameter, which the values will be passed to.
+                The function can also be a partial--any Callable type will work.
+            args: List of arguments to be passed
+            kwargs: List of keyword arguments to be passed
+        Returns:
+            None
+        """
         raise ValueError("Please use SweepArm instead, or use SimulationBuilder directly!")
 
     def add_multiple_parameter_sweep_definition(self, function: TSweepFunction, *args, **kwargs):
+        """
+        Add parameters sweep definition.
+        Args:
+            function: The sweep function, which must include a **simulation** parameter (or
+                whatever is specified in :attr:`~idmtools.builders.ExperimentBuilder.SIMULATION_ATTR`).
+                The function also must include EXACTLY ONE free parameter, which the values will be passed to.
+                The function can also be a partial--any Callable type will work.
+            args: List of arguments to be passed
+            kwargs: List of keyword arguments to be passed
+        Returns:
+            None
+        """
         raise ValueError("Please use SweepArm instead, or use SimulationBuilder directly!")
 
     def __iter__(self):
