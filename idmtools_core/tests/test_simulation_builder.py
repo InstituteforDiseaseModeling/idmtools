@@ -2,6 +2,7 @@ import allure
 import itertools
 from functools import partial
 
+import pandas as pd
 import pytest
 
 from idmtools.builders import SimulationBuilder
@@ -653,3 +654,42 @@ class TestSimulationBuilder(ITestWithPersistence):
             assert len(simulations) == 1
             expected_dict = {'param_a': {'a': 'b'}}
             assert simulations[0].task.parameters == expected_dict
+
+    def test_add_sweep_definition_with_pandas_args(self):
+        builder = SimulationBuilder()
+
+        data = {
+            "arg1": [420, 380, 390],
+            "arg2": [50, 40, 45]
+        }
+
+        def sweep_function(simulation, df):
+            simulation.task.set_parameter('arg1', df['arg1'])
+            simulation.task.set_parameter('arg2', df['arg2'])
+            return {'arg1': df['arg1'], 'arg2': df['arg2']}
+
+        builder.add_sweep_definition(sweep_function, pd.DataFrame(data))
+        assert builder.count == 1
+        simulations = self.get_simulations_with_builder(builder)
+        assert simulations[0].task.parameters['arg1'].equals(pd.DataFrame(data)['arg1'])
+        assert simulations[0].task.parameters['arg2'].equals(pd.DataFrame(data)['arg2'])
+
+    def test_add_sweep_definition_with_pandas_kwargs(self):
+        builder = SimulationBuilder()
+
+        data = {
+            "arg1": [420, 380, 390],
+            "arg2": [50, 40, 45]
+        }
+
+        def sweep_function(simulation, df):
+            simulation.task.set_parameter('arg1', df['arg1'])
+            simulation.task.set_parameter('arg2', df['arg2'])
+            return {'arg1': df['arg1'], 'arg2': df['arg2']}
+
+        builder.add_sweep_definition(sweep_function, df=pd.DataFrame(data))
+        assert builder.count == 1
+        simulations = self.get_simulations_with_builder(builder)
+        assert simulations[0].task.parameters['arg1'].equals(pd.DataFrame(data)['arg1'])
+        assert simulations[0].task.parameters['arg2'].equals(pd.DataFrame(data)['arg2'])
+
