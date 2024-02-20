@@ -8,6 +8,8 @@ from functools import partial
 from inspect import signature
 from itertools import product
 from typing import Callable, Any, Iterable, Union, Dict, Sized
+import pandas as pd
+
 from idmtools.entities.simulation import Simulation
 from idmtools.utils.collections import duplicate_list_of_generators
 
@@ -159,11 +161,12 @@ class SimulationBuilder:
 
     def case_args_tuple(self, function: TSweepFunction, remaining_parameters, values):
         # this is len(values) > 0 case
-        required_params = {k: v for k, v in remaining_parameters.items() if v == inspect.Parameter.empty}
+        required_params = {k: v for k, v in remaining_parameters.items() if not isinstance(v, pd.DataFrame)}
+        required_params = {k: v for k, v in required_params.items() if v == inspect.Parameter.empty}
         _values = [self._validate_value(vals) for vals in values]
 
         if len(required_params) > 0 and len(required_params) != len(values):
-            if  len(remaining_parameters) != len(values):
+            if len(remaining_parameters) != len(values):
                 raise ValueError(
                     f"Currently the callback has {len(required_params)} required parameters and callback has {len(remaining_parameters)} parameters but there were {len(values)} arguments passed.")
             else:
@@ -308,7 +311,7 @@ class SimulationBuilder:
             return [value]
         # elif hasattr(value, '__len__'):
         elif isinstance(value, Sized):
-            if isinstance(value, dict):
+            if isinstance(value, (dict, pd.DataFrame)):
                 return [value]
             else:
                 return value
