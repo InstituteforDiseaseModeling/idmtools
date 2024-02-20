@@ -221,12 +221,21 @@ class TestArmBuilder(ITestWithPersistence):
 
     def test_single_dict_arm_builder(self):
         arm = SweepArm()
-        a = {"first": 10}  # test only one dict
+        a = {"a": 10}  # test only one dict. we actually sweep on dict value
         b = [1, 2, 3]
-        arm.add_sweep_definition(setA, a)
-        arm.add_sweep_definition(setB, b)
+
+        def sweep_function_a(simulation, a):
+            simulation.task.set_parameter("param_a", a)
+            return {"param_a": a}
+
+        def sweep_function_b(simulation, b):
+            simulation.task.set_parameter("param_b", b)
+            return {"param_ab": a}
+
+        arm.add_sweep_definition(sweep_function_a, a)
+        arm.add_sweep_definition(sweep_function_b, b)
         self.builder.add_arm(arm)
-        expected_values = list(itertools.product([a], b))
+        expected_values = list(itertools.product([a['a']], b))
         self.assertEqual(self.builder.count, len(expected_values))
         templated_sim = self.get_templated_sim_builder()
         simulations = list(templated_sim)
@@ -234,7 +243,7 @@ class TestArmBuilder(ITestWithPersistence):
         self.assertEqual(len(simulations), len(expected_values))
         # Verify simulations individually
         for simulation, value in zip(simulations, expected_values):
-            expected_dict = {"a": value[0], "b": value[1]}
+            expected_dict = {"param_a": value[0], "param_b": value[1]}
             self.assertEqual(simulation.task.parameters, expected_dict)
 
     def test_single_string_arm_builder(self):
