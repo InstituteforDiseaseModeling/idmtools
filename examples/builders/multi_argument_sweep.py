@@ -32,14 +32,16 @@ def param_update(simulation, a_value, b_value, c_value):
 
 if __name__ == "__main__":
     # define what platform we want to use. Here we use a context manager but if you prefer you can
-    # use objects such as Platform('BELEGOST') instead
-    with Platform('BELEGOST'):
+    # use objects such as Platform('Calculon') instead
+    with Platform('Calculon'):
         # define our base task
         base_task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"),
                                              parameters=dict())
         # define our input csv sweep
         builder = SimulationBuilder()
-        builder.add_multiple_parameter_sweep_definition(param_update, range(2), range(2), range(2))
+        # we can use add_sweep_definition call to do multiple parameter sweeping now
+        builder.add_sweep_definition(param_update, range(2), range(2), range(2))
+        #builder.add_multiple_parameter_sweep_definition(param_update, range(2), range(2), range(2))
 
         # define our experiment with its metadata
         experiment = Experiment.from_builder(

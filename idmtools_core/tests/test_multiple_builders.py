@@ -9,7 +9,8 @@ import pytest
 from idmtools.builders import ArmSimulationBuilder, SweepArm, ArmType, SimulationBuilder
 from idmtools.builders import CsvExperimentBuilder
 from idmtools.builders import YamlSimulationBuilder
-from idmtools.entities.templated_simulation import TemplatedSimulations
+from idmtools.entities.simulation import Simulation
+from idmtools.entities.templated_simulation import TemplatedSimulations, simulation_generator
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.test_task import TestTask
@@ -22,6 +23,12 @@ def param_update(simulation, param, value):
 def update_command_task(simulation, a, b):
     simulation.task.config["a"] = a
     simulation.task.config["b"] = b
+    return {"a": a, "b": b}
+
+
+def update_command_task1(simulation, a, b):
+    simulation.task.set_parameter("a", a)
+    simulation.task.set_parameter("b", b)
     return {"a": a, "b": b}
 
 
@@ -122,26 +129,29 @@ class TestMultipleBuilders(ITestWithPersistence):
         b_values = ["c", "d"]
         with self.assertRaises(ValueError) as context:
             sb.add_multiple_parameter_sweep_definition(update_command_task_with_defaults, a_values, b_values)
-        self.assertIn("In addition, currently we do not support over-riding default values for parameters", context.exception.args[0])
+        self.assertIn("Currently the callback 2 parameters (all have default values) and there were 2 arguments passed.", context.exception.args[0])
 
-    def test_simulation_builder_args_not_iterable_error_as_second(self):
-        """Test simulation builder using multiple arguments
-
-        here b is not iterable and throws an error
+    def test_simulation_builder_args_spec_case(self):
+        """
+        Test simulation builder using multiple arguments
         """
         sb = SimulationBuilder()
-        a_values = 'c'
+        a_values = 'test'
         b_values = 1
-        with self.assertRaises(ValueError) as context:
-            sb.add_multiple_parameter_sweep_definition(update_command_task, a_values, b_values)
-        self.assertIn("defining a sweep across multiple parameters, they must be specified either in a Dict in the form of {{ KeyWork: Values }} where values is a list or [ Param1-Vals, Param2-Vals]", context.exception.args[0])
+        sb.add_multiple_parameter_sweep_definition(update_command_task1, a_values, b_values)
+        self.assertEqual(sb.count, 1)
+        templated_sim = TemplatedSimulations(base_task=TestTask())
+        templated_sim.builder = sb
+        sims = list(templated_sim)
+        self.assertEqual(len(sims), 1)
+        tags = [s.tags for s in sims]
+        self.assertEqual(tags[0]['a'], a_values)
+        self.assertEqual(tags[0]['b'], b_values)
 
     def test_simulation_builder_args_pandas(self):
         """
         Test to ensure #1593 is working
         """
-        from idmtools.entities.simulation import Simulation
-        from idmtools.entities.templated_simulation import simulation_generator
 
         def test_pandas_callback(simulation, value, df=pd.DataFrame()):
             return {'t': value}
@@ -184,7 +194,7 @@ class TestMultipleBuilders(ITestWithPersistence):
         c_values = range(1, 2)
         with self.assertRaises(ValueError) as context:
             sb.add_multiple_parameter_sweep_definition(update_command_task, a_values, b_values, c_values)
-        self.assertIn("2 parameters and there were 3 arguments", context.exception.args[0])
+        self.assertIn("Currently the callback has 2 required parameters and callback has 2 parameters but there were 3 arguments passed.", context.exception.args[0])
 
     def test_simulation_builder_args_single_dict(self):
 
@@ -226,7 +236,7 @@ class TestMultipleBuilders(ITestWithPersistence):
         b_values = ["c", "d"]
         with self.assertRaises(ValueError) as context:
             sb.add_multiple_parameter_sweep_definition(update_command_task, **dict(a=a_values, b=b_values, c=range(1, 2)))
-        self.assertIn("2 parameters and there were 3 arguments", context.exception.args[0])
+            self.assertIn("2 parameters and there were 3 arguments", context.exception.args[0])
 
     def test_simulation_builder_kwargs_mismatch_name(self):
         """Test simulation builder using kwargs but with arguments that don't match parameters"""
@@ -235,7 +245,7 @@ class TestMultipleBuilders(ITestWithPersistence):
         b_values = ["c", "d"]
         with self.assertRaises(ValueError) as context:
             sb.add_multiple_parameter_sweep_definition(update_command_task, **dict(a=a_values, b2=b_values))
-        self.assertIn("Unknown keyword parameter passed: b2", context.exception.args[0])
+        self.assertIn("Extra arguments passed: b2.", context.exception.args[0])
 
     def __validate_a_b_sb_test(self, a_values, b_values, sb):
         tt = TestTask()
@@ -290,15 +300,14 @@ class TestMultipleBuilders(ITestWithPersistence):
         builder = SimulationBuilder()
         with self.assertRaises(ValueError) as context:
             # test 'sim' (should be 'simulation') is bad parameter for add_sweep_definition()
-            builder.add_sweep_definition(lambda sim, value: {"p": value}, range(0, 2))
+            builder.add_sweep_definition(lambda sim, value: {"p": value}, )
         self.assertTrue('passed to SweepBuilder.add_sweep_definition needs to take a simulation argument!' in str(
             context.exception.args[0]))
 
     def test_bad_experiment_builder1(self):
         builder = SimulationBuilder()
         with self.assertRaises(ValueError) as context:
-            # test 'sim' is bad extra parameter for add_sweep_definition()
             builder.add_sweep_definition(lambda simulation, sim, value: {"p": value}, range(0, 2))
-        self.assertTrue(
-            'passed to SweepBuilder.add_sweep_definition needs to only have simulation and exactly one free parameter.' in str(
-                context.exception.args[0]))
+        self.assertEqual(context.exception.args[0],
+            'Currently the callback has 2 required parameters and callback has 2 parameters but there were 1 arguments passed.')
+

@@ -43,6 +43,7 @@ class SweepArm:
     def count(self) -> int:
         """
         Simulation count.
+
         Returns:
             count
         """
@@ -52,8 +53,10 @@ class SweepArm:
     def count(self, cnt: int):
         """
         Set the count property.
+
         Args:
             cnt: count set
+
         Returns:
             None
         """
@@ -116,14 +119,12 @@ class SweepArm:
                 # Example calling using a dictionary instead
                 sb.add_sweep_definition(three_param_callback, dict(parameter_a=range(1,5), parameter_b=["a", "b"], parameter_c=range(4,5))
                 # The following is equivalent
-                sb.add_sweep_definition(three_param_callback, **dict(parameter_a=range(1,5), parameter_b=["a", "b"], parameter_c=range(4,5))
+                sb.add_sweep_definition(three_param_callback, **dict(parameter_a=range(1,5), parameter_b=["a", "b"], parameter_c=range(4,5)))
 
-                sb3 = SimulationBuilder()
                 # If all parameters have default values, we can even simply do
-                sb3.add_sweep_definition(three_param_callback)
+                sb.add_sweep_definition(three_param_callback)
 
-
-            Remark: in general
+                # Remark: in general
                 def my_callback(simulation, parameter_1, parameter_2, ..., parameter_n):
                     pass
 
@@ -132,15 +133,12 @@ class SweepArm:
                 sb = SimulationBuilder()
                 sb.add_sweep_definition(my_callback, Iterable_1, Iterable_2, ..., Iterable_m)
 
-                Note:   the # of Iterable object must match the parameters # of my_callback, which don't have default values
+                # Note:  the # of Iterable object must match the parameters # of my_callback, which don't have default values or use the key (parameter names)
 
-                Or use the key (parameter names)
-
-                sb = SimulationBuilder()
                 sb.add_sweep_definition(my_callback, parameter_1=Iterable_1, parameter_2=Iterable_2, ..., parameter_m=Iterable_m)
+
                 # The following is equivalent
                 sb.add_sweep_definition(my_callback, dict(parameter_1=Iterable_1, parameter_2=Iterable_2, ..., parameter_m=Iterable_m))
-                and
                 sb.add_sweep_definition(my_callback, **dict(parameter_1=Iterable_1, parameter_2=Iterable_2, ..., parameter_m=Iterable_m))
         """
         builder = SimulationBuilder()
@@ -164,63 +162,7 @@ class SweepArm:
             None. Updates the Sweeps
 
         Examples:
-            Examples of valid functions::
-
-                # This function takes one parameter
-                def myFunction(simulation, parameter_a):
-                    pass
-
-               # This function takes one parameter with default value
-                def myFunction(simulation, parameter_a=6):
-                    pass
-
-                # This function takes two parameters (parameters may have default values)
-                def myFunction(simulation, parameter_a, parameter_b=9):
-                    pass
-
-                # Function that takes three parameters (parameters may have default values)
-                def three_param_callback(simulation, parameter_a, parameter_b, parameter_c=10):
-                    pass
-
-            Calling Sweeps that take multiple parameters::
-
-                # This example references the above valid function example
-                sb = SimulationBuilder()
-
-                # Add a sweep on the myFunction that takes parameter(s).
-                # Here we sweep the values 1-4 on parameter_a and a,b on parameter_b
-                sb.add_sweep_definition(myFunction, range(1,5), ["a", "b"])
-
-                sb2 = SimulationBuilder()
-                # Example calling using a dictionary instead
-                sb.add_sweep_definition(three_param_callback, dict(parameter_a=range(1,5), parameter_b=["a", "b"], parameter_c=range(4,5))
-                # The following is equivalent
-                sb.add_sweep_definition(three_param_callback, **dict(parameter_a=range(1,5), parameter_b=["a", "b"], parameter_c=range(4,5))
-
-                sb3 = SimulationBuilder()
-                # If all parameters have default values, we can even simply do
-                sb3.add_sweep_definition(three_param_callback)
-
-
-            Remark: in general
-                def my_callback(simulation, parameter_1, parameter_2, ..., parameter_n):
-                    pass
-
-                Calling Sweeps that take multiple parameters::
-
-                sb = SimulationBuilder()
-                sb.add_sweep_definition(my_callback, Iterable_1, Iterable_2, ..., Iterable_m)
-
-                Note:   the # of Iterable object must match the parameters # of my_callback, which don't have default values
-
-                Or use the key (parameter names)
-
-                sb = SimulationBuilder()
-                sb.add_sweep_definition(my_callback, parameter_1=Iterable_1, parameter_2=Iterable_2, ..., parameter_m=Iterable_m)
-                # The following is equivalent
-                sb.add_sweep_definition(my_callback, dict(parameter_1=Iterable_1, parameter_2=Iterable_2, ..., parameter_m=Iterable_m))
-                and
-                sb.add_sweep_definition(my_callback, **dict(parameter_1=Iterable_1, parameter_2=Iterable_2, ..., parameter_m=Iterable_m))
+            Refer to the comments in the add_sweep_definition function for examples
         """
         builder = SimulationBuilder()
         builder.add_multiple_parameter_sweep_definition(function, *args, **kwargs)
@@ -335,6 +277,7 @@ class ArmSimulationBuilder(SimulationBuilder):
     def add_sweep_definition(self, function: TSweepFunction, *args, **kwargs):
         """
         Add parameters sweep definition.
+
         Args:
             function: The sweep function, which must include a **simulation** parameter (or
                 whatever is specified in :attr:`~idmtools.builders.ExperimentBuilder.SIMULATION_ATTR`).
@@ -342,6 +285,7 @@ class ArmSimulationBuilder(SimulationBuilder):
                 The function can also be a partial--any Callable type will work.
             args: List of arguments to be passed
             kwargs: List of keyword arguments to be passed
+
         Returns:
             None
         """
@@ -350,6 +294,7 @@ class ArmSimulationBuilder(SimulationBuilder):
     def add_multiple_parameter_sweep_definition(self, function: TSweepFunction, *args, **kwargs):
         """
         Add parameters sweep definition.
+
         Args:
             function: The sweep function, which must include a **simulation** parameter (or
                 whatever is specified in :attr:`~idmtools.builders.ExperimentBuilder.SIMULATION_ATTR`).
@@ -357,6 +302,7 @@ class ArmSimulationBuilder(SimulationBuilder):
                 The function can also be a partial--any Callable type will work.
             args: List of arguments to be passed
             kwargs: List of keyword arguments to be passed
+
         Returns:
             None
         """
