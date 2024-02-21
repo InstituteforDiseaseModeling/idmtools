@@ -162,55 +162,7 @@ class SweepArm:
             None. Updates the Sweeps
 
         Examples:
-            Examples of valid functions::
-
-                # This function takes one parameter
-                def myFunction(simulation, parameter_a):
-                    pass
-
-               # This function takes one parameter with default value
-                def myFunction(simulation, parameter_a=6):
-                    pass
-
-                # This function takes two parameters (parameters may have default values)
-                def myFunction(simulation, parameter_a, parameter_b=9):
-                    pass
-
-                # Function that takes three parameters (parameters may have default values)
-                def three_param_callback(simulation, parameter_a, parameter_b, parameter_c=10):
-                    pass
-
-            Calling Sweeps that take multiple parameters::
-
-                # This example references the above valid function example
-                sb = SimulationBuilder()
-                sb.add_multiple_parameter_sweep_definition(myFunction, range(1,5), ["a", "b"])
-
-                # Example calling using a dictionary instead
-                sb.add_multiple_parameter_sweep_definition(three_param_callback, dict(parameter_a=range(1,5), parameter_b=["a", "b"], parameter_c=range(4,5)))
-
-                # The following is equivalent
-                sb.add_multiple_parameter_sweep_definition(three_param_callback, **dict(parameter_a=range(1,5), parameter_b=["a", "b"], parameter_c=range(4,5)))
-
-                # If all parameters have default values, we can even simply do
-                sb.add_multiple_parameter_sweep_definition(three_param_callback)
-
-
-                # Remark: in general
-                def my_callback(simulation, parameter_1, parameter_2, ..., parameter_n):
-                    pass
-
-                Calling Sweeps that take multiple parameters::
-
-                sb = SimulationBuilder()
-                sb.add_sweep_definition(my_callback, Iterable_1, Iterable_2, ..., Iterable_m)
-
-                # The # of Iterable object must match the parameters # of my_callback, which don't have default values or use the key (parameter names)
-                sb.add_multiple_parameter_sweep_definition(my_callback, parameter_1=Iterable_1, parameter_2=Iterable_2, ..., parameter_m=Iterable_m)
-
-                # The following is equivalent
-                sb.add_multiple_parameter_sweep_definition(my_callback, dict(parameter_1=Iterable_1, parameter_2=Iterable_2, ..., parameter_m=Iterable_m))
-                sb.add_multiple_parameter_sweep_definition(my_callback, **dict(parameter_1=Iterable_1, parameter_2=Iterable_2, ..., parameter_m=Iterable_m))
+            Refer to the comments in the add_sweep_definition function for examples
         """
         builder = SimulationBuilder()
         builder.add_multiple_parameter_sweep_definition(function, *args, **kwargs)
