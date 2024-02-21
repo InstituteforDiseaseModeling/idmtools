@@ -37,12 +37,12 @@ class TestSimulationBuilder(ITestWithPersistence):
 
     def get_templated_sim_builder(self):
         templated_sim = TemplatedSimulations(base_task=TestTask())
-        templated_sim.builder = self.builder
+        templated_sim.add_builder(self.builder)
         return templated_sim
 
     def get_simulations_with_builder(self, builder):
         templated_sim = TemplatedSimulations(base_task=TestTask())
-        templated_sim.builder = builder
+        templated_sim.add_builder(builder)
         simulations = list(templated_sim)
         return simulations
 
@@ -83,7 +83,7 @@ class TestSimulationBuilder(ITestWithPersistence):
         templated_sim2.builder = builder2
 
         simulations2_cfgs = list([s.task.parameters for s in templated_sim2])
-
+        self.assertEqual(builder2.count, len(simulations2_cfgs))
         for cfg in simulations_cfgs:
             self.assertIn(dict(b=cfg['b'], a=cfg['a']), simulations2_cfgs)
 
@@ -103,6 +103,7 @@ class TestSimulationBuilder(ITestWithPersistence):
             assert sweep[0].keywords['arg'] == test_args[i]
 
         simulations = self.get_simulations_with_builder(builder)
+        assert builder.count == len(simulations)
         for i, simulation in enumerate(simulations):
             assert simulation.tags['arg'] == test_args[i]
             assert simulation.task.parameters == {'param_a': test_args[i]}
@@ -236,6 +237,24 @@ class TestSimulationBuilder(ITestWithPersistence):
             assert sweep[0].keywords['sweep'] == test_args
 
         simulations = self.get_simulations_with_builder(builder)
+        assert simulations[0].tags['arg'] == test_args
+        assert simulations[0].task.parameters == {'arg': test_args}
+
+    def test_handle_callback_with_single_int_parameter(self):
+        builder = SimulationBuilder()
+
+        def sweep_function(simulation, sweep):
+            simulation.task.set_parameter('arg', sweep)
+            return {'arg': sweep}
+
+        test_args = 1
+        builder.add_sweep_definition(sweep_function, test_args)
+        assert len(builder) == 1
+        for i, sweep in enumerate(builder):
+            assert sweep[0].keywords['sweep'] == test_args
+
+        simulations = self.get_simulations_with_builder(builder)
+        assert builder.count == len(simulations) == 1
         assert simulations[0].tags['arg'] == test_args
         assert simulations[0].task.parameters == {'arg': test_args}
 
@@ -429,38 +448,44 @@ class TestSimulationBuilder(ITestWithPersistence):
             assert simulation.task.parameters == expected_results[i]
 
     # can handle a callback with extra default parameter
-    def test_handle_callback_with_default_parameters_3(self):
+    def test_handle_callback_with_default_parameters_in_dict(self):
         builder = SimulationBuilder()
 
-        def sweep_function(simulation, sweep1, sweep2=10, sweep3=20):
-            simulation.task.set_parameter('arg1', sweep1)
-            simulation.task.set_parameter('arg2', sweep2)
-            return {'sweep_a': sweep1, 'sweep_b': sweep2}
+        def sweep_function(simulation, a, b, c=20):
+            simulation.task.set_parameter('arg1', a)
+            simulation.task.set_parameter('arg2', b)
+            simulation.task.set_parameter('arg3', c)
+            return {'sweep_a': a, 'sweep_b': b, 'sweep_c': c}
 
-        with pytest.raises(ValueError) as context:
-            builder.add_sweep_definition(sweep_function, range(3), [4, 5])
-        assert context.value.args[
-                   0] == "Currently the callback has 1 required parameters and callback has 3 parameters but there were 2 arguments passed."
+        builder.add_sweep_definition(sweep_function, {'a': [3, 4], 'b': range(3)})
+        expected_values = list(itertools.product([3, 4], range(3), [20]))
+        simulations = self.get_simulations_with_builder(builder)
+        assert len(simulations) == builder.count == 6
+        for i, simulation in enumerate(simulations):
+            assert simulation.task.parameters['arg1'] == expected_values[i][0]
+            assert simulation.task.parameters['arg2'] == expected_values[i][1]
+            assert simulation.task.parameters['arg3'] == expected_values[i][2]
 
-    # raises a ValueError when adding a single-argument sweep definition with no simulation argument
-    def test_raises_value_error_single_argument_no_simulation(self):
+    def test_partial_function(self):
         builder = SimulationBuilder()
 
-        def sweep_function(sweep):
-            return {'arg': sweep}
+        def sweep_function(simulation, a, b, c):
+            simulation.task.set_parameter('arg1', a)
+            simulation.task.set_parameter('arg2', b)
+            simulation.task.set_parameter('arg3', c)
+            return {'sweep_a': a, 'sweep_b': b, 'sweep_c': c}
+        setB = partial(sweep_function, b=5)
 
-        with pytest.raises(ValueError) as context:
-            builder.add_sweep_definition(sweep_function, [1, 2, 3])
-        assert context.value.args[
-                   0] == "The callback function passed to SweepBuilder.add_sweep_definition needs to take a simulation argument!"
-
-    def test_raises_value_error_with_extra_arguments_in_dict(self):
-        def my_func(simulation, a):  # test dict key mismatch ('a' vs 'aa' here)
-            return {"first": a}
-
-        with pytest.raises(ValueError) as context:
-            self.builder.add_sweep_definition(my_func, dict({"aa": 1}))
-        assert context.value.args[0] == "Extra arguments passed: aa."
+        builder.add_sweep_definition(setB, range(3), range(2))
+        assert builder.count == len(builder)
+        expected_values = list(itertools.product(range(3), [5], range(2)))
+        simulations = self.get_simulations_with_builder(builder)
+        assert builder.count == len(simulations) == 6
+        for i, simulation in enumerate(simulations):
+            assert simulation.tags['sweep_a'] == expected_values[i][0]
+            assert simulation.tags['sweep_b'] == 5
+            assert simulation.tags['sweep_c'] == expected_values[i][2]
+            assert simulation.task.parameters == {'arg1': expected_values[i][0], 'arg2': 5, 'arg3':expected_values[i][2]}
 
     def test_add_sweep_definition_with_tuple(self):
         a = (4, 5, 6)
@@ -608,7 +633,41 @@ class TestSimulationBuilder(ITestWithPersistence):
             assert simulation.tags == expected_tags[i]
             assert simulation.task.parameters == expected_tags[i]
 
-    # raises a ValueError when adding a multi-argument sweep definition with no simulation argument
+    # raises a ValueError when adding a single-argument sweep definition with extra parameters
+    def test_raises_value_error_with_extra_parameters(self):
+        builder = SimulationBuilder()
+
+        def sweep_function(simulation, sweep1, sweep2=10, sweep3=20):
+            simulation.task.set_parameter('arg1', sweep1)
+            simulation.task.set_parameter('arg2', sweep2)
+            return {'sweep_a': sweep1, 'sweep_b': sweep2}
+
+        with pytest.raises(ValueError) as context:
+            builder.add_sweep_definition(sweep_function, range(3), [4, 5])
+        assert context.value.args[
+                   0] == "Currently the callback has 1 required parameters and callback has 3 parameters but there were 2 arguments passed."
+
+    # raises a ValueError when adding a single-argument sweep definition with no simulation argument
+    def test_raises_value_error_single_argument_no_simulation(self):
+        builder = SimulationBuilder()
+
+        def sweep_function(sweep):
+            return {'arg': sweep}
+
+        with pytest.raises(ValueError) as context:
+            builder.add_sweep_definition(sweep_function, [1, 2, 3])
+        assert context.value.args[
+                   0] == "The callback function passed to SweepBuilder.add_sweep_definition needs to take a simulation argument!"
+
+    def test_raises_value_error_with_extra_arguments_in_dict(self):
+        def my_func(simulation, a):  # test dict key mismatch ('a' vs 'aa' here)
+            return {"first": a}
+
+        with pytest.raises(ValueError) as context:
+            self.builder.add_sweep_definition(my_func, dict({"aa": 1}))
+        assert context.value.args[0] == "Extra arguments passed: aa."
+
+    # raises a ValueError when adding a single-argument sweep definition with no simulation argument
     def test_raises_value_error_with_no_simulation_argument(self):
         builder = SimulationBuilder()
 
@@ -616,9 +675,58 @@ class TestSimulationBuilder(ITestWithPersistence):
             return {'arg1': arg1, 'arg2': arg2}
 
         with pytest.raises(ValueError) as context:
-            builder.add_multiple_parameter_sweep_definition(sweep_function, arg1=[1, 2, 3], arg2=[4, 5, 6])
+            builder.add_sweep_definition(sweep_function, arg1=[1, 2, 3], arg2=[4, 5, 6])
         assert context.value.args[
                    0] == "The callback function passed to SweepBuilder.add_sweep_definition needs to take a simulation argument!"
+
+    # raises a ValueError when adding a single-argument sweep definition with args and kwargs provided
+    def test_raises_value_error_with_both_arguments_given(self):
+        builder = SimulationBuilder()
+
+        def sweep_function(simulation, arg1, arg2):
+            return {'arg1': arg1, 'arg2': arg2}
+
+        with pytest.raises(ValueError) as context:
+            builder.add_sweep_definition(sweep_function, [1, 2, 3], arg2=[4, 5, 6])
+        assert context.value.args[
+                   0] == "Currently in multi-argument sweep definitions, you have to supply either a arguments or keyword arguments, but not both."
+
+    # raises a ValueError when adding a single-argument sweep definition with wrong required params passed
+    def test_raises_value_error_with_wrong_len_required_params(self):
+        builder = SimulationBuilder()
+
+        def sweep_function(simulation, a=0):
+            return {'arg1': a}
+
+        with pytest.raises(ValueError) as context:
+            builder.add_sweep_definition(sweep_function, [1, 2, 3], [4, 5, 6])
+        assert context.value.args[
+                   0] == "Currently the callback 1 parameters (all have default values) and there were 2 arguments passed."
+
+    # raises a ValueError when adding a single-argument sweep definition with missing required params
+    def test_raises_value_error_with_missing_required_params_value(self):
+        builder = SimulationBuilder()
+
+        def sweep_function(simulation, a, b=1, c=10):
+            return {'arg1': a}
+
+        with pytest.raises(ValueError) as context:
+            builder.add_sweep_definition(sweep_function)
+        assert context.value.args[
+                   0] == "Missing arguments: ['a']."
+
+    # raises a ValueError when adding a single-argument sweep definition with miss matched parameters
+    def test_raises_value_error_with_miss_matched_params(self):
+        builder = SimulationBuilder()
+
+        def sweep_function(simulation, a=0, b=1, c=3):
+            return {'arg1': a}
+        setB = partial(sweep_function, b=5)
+
+        with pytest.raises(ValueError) as context:
+            builder.add_sweep_definition(setB, range(2))
+        assert context.value.args[
+                   0] == "Currently the callback has 3 parameters (all have default values) and there were 1 arguments passed."
 
     # Test cases to pass single dict item to add_multiple_parameter_sweep_definition:
     def test_add_multiple_parameter_sweep_definition_dict(self):
@@ -692,4 +800,28 @@ class TestSimulationBuilder(ITestWithPersistence):
         simulations = self.get_simulations_with_builder(builder)
         assert simulations[0].task.parameters['arg1'].equals(pd.DataFrame(data)['arg1'])
         assert simulations[0].task.parameters['arg2'].equals(pd.DataFrame(data)['arg2'])
+
+    def test_add_sweep_definition_with_default_pandas_args(self):
+        builder = SimulationBuilder()
+
+        data = {
+            "arg1": [420, 380, 390],
+            "arg2": [50, 40, 45]
+        }
+
+        def sweep_function(simulation, value, df=pd.DataFrame(data)):
+            simulation.task.set_parameter('value', value)
+            simulation.task.set_parameter('arg1', df['arg1'])
+            simulation.task.set_parameter('arg2', df['arg2'])
+            return {'value': value, 'arg1': df['arg1'], 'arg2': df['arg2']}
+
+        builder.add_sweep_definition(sweep_function, range(2))
+
+        simulations = self.get_simulations_with_builder(builder)
+        assert builder.count == len(simulations) == 2
+        for i, simulation in enumerate(simulations):
+            assert simulation.task.parameters['value'] == i
+            assert simulation.task.parameters['arg1'].equals(pd.DataFrame(data)['arg1'])
+            assert simulation.task.parameters['arg2'].equals(pd.DataFrame(data)['arg2'])
+
 
