@@ -102,25 +102,25 @@ class SimulationBuilder:
                 # If all parameters have default values, we can even simply do
                 sb3.add_sweep_definition(three_param_callback)
 
+            Remark: in general::
 
-            Remark: in general
                 def my_callback(simulation, parameter_1, parameter_2, ..., parameter_n):
                     pass
 
-                Calling Sweeps that take multiple parameters::
+            Calling Sweeps that take multiple parameters::
 
                 sb = SimulationBuilder()
                 sb.add_sweep_definition(my_callback, Iterable_1, Iterable_2, ..., Iterable_m)
 
-                Note:   the # of Iterable object must match the parameters # of my_callback, which don't have default values
+                # Note: the # of Iterable object must match the parameters # of my_callback, which don't have default values
 
-                Or use the key (parameter names)
+                # Or use the key (parameter names)
 
                 sb = SimulationBuilder()
                 sb.add_sweep_definition(my_callback, parameter_1=Iterable_1, parameter_2=Iterable_2, ..., parameter_m=Iterable_m)
                 # The following is equivalent
                 sb.add_sweep_definition(my_callback, dict(parameter_1=Iterable_1, parameter_2=Iterable_2, ..., parameter_m=Iterable_m))
-                and
+                # and
                 sb.add_sweep_definition(my_callback, **dict(parameter_1=Iterable_1, parameter_2=Iterable_2, ..., parameter_m=Iterable_m))
         """
         remaining_parameters = self._extract_remaining_parameters(function)
@@ -275,24 +275,25 @@ class SimulationBuilder:
                 sb3.add_sweep_definition(three_param_callback)
 
 
-            Remark: in general
+            Remark: in general::
+
                 def my_callback(simulation, parameter_1, parameter_2, ..., parameter_n):
                     pass
 
-                Calling Sweeps that take multiple parameters::
+            Calling Sweeps that take multiple parameters::
 
                 sb = SimulationBuilder()
                 sb.add_sweep_definition(my_callback, Iterable_1, Iterable_2, ..., Iterable_m)
 
-                Note:   the # of Iterable object must match the parameters # of my_callback, which don't have default values
+                # Note:  the # of Iterable object must match the parameters # of my_callback, which don't have default values
 
-                Or use the key (parameter names)
+                # Or use the key (parameter names)
 
                 sb = SimulationBuilder()
                 sb.add_sweep_definition(my_callback, parameter_1=Iterable_1, parameter_2=Iterable_2, ..., parameter_m=Iterable_m)
                 # The following is equivalent
                 sb.add_sweep_definition(my_callback, dict(parameter_1=Iterable_1, parameter_2=Iterable_2, ..., parameter_m=Iterable_m))
-                and
+                # and
                 sb.add_sweep_definition(my_callback, **dict(parameter_1=Iterable_1, parameter_2=Iterable_2, ..., parameter_m=Iterable_m))
         """
         self.add_sweep_definition(function, *args, **kwargs)
