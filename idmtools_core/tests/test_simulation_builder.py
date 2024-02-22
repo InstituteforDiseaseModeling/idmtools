@@ -8,12 +8,15 @@ import pytest
 from idmtools.builders import SimulationBuilder
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
-from idmtools_models.json_configured_task import JSONConfiguredTask
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.test_task import TestTask
 
-setA = partial(JSONConfiguredTask.set_parameter_sweep_callback, param="a")
-setB = partial(JSONConfiguredTask.set_parameter_sweep_callback, param="b")
+
+def param_update(simulation, param, value):
+    return simulation.task.set_parameter(param, value)
+
+setA = partial(param_update, param="a")
+setB = partial(param_update, param="b")
 
 
 def update_parameter_callback(simulation, a, b, c):

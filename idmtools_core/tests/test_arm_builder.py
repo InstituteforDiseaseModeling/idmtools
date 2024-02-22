@@ -24,6 +24,9 @@ class TestTestTask(TestTask):
 
 setA = partial(TestTestTask.set_parameter_sweep_callback, param="a")
 setB = partial(TestTestTask.set_parameter_sweep_callback, param="b")
+setC = partial(TestTestTask.set_parameter_sweep_callback, param="c")
+setD = partial(TestTestTask.set_parameter_sweep_callback, param="d")
+setE = partial(TestTestTask.set_parameter_sweep_callback, param="e")
 
 
 def update_parameter_callback(simulation, a, b, c):
@@ -148,7 +151,6 @@ class TestArmBuilder(ITestWithPersistence):
         c = "test"
         arm.add_multiple_parameter_sweep_definition(update_parameter_callback, a, b, c)
         d = (6, 7)
-        setD = partial(JSONConfiguredTask.set_parameter_sweep_callback, param="d")
         arm.add_sweep_definition(setD, d)
         self.builder.add_arm(arm)
         self.assertEqual(self.builder.count, len(a) * len(b) * len([c]) * len(d))
@@ -170,7 +172,6 @@ class TestArmBuilder(ITestWithPersistence):
             arm.add_multiple_parameter_sweep_definition(update_parameter_callback, a, b, c)
             self.assertEqual(arm.count, len(a) * len(b) * len([c]))
             d = range(10)
-            setD = partial(JSONConfiguredTask.set_parameter_sweep_callback, param="d")
             arm.add_sweep_definition(setD, d)
             self.builder.add_arm(arm)
             self.assertEqual(self.builder.count, len(d))  # for pair, count equals each arm's count
@@ -190,7 +191,6 @@ class TestArmBuilder(ITestWithPersistence):
             arm3 = SweepArm(type=ArmType.pair)
             arm3.add_multiple_parameter_sweep_definition(update_parameter_callback, a, b, c)
             e = [1,2,3]
-            setE = partial(JSONConfiguredTask.set_parameter_sweep_callback, param="e")
             with self.assertRaises(ValueError) as ex:
                 arm3.add_sweep_definition(setE, e)
             self.assertEqual(ex.exception.args[0],
