@@ -14,7 +14,7 @@ ao = AssetizeOutput(file_patterns=["*.out"], related_experiments=[experiment], n
 # Exclude some output files while preserving the default exclusions of stdout and stderr.txt
 ao.exclude_patterns.append("3.out")
 ao.exclude_patterns.append("5.out")
-ao.run(wait_on_done=True)
+ao.run(wait_until_done=True)
 
 if ao.succeeded:
     for asset in sorted(ao.asset_collection, key=lambda sa: sa.short_remote_path().rjust(6)):

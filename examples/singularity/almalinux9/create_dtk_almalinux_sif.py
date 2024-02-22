@@ -15,7 +15,7 @@ def make_work():
                                  definition_file='dtk_almalinux.def', image_name="dtk_build_almalinux.sif", force=True)
 
   # Wait until the image is built
-  ac_obj=sbwi.run(wait_on_done=True, platform=platform)
+  ac_obj=sbwi.run(wait_until_done=True, platform=platform)
 
   if sbwi.succeeded:
     print("sbi.id: ", sbwi.id)

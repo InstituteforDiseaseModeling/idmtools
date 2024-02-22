@@ -14,4 +14,4 @@ if __name__ == "__main__":
     # wi.set_work_order(data)
     # Or directly pass work_order
     wi = VisToolsWorkItem(name=wi_name, tags=tags, work_order=data, related_simulations=[sim_id])
-    wi.run(wait_on_done=True)
+    wi.run(wait_until_done=True)

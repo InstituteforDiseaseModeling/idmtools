@@ -19,7 +19,7 @@ if __name__ == "__main__":
     wi.transient_assets.add_asset(os.path.join("climate", "site_details.csv"))
     # upload WorkOrder.json to workitem's root dir in COMPS
     wi.load_work_order(os.path.join("climate", "WorkOrder.json"))
-    wi.run(wait_on_done=True)
+    wi.run(wait_until_done=True)
     wi_id = wi.id
     print(wi_id)
     # download generated er5 climate files to local "output_er5" folder by download cli util

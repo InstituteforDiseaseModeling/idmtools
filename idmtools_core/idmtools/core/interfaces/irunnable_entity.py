@@ -3,6 +3,7 @@ IRunnableEntity definition. IRunnableEntity defines items that can be ran using 
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+import warnings
 from dataclasses import field, dataclass
 from inspect import signature
 from logging import getLogger, DEBUG
@@ -17,6 +18,7 @@ if TYPE_CHECKING:  # pragma: no cover
 
 runnable_hook = Callable[['IRunnableEntity', 'IPlatform'], None]
 logger = getLogger(__name__)
+user_logger = getLogger('user')
 
 
 @dataclass
@@ -87,7 +89,7 @@ class IRunnableEntity(IEntity, metaclass=ABCMeta):
             raise ValueError("Post Run hooks should have 2 arguments. The first argument will be the item, the second the platform")
         self.__post_run_hooks.append(hook)
 
-    def run(self, wait_until_done: bool = False, platform: 'IPlatform' = None, wait_on_done_progress: bool = True, wait_on_done: bool = True, **run_opts) -> NoReturn:
+    def run(self, wait_until_done: bool = False, platform: 'IPlatform' = None, wait_on_done_progress: bool = True, **run_opts) -> NoReturn:
         """
         Runs an item.
 
@@ -101,8 +103,12 @@ class IRunnableEntity(IEntity, metaclass=ABCMeta):
             None
         """
         p = super()._check_for_platform_from_context(platform)
+        if 'wait_on_done' in run_opts:
+            warnings.warn("wait_on_done will be deprecated soon. Please use wait_until_done instead.",
+                          DeprecationWarning, 2)
+            user_logger.warning("wait_on_done will be deprecated soon. Please use wait_until_done instead.")
         p.run_items(self, wait_on_done_progress=wait_on_done_progress, **run_opts)
-        if wait_until_done or wait_on_done:
+        if wait_until_done or run_opts.get('wait_on_done', False):
             self.wait(wait_on_done_progress=wait_on_done_progress, platform=p)
 
     def wait(self, wait_on_done_progress: bool = True, timeout: int = None, refresh_interval=None, platform: 'IPlatform' = None, **kwargs):
