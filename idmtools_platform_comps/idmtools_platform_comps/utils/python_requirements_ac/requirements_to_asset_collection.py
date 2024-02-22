@@ -305,7 +305,7 @@ class RequirementsToAssetCollection:
                           transient_assets=AssetCollection([os.path.join(CURRENT_DIRECTORY, MODEL_CREATE_AC)]),
                           tags=tags, related_experiments=[exp_id])
 
-        wi.run(wait_on_done=True, platform=self.platform)
+        wi.run(wait_until_done=True, platform=self.platform)
 
         if wi.succeeded:
             # make ac as related_asset_collection to wi

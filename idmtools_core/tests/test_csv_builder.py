@@ -39,8 +39,16 @@ class TestCsvBuilder(ITestWithPersistence):
         func_map = {'a': setA, 'b': setB, 'c': setC, 'd': setD}
         type_map = {'a': np.int64, 'b': np.int64, 'c': np.int64, 'd': np.int64}
         self.builder.add_sweeps_from_file(file_path, func_map, type_map)
+        self.assertEqual(self.builder.count, 5)
 
-        # expected_values = list(itertools.product(range(5), [1, 2, 3]))
+        import pandas as pd
+
+        data = pd.read_csv(file_path).replace({np.nan: None})
+        # Convert the DataFrame to a Dictionary
+        data_dict = data.to_dict(orient='records')
+        expected_values = []
+        for d in data_dict:
+            expected_values.append({k: int(v) for k, v in d.items() if v is not None})
 
         templated_sim = TemplatedSimulations(base_task=TestTask())
         templated_sim.builder = self.builder
@@ -49,11 +57,6 @@ class TestCsvBuilder(ITestWithPersistence):
 
         # Test if we have correct number of simulations
         self.assertEqual(len(simulations), 5)
+        for i, simulation in enumerate(simulations):
+            self.assertEqual(simulation.task.parameters, expected_values[i])
 
-        # Verify simulations individually
-        # for simulation in simulations:
-        #     found = verify_simulation(simulation, ["a", "b"], expected_values)
-        #     self.assertTrue(found)
-
-    def test_complex_scenario(self):
-        pass

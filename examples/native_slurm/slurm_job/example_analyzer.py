@@ -75,7 +75,7 @@ def run_experiment():
     e.assets.add_directory(assets_directory=os.path.join(COMMON_INPUT_PATH, "python", "Assets"))
     suite = Suite(name='Idm Suite')
     suite.add_experiment(e)
-    suite.run(platform=platform, wait_on_done=True, max_running_jobs=5, retries=5)
+    suite.run(platform=platform, wait_until_done=True, max_running_jobs=5, retries=5)
     return e.id
 
 

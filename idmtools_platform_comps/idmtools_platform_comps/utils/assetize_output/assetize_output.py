@@ -5,6 +5,8 @@ Notes:
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+import warnings
+from logging import getLogger
 from pathlib import PurePath
 from uuid import UUID
 from dataclasses import dataclass, field
@@ -15,6 +17,9 @@ from idmtools.entities.iplatform import IPlatform
 from idmtools.entities.relation_type import RelationType
 from idmtools.core.enums import EntityStatus
 from idmtools_platform_comps.utils.file_filter_workitem import FileFilterWorkItem
+
+logger = getLogger(__name__)
+user_logger = getLogger('user')
 
 
 @dataclass(repr=False)
@@ -73,7 +78,7 @@ class AssetizeOutput(FileFilterWorkItem):
         for ac in self.related_asset_collections:
             self.asset_tags['AssetizedOutputfromAssetCollection'] = str(ac.id)
 
-    def run(self, wait_until_done: bool = False, platform: 'IPlatform' = None, wait_on_done_progress: bool = True, wait_on_done: bool = True, **run_opts) -> Union[AssetCollection, None]:
+    def run(self, wait_until_done: bool = False, platform: 'IPlatform' = None, wait_on_done_progress: bool = True, **run_opts) -> Union[AssetCollection, None]:
         """
         Run the AssetizeOutput.
 
@@ -81,15 +86,17 @@ class AssetizeOutput(FileFilterWorkItem):
             wait_until_done: Wait until Done will wait for the workitem to complete
             platform: Platform Object
             wait_on_done_progress: When set to true, a progress bar will be shown from the item
-            wait_on_done: Wait for item to be done. This will first wait on any dependencies
             **run_opts: Additional options to pass to Run on platform
 
         Returns:
             AssetCollection created if item succeeds
         """
         p = super()._check_for_platform_from_context(platform)
+        if 'wait_on_done' in run_opts:
+            warnings.warn("wait_on_done will be deprecated soon. Please use wait_until_done instead.", DeprecationWarning, 2)
+            user_logger.warning("wait_on_done will be deprecated soon. Please use wait_until_done instead.")
         p.run_items(self, wait_on_done_progress=wait_on_done_progress, **run_opts)
-        if wait_until_done or wait_on_done:
+        if wait_until_done or run_opts.get('wait_on_done', False):
             return self.wait(wait_on_done_progress=wait_on_done_progress, platform=p)
 
     def wait(self, wait_on_done_progress: bool = True, timeout: int = None, refresh_interval=None, platform: 'IPlatform' = None) -> Union[AssetCollection, None]:

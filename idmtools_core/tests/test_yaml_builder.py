@@ -3,7 +3,6 @@ import os
 from functools import partial
 
 import pytest
-from idmtools.builders.arm_simulation_builder import ArmType
 from idmtools.builders.yaml_simulation_builder import YamlSimulationBuilder
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_test import COMMON_INPUT_PATH
@@ -39,44 +38,28 @@ class TestYamlBuilder(ITestWithPersistence):
         templated_sim.builder = self.builder
         return templated_sim
 
-    def test_simple_yaml_cross(self):
+    def test_simple_yaml(self):
         file_path = os.path.join(self.base_path, 'sweeps.yaml')
         func_map = {'a': setA, 'b': setB, 'c': setC, 'd': setD}
         self.builder.add_sweeps_from_file(file_path, func_map)
-
-        # expected_values = list(itertools.product(range(5), [1, 2, 3]))
+        self.assertEqual(self.builder.count, 10)
 
         templated_sim = self.get_templated_sim_builder()
         simulations = list(templated_sim)
 
-        # Test if we have correct number of simulations
         self.assertEqual(len(simulations), 10)
+        expected_values = [{'a': 1, 'b': 2, 'c': 3, 'd': 5},  # group1
+                           {'a': 1, 'b': 2, 'c': 3, 'd': 6},  # group1
+                           {'a': 1, 'b': 2, 'c': 4, 'd': 5},  # group1
+                           {'a': 1, 'b': 2, 'c': 4, 'd': 6},  # group1
+                           {'c': 3, 'd': 5},  # group2
+                           {'c': 3, 'd': 6},  # group2
+                           {'c': 3, 'd': 7},  # group2
+                           {'c': 4, 'd': 5},  # group2
+                           {'c': 4, 'd': 6},  # group2
+                           {'c': 4, 'd': 7}]  # group2
 
         # Verify simulations individually
-        # for simulation in simulations:
-        #     found = verify_simulation(simulation, ["a", "b"], expected_values)
-        #     self.assertTrue(found)
+        for i, simulation in enumerate(simulations):
+            self.assertEqual(simulation.task.parameters, expected_values[i])
 
-    def test_simple_yaml_zip(self):
-        file_path = os.path.join(self.base_path, 'sweeps.yaml')
-        func_map = {'a': setA, 'b': setB, 'c': setC, 'd': setD}
-        self.builder.add_sweeps_from_file(file_path, func_map, sweep_type=ArmType.pair)
-
-        # expected_values = list(itertools.product(range(5), [1, 2, 3]))
-
-        templated_sim = self.get_templated_sim_builder()
-        simulations = list(templated_sim)
-
-        for s in simulations:
-            print(s._uid, ": ", s.task.parameters)
-
-        # Test if we have correct number of simulations
-        self.assertEqual(len(simulations), 5)
-
-        # Verify simulations individually
-        # for simulation in simulations:
-        #     found = verify_simulation(simulation, ["a", "b"], expected_values)
-        #     self.assertTrue(found)
-
-    def test_complex_scenario(self):
-        pass

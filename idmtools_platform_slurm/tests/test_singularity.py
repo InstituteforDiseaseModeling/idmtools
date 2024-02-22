@@ -30,7 +30,7 @@ class TestSingularity(ITestWithPersistence):
         suite = Suite(name='Idm Suite')
         suite.update_tags({'name': 'suite_tag', 'idmtools': '123'})
         suite.add_experiment(experiment)
-        suite.run(platform=self.platform, wait_until_done=False, wait_on_done=False,
+        suite.run(platform=self.platform, wait_until_done=False,
                   max_running_jobs=10,
                   retries=5, dry_run=True)
         for simulation in experiment.simulations:
@@ -52,7 +52,7 @@ class TestSingularity(ITestWithPersistence):
         suite.update_tags({'name': 'suite_tag', 'idmtools': '123'})
         # Add experiment to the suite
         suite.add_experiment(experiment)
-        suite.run(platform=self.platform, wait_until_done=False, wait_on_done=False,
+        suite.run(platform=self.platform, wait_until_done=False,
                   max_running_jobs=10,
                   retries=5, dry_run=True)
         for simulation in experiment.simulations:
@@ -78,7 +78,7 @@ class TestSingularity(ITestWithPersistence):
         suite.update_tags({'name': 'suite_tag', 'idmtools': '123'})
         # Add experiment to the suite
         suite.add_experiment(experiment)
-        suite.run(platform=self.platform, wait_until_done=False, wait_on_done=False,
+        suite.run(platform=self.platform, wait_until_done=False,
                   max_running_jobs=10,
                   retries=5, dry_run=True)
         exp_dir = self.platform.get_directory(experiment)
@@ -111,7 +111,7 @@ class TestSingularity(ITestWithPersistence):
         suite.update_tags({'name': 'suite_tag', 'idmtools': '123'})
         # Add experiment to the suite
         suite.add_experiment(experiment)
-        suite.run(platform=platform, wait_until_done=False, wait_on_done=False,
+        suite.run(platform=platform, wait_until_done=False,
                   max_running_jobs=10,
                   retries=5, dry_run=True)
         for simulation in experiment.simulations:
