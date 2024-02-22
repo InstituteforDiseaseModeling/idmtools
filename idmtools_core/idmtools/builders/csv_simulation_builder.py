@@ -6,35 +6,25 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 import pandas as pd
 import numpy as np
 from numbers import Number
-from itertools import product
-from idmtools.builders import SimulationBuilder
+from idmtools.builders import ArmSimulationBuilder
+from idmtools.builders.arm_simulation_builder import SweepArm
 
 
-class CsvExperimentBuilder(SimulationBuilder):
+class CsvExperimentBuilder(ArmSimulationBuilder):
     """
     Class that represents an experiment builder.
-
     Examples:
         .. literalinclude:: ../../examples/builders/csv_builder_python.py
     """
 
-    def __init__(self):
-        """
-        Initialize our CsvExperimentBuilder.
-        """
-        super().__init__()
-        self.SweepFunctions = []
-
     def add_sweeps_from_file(self, file_path, func_map=None, type_map=None, sep=","):
         """
         Create sweeps from a CSV file.
-
         Args:
             file_path: Path to file
             func_map: Function map
             type_map: Type
             sep: CSV Seperator
-
         Returns:
             None
         """
@@ -51,7 +41,8 @@ class CsvExperimentBuilder(SimulationBuilder):
             return np.nan if y == '' else y
 
         # make up our column converter
-        convert_map = {c: strip_column for c, v in type_map.items() if v in (np.int64, np.float64, np.int64, np.float64)}
+        convert_map = {c: strip_column for c, v in type_map.items() if
+                       v in (np.int64, np.float64, np.int64, np.float64)}
 
         # load csv with our converter
         # df_sweeps = pd.read_csv(file_path, sep=sep)
@@ -71,19 +62,16 @@ class CsvExperimentBuilder(SimulationBuilder):
             # make parameter with the correct value type
             type_map_t = {k: v for k, v in type_map.items() if k in df.columns.tolist()}
             df = df.astype(type_map_t)
-
             # make dict like: {'a': [1], 'b': [2]}
             sweep = df.to_dict(orient='list')
+
+            # create an arm
+            arm = SweepArm()
 
             # go through each (key, value)
             for param, value in sweep.items():
                 # get the mapping function
                 func = func_map[param]
+                arm.add_sweep_definition(func, value)
 
-                self.add_sweep_definition(func, value)
-
-            self.SweepFunctions.extend(product(*self.sweeps))
-
-    def __iter__(self):
-        """Iterator."""
-        yield from self.SweepFunctions
+            self.add_arm(arm)
