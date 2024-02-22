@@ -7,7 +7,6 @@ from idmtools.builders import SimulationBuilder
 from idmtools.core.experiment_factory import experiment_factory
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.templated_simulation import TemplatedSimulations
-from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.test_platform import TestPlatform
@@ -24,16 +23,18 @@ class TestExperimentFactory(ITestWithPersistence):
         test_platform: TestPlatform = Platform('Test')
         experiment = experiment_factory.create("Experiment", tags={"a": "1", "b": 2})
         script_path = os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py")
-        ts = TemplatedSimulations(base_task=JSONConfiguredPythonTask(script_path=script_path))
+        from idmtools_test.utils.test_task import TestTask
+        ts = TemplatedSimulations(base_task=TestTask())
         builder = SimulationBuilder()
         builder.add_sweep_definition(lambda simulation, value: {"p": value}, range(0, 2))
         ts.add_builder(builder)
         experiment.simulations = ts
+        experiment.add_asset(script_path)
         test_platform.run_items(experiment)
 
         self.assertEqual(len(experiment.simulations), 2)
         self.assertEqual(experiment.assets.assets[0].filename, "working_model.py")
-        tag_value = "idmtools_models.python.json_python_task.JSONConfiguredPythonTask"
+        tag_value = "idmtools_test.utils.test_task.TestTask"
         self.assertEqual(experiment.simulations[0].tags, {'p': 0, 'task_type': tag_value})
         self.assertEqual(experiment.simulations[1].tags, {'p': 1, 'task_type': tag_value})
 

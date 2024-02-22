@@ -10,7 +10,7 @@ from COMPS.Data import Experiment as COMPSExperiment
 from COMPS.Data import Simulation as COMPSSimulation
 from COMPS.Data import QueryCriteria
 
-from idmtools.assets import Asset, AssetCollection
+from idmtools.assets import AssetCollection
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.command_task import CommandTask
@@ -18,7 +18,7 @@ from idmtools.utils.entities import save_id_as_file_as_hook
 
 from idmtools_platform_comps.utils.general import update_item
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
-from idmtools_test.utils.shared_functions import validate_output, validate_sim_tags
+from idmtools_test.utils.shared_functions import validate_sim_tags
 from idmtools_test.utils.utils import get_case_name
 
 from idmtools_platform_comps.comps_platform import COMPSPlatform
@@ -27,6 +27,7 @@ from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.registry.functions import FunctionPluginManager
 from idmtools.registry.hook_specs import function_hook_impl
+
 
 def initialize_plugins(**kwargs):
     """
@@ -43,6 +44,9 @@ def initialize_plugins(**kwargs):
 
 class Plugin_create_hook:
     """A 2nd hook implementation namespace."""
+
+    def __init__(self, **kwargs):
+        self.kwargs = kwargs
 
     @function_hook_impl
     def idmtools_platform_pre_create_item(self, item, **kwargs):
@@ -67,7 +71,7 @@ class Plugin_create_hook:
         Returns:
             None
         """
-        if isinstance(item, Simulation):
+        if isinstance(item, Simulation) and self.kwargs.get('my_test') == 1:
             item.tags.update({"sim_tag_post_key": "sim_tag_post_value"})
 
 @pytest.mark.comps
@@ -238,7 +242,7 @@ class TestHooks(ITestWithPersistence):
 
         exp = Experiment(name=self.case_name)
         exp.simulations = [sim]
-        kwargs = {}
+        kwargs = {"my_test": 1}
 
         def _pre_run(**kwargs):
             initialize_plugins(**kwargs)
