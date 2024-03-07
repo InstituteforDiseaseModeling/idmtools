@@ -4,12 +4,11 @@ idmtools SimulationBuilder definition.
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import inspect
+import pandas as pd
 from functools import partial
 from inspect import signature
 from itertools import product
 from typing import Callable, Any, Iterable, Union, Dict, Sized
-import pandas as pd
-
 from idmtools.entities.simulation import Simulation
 from idmtools.utils.collections import duplicate_list_of_generators
 
@@ -47,7 +46,25 @@ class SimulationBuilder:
         Constructor.
         """
         self.sweeps = []
-        self.count = 0
+        self.__count = 0
+
+    @property
+    def count(self):
+        return self.__count
+
+    @count.setter
+    def count(self, cnt):
+        """
+        Set the count property.
+        Args:
+            cnt: count set
+        Returns:
+            int
+        """
+        if self.__count == 0:
+            self.__count = cnt
+        else:
+            self.__count = self.__count * cnt
 
     def add_sweep_definition(self, function: TSweepFunction, *args, **kwargs):
         """
@@ -141,7 +158,7 @@ class SimulationBuilder:
             values = kwargs
             self.case_kwargs(function, remaining_parameters, values)
         else:
-            required_params = {k: v for k, v in remaining_parameters.items() if v == inspect.Parameter.empty}
+            required_params = self._extract_required_parameters(remaining_parameters)
             if len(required_params) > 0:
                 raise ValueError(f"Missing arguments: {list(required_params)}.")
             self.sweeps.append((function,))
@@ -161,8 +178,7 @@ class SimulationBuilder:
 
     def case_args_tuple(self, function: TSweepFunction, remaining_parameters, values):
         # this is len(values) > 0 case
-        required_params = {k: v for k, v in remaining_parameters.items() if not isinstance(v, pd.DataFrame)}
-        required_params = {k: v for k, v in required_params.items() if v == inspect.Parameter.empty}
+        required_params = self._extract_required_parameters(remaining_parameters)
         _values = [self._validate_value(vals) for vals in values]
 
         if len(required_params) > 0 and len(required_params) != len(values):
@@ -173,7 +189,7 @@ class SimulationBuilder:
                 # Handle special case
                 generated_values = product(*_values)
                 self.sweeps.append(
-                    partial(function, **self._map_multi_argument_array(list(remaining_parameters), v)) for v in
+                    partial(function, **self._map_argument_array(list(remaining_parameters), v)) for v in
                     generated_values)
                 list(map(self._update_count, _values))
                 return
@@ -193,17 +209,16 @@ class SimulationBuilder:
         generated_values = product(*_values)
         if len(required_params) > 0:
             self.sweeps.append(
-                partial(function, **self._map_multi_argument_array(list(required_params), v)) for v in
+                partial(function, **self._map_argument_array(list(required_params), v)) for v in
                 generated_values)
         else:
             self.sweeps.append(
-                partial(function, **self._map_multi_argument_array(list(remaining_parameters), v)) for v in
+                partial(function, **self._map_argument_array(list(remaining_parameters), v)) for v in
                 generated_values)
         list(map(self._update_count, _values))
 
     def case_kwargs(self, function: TSweepFunction, remaining_parameters, values):
-        required_params = {k: v for k, v in remaining_parameters.items() if v == inspect.Parameter.empty}
-
+        required_params = self._extract_required_parameters(remaining_parameters)
         extra_inputs = list(set(values) - set(remaining_parameters))
         if len(extra_inputs) > 0:
             raise ValueError(
@@ -218,7 +233,7 @@ class SimulationBuilder:
         _values = {key: self._validate_value(vals) for key, vals in values.items()}
         generated_values = product(*_values.values())
         self.sweeps.append(
-            partial(function, **self._map_multi_argument_array(_values.keys(), v)) for v in generated_values)
+            partial(function, **self._map_argument_array(_values.keys(), v)) for v in generated_values)
         list(map(self._update_count, _values.values()))
 
     def add_multiple_parameter_sweep_definition(self, function: TSweepFunction, *args, **kwargs):
@@ -263,7 +278,7 @@ class SimulationBuilder:
             return list(value)
 
     @staticmethod
-    def _map_multi_argument_array(parameters, value_set, remainder: str = None) -> Dict[str, Iterable]:
+    def _map_argument_array(parameters, value_set, remainder: str = None) -> Dict[str, Iterable]:
         """
         Map multi-argument calls to parameters in a callback.
         Args:
@@ -280,6 +295,11 @@ class SimulationBuilder:
             return {remainder: call_args}
         else:
             return call_args
+
+    def _extract_required_parameters(self, remaining_parameters: Dict) -> Dict:
+        required_params = {k: v for k, v in remaining_parameters.items() if
+                           not isinstance(v, pd.DataFrame) and v == inspect.Parameter.empty}
+        return required_params
 
     def _update_count(self, values):
         """
