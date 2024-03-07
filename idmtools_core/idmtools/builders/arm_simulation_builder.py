@@ -3,11 +3,8 @@ idmtools arm builder definition.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
-from idmtools.builders import SimulationBuilder
-from idmtools.builders import TSweepFunction
 
 
-# class ArmSimulationBuilder(SimulationBuilder):
 class ArmSimulationBuilder:
     """
     Class that represents an experiment builder.
@@ -110,14 +107,6 @@ class ArmSimulationBuilder:
         """
         self.arms.append(arm)
         arm._update_sweep_functions()
-
-    # TODO: remove
-    def add_sweep_definition(self, function: TSweepFunction, *args, **kwargs):
-        raise ValueError(f"Please use SweepArm instead, or use SimulationBuilder directly!")
-
-    # TODO: remove
-    def add_multiple_parameter_sweep_definition(self, function: TSweepFunction, *args, **kwargs):
-        raise ValueError(f"Please use SweepArm instead, or use SimulationBuilder directly!")
 
     def __iter__(self):
         """
