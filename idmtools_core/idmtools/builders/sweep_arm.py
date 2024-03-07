@@ -33,7 +33,6 @@ class SweepArm(SimulationBuilder):
         Constructor.
         """
         self.type = type
-        # self.sweeps = []
         self.__count = 0
         self.__functions = None
         super().__init__()
@@ -45,16 +44,17 @@ class SweepArm(SimulationBuilder):
 
     @property
     def count(self):
+        """return simulations count."""
         return self.__count
 
     @count.setter
     def count(self, cnt):
         """
-        Set the count property.
+        Set simulations count.
         Args:
-            cnt: count set
+            cnt: count to set
         Returns:
-            int
+            None
         """
         if self.__count == 0:
             self.__count = cnt
