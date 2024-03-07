@@ -6,8 +6,7 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 import pandas as pd
 import numpy as np
 from numbers import Number
-from idmtools.builders import ArmSimulationBuilder
-from idmtools.builders.arm_simulation_builder import SweepArm
+from idmtools.builders import ArmSimulationBuilder, SweepArm
 
 
 class CsvExperimentBuilder(ArmSimulationBuilder):
