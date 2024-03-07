@@ -112,7 +112,7 @@ class TestArmBuilder(ITestWithPersistence):
             arm.add_sweep_definition(setB, b)  # Adding different length of list, expect throw exception
             self.builder.add_arm(arm)
         self.assertEqual(ex.exception.args[0],
-                         f"For pair case, all function inputs must have the save size/length: {len(b)} != {len(a)}")
+                         f"For pair case, all function inputs must have the same size/length: {len(b)} != {len(a)}")
 
     def test_simple_arm_pair(self):
         arm = SweepArm(type=ArmType.pair)
@@ -190,11 +190,11 @@ class TestArmBuilder(ITestWithPersistence):
             self.builder = ArmSimulationBuilder()
             arm3 = SweepArm(type=ArmType.pair)
             arm3.add_multiple_parameter_sweep_definition(update_parameter_callback, a, b, c)
-            e = [1,2,3]
+            e = [1, 2, 3]
             with self.assertRaises(ValueError) as ex:
                 arm3.add_sweep_definition(setE, e)
             self.assertEqual(ex.exception.args[0],
-                             f"For pair case, all function inputs must have the save size/length: {len(e)} != {len(a) * len(b) * len([c])}")
+                             f"For pair case, all function inputs must have the same size/length: {len(e)} != {len(a) * len(b) * len([c])}")
 
     def test_single_item_arm_builder(self):
         arm = SweepArm()
