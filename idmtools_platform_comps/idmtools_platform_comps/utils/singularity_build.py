@@ -27,8 +27,10 @@ from idmtools.core import EntityStatus, NoPlatformException
 from idmtools.core.logging import SUCCESS
 from idmtools.entities.command_task import CommandTask
 from idmtools.entities.relation_type import RelationType
+from idmtools.utils.file import write_md5_to_file
 from idmtools.utils.hashing import calculate_md5_stream
 from idmtools_platform_comps.ssmt_work_items.comps_workitems import InputDataWorkItem
+from idmtools_platform_comps.utils.general import get_asset_id
 from idmtools_platform_comps.utils.package_version import get_docker_manifest, get_digest_from_docker_hub
 
 if TYPE_CHECKING:
@@ -111,7 +113,7 @@ class SingularityBuildWorkItem(InputDataWorkItem):
         pass
 
     @property
-    def image_url(self):
+    def image_url(self):  # noqa: F811
         """Get the image url."""
         return self._image_url
 
@@ -397,7 +399,7 @@ class SingularityBuildWorkItem(InputDataWorkItem):
         ac = self.find_existing_container(self, platform=p)
         if ac is None or self.force:
             super().run(**opts)
-            return self.asset_collection
+
         else:
             if IdmConfigParser.is_output_enabled():
                 user_logger.log(SUCCESS, f"Existing build of image found with Asset Collection ID of {ac.id}")
@@ -409,7 +411,10 @@ class SingularityBuildWorkItem(InputDataWorkItem):
             self.asset_collection = ac
             # how do we get id for original work item from AC?
             self.status = EntityStatus.SUCCEEDED
-            return self.asset_collection
+
+        asset_dict = get_asset_id(self.asset_collection.id)
+        write_md5_to_file(asset_dict)
+        return self.asset_collection
 
     def wait(self, wait_on_done_progress: bool = True, timeout: int = None, refresh_interval=None, platform: 'IPlatform' = None, wait_progress_desc: str = None) -> Optional[AssetCollection]:
         """

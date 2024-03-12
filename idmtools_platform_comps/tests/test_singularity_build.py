@@ -1,4 +1,5 @@
 import os
+import shutil
 import unittest
 import allure
 import pytest
@@ -90,6 +91,9 @@ class TestSingularityBuild(unittest.TestCase):
         self.assertIsNotNone(sbi.asset_collection)
         self.assertIn('image_name', sbi.image_tags)
         self.assertIn('created_by', sbi.image_tags)
+        asset_file = os.path.join(os.curdir, "alpine_3.11.6.sif.asset_id")
+        self.assertTrue(os.path.exists(asset_file))
+        os.remove(asset_file)
 
     # because of new lines on python files, we have to make this different on different platforms
     # we can't do this everytime since latest changes
@@ -118,6 +122,9 @@ class TestSingularityBuild(unittest.TestCase):
         self.assertIn('build_context', sbi.image_tags)
         self.assertEqual(sbi.image_tags['image_name'], 'Singularity.sif')
         self.assertIn('created_by', sbi.image_tags)
+        asset_file = os.path.join(os.curdir, "Singularity.sif.asset_id")
+        self.assertTrue(os.path.exists(asset_file))
+        os.remove(asset_file)
 
     def test_singularity_template(self):
         sing_dir = os.path.join(COMMON_INPUT_PATH, 'singularity', 'alpine_template')
@@ -155,6 +162,13 @@ From: python:3.8.6
         self.assertIsNotNone(sbi.asset_collection)
         self.assertIn('image_name', sbi.image_tags)
         self.assertIn('created_by', sbi.image_tags)
+        asset_file = os.curdir + "/Singularity.jinja.sif.asset_id"
+        self.assertTrue(os.path.exists(asset_file))
+        with open(asset_file, "r") as asset_fd:
+            asset_file_content = asset_fd.read()
+            self.assertIn('Singularity.jinja.sif:asset_id:fb0a1109-6de1-1467-f50a-4dc2cf487cf9', asset_file_content)
+            asset_fd.close()
+        os.remove(asset_file)
 
     def test_singularity_from_definition_content_alpine(self):
         sing_dir = os.path.join(COMMON_INPUT_PATH, 'singularity', 'alpine_simple')
