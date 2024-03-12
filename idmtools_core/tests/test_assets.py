@@ -373,7 +373,29 @@ class TestAssets(unittest.TestCase):
         with open(dest, "rb") as dest_file:
             dest_content = dest_file.read()
         assert asset_content == dest_content
+        os.remove(dest)
 
-        
+    # downloads an asset with filename and content and saves it to destination file
+    def test_download_asset_with_filename_and_content(self):
+        # Initialize the asset object with a filename and content
+        asset = Asset(filename="file.txt", content=b"Hello, World!")
+
+        # Set the destination file path
+        dest = os.path.join(os.curdir, "output")
+        # Create the directory if it doesn't exist
+        os.makedirs(dest, exist_ok=True)
+        # Call the download_asset method
+        asset.download_asset(dest)
+
+        # Assert that the destination file exists
+        assert os.path.exists(dest)
+
+        # Assert that the content of the destination file is the same as the content of the asset
+        with open(os.path.join(dest, "file.txt"), "rb") as dest_file:
+            dest_content = dest_file.read()
+        assert asset.content == dest_content
+        os.remove(os.path.join(dest, "file.txt"))
+
+
 if __name__ == '__main__':
     unittest.main()
