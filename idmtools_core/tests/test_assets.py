@@ -351,6 +351,29 @@ class TestAssets(unittest.TestCase):
         ac.add_directory(bd, no_ignore=True)
         self.assertEqual(len(ac), 2)
 
+    # downloads an asset with absolute path and saves it to destination file
+    def test_download_asset_with_absolute_path(self):
+        # Initialize the asset object with an absolute path
+        asset = Asset(absolute_path=os.path.join("idmtools.ini"))
+
+        # Set the destination file path
+        dest = "output/idmtools.ini"
+
+        # Create the directory if it doesn't exist
+        os.makedirs(os.path.dirname(dest), exist_ok=True)
+        # Call the download_asset method
+        asset.download_asset(dest)
+
+        # Assert that the destination file exists
+        assert os.path.exists(dest)
+
+        # Assert that the content of the destination file is the same as the content of the asset file
+        with open(asset.absolute_path, "rb") as asset_file:
+            asset_content = asset_file.read()
+        with open(dest, "rb") as dest_file:
+            dest_content = dest_file.read()
+        assert asset_content == dest_content
+
         
 if __name__ == '__main__':
     unittest.main()
