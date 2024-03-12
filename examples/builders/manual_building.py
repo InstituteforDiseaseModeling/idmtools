@@ -19,7 +19,7 @@ from idmtools_test import COMMON_INPUT_PATH
 if __name__ == "__main__":
 
     # define our platform
-    platform = Platform('BELEGOST')
+    platform = Platform('Calculon')
 
     # create experiment  object and define some extra assets
     assets_path = os.path.join(COMMON_INPUT_PATH, "python", "Assets")

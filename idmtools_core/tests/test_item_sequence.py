@@ -1,5 +1,4 @@
 import json
-import os
 import time
 import unittest.mock
 from functools import partial
@@ -10,7 +9,6 @@ from idmtools import IdmConfigParser
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
-from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.test_execute_platform import clear_execute_platform
 from idmtools_test.utils.test_task import TestTask
@@ -161,8 +159,7 @@ class TestItemSequence(unittest.TestCase):
     def _run_experiment(self, ):
         platform = Platform('TestExecute', missing_ok=True)
 
-        task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"),
-                                        envelope="parameters", parameters=(dict(c=0)))
+        task = task = TestTask()
         ts = TemplatedSimulations(base_task=task)
         e = Experiment.from_template(ts)
         from idmtools.builders import SimulationBuilder
@@ -185,8 +182,7 @@ class TestItemSequence(unittest.TestCase):
         parser.ensure_init(file_name='idmtools_item_sequence.ini', force=True)
         sequence_file = self.get_sequence_file()
         mp = Path(COMMON_INPUT_PATH).joinpath("python").joinpath("model3.py")
-        task = JSONConfiguredPythonTask(script_path=str(mp),
-                                        envelope="parameters", parameters=(dict(c=0)))
+        task = TestTask()
         platform = Platform('TestExecute', missing_ok=True)
         ts = TemplatedSimulations(base_task=task)
         e = Experiment.from_template(ts)
@@ -216,8 +212,7 @@ class TestItemSequence(unittest.TestCase):
         parser.ensure_init(file_name='idmtools_default_location.ini', force=True)
         sequence_file = self.get_sequence_file()
         mp = Path(COMMON_INPUT_PATH).joinpath("python").joinpath("model3.py")
-        task = JSONConfiguredPythonTask(script_path=str(mp),
-                                        envelope="parameters", parameters=(dict(c=0)))
+        task = TestTask()
         platform = Platform('TestExecute', missing_ok=True)
         ts = TemplatedSimulations(base_task=task)
         e = Experiment.from_template(ts)
