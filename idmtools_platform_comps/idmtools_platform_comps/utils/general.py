@@ -4,12 +4,14 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import ntpath
 import re
+import uuid
 from logging import getLogger, DEBUG
 from typing import List, Dict, Union, Generator, Optional
 from uuid import UUID
 
 from COMPS import Client
-from COMPS.Data import Simulation, SimulationFile, AssetCollectionFile, WorkItemFile, OutputFileMetadata, Experiment
+from COMPS.Data import Simulation, SimulationFile, AssetCollectionFile, WorkItemFile, OutputFileMetadata, Experiment, \
+    AssetCollection, QueryCriteria
 from COMPS.Data.AssetFile import AssetFile
 from COMPS.Data.Simulation import SimulationState
 from COMPS.Data.WorkItem import WorkItemState, WorkItem
@@ -265,3 +267,50 @@ def update_item(platform: IPlatform, item_id: str, item_type: ItemType, tags: di
     if name is not None:
         comps_item.name = name
     comps_item.save()
+
+
+def get_asset_id(ac_id: str):
+    """
+    Get dictionary of file name as key and md5 as value.
+
+    Args:
+        ac_id: asset collection id string
+
+    Returns:
+        Dictionary in structure of filename:md5
+    """
+    ac = AssetCollection.get(ac_id)
+    acs = ac.get(ac.id, QueryCriteria().select_children('assets'))
+    md5_file_dict = {}
+    for asset in acs.assets:
+        md5_file_dict[asset.file_name] = asset.md5_checksum
+
+    return md5_file_dict
+
+
+def generate_ac_from_asset_id(file_name: str, asset_id: [str, uuid.UUID], tags: dict = None):
+    """
+    Get an asset collection by asset id(md5).
+    Args:
+        file_name: file name string
+        asset_id: asset id (md5)
+
+    Returns:
+        COMPS AssetCollection
+    """
+    if tags is None:
+        tags = {'Name': file_name, 'md5': asset_id}
+    else:
+        tags['Name'] = file_name
+        tags['md5'] = asset_id
+
+    ac = AssetCollection()
+
+    ac.set_tags(tags)
+    asset_dict = {file_name: asset_id}
+    for file_name, md5 in asset_dict.items():
+        acf = AssetCollectionFile(file_name=file_name, md5_checksum=md5)
+        ac.add_asset(acf)
+    ac.save()
+    print('done - created AC ' + str(ac.id))
+    return ac
