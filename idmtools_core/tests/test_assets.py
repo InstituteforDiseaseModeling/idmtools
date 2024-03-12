@@ -351,11 +351,6 @@ class TestAssets(unittest.TestCase):
         ac.add_directory(bd, no_ignore=True)
         self.assertEqual(len(ac), 2)
 
-    def test_download_asset(self):
-        asset = Asset(filename='my_shiny_new1.sif', checksum='8ced1fc3-cc4e-d3c5-b3fd-2919739deb2c')
-        ac = AssetCollection()
-        ac.add_asset(asset)
-        print(ac.id)
         
 if __name__ == '__main__':
     unittest.main()
