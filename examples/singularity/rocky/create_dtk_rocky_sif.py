@@ -18,4 +18,5 @@ if __name__ == '__main__':
         # Write ID file
         sbi.asset_collection.to_id_file(f"{platform._config_block}_dtk_run_rocky_py39_prod.id")
         print("ac_obj: ", ac_obj.id)
-        get_files(sbi.id, "dtk_run_rocky_py39.sif")
+        # uncomment the following line to download dtk_run_rocky_py39.sif to local current directory
+        #get_files(sbi.id, "dtk_run_rocky_py39.sif")
