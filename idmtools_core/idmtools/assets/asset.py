@@ -6,15 +6,16 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 
 import io
 import os
-import shutil
 from dataclasses import dataclass, field, InitVar
+from functools import partial
 from io import BytesIO
 from logging import getLogger, DEBUG
-from pathlib import PurePosixPath, Path
+from pathlib import PurePosixPath
 from typing import TypeVar, Union, List, Callable, Any, Optional, Generator, BinaryIO
 import backoff
 import requests
 from idmtools import IdmConfigParser
+from idmtools.utils.file import file_content_to_generator, content_generator
 from idmtools.utils.hashing import calculate_md5, calculate_md5_stream
 
 logger = getLogger(__name__)
@@ -413,19 +414,34 @@ class Asset:
             path = PurePosixPath(self.filename)
         return str(path)
 
-    def download_asset(self, dest: str):  # noqa: F811
+    def save_as(self, dest: str, force: bool = False):  # noqa: F811
         """
         Download asset object to destination file.
         Args:
             dest: the file path
+            force: force download
         Returns:
             None
         """
-        if self.absolute_path:
-            shutil.copy(self.absolute_path, dest)
-        elif self.filename and self.content:
-            dest_path = Path(dest, self.filename)
-            dest_path.write_bytes(self.bytes)
+        if self.absolute_path is not None:
+            self.download_generator_hook = partial(file_content_to_generator, self.absolute_path)
+        elif self.content:
+            self.download_generator_hook = partial(content_generator, self.content)
+        else:
+            raise ValueError("Asset has no content or absolute path")
+
+        self.download_to_path(dest, force)
+
+    def save_md5_checksum(self):
+        """
+        Save the md5 checksum of the asset to a file in the same directory as the asset.
+        Returns:
+            None
+        """
+        asset = Asset(filename=f"{self.filename}.asset_id", content=f"{self.filename}:asset_id:{self.checksum}".encode())
+        if asset.checksum is None:
+            asset.calculate_checksum()
+        asset.save_as(os.path.curdir, force=True)
 
 
 TAsset = TypeVar("TAsset", bound=Asset)

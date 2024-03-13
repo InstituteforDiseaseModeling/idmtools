@@ -10,8 +10,8 @@ from typing import List, Dict, Union, Generator, Optional
 from uuid import UUID
 
 from COMPS import Client
-from COMPS.Data import Simulation, SimulationFile, AssetCollectionFile, WorkItemFile, OutputFileMetadata, Experiment, \
-    AssetCollection, QueryCriteria
+from COMPS.Data import Simulation, SimulationFile, AssetCollectionFile, WorkItemFile, OutputFileMetadata, Experiment
+from COMPS.Data import AssetCollection as COMPSAssetCollection
 from COMPS.Data.AssetFile import AssetFile
 from COMPS.Data.Simulation import SimulationState
 from COMPS.Data.WorkItem import WorkItemState, WorkItem
@@ -269,26 +269,7 @@ def update_item(platform: IPlatform, item_id: str, item_type: ItemType, tags: di
     comps_item.save()
 
 
-def get_asset_id(ac_id: str):
-    """
-    Get dictionary of file name as key and md5 as value.
-
-    Args:
-        ac_id: asset collection id string
-
-    Returns:
-        Dictionary in structure of filename:md5
-    """
-    ac = AssetCollection.get(ac_id)
-    acs = ac.get(ac.id, QueryCriteria().select_children('assets'))
-    md5_file_dict = {}
-    for asset in acs.assets:
-        md5_file_dict[asset.file_name] = asset.md5_checksum
-
-    return md5_file_dict
-
-
-def generate_ac_from_asset_id(file_name: str, asset_id: [str, uuid.UUID], tags: dict = None):
+def generate_ac_from_asset_md5(file_name: str, asset_id: [str, uuid.UUID], tags: dict = None):
     """
     Get an asset collection by asset id(md5).
     Args:
@@ -304,13 +285,49 @@ def generate_ac_from_asset_id(file_name: str, asset_id: [str, uuid.UUID], tags: 
         tags['Name'] = file_name
         tags['md5'] = asset_id
 
-    ac = AssetCollection()
-
+    ac = COMPSAssetCollection()
     ac.set_tags(tags)
-    asset_dict = {file_name: asset_id}
-    for file_name, md5 in asset_dict.items():
-        acf = AssetCollectionFile(file_name=file_name, md5_checksum=md5)
-        ac.add_asset(acf)
+    acf = AssetCollectionFile(file_name=file_name, md5_checksum=asset_id)
+    ac.add_asset(acf)
     ac.save()
     print('done - created AC ' + str(ac.id))
+    return ac
+
+
+def generate_ac_from_asset_id_file(file_path: str):
+    """
+    Get an asset collection by file path.
+    Args:
+        file_path : file path
+
+    Returns:
+        COMPS AssetCollection
+    """
+    # Check if the file exists and is accessible
+    try:
+        with open(file_path, "r") as asset_fd:
+            content = asset_fd.read()
+    except FileNotFoundError:
+        logger.debug(f"Error: The file {file_path} was not found.")
+        return None
+    except IOError:
+        logger.debug(f"Error: Could not read the file {file_path}.")
+        return None
+
+    # Split the content and check format
+    items = content.split(':')
+    if len(items) < 3:
+        logger.debug("Error: The file's content is not in the expected format.")
+        return None
+
+    file_name = items[0]
+    asset_id = items[2]
+
+    # Handle errors from generate_ac_from_asset_id
+    try:
+        ac = generate_ac_from_asset_md5(file_name, asset_id)
+    except Exception as e:
+        logger.debug(f"An error occurred while generating AC from asset ID: {e}")
+        return None
+
     return ac

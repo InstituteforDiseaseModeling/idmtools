@@ -27,11 +27,10 @@ from idmtools.core import EntityStatus, NoPlatformException
 from idmtools.core.logging import SUCCESS
 from idmtools.entities.command_task import CommandTask
 from idmtools.entities.relation_type import RelationType
-from idmtools.utils.file import write_md5_to_file
 from idmtools.utils.hashing import calculate_md5_stream
 from idmtools_platform_comps.ssmt_work_items.comps_workitems import InputDataWorkItem
-from idmtools_platform_comps.utils.general import get_asset_id
 from idmtools_platform_comps.utils.package_version import get_docker_manifest, get_digest_from_docker_hub
+from COMPS.Data import AssetCollection as COMPSAssetCollection
 
 if TYPE_CHECKING:
     from idmtools.entities.iplatform import IPlatform
@@ -412,8 +411,10 @@ class SingularityBuildWorkItem(InputDataWorkItem):
             # how do we get id for original work item from AC?
             self.status = EntityStatus.SUCCEEDED
 
-        asset_dict = get_asset_id(self.asset_collection.id)
-        write_md5_to_file(asset_dict)
+        ac = COMPSAssetCollection.get(ac.id, QueryCriteria().select_children(['assets']))
+        asset = Asset(filename=ac.assets[0].file_name, checksum=ac.assets[0].md5_checksum)
+        asset.save_md5_checksum()
+
         return self.asset_collection
 
     def wait(self, wait_on_done_progress: bool = True, timeout: int = None, refresh_interval=None, platform: 'IPlatform' = None, wait_progress_desc: str = None) -> Optional[AssetCollection]:
