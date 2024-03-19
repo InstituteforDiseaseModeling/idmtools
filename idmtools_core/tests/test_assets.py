@@ -401,38 +401,38 @@ class TestAssets(unittest.TestCase):
     def test_save_md5_checksum(self):
         asset = Asset(filename='test_file.txt', checksum='test_checksum', content='test_content')
         asset.save_md5_checksum()
-        expected_content = f"{asset.filename}:asset_id:{asset.checksum}"
+        expected_content = f"{asset.filename}:md5:{asset.checksum}"
 
         # Assert that the file with the checksum exists in the same directory as the asset
-        assert os.path.exists(os.path.join(os.path.curdir, "test_file.txt.asset_id"))
-        with open(os.path.join(os.path.curdir, "test_file.txt.asset_id"), "r") as f:
+        assert os.path.exists(os.path.join(os.path.curdir, "test_file.txt.md5"))
+        with open(os.path.join(os.path.curdir, "test_file.txt.md5"), "r") as f:
             assert f.read() == expected_content
-        os.remove(os.path.join(os.path.curdir, "test_file.txt.asset_id"))
+        os.remove(os.path.join(os.path.curdir, "test_file.txt.md5"))
 
     # handles the case when the asset content is a string
     def test_save_md5_checksum_saves_checksum_to_file(self):
         # Initialize the asset object
         asset = Asset(filename="example.txt", checksum="1234567890abcdef", content="example content")
-        expected_content = f"{asset.filename}:asset_id:{asset.checksum}"
+        expected_content = f"{asset.filename}:md5:{asset.checksum}"
         # Invoke the save_md5_checksum method
         asset.save_md5_checksum()
 
         # Assert that the file with the checksum exists in the same directory as the asset
-        assert os.path.exists(os.path.join(os.path.curdir, "example.txt.asset_id"))
-        with open(os.path.join(os.path.curdir, "example.txt.asset_id"), "r") as f:
+        assert os.path.exists(os.path.join(os.path.curdir, "example.txt.md5"))
+        with open(os.path.join(os.path.curdir, "example.txt.md5"), "r") as f:
             assert f.read() == expected_content
-        os.remove(os.path.join(os.path.curdir, "example.txt.asset_id"))
+        os.remove(os.path.join(os.path.curdir, "example.txt.md5"))
 
     def test_save_md5_checksum_with_abs_path_in_asset(self):
         base_path = os.path.abspath(os.path.join(COMMON_INPUT_PATH, "python", "Assets"))
         asset = Asset(absolute_path=os.path.join(base_path, "MyExternalLibrary", "functions.py"), filename="test_md5.txt")
-        expected_content = f"{asset.filename}:asset_id:{asset.checksum}"
+        expected_content = f"{asset.filename}:md5:{asset.checksum}"
         asset.save_md5_checksum()
         # Assert that the file with the checksum exists in the same directory as the asset
-        assert os.path.exists(os.path.join(os.path.curdir, "test_md5.txt.asset_id"))
-        with open(os.path.join(os.path.curdir, "test_md5.txt.asset_id"), "r") as f:
+        assert os.path.exists(os.path.join(os.path.curdir, "test_md5.txt.md5"))
+        with open(os.path.join(os.path.curdir, "test_md5.txt.md5"), "r") as f:
             assert f.read() == expected_content
-        os.remove(os.path.join(os.path.curdir, "test_md5.txt.asset_id"))
+        os.remove(os.path.join(os.path.curdir, "test_md5.txt.md5"))
 
     def test_content_generator_chunk_size_100(self):
         content = b"This is a test content for the content_generator function."

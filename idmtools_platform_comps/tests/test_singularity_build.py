@@ -91,7 +91,7 @@ class TestSingularityBuild(unittest.TestCase):
         self.assertIsNotNone(sbi.asset_collection)
         self.assertIn('image_name', sbi.image_tags)
         self.assertIn('created_by', sbi.image_tags)
-        asset_file = os.path.join(os.curdir, "alpine_3.11.6.sif.asset_id")
+        asset_file = os.path.join(os.curdir, "alpine_3.11.6.sif.md5")
         self.assertTrue(os.path.exists(asset_file))
         os.remove(asset_file)
 
@@ -122,7 +122,7 @@ class TestSingularityBuild(unittest.TestCase):
         self.assertIn('build_context', sbi.image_tags)
         self.assertEqual(sbi.image_tags['image_name'], 'Singularity.sif')
         self.assertIn('created_by', sbi.image_tags)
-        asset_file = os.path.join(os.curdir, "Singularity.sif.asset_id")
+        asset_file = os.path.join(os.curdir, "Singularity.sif.md5")
         self.assertTrue(os.path.exists(asset_file))
         os.remove(asset_file)
 
@@ -162,11 +162,11 @@ From: python:3.8.6
         self.assertIsNotNone(sbi.asset_collection)
         self.assertIn('image_name', sbi.image_tags)
         self.assertIn('created_by', sbi.image_tags)
-        asset_file = os.curdir + "/Singularity.jinja.sif.asset_id"
+        asset_file = os.curdir + "/Singularity.jinja.sif.md5"
         self.assertTrue(os.path.exists(asset_file))
         with open(asset_file, "r") as asset_fd:
             asset_file_content = asset_fd.read()
-            self.assertIn('Singularity.jinja.sif:asset_id:fb0a1109-6de1-1467-f50a-4dc2cf487cf9', asset_file_content)
+            self.assertIn('Singularity.jinja.sif:md5:fb0a1109-6de1-1467-f50a-4dc2cf487cf9', asset_file_content)
             asset_fd.close()
         os.remove(asset_file)
 

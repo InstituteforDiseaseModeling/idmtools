@@ -438,7 +438,7 @@ class Asset:
         Returns:
             None
         """
-        asset = Asset(filename=f"{self.filename}.asset_id", content=f"{self.filename}:asset_id:{self.checksum}".encode())
+        asset = Asset(filename=f"{self.filename}.md5", content=f"{self.filename}:md5:{self.checksum}".encode())
         if asset.checksum is None:
             asset.calculate_checksum()
         asset.save_as(os.path.curdir, force=True)
