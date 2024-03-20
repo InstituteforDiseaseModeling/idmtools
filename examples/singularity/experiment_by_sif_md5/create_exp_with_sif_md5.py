@@ -22,10 +22,10 @@ def create_singularity_sif(platform):
     sbi = SingularityBuildWorkItem(name="Create my test sif", definition_file=def_file, image_name=image_name, force=False)
     sbi.add_assets(["input/model.py"])
     sbi.tags = dict(image="alpine_simple.sif")
-    sbi.run(wait_until_done=True, platform=platform)
+    ac = sbi.run(wait_until_done=True, platform=platform)
     if sbi.succeeded:
         # Write ID file
-        sbi.asset_collection.to_id_file("alpine_simple.id")
+        ac.to_id_file("alpine_simple.id")
 
 
 def create_experiment_with_sif(platform):

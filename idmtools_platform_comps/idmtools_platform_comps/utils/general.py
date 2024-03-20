@@ -17,7 +17,7 @@ from COMPS.Data.Simulation import SimulationState
 from COMPS.Data.WorkItem import WorkItemState, WorkItem
 from requests import RequestException
 
-from idmtools.assets import AssetCollection
+from idmtools.assets import AssetCollection, Asset
 from idmtools.core import EntityStatus, ItemType
 from idmtools.core.context import get_current_platform
 from idmtools.core.interfaces.ientity import IEntity
@@ -271,12 +271,12 @@ def update_item(platform: IPlatform, item_id: str, item_type: ItemType, tags: di
     comps_item.save()
 
 
-def generate_ac_from_asset_md5(file_name: str, asset_id: [str, uuid.UUID], platform: 'IPlatform' = None, tags: dict = None):
+def generate_ac_from_asset_md5(file_name: str, asset_md5: [str, uuid.UUID], platform: 'IPlatform' = None, tags: dict = None):
     """
     Get an asset collection by asset id(md5).
     Args:
         file_name: file name string
-        asset_id: asset id (md5)
+        asset_md5: asset md5 string
         platform : Platform object
         tags: tags dict for asset collection
 
@@ -284,21 +284,21 @@ def generate_ac_from_asset_md5(file_name: str, asset_id: [str, uuid.UUID], platf
         COMPS AssetCollection
     """
     if tags is None:
-        tags = {'Name': file_name, 'md5': asset_id}
+        tags = {'Name': file_name, 'md5': asset_md5}
     else:
         tags['Name'] = file_name
-        tags['md5'] = asset_id
+        tags['md5'] = asset_md5
 
     if platform is None:
         platform = get_current_platform()
 
     ac = COMPSAssetCollection()
     ac.set_tags(tags)
-    acf = AssetCollectionFile(file_name=file_name, md5_checksum=asset_id)
+    acf = AssetCollectionFile(file_name=file_name, md5_checksum=asset_md5)
     ac.add_asset(acf)
     ac.save()
     print('done - created AC ' + str(ac.id))
-    asset_collection: AssetCollection = platform.get_item(item_id=str(ac.id), item_type=ItemType.ASSETCOLLECTION)
+    asset_collection: AssetCollection = platform._assets.to_entity(ac)
     return asset_collection
 
 
@@ -329,13 +329,26 @@ def generate_ac_from_asset_md5_file(file_path: str):
         return None
 
     file_name = items[0]
-    asset_id = items[2]
+    asset_md5 = items[2]
 
-    # Handle errors from generate_ac_from_asset_id
+    # Handle errors from generate_ac_from_asset_md5
     try:
-        asset_collection: AssetCollection = generate_ac_from_asset_md5(file_name, asset_id)
+        asset_collection: AssetCollection = generate_ac_from_asset_md5(file_name, asset_md5)
     except Exception as e:
         logger.debug(f"An error occurred while generating AC from asset ID: {e}")
         return None
 
     return asset_collection
+
+
+def save_sif_asset_md5_from_ac_id(ac_id: str):
+    """
+    Get the md5 of the asset in the asset collection of singularity.
+    Args:
+        ac_id: asset collection id
+    """
+    from COMPS.Data import QueryCriteria
+    ac = COMPSAssetCollection.get(ac_id, QueryCriteria().select_children(['assets']))
+    asset = Asset(filename=ac.assets[0].file_name, checksum=ac.assets[0].md5_checksum)
+    # Save the asset filename and md5 checksum to local file
+    asset.save_md5_checksum()
