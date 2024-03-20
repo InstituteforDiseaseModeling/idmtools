@@ -7,6 +7,7 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 import io
 import os
 from dataclasses import dataclass, field, InitVar
+from functools import partial
 from io import BytesIO
 from logging import getLogger, DEBUG
 from pathlib import PurePosixPath
@@ -14,6 +15,7 @@ from typing import TypeVar, Union, List, Callable, Any, Optional, Generator, Bin
 import backoff
 import requests
 from idmtools import IdmConfigParser
+from idmtools.utils.file import file_content_to_generator, content_generator
 from idmtools.utils.hashing import calculate_md5, calculate_md5_stream
 
 logger = getLogger(__name__)
@@ -93,7 +95,7 @@ class Asset:
         return f"<Asset: {os.path.join(self.relative_path, self.filename)} from {self.absolute_path}>"
 
     @property
-    def checksum(self):
+    def checksum(self):  # noqa: F811
         """
 
         Returns checksum of object.
@@ -133,7 +135,7 @@ class Asset:
         return os.path.splitext(self.filename)[1].lstrip('.').lower()
 
     @property
-    def filename(self):
+    def filename(self):  # noqa: F811
         """
         Filename as asset.
 
@@ -157,7 +159,7 @@ class Asset:
         self._key = None
 
     @property
-    def relative_path(self):
+    def relative_path(self):  # noqa: F811
         """
         Get the relative path.
 
@@ -220,7 +222,7 @@ class Asset:
         self._length = new_length
 
     @property
-    def content(self):
+    def content(self):  # noqa: F811
         """
         Content of the asset.
 
@@ -411,6 +413,35 @@ class Asset:
         else:
             path = PurePosixPath(self.filename)
         return str(path)
+
+    def save_as(self, dest: str, force: bool = False):  # noqa: F811
+        """
+        Download asset object to destination file.
+        Args:
+            dest: the file path
+            force: force download
+        Returns:
+            None
+        """
+        if self.absolute_path is not None:
+            self.download_generator_hook = partial(file_content_to_generator, self.absolute_path)
+        elif self.content:
+            self.download_generator_hook = partial(content_generator, self.content)
+        else:
+            raise ValueError("Asset has no content or absolute path")
+
+        self.download_to_path(dest, force)
+
+    def save_md5_checksum(self):
+        """
+        Save the md5 checksum of the asset to a file in the same directory as the asset.
+        Returns:
+            None
+        """
+        asset = Asset(filename=f"{self.filename}.md5", content=f"{self.filename}:md5:{self.checksum}".encode())
+        if asset.checksum is None:
+            asset.calculate_checksum()
+        asset.save_as(os.path.curdir, force=True)
 
 
 TAsset = TypeVar("TAsset", bound=Asset)

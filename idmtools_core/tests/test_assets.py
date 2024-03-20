@@ -1,4 +1,5 @@
 from pathlib import PurePath
+from unittest.mock import patch, mock_open
 
 import allure
 import json
@@ -10,6 +11,7 @@ from tqdm import tqdm
 from idmtools.assets import Asset, AssetCollection
 from idmtools.assets.errors import DuplicatedAssetError
 from idmtools.core import FilterMode
+from idmtools.utils.file import content_generator, file_content_to_generator
 from idmtools.utils.filters.asset_filters import asset_in_directory, file_name_is
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.decorators import run_in_temp_dir
@@ -350,6 +352,173 @@ class TestAssets(unittest.TestCase):
         ac = AssetCollection()
         ac.add_directory(bd, no_ignore=True)
         self.assertEqual(len(ac), 2)
+
+    # downloads an asset with absolute path and saves it to destination file
+    def test_download_asset_with_absolute_path(self):
+        # Initialize the asset object with an absolute path
+        asset = Asset(absolute_path=os.path.join("idmtools.ini"))
+
+        # Set the destination file path
+        dest = "output/idmtools.ini"
+
+        # Create the directory if it doesn't exist
+        os.makedirs(os.path.dirname(dest), exist_ok=True)
+        # Call the download_asset method
+        asset.save_as(dest)
+
+        # Assert that the destination file exists
+        assert os.path.exists(dest)
+
+        # Assert that the content of the destination file is the same as the content of the asset file
+        with open(asset.absolute_path, "rb") as asset_file:
+            asset_content = asset_file.read()
+        with open(dest, "rb") as dest_file:
+            dest_content = dest_file.read()
+        assert asset_content == dest_content
+        os.remove(dest)
+
+    # downloads an asset with filename and content and saves it to destination file
+    def test_download_asset_with_filename_and_content(self):
+        # Initialize the asset object with a filename and content
+        asset = Asset(filename="file.txt", content=b"Hello, World!")
+
+        # Set the destination file path
+        dest = os.path.join(os.curdir, "output")
+        # Create the directory if it doesn't exist
+        os.makedirs(dest, exist_ok=True)
+        # Call the download_asset method
+        asset.save_as(dest)
+
+        # Assert that the destination file exists
+        assert os.path.exists(dest)
+
+        # Assert that the content of the destination file is the same as the content of the asset
+        with open(os.path.join(dest, "file.txt"), "rb") as dest_file:
+            dest_content = dest_file.read()
+        assert asset.content == dest_content
+        os.remove(os.path.join(dest, "file.txt"))
+
+    def test_save_md5_checksum(self):
+        asset = Asset(filename='test_file.txt', checksum='test_checksum', content='test_content')
+        asset.save_md5_checksum()
+        expected_content = f"{asset.filename}:md5:{asset.checksum}"
+
+        # Assert that the file with the checksum exists in the same directory as the asset
+        assert os.path.exists(os.path.join(os.path.curdir, "test_file.txt.md5"))
+        with open(os.path.join(os.path.curdir, "test_file.txt.md5"), "r") as f:
+            assert f.read() == expected_content
+        os.remove(os.path.join(os.path.curdir, "test_file.txt.md5"))
+
+    # handles the case when the asset content is a string
+    def test_save_md5_checksum_saves_checksum_to_file(self):
+        # Initialize the asset object
+        asset = Asset(filename="example.txt", checksum="1234567890abcdef", content="example content")
+        expected_content = f"{asset.filename}:md5:{asset.checksum}"
+        # Invoke the save_md5_checksum method
+        asset.save_md5_checksum()
+
+        # Assert that the file with the checksum exists in the same directory as the asset
+        assert os.path.exists(os.path.join(os.path.curdir, "example.txt.md5"))
+        with open(os.path.join(os.path.curdir, "example.txt.md5"), "r") as f:
+            assert f.read() == expected_content
+        os.remove(os.path.join(os.path.curdir, "example.txt.md5"))
+
+    def test_save_md5_checksum_with_abs_path_in_asset(self):
+        base_path = os.path.abspath(os.path.join(COMMON_INPUT_PATH, "python", "Assets"))
+        asset = Asset(absolute_path=os.path.join(base_path, "MyExternalLibrary", "functions.py"), filename="test_md5.txt")
+        expected_content = f"{asset.filename}:md5:{asset.checksum}"
+        asset.save_md5_checksum()
+        # Assert that the file with the checksum exists in the same directory as the asset
+        assert os.path.exists(os.path.join(os.path.curdir, "test_md5.txt.md5"))
+        with open(os.path.join(os.path.curdir, "test_md5.txt.md5"), "r") as f:
+            assert f.read() == expected_content
+        os.remove(os.path.join(os.path.curdir, "test_md5.txt.md5"))
+
+    def test_content_generator_chunk_size_100(self):
+        content = b"This is a test content for the content_generator function."
+        chunk_size = 100
+        generator = content_generator(content, chunk_size)
+        chunks = list(generator)
+        self.assertEqual(len(chunks), len(content) // chunk_size + (len(content) % chunk_size > 0))
+        self.assertEqual(chunks[0], content[:chunk_size])
+
+    def test_content_generator_chunk_size_greater_than_content(self):
+        content = b"This is a test content for the content_generator function."
+        chunk_size = 1000
+        generator = content_generator(content, chunk_size)
+        chunks = list(generator)
+        self.assertEqual(len(chunks), 1)
+        self.assertEqual(chunks[0], content)
+
+    def test_content_generator_empty_content(self):
+        content = b""
+        chunk_size = 10
+        generator = content_generator(content, chunk_size)
+        chunks = list(generator)
+        self.assertEqual(len(chunks), 0)
+
+    def test_content_generator_content_size_equal_to_chunk_size(self):
+        content = b"This is a test content for the content_generator function."
+        chunk_size = len(content)
+        generator = content_generator(content, chunk_size)
+        chunks = list(generator)
+        self.assertEqual(len(chunks), 1)
+        self.assertEqual(chunks[0], content)
+
+    def test_content_generator_content_size_multiple_of_chunk_size(self):
+        content = b"This is a test content for the content_generator function." * 10
+        chunk_size = len("This is a test content for the content_generator function.")
+        generator = content_generator(content, chunk_size)
+        chunks = list(generator)
+        self.assertEqual(len(chunks), 10)
+        self.assertEqual(chunks[0], content[:chunk_size])
+
+    def test_content_generator_content_size_not_multiple_of_chunk_size(self):
+        content = b"This is a test content for the content_generator function." * 10 + b"extra"
+        chunk_size = len("This is a test content for the content_generator function.")
+        generator = content_generator(content, chunk_size)
+        chunks = list(generator)
+        self.assertEqual(len(chunks), 11)
+        self.assertEqual(chunks[0], content[:chunk_size])
+
+    def test_content_generator_chunk_size_zero(self):
+        content = b"This is a test content for the content_generator function."
+        chunk_size = 0
+        generator = content_generator(content, chunk_size)
+        chunks = list(generator)
+        self.assertEqual(len(chunks), 0)
+
+    def test_content_generator_chunk_size_negative(self):
+        content = b"This is a test content for the content_generator function."
+        chunk_size = -10  # content_generator should treat negative chunk_size as read all content at once
+        generator = content_generator(content, chunk_size)
+        chunks = list(generator)
+        self.assertEqual(len(chunks), 1)
+        self.assertEqual(chunks[0], content)
+
+    @patch('builtins.open', new_callable=mock_open, read_data=b'This is a test content for the file_content_to_generator function.')
+    def test_file_content_to_generator_chunk_size_10(self, mock_file):
+        chunk_size = 10
+        generator = file_content_to_generator(mock_file, chunk_size)
+        chunks = list(generator)
+        self.assertEqual(len(chunks), 7)
+        self.assertEqual(chunks[0], b'This is a ')
+
+    @patch('builtins.open', new_callable=mock_open, read_data=b'This is a test content for the file_content_to_generator function.')
+    def test_file_content_to_generator_chunk_size_100(self, mock_file):
+        chunk_size = 100
+        generator = file_content_to_generator(mock_file, chunk_size)
+        chunks = list(generator)
+        self.assertEqual(len(chunks), 1)
+        self.assertEqual(chunks[0], b'This is a test content for the file_content_to_generator function.')
+
+    @patch('builtins.open', new_callable=mock_open, read_data=b'')
+    def test_file_content_to_generator_empty_file(self, mock_file):
+        chunk_size = 10
+        generator = file_content_to_generator(mock_file, chunk_size)
+        chunks = list(generator)
+        self.assertEqual(len(chunks), 0)
+
 
 if __name__ == '__main__':
     unittest.main()
