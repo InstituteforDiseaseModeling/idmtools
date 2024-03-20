@@ -153,7 +153,7 @@ class TestAssetsInComps(unittest.TestCase):
         """
         Test that we can generate an asset collection (COMPS) from an asset id.
         """
-        ac = generate_ac_from_asset_md5(self.platform, file_name='my_shiny_new1.sif', asset_id='8ced1fc3-cc4e-d3c5-b3fd-2919739deb2c',
+        ac = generate_ac_from_asset_md5(file_name='my_shiny_new1.sif', asset_id='8ced1fc3-cc4e-d3c5-b3fd-2919739deb2c',
                                        tags={"string_tag": "testACtag", "number_tag": 123, "KeyOnly": None})
         self.assertTrue(isinstance(ac, AssetCollection))
         self.assertEqual(ac.id, 'b423b446-78dd-ee11-9301-f0921c167864')
@@ -165,27 +165,27 @@ class TestAssetsInComps(unittest.TestCase):
         asset_id = uuid.uuid4()
 
         with pytest.raises(ValueError, match=r'Invalid file_name: cannot be empty or None'):
-            generate_ac_from_asset_md5(self.platform, file_name, asset_id)
+            generate_ac_from_asset_md5(file_name, asset_id)
 
     # Test we can not generate an asset collection (COMPS) from an unknown asset id.
     def test_generate_ac_from_asset_id_with_unknown_asset_id(self):
         file_name = "test_file"
         asset_id = uuid.uuid4()
         try:
-            generate_ac_from_asset_md5(self.platform, file_name, asset_id)
+            generate_ac_from_asset_md5(file_name, asset_id)
         except Exception as e:
             assert "400 Bad Request - Unknown assets referenced in request: " in str(e)
 
     # Test we can not generate an asset collection (COMPS) from an kwown asset id in a file.
     @patch('builtins.open', new_callable=mock_open, read_data='my_shiny_new1.sif:asset_id:8ced1fc3-cc4e-d3c5-b3fd-2919739deb2c')
     def test_generate_ac_from_known_asset_id_file(self, mock_file):
-        ac = generate_ac_from_asset_md5_file(self.platform, mock_file)
+        ac = generate_ac_from_asset_md5_file(mock_file)
         self.assertEqual(ac.assets[0].md5_checksum, UUID("8ced1fc3-cc4e-d3c5-b3fd-2919739deb2c"))
 
     # Test we can not generate an asset collection (COMPS) from an unknown asset id.
     @patch('builtins.open', new_callable=mock_open, read_data='test:asset_id:anything')
     def test_generate_ac_from_known_asset_id_file(self, mock_file):
-        ac = generate_ac_from_asset_md5_file(self.platform, mock_file)
+        ac = generate_ac_from_asset_md5_file(mock_file)
         self.assertIsNone(ac)
 
 

@@ -19,6 +19,7 @@ from requests import RequestException
 
 from idmtools.assets import AssetCollection
 from idmtools.core import EntityStatus, ItemType
+from idmtools.core.context import get_current_platform
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities.iplatform import IPlatform
 
@@ -270,13 +271,14 @@ def update_item(platform: IPlatform, item_id: str, item_type: ItemType, tags: di
     comps_item.save()
 
 
-def generate_ac_from_asset_md5(platform: IPlatform, file_name: str, asset_id: [str, uuid.UUID], tags: dict = None):
+def generate_ac_from_asset_md5(file_name: str, asset_id: [str, uuid.UUID], platform: 'IPlatform' = None, tags: dict = None):
     """
     Get an asset collection by asset id(md5).
     Args:
-        platform : Platform
         file_name: file name string
         asset_id: asset id (md5)
+        platform : Platform object
+        tags: tags dict for asset collection
 
     Returns:
         COMPS AssetCollection
@@ -286,6 +288,9 @@ def generate_ac_from_asset_md5(platform: IPlatform, file_name: str, asset_id: [s
     else:
         tags['Name'] = file_name
         tags['md5'] = asset_id
+
+    if platform is None:
+        platform = get_current_platform()
 
     ac = COMPSAssetCollection()
     ac.set_tags(tags)
@@ -297,11 +302,10 @@ def generate_ac_from_asset_md5(platform: IPlatform, file_name: str, asset_id: [s
     return asset_collection
 
 
-def generate_ac_from_asset_md5_file(platform: IPlatform, file_path: str):
+def generate_ac_from_asset_md5_file(file_path: str):
     """
     Get an asset collection by file path.
     Args:
-        platform : Platform
         file_path : file path
 
     Returns:
@@ -329,7 +333,7 @@ def generate_ac_from_asset_md5_file(platform: IPlatform, file_path: str):
 
     # Handle errors from generate_ac_from_asset_id
     try:
-        asset_collection: AssetCollection = generate_ac_from_asset_md5(platform, file_name, asset_id)
+        asset_collection: AssetCollection = generate_ac_from_asset_md5(file_name, asset_id)
     except Exception as e:
         logger.debug(f"An error occurred while generating AC from asset ID: {e}")
         return None

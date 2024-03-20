@@ -30,7 +30,7 @@ def create_singularity_sif(platform):
 
 def create_experiment_with_sif(platform):
     # get the asset collection from the md5 file (asset id of sin
-    ac = generate_ac_from_asset_md5_file(platform, f"{image_name}.md5")
+    ac = generate_ac_from_asset_md5_file(f"{image_name}.md5")
     sif_asset = ac.assets[0]
     sif_filename = [
         acf.filename for acf in ac.assets if acf.filename.endswith(".sif")
@@ -66,7 +66,7 @@ def create_experiment_with_sif(platform):
     task.common_assets.add_asset(sif_asset)
     task.common_assets.add_asset(os.path.join("input", "model.py"))
     experiment.run(platform=platform, wait_until_done=True)
-
+    sys.exit(0 if experiment.succeeded else -1)
 
 if __name__ == '__main__':
     platform = Platform("SlurmStage")
