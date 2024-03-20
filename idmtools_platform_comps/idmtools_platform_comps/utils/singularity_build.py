@@ -398,6 +398,7 @@ class SingularityBuildWorkItem(InputDataWorkItem):
         ac = self.find_existing_container(self, platform=p)
         if ac is None or self.force:
             super().run(**opts)
+            ac = self.asset_collection
 
         else:
             if IdmConfigParser.is_output_enabled():

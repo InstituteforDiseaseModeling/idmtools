@@ -17,6 +17,7 @@ from COMPS.Data.Simulation import SimulationState
 from COMPS.Data.WorkItem import WorkItemState, WorkItem
 from requests import RequestException
 
+from idmtools.assets import AssetCollection
 from idmtools.core import EntityStatus, ItemType
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities.iplatform import IPlatform
@@ -269,10 +270,11 @@ def update_item(platform: IPlatform, item_id: str, item_type: ItemType, tags: di
     comps_item.save()
 
 
-def generate_ac_from_asset_md5(file_name: str, asset_id: [str, uuid.UUID], tags: dict = None):
+def generate_ac_from_asset_md5(platform: IPlatform, file_name: str, asset_id: [str, uuid.UUID], tags: dict = None):
     """
     Get an asset collection by asset id(md5).
     Args:
+        platform : Platform
         file_name: file name string
         asset_id: asset id (md5)
 
@@ -291,13 +293,15 @@ def generate_ac_from_asset_md5(file_name: str, asset_id: [str, uuid.UUID], tags:
     ac.add_asset(acf)
     ac.save()
     print('done - created AC ' + str(ac.id))
-    return ac
+    asset_collection: AssetCollection = platform.get_item(item_id=str(ac.id), item_type=ItemType.ASSETCOLLECTION)
+    return asset_collection
 
 
-def generate_ac_from_asset_id_file(file_path: str):
+def generate_ac_from_asset_md5_file(platform: IPlatform, file_path: str):
     """
     Get an asset collection by file path.
     Args:
+        platform : Platform
         file_path : file path
 
     Returns:
@@ -325,9 +329,9 @@ def generate_ac_from_asset_id_file(file_path: str):
 
     # Handle errors from generate_ac_from_asset_id
     try:
-        ac = generate_ac_from_asset_md5(file_name, asset_id)
+        asset_collection: AssetCollection = generate_ac_from_asset_md5(platform, file_name, asset_id)
     except Exception as e:
         logger.debug(f"An error occurred while generating AC from asset ID: {e}")
         return None
 
-    return ac
+    return asset_collection
