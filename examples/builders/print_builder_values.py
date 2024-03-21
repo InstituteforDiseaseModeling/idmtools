@@ -29,4 +29,4 @@ builder.add_arm(arm2)
 sims = TemplatedSimulations(base_task=base_task)
 sims.add_builder(builder)
 
-print(tabulate([s.task.config for s in list(sims)], headers="keys"))
+print(tabulate([s.task.config for s in sims], headers="keys"))
