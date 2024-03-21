@@ -4,6 +4,7 @@ idmtools SimulationBuilder definition.
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import inspect
+import math
 import pandas as pd
 from functools import partial
 from inspect import signature
@@ -162,7 +163,7 @@ class SimulationBuilder:
             if len(required_params) > 0:
                 raise ValueError(f"Missing arguments: {list(required_params)}.")
             self.sweeps.append((function,))
-            self._update_count([])
+            self.count = 1
 
     def _extract_remaining_parameters(self, function):
         # Retrieve all the parameters in the signature of the function
@@ -191,7 +192,7 @@ class SimulationBuilder:
                 self.sweeps.append(
                     partial(function, **self._map_argument_array(list(remaining_parameters), v)) for v in
                     generated_values)
-                list(map(self._update_count, _values))
+                self.count = math.prod(map(len, _values))
                 return
 
         if len(required_params) == 0 and len(values) > 1:
@@ -215,7 +216,7 @@ class SimulationBuilder:
             self.sweeps.append(
                 partial(function, **self._map_argument_array(list(remaining_parameters), v)) for v in
                 generated_values)
-        list(map(self._update_count, _values))
+        self.count = math.prod(map(len, _values))
 
     def case_kwargs(self, function: TSweepFunction, remaining_parameters, values):
         required_params = self._extract_required_parameters(remaining_parameters)
@@ -234,7 +235,7 @@ class SimulationBuilder:
         generated_values = product(*_values.values())
         self.sweeps.append(
             partial(function, **self._map_argument_array(_values.keys(), v)) for v in generated_values)
-        list(map(self._update_count, _values.values()))
+        self.count = math.prod(map(len, _values.values()))
 
     def add_multiple_parameter_sweep_definition(self, function: TSweepFunction, *args, **kwargs):
         """
@@ -300,22 +301,6 @@ class SimulationBuilder:
         required_params = {k: v for k, v in remaining_parameters.items() if
                            not isinstance(v, pd.DataFrame) and v == inspect.Parameter.empty}
         return required_params
-
-    def _update_count(self, values):
-        """
-        Update count of sweeps.
-        Args:
-            values :Values to count
-        Returns:
-            None
-        """
-        if self.count == 0:
-            if len(values) == 0:
-                self.count = 1
-            else:
-                self.count = len(values)
-        else:
-            self.count *= len(values)
 
     def __iter__(self):
         """

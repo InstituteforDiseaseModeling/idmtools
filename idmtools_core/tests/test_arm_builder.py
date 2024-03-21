@@ -3,7 +3,7 @@ import itertools
 from functools import partial
 
 import pytest
-from idmtools.builders.arm_simulation_builder import ArmSimulationBuilder, SweepArm, ArmType
+from idmtools.builders import ArmSimulationBuilder, SweepArm, ArmType
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
@@ -135,14 +135,6 @@ class TestArmBuilder(ITestWithPersistence):
         for i, simulation in enumerate(simulations):
             expected_dict = {"a": expected_values[i][0], "b": expected_values[i][1]}
             self.assertEqual(simulation.task.parameters, expected_dict)
-
-    def test_add_multiple_parameter_sweep_definition_via_builder(self):
-        a = [True, False]
-        b = [1, 2, 3, 4, 5]
-        c = "test"
-        with self.assertRaises(ValueError) as ex:
-            self.builder.add_multiple_parameter_sweep_definition(update_parameter_callback, a, b, c)
-        self.assertEqual(ex.exception.args[0], "Please use SweepArm instead, or use SimulationBuilder directly!")
 
     def test_add_multiple_parameter_sweep_definition(self):
         arm = SweepArm()

@@ -62,7 +62,7 @@ class SweepArm(SimulationBuilder):
             self.__count = self.__count * cnt
         elif self.type == ArmType.pair:
             if self.__count != cnt:
-                raise ValueError(f"For pair case, all inputs must have the same size/length: {cnt} != {self.__count}")
+                raise ValueError(f"For pair case, all function inputs must have the same size/length: {cnt} != {self.__count}")
             else:
                 self.__count = cnt
 
