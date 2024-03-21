@@ -519,6 +519,15 @@ class TestAssets(unittest.TestCase):
         chunks = list(generator)
         self.assertEqual(len(chunks), 0)
 
+    def test_save_as(self):
+        # Initialize the asset object
+        asset = Asset(filename="example.txt", content="example content")
+        expected_content = f"{asset.content}"
+        asset.save_as("example.txt", force=True)
+        with open(os.path.join(os.path.curdir, "example.txt"), "r") as f:
+            assert f.read() == expected_content
+        os.remove(os.path.join(os.path.curdir, "example.txt"))
+
 
 if __name__ == '__main__':
     unittest.main()

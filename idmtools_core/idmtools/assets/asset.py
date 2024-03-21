@@ -426,7 +426,7 @@ class Asset:
         if self.absolute_path is not None:
             self.download_generator_hook = partial(file_content_to_generator, self.absolute_path)
         elif self.content:
-            self.download_generator_hook = partial(content_generator, self.content)
+            self.download_generator_hook = partial(content_generator, self.bytes)
         else:
             raise ValueError("Asset has no content or absolute path")
 
@@ -438,7 +438,7 @@ class Asset:
         Returns:
             None
         """
-        asset = Asset(filename=f"{self.filename}.md5", content=f"{self.filename}:md5:{self.checksum}".encode())
+        asset = Asset(filename=f"{self.filename}.md5", content=f"{self.filename}:md5:{self.checksum}")
         if asset.checksum is None:
             asset.calculate_checksum()
         asset.save_as(os.path.curdir, force=True)
