@@ -20,7 +20,7 @@ def make_work():
   if sbwi.succeeded:
     print("sbi.id: ", sbwi.id)
     # Write ID file
-    sbwi.asset_collection.to_id_file(f"{platform._config_block}_dtk_almalinux9_prod.id")
+    ac_obj.to_id_file(f"{platform._config_block}_dtk_almalinux9_prod.id")
     print("sc: ", ac_obj.id)
     get_files(sbwi.id, "dtk_build_almalinux.sif")
 

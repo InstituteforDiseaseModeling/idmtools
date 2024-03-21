@@ -17,6 +17,6 @@ if __name__ == '__main__':
     fp = pwd.joinpath("ubuntu.id")
     sbi.add_assets(AssetCollection.from_id_file(fp))
     sbi.tags = dict(covasim=None)
-    sbi.run(wait_until_done=True, platform=platform)
+    ac = sbi.run(wait_until_done=True, platform=platform)
     if sbi.succeeded:
-        sbi.asset_collection.to_id_file("covasim.id")
+        ac.to_id_file("covasim.id")

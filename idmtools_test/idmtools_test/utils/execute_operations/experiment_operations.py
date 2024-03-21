@@ -14,7 +14,7 @@ from idmtools.core import EntityStatus, ItemType
 from idmtools.core import IDMTOOLS_USER_HOME
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
-from idmtools.utils.file import file_contents_to_generator
+from idmtools.utils.file import file_content_to_generator
 from idmtools.utils.json import IDMJSONEncoder
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -207,7 +207,7 @@ class TestExecutePlatformExperimentOperation(IPlatformExperimentOperations):
                 for file in files:
                     fp = os.path.abspath(os.path.join(root, file))
                     asset = Asset(absolute_path=fp, filename=file)
-                    asset.download_generator_hook = partial(file_contents_to_generator, fp)
+                    asset.download_generator_hook = partial(file_content_to_generator, fp)
                     assets.add_asset(asset)
             experiment.assets = assets
         if children:

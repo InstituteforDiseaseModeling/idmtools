@@ -4,6 +4,7 @@ utilities for files.
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import os
+from io import BytesIO
 from os import DirEntry
 from typing import Iterable, Generator, List
 
@@ -28,21 +29,41 @@ def scan_directory(basedir: str, recursive: bool = True, ignore_directories: Lis
                 yield from scan_directory(entry.path)
 
 
-def file_contents_to_generator(filename, chunk_size=128) -> Generator[bytearray, None, None]:
+def file_content_to_generator(absolute_path, chunk_size=128) -> Generator[bytearray, None, None]:
     """
     Create a generator from file contents in chunks(useful for streaming binary data and piping).
 
     Args:
-        filename:
-        chunk_size:
+        absolute_path: absolute path to file
+        chunk_size: chunk size
 
     Returns:
         Generator that return bytes in chunks of size chunk_size
     """
-    with open(filename, 'rb') as i:
+    with open(absolute_path, 'rb') as i:
         while True:
             res = i.read(chunk_size)
             if res == b'':
                 break
             else:
                 yield res
+
+
+def content_generator(content, chunk_size=128) -> Generator[bytearray, None, None]:
+    """
+    Create a generator from file contents in chunks(useful for streaming binary data and piping).
+
+    Args:
+        content : file content
+        chunk_size : chunk size
+
+    Returns:
+        Generator that return bytes in chunks of size chunk_size
+    """
+    content_io = BytesIO(content)
+    while True:
+        chunk = content_io.read(chunk_size)
+        if chunk == b'':
+            break
+        else:
+            yield chunk
