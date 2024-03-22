@@ -6,7 +6,7 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 import os
 from io import BytesIO
 from os import DirEntry
-from typing import Iterable, Generator, List
+from typing import Iterable, Generator, List, Union
 
 
 def scan_directory(basedir: str, recursive: bool = True, ignore_directories: List[str] = None) -> Iterable[DirEntry]:
@@ -49,7 +49,7 @@ def file_content_to_generator(absolute_path, chunk_size=128) -> Generator[bytear
                 yield res
 
 
-def content_generator(content, chunk_size=128) -> Generator[bytearray, None, None]:
+def content_generator(content: Union[str, bytes], chunk_size=128) -> Generator[bytearray, None, None]:
     """
     Create a generator from file contents in chunks(useful for streaming binary data and piping).
 
@@ -60,7 +60,10 @@ def content_generator(content, chunk_size=128) -> Generator[bytearray, None, Non
     Returns:
         Generator that return bytes in chunks of size chunk_size
     """
-    content_io = BytesIO(content)
+    if isinstance(content, str):
+        content_io = BytesIO(content.encode())
+    else:
+        content_io = BytesIO(content)
     while True:
         chunk = content_io.read(chunk_size)
         if chunk == b'':
