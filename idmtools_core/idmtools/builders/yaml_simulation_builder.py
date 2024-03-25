@@ -6,8 +6,7 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 import yaml
 from logging import getLogger
 from typing import Union, Callable, Dict, Any
-from idmtools.builders import ArmSimulationBuilder
-from idmtools.builders.arm_simulation_builder import SweepArm
+from idmtools.builders import ArmSimulationBuilder, SweepArm
 
 logger = getLogger(__name__)
 
