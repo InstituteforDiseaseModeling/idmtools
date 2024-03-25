@@ -426,7 +426,6 @@ def get_pkg_match_version(pkg_name, base_version=None, test='==', validate=True)
     if not is_in_list and validate:
         raise Exception(f"Could not find the version of '{base_version}'.")
 
-
     if test == '~=':
         return get_latest_compatible_version(pkg_name, base_version, versions)
 
