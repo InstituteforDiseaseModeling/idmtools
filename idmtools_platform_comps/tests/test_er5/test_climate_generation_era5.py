@@ -1,8 +1,6 @@
 import os
-import unittest
 import shutil
 import tempfile
-import xmlrunner
 import pytest
 
 from idmtools.core.platform_factory import Platform
@@ -95,5 +93,4 @@ class ClimateGenerationTest(ITestWithPersistence):
         finally:
             shutil.rmtree(output_path)
 
-if __name__ == "__main__":
-    unittest.main(testRunner=xmlrunner.XMLTestRunner(output='reports'))
+

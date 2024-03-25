@@ -13,7 +13,7 @@ from logging import getLogger, DEBUG
 from typing import Optional, List, Type
 from urllib import request
 import requests
-from pkg_resources import parse_version
+
 from packaging.version import parse
 from html.parser import HTMLParser
 
@@ -100,7 +100,7 @@ def get_latest_package_version_from_pypi(pkg_name, display_all=False):
     except Exception:
         return None
 
-    all_releases = sorted(releases, key=parse_version, reverse=True)
+    all_releases = sorted(releases, key=parse, reverse=True)
 
     if display_all:
         print(all_releases)
@@ -237,7 +237,7 @@ def fetch_versions_from_server(pkg_url: str, parser: Type[PackageHTMLParser] = L
     releases = parser.pkg_version
     releases = [v for v in releases if not v.startswith('.')]
 
-    all_releases = sorted(releases, key=parse_version, reverse=True)
+    all_releases = sorted(releases, key=parse, reverse=True)
     return all_releases
 
 
@@ -267,7 +267,7 @@ def fetch_versions_from_artifactory(pkg_name: str, parser: Type[PackageHTMLParse
     releases = parser.pkg_version
     releases = [v for v in releases if not v.startswith('.')]
 
-    all_releases = sorted(releases, key=parse_version, reverse=True)
+    all_releases = sorted(releases, key=parse, reverse=True)
     return all_releases
 
 
@@ -379,7 +379,7 @@ def fetch_package_versions(pkg_name, is_released=True, sort=True, display_all=Fa
         versions = fetch_package_versions_from_pypi(pkg_name)
 
     if sort:
-        versions = sorted(versions, key=parse_version, reverse=True)
+        versions = sorted(versions, key=parse, reverse=True)
 
     if is_released:
         versions = [ver for ver in versions if not parse(ver).is_prerelease]
@@ -419,10 +419,13 @@ def get_pkg_match_version(pkg_name, base_version=None, test='==', validate=True)
         return versions[0]
 
     # Make sure the input is valid
-    if base_version not in versions:
-        if validate:
-            # print(f"Could not find the version of '{version}'.")
-            raise Exception(f"Could not find the version of '{base_version}'.")
+    parsed_version_to_check = parse(base_version)
+
+    # Check if the version is in the list
+    is_in_list = any(parsed_version_to_check == parse(version) for version in versions)
+    if not is_in_list and validate:
+        raise Exception(f"Could not find the version of '{base_version}'.")
+
 
     if test == '~=':
         return get_latest_compatible_version(pkg_name, base_version, versions)
@@ -508,10 +511,12 @@ def get_latest_compatible_version(pkg_name, base_version=None, versions=None, va
     base_version = base_version.replace('+nightly', '')
 
     # Make sure the input is valid
-    if base_version not in versions:
-        if validate:
-            # print(f"Could not find the version of '{version}'.")
-            raise Exception(f"Could not find the version of '{base_version}'.")
+    parsed_version_to_check = parse(base_version)
+
+    # Check if the version is in the list
+    is_in_list = any(parsed_version_to_check == parse(version) for version in versions)
+    if not is_in_list and validate:
+        raise Exception(f"Could not find the version of '{base_version}'.")
 
     # Find all possible candidates
     v_root = base_version[0: base_version.rindex('.') + 1]
