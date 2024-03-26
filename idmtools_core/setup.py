@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 
 """The setup script for the idmtools_core platform, the core tools for modeling and analysis."""
-import sys
-
 from setuptools import setup, find_packages
 
 with open('README.md') as readme_file:
@@ -18,6 +16,9 @@ for file_prefix in ['', 'dev_', 'build_']:
     with open(f'{filename}.txt') as requirements_file:
         extra_require_files[file_prefix.strip("_") if file_prefix else filename] = [dependency for dependency in requirements_file.read().split("\n") if not dependency.startswith("--")]
 
+# Conditional dependency based on Python version
+conditional_requirements = ['importlib_metadata; python_version < "3.8"']
+
 version = '1.7.9+nightly'
 
 extras = {
@@ -29,10 +30,6 @@ extras = {
     # our full install include all common plugins
     'full': ['idmtools_platform_comps', 'idmtools_cli', 'idmtools_models', 'idmtools_platform_slurm', 'idmtools_slurm_utils', 'idmtools_platform_general']
 }
-
-if sys.platform in ["win32", "cygwin"]:
-    requirements.append('pypiwin32==223')
-    requirements.append('pywin32')
 
 authors = [
     ("Ross Carter", "rcarter@idmod.org"),
@@ -57,10 +54,11 @@ setup(
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
         'Framework:: IDM-Tools'
     ],
     description="Core tools for modeling",
-    install_requires=extra_require_files['requirements'],
+    install_requires=extra_require_files['requirements'] + conditional_requirements,
     long_description=readme,
     include_package_data=True,
     keywords='modeling, IDM',

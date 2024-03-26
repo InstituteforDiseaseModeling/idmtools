@@ -36,8 +36,8 @@ def main():
     # 3. create a WorkItem to create a Asset Collection
     # 4. return ac id based on the requirements.txt
     # note: pkg_list is not required. package in this list will override package in requirements.txt
-    pl = RequirementsToAssetCollection(platform, requirements_path='./requirements.txt', pkg_list=['astor==0.8.0'])
-    ac_id = pl.run()
+    pl = RequirementsToAssetCollection(platform, requirements_path='./requirements.txt', pkg_list=['astor==0.8.1'])
+    ac_id = pl.run(rerun=True)
     print('ac_id: ', ac_id)
 
     if ac_id:
@@ -48,5 +48,5 @@ def main():
 
 
 if __name__ == '__main__':
-    with Platform('BELEGOST') as platform:
+    with Platform('SlurmStage') as platform:
         main()

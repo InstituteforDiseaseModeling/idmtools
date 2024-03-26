@@ -22,7 +22,7 @@ if 'dev' in extra_require_files:
     build_requirements = list(set(build_requirements))
 
 setup_requirements = []
-test_requirements = ['pytest', 'pytest-runner', 'xmlrunner', 'pytest-timeout', 'pytest-cache'] + build_requirements
+test_requirements = ['pytest', 'pytest-runner', 'pytest-timeout', 'pytest-cache'] + build_requirements
 
 extras = {
     'test': test_requirements,
@@ -42,7 +42,8 @@ setup(
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
-        'Programming Language :: Python :: 3.11'
+        'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12'
     ],
     description="idmtools slurm utils",
     install_requires=extra_require_files['requirements'],

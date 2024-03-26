@@ -9,11 +9,11 @@ with open('README.md') as readme_file:
     readme = readme_file.read()
 
 with open('requirements.txt') as requirements_file:
-    requirements = requirements_file.read().split("\n")
+    requirements = requirements_file.read().splitlines()
 
 build_requirements = ['flake8', 'coverage', 'bump2version']
 setup_requirements = []
-test_requirements = ['pytest', 'pytest-runner', 'xmlrunner', 'pytest-timeout', 'pytest-cache'] + build_requirements
+test_requirements = ['pytest', 'pytest-runner', 'pytest-timeout', 'pytest-cache'] + build_requirements
 
 extras = {
     'test': test_requirements,
@@ -39,6 +39,7 @@ setup(
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
         'Framework:: IDM-Tools :: CLI'
     ],
     description="CLI for IDM-Tools",

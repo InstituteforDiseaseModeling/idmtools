@@ -17,6 +17,7 @@ from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
+from idmtools_platform_file.file_platform import is_admin
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
@@ -77,7 +78,14 @@ class TestFilePlatform(ITestWithPersistence):
         base_sim = experiment.simulations.items.base_simulation
         base_sim.assets.add_pre_creation_hook(add_sim_pre_creation_hook)
         base_sim.assets.add_post_creation_hook(add_sim_post_creation_hook)
-        suite.run(platform=self.platform, wait_until_done=False, retries=2)
+        if sys.platform == 'win32' and sys.version_info < (3, 8):
+            if not is_admin():
+                with self.assertRaises(Exception) as ex:
+                    suite.run(platform=self.platform, wait_until_done=False, retries=2)
+                self.assertTrue(ex.exception.args[0], "You need to run this function as an administrator.")
+                return
+        else:
+            suite.run(platform=self.platform, wait_until_done=False, retries=2)
         stdout = mock_stdout.getvalue()
         self.assertTrue("hello add_pre_creation_hook! succeeded = False" in stdout)
         self.assertTrue("hello add_post_creation_hook! succeeded = EntityStatus.CREATED" in stdout)

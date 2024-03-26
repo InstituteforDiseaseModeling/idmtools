@@ -9,6 +9,8 @@ import hashlib
 from dataclasses import dataclass, field
 from logging import getLogger, DEBUG
 from typing import List
+
+from packaging.requirements import Requirement
 from COMPS.Data import QueryCriteria
 from COMPS.Data.AssetCollection import AssetCollection as COMPSAssetCollection
 from idmtools.assets import Asset, AssetCollection
@@ -333,11 +335,20 @@ class RequirementsToAssetCollection:
 
         Returns: the consolidated requirements (as a list)
         """
-        import pkg_resources
         from idmtools_platform_comps.utils.package_version import get_pkg_match_version
 
         req_dict = {}
         comment_list = []
+        # Update the custom sort order for operators to include '~='
+        operator_sort_order = {
+            '<': 0,
+            '<=': 1,
+            '~=': 2,  # Place '~=' after '<='
+            '!=': 3,
+            '==': 4,
+            '>=': 5,
+            '>': 6
+        }
         if self.requirements_path:
             with open(self.requirements_path, 'r') as fd:
                 for _cnt, line in enumerate(fd):
@@ -349,14 +360,20 @@ class RequirementsToAssetCollection:
                         comment_list.append(line)
                         continue
 
-                    req = pkg_resources.Requirement.parse(line)
-                    req_dict[req.name] = req.specs
+                    req = Requirement(line)
+                    # we need to sort the requirements based on the operator so that we can get the base_version and
+                    # operation correctly in line 383 and 384. for example,
+                    # if package version pytest<7.0.0,>=6.0.0, we will get base_version as '7.0.0' and test as '<'
+                    req_dict[req.name] = sorted([(s.operator, str(s.version)) for s in req.specifier],
+                                                key=lambda x: (operator_sort_order.get(x[0], 7), x[1])
+                                                )
 
         # pkg_list will overwrite pkg in requirement file
         if self.pkg_list:
             for pkg in self.pkg_list:
-                req = pkg_resources.Requirement.parse(pkg)
-                req_dict[req.name] = req.specs
+                req = Requirement(pkg)
+                req_dict[req.name] = sorted([(s.operator, str(s.version)) for s in req.specifier],
+                                            key=lambda x: (operator_sort_order.get(x[0], 7), x[1]))
 
         missing_version_dict = {k: v for k, v in req_dict.items() if len(v) == 0 or v[0][1] == ''}
 

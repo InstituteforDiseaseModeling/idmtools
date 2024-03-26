@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """The setup script for the idmtools_test module to run extended tests and provide demo date for idmtools tests."""
+import sys
 
 from setuptools import setup, find_packages
 
@@ -12,6 +13,10 @@ with open('requirements.txt') as requirements_file:
     requirements = requirements_file.read().split("\n")
 
 setup_requirements = []
+
+if sys.platform in ["win32", "cygwin"]:
+    requirements.append('pypiwin32==223')
+    requirements.append('pywin32')
 
 authors = [
     ("Sharon Chen", "schen@idmod.org"),
