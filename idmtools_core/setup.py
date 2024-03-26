@@ -34,8 +34,8 @@ extras = {
 }
 
 if sys.platform in ["win32", "cygwin"]:
-    requirements.append('pypiwin32==223')
-    requirements.append('pywin32')
+    extra_require_files['requirements'].append('pypiwin32==223')
+    extra_require_files['requirements'].append('pywin32')
 
 authors = [
     ("Ross Carter", "rcarter@idmod.org"),
