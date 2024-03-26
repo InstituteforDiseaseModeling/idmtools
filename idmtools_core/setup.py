@@ -33,10 +33,6 @@ extras = {
     'full': ['idmtools_platform_comps', 'idmtools_cli', 'idmtools_models', 'idmtools_platform_slurm', 'idmtools_slurm_utils', 'idmtools_platform_general']
 }
 
-if sys.platform in ["win32", "cygwin"]:
-    extra_require_files['requirements'].append('pypiwin32==223')
-    extra_require_files['requirements'].append('pywin32')
-
 authors = [
     ("Ross Carter", "rcarter@idmod.org"),
     ("Sharon Chen", "shchen@idmod.org"),
