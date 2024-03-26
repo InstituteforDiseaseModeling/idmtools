@@ -3,9 +3,11 @@ Here we implement the FilePlatform object.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+import ctypes
 import os
 import shlex
 import shutil
+import sys
 from pathlib import Path
 from logging import getLogger
 from typing import Union, List
@@ -28,6 +30,13 @@ from idmtools_platform_file.platform_operations.utils import FileExperiment, Fil
 logger = getLogger(__name__)
 
 op_defaults = dict(default=None, compare=False, metadata={"pickle_ignore": True})
+
+
+def is_admin():
+    try:
+        return ctypes.windll.shell32.IsUserAnAdmin()
+    except:
+        return False
 
 
 @dataclass(repr=False)
@@ -167,6 +176,9 @@ class FilePlatform(IPlatform):
         """
         target = Path(target).absolute()
         link = Path(link).absolute()
+        if sys.platform == 'win32' and sys.version_info < (3, 8):
+            if not is_admin():
+                raise RuntimeError("You need to run this function as an administrator.")
         link.symlink_to(target)
 
     def create_batch_file(self, item: Union[Experiment, Simulation], **kwargs) -> None:
