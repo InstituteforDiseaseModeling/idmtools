@@ -4,7 +4,8 @@ idmtools SimulationBuilder definition.
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import inspect
-import math
+
+import numpy as np
 import pandas as pd
 from functools import partial
 from inspect import signature
@@ -192,7 +193,7 @@ class SimulationBuilder:
                 self.sweeps.append(
                     partial(function, **self._map_argument_array(list(remaining_parameters), v)) for v in
                     generated_values)
-                self.count = math.prod(map(len, _values))
+                self.count = np.prod(list(map(len, _values)))
                 return
 
         if len(required_params) == 0 and len(values) > 1:
@@ -216,7 +217,8 @@ class SimulationBuilder:
             self.sweeps.append(
                 partial(function, **self._map_argument_array(list(remaining_parameters), v)) for v in
                 generated_values)
-        self.count = math.prod(map(len, _values))
+
+        self.count = np.prod(list(map(len, _values)))
 
     def case_kwargs(self, function: TSweepFunction, remaining_parameters, values):
         required_params = self._extract_required_parameters(remaining_parameters)
@@ -235,7 +237,7 @@ class SimulationBuilder:
         generated_values = product(*_values.values())
         self.sweeps.append(
             partial(function, **self._map_argument_array(_values.keys(), v)) for v in generated_values)
-        self.count = math.prod(map(len, _values.values()))
+        self.count = np.prod(list(map(len, _values.values())))
 
     def add_multiple_parameter_sweep_definition(self, function: TSweepFunction, *args, **kwargs):
         """
