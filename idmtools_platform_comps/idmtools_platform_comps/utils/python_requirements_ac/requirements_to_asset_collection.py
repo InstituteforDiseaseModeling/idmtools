@@ -17,6 +17,7 @@ from idmtools.core import ItemType
 from idmtools.entities.experiment import Experiment
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_platform_comps.comps_platform import COMPSPlatform, SLURM_ENVS
+from idmtools_platform_comps.utils.package_version import get_highest_version
 
 CURRENT_DIRECTORY = os.path.dirname(__file__)
 REQUIREMENT_FILE = 'requirements_updated.txt'
@@ -334,20 +335,9 @@ class RequirementsToAssetCollection:
 
         Returns: the consolidated requirements (as a list)
         """
-        from idmtools_platform_comps.utils.package_version import get_pkg_match_version
-
         req_dict = {}
         comment_list = []
-        # Update the custom sort order for operators to include '~='
-        operator_sort_order = {
-            '<': 0,
-            '<=': 1,
-            '~=': 2,  # Place '~=' after '<='
-            '!=': 3,
-            '==': 4,
-            '>=': 5,
-            '>': 6
-        }
+
         if self.requirements_path:
             with open(self.requirements_path, 'r') as fd:
                 for _cnt, line in enumerate(fd):
@@ -360,28 +350,17 @@ class RequirementsToAssetCollection:
                         continue
 
                     req = Requirement(line)
-                    # we need to sort the requirements based on the operator so that we can get the base_version and
-                    # operation correctly in line 383 and 384. for example,
-                    # if package version pytest<7.0.0,>=6.0.0, we will get base_version as '7.0.0' and test as '<'
-                    req_dict[req.name] = sorted([(s.operator, str(s.version)) for s in req.specifier],
-                                                key=lambda x: (operator_sort_order.get(x[0], 7), x[1])
-                                                )
+                    req_dict[req.name] = req.specifier
 
         # pkg_list will overwrite pkg in requirement file
         if self.pkg_list:
             for pkg in self.pkg_list:
                 req = Requirement(pkg)
-                req_dict[req.name] = sorted([(s.operator, str(s.version)) for s in req.specifier],
-                                            key=lambda x: (operator_sort_order.get(x[0], 7), x[1]))
-
-        missing_version_dict = {k: v for k, v in req_dict.items() if len(v) == 0 or v[0][1] == ''}
+                req_dict[req.name] = req.specifier
 
         req_list = []
         for k, v in req_dict.items():
-            pkg_name = k
-            base_version = None if k in missing_version_dict else v[0][1]
-            test = '==' if k in missing_version_dict else v[0][0]
-            req_list.append(f'{pkg_name}=={get_pkg_match_version(pkg_name, base_version, test)}')
+            req_list.append(f'{k}=={get_highest_version(k, str(v))}')
 
         wheel_list = []
         if self.local_wheels:

@@ -5,8 +5,8 @@ import pytest
 from unittest import mock
 from idmtools_test.utils.cli import run_command
 from idmtools.assets import AssetCollection
-from idmtools_platform_comps.utils.package_version import get_pkg_match_version, get_latest_version, \
-    fetch_package_versions
+from idmtools_platform_comps.utils.package_version import get_latest_version, \
+    fetch_package_versions, get_highest_version
 from idmtools_test import COMMON_INPUT_PATH
 
 wheel_file_1 = os.path.join(COMMON_INPUT_PATH, 'simple_load_lib_example', 'fake_wheel_file_a.whl')
@@ -246,13 +246,13 @@ class TestPackageVersionCLI(unittest.TestCase):
                          '0.3', '0.2.1', '0.2', '0.1']
         with mock.patch('idmtools_platform_comps.utils.package_version.fetch_versions_from_server',
                         return_value=test_versions) as mock_fetch:
-            self.assertEqual(get_pkg_match_version(pkg_name='astor', base_version='0.7.1', test='<'), '0.7.0')
-            self.assertEqual(get_pkg_match_version(pkg_name='astor', base_version='0.7.1', test='<='), '0.7.1')
-            self.assertEqual(get_pkg_match_version(pkg_name='astor', base_version='0.8.0', test='~='), '0.8.1')
-            self.assertEqual(get_pkg_match_version(pkg_name='astor', base_version='0.8.0', test='>='), '10.0.0')
-            self.assertEqual(get_pkg_match_version(pkg_name='astor', base_version='0.8.0', test='>'), '10.0.0')
-            self.assertEqual(get_pkg_match_version(pkg_name='astor', base_version='0.7.1', test='!='), '10.0.0')
-            self.assertEqual(get_pkg_match_version(pkg_name='astor', base_version='0.6', test='=='), '0.6')
+            self.assertEqual(get_highest_version(pkg_name='astor', spec_str='<0.7.1'), '0.7.0')
+            self.assertEqual(get_highest_version(pkg_name='astor', spec_str='<=0.7.1'), '0.7.1')
+            self.assertEqual(get_highest_version(pkg_name='astor', spec_str='~=0.8.0'), '0.8.1')
+            self.assertEqual(get_highest_version(pkg_name='astor', spec_str='>=0.8.0'), '10.0.0')
+            self.assertEqual(get_highest_version(pkg_name='astor', spec_str='>0.8.0'), '10.0.0')
+            self.assertEqual(get_highest_version(pkg_name='astor', spec_str='!=0.7.1'), '10.0.0')
+            self.assertEqual(get_highest_version(pkg_name='astor', spec_str='==0.6'), '0.6')
 
     @pytest.mark.serial
     def test_get_latest_version(self):
