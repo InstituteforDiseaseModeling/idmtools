@@ -15,7 +15,25 @@ from idmtools_cli.iplatform_cli import IPlatformCLI
 pass_platform_cli = click.make_pass_decorator(IPlatformCLI)
 
 
-@with_plugins(entry_points().select(group='idmtools_cli.cli_plugins'))
+def get_filtered_entry_points(group):
+    """
+    Get entry points for a specific group, compatible across Python versions.
+
+    Args:
+        group (str): The entry point group to filter by.
+
+    Returns:
+        An iterable of entry point objects for the specified group.
+    """
+    # For Python 3.10 and newer, use the select method if available
+    if hasattr(entry_points(), 'select'):
+        return entry_points().select(group=group)
+    else:
+        # For Python 3.9 and earlier, manually filter the entry points
+        return (ep for ep in entry_points().get(group, []))
+
+
+@with_plugins(get_filtered_entry_points('idmtools_cli.cli_plugins'))
 @click.group()
 @click.option('--debug/--no-debug', default=False, help="When selected, enables console level logging")
 def cli(debug):
