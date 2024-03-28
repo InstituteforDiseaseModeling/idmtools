@@ -9,7 +9,6 @@ import hashlib
 from dataclasses import dataclass, field
 from logging import getLogger, DEBUG
 from typing import List
-
 from packaging.requirements import Requirement
 from COMPS.Data import QueryCriteria
 from COMPS.Data.AssetCollection import AssetCollection as COMPSAssetCollection

@@ -4,7 +4,6 @@ idmtools SimulationBuilder definition.
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import inspect
-
 import numpy as np
 import pandas as pd
 from functools import partial

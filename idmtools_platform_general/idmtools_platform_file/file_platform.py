@@ -174,11 +174,11 @@ class FilePlatform(IPlatform):
         Returns:
             None
         """
-        target = Path(target).absolute()
-        link = Path(link).absolute()
         if sys.platform == 'win32' and sys.version_info < (3, 8):
             if not is_admin():
                 raise RuntimeError("You need to run this function as an administrator.")
+        target = Path(target).absolute()
+        link = Path(link).absolute()
         link.symlink_to(target)
 
     def create_batch_file(self, item: Union[Experiment, Simulation], **kwargs) -> None:

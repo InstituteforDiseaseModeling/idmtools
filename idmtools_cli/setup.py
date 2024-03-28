@@ -9,7 +9,7 @@ with open('README.md') as readme_file:
     readme = readme_file.read()
 
 with open('requirements.txt') as requirements_file:
-    requirements = requirements_file.read().splitlines()
+    requirements = requirements_file.read().split("\n")
 
 build_requirements = ['flake8', 'coverage', 'bump2version']
 setup_requirements = []

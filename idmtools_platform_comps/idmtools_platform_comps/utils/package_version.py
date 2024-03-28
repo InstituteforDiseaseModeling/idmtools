@@ -13,7 +13,6 @@ from logging import getLogger, DEBUG
 from typing import Optional, List, Type
 from urllib import request
 import requests
-
 from packaging.version import parse
 from html.parser import HTMLParser
 
