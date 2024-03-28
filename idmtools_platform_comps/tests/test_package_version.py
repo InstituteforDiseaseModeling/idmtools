@@ -241,7 +241,7 @@ class TestPackageVersionCLI(unittest.TestCase):
                         result1.stdout_bytes.decode('utf-8'))
 
     @pytest.mark.serial
-    def test_get_pkg_match_version(self):
+    def test_get_highest_version(self):
         test_versions = ['10.0.0', '0.8.1', '0.8.0', '0.7.1', '0.7.0', '0.6.2', '0.6.1', '0.6', '0.5', '0.4.1', '0.4',
                          '0.3', '0.2.1', '0.2', '0.1']
         with mock.patch('idmtools_platform_comps.utils.package_version.fetch_versions_from_server',
