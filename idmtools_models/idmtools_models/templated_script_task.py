@@ -40,7 +40,7 @@ WINDOWS_PYTHON_PATH_WRAPPER = """set PYTHONPATH=%cd%\\Assets\\site-packages\\;%c
 WINDOWS_DICT_TO_ENVIRONMENT = WINDOWS_DICT_TO_ENVIRONMENT + WINDOWS_BASE_WRAPPER
 
 # Define our linux common scripts
-LINUX_BASE_WRAPPER = """echo Running $@
+LINUX_BASE_WRAPPER = """echo Running args $@
 \"$@\"
 """
 LINUX_PYTHON_PATH_WRAPPER = """export PYTHONPATH=$(pwd)/Assets/site-packages:$(pwd)/Assets/:$PYTHONPATH
