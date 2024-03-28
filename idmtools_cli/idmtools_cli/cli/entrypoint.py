@@ -5,7 +5,10 @@ from idmtools.core.logging import setup_logging, IdmToolsLoggingConfig
 import click
 from click_plugins import with_plugins
 
-from importlib_metadata import entry_points
+try:
+    from importlib.metadata import entry_points
+except ImportError:
+    from importlib_metadata import entry_points  # for python 3.7
 from idmtools_cli.iplatform_cli import IPlatformCLI
 
 # Decorator for CLI functions that will require a platform object passed down to them
