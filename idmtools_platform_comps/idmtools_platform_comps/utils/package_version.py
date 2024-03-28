@@ -486,7 +486,7 @@ def get_latest_compatible_version(pkg_name, base_version=None, versions=None, va
     # Check if the version is in the list
     is_in_list = any(parsed_version_to_check == parse(version) for version in versions)
     if not is_in_list and validate:
-        raise Exception(f"Could not find the version of '{base_version}'.")
+        raise Exception(f"Could not find the version of '{base_version}' for {pkg_name}.")
 
     # Find all possible candidates
     candidates = [version for version in versions if version.startswith(base_version)]
