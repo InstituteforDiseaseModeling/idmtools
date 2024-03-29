@@ -7,6 +7,7 @@ import os
 import shlex
 import shutil
 import subprocess
+import sys
 from dataclasses import dataclass
 from logging import getLogger
 from pathlib import Path
@@ -111,6 +112,8 @@ class LocalSlurmOperations(SlurmOperations):
         Returns:
             None
         """
+        if sys.platform == 'win32' and sys.version_info < (3, 8):
+            logger.debug('Need administrator privileges to create symbolic links on Windows.')
         target = Path(target).absolute()
         link = Path(link).absolute()
         link.symlink_to(target)
@@ -124,6 +127,8 @@ class LocalSlurmOperations(SlurmOperations):
         Returns:
             None
         """
+        if sys.platform == 'win32' and sys.version_info < (3, 8):
+            logger.debug('Need administrator privileges to create symbolic links on Windows.')
         target = Path(target).absolute()
         link = Path(link).absolute()
         link.symlink_to(target)

@@ -25,12 +25,13 @@ def get_filtered_entry_points(group):
     Returns:
         An iterable of entry point objects for the specified group.
     """
+    user_entry_points = entry_points()
     # For Python 3.10 and newer, use the select method if available
-    if hasattr(entry_points(), 'select'):
-        return entry_points().select(group=group)
+    if hasattr(user_entry_points, 'select'):
+        return user_entry_points.select(group=group)
     else:
         # For Python 3.9 and earlier, manually filter the entry points
-        return (ep for ep in entry_points().get(group, []))
+        return (ep for ep in user_entry_points.get(group, []))
 
 
 @with_plugins(get_filtered_entry_points('idmtools_cli.cli_plugins'))
