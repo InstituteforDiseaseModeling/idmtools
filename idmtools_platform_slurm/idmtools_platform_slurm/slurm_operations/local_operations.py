@@ -7,7 +7,6 @@ import os
 import shlex
 import shutil
 import subprocess
-import sys
 from dataclasses import dataclass
 from logging import getLogger
 from pathlib import Path
@@ -20,6 +19,8 @@ from idmtools.entities.simulation import Simulation
 from idmtools_platform_slurm.assets import generate_batch, generate_script, generate_simulation_script
 from idmtools_platform_slurm.slurm_operations.operations_interface import SlurmOperations
 from idmtools_platform_slurm.slurm_operations.slurm_constants import SLURM_MAPS
+
+from idmtools.utils.decorators import check_symlink_capabilities
 
 logger = getLogger(__name__)
 
@@ -103,6 +104,7 @@ class LocalSlurmOperations(SlurmOperations):
         else:
             target.mkdir(parents=True, exist_ok=exist_ok)
 
+    @check_symlink_capabilities
     def link_file(self, target: Union[Path, str], link: Union[Path, str]) -> None:
         """
         Link files.
@@ -112,12 +114,11 @@ class LocalSlurmOperations(SlurmOperations):
         Returns:
             None
         """
-        if sys.platform == 'win32' and sys.version_info < (3, 8):
-            logger.debug('Need administrator privileges to create symbolic links on Windows.')
         target = Path(target).absolute()
         link = Path(link).absolute()
         link.symlink_to(target)
 
+    @check_symlink_capabilities
     def link_dir(self, target: Union[Path, str], link: Union[Path, str]) -> None:
         """
         Link directory/files.
@@ -127,8 +128,6 @@ class LocalSlurmOperations(SlurmOperations):
         Returns:
             None
         """
-        if sys.platform == 'win32' and sys.version_info < (3, 8):
-            logger.debug('Need administrator privileges to create symbolic links on Windows.')
         target = Path(target).absolute()
         link = Path(link).absolute()
         link.symlink_to(target)

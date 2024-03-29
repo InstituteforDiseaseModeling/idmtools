@@ -407,11 +407,11 @@ def fetch_package_versions(pkg_name, is_released=True, sort=True, display_all=Fa
 
 def get_highest_version(pkg_requirement: str):
     """
-        Utility to get the latest version for a given package name.
+    Utility to get the latest version for a given package name.
 
-        Args:
-            pkg_requirement: package requirement given
-        Returns: the highest valid version of the package
+    Args:
+        pkg_requirement: package requirement given
+    Returns: the highest valid version of the package
     """
     req = Requirement(pkg_requirement)
     available_versions = fetch_package_versions(req.name)
