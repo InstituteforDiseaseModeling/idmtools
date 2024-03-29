@@ -360,7 +360,8 @@ class RequirementsToAssetCollection:
 
         req_list = []
         for k, v in req_dict.items():
-            req_list.append(f'{k}=={get_highest_version(k, str(v))}')
+            pkg_requirement = f'{k}{str(v)}'
+            req_list.append(f'{k}=={get_highest_version(pkg_requirement)}')
 
         wheel_list = []
         if self.local_wheels:

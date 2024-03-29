@@ -13,9 +13,12 @@ from logging import getLogger, DEBUG
 from typing import Optional, List, Type
 from urllib import request
 import requests
-from packaging.specifiers import SpecifierSet
+from packaging.requirements import Requirement
 from packaging.version import Version, parse
 from html.parser import HTMLParser
+
+user_logger = getLogger('user')
+
 
 PKG_PYPI = 'https://pypi.python.org/pypi/{}/json'
 PYPI_PRODUCTION_SIMPLE = 'https://packages.idmod.org/artifactory/api/pypi/pypi-production/simple'
@@ -232,9 +235,10 @@ def fetch_versions_from_server(pkg_url: str, parser: Type[PackageHTMLParser] = L
         All the releases for a package
     """
     resp = requests.get(pkg_url)
+    pkg_name = pkg_url.split('/')[-1]
     if resp.status_code != 200:
-        logger.warning('Could not fetch URL')
-        return None
+        logger.warning(f"Error fetching package {pkg_name} information. Status code: {resp.status_code}")
+        return []
 
     html_str = resp.text
 
@@ -401,20 +405,19 @@ def fetch_package_versions(pkg_name, is_released=True, sort=True, display_all=Fa
     return versions
 
 
-def get_highest_version(pkg_name, spec_str: str = None):
+def get_highest_version(pkg_requirement: str):
     """
         Utility to get the latest version for a given package name.
 
         Args:
-            pkg_name: package name given
-            spec_str: SpecifierSet str
+            pkg_requirement: package requirement given
         Returns: the highest valid version of the package
     """
-    available_versions = fetch_package_versions(pkg_name)
-    spec = SpecifierSet(spec_str)
+    req = Requirement(pkg_requirement)
+    available_versions = fetch_package_versions(req.name)
 
     # Filter versions that satisfy the specifier
-    valid_versions = [Version(version) for version in available_versions if parse(version) in spec]
+    valid_versions = [Version(version) for version in available_versions if parse(version) in req.specifier]
 
     if not valid_versions:
         return None  # No valid versions found
@@ -431,22 +434,12 @@ def get_latest_version(pkg_name):
         pkg_name: package name given
 
     Returns: the latest version of package
-
-    Raises:
-        Exception if package could not be found.
-
-    Notes:
-        - TODO - Make custom exception or use ValueError
     """
-    # Get sorted package versions
-    versions = fetch_package_versions(pkg_name)
-
-    if versions is None:
-        # print(f"Could not find the version of '{version}'.")
-        raise Exception(f"Could not find the package'{pkg_name}'.")
-
-    # Pick the latest
-    return versions[0]
+    version = get_highest_version(pkg_name)
+    if version is None:
+        user_logger.info(f"No valid versions found for '{pkg_name}'")
+        exit(1)
+    return version
 
 
 def get_latest_compatible_version(pkg_name, base_version=None, versions=None, validate=True):
@@ -486,7 +479,8 @@ def get_latest_compatible_version(pkg_name, base_version=None, versions=None, va
     # Check if the version is in the list
     is_in_list = any(parsed_version_to_check == parse(version) for version in versions)
     if not is_in_list and validate:
-        raise Exception(f"Could not find the version of '{base_version}' for {pkg_name}.")
+        user_logger.info(f"Could not find the version of '{base_version}' for '{pkg_name}'.")
+        return None
 
     # Find all possible candidates
     candidates = [version for version in versions if version.startswith(base_version)]

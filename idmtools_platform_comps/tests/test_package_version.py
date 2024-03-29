@@ -1,5 +1,7 @@
 import os
 import unittest
+from unittest.mock import patch
+
 import allure
 import pytest
 from unittest import mock
@@ -246,13 +248,13 @@ class TestPackageVersionCLI(unittest.TestCase):
                          '0.3', '0.2.1', '0.2', '0.1']
         with mock.patch('idmtools_platform_comps.utils.package_version.fetch_versions_from_server',
                         return_value=test_versions) as mock_fetch:
-            self.assertEqual(get_highest_version(pkg_name='astor', spec_str='<0.7.1'), '0.7.0')
-            self.assertEqual(get_highest_version(pkg_name='astor', spec_str='<=0.7.1'), '0.7.1')
-            self.assertEqual(get_highest_version(pkg_name='astor', spec_str='~=0.8.0'), '0.8.1')
-            self.assertEqual(get_highest_version(pkg_name='astor', spec_str='>=0.8.0'), '10.0.0')
-            self.assertEqual(get_highest_version(pkg_name='astor', spec_str='>0.8.0'), '10.0.0')
-            self.assertEqual(get_highest_version(pkg_name='astor', spec_str='!=0.7.1'), '10.0.0')
-            self.assertEqual(get_highest_version(pkg_name='astor', spec_str='==0.6'), '0.6')
+            self.assertEqual(get_highest_version(pkg_requirement='astor<0.7.1'), '0.7.0')
+            self.assertEqual(get_highest_version(pkg_requirement='astor<=0.7.1'), '0.7.1')
+            self.assertEqual(get_highest_version(pkg_requirement='astor~=0.8.0'), '0.8.1')
+            self.assertEqual(get_highest_version(pkg_requirement='astor>=0.8.0'), '10.0.0')
+            self.assertEqual(get_highest_version(pkg_requirement='astor>0.8.0'), '10.0.0')
+            self.assertEqual(get_highest_version(pkg_requirement='astor!=0.7.1'), '10.0.0')
+            self.assertEqual(get_highest_version(pkg_requirement='astor==0.6'), '0.6')
 
     @pytest.mark.serial
     def test_get_latest_version(self):
@@ -279,7 +281,12 @@ class TestPackageVersionCLI(unittest.TestCase):
                         return_value=test_versions) as mock_fetch:
             self.assertEqual(get_latest_compatible_version(pkg_name='pytest', base_version='7'), '7.4.4')
             self.assertEqual(get_latest_compatible_version(pkg_name='pytest', base_version='8.1'), '8.1.1')
-            with self.assertRaises(Exception) as context:
-                get_latest_compatible_version(pkg_name='pytest', base_version='10')
-            self.assertEqual(str(context.exception), "Could not find the version of '10' for pytest.")
+
+    @pytest.mark.serial
+    def test_get_latest_compatible_version_no_exist(self):
+        test_versions = ['8.1.1', '8.1.0', '8.0.2', '8.0.1', '8.0.0', '7.4.4', '7.4.3', '7.4.2', '7.4.1', '7.4.0',
+                         '7.3.2', '7.0.0']
+        with mock.patch('idmtools_platform_comps.utils.package_version.fetch_versions_from_server',
+                        return_value=test_versions) as mock_fetch:
+            self.assertEqual(get_latest_compatible_version(pkg_name='pytest', base_version='10'), None)
 
