@@ -4,9 +4,11 @@ Decorators defined for idmtools.
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import datetime
+import functools
 import importlib
 import importlib.util
 import os
+import sys
 import threading
 from concurrent.futures import Executor, as_completed
 from concurrent.futures.thread import ThreadPoolExecutor
@@ -14,6 +16,7 @@ from functools import wraps
 from logging import getLogger, DEBUG
 from typing import Callable, Union, Optional, Type
 
+user_logger = getLogger('user')
 logger = getLogger(__name__)
 
 
@@ -267,3 +270,13 @@ class ParallelizeDecorator:
             None
         """
         del self.queue
+
+
+def check_symlink_capabilities(func):
+    """Decorator to check symlink creation capabilities."""
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        if sys.platform == 'win32' and sys.version_info < (3, 8):
+            user_logger.debug('Need administrator privileges to create symbolic links on Windows.')
+        return func(*args, **kwargs)
+    return wrapper

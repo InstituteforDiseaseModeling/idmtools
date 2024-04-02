@@ -69,8 +69,11 @@ def get_packages_from_pip():
     Returns:
         (List[str]): A list of packages installed.
     """
-    import pkg_resources
-    return [str(d) for d in pkg_resources.working_set]
+    try:
+        from importlib.metadata import distributions
+    except ImportError:
+        from importlib_metadata import distributions  # for python 3.7
+    return [f'{d.name} {d.version}' for d in distributions()]
 
 
 def get_packages_list() -> List[str]:

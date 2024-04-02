@@ -20,6 +20,8 @@ from idmtools_platform_slurm.assets import generate_batch, generate_script, gene
 from idmtools_platform_slurm.slurm_operations.operations_interface import SlurmOperations
 from idmtools_platform_slurm.slurm_operations.slurm_constants import SLURM_MAPS
 
+from idmtools.utils.decorators import check_symlink_capabilities
+
 logger = getLogger(__name__)
 
 
@@ -102,6 +104,7 @@ class LocalSlurmOperations(SlurmOperations):
         else:
             target.mkdir(parents=True, exist_ok=exist_ok)
 
+    @check_symlink_capabilities
     def link_file(self, target: Union[Path, str], link: Union[Path, str]) -> None:
         """
         Link files.
@@ -115,6 +118,7 @@ class LocalSlurmOperations(SlurmOperations):
         link = Path(link).absolute()
         link.symlink_to(target)
 
+    @check_symlink_capabilities
     def link_dir(self, target: Union[Path, str], link: Union[Path, str]) -> None:
         """
         Link directory/files.
