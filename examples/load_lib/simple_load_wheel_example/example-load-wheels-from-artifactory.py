@@ -11,7 +11,7 @@ from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_
 
 def run_example(ac_id):
     print(f'run example with ac: {ac_id}')
-    platform = Platform('BELEGOST')
+    platform = Platform('IDMCloud')
     # create AssetCollection based on ac_id
     common_assets = AssetCollection.from_id(ac_id, as_copy=True)
 
@@ -50,5 +50,5 @@ def main():
 
 
 if __name__ == '__main__':
-    with Platform('BELEGOST') as platform:
+    with Platform('IDMCloud') as platform:
         main()

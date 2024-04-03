@@ -48,7 +48,7 @@ setD = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="d")
 if __name__ == "__main__":
     # define what platform we want to use. Here we use a context manager but if you prefer you can
     # use objects such as Platform('COMPS') instead
-    with platform('Calculon'):
+    with platform('CALCULON'):
         # define our base task
         base_task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"),
                                              parameters=dict(c='c-value'))

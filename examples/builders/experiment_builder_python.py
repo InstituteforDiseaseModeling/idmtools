@@ -36,8 +36,7 @@ def param_update_ab(simulation, param, value):
 
 if __name__ == "__main__":
     # define what platform we want to use. Here we use a context manager but if you prefer you can
-    # use objects such as Platform('BELEGOST') instead
-    with platform('Calculon'):
+    with platform('CALCULON'):
         # define our base task
         base_task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"),
                                              parameters=dict(c='c-value'))

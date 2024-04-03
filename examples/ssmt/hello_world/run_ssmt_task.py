@@ -7,7 +7,7 @@ command = "python3 hello.py"
 tags = {'test': 123}
 
 if __name__ == "__main__":
-    with Platform('BELEGOST'):
+    with Platform('CALCULON'):
 
         # If docker_image is defined within idmtools.ini, it It will use this docker image.
         # If docker_image is not defined in idmtools.ini, it will use the default docker image based on platform:

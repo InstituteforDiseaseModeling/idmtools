@@ -49,7 +49,7 @@ def generate_sim():
 
 
 if __name__ == "__main__":
-    platform = Platform('BELEGOST')
+    platform = Platform('IDMCloud')
     sims = generate_sim()
     sim_id = str(sims[0].uid)
     node_type = 'Points'

@@ -73,7 +73,7 @@ def get_packages_from_pip():
         from importlib.metadata import distributions
     except ImportError:
         from importlib_metadata import distributions  # for python 3.7
-    return [f'{d.name} {d.version}' for d in distributions()]
+    return [f'{d.metadata["Name"]} {d.version}' for d in distributions()]
 
 
 def get_packages_list() -> List[str]:

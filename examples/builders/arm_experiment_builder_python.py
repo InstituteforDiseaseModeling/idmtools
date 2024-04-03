@@ -37,7 +37,7 @@ setC = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="c")
 
 
 if __name__ == "__main__":
-    with platform('Calculon'):
+    with platform('CALCULON'):
         base_task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
         # define that we are going to create multiple simulations from this task
         ts = TemplatedSimulations(base_task=base_task)

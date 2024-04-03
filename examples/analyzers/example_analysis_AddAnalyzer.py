@@ -10,13 +10,12 @@ from idmtools.core.platform_factory import Platform
 if __name__ == '__main__':
 
     # Set the platform where you want to run your analysis
-    # In this case we are running in BELEGOST, but this can be changed to run 'CALCULON'
-    with Platform('BELEGOST') as platform:
+    with Platform('CALCULON') as platform:
 
         # Arg option for analyzer init are uid, working_dir, data in the method map (aka select_simulation_data),
         # and filenames
         # In this case, we want to provide a filename to analyze
-        filenames = ['StdOut.txt']
+        filenames = ['stdout.txt']
         # Initialize the analyser class with the name of file to save to and start the analysis
         analyzers = [AddAnalyzer(filenames=filenames)]
 

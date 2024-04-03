@@ -4,9 +4,9 @@ from idmtools.core.platform_factory import Platform
 from idmtools.analysis.platform_anaylsis import PlatformAnalysis
 
 if __name__ == "__main__":
-    platform = Platform('BELEGOST')
+    platform = Platform('CALCULON')
     analysis = PlatformAnalysis(
-        platform=platform, experiment_ids=["b716f387-cb04-eb11-a2c7-c4346bcb1553"],
+        platform=platform, experiment_ids=["b3e4fceb-bb71-ed11-aa00-b88303911bc1"],
         analyzers=[PopulationAnalyzer, AdultVectorsAnalyzer], analyzers_args=[{'title': 'idm'}, {'name': 'global good'}],
         analysis_name="SSMT Analysis Simple 1",
         # You can pass any additional arguments needed to AnalyzerManager through the extra_args parameter

@@ -70,14 +70,16 @@ class TestRetrieval(ITestWithPersistence):
         # Test attributes
         self.assertEqual(sim.uid, base.uid)
         self.assertEqual(sim.name, base.name)
-        self.assertEqual({k: str(v) for k, v in base.tags.items()}, sim.tags)
+        self.assertEqual({k: str(v) for k, v in sorted(base.tags.items())},
+                         {k: str(v) for k, v in sorted(sim.tags.items())})
 
         # Test the raw retrieval
         comps_simulation: COMPSSimulation = self.platform.get_item(base.uid, ItemType.SIMULATION, raw=True)
         self.assertIsInstance(comps_simulation, COMPSSimulation)
         self.assertEqual(base.uid, comps_simulation.id)
         self.assertEqual(self.case_name, comps_simulation.name)
-        self.assertEqual({k: str(v) for k, v in base.tags.items()}, comps_simulation.tags)
+        self.assertEqual({k: str(v) for k, v in sorted(base.tags.items())},
+                         {k: str(v) for k, v in sorted(comps_simulation.tags.items())})
 
     def test_parent(self):
         parent_exp = self.platform.get_parent(self.exp.simulations[0].uid, ItemType.SIMULATION)

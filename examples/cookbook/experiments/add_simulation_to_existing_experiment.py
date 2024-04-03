@@ -7,7 +7,7 @@ from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 
 # load up an existing experiment with completed simulations
-with Platform('BELEGOST'):
+with Platform('Calculon', node_group="idm_48cores", priority="Highest"):
     # Create First Experiment
     builder = SimulationBuilder()
     builder.add_sweep_definition(JSONConfiguredPythonTask.set_parameter_partial("a"),

@@ -6,7 +6,7 @@ from idmtools_platform_comps.utils.assetize_output.assetize_output import Asseti
 task = CommandTask(command="python Assets/model.py")
 task.common_assets.add_asset("model.py")
 
-platform = Platform("BELEGOST")
+platform = Platform("CALCULON")
 experiment = Experiment.from_task(task)
 
 # Since we have one simulation in our experiment, we can "flatten output" by using the format str
