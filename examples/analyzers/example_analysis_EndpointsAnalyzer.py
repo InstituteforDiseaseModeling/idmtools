@@ -93,8 +93,7 @@ class EndpointsAnalyzer(IAnalyzer):
 if __name__ == "__main__":
 
     # Set the platform where you want to run your analysis
-    # In this case we are running in BELEGOST, but this can be changed to run 'CALCULON'
-    with Platform('BELEGOST') as platform:
+    with Platform('CALCULON') as platform:
 
         # Set the experiment you want to analyze
         exp_id = 'adad3ad2-4304-eb11-a2c7-c4346bcb1553'  # comps exp id

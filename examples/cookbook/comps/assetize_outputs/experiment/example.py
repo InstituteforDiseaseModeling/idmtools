@@ -34,7 +34,7 @@ builder = SimulationBuilder()
 builder.add_sweep_definition(partial(set_parameter, parameter="a"), range(3))
 builder.add_sweep_definition(partial(set_parameter, parameter="b"), range(3))
 
-platform = Platform("BELEGOST")
+platform = Platform("CALCULON")
 
 experiment = Experiment.from_builder(builders=builder, base_task=base_task, name="Create example output")
 
