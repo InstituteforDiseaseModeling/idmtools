@@ -20,6 +20,7 @@ setA = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="a")
 
 @pytest.mark.comps
 @pytest.mark.long
+@pytest.mark.serial
 @allure.story("COMPS")
 @allure.story("Outputs")
 @allure.suite("idmtools_platform_comps")

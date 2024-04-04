@@ -89,6 +89,7 @@ class Plugin_create_hook:
 
 @pytest.mark.comps
 @pytest.mark.python
+@pytest.mark.serial
 @allure.story("COMPS")
 @allure.story("Python")
 @allure.suite("idmtools_platform_comps")
