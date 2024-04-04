@@ -25,7 +25,7 @@ task = CommandTask(command=command)
 ts = TemplatedSimulations(base_task=task)
 
 sb = SimulationBuilder()
-sb.add_multiple_parameter_sweep_definition(update_parameter_callback, pop_size=[10000, 20000], pop_infected=[10, 100],
+sb.add_sweep_definition(update_parameter_callback, pop_size=[10000, 20000], pop_infected=[10, 100],
                                            n_days=[100, 110], rand_seed=[1234, 4567])
 # has to add workorder.json with simulation to update cmd arguments
 # for command line task sweep with workorder, DO NOT use since it will not update arguments:
@@ -38,6 +38,6 @@ ts.add_builder(sb)
 experiment = Experiment.from_template(ts, name=os.path.split(sys.argv[0])[1])
 experiment.add_asset(os.path.join("inputs", "scheduling", "commandline_model.py"))
 with Platform('CALCULON') as platform:
-    experiment.run(wait_on_done=True, scheduling=True)
+    experiment.run(wait_until_done=True, scheduling=True)
     # use system status as the exit code
     sys.exit(0 if experiment.succeeded else -1)

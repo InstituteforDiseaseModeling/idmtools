@@ -1,4 +1,4 @@
-"""idmtools script to run on HPC to install python files.
+"""idmtools script to run on Slurm to install python files.
 
 This is part of the RequirementsToAssetCollection tool. This will run on the HPC in an Experiment to install the python requirements
 as output that will be converted to an AssetCollection later.

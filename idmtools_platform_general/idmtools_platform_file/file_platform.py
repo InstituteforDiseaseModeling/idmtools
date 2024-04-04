@@ -16,6 +16,7 @@ from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.iplatform import IPlatform, ITEM_TYPE_TO_OBJECT_INTERFACE
+from idmtools.utils.decorators import check_symlink_capabilities
 from idmtools_platform_file.platform_operations.utils import FILE_MAPS
 from idmtools_platform_file.assets import generate_script, generate_simulation_script
 from idmtools_platform_file.platform_operations.asset_collection_operations import FilePlatformAssetCollectionOperations
@@ -142,6 +143,7 @@ class FilePlatform(IPlatform):
         target.mkdir(parents=True, exist_ok=exist_ok)
 
     @staticmethod
+    @check_symlink_capabilities
     def link_file(target: Union[Path, str], link: Union[Path, str]) -> None:
         """
         Link files.
@@ -156,6 +158,7 @@ class FilePlatform(IPlatform):
         link.symlink_to(target)
 
     @staticmethod
+    @check_symlink_capabilities
     def link_dir(target: Union[Path, str], link: Union[Path, str]) -> None:
         """
         Link directory/files.

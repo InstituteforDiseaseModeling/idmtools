@@ -97,9 +97,6 @@ if "%1" == "generate-api" (
 	sphinx-apidoc -f -e -M -o ./api/ --templatedir api_templates ../idmtools_slurm_utils/idmtools_slurm_utils
 	REN ./api/modules.rst ./api/idmtools_slurm_utils_index.rst
 
-	del ./api/idmtools_platform_local_index.rst >nul 2>&1
-	DEL /Q /F /S "*.tmp" >nul 2>&1
-	sphinx-apidoc -f -e -M -o ./api/ --templatedir api_templates ../idmtools_platform_local/idmtools_platform_local '../idmtools_platform_local/idmtools_platform_local/internals//*'
 	goto end
 )
 

@@ -96,7 +96,7 @@ def get_issue_type(issue_types, issue, labels):
         issue_types[issue] = 'User Experience'
     elif 'Documentation' in labels:
         issue_types[issue] = 'Documentation'
-    elif any([x in labels for x in ['Platform support', 'COMPS', 'Local Platform', 'SLURM']]):
+    elif any([x in labels for x in ['Platform support', 'COMPS', 'SLURM']]):
         issue_types[issue] = 'Platforms'
     elif 'Analyzers' in labels:
         issue_types[issue] = 'Analyzers'

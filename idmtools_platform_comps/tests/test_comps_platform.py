@@ -126,7 +126,7 @@ class TestCOMPSPlatform(ITestWithPersistence):
         experiment.simulations.append(Simulation.from_task(CommandTask(command="python --help")))
         experiment.simulations.items[1]._platform_kwargs['num_cores'] = 2
         experiment.simulations.items[1]._platform_kwargs['priority'] = Priority.Highest
-        experiment.run(wait_on_done=True, platform=self.platform)
+        experiment.run(wait_until_done=True, platform=self.platform)
         self.assertTrue(experiment.succeeded)
 
         exp_raw = experiment.get_platform_object()

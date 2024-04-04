@@ -9,11 +9,11 @@ from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
 
-with platform('BELEGOST'):
+with platform('SlurmStage'):
     base_task = JSONConfiguredPythonTask(
         script_path=os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py"),
         # add common assets from existing collection
-        common_assets=AssetCollection.from_id("6af9a874-1304-eb11-a2c7-c4346bcb1553", as_copy=True)
+        common_assets=AssetCollection.from_id("00a10ad3-2af1-ee11-9302-f0921c167864", as_copy=True)
     )
 
     ts = TemplatedSimulations(base_task=base_task)

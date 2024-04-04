@@ -10,8 +10,6 @@ Supported platforms
 
 **SLURM**: You can also run simulations on the open-source |SLURM_s| platform for large and small Linux clusters.". For more information, see :doc:`slurm/index`.
 
-**Local**: You can also run simulations and analysis locally on your computer, rather than on a remote high-performance computer (HPC). For more information about these modules, see :doc:`../api/idmtools_platform_local_index`.
-
 If you need to use a different platform, you can also add a new platform to |IT_s| by creating a new platform plugin, as described in :doc:`platforms-plugin`. 
 
 You can use the **idmtools.ini** file to configure platform specific settings, as the following examples shows for |COMPS_s|::
@@ -42,5 +40,4 @@ For additional information about configuring idmtools.ini, see :doc:`../configur
 .. toctree::
    platforms-comps
    slurm/index
-   platforms-local
    platforms-plugin

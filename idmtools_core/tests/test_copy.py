@@ -1,15 +1,16 @@
 import copy
 import allure
 import os
-import unittest.mock
 from functools import partial
 import pytest
+from idmtools_test.utils.test_task import TestTask
+
 from idmtools.assets import Asset
 from idmtools.core.platform_factory import Platform
+from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
-from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
@@ -48,11 +49,14 @@ class TestCopy(ITestWithPersistence):
         super().tearDown()
 
     def test_deepcopy_assets(self):
-        e = Experiment.from_task(JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, 'python_experiments', "model.py")))
+        test_platform = Platform("TestExecute", missing_ok=True)
+        task = CommandTask(command="python --version")
+        e = Experiment.from_task(task=task, name="Example of experiment from task")
+        e.add_asset(os.path.join(COMMON_INPUT_PATH, 'python_experiments', "model.py"))
         e.simulations[0].assets.add_asset(Asset(absolute_path=os.path.join(COMMON_INPUT_PATH, 'files', "config.json")))
 
         # test deepcopy of experiment
-        e.pre_creation(None)
+        e.pre_creation(test_platform)
         ep = copy.deepcopy(e)
         self.assertEqual(len(ep.assets.assets), 1)
         ep.assets = copy.deepcopy(e.assets)
@@ -68,8 +72,11 @@ class TestCopy(ITestWithPersistence):
         self.assertEqual(sim.assets, sim.assets)
 
     def test_deepcopy_experiment(self):
-        ts = TemplatedSimulations(base_task=JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, 'python_experiments', "model.py")))
+        test_platform = Platform("TestExecute", missing_ok=True)
+        task = TestTask()
+        ts = TemplatedSimulations(base_task=task)
         e = Experiment.from_template(ts)
+        e.add_asset(os.path.join(COMMON_INPUT_PATH, 'python_experiments', "model.py"))
         from idmtools.builders import SimulationBuilder
         builder = SimulationBuilder()
         builder.add_sweep_definition(setA, range(10))
@@ -80,7 +87,7 @@ class TestCopy(ITestWithPersistence):
 
         self.assertEqual(len(ts.builders), 1)
         self.assertEqual(len(e.simulations), 30)
-        e.pre_creation(None)
+        e.pre_creation(test_platform)
         self.assertEqual(len(e.assets.assets), 1)
 
         # test deepcopy of experiment
@@ -97,9 +104,11 @@ class TestCopy(ITestWithPersistence):
         self.assertIn('Set self.maxDiff to None to see it', context.exception.args[0])
 
     def test_deepcopy_simulation(self):
-        sim = Simulation.from_task(JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, 'python_experiments', "model.py")))
+        test_platform = Platform("TestExecute", missing_ok=True)
+        task = TestTask()
+        sim = Simulation.from_task(task=task)
 
-        sim.pre_creation(Platform('Test'))
+        sim.pre_creation(test_platform)
         self.assertEqual(len(sim.assets.assets), 1)
 
         # test deepcopy of simulation
@@ -110,12 +119,3 @@ class TestCopy(ITestWithPersistence):
         sim.task.common_assets = None
         self.assertEqual(sim, sp)
 
-    @pytest.mark.comps
-    @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
-    @pytest.mark.serial
-    def test_deepcopy_platform(self, login_mock):
-        from idmtools.core.platform_factory import Platform
-        p = Platform('COMPS')
-
-        pp = copy.deepcopy(p)
-        self.assertEqual(p, pp)

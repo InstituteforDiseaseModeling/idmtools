@@ -36,7 +36,7 @@ class TestSlurmOperations(ITestWithPersistence):
         ts.add_builder(builder)
         exp = Experiment(name=self.case_name, simulations=ts, tags=dict(number_tag=123, KeyOnly=None))
         suite = add_dummy_suite(exp)
-        suite.run(platform=platform, wait_until_done=False, wait_on_done=False, dry_run=True)
+        suite.run(platform=platform, wait_until_done=False, dry_run=True)
         return suite, exp
 
     def setUp(self) -> None:
@@ -228,7 +228,7 @@ class TestSlurmOperations(ITestWithPersistence):
         exp = Experiment.from_task(task, name=self.case_name)
         suite = add_dummy_suite(exp)
         platform = Platform('SLURM_LOCAL', job_directory="test")
-        suite.run(platform=platform, wait_until_done=False, wait_on_done=False, dry_run=True)
+        suite.run(platform=platform, wait_until_done=False, dry_run=True)
         my_exp = platform.get_item(exp.id, ItemType.EXPERIMENT)
         self.assertEqual(my_exp.id, exp.id)
         assets = my_exp.assets

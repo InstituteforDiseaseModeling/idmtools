@@ -21,11 +21,12 @@ arm.add_sweep_definition(partial(update_parameter, parameter='population'), [500
 arm.add_sweep_definition(partial(update_parameter, parameter='susceptible'), [0.5, 0.9])
 builder.add_arm(arm)
 # Now add the sweeps with the birth_rate as well
-arm.add_sweep_definition(partial(update_parameter, parameter='enable_births'), [True])
-arm.add_sweep_definition(partial(update_parameter, parameter='birth_rate'), [0.01, 0.1])
-builder.add_arm(arm)
+arm2 = SweepArm(type=ArmType.cross)
+arm2.add_sweep_definition(partial(update_parameter, parameter='enable_births'), [True])
+arm2.add_sweep_definition(partial(update_parameter, parameter='birth_rate'), [0.01, 0.1])
+builder.add_arm(arm2)
 
 sims = TemplatedSimulations(base_task=base_task)
 sims.add_builder(builder)
 
-print(tabulate([s.task.config for s in list(sims)], headers="keys"))
+print(tabulate([s.task.config for s in sims], headers="keys"))

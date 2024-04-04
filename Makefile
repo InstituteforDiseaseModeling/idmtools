@@ -26,9 +26,8 @@ clean-all: ## Clean most common outputs(Logs, Test Results, etc) as well as loca
 
 setup-dev: ## Setup packages in dev mode
 	python dev_scripts/bootstrap.py
-	$(MAKE) -C idmtools_platform_local docker
 
-setup-dev-no-docker: ## Setup packages in dev mode minus docker
+setup-dev-no-docker: ## Setup packages in dev mode
 	python dev_scripts/bootstrap.py
 
 lint: ## check style with flake8
@@ -99,12 +98,12 @@ coverage-report: ## Generate coverage report for tests already ran
 
 coverage: ## Run all tests and then generate a coverage report
 	$(MAKEALL) "coverage-all"
-	coverage combine idmtools_cli/$(COVERAGE_PATH) idmtools_core/$(COVERAGE_PATH) idmtools_models/$(COVERAGE_PATH) idmtools_platform_comps/$(COVERAGE_PATH) idmtools_platform_local/$(COVERAGE_PATH)
+	coverage combine idmtools_cli/$(COVERAGE_PATH) idmtools_core/$(COVERAGE_PATH) idmtools_models/$(COVERAGE_PATH) idmtools_platform_comps/$(COVERAGE_PATH)
 	$(MAKE) coverage-report
 
 coverage-smoke: ## Generate a code-coverage report
 	$(MAKEALL) "coverage-smoke"
-	coverage combine idmtools_cli/$(COVERAGE_PATH) idmtools_core/$(COVERAGE_PATH) idmtools_models/$(COVERAGE_PATH) idmtools_platform_comps/$(COVERAGE_PATH) idmtools_platform_local/$(COVERAGE_PATH)
+	coverage combine idmtools_cli/$(COVERAGE_PATH) idmtools_core/$(COVERAGE_PATH) idmtools_models/$(COVERAGE_PATH) idmtools_platform_comps/$(COVERAGE_PATH)
 	$(MAKE) coverage-report
 
 dist: ## build our package
@@ -161,7 +160,6 @@ dev-watch: ## Run lint on any python code changes
         --command 'watchmedo shell-command --patterns="*.py" --ignore-pattern="*/tests/.test_platform/*" --drop --interval 10 --recursive --command="$(MAKE) test-smoke";;;idmtools_core' \
         --command 'watchmedo shell-command --patterns="*.py" --ignore-pattern="*/tests/.test_platform/*" --drop --interval 10 --recursive --command="$(MAKE) test-smoke";;;idmtools_models' \
         --command 'watchmedo shell-command --patterns="*.py" --ignore-pattern="*/tests/.test_platform/*" --drop --interval 10 --recursive --command="$(MAKE) test-smoke";;;idmtools_platform_comps' \
-        --command 'watchmedo shell-command --patterns="*.py" --ignore-pattern="*/tests/.test_platform/*" --drop --interval 10 --recursive --command="$(MAKE) test-smoke";;;idmtools_platform_local' \
         --command 'watchmedo shell-command --patterns="*.py" --ignore-pattern="*/tests/.test_platform/*" --drop --interval 10 --recursive --command="$(MAKE) test-smoke";;;idmtools_cli'
 
 generate-stubs: ## Generate python interfaces. Useful to identify what the next version should be by comparing to previous runs

@@ -32,7 +32,7 @@ def run_example(ac_id):
 def main():
     # RequirementsToAssetCollection will do:
     # 1. check if asset collection exists for given requirements, return ac id (#4) if exists
-    # 2. create an Experiment to install the requirements on BELEGOST
+    # 2. create an Experiment to install the requirements on CALCULON
     # 3. create a WorkItem to create a Asset Collection
     # 4. return ac id based on the requirements.txt
     # note: pkg_list is not required. package in this list will override package in requirements.txt
@@ -50,5 +50,5 @@ def main():
 
 
 if __name__ == '__main__':
-    with Platform('BELEGOST') as platform:
+    with Platform('CALCULON') as platform:
         main()

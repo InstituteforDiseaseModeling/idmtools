@@ -15,7 +15,7 @@ from idmtools_core.idmtools.utils.dropbox_location import get_dropbox_location
 if __name__ == '__main__':
 
     # In order to run the SSMT work item, we need to set a `Platform`
-    platform = Platform('BELEGOST')
+    platform = Platform('CALCULON')
     case_name = os.path.basename(__file__) + "--" + 'example_r_ssmt_workitem_add_ac_from_dropbox_path'
     input_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 

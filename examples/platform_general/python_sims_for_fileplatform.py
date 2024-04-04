@@ -80,7 +80,7 @@ suite.update_tags({'name': 'suite_tag', 'idmtools': '123'})
 # Add experiment to the suite
 suite.add_experiment(experiment)
 
-suite.run(platform=platform, wait_until_done=False, wait_on_done=False)
+suite.run(platform=platform, wait_until_done=False)
 # run following command to check status
 print("idmtools file " + job_directory + " status --exp-id " + experiment.id)
 

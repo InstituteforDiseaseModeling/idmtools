@@ -72,7 +72,7 @@ class TestAnalyzersSlurm(ITestWithPersistence):
         # Add experiment to the suite
         #cls.platform.create_items([suite])  # add this line if we want to do experiment.run
         suite.add_experiment(e)
-        suite.run(platform=cls.platform, wait_on_done=True, max_running_jobs=5, retries=5, dry_run=False)
+        suite.run(platform=cls.platform, wait_until_done=True, max_running_jobs=5, retries=5, dry_run=False)
         cls.exp_id = e.uid
         cls.suite_id = suite.uid
 

@@ -1,8 +1,6 @@
 """
 DockerTask provides a utility to run docker images.
 
-This is currently only used by idmtools_local_platform.
-
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import os

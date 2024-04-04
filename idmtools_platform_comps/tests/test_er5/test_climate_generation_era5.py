@@ -1,8 +1,6 @@
 import os
-import unittest
 import shutil
 import tempfile
-import xmlrunner
 import pytest
 
 from idmtools.core.platform_factory import Platform
@@ -47,7 +45,7 @@ class ClimateGenerationTest(ITestWithPersistence):
         # upload site_details.csv to workitem's root dir in COMPS
         CURRENT_DIRECTORY = os.path.dirname(__file__)
         wi.transient_assets.add_asset(os.path.join(CURRENT_DIRECTORY, "climate", points_file))
-        wi.run(wait_on_done=True)
+        wi.run(wait_until_done=True)
 
         # Get the work item, related asset collection, and assets
         wi_id = wi.id
@@ -66,7 +64,7 @@ class ClimateGenerationTest(ITestWithPersistence):
         wi.transient_assets.add_asset(os.path.join(CURRENT_DIRECTORY, "climate", "site_details.csv"))
         # upload WorkOrder.json to workitem's root dir in COMPS
         wi.load_work_order(os.path.join(CURRENT_DIRECTORY, "climate", "WorkOrder.json"))
-        wi.run(wait_on_done=True)
+        wi.run(wait_until_done=True)
 
         # Get the work item, related asset collection, and assets
         wi_id = wi.id
@@ -95,5 +93,4 @@ class ClimateGenerationTest(ITestWithPersistence):
         finally:
             shutil.rmtree(output_path)
 
-if __name__ == "__main__":
-    unittest.main(testRunner=xmlrunner.XMLTestRunner(output='reports'))
+
