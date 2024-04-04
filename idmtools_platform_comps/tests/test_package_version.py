@@ -104,7 +104,7 @@ class TestPackageVersionCLI(unittest.TestCase):
             result = run_command('package', 'list-versions', '--name', 'astor', **self.default_opts)
             self.assertTrue(result.exit_code == 0, msg=result.output)
             output_str = result.output
-            actual_versions = re.sub('["[\]\'\n ]', '', output_str).split(',')
+            actual_versions = re.sub(r'["[\]\'\n ]', '', output_str).split(',')
             self.assertListEqual(actual_versions, test_versions)
 
     @allure.feature("req2ac")
