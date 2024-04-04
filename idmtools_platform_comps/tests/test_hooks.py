@@ -14,6 +14,7 @@ from idmtools.assets import AssetCollection
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.command_task import CommandTask
+from idmtools.utils.decorators import SingletonMixin
 from idmtools.utils.entities import save_id_as_file_as_hook
 
 from idmtools_platform_comps.utils.general import update_item
@@ -29,33 +30,32 @@ from idmtools.registry.functions import FunctionPluginManager
 from idmtools.registry.hook_specs import function_hook_impl
 
 
-def register_plugins(name="Plugin_create_hook", **kwargs):
+def register_plugins(my_hook):
     """
     Register plugins.
     Args:
-        name: Plugin name
-        kwargs: user inputs
+        my_hook: plugin hook
     Returns:
         None
     """
     # register plugins
     fpm = FunctionPluginManager.instance()
-    fpm.register(Plugin_create_hook(**kwargs), name=name)
+    fpm.register(my_hook)
 
 
-def un_register_plugins(name="Plugin_create_hook"):
+def un_register_plugins(my_hook):
     """
     Unregister plugins.
     Args:
-        name: Plugin name
+        my_hook: plugin hook
     Returns:
         None
     """
     fpm = FunctionPluginManager.instance()
-    fpm.unregister(Plugin_create_hook(), name=name)
+    fpm.unregister(my_hook)
 
 
-class Plugin_create_hook:
+class Plugin_create_hook(SingletonMixin):
     """A 2nd hook implementation namespace."""
 
     def __init__(self, **kwargs):
@@ -89,6 +89,7 @@ class Plugin_create_hook:
 
 @pytest.mark.comps
 @pytest.mark.python
+@pytest.mark.serial
 @allure.story("COMPS")
 @allure.story("Python")
 @allure.suite("idmtools_platform_comps")
@@ -257,7 +258,8 @@ class TestHooks(ITestWithPersistence):
         exp.simulations = [sim]
         kwargs = {"my_test": 1}
 
-        register_plugins(**kwargs)
+        my_hook = Plugin_create_hook(**kwargs)
+        register_plugins(my_hook)
         exp.run(True)
         # verify idmtools experiment tags
         expected_tags = {'tag_key': 'tag_value'}
@@ -275,5 +277,5 @@ class TestHooks(ITestWithPersistence):
         sim_tags = COMPSSimulation.get(exp.simulations[0].id, QueryCriteria().select_children('tags')).tags
         sim_tags.pop('task_type')
         self.assertDictEqual(sim_tags, {})
-        un_register_plugins()
+        un_register_plugins(my_hook)
 
