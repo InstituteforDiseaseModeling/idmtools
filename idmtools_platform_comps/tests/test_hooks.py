@@ -29,9 +29,9 @@ from idmtools.registry.functions import FunctionPluginManager
 from idmtools.registry.hook_specs import function_hook_impl
 
 
-def initialize_plugins(name="Plugin_create_hook", **kwargs):
+def register_plugins(name="Plugin_create_hook", **kwargs):
     """
-    Setup plugins.
+    Register plugins.
     Args:
         name: Plugin name
         kwargs: user inputs
@@ -257,10 +257,7 @@ class TestHooks(ITestWithPersistence):
         exp.simulations = [sim]
         kwargs = {"my_test": 1}
 
-        def _pre_run(**kwargs):
-            initialize_plugins(**kwargs)
-
-        _pre_run(**kwargs)
+        register_plugins(**kwargs)
         exp.run(True)
         # verify idmtools experiment tags
         expected_tags = {'tag_key': 'tag_value'}
@@ -279,6 +276,4 @@ class TestHooks(ITestWithPersistence):
         sim_tags.pop('task_type')
         self.assertDictEqual(sim_tags, {})
         un_register_plugins()
-
-
 
