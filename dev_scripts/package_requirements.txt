@@ -1,7 +1,7 @@
 --extra-index-url https://packages.idmod.org/api/pypi/idm-pypi-production/simple
 bump2version~=1.0.1
 coverage>=5.3,<6.6
-flake8~=6.0.0
+flake8~=7.0.0
 packaging~=24.0
 idm-buildtools~=1.0.5
 twine~=4.0.2
