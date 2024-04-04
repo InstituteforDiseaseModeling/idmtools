@@ -70,7 +70,7 @@ experiment.tags["tag1"] = 1
 # And maybe some custom Experiment Level Assets
 experiment.assets.add_directory(assets_directory=os.path.join("inputs", "python_model_with_deps", "Assets"))
 
-with Platform('BELEGOST') as platform:
+with Platform('IDMCloud') as platform:
     # Call run() with 'scheduling=True' to run simulations with scheduling using WorkOrder.json(loaded above)
     # There are few ways to schedule computation resources in COMPS:
     #    1. add_work_order() method to add WorkOrder.json file to simulations as transient asset

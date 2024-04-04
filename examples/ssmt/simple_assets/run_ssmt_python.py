@@ -6,7 +6,7 @@ wi_name = "SSMT AssetCollection Hello 1"
 command = "python3 Assets/Hello_model.py"
 
 if __name__ == "__main__":
-    platform = Platform('BELEGOST')
+    platform = Platform('CALCULON')
     wi = SSMTWorkItem(name=wi_name, command=command, assets=AssetCollection.from_directory("Assets"))
     wi.run(True, platform=platform)
 

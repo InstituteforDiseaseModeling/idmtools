@@ -10,15 +10,16 @@ from COMPS.Data import Experiment as COMPSExperiment
 from COMPS.Data import Simulation as COMPSSimulation
 from COMPS.Data import QueryCriteria
 
-from idmtools.assets import Asset, AssetCollection
+from idmtools.assets import AssetCollection
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.command_task import CommandTask
+from idmtools.utils.decorators import SingletonMixin
 from idmtools.utils.entities import save_id_as_file_as_hook
 
 from idmtools_platform_comps.utils.general import update_item
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
-from idmtools_test.utils.shared_functions import validate_output, validate_sim_tags
+from idmtools_test.utils.shared_functions import validate_sim_tags
 from idmtools_test.utils.utils import get_case_name
 
 from idmtools_platform_comps.comps_platform import COMPSPlatform
@@ -28,21 +29,37 @@ from idmtools.entities.simulation import Simulation
 from idmtools.registry.functions import FunctionPluginManager
 from idmtools.registry.hook_specs import function_hook_impl
 
-def initialize_plugins(**kwargs):
+
+def register_plugins(my_hook):
     """
-    Setup plugins.
+    Register plugins.
     Args:
-        kwargs: user inputs
+        my_hook: plugin hook
     Returns:
         None
     """
     # register plugins
     fpm = FunctionPluginManager.instance()
-    fpm.register(Plugin_create_hook(**kwargs))
+    fpm.register(my_hook)
 
 
-class Plugin_create_hook:
+def un_register_plugins(my_hook):
+    """
+    Unregister plugins.
+    Args:
+        my_hook: plugin hook
+    Returns:
+        None
+    """
+    fpm = FunctionPluginManager.instance()
+    fpm.unregister(my_hook)
+
+
+class Plugin_create_hook(SingletonMixin):
     """A 2nd hook implementation namespace."""
+
+    def __init__(self, **kwargs):
+        self.kwargs = kwargs
 
     @function_hook_impl
     def idmtools_platform_pre_create_item(self, item, **kwargs):
@@ -67,11 +84,12 @@ class Plugin_create_hook:
         Returns:
             None
         """
-        if isinstance(item, Simulation):
+        if isinstance(item, Simulation) and self.kwargs.get('my_test') == 1:
             item.tags.update({"sim_tag_post_key": "sim_tag_post_value"})
 
 @pytest.mark.comps
 @pytest.mark.python
+@pytest.mark.serial
 @allure.story("COMPS")
 @allure.story("Python")
 @allure.suite("idmtools_platform_comps")
@@ -238,12 +256,10 @@ class TestHooks(ITestWithPersistence):
 
         exp = Experiment(name=self.case_name)
         exp.simulations = [sim]
-        kwargs = {}
+        kwargs = {"my_test": 1}
 
-        def _pre_run(**kwargs):
-            initialize_plugins(**kwargs)
-
-        _pre_run(**kwargs)
+        my_hook = Plugin_create_hook(**kwargs)
+        register_plugins(my_hook)
         exp.run(True)
         # verify idmtools experiment tags
         expected_tags = {'tag_key': 'tag_value'}
@@ -261,7 +277,5 @@ class TestHooks(ITestWithPersistence):
         sim_tags = COMPSSimulation.get(exp.simulations[0].id, QueryCriteria().select_children('tags')).tags
         sim_tags.pop('task_type')
         self.assertDictEqual(sim_tags, {})
-
-
-
+        un_register_plugins(my_hook)
 

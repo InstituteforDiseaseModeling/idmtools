@@ -7,12 +7,12 @@ from examples.idmtools_ini_alias import shared_function
 
 experiment = shared_function.create_experiment()
 
-# We can use code to define Platform configuration. "Belegost" is Production Windows environment
+# We can use code to define Platform configuration. "CALCULON" is Production Linux environment
 # To see list of environment aliases, you can run cli command: idmtools info plugins platform-aliases
-with Platform('Belegost',
+with Platform('CALCULON',
               priority='Normal',
               simulation_root=os.path.join('$COMPS_PATH(USER)', 'my_output'),
-              node_group='emod_a',
+              node_group='idm_abcd',
               num_cores=1,
               num_retries=0,
               exclusive=False):

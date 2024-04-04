@@ -39,7 +39,7 @@ class TestCreateSimDirectoryMap(ITestWithPersistence):
         ts.add_builder(builder)
         exp = Experiment(name=self.case_name, simulations=ts, tags=dict(number_tag=123, KeyOnly=None))
         suite = add_dummy_suite(exp)
-        suite.run(platform=platform, wait_until_done=False, wait_on_done=False, dry_run=True)
+        suite.run(platform=platform, wait_until_done=False, dry_run=True)
         return suite, exp
 
     # test create_sim_directory_map from platform for experiment

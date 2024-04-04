@@ -9,4 +9,4 @@ if __name__ == "__main__":
     platform = Platform('CALCULON')
     wi = InputDataWorkItem(name=os.path.split(sys.argv[0])[1], tags={'idmtools': 'ImageBuilderWorker'}, work_item_type="ImageBuilderWorker")
     wi.load_work_order(os.path.join('inputs', 'covasim_wo.json'))
-    wi.run(wait_on_done=True)
+    wi.run(wait_until_done=True)

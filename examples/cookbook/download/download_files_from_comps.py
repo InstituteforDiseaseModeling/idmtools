@@ -21,4 +21,4 @@ dl_wi = DownloadWorkItem(name=os.path.split(sys.argv[0])[1],
                          verbose=True,
                          output_path=os.path.join(os.getcwd(), "output_dir"),
                          )
-dl_wi.run(wait_on_done=True, platform=platform)
+dl_wi.run(wait_until_done=True, platform=platform)

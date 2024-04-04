@@ -54,7 +54,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
 
         wi.add_pre_creation_hook(add_date_as_tag)
         wi.add_post_creation_hook(save_id_as_file_as_hook)
-        wi.run(wait_on_done=True)
+        wi.run(wait_until_done=True)
 
         # verify workitem output files
         local_output_path = "output"  # local output dir
@@ -93,7 +93,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
         # experiment_id = "18553481-1f42-ea11-941b-0050569e0ef3"  # idmtvapp17 exp
         command = "python3 Assets/run_population_analyzer.py " + experiment_id
         wi = SSMTWorkItem(item_name=self.case_name, command=command, assets=asset_files, tags=self.tags)
-        wi.run(wait_on_done=True)
+        wi.run(wait_until_done=True)
 
         # validate output files
         local_output_path = "output"
@@ -131,7 +131,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
         # experiment_id = "18553481-1f42-ea11-941b-0050569e0ef3"  # idmtvapp17 exp
         command = "python3 run_multiple_analyzers.py " + experiment_id
         wi = SSMTWorkItem(item_name=self.case_name, command=command, transient_assets=transient_assets, tags=self.tags)
-        wi.run(wait_on_done=True)
+        wi.run(wait_until_done=True)
 
         # validate output files
         local_output_path = "output"
@@ -171,7 +171,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
 
         command = "python3 Assets/run_multiple_exps.py " + exp_id1 + " " + exp_id2
         wi = SSMTWorkItem(name=self.case_name, command=command, assets=asset_files, tags=self.tags)
-        wi.run(wait_on_done=True)
+        wi.run(wait_until_done=True)
 
         # validate output files
         local_output_path = "output"
@@ -277,7 +277,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
         # experiment_id = 'de07f612-69ed-ea11-941f-0050569e0ef3'  # idmtvapp17
         command = "python3 Assets/run_csv_analyzer.py " + experiment_id
         wi = SSMTWorkItem(name=self.case_name, command=command, assets=asset_files, tags=self.tags)
-        wi.run(wait_on_done=True)
+        wi.run(wait_until_done=True)
         local_output_path = "output"
         out_filenames = ["output_csv/" + experiment_id + "/CSVAnalyzer.csv"]  # new
         # out_filenames = ["output_csv/CSVAnalyzer.csv"]  # old
@@ -330,5 +330,5 @@ class TestSSMTWorkItem(ITestWithPersistence):
         task = CommandTask(command=command,
                            transient_assets=AssetCollection([os.path.join(self.input_file_path, "hello.py")]))
         wi = SSMTWorkItem(task=task, name=self.case_name, tags=self.tags)
-        wi.run(wait_on_done=True)
+        wi.run(wait_until_done=True)
         self.assertTrue(wi.succeeded)

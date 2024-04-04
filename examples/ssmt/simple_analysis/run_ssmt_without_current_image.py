@@ -55,8 +55,8 @@ def pre_load_func():
     print(f"Idmtools COMPS Version: {comps_version}")
 
 
-platform = Platform('Slurm2')
-analysis = PlatformAnalysis(platform=platform, experiment_ids=["c348452d-921c-ec11-92e0-f0921c167864"],
+platform = Platform('CALCULON')
+analysis = PlatformAnalysis(platform=platform, experiment_ids=["dfca776c-afdc-ee11-aa11-b88303911bc1"],
                             analyzers=[PopulationAnalyzer],
                             analyzers_args=[{'title': 'idm'}], analysis_name="SSMT Analysis Simple no image",
                             extra_args=dict(max_workers=8),

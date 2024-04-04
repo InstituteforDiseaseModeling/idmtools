@@ -8,8 +8,15 @@ import numpy as np
 
 
 class SpatialOutput:
+    """
+    SpatialOutput class is used to parse data from binary file (.bin).
+    """
 
     def __init__(self):
+        """
+        Initialize an instance of SpatialOutput.
+        This constructor does not take any parameters other than the implicit 'self'.
+        """
         self.n_nodes = 0
         self.n_tstep = 0
         self.nodeids = []
@@ -19,6 +26,13 @@ class SpatialOutput:
 
     @classmethod
     def from_bytes(cls, bytes, filtered=False):
+        """
+        Convert from bytes to class object.
+
+        Args:
+            bytes: bytes
+            filtered: flag for applying filter
+        """
         # The header size changes if the file is a filtered one
         headersize = 16 if filtered else 8
 
@@ -50,6 +64,10 @@ class SpatialOutput:
         return so
 
     def to_dict(self):
+        """
+        Convert to dict.
+        Return: dict
+        """
         return {'n_nodes': self.n_nodes,
                 'n_tstep': self.n_tstep,
                 'nodeids': self.nodeids,

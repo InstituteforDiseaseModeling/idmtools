@@ -1,5 +1,0 @@
-#!/usr/bin/with-contenv sh
-
-echo Starting API
-cd /app
-exec s6-setuidgid idmtools uwsgi --ini /app/uwsgi.ini

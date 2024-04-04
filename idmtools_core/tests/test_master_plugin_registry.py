@@ -21,8 +21,6 @@ class TestMasterPluginRegistry(TestCase):
         if any(['idmtools-platform-comps' in p for p in packages]):
             self.assertIn('COMPSPlatform', pm.get_plugin_map().keys())
             self.assertIn('SSMTPlatform', pm.get_plugin_map().keys())
-        if any(['idmtools-platform-local' in p for p in packages]):
-            self.assertIn('LocalPlatform', pm.get_plugin_map().keys())
         if any(['idmtools-platform-slurm' in p for p in packages]):
             self.assertIn('SlurmPlatform', pm.get_plugin_map().keys())
         if any(['idmtools-models' in p for p in packages]):

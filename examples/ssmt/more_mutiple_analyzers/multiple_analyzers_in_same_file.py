@@ -29,7 +29,7 @@ class ExampleAnalyzer2(IAnalyzer):
         super().__init__(uid, working_dir, parse, filenames=filenames)
 
     def filter(self, simulation: IItem) -> bool:
-        return int(simulation.tags.get("b")) > 5
+        return int(simulation.tags.get("b")) > 1
 
     def map(self, data: Dict[str, Any], simulation: IItem):
         result = data[self.filenames[0]]
@@ -44,10 +44,10 @@ class ExampleAnalyzer2(IAnalyzer):
 
 
 if __name__ == "__main__":
-    platform = Platform('BELEGOST')
+    platform = Platform('CALCULON')
     analyzers = [ExampleAnalyzer, ExampleAnalyzer2]
-    experiment_id = "40c1b14d-0a04-eb11-a2c7-c4346bcb1553"  # comps exp id
-    analysis = PlatformAnalysis(platform, experiment_ids=[experiment_id], analyzers=analyzers, analyzers_args=[{'filenames': ['output/result.json']}, {'filenames': ['config.json']}], analysis_name=os.path.split(sys.argv[0])[1])
+    experiment_id = "31285dfc-4fe6-ee11-9f02-9440c9bee941"  # comps exp id
+    analysis = PlatformAnalysis(platform, experiment_ids=[experiment_id], analyzers=analyzers, analyzers_args=[{'filenames': ['output/a.csv']}, {'filenames': ['config.json']}], analysis_name=os.path.split(sys.argv[0])[1])
     analysis.analyze(check_status=True)
     wi = analysis.get_work_item()
     print(wi)

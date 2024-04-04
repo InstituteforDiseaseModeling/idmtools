@@ -142,10 +142,10 @@ class TemplatedSimulations:
         Raises:
             ValueError - Builder must be type of SimulationBuilder
         """
-        from idmtools.builders import SimulationBuilder
+        from idmtools.builders import SimulationBuilder, ArmSimulationBuilder
 
         # Add builder validation
-        if not isinstance(builder, SimulationBuilder):
+        if not isinstance(builder, (SimulationBuilder, ArmSimulationBuilder)):
             raise ValueError("Builder ({}) must have type of ExperimentBuilder!".format(builder))
 
         # Initialize builders the first time

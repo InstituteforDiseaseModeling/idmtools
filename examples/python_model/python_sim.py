@@ -36,7 +36,7 @@ from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 # first let's define our base task. Normally, you want to do set any assets/configurations you want across the
 # all the different Simulations we are going to build for our experiment. Here we set c to 0 since we do not want to
 # sweep it
-task = JSONConfiguredPythonTask(script_path=os.path.join("inputs", "python_model_with_deps", "Assets", "model.py"),
+task = JSONConfiguredPythonTask(script_path=os.path.join("inputs", "python", "Assets", "model.py"),
                                 parameters=(dict(c=0)))
 
 # now let's use this task to create a TemplatedSimulation builder. This will build new simulations from sweep builders
@@ -119,8 +119,8 @@ experiment.assets.add_directory(assets_directory=os.path.join("inputs", "python_
 
 # In order to run the experiment, we need to create a `Platform`
 # The `Platform` defines where we want to run our simulation.
-# You can easily switch platforms by changing the Platform to for example 'Local'
-with Platform('BELEGOST'):
+# You can easily switch platforms by changing the Platform to for example 'CALCULON'
+with Platform('CALCULON'):
 
     # The last step is to call run() on the ExperimentManager to run the simulations.
     experiment.run(True)

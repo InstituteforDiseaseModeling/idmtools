@@ -170,7 +170,7 @@ class TestWorkOrder(ITestWithPersistence):
         add_work_order(experiment, file_path=os.path.join(COMMON_INPUT_PATH, "scheduling", "hpc", "WorkOrder.json"))
 
         with Platform('Cumulus') as platform:
-            experiment.run(wait_on_done=True, scheduling=True)
+            experiment.run(wait_until_done=True, scheduling=True)
             self.assertTrue(experiment.succeeded)
 
         for sim in experiment.simulations:
@@ -357,7 +357,7 @@ class TestWorkOrder(ITestWithPersistence):
                             num_cores=1, SingleNode=False, Exclusive=False)
 
         with Platform('Cumulus') as platform:
-            experiment.run(wait_on_done=True, scheduling=True)
+            experiment.run(wait_until_done=True, scheduling=True)
             self.assertTrue(experiment.succeeded)
 
         for sim in experiment.simulations:
@@ -424,7 +424,7 @@ class TestWorkOrder(ITestWithPersistence):
         wi = SSMTWorkItem(name=self.case_name, command=command,tags={'idmtools': self.case_name})
         # overrode workorder.json with user provide file
         wi.load_work_order(os.path.join("inputs", "workitems", "ssmt", "WorkOrder.json"))
-        wi.run(wait_on_done=True)
+        wi.run(wait_until_done=True)
         out_filenames = ["stdout.txt"]
         files = self.platform.get_files(item=wi, files=out_filenames)
         stdout_content = files['stdout.txt'].decode('utf-8')

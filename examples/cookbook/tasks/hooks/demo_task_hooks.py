@@ -49,4 +49,4 @@ sb.add_sweep_definition(partial(set_value, name="gamma"), numpy.arange(0.1, 0.8,
 sb.add_sweep_definition(partial(set_value, name="beta"), numpy.arange(0.01, 1, 0.05)) # 21
 
 experiment = Experiment.from_builder(sb, base_task=wrapper_task, name="Demo Hooks")
-experiment.run(wait_on_done=True)
+experiment.run(wait_until_done=True)
