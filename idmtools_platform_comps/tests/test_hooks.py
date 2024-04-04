@@ -250,6 +250,7 @@ class TestHooks(ITestWithPersistence):
         self.assertIsNotNone(ac_comps.tags['idmtools'])
         self.assertEqual(ac_comps.tags.__len__(), 2)  # ac_comps only has 2 tags, there is no post_tag
 
+    @pytest.mark.skip("This test is affecting other tests, disable for now and more investigation is needed.")
     def test_plugin_hooks(self):
         base_task = CommandTask(command="python --version")
         sim = Simulation(task=base_task)
