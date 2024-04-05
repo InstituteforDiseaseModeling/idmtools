@@ -28,6 +28,7 @@ Core
 * `#2184 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2184>`_ - Improved Simulation builders (fixed several issues)
 * `#2192 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2192>`_ - Builder function add_multiple_parameter_sweep_definition doesn't support function with single dictionary parameter
 * `#2194 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2194>`_ - Sweeping function allow parameters with default values
+* `#2195 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2195>`_ - Combine two add sweeping functions into one
 * `#2196 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2196>`_ - Refactor Simulation Builders to remove duplicated code
 * `#2214 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2214>`_ - Investigation: idmtools support Python 3.12
 * `#2203 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2203>`_ - Refactor idmtools Simulation Builders structure.
@@ -60,6 +61,7 @@ Developer/Test
 * `#2155 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2155>`_ - Remove Bayesian tests
 * `#2175 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2175>`_ - Fix circular dependency for core and cli tests and move comps related test in core to comps test
 * `#2213 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2213>`_ - Fix bug for save_as for content type and add unittest
+* `#2226 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2226>`_ - unregister plugin in test_hooks.py to avoid affecting other test
 
 
 Feature Request
@@ -67,6 +69,7 @@ Feature Request
 * `#2032 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2032>`_ - Assetization workflow for generating SIF image should track using Asset ID instead of AC ID
 * `#2160 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2160>`_ - Remove local platform from idmtools repo
 * `#2170 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2170>`_ - Move unit tests in core package which depend on idmtools_platform_comps to idmtools_platform_comps
+* `#2210 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2210>`_ - Add download asset and use asset id in generate singularity builder instead of assetcollection
 * `#2215 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2215>`_ - Update idmtools to work with python 3.12
 
 
