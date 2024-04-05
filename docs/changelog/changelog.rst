@@ -32,3 +32,4 @@ Changelog
     changelog_1.7.7
     changelog_1.7.8
     changelog_1.7.9
+    changelog_1.7.10
