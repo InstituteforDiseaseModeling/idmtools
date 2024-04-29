@@ -9,6 +9,6 @@ pytest-mock
 pytest-runner~=6.0
 pytest-timeout~=2.3.1
 pytest-xdist~=3.5
-pytest~=7.2
+pytest~=8.2
 pytest-lazy-fixture
 jinja2~=3.1.3
