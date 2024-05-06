@@ -205,7 +205,7 @@ html_theme_options = {
         {"name": "IDM docs", "url": "https://docs.idmod.org", "icon": "fas fa-home"},
         {
             "name": "GitHub",
-            "url": "https://github.com/institutefordiseasemodeling/hiv_workflow",
+            "url": "https://github.com/institutefordiseasemodeling/idmtools",
             "icon": "fab fa-github-square",
         },
     ],
@@ -221,9 +221,9 @@ html_sidebars = {
 html_logo = "images/idm-logo-transparent.png"
 html_favicon = "images/favicon.ico"
 html_static_path = ['_static']
-html_baseurl = "https://docs.idmod.org/projects/hiv_workflow/en/latest"
+html_baseurl = "https://docs.idmod.org/projects/idmtools/en/latest"
 html_context = {
-    'rtd_url': 'https://docs.idmod.org/projects/hiv_workflow/en/latest',
+    'rtd_url': 'https://docs.idmod.org/projects/idmtools/en/latest',
     "versions_dropdown": {
         "latest": "devel (latest)",
         "stable": "current (stable)",
