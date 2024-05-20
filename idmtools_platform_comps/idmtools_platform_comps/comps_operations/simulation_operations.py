@@ -245,7 +245,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             comps_configuration['simulation_input_args'] = sim_task
         if logger.isEnabledFor(DEBUG):
             logger.debug(f'Simulation config: {str(comps_configuration)}')
-        if scheduling:
+        if scheduled(simulation):
             comps_configuration.update(executable_path=None, node_group_name=None, min_cores=None, max_cores=None,
                                        exclusive=None, simulation_input_args=None)
 
@@ -322,12 +322,10 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         Returns:
             None
         """
-        scheduling = kwargs.get("scheduling", False) and scheduled(simulation)
-
         if comps_sim is None:
             comps_sim = simulation.get_platform_object()
         for asset in simulation.assets:
-            if asset.filename.lower() == 'workorder.json' and scheduling:
+            if asset.filename.lower() == 'workorder.json' and scheduled(simulation):
                 comps_sim.add_file(simulationfile=SimulationFile(asset.filename, 'WorkOrder'), data=asset.bytes)
             else:
                 comps_sim.add_file(simulationfile=SimulationFile(asset.filename, 'input'), data=asset.bytes)

@@ -22,7 +22,7 @@ from idmtools_platform_comps.utils.python_requirements_ac.requirements_to_asset_
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.common_experiments import wait_on_experiment_and_check_all_sim_status
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
-from idmtools_platform_comps.utils.scheduling import default_add_workerorder_sweep_callback
+from idmtools_platform_comps.utils.scheduling import default_add_workorder_sweep_callback
 from idmtools_test.utils.utils import get_case_name
 
 
@@ -64,7 +64,7 @@ class TestWorkOrder(ITestWithPersistence):
         ts.add_builder(builder)
 
         experiment = Experiment.from_template(ts, name=self.case_name)
-        wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform, scheduling=True)
+        wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform)
         self.assertTrue(experiment.succeeded)
         for sim in experiment.simulations:
             assets = self.platform._simulations.all_files(sim)
@@ -98,13 +98,14 @@ class TestWorkOrder(ITestWithPersistence):
         sb.add_sweep_definition(partial(set_value, name="pop_infected"), [10, 100])
         sb.add_sweep_definition(partial(set_value, name="n_days"), [100, 110])
         sb.add_sweep_definition(partial(set_value, name="rand_seed"), [1234, 4567])
-        sb.add_sweep_definition(partial(default_add_workerorder_sweep_callback, file_name="WorkOrder.json"),
+        sb.add_sweep_definition(partial(default_add_workorder_sweep_callback, file_name="WorkOrder.json"),
                                 os.path.join(COMMON_INPUT_PATH, "scheduling", "slurm", "WorkOrder1.json"))
 
         ts.add_builder(sb)
 
         experiment = Experiment.from_template(ts, name=self.case_name)
         experiment.add_asset(os.path.join(COMMON_INPUT_PATH, "scheduling", "slurm", "commandline_model.py"))
+        # scheduling=True is required here for calling default_add_workorder_sweep_callback in add_sweep_definition
         wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform, scheduling=True)
         self.assertTrue(experiment.succeeded)
 
@@ -145,7 +146,7 @@ class TestWorkOrder(ITestWithPersistence):
         # upload WorkOrder.json to simulation root dir
         add_work_order(experiment, file_path=os.path.join("inputs", "WorkOrder.json"))
 
-        wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform, scheduling=True)
+        wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform)
         self.assertTrue(experiment.succeeded)
 
         for sim in experiment.simulations:
@@ -170,7 +171,7 @@ class TestWorkOrder(ITestWithPersistence):
         add_work_order(experiment, file_path=os.path.join(COMMON_INPUT_PATH, "scheduling", "hpc", "WorkOrder.json"))
 
         with Platform('Cumulus') as platform:
-            experiment.run(wait_until_done=True, scheduling=True)
+            experiment.run(wait_until_done=True)
             self.assertTrue(experiment.succeeded)
 
         for sim in experiment.simulations:
@@ -211,7 +212,7 @@ class TestWorkOrder(ITestWithPersistence):
         experiment = Experiment.from_task(task, name=self.case_name)
         # add local WorkOrder2.json to comps and change file name to WorkOrder.json
         add_work_order(experiment, file_path=os.path.join(COMMON_INPUT_PATH, "scheduling", "slurm", "WorkOrder2.json"))
-        wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform, scheduling=True)
+        wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform)
 
         # only verify first simulation's stdout.txt
         files = self.platform.get_files(item=experiment.simulations[0], files=['stdout.txt'])
@@ -247,7 +248,7 @@ class TestWorkOrder(ITestWithPersistence):
         ts.add_builder(builder)
 
         experiment = Experiment.from_template(ts, name=self.case_name)
-        wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform, scheduling=True)
+        wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform)
         self.assertTrue(experiment.succeeded)
         for sim in experiment.simulations:
             assets = self.platform._simulations.all_files(sim)
@@ -331,7 +332,7 @@ class TestWorkOrder(ITestWithPersistence):
         add_schedule_config(experiment, command="python3.6 --version", node_group_name='idm_abcd', num_cores=1,
                             NumProcesses=1, NumNodes=1, Environment={"key1": "value1", "key2": "value2"})
 
-        wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform, scheduling=True)
+        wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform)
         self.assertTrue(experiment.succeeded)
 
         for sim in experiment.simulations:
@@ -357,7 +358,7 @@ class TestWorkOrder(ITestWithPersistence):
                             num_cores=1, SingleNode=False, Exclusive=False)
 
         with Platform('Cumulus') as platform:
-            experiment.run(wait_until_done=True, scheduling=True)
+            experiment.run(wait_until_done=True)
             self.assertTrue(experiment.succeeded)
 
         for sim in experiment.simulations:
@@ -403,7 +404,7 @@ class TestWorkOrder(ITestWithPersistence):
                                          "PYTHONPATH": "$PYTHONPATH:$PWD/Assets:$PWD/Assets/site-packages",
                                          "PATH": "$PATH:$PWD/Assets:$PWD/Assets/site-packages"})
 
-        wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform, scheduling=True)
+        wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform)
 
         # only verify first simulation's stdout.txt
         files = self.platform.get_files(item=experiment.simulations[0], files=['stdout.txt'])
