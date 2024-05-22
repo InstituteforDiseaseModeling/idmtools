@@ -213,8 +213,8 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             Configuration
         """
         global_scheduling = kwargs.get("scheduling", False)
-        sim_scheduling = getattr(simulation, 'scheduling', False)
-        scheduling = global_scheduling and sim_scheduling
+        sim_scheduling = scheduled(simulation)
+        scheduling = global_scheduling or sim_scheduling
 
         comps_configuration = dict()
         if global_scheduling:
@@ -245,7 +245,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             comps_configuration['simulation_input_args'] = sim_task
         if logger.isEnabledFor(DEBUG):
             logger.debug(f'Simulation config: {str(comps_configuration)}')
-        if scheduled(simulation):
+        if scheduling:
             comps_configuration.update(executable_path=None, node_group_name=None, min_cores=None, max_cores=None,
                                        exclusive=None, simulation_input_args=None)
 
