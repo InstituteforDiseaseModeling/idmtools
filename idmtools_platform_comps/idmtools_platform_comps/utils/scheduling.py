@@ -57,9 +57,8 @@ def scheduled(simulation: Simulation):
     return scheduling
 
 
-def _add_work_order_asset(item: Union[Experiment, Simulation, TemplatedSimulations],
-               config: Dict,
-               file_name: str = "WorkOrder.json"):
+def _add_work_order_asset(item: Union[Experiment, Simulation, TemplatedSimulations], config: Dict,
+                          file_name: str = "WorkOrder.json"):
     """
     Helper function to add an WorkOrder.json asset to an item.
 
