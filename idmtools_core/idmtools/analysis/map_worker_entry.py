@@ -61,8 +61,6 @@ def _get_mapped_data_for_item(item: IEntity, analyzers: TAnalyzerList, platform:
         # ensure item has a platform
         item.platform = platform
         analyzers_to_use = [a for a in analyzers if a.filter(item)]
-        if len(analyzers_to_use) == 0:
-            logger.warning(f"No analyzers matched the filter criteria for the item with ID {item.id}")
         analyzer_uids = [a.uid for a in analyzers]
 
         filenames = set(itertools.chain(*(a.filenames for a in analyzers_to_use)))
