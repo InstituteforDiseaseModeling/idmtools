@@ -76,7 +76,7 @@ def _add_work_order_asset(item: Union[Experiment, Simulation, TemplatedSimulatio
         if hasattr(simulation.task.command, 'cmd') and len(simulation.task.command.cmd) > 0:
             config["Command"] = simulation.task.command.cmd
         ctn = json.dumps(config, indent=3)
-        simulation.task.transient_assets.add_asset(Asset(filename=file_name, content=ctn))
+        simulation.add_asset(Asset(filename=file_name, content=ctn))
 
     if isinstance(item, Simulation):
         _process_simulation(item)
