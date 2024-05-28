@@ -9,6 +9,7 @@ import hashlib
 from dataclasses import dataclass, field
 from logging import getLogger, DEBUG
 from typing import List
+from packaging.requirements import Requirement
 from COMPS.Data import QueryCriteria
 from COMPS.Data.AssetCollection import AssetCollection as COMPSAssetCollection
 from idmtools.assets import Asset, AssetCollection
@@ -16,6 +17,7 @@ from idmtools.core import ItemType
 from idmtools.entities.experiment import Experiment
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_platform_comps.comps_platform import COMPSPlatform, SLURM_ENVS
+from idmtools_platform_comps.utils.package_version import get_highest_version
 
 CURRENT_DIRECTORY = os.path.dirname(__file__)
 REQUIREMENT_FILE = 'requirements_updated.txt'
@@ -305,7 +307,7 @@ class RequirementsToAssetCollection:
                           transient_assets=AssetCollection([os.path.join(CURRENT_DIRECTORY, MODEL_CREATE_AC)]),
                           tags=tags, related_experiments=[exp_id])
 
-        wi.run(wait_on_done=True, platform=self.platform)
+        wi.run(wait_until_done=True, platform=self.platform)
 
         if wi.succeeded:
             # make ac as related_asset_collection to wi
@@ -333,11 +335,9 @@ class RequirementsToAssetCollection:
 
         Returns: the consolidated requirements (as a list)
         """
-        import pkg_resources
-        from idmtools_platform_comps.utils.package_version import get_pkg_match_version
-
         req_dict = {}
         comment_list = []
+
         if self.requirements_path:
             with open(self.requirements_path, 'r') as fd:
                 for _cnt, line in enumerate(fd):
@@ -349,23 +349,19 @@ class RequirementsToAssetCollection:
                         comment_list.append(line)
                         continue
 
-                    req = pkg_resources.Requirement.parse(line)
-                    req_dict[req.name] = req.specs
+                    req = Requirement(line)
+                    req_dict[req.name] = req.specifier
 
         # pkg_list will overwrite pkg in requirement file
         if self.pkg_list:
             for pkg in self.pkg_list:
-                req = pkg_resources.Requirement.parse(pkg)
-                req_dict[req.name] = req.specs
-
-        missing_version_dict = {k: v for k, v in req_dict.items() if len(v) == 0 or v[0][1] == ''}
+                req = Requirement(pkg)
+                req_dict[req.name] = req.specifier
 
         req_list = []
         for k, v in req_dict.items():
-            pkg_name = k
-            base_version = None if k in missing_version_dict else v[0][1]
-            test = '==' if k in missing_version_dict else v[0][0]
-            req_list.append(f'{pkg_name}=={get_pkg_match_version(pkg_name, base_version, test)}')
+            pkg_requirement = f'{k}{str(v)}'
+            req_list.append(f'{k}=={get_highest_version(pkg_requirement)}')
 
         wheel_list = []
         if self.local_wheels:

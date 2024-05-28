@@ -12,10 +12,10 @@ from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.comps import get_asset_collection_id_for_simulation_id
 
 # connect to COMPS
-with platform('BELEGOST'):
+with platform('SlurmStage'):
     # get asset collection from an existing sim
     # Use existing simulation id
-    sim_id = '071c6f5d-1504-eb11-a2c7-c4346bcb1553'  # comps sim id
+    sim_id = '7415d267-2df1-ee11-9302-f0921c167864'  # comps sim id
     collection_id = get_asset_collection_id_for_simulation_id(sim_id)
 
     # define our base task with addition of the Comps Asset collection

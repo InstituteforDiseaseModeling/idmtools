@@ -47,6 +47,6 @@ def add_date_as_tag(experiment: Experiment, platform: 'COMPSPlatform'):
 experiment.add_pre_creation_hook(add_date_as_tag)
 experiment.add_post_creation_hook(save_id_as_file_as_hook)
 
-with Platform('BELEGOST'):
+with Platform('CALCULON'):
     experiment.run(True)
     sys.exit(0 if experiment.succeeded else -1)

@@ -73,9 +73,6 @@ generate-api:
 	sphinx-apidoc -f -e -M -o ./api --templatedir api_templates ../idmtools_slurm_utils/idmtools_slurm_utils
 	mv ./api/modules.rst ./api/idmtools_slurm_utils_index.rst
 
-	-rm ./api/idmtools_platform_local_index.rst
-	SPHINX_APIDOC_OPTIONS=members,undoc-members,show-inheritance,ignore-module-all sphinx-apidoc -f -e -M -o ./api --templatedir api_templates  ../idmtools_platform_local/idmtools_platform_local '../idmtools_platform_local/idmtools_platform_local/internals//*'
-	mv ./api/modules.rst ./api/idmtools_platform_local_index.rst
 
 .PHONY: html
 html:

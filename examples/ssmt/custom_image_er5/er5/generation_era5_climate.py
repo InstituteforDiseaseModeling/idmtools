@@ -32,7 +32,7 @@ if __name__ == "__main__":
     # upload site_details.csv to workitem's root dir in COMPS
     wi.transient_assets.add_asset(os.path.join("climate", "site_details.csv"))
     wi.related_asset_collections
-    wi.run(wait_on_done=True)
+    wi.run(wait_until_done=True)
 
     wi_id = wi.id
     print(wi_id)

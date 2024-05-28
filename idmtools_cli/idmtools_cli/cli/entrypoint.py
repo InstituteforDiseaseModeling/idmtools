@@ -4,14 +4,37 @@ from idmtools import IdmConfigParser
 from idmtools.core.logging import setup_logging, IdmToolsLoggingConfig
 import click
 from click_plugins import with_plugins
-from pkg_resources import iter_entry_points
+
+try:
+    from importlib.metadata import entry_points
+except ImportError:
+    from importlib_metadata import entry_points  # for python 3.7
 from idmtools_cli.iplatform_cli import IPlatformCLI
 
 # Decorator for CLI functions that will require a platform object passed down to them
 pass_platform_cli = click.make_pass_decorator(IPlatformCLI)
 
 
-@with_plugins(iter_entry_points('idmtools_cli.cli_plugins'))
+def get_filtered_entry_points(group):
+    """
+    Get entry points for a specific group, compatible across Python versions.
+
+    Args:
+        group (str): The entry point group to filter by.
+
+    Returns:
+        An iterable of entry point objects for the specified group.
+    """
+    user_entry_points = entry_points()
+    # For Python 3.10 and newer, use the select method if available
+    if hasattr(user_entry_points, 'select'):
+        return user_entry_points.select(group=group)
+    else:
+        # For Python 3.9 and earlier, manually filter the entry points
+        return (ep for ep in user_entry_points.get(group, []))
+
+
+@with_plugins(get_filtered_entry_points('idmtools_cli.cli_plugins'))
 @click.group()
 @click.option('--debug/--no-debug', default=False, help="When selected, enables console level logging")
 def cli(debug):

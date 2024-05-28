@@ -8,7 +8,6 @@ from idmtools.assets import AssetCollection
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
-from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.test_task import TestTask
@@ -26,8 +25,8 @@ class TestPersistenceServices(ITestWithPersistence):
     def test_fix_107(self):
         # https://github.com/InstituteforDiseaseModeling/idmtools/issues/107
         assets_path = os.path.join(COMMON_INPUT_PATH, "regression", "107", "Assets")
-        sp = os.path.join(assets_path, "model.py")
-        pe = Experiment.from_task(name=self.case_name, task=JSONConfiguredPythonTask(script_path=sp),
+        base_task = TestTask()
+        pe = Experiment.from_task(name=self.case_name, task=base_task,
                                   assets=AssetCollection.from_directory(assets_path))
         pe.gather_assets()
         self.assertEqual(len(pe.assets.assets), 2)
@@ -39,9 +38,9 @@ class TestPersistenceServices(ITestWithPersistence):
     def test_fix_114(self):
         # https://github.com/InstituteforDiseaseModeling/idmtools/issues/114
         assets_path = os.path.join(COMMON_INPUT_PATH, "regression", "107", "Assets")
-        sp = os.path.join(assets_path, "model.py")
-        s = Simulation.from_task(JSONConfiguredPythonTask(script_path=sp, parameters={"a": 1}))
-        ts = TemplatedSimulations(base_task=JSONConfiguredPythonTask(script_path=sp, parameters={"a": 1}))
+        base_task = TestTask()
+        s = Simulation.from_task(task=base_task)
+        ts = TemplatedSimulations(base_task=base_task)
         self.assertEqual(ts.base_simulation, s)
 
     @allure.issue(125, "relative_path for AssetCollection does not work")

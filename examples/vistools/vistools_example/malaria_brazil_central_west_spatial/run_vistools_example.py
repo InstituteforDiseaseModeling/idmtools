@@ -49,14 +49,14 @@ def generate_sim():
 
 
 if __name__ == "__main__":
-    platform = Platform('BELEGOST')
+    platform = Platform('IDMCloud')
     sims = generate_sim()
     sim_id = str(sims[0].uid)
     node_type = 'Points'
     data = {"SimulationId": "" + sim_id + "", "NodesRepresentation": node_type}
     tags = {'SimulationId': sim_id}
     wi = VisToolsWorkItem(item_name="example--run_vistools_example.py", tags=tags, work_order=data, related_simulations=[sim_id])
-    wi.run(wait_on_done=True)
+    wi.run(wait_until_done=True)
 
     output_path = "workitem_output"
     out_filenames = ["WorkOrder.json"]

@@ -37,6 +37,7 @@ setup(
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
         'Framework:: IDM-Tools :: Platform'
     ],
     description="Comps platform for IDM-Tools",
@@ -59,5 +60,5 @@ comps-cli=idmtools_platform_comps.cli.comps:comps
 """,
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='1.7.8+nightly'
+    version='1.7.10'
 )

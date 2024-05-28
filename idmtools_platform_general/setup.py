@@ -40,6 +40,7 @@ setup(
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
         'Framework:: IDM-Tools :: Platform'
     ],
     description="General platform for IDM-Tools",
@@ -57,5 +58,5 @@ setup(
     },
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='1.7.8+nightly'
+    version='1.7.10'
 )

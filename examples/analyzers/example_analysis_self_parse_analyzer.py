@@ -44,17 +44,17 @@ class MyCSVAnalyzer(IAnalyzer):
 
 
 if __name__ == '__main__':
-    with Platform('Belegost') as platform:
+    with Platform('CALCULON') as platform:
 
         # Arg option for analyzer init are uid, working_dir, data in the method map (aka select_simulation_data),
         # and filenames
         # In this case, we want to provide a filename to analyze
-        filenames = ['output/a.csv']
+        filenames = ['output/b.csv']
         # Initialize the analyser class with the path of the output csv file
         analyzers = [MyCSVAnalyzer(filenames=filenames, parse=False)]
 
         # Set the experiment id you want to analyze
-        experiment_id = 'd1ca14f3-94cc-ec11-a9f8-b88303911bc1'  # comps exp id simple sim and csv example
+        experiment_id = '31285dfc-4fe6-ee11-9f02-9440c9bee941'  # comps exp id simple sim and csv example
 
         # Specify the id Type, in this case an Experiment on COMPS
         manager = AnalyzeManager(partial_analyze_ok=True, ids=[(experiment_id, ItemType.EXPERIMENT)],

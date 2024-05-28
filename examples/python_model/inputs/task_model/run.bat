@@ -1,1 +1,0 @@
-C:\Python36\python.exe -m pip list

@@ -155,8 +155,8 @@ if __name__ == '__main__':
 
     # 6. In order to run the experiment, we need to create a `Platform`
     # The `Platform` defines where we want to run our simulation.
-    # You can easily switch platforms by changing the Platform to for example 'Local'
-    platform = Platform('BELEGOST')
+    # You can easily switch platforms by changing the Platform to for example 'CALCULON'
+    platform = Platform('IDMCloud')
 
     # The last step is to call run() on the ExperimentManager to run the simulations.
     experiment.run(wait_until_done=True)

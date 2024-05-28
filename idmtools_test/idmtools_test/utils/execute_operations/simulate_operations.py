@@ -19,7 +19,7 @@ from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
 from idmtools.entities.simulation import Simulation
-from idmtools.utils.file import file_contents_to_generator
+from idmtools.utils.file import file_content_to_generator
 from idmtools.utils.json import IDMJSONEncoder
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -294,7 +294,7 @@ class TestExecutePlatformSimulationOperation(IPlatformSimulationOperations):
             for file in files:
                 fp = os.path.abspath(os.path.join(root, file))
                 asset = Asset(absolute_path=fp, filename=file)
-                asset.download_generator_hook = partial(file_contents_to_generator, fp)
+                asset.download_generator_hook = partial(file_content_to_generator, fp)
                 cksum_hash = hashlib.md5()
                 with open(fp, 'rb') as fin:
                     cksum_hash.update(fin.read())
@@ -332,7 +332,7 @@ class TestExecutePlatformSimulationOperation(IPlatformSimulationOperations):
                         dict_asset['absolute_path'] = os.path.join(sim_path, dict_asset['filename'])
                 asset = Asset(**dict_asset)
                 asset.persisted = True
-                asset.download_generator_hook = partial(file_contents_to_generator, asset.absolute_path)
+                asset.download_generator_hook = partial(file_content_to_generator, asset.absolute_path)
                 ac.add_asset(asset)
             sim.assets = ac
         # should we fully load the task?

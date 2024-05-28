@@ -1,4 +1,0 @@
-#!/usr/bin/with-contenv sh
-
-echo Starting UI
-nginx -g 'daemon off;' -c /app/nginx.conf

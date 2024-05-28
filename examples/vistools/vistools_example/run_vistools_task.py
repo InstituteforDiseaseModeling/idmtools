@@ -9,9 +9,9 @@ node_type = 'Points'
 data = {"SimulationId": "" + str(sim_id) + "", "NodesRepresentation": node_type}
 
 if __name__ == "__main__":
-    platform = Platform('BELEGOST')
+    platform = Platform('CALCULON')
     # wi = VisToolsWorkItem(item_name=wi_name, tags=tags, related_simulations=[sim_id])
     # wi.set_work_order(data)
     # Or directly pass work_order
     wi = VisToolsWorkItem(name=wi_name, tags=tags, work_order=data, related_simulations=[sim_id])
-    wi.run(wait_on_done=True)
+    wi.run(wait_until_done=True)

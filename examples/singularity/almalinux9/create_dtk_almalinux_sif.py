@@ -15,12 +15,12 @@ def make_work():
                                  definition_file='dtk_almalinux.def', image_name="dtk_build_almalinux.sif", force=True)
 
   # Wait until the image is built
-  ac_obj=sbwi.run(wait_on_done=True, platform=platform)
+  ac_obj=sbwi.run(wait_until_done=True, platform=platform)
 
   if sbwi.succeeded:
     print("sbi.id: ", sbwi.id)
     # Write ID file
-    sbwi.asset_collection.to_id_file(f"{platform._config_block}_dtk_almalinux9_prod.id")
+    ac_obj.to_id_file(f"{platform._config_block}_dtk_almalinux9_prod.id")
     print("sc: ", ac_obj.id)
     get_files(sbwi.id, "dtk_build_almalinux.sif")
 
