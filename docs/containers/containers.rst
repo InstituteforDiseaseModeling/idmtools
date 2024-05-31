@@ -1,6 +1,6 @@
-===================
-Containers overview
-===================
+==========
+Containers
+==========
 
 You can use |IT_s| in containers, such as Singularity and |COMPS_s|. This can help 
 make it easier for other data scientists to use and rerun your work without having 

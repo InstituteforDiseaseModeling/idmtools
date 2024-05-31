@@ -1,6 +1,6 @@
-===========================
-Frequently asked questions
-===========================
+===
+FAQ
+===
 
 As you get started with |IT_s|, you may have questions. The most common
 questions are answered below. If you are using |IT_s| with |EMODPY_s|
