@@ -8,8 +8,6 @@
 
   - [Installing](#installing)
 - [Development Tips](#development-tips)
-- [Use Cases](#use-cases)
-- [Feature Roadmap](#feature-roadmap)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
