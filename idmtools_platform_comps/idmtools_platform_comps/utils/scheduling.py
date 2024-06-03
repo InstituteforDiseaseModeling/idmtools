@@ -36,10 +36,10 @@ def default_add_workorder_sweep_callback(simulation, file_name, file_path):
     add_work_order(simulation, file_name=file_name, file_path=file_path)
 
 
-def default_add_schedule_config_sweep_callback(simulation, command: str = None, node_group_name: str = None,
+def default_add_schedule_config_sweep_callback(simulation, command: str = None, node_group: str = None,
                                                num_cores: int = 1, **config_opts):
     """Default callback to be used for sweeps that affect a scheduling config."""
-    add_schedule_config(simulation, command=command, node_group_name=node_group_name, num_cores=num_cores,
+    add_schedule_config(simulation, command=command, node_group=node_group, num_cores=num_cores,
                         **config_opts["config_opts"])
 
 
@@ -127,7 +127,7 @@ def add_work_order(item: Union[Experiment, Simulation, TemplatedSimulations], fi
 
 
 def add_schedule_config(item: Union[Experiment, Simulation, TemplatedSimulations], command: str = None,
-                        node_group_name: str = None, num_cores: int = 1, **config_opts):
+                        node_group: str = None, num_cores: int = 1, **config_opts):
     """
     Add scheduling config to an Item.
 
@@ -136,7 +136,7 @@ def add_schedule_config(item: Union[Experiment, Simulation, TemplatedSimulations
     Args:
         item: Item to add scheduling config to
         command: Command to run
-        node_group_name: Node group name
+        node_group: Node group name
         num_cores: Num of cores to use
         **config_opts: Additional config options
 
@@ -150,6 +150,6 @@ def add_schedule_config(item: Union[Experiment, Simulation, TemplatedSimulations
     Notes:
         - TODO refactor to reuse the add_work_order if possible. The complication is simulation command possibly
     """
-    config = dict(Command=command, NodeGroupName=node_group_name, NumCores=num_cores)
+    config = dict(Command=command, NodeGroupName=node_group, NumCores=num_cores)
     config.update(config_opts)
     _add_work_order_asset(item, config, file_name="WorkOrder.json")

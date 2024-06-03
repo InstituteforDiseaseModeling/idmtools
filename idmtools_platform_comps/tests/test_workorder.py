@@ -36,7 +36,7 @@ class TestWorkOrder(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
         print(self.case_name)
-        self.platform = Platform('SlurmStage')
+        self.platform = Platform('SlurmStage', node_group='idm_48cores')
 
     def test_workorder_pythontask(self):
         """
@@ -235,7 +235,7 @@ class TestWorkOrder(ITestWithPersistence):
         ts = TemplatedSimulations(base_task=task)
 
         # use dynamic WorkOrder.json which override input commandline command and arguments
-        add_schedule_config(ts, command="python -c \"print('hello test')\"", node_group_name='idm_abcd', num_cores=2,
+        add_schedule_config(ts, command="python -c \"print('hello test')\"", node_group='idm_abcd', num_cores=2,
                             NumProcesses=1, NumNodes=1,
                             Environment={"key1": "value1", "key2": "value2"})
 
@@ -285,7 +285,7 @@ class TestWorkOrder(ITestWithPersistence):
         sb.add_sweep_definition(
             partial(default_add_schedule_config_sweep_callback,
                     command="python3 Assets/commandline_model.py {pop_size} {pop_infected} {n_days} {rand_seed}",
-                    node_group_name='idm_cd', num_cores=1),
+                    node_group='idm_cd', num_cores=1),
             [dict(NumProcesses=1, NumNodes=1, Environment={"key1": "value1", "key2": "value2"})])
 
         ts.add_builder(sb)
@@ -329,7 +329,7 @@ class TestWorkOrder(ITestWithPersistence):
         experiment = Experiment.from_task(wrapper_task, name=self.case_name)
 
         # upload dynamic WorkOrder.json to simulation root dir
-        add_schedule_config(experiment, command="python3.6 --version", node_group_name='idm_abcd', num_cores=1,
+        add_schedule_config(experiment, command="python3.6 --version", node_group='idm_abcd', num_cores=1,
                             NumProcesses=1, NumNodes=1, Environment={"key1": "value1", "key2": "value2"})
 
         wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform)
@@ -354,7 +354,7 @@ class TestWorkOrder(ITestWithPersistence):
             parameters=(dict(c=0)))
 
         experiment = Experiment.from_task(task, name=self.case_name)
-        add_schedule_config(experiment, command="python -c \"print('hello test')\"", node_group_name='emod_abcd',
+        add_schedule_config(experiment, command="python -c \"print('hello test')\"", node_group='emod_abcd',
                             num_cores=1, SingleNode=False, Exclusive=False)
 
         with Platform('Cumulus') as platform:
@@ -398,7 +398,7 @@ class TestWorkOrder(ITestWithPersistence):
         task.common_assets.add_directory(assets_directory=os.path.join(COMMON_INPUT_PATH, "python", "Assets"))
         experiment = Experiment.from_task(task, name=self.case_name)
         # add dynamic WorkOrder2.json to comps and change file name to WorkOrder.json
-        add_schedule_config(experiment, command="python3 Assets/model.py", node_group_name='idm_abcd', num_cores=1,
+        add_schedule_config(experiment, command="python3 Assets/model.py", node_group='idm_abcd', num_cores=1,
                             NumProcesses=1, NumNodes=1,
                             Environment={"key1": "value1", "key2": "value2",
                                          "PYTHONPATH": "$PYTHONPATH:$PWD/Assets:$PWD/Assets/site-packages",
