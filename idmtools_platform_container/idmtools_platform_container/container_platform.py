@@ -54,7 +54,8 @@ class ContainerPlatform(FilePlatform):
             return
 
         if isinstance(item, Experiment):
-            user_logger.debug("Build Experiment/Simulation on Docker Image!")
+            if logger.isEnabledFor(DEBUG):
+                logger.debug("Build Suite/Experiment/Simulation files!")
             container_id = self.check_container(**kwargs)
             if logger.isEnabledFor(DEBUG):
                 logger.debug(f"Container started successfully: {container_id}")
