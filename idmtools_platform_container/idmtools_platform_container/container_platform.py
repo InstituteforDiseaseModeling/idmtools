@@ -62,7 +62,7 @@ class ContainerPlatform(FilePlatform):
 
             if platform.system() in ["Windows"]:
                 if logger.isEnabledFor(DEBUG):
-                    logger.debug("Build Experiment/Simulation on Windows!")
+                    logger.debug("Build Suite/Experiment/Simulation files on Windows!")
                 self.convert_scripts_to_linux(container_id, item, **kwargs)
 
             # submit the experiment/simulations
@@ -72,10 +72,10 @@ class ContainerPlatform(FilePlatform):
             return result
 
         elif isinstance(item, Simulation):
-            raise NotImplementedError("submit_job directly for simulation is not implemented on ProcessPlatform.")
+            raise NotImplementedError("submit_job directly for simulation is not implemented on ContainerPlatform.")
         else:
             raise NotImplementedError(
-                f"Submit job is not implemented for {item.__class__.__name__} on ProcessPlatform.")
+                f"Submit job is not implemented for {item.__class__.__name__} on ContainerPlatform.")
 
     def check_container(self, **kwargs) -> Any:
         """
