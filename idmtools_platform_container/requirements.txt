@@ -1,0 +1,2 @@
+idmtools-platform-file~=1.7.10
+docker

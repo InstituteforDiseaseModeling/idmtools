@@ -3,6 +3,7 @@ Here we implement the JSON Metadata operations.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+import os
 import json
 from pathlib import Path
 from typing import TYPE_CHECKING, Dict, List, Type, Union
@@ -88,6 +89,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         meta['id'] = meta['_uid']
         meta['uid'] = meta['_uid']
         meta['status'] = 'CREATED'
+        meta['dir'] = os.path.abspath(self.platform.get_directory(item))
         return meta
 
     def dump(self, item: Union[Suite, Experiment, Simulation]) -> None:
