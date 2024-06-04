@@ -95,7 +95,7 @@ def check_container_running(image: str, platform) -> Any:
 def stop_all_containers(image: str):
     client = docker.from_env()
     for container in client.containers.list():
-        if container.image.tags[0] == image:
+        if image in container.image.tags:
             container.stop()
             container.remove()
 
