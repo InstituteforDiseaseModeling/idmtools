@@ -29,7 +29,6 @@ class ContainerPlatform(FilePlatform):
     docker_image: str = field(default=None)
     data_mount: str = field(default="/home/container_data")
     user_mounts: dict = field(default=None)
-    container_name: str = field(default="idmtools_container_image")
     force_start: bool = field(default=False)
 
     def __post_init__(self):
@@ -120,8 +119,7 @@ class ContainerPlatform(FilePlatform):
             volumes=volumes,
             stdin_open=True,
             tty=True,
-            detach=True,
-            name=self.container_name
+            detach=True
         )
 
         # Output the container ID
