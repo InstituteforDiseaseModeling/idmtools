@@ -30,7 +30,7 @@ def ensure_docker_daemon_running(platform, **kwargs):
         exit(-1)
 
     container_id = check_container_running(platform.docker_image, platform)
-    if container_id is not None or platform.force_start:
+    if container_id is not None and platform.force_start:
         if logger.isEnabledFor(DEBUG):
             logger.debug("Container is running!")
             logger.debug(f"Stop all containers {platform.docker_image}!")
