@@ -14,7 +14,7 @@ from idmtools.entities.simulation import Simulation
 from idmtools_platform_container.container_operations.docker_operations import ensure_docker_daemon_running
 from idmtools_platform_file.file_platform import FilePlatform
 from idmtools_platform_container.platform_operations.experiment_operations import ContainerPlatformExperimentOperations
-from logging import getLogger
+from logging import getLogger, DEBUG
 
 logger = getLogger(__name__)
 user_logger = getLogger('user')
@@ -25,7 +25,7 @@ class ContainerPlatform(FilePlatform):
     """
     Container Platform definition.
     """
-    __CONTAINER_IMAGE = "idm-docker-staging.packages.idmod.org/idmtools/container-test8:0.0.3"
+    __CONTAINER_IMAGE = "idm-docker-staging.packages.idmod.org/idmtools/container-test:0.0.3"
     docker_image: str = field(default=None)
     data_mount: str = field(default="/home/container_data")
     user_mounts: dict = field(default=None)
@@ -57,14 +57,17 @@ class ContainerPlatform(FilePlatform):
         if isinstance(item, Experiment):
             user_logger.debug("Build Experiment/Simulation on Docker Image!")
             container_id = self.check_container(**kwargs)
-            user_logger.debug(f"Container started successfully: {container_id}")
+            if logger.isEnabledFor(DEBUG):
+                logger.debug(f"Container started successfully: {container_id}")
 
             if platform.system() in ["Windows"]:
-                user_logger.warning("Build Experiment/Simulation on Windows!")
+                if logger.isEnabledFor(DEBUG):
+                    logger.debug("Build Experiment/Simulation on Windows!")
                 self.convert_scripts_to_linux(container_id, item, **kwargs)
 
             # submit the experiment/simulations
-            user_logger.debug(f"Submit experiment/simulations to container: {container_id}!")
+            if logger.isEnabledFor(DEBUG):
+                logger.debug(f"Submit experiment/simulations to container: {container_id}!")
             result = self.submit_experiment(container_id, item, **kwargs)
             return result
 
@@ -122,7 +125,9 @@ class ContainerPlatform(FilePlatform):
         )
 
         # Output the container ID
-        print("Container ID:", container.id)
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f"Container ID: {container.id}")
+
         return container.id
 
     def convert_scripts_to_linux(self, container_id: str, experiment: Experiment, **kwargs) -> Any:
@@ -157,8 +162,9 @@ class ContainerPlatform(FilePlatform):
     def submit_experiment(self, container_id, experiment: Experiment, **kwargs) -> Any:
         directory = os.path.join(self.data_mount, experiment.parent_id, experiment.id)
         directory = str(directory).replace("\\", '/')
-        print('directory: ', directory)
-        print('container_id: ', container_id)
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f"Directory: {directory}")
+            logger.debug(f"container_id: {container_id}")
 
         try:
             # Commands to change directory and run the script
@@ -172,7 +178,8 @@ class ContainerPlatform(FilePlatform):
 
             # Execute the command
             result = subprocess.run(full_command, stdout=subprocess.PIPE)
-            print(result)
+            if logger.isEnabledFor(DEBUG):
+                logger.debug(f"Result from submit: {result}")
 
         except subprocess.CalledProcessError as e:
             print("Error executing command:", e)

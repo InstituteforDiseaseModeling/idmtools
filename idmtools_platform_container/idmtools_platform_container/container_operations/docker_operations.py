@@ -1,8 +1,9 @@
-from typing import Any
 import json
 import docker
-from logging import getLogger
+from typing import Any
+from logging import getLogger, DEBUG
 
+logger = getLogger(__name__)
 user_logger = getLogger('user')
 
 
@@ -16,7 +17,8 @@ def ensure_docker_daemon_running(platform, **kwargs):
         Container ID
     """
     if check_docker_daemon():
-        user_logger.debug("Docker daemon is running!")
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Docker daemon is running!")
     else:
         user_logger.error("/!\\ ERROR: Docker daemon is not running!")
         exit(-1)
@@ -29,23 +31,27 @@ def ensure_docker_daemon_running(platform, **kwargs):
 
     container_id = check_container_running(platform.docker_image, platform)
     if container_id is not None or platform.force_start:
-        user_logger.debug("Docker container is already running!")
-        user_logger.debug(f"Stop all containers {platform.docker_image}!")
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Container is running!")
+            logger.debug(f"Stop all containers {platform.docker_image}!")
         stop_all_containers(platform.docker_image)
         container_id = None
 
     if container_id is None:
         if check_container_name(platform.container_name):
-            user_logger.error(f"Container name '{platform.container_name}' is already being used!")
+            if logger.isEnabledFor(DEBUG):
+                logger.debug(f"Container name '{platform.container_name}' is already being used!")
             if platform.force_start:
-                user_logger.debug(f"Stop container '{platform.container_name}'!")
+                if logger.isEnabledFor(DEBUG):
+                    logger.debug(f"Stop container '{platform.container_name}'!")
                 stop_container(platform.container_name)
             else:
-                user_logger.error("Please provide a different container name or set force_start to True.")
+                user_logger.warning("/!\\ WARNING: Please provide a different container name or set force_start to True.")
                 exit(-1)
 
         # restart the container
-        user_logger.debug(f"Start container: {platform.docker_image}!")
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f"Start container: {platform.docker_image}!")
         container_id = platform.start_container(**kwargs)
 
     return container_id
@@ -62,13 +68,14 @@ def verify_mount(container, platform):
     directory = directory.replace("\\", '/')
     mounts = {k.replace("\\", '/'): v.replace("\\", '/') for k, v in mount_bindings.items()}
     if directory in mounts:
-        print("Mount verified.")
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Mount verified.")
         return True
     else:
-        print("Mount not verified.")
-        # print("The cunning container has the following mounts:\n", mounts)
-        print("The cunning container has the following mounts:\n")
-        print(json.dumps(mounts, indent=3))
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Mount not verified.")
+            logger.debug("The cunning container has the following mounts:\n")
+            logger.debug(json.dumps(mounts, indent=3))
         return False
 
 
@@ -77,11 +84,12 @@ def check_container_running(image: str, platform) -> Any:
     client = docker.from_env()
     for container in client.containers.list():
         if container.image.tags[0] == image:
-            print("Container is running.")
+            if logger.isEnabledFor(DEBUG):
+                logger.debug(f"Container is running: {container.name}")
             if verify_mount(container, platform):
                 return container.id
             else:
-                print(
+                user_logger.warning(
                     f"Platform job_directory '{platform.job_directory}' is different from being used in the running container, please modify job_directory or re-start the container.")
                 # exit(-1)
                 return None
@@ -94,10 +102,12 @@ def check_container_name(container_name: str) -> Any:
     client = docker.from_env()
     for container in client.containers.list():
         if container.name == container_name:
-            print(f"Container name {container_name} is being used.")
+            if logger.isEnabledFor(DEBUG):
+                logger.debug(f"Container name {container_name} is being used.")
             return True
 
-    print(f"Container name {container_name} is not being used.")
+    if logger.isEnabledFor(DEBUG):
+        logger.debug(f"Container name {container_name} is not being used.")
     return False
 
 
@@ -120,13 +130,16 @@ def check_docker_daemon():
     try:
         client = docker.from_env()
         client.ping()
-        print("Docker daemon is running.")
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Docker daemon is running.")
         return True
     except docker.errors.APIError as e:
-        print("Docker daemon is not running:", e)
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Docker daemon is not running:", e)
         return False
     except Exception as ex:
-        print("Error checking Docker daemon:", ex)
+        if logger.isEnabledFor(DEBUG):
+            logger.debug("Error checking Docker daemon:", ex)
         return False
 
 
