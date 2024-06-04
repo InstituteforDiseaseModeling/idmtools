@@ -16,6 +16,7 @@ from idmtools_platform_file.file_platform import FilePlatform
 from idmtools_platform_container.platform_operations.experiment_operations import ContainerPlatformExperimentOperations
 from logging import getLogger
 
+logger = getLogger(__name__)
 user_logger = getLogger('user')
 
 
@@ -24,11 +25,11 @@ class ContainerPlatform(FilePlatform):
     """
     Container Platform definition.
     """
-    __CONTAINER_IMAGE = "my-mpich-sig-rockylinux:latest"  # TODO: Important, container list add latest to it
-    docker_image: str = field(default=None)  # TODO: Important, container list add latest to it
+    __CONTAINER_IMAGE = "idm-docker-staging.packages.idmod.org/idmtools/container-test8:0.0.3"
+    docker_image: str = field(default=None)
     data_mount: str = field(default="/home/container_data")
     user_mounts: dict = field(default=None)
-    container_name: str = field(default="idmtools_container_image")
+    container_name: str = field(default="idmtools_container_image_2")
     force_start: bool = field(default=False)
 
     def __post_init__(self):
@@ -37,7 +38,7 @@ class ContainerPlatform(FilePlatform):
         self.sym_link = False
         self.run_sequence = False
         if self.docker_image is None:
-            self.docker_image = self.__CONTAINER_IMAGE  # TODO: Important, container list add latest to it
+            self.docker_image = self.__CONTAINER_IMAGE
 
     def submit_job(self, item: Union[Experiment, Simulation], dry_run: bool = False, **kwargs) -> Any:
         """

@@ -18,7 +18,13 @@ def ensure_docker_daemon_running(platform, **kwargs):
     if check_docker_daemon():
         user_logger.debug("Docker daemon is running!")
     else:
-        user_logger.error("Docker daemon is not running!")
+        user_logger.error("/!\\ ERROR: Docker daemon is not running!")
+        exit(-1)
+
+    # Check image exists
+    if not check_image(platform.docker_image):
+        user_logger.error(
+            f"/!\\ ERROR: Image {platform.docker_image} does not exist!, please build or pull the image first.")
         exit(-1)
 
     container_id = check_container_running(platform.docker_image, platform)
@@ -122,3 +128,16 @@ def check_docker_daemon():
     except Exception as ex:
         print("Error checking Docker daemon:", ex)
         return False
+
+
+def check_image(image_name: str):
+    client = docker.from_env()
+    for image in client.images.list():
+        if image_name in image.tags:
+            return True
+    return False
+
+
+def list_images():
+    client = docker.from_env()
+    return client.images.list()
