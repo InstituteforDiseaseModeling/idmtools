@@ -83,17 +83,23 @@ def check_container_running(image: str, platform) -> Any:
     # TODO: should or can we check container name?
     client = docker.from_env()
     for container in client.containers.list():
-        if container.image.tags[0] == image:
-            if logger.isEnabledFor(DEBUG):
-                logger.debug(f"Container is running: {container.name}")
-            if verify_mount(container, platform):
-                return container.id
-            else:
-                user_logger.warning(
-                    f"Platform job_directory '{platform.job_directory}' is different from being used in the running container, please modify job_directory or re-start the container.")
-                # exit(-1)
-                return None
-    print("Container is not running.")
+        for t in container.image.tags:
+            if t == image:
+                if logger.isEnabledFor(DEBUG):
+                    logger.debug(f"Container is running: {container.name}")
+                if verify_mount(container, platform):
+                    return container.id
+                else:
+                    if logger.isEnabledFor(DEBUG):
+                        if platform.force_start:
+                            logger.debug(
+                                f"Platform job_directory '{platform.job_directory}' is different from being used in the running container, will re-start the container.")
+                        else:
+                            logger.debug(
+                                f"Platform job_directory '{platform.job_directory}' is different from being used in the running container, please modify job_directory or re-start the container.")
+                    return None
+    if logger.isEnabledFor(DEBUG):
+        logger.debug("Container is not running.")
     return None
 
 
