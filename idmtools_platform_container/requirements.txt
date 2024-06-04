@@ -1,2 +1,2 @@
-idmtools~=1.7.10
+idmtools-platform-file~=1.7.10
 docker
