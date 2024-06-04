@@ -38,17 +38,6 @@ def ensure_docker_daemon_running(platform, **kwargs):
         container_id = None
 
     if container_id is None:
-        if check_container_name(platform.container_name):
-            if logger.isEnabledFor(DEBUG):
-                logger.debug(f"Container name '{platform.container_name}' is already being used!")
-            if platform.force_start:
-                if logger.isEnabledFor(DEBUG):
-                    logger.debug(f"Stop container '{platform.container_name}'!")
-                stop_container(platform.container_name)
-            else:
-                user_logger.warning("/!\\ WARNING: Please provide a different container name or set force_start to True.")
-                exit(-1)
-
         # restart the container
         if logger.isEnabledFor(DEBUG):
             logger.debug(f"Start container: {platform.docker_image}!")
@@ -101,20 +90,6 @@ def check_container_running(image: str, platform) -> Any:
     if logger.isEnabledFor(DEBUG):
         logger.debug("Container is not running.")
     return None
-
-
-def check_container_name(container_name: str) -> Any:
-    # TODO: should or can we check container name?
-    client = docker.from_env()
-    for container in client.containers.list():
-        if container.name == container_name:
-            if logger.isEnabledFor(DEBUG):
-                logger.debug(f"Container name {container_name} is being used.")
-            return True
-
-    if logger.isEnabledFor(DEBUG):
-        logger.debug(f"Container name {container_name} is not being used.")
-    return False
 
 
 def stop_all_containers(image: str):
