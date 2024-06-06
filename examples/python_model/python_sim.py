@@ -122,6 +122,7 @@ experiment.assets.add_directory(assets_directory=os.path.join("inputs", "python_
 
 # You can easily switch platforms by changing the Platform to for example 'CALCULON'
 with Platform('CALCULON'):
+
     # The last step is to call run() on the ExperimentManager to run the simulations.
     experiment.run(True)
     # use system status as the exit code
