@@ -7,9 +7,7 @@ Notes:
 Copyright 2024, Bill Gates Foundation. All rights reserved.
 """
 import argparse
-import glob
 import os
-import shutil
 import subprocess
 from logging import getLogger, basicConfig, DEBUG, INFO
 import sys
@@ -34,6 +32,7 @@ BASE_VERSION = open(os.path.join(CURRENT_DIRECTORY, 'BASE_VERSION')).read().stri
 logger.info("Please be sure you are logged into the docker-production.packages.idmod.org Docker Repo")
 BASE_DIR = os.path.abspath(os.path.join(CURRENT_DIRECTORY, '..', '..'))
 LOCAL_PACKAGE_DIR = os.path.join(BASE_DIR, 'idmtools_platform_container/docker_image')
+
 
 def get_username_and_password(disable_keyring_load=False, disable_keyring_save=False):
     """
