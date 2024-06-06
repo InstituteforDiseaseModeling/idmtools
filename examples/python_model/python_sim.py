@@ -121,8 +121,7 @@ experiment.assets.add_directory(assets_directory=os.path.join("inputs", "python_
 # The `Platform` defines where we want to run our simulation.
 
 # You can easily switch platforms by changing the Platform to for example 'Local'
-with Platform(block='COMPS', endpoint = 'https://comps.idmod.org', environment='Calculon', type='COMPS') :
-
+with Platform('CALCULON'):
     # The last step is to call run() on the ExperimentManager to run the simulations.
     experiment.run(True)
     # use system status as the exit code
