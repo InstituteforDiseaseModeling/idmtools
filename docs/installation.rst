@@ -1,6 +1,6 @@
-============
-Installation
-============
+=======
+Install
+=======
 
 You can install |IT_s| in two different ways. If you intend to use |IT_s| as
 |IDM_s| builds it, follow the instructions in :doc:`basic-installation`.
