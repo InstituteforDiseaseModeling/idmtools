@@ -1,6 +1,6 @@
-==========================
-Create and run simulations
-==========================
+===========
+Simulations
+===========
 
 To create simulations with |IT_s|, create a Python file that imports the relevant packages, uses the classes and functions to meet your specific needs, and then run the script using ``python script_name.py``.
 
