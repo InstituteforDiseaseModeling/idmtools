@@ -7,7 +7,7 @@ from idmtools.entities import CommandLine
 from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.templated_simulation import TemplatedSimulations
-from idmtools_platform_comps.utils.scheduling import default_add_workerorder_sweep_callback
+from idmtools_platform_comps.utils.scheduling import default_add_workorder_sweep_callback
 
 
 def update_parameter_callback(simulation, pop_size, pop_infected, n_days, rand_seed):
@@ -31,7 +31,7 @@ sb.add_sweep_definition(update_parameter_callback, pop_size=[10000, 20000], pop_
 # for command line task sweep with workorder, DO NOT use since it will not update arguments:
 # add_work_order(experiment, file_name="WorkOrder.json", file_path=os.path.join("inputs", "scheduling", "WorkOrder_orig.json"))
 
-sb.add_sweep_definition(partial(default_add_workerorder_sweep_callback, file_name="WorkOrder.json"),
+sb.add_sweep_definition(partial(default_add_workorder_sweep_callback, file_name="WorkOrder.json"),
                         os.path.join("inputs", "scheduling", "WorkOrder_orig.json"))
 ts.add_builder(sb)
 

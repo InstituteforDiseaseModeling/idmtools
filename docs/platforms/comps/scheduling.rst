@@ -78,7 +78,7 @@ create one using the ``add_schedule_config`` method, both methods included in th
 
 **Dynamically create workorder.json**::
 
-    add_schedule_config(ts, command="python -c \"print('hello test')\"", node_group_name='idm_abcd', num_cores=2,
+    add_schedule_config(ts, command="python -c \"print('hello test')\"", node_group='idm_abcd', num_cores=2,
                             NumProcesses=1, NumNodes=1,
                             Environment={"key1": "value1", "key2:": "value2"})
 
