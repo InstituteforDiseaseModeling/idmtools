@@ -49,7 +49,7 @@ setup(
     include_package_data=True,
     keywords='modeling, IDM',
     name='idmtools_platform_general',
-    packages=find_packages(),
+    packages=find_packages(exclude=["tests"]),
     test_suite='tests',
     entry_points={"idmtools_platform": [
         "idmtools_platform_file = idmtools_platform_file.plugin_info:FilePlatformSpecification",

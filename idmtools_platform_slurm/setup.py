@@ -45,7 +45,7 @@ setup(
     include_package_data=True,
     keywords='modeling, IDM',
     name='idmtools_platform_slurm',
-    packages=find_packages(),
+    packages=find_packages(exclude=["tests"]),
     setup_requires=setup_requirements,
     entry_points={"idmtools_platform": [
         "idmtools_platform_slurm = idmtools_platform_slurm.plugin_info:SlurmPlatformSpecification"],

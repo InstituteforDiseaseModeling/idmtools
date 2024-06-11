@@ -62,7 +62,7 @@ setup(
                        "idmtools_task_json = idmtools_models.json_configured_task:JSONConfiguredTaskSpecification"
                        ]
                       ),
-    packages=find_packages(),
+    packages=find_packages(exclude=["tests"]),
     setup_requires=setup_requirements,
     test_suite='tests',
     extras_require=extras,

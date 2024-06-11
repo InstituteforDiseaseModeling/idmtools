@@ -51,7 +51,7 @@ setup(
     include_package_data=True,
     keywords='modeling, IDM',
     name='idmtools-slurm-utils',
-    packages=find_packages(),
+    packages=find_packages(exclude=["tests"]),
     setup_requires=[],
     test_suite='tests',
     extras_require=extras,
