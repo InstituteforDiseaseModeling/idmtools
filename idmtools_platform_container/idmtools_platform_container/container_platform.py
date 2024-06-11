@@ -93,7 +93,7 @@ class ContainerPlatform(FilePlatform):
         if isinstance(item, Experiment):
             if logger.isEnabledFor(DEBUG):
                 logger.debug("Build Suite/Experiment/Simulation files!")
-            self.container_id = self.check_container(all=True, **kwargs)
+            self.container_id = self.check_container(**kwargs)
             if logger.isEnabledFor(DEBUG):
                 logger.debug(f"Container started successfully: {self.container_id}")
 
