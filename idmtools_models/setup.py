@@ -18,9 +18,6 @@ test_requirements = ['pytest', 'pytest-runner', 'pytest-timeout', 'pytest-cache'
 
 extras = dict(test=test_requirements, packaging=build_requirements)
 
-# check for python 3.7
-if sys.version_info[0] == 3 and sys.version_info[1] == 7 and sys.version_info[2] < 3:
-    raise EnvironmentError("Python 3.7 requires 3.7.3 or higher")
 
 authors = [
     ("Ross Carter", "rcarter@idmod.org"),
@@ -38,7 +35,6 @@ setup(
     author=", ".join([author[0] for author in authors]),
     author_email=", ".join([author[1] for author in authors]),
     classifiers=[
-        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
