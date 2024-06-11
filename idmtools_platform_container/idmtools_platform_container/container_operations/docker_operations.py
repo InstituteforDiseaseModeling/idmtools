@@ -1,11 +1,7 @@
-import os
-import json
 import docker
-import platform
 import subprocess
-from typing import Any, List
+from typing import Any, List, Dict
 from logging import getLogger, DEBUG
-from idmtools_platform_container.utils import normalize_path
 
 logger = getLogger(__name__)
 user_logger = getLogger('user')
@@ -42,7 +38,6 @@ def ensure_docker_daemon_running(platform, all: bool = False, **kwargs):
             user_logger.error(f"/!\\ ERROR: Failed to pull image {platform.docker_image}.")
             exit(-1)
 
-    running_status = False
     container_id = None
     container_match = check_running_container(platform, all=all)
     if len(container_match) > 0:
@@ -51,7 +46,6 @@ def ensure_docker_daemon_running(platform, all: bool = False, **kwargs):
 
         if len(container_running) > 0:
             # Get the first container
-            running_status = True
             container_id = container_running[0].short_id
             if logger.isEnabledFor(DEBUG):
                 logger.debug(f"Found running container {container_id}.")
@@ -60,7 +54,7 @@ def ensure_docker_daemon_running(platform, all: bool = False, **kwargs):
                 if logger.isEnabledFor(DEBUG):
                     logger.debug(f"Per request force_start=True, will re-start the container.")
                     logger.debug(f"Stop all containers {container_match}")
-                stop_all_containers_2(container_match)
+                stop_all_containers(container_match)
                 container_id = None
         else:
             if logger.isEnabledFor(DEBUG):
@@ -79,29 +73,6 @@ def ensure_docker_daemon_running(platform, all: bool = False, **kwargs):
     return container_id
 
 
-# TODO: not used and got replaced
-def verify_mount(container, platform):
-    # TODO: currently only check job_directory exists in the mounts. Is it enough?
-    directory = platform.job_directory
-    mounts = container.attrs['Mounts']  # list
-    mount_bindings = {}
-    for mount in mounts:
-        mount_bindings[mount['Source']] = mount['Destination']
-    # normalize directory and mount paths
-    directory = directory.replace("\\", '/')
-    mounts = {k.replace("\\", '/'): v.replace("\\", '/') for k, v in mount_bindings.items()}
-    if directory in mounts:
-        if logger.isEnabledFor(DEBUG):
-            logger.debug("Mount verified.")
-        return True
-    else:
-        if logger.isEnabledFor(DEBUG):
-            logger.debug("Mount not verified.")
-            logger.debug("The running container has the following mounts:\n")
-            logger.debug(json.dumps(mounts, indent=3))
-        return False
-
-
 #############################
 ## Check containers
 #############################
@@ -116,18 +87,6 @@ def find_container_by_image(image: str, all: bool = False) -> Dict:
             if container_found.get(container.status, None) is None:
                 container_found[container.status] = []
             container_found[container.status].append(container)
-
-    return container_found
-
-
-def find_container_by_image_bk(image: str, all: bool = False) -> List:
-    client = docker.from_env()
-    container_found = []
-    for container in client.containers.list(all=all):
-        if image in container.image.tags:
-            if logger.isEnabledFor(DEBUG):
-                logger.debug(f"Image {image} found in container: {container.short_id}")
-            container_found.append(container)
 
     return container_found
 
@@ -157,25 +116,10 @@ def check_running_container(platform, image: str = None, all: bool = False) -> A
     return container_match
 
 
-def stop_all_containers(image: str):
-    client = docker.from_env()
-    for container in client.containers.list():
-        if image in container.image.tags:
-            container.stop()
-            container.remove()
-
-
-def stop_all_containers_2(containers: List):
+def stop_all_containers(containers: List):
     for container in containers:
         container.stop()
         container.remove()
-
-
-def stop_container(container_id):
-    client = docker.from_env()
-    container = client.containers.get(container_id)
-    container.stop()
-    container.remove()
 
 
 #############################
@@ -248,4 +192,3 @@ def pull_docker_image(image_name, tag='latest'):
         if logger.isEnabledFor(DEBUG):
             logger.debug(f'Error pulling {full_image_name}: {e}')
         return False
-
