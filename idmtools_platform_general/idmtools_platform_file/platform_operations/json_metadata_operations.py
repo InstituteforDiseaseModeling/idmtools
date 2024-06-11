@@ -90,6 +90,10 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         meta['uid'] = meta['_uid']
         meta['status'] = 'CREATED'
         meta['dir'] = os.path.abspath(self.platform.get_directory(item))
+
+        if isinstance(item, Experiment):
+            meta['suite_id'] = meta["parent_id"]
+
         return meta
 
     def dump(self, item: Union[Suite, Experiment, Simulation]) -> None:
