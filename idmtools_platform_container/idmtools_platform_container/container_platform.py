@@ -25,19 +25,23 @@ class ContainerPlatform(FilePlatform):
     """
     Container Platform definition.
     """
-    __CONTAINER_IMAGE = "idm-docker-staging.packages.idmod.org/idmtools/container-test:0.0.3"
+    __CONTAINER_IMAGE = "docker-production-public.packages.idmod.org/idmtools/container-test:0.0.3"
+    __CONTAINER_MOUNT = "/home/container_data"
     docker_image: str = field(default=None)
-    data_mount: str = field(default="/home/container_data")
+    data_mount: str = field(default=None)
     user_mounts: dict = field(default=None)
     force_start: bool = field(default=False)
 
     def __post_init__(self):
         super().__post_init__()
         self._experiments = ContainerPlatformExperimentOperations(platform=self)
+        self.job_directory = os.path.abspath(self.job_directory)
         self.sym_link = False
         self.run_sequence = False
         if self.docker_image is None:
             self.docker_image = self.__CONTAINER_IMAGE
+        if self.data_mount is None:
+            self.data_mount = self.__CONTAINER_MOUNT
 
     def submit_job(self, item: Union[Experiment, Simulation], dry_run: bool = False, **kwargs) -> Any:
         """
