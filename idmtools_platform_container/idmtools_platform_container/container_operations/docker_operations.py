@@ -3,7 +3,7 @@ import json
 import docker
 import platform
 import subprocess
-from typing import Any, List, Dict
+from typing import Any, List
 from logging import getLogger, DEBUG
 from idmtools_platform_container.utils import normalize_path
 
@@ -35,12 +35,12 @@ def ensure_docker_daemon_running(platform, all: bool = False, **kwargs):
         exit(-1)
 
     # Check image exists
-    # if not check_local_image(platform.docker_image):
-    #     user_logger.info(f"Image {platform.docker_image} does not exist!, pull the image first.")
-    #     result = pull_docker_image(platform.docker_image)
-    #     if not result:
-    #         user_logger.error(f"/!\\ ERROR: Failed to pull image {platform.docker_image}.")
-    #         exit(-1)
+    if not check_local_image(platform.docker_image):
+        user_logger.info(f"Image {platform.docker_image} does not exist!, pull the image first.")
+        result = pull_docker_image(platform.docker_image)
+        if not result:
+            user_logger.error(f"/!\\ ERROR: Failed to pull image {platform.docker_image}.")
+            exit(-1)
 
     running_status = False
     container_id = None
@@ -217,3 +217,35 @@ def check_docker_daemon():
         if logger.isEnabledFor(DEBUG):
             logger.debug("Error checking Docker daemon:", ex)
         return False
+
+
+#############################
+## Check images
+#############################
+
+def check_local_image(image_name: str):
+    client = docker.from_env()
+    for image in client.images.list():
+        if image_name in image.tags:
+            return True
+    return False
+
+
+def pull_docker_image(image_name, tag='latest'):
+    if ':' in image_name:
+        full_image_name = image_name
+    else:
+        full_image_name = f'{image_name}:{tag}'
+
+    user_logger.info(f'Pulling image {full_image_name} ...')
+    try:
+        client = docker.from_env()
+        client.images.pull(f'{full_image_name}')
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f'Successfully pulled {full_image_name}')
+        return True
+    except docker.errors.APIError as e:
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f'Error pulling {full_image_name}: {e}')
+        return False
+
