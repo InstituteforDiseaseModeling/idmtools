@@ -7,6 +7,7 @@ import os
 import docker
 import platform
 import subprocess
+from uuid import uuid4
 from typing import Union, Any
 from dataclasses import dataclass, field
 from idmtools.entities.experiment import Experiment
@@ -30,6 +31,7 @@ class ContainerPlatform(FilePlatform):
     docker_image: str = field(default=None)
     data_mount: str = field(default=None)
     user_mounts: dict = field(default=None)
+    container_prefix: str = field(default=None)
     force_start: bool = field(default=False)
 
     def __post_init__(self):
@@ -124,7 +126,8 @@ class ContainerPlatform(FilePlatform):
             volumes=volumes,
             stdin_open=True,
             tty=True,
-            detach=True
+            detach=True,
+            name=f"{self.container_prefix}_{str(uuid4())}" if self.container_prefix else None
         )
 
         # Output the container ID
