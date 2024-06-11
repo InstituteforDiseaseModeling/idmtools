@@ -39,6 +39,7 @@ class FilePlatform(IPlatform):
     job_directory: str = field(default=None)
     max_job: int = field(default=4)
     run_sequence: bool = field(default=True)
+    sym_link: bool = field(default=True)
 
     # Default retries for jobs
     retries: int = field(default=1)
@@ -142,9 +143,8 @@ class FilePlatform(IPlatform):
             raise RuntimeError('Only support Suite/Experiment/Simulation or not None dest.')
         target.mkdir(parents=True, exist_ok=exist_ok)
 
-    @staticmethod
     @check_symlink_capabilities
-    def link_file(target: Union[Path, str], link: Union[Path, str]) -> None:
+    def link_file(self, target: Union[Path, str], link: Union[Path, str]) -> None:
         """
         Link files.
         Args:
@@ -155,11 +155,13 @@ class FilePlatform(IPlatform):
         """
         target = Path(target).absolute()
         link = Path(link).absolute()
-        link.symlink_to(target)
+        if self.sym_link:
+            link.symlink_to(target)
+        else:
+            shutil.copyfile(target, link)
 
-    @staticmethod
     @check_symlink_capabilities
-    def link_dir(target: Union[Path, str], link: Union[Path, str]) -> None:
+    def link_dir(self, target: Union[Path, str], link: Union[Path, str]) -> None:
         """
         Link directory/files.
         Args:
@@ -170,7 +172,10 @@ class FilePlatform(IPlatform):
         """
         target = Path(target).absolute()
         link = Path(link).absolute()
-        link.symlink_to(target)
+        if self.sym_link:
+            link.symlink_to(target)
+        else:
+            shutil.copytree(target, link)
 
     def create_batch_file(self, item: Union[Experiment, Simulation], **kwargs) -> None:
         """
