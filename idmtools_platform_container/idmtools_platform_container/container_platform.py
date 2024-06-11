@@ -33,6 +33,7 @@ class ContainerPlatform(FilePlatform):
     user_mounts: dict = field(default=None)
     container_prefix: str = field(default=None)
     force_start: bool = field(default=False)
+    _container_id: str = field(default=None, init=False)
 
     def __post_init__(self):
         super().__post_init__()
@@ -44,6 +45,29 @@ class ContainerPlatform(FilePlatform):
             self.docker_image = self.__CONTAINER_IMAGE
         if self.data_mount is None:
             self.data_mount = self.__CONTAINER_MOUNT
+
+    @property
+    def container_id(self):  # noqa: F811
+        """
+        Returns container id.
+
+        Returns:
+            container id
+        """
+        return self._container_id
+
+    @container_id.setter
+    def container_id(self, _id):
+        """
+        Set the container id property.
+
+        Args:
+            _id: container id
+
+        Returns:
+            None
+        """
+        self._container_id = _id
 
     def submit_job(self, item: Union[Experiment, Simulation], dry_run: bool = False, **kwargs) -> Any:
         """
