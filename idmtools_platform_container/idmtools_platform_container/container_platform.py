@@ -33,6 +33,7 @@ class ContainerPlatform(FilePlatform):
     user_mounts: dict = field(default=None)
     container_prefix: str = field(default=None)
     force_start: bool = field(default=False)
+    debug: bool = field(default=False)
     _container_id: str = field(default=None, init=False)
 
     def __post_init__(self):
@@ -45,6 +46,10 @@ class ContainerPlatform(FilePlatform):
             self.docker_image = self.__CONTAINER_IMAGE
         if self.data_mount is None:
             self.data_mount = self.__CONTAINER_MOUNT
+
+        if self.debug:
+            root_logger = getLogger()
+            root_logger.setLevel(DEBUG)
 
     @property
     def container_id(self):  # noqa: F811
