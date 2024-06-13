@@ -11,7 +11,7 @@ user_logger = getLogger('user')
 CONTAINER_STATUS = ['exited', 'running', 'paused']
 
 
-def ensure_docker_daemon_running(platform, **kwargs) -> str:
+def validate_container_running(platform, **kwargs) -> str:
     """
     Check if the docker daemon is running, find existing container or start a new container.
     Args:
@@ -42,7 +42,7 @@ def ensure_docker_daemon_running(platform, **kwargs) -> str:
 
     # Check containers
     container_id = None
-    container_match = platform.check_running_container(**kwargs)
+    container_match = platform.retrieve_match_containers(**kwargs)
     container_running = [container for status, container in container_match if status == 'running']
     container_stopped = [container for status, container in container_match if status != 'running']
 

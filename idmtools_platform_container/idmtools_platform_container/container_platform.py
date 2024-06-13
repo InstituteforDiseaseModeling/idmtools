@@ -13,7 +13,7 @@ from dataclasses import dataclass, field
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
-from idmtools_platform_container.container_operations.docker_operations import ensure_docker_daemon_running, \
+from idmtools_platform_container.container_operations.docker_operations import validate_container_running, \
     find_container_by_image, compare_mounts
 from idmtools_platform_container.utils import map_container_path
 from idmtools_platform_file.file_platform import FilePlatform
@@ -122,7 +122,7 @@ class ContainerPlatform(FilePlatform):
         Returns:
             container id
         """
-        container_id = ensure_docker_daemon_running(self, **kwargs)
+        container_id = validate_container_running(self, **kwargs)
         return container_id
 
     def start_container(self, **kwargs) -> str:
@@ -278,7 +278,7 @@ class ContainerPlatform(FilePlatform):
 
         return item_container_dir
 
-    def check_running_container(self, image: str = None) -> List:
+    def retrieve_match_containers(self, image: str = None) -> List:
         """
         Find the containers that match math the image.
         Args:
