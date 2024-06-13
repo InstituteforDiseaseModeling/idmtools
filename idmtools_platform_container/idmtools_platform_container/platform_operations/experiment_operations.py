@@ -9,6 +9,7 @@ from idmtools.entities.experiment import Experiment
 from idmtools_platform_file.platform_operations.experiment_operations import FilePlatformExperimentOperations
 from logging import getLogger
 
+logger = getLogger(__name__)
 user_logger = getLogger('user')
 
 
@@ -34,7 +35,6 @@ class ContainerPlatformExperimentOperations(FilePlatformExperimentOperations):
     def post_run_item(self, experiment: Experiment, **kwargs):
         """
         Trigger right after commissioning experiment on platform.
-
         Args:
             experiment: Experiment just commissioned
             kwargs: keyword arguments used to expand functionality
@@ -42,5 +42,6 @@ class ContainerPlatformExperimentOperations(FilePlatformExperimentOperations):
             None
         """
         super().post_run_item(experiment, **kwargs)
+        user_logger.info(f"\nContainer ID: {self.platform.container_id}")
         user_logger.info(
             f'\nYou may try the following command to check simulations running status: \n  idmtools file {os.path.abspath(self.platform.job_directory)} status --exp-id {experiment.id}')

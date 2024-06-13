@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from typing import Union
+import platform as platform
 
 
 def normalize_path(path: Union[str, Path]):
@@ -13,7 +14,6 @@ def normalize_path(path: Union[str, Path]):
     Returns:
         str: The normalized path.
     """
-    import platform as platform
     path = str(path)
     if platform.system() == 'Windows':
         path = path.lower()
@@ -21,7 +21,7 @@ def normalize_path(path: Union[str, Path]):
     return path.rstrip('/')
 
 
-def get_container_path(source_binding, destination_binding, source_path):
+def map_container_path(source_binding, destination_binding, source_path):
     """
     Map a source path to its corresponding destination path within the container.
 
@@ -52,6 +52,6 @@ def get_container_path(source_binding, destination_binding, source_path):
     destination_path = os.path.join(destination_binding, relative_path)
 
     # Normalize the destination path to ensure proper path separators and convert to Unix-style path
-    destination_path = os.path.normpath(destination_path).replace('\\', '/')
+    destination_path = normalize_path(destination_path)
 
     return destination_path

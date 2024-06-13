@@ -4,17 +4,18 @@ Here we implement the ContainerPlatform object.
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import os
-from uuid import uuid4
 import docker
 import platform
 import subprocess
-from typing import Union, Any
+from uuid import uuid4
+from typing import Union, NoReturn, List
 from dataclasses import dataclass, field
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
-from idmtools_platform_container.container_operations.docker_operations import ensure_docker_daemon_running
-from idmtools_platform_container.utils import normalize_path
+from idmtools_platform_container.container_operations.docker_operations import validate_container_running, \
+    find_container_by_image, compare_mounts
+from idmtools_platform_container.utils import map_container_path
 from idmtools_platform_file.file_platform import FilePlatform
 from idmtools_platform_container.platform_operations.experiment_operations import ContainerPlatformExperimentOperations
 from logging import getLogger, DEBUG
@@ -35,6 +36,8 @@ class ContainerPlatform(FilePlatform):
     user_mounts: dict = field(default=None)
     container_prefix: str = field(default=None)
     force_start: bool = field(default=False)
+    new_container: bool = field(default=False)
+    include_stopped: bool = field(default=False)
     debug: bool = field(default=False)
     _container_id: str = field(default=None, init=False)
 
@@ -76,7 +79,7 @@ class ContainerPlatform(FilePlatform):
         """
         self._container_id = _id
 
-    def submit_job(self, item: Union[Experiment, Simulation], dry_run: bool = False, **kwargs) -> Any:
+    def submit_job(self, item: Union[Experiment, Simulation], dry_run: bool = False, **kwargs) -> NoReturn:
         """
         Submit a Process job in a docker container.
         Args:
@@ -92,21 +95,18 @@ class ContainerPlatform(FilePlatform):
 
         if isinstance(item, Experiment):
             if logger.isEnabledFor(DEBUG):
-                logger.debug("Build Suite/Experiment/Simulation files!")
+                logger.debug("Run experiment!")
             self.container_id = self.check_container(**kwargs)
-            if logger.isEnabledFor(DEBUG):
-                logger.debug(f"Container started successfully: {self.container_id}")
 
             if platform.system() in ["Windows"]:
                 if logger.isEnabledFor(DEBUG):
-                    logger.debug("Build Suite/Experiment/Simulation files on Windows!")
-                self.convert_scripts_to_linux(self.container_id, item, **kwargs)
+                    logger.debug("Script runs on Windows!")
+                self.convert_scripts_to_linux(item, **kwargs)
 
             # submit the experiment/simulations
             if logger.isEnabledFor(DEBUG):
                 logger.debug(f"Submit experiment/simulations to container: {self.container_id}!")
-            result = self.submit_experiment(self.container_id, item, **kwargs)
-            return result
+            self.submit_experiment(item, **kwargs)
 
         elif isinstance(item, Simulation):
             raise NotImplementedError("submit_job directly for simulation is not implemented on ContainerPlatform.")
@@ -114,24 +114,24 @@ class ContainerPlatform(FilePlatform):
             raise NotImplementedError(
                 f"Submit job is not implemented for {item.__class__.__name__} on ContainerPlatform.")
 
-    def check_container(self, all: bool = False, **kwargs) -> str:
+    def check_container(self, **kwargs) -> str:
         """
         Check the container status.
         Args:
             kwargs: keyword arguments used to expand functionality
         Returns:
-            Any
+            container id
         """
-        container_id = ensure_docker_daemon_running(self, all, **kwargs)
+        container_id = validate_container_running(self, **kwargs)
         return container_id
 
-    def start_container(self, **kwargs) -> Any:
+    def start_container(self, **kwargs) -> str:
         """
         Execute a command in a container.
         Args:
             kwargs: keyword arguments used to expand functionality
         Returns:
-            Any
+            container id
         """
         # Create a Docker client
         client = docker.from_env()
@@ -148,24 +148,18 @@ class ContainerPlatform(FilePlatform):
             name=f"{self.container_prefix}_{str(uuid4())}" if self.container_prefix else None
         )
 
-        # Output the container ID
-        if logger.isEnabledFor(DEBUG):
-            logger.debug(f"Container ID: {container.short_id}")
-
         return container.short_id
 
-    def convert_scripts_to_linux(self, container_id: str, experiment: Experiment, **kwargs) -> Any:
+    def convert_scripts_to_linux(self, experiment: Experiment, **kwargs) -> NoReturn:
         """
         Convert the scripts to Linux format.
         Args:
-            container_id: container ID
-            experiment: idmtools Experiment
+            experiment: Experiment
             kwargs: keyword arguments used to expand functionality
         Returns:
-            Any
+            No return
         """
-        directory = os.path.join(self.data_mount, experiment.parent_id, experiment.id)
-        directory = directory.replace("\\", '/')
+        directory = self.get_container_directory(experiment)
 
         try:
             commands = [
@@ -174,20 +168,28 @@ class ContainerPlatform(FilePlatform):
             ]
 
             # Constructing the overall command
-            full_command = ["docker", "exec", container_id, "bash", "-c", ";".join(commands)]
+            full_command = ["docker", "exec", self.container_id, "bash", "-c", ";".join(commands)]
             # Execute the command
-            result = subprocess.run(full_command, stdout=subprocess.PIPE)
+            subprocess.run(full_command, stdout=subprocess.PIPE)
 
         except subprocess.CalledProcessError as e:
             print("Error executing command:", e)
         except Exception as ex:
             print("Error:", ex)
 
-    def submit_experiment(self, container_id, experiment: Experiment, **kwargs) -> Any:
+    def submit_experiment(self, experiment: Experiment, **kwargs) -> NoReturn:
+        """
+        Submit an experiment to the container.
+        Args:
+            experiment: Experiment
+            kwargs: keyword arguments used to expand functionality
+        Returns:
+            No return
+        """
         directory = self.get_container_directory(experiment)
         if logger.isEnabledFor(DEBUG):
             logger.debug(f"Directory: {directory}")
-            logger.debug(f"container_id: {container_id}")
+            logger.debug(f"container_id: {self.container_id}")
 
         try:
             # Commands to change directory and run the script
@@ -197,7 +199,7 @@ class ContainerPlatform(FilePlatform):
             ]
 
             # Constructing the overall command
-            full_command = ["docker", "exec", container_id, "bash", "-c", ";".join(commands)]
+            full_command = ["docker", "exec", self.container_id, "bash", "-c", ";".join(commands)]
 
             # Execute the command
             result = subprocess.run(full_command, stdout=subprocess.PIPE)
@@ -209,8 +211,12 @@ class ContainerPlatform(FilePlatform):
         except Exception as ex:
             print("Error:", ex)
 
-    def build_binding_volumes(self):
-        # Define the default volume mapping
+    def build_binding_volumes(self) -> dict:
+        """
+        Build the binding volumes for the container.
+        Returns:
+            bindings in dict format
+        """
         volumes = {
             self.job_directory: {"bind": self.data_mount, "mode": "rw"}
         }
@@ -222,14 +228,17 @@ class ContainerPlatform(FilePlatform):
 
         return volumes
 
-    def get_mounts(self):
+    def get_mounts(self) -> List:
+        """
+        Build the mounts of the container.
+        Returns:
+            List of mounts (Dict)
+        """
         mounts = []
         mount = {'Type': 'bind',
                  'Source': self.job_directory,
                  'Destination': self.data_mount,
-                 'Mode': 'rw',
-                 'RW': True,
-                 'Propagation': 'rprivate'}
+                 'Mode': 'rw'}
 
         mounts.append(mount)
 
@@ -239,45 +248,59 @@ class ContainerPlatform(FilePlatform):
                 mount = {'Type': 'bind',
                          'Source': key,
                          'Destination': value,
-                         'Mode': 'rw',
-                         'RW': True,
-                         'Propagation': 'rprivate'}
+                         'Mode': 'rw'}
                 mounts.append(mount)
 
         return mounts
 
-    def compare_mounts(self, container):
-        """Compare the mount configurations of two containers."""
+    def validate_mount(self, container) -> bool:
+        """
+        Compare the mounts of the container with the platform.
+        Args:
+            container: a container to be compared.
+        Returns:
+            True/False
+        """
         mounts1 = self.get_mounts()
         mounts2 = container.attrs['Mounts']
-
-        # Convert mount configurations to a set of tuples for easy comparison
-        mounts_set1 = set(
-            (mount['Type'], normalize_path(mount['Source']), normalize_path(mount['Destination'])) for mount in mounts1
-        )
-        mounts_set2 = set(
-            (mount['Type'], normalize_path(mount['Source']), normalize_path(mount['Destination'])) for mount in mounts2
-        )
-
-        if mounts_set1 == mounts_set2:
-            # if logger.isEnabledFor(DEBUG):
-            #     logger.debug(f'Found container {container.short_id} match the platform bindings.')
-            return True
-        else:
-            # print("The two containers do not have the same bindings/mountings.")
-            # print(f"Differences:\nContainer 1: {mounts_set1}\nContainer 2: {mounts_set2}")
-            return False
+        return compare_mounts(mounts1, mounts2)
 
     def get_container_directory(self, item: Union[Suite, Experiment, Simulation]) -> str:
         """
-        Get the directory of the item.
+        Get the container corresponding directory of an item.
         Args:
-            item: idmtools Suite, Experiment or Simulation
+            item: Suite, Experiment or Simulation
         Returns:
-            Path
+            string Path
         """
-        from idmtools_platform_container.utils import get_container_path
         item_dir = self.get_directory(item)
-        item_container_dir = get_container_path(self.job_directory, self.data_mount, item_dir)
+        item_container_dir = map_container_path(self.job_directory, self.data_mount, str(item_dir))
 
         return item_container_dir
+
+    def retrieve_match_containers(self, image: str = None) -> List:
+        """
+        Find the containers that match math the image.
+        Args:
+            image: docker image
+        Returns:
+            list of containers
+        """
+        if image is None:
+            image = self.docker_image
+        container_found = find_container_by_image(image, self.include_stopped)
+        container_match = []
+        if len(container_found) > 0:
+            for status, containers in container_found.items():
+                for container in containers:
+                    if self.validate_mount(container):
+                        container_match.append((status, container))
+
+            if len(container_match) == 0:
+                if logger.isEnabledFor(DEBUG):
+                    logger.debug(f"Found container with image {image}, but no one match platform mounts.")
+        else:
+            if logger.isEnabledFor(DEBUG):
+                logger.debug(f"Not found container matching image {image}.")
+
+        return container_match
