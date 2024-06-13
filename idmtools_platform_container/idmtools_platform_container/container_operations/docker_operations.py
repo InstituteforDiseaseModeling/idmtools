@@ -1,3 +1,8 @@
+"""
+Here we implement the ProcessPlatform docker operations.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import docker
 import subprocess
 from typing import List, Dict, NoReturn, Any
@@ -87,14 +92,14 @@ def validate_container_running(platform, **kwargs) -> str:
 
 
 #############################
-## Check containers
+# Check containers
 #############################
 
 def get_container(container_id) -> Any:
     """
     Get the container object by container ID.
     Args:
-        container_id:
+        container_id: container id
     Returns:
         container object
     """
@@ -169,7 +174,7 @@ def stop_all_containers(containers: List) -> NoReturn:
 
 
 #############################
-## Check docker
+# Check docker
 #############################
 
 def is_docker_installed() -> bool:
@@ -220,7 +225,7 @@ def is_docker_daemon_running() -> bool:
 
 
 #############################
-## Check images
+# Check images
 #############################
 
 def check_local_image(image_name: str) -> bool:
@@ -266,7 +271,7 @@ def pull_docker_image(image_name, tag='latest') -> bool:
 
 
 #############################
-## Check bending/mounting
+# Check bending/mounting
 #############################
 def compare_mounts(mounts1: Dict, mounts2: Dict) -> bool:
     """

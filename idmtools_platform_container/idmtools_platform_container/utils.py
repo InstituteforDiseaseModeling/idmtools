@@ -1,3 +1,8 @@
+"""
+Here we implement the ContainerPlatform utils.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import os
 from pathlib import Path
 from typing import Union
