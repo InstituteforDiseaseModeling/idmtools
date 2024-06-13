@@ -95,7 +95,7 @@ class ContainerPlatform(FilePlatform):
 
         if isinstance(item, Experiment):
             if logger.isEnabledFor(DEBUG):
-                logger.debug("Run experiment!")
+                logger.debug("Run experiment on container!")
             self.container_id = self.check_container(**kwargs)
 
             if platform.system() in ["Windows"]:
@@ -105,7 +105,7 @@ class ContainerPlatform(FilePlatform):
 
             # submit the experiment/simulations
             if logger.isEnabledFor(DEBUG):
-                logger.debug(f"Submit experiment/simulations to container: {self.container_id}!")
+                logger.debug(f"Submit experiment/simulations to container: {self.container_id}")
             self.submit_experiment(item, **kwargs)
 
         elif isinstance(item, Simulation):

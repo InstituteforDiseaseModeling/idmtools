@@ -33,7 +33,7 @@ def validate_container_running(platform, **kwargs) -> str:
 
     # Check image exists
     if not check_local_image(platform.docker_image):
-        user_logger.info(f"Image {platform.docker_image} does not exist!, pull the image first.")
+        user_logger.info(f"Image {platform.docker_image} does not exist, pull the image first.")
         succeeded = pull_docker_image(platform.docker_image)
         if not succeeded:
             user_logger.error(f"/!\\ ERROR: Failed to pull image {platform.docker_image}.")
