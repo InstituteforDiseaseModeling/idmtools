@@ -60,7 +60,6 @@ class ContainerPlatform(FilePlatform):
     def container_id(self):  # noqa: F811
         """
         Returns container id.
-
         Returns:
             container id
         """
@@ -70,10 +69,8 @@ class ContainerPlatform(FilePlatform):
     def container_id(self, _id):
         """
         Set the container id property.
-
         Args:
             _id: container id
-
         Returns:
             None
         """
@@ -173,9 +170,9 @@ class ContainerPlatform(FilePlatform):
             subprocess.run(full_command, stdout=subprocess.PIPE)
 
         except subprocess.CalledProcessError as e:
-            print("Error executing command:", e)
+            logger.warning("Error executing command:", e)
         except Exception as ex:
-            print("Error:", ex)
+            logger.warning("Error:", ex)
 
     def submit_experiment(self, experiment: Experiment, **kwargs) -> NoReturn:
         """
@@ -207,9 +204,9 @@ class ContainerPlatform(FilePlatform):
                 logger.debug(f"Result from submit: {result}")
 
         except subprocess.CalledProcessError as e:
-            print("Error executing command:", e)
+            logger.debug("Error executing command:", e)
         except Exception as ex:
-            print("Error:", ex)
+            logger.debug("Error:", ex)
 
     def build_binding_volumes(self) -> dict:
         """

@@ -8,6 +8,8 @@ import subprocess
 from typing import List, Dict, NoReturn, Any
 from logging import getLogger, DEBUG
 from idmtools_platform_container.utils import normalize_path
+from docker.errors import NotFound as ErrorNotFound
+from docker.errors import APIError as DockerAPIError
 
 logger = getLogger(__name__)
 user_logger = getLogger('user')
@@ -109,10 +111,10 @@ def get_container(container_id) -> Any:
         # Retrieve the container
         container = client.containers.get(container_id)
         return container
-    except docker.errors.NotFound:
+    except ErrorNotFound:
         user_logger.debug(f"Container with ID {container_id} not found.")
         return None
-    except docker.errors.APIError as e:
+    except DockerAPIError as e:
         user_logger.debug(f"Error retrieving container with ID {container_id}: {str(e)}")
         return None
 
@@ -155,9 +157,9 @@ def stop_container(container) -> NoReturn:
         container.remove()
         if logger.isEnabledFor(DEBUG):
             logger.debug(f"Container with ID {container.short_id} has been stopped.")
-    except docker.errors.NotFound:
+    except ErrorNotFound:
         logger.debug(f"Container with ID {container.short_id} not found.")
-    except docker.errors.APIError as e:
+    except DockerAPIError as e:
         logger.debug(f"Error stopping container with ID {container.short_id}: {str(e)}")
 
 
@@ -214,7 +216,7 @@ def is_docker_daemon_running() -> bool:
         if logger.isEnabledFor(DEBUG):
             logger.debug("Docker daemon is running.")
         return True
-    except docker.errors.APIError as e:
+    except DockerAPIError as e:
         if logger.isEnabledFor(DEBUG):
             logger.debug("Docker daemon is not running:", e)
         return False
@@ -264,7 +266,7 @@ def pull_docker_image(image_name, tag='latest') -> bool:
         if logger.isEnabledFor(DEBUG):
             logger.debug(f'Successfully pulled {full_image_name}')
         return True
-    except docker.errors.APIError as e:
+    except DockerAPIError as e:
         if logger.isEnabledFor(DEBUG):
             logger.debug(f'Error pulling {full_image_name}: {e}')
         return False

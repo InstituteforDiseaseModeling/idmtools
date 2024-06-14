@@ -12,10 +12,8 @@ import platform as platform
 def normalize_path(path: Union[str, Path]):
     """
     Normalize the binding path to handle case insensitivity and path separators for Windows.
-
     Args:
         path (str): The path to normalize.
-
     Returns:
         str: The normalized path.
     """
@@ -29,15 +27,12 @@ def normalize_path(path: Union[str, Path]):
 def map_container_path(source_binding, destination_binding, source_path):
     """
     Map a source path to its corresponding destination path within the container.
-
     Args:
         source_binding (str): The source directory in the binding (e.g., /abc/my_path).
         destination_binding (str): The destination directory in the container (e.g., /home/my_path).
         source_path (str): The source file or folder path to map (e.g., /abc/my_path/file_or_folder_path).
-
     Returns:
         str: The corresponding destination path within the container (e.g., /home/my_path/file_or_folder_path).
-
     Raises:
         ValueError: If the source path does not start with the source binding path.
     """
