@@ -8,7 +8,7 @@ import docker
 import platform
 import subprocess
 from uuid import uuid4
-from typing import Union, NoReturn, List
+from typing import Union, NoReturn, List, Dict
 from dataclasses import dataclass, field
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
@@ -208,7 +208,7 @@ class ContainerPlatform(FilePlatform):
         except Exception as ex:
             logger.debug("Error:", ex)
 
-    def build_binding_volumes(self) -> dict:
+    def build_binding_volumes(self) -> Dict:
         """
         Build the binding volumes for the container.
         Returns:

@@ -275,7 +275,7 @@ def pull_docker_image(image_name, tag='latest') -> bool:
 #############################
 # Check bending/mounting
 #############################
-def compare_mounts(mounts1: Dict, mounts2: Dict) -> bool:
+def compare_mounts(mounts1: List[Dict], mounts2:List[Dict]) -> bool:
     """
     Compare two sets of mount configurations.
     Args:
