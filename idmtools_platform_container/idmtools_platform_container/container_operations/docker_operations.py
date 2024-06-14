@@ -1,5 +1,5 @@
 """
-Here we implement the ProcessPlatform docker operations.
+Here we implement the ContainerPlatform docker operations.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
