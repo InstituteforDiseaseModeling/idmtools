@@ -162,16 +162,16 @@ def stop_container(container: Union[str, Container], remove: bool = True) -> NoR
         # Stop the container
         container.stop()
         if logger.isEnabledFor(DEBUG):
-            logger.debug(f"Container with ID {container.short_id} has been stopped.")
+            logger.debug(f"Container {str(container)} has been stopped.")
 
         if remove:
             container.remove()
             if logger.isEnabledFor(DEBUG):
-                logger.debug(f"Container with ID {container.short_id} has been removed.")
+                logger.debug(f"Container {str(container)} has been removed.")
     except ErrorNotFound:
-        logger.debug(f"Container with ID {container.short_id} not found.")
+        logger.debug(f"Container {str(container)} not found.")
     except DockerAPIError as e:
-        logger.debug(f"Error stopping container with ID {container.short_id}: {str(e)}")
+        logger.debug(f"Error stopping container {str(container)}: {str(e)}")
 
 
 def stop_all_containers(containers: List[Union[str, Container]], remove: bool = True) -> NoReturn:
