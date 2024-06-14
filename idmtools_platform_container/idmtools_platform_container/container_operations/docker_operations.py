@@ -297,17 +297,17 @@ def compare_mounts(mounts1: List[Dict], mounts2:List[Dict]) -> bool:
     return mounts_set1 == mounts_set2
 
 
-def compare_container_mount(container_id_1: str, container_id_2: str) -> bool:
+def compare_container_mount(container_id1: str, container_id2: str) -> bool:
     """
     Compare the mount configurations of two containers.
     Args:
-        container_id_1: container id
-        container_id_2: container id
+        container_id1: container id
+        container_id2: container id
     Returns:
         True/False
     """
-    container1 = get_container(container_id_1)
-    container2 = get_container(container_id_2)
+    container1 = get_container(container_id1)
+    container2 = get_container(container_id2)
 
     mounts1 = container1.attrs['Mounts']
     mounts2 = container2.attrs['Mounts']
