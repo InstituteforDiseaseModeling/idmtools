@@ -5,9 +5,10 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import docker
 import subprocess
-from typing import List, Dict, NoReturn, Any
+from typing import List, Dict, NoReturn, Any, Union
 from logging import getLogger, DEBUG
 from idmtools_platform_container.utils import normalize_path
+from docker.models.containers import Container
 from docker.errors import NotFound as ErrorNotFound
 from docker.errors import APIError as DockerAPIError
 
@@ -143,36 +144,47 @@ def find_container_by_image(image: str, include_stopped: bool = False) -> Dict:
     return container_found
 
 
-def stop_container(container) -> NoReturn:
+def stop_container(container: Union[str, Container], remove: bool = True) -> NoReturn:
     """
     Stop a container.
     Args:
-        container: a container object to be stopped
+        container: container id  or container object to be stopped
+        remove: bool, if remove the container or not
     Returns:
         No return
     """
     try:
+        if isinstance(container, str):
+            container = get_container(container)
+        elif not isinstance(container, Container):
+            raise TypeError("Invalid container object.")
+
         # Stop the container
         container.stop()
-        container.remove()
         if logger.isEnabledFor(DEBUG):
             logger.debug(f"Container with ID {container.short_id} has been stopped.")
+
+        if remove:
+            container.remove()
+            if logger.isEnabledFor(DEBUG):
+                logger.debug(f"Container with ID {container.short_id} has been removed.")
     except ErrorNotFound:
         logger.debug(f"Container with ID {container.short_id} not found.")
     except DockerAPIError as e:
         logger.debug(f"Error stopping container with ID {container.short_id}: {str(e)}")
 
 
-def stop_all_containers(containers: List) -> NoReturn:
+def stop_all_containers(containers: List[Union[str, Container]], remove: bool = True) -> NoReturn:
     """
     Stop all containers.
     Args:
-        containers: list of containers to be stopped
+        containers: list of container id or containers to be stopped
+        remove: bool, if remove the container or not
     Returns:
         No return
     """
     for container in containers:
-        stop_container(container)
+        stop_container(container, remove=remove)
 
 
 #############################
@@ -275,7 +287,7 @@ def pull_docker_image(image_name, tag='latest') -> bool:
 #############################
 # Check binding/mounting
 #############################
-def compare_mounts(mounts1: List[Dict], mounts2:List[Dict]) -> bool:
+def compare_mounts(mounts1: List[Dict], mounts2: List[Dict]) -> bool:
     """
     Compare two sets of mount configurations.
     Args:
