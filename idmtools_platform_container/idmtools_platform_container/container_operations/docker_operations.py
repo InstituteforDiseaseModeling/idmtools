@@ -1,8 +1,15 @@
+"""
+Here we implement the ContainerPlatform docker operations.
+
+Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+"""
 import docker
 import subprocess
 from typing import List, Dict, NoReturn, Any
 from logging import getLogger, DEBUG
 from idmtools_platform_container.utils import normalize_path
+from docker.errors import NotFound as ErrorNotFound
+from docker.errors import APIError as DockerAPIError
 
 logger = getLogger(__name__)
 user_logger = getLogger('user')
@@ -28,7 +35,7 @@ def validate_container_running(platform, **kwargs) -> str:
 
     # Check image exists
     if not check_local_image(platform.docker_image):
-        user_logger.info(f"Image {platform.docker_image} does not exist!, pull the image first.")
+        user_logger.info(f"Image {platform.docker_image} does not exist, pull the image first.")
         succeeded = pull_docker_image(platform.docker_image)
         if not succeeded:
             user_logger.error(f"/!\\ ERROR: Failed to pull image {platform.docker_image}.")
@@ -87,14 +94,14 @@ def validate_container_running(platform, **kwargs) -> str:
 
 
 #############################
-## Check containers
+# Check containers
 #############################
 
 def get_container(container_id) -> Any:
     """
     Get the container object by container ID.
     Args:
-        container_id:
+        container_id: container id
     Returns:
         container object
     """
@@ -104,10 +111,10 @@ def get_container(container_id) -> Any:
         # Retrieve the container
         container = client.containers.get(container_id)
         return container
-    except docker.errors.NotFound:
+    except ErrorNotFound:
         user_logger.debug(f"Container with ID {container_id} not found.")
         return None
-    except docker.errors.APIError as e:
+    except DockerAPIError as e:
         user_logger.debug(f"Error retrieving container with ID {container_id}: {str(e)}")
         return None
 
@@ -150,9 +157,9 @@ def stop_container(container) -> NoReturn:
         container.remove()
         if logger.isEnabledFor(DEBUG):
             logger.debug(f"Container with ID {container.short_id} has been stopped.")
-    except docker.errors.NotFound:
+    except ErrorNotFound:
         logger.debug(f"Container with ID {container.short_id} not found.")
-    except docker.errors.APIError as e:
+    except DockerAPIError as e:
         logger.debug(f"Error stopping container with ID {container.short_id}: {str(e)}")
 
 
@@ -169,7 +176,7 @@ def stop_all_containers(containers: List) -> NoReturn:
 
 
 #############################
-## Check docker
+# Check docker
 #############################
 
 def is_docker_installed() -> bool:
@@ -209,7 +216,7 @@ def is_docker_daemon_running() -> bool:
         if logger.isEnabledFor(DEBUG):
             logger.debug("Docker daemon is running.")
         return True
-    except docker.errors.APIError as e:
+    except DockerAPIError as e:
         if logger.isEnabledFor(DEBUG):
             logger.debug("Docker daemon is not running:", e)
         return False
@@ -220,7 +227,7 @@ def is_docker_daemon_running() -> bool:
 
 
 #############################
-## Check images
+# Check images
 #############################
 
 def check_local_image(image_name: str) -> bool:
@@ -259,16 +266,16 @@ def pull_docker_image(image_name, tag='latest') -> bool:
         if logger.isEnabledFor(DEBUG):
             logger.debug(f'Successfully pulled {full_image_name}')
         return True
-    except docker.errors.APIError as e:
+    except DockerAPIError as e:
         if logger.isEnabledFor(DEBUG):
             logger.debug(f'Error pulling {full_image_name}: {e}')
         return False
 
 
 #############################
-## Check bending/mounting
+# Check binding/mounting
 #############################
-def compare_mounts(mounts1: Dict, mounts2: Dict) -> bool:
+def compare_mounts(mounts1: List[Dict], mounts2:List[Dict]) -> bool:
     """
     Compare two sets of mount configurations.
     Args:
@@ -290,17 +297,17 @@ def compare_mounts(mounts1: Dict, mounts2: Dict) -> bool:
     return mounts_set1 == mounts_set2
 
 
-def compare_container_mount(container_id_1: str, container_id_2: str) -> bool:
+def compare_container_mount(container_id1: str, container_id2: str) -> bool:
     """
     Compare the mount configurations of two containers.
     Args:
-        container_id_1: container id
-        container_id_2: container id
+        container_id1: container id
+        container_id2: container id
     Returns:
         True/False
     """
-    container1 = get_container(container_id_1)
-    container2 = get_container(container_id_2)
+    container1 = get_container(container_id1)
+    container2 = get_container(container_id2)
 
     mounts1 = container1.attrs['Mounts']
     mounts2 = container2.attrs['Mounts']

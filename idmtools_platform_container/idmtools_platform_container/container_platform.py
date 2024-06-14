@@ -8,7 +8,7 @@ import docker
 import platform
 import subprocess
 from uuid import uuid4
-from typing import Union, NoReturn, List
+from typing import Union, NoReturn, List, Dict
 from dataclasses import dataclass, field
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
@@ -60,7 +60,6 @@ class ContainerPlatform(FilePlatform):
     def container_id(self):  # noqa: F811
         """
         Returns container id.
-
         Returns:
             container id
         """
@@ -70,10 +69,8 @@ class ContainerPlatform(FilePlatform):
     def container_id(self, _id):
         """
         Set the container id property.
-
         Args:
             _id: container id
-
         Returns:
             None
         """
@@ -95,7 +92,7 @@ class ContainerPlatform(FilePlatform):
 
         if isinstance(item, Experiment):
             if logger.isEnabledFor(DEBUG):
-                logger.debug("Run experiment!")
+                logger.debug("Run experiment on container!")
             self.container_id = self.check_container(**kwargs)
 
             if platform.system() in ["Windows"]:
@@ -105,7 +102,7 @@ class ContainerPlatform(FilePlatform):
 
             # submit the experiment/simulations
             if logger.isEnabledFor(DEBUG):
-                logger.debug(f"Submit experiment/simulations to container: {self.container_id}!")
+                logger.debug(f"Submit experiment/simulations to container: {self.container_id}")
             self.submit_experiment(item, **kwargs)
 
         elif isinstance(item, Simulation):
@@ -173,9 +170,9 @@ class ContainerPlatform(FilePlatform):
             subprocess.run(full_command, stdout=subprocess.PIPE)
 
         except subprocess.CalledProcessError as e:
-            print("Error executing command:", e)
+            logger.warning("Error executing command:", e)
         except Exception as ex:
-            print("Error:", ex)
+            logger.warning("Error:", ex)
 
     def submit_experiment(self, experiment: Experiment, **kwargs) -> NoReturn:
         """
@@ -207,11 +204,11 @@ class ContainerPlatform(FilePlatform):
                 logger.debug(f"Result from submit: {result}")
 
         except subprocess.CalledProcessError as e:
-            print("Error executing command:", e)
+            logger.debug("Error executing command:", e)
         except Exception as ex:
-            print("Error:", ex)
+            logger.debug("Error:", ex)
 
-    def build_binding_volumes(self) -> dict:
+    def build_binding_volumes(self) -> Dict:
         """
         Build the binding volumes for the container.
         Returns:
