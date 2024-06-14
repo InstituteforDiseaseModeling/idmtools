@@ -273,7 +273,7 @@ def pull_docker_image(image_name, tag='latest') -> bool:
 
 
 #############################
-# Check bending/mounting
+# Check binding/mounting
 #############################
 def compare_mounts(mounts1: List[Dict], mounts2:List[Dict]) -> bool:
     """
