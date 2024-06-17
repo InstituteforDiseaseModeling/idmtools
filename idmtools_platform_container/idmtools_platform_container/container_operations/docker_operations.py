@@ -50,7 +50,7 @@ def validate_container_running(platform, **kwargs) -> str:
 
     # Check containers
     container_id = None
-    container_match = platform.retrieve_match_containers(**kwargs)
+    container_match = platform.retrieve_match_containers()
     container_running = [container for status, container in container_match if status == 'running']
     container_stopped = [container for status, container in container_match if status != 'running']
 
