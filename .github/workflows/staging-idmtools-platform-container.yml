@@ -12,9 +12,10 @@ on:
       - 'idmtools_core/**'
       - 'idmtools_platform_container/**'
       - 'idmtools_platform_general/**'
+  workflow_dispatch:
 
 jobs:
-  deploy-comps-staging:
+  deploy-container-staging:
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, 'Bump version: ')"
     steps:
