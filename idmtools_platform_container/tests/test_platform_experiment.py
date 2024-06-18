@@ -152,7 +152,7 @@ class TestPlatformExperiment(unittest.TestCase):
             # clean up
             delete_container_by_name(platform2.container_id)
 
-    def test_platform_with_for_start(self):
+    def test_platform_with_force_start(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             # first create experiment with new_container=True
             platform1 = Platform("Container", job_directory=temp_dir, new_container=True)

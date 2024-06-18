@@ -1,7 +1,5 @@
-# Simple python simulation running native slurm cluster. This example is to run python script(model3.py) in slurm cluster
-# which doing simple add() caculation function with 2 sweep parameters as add(a,b)=a+b). The function result will be
-# printed to stdout.txt file and output/result.txt file in each simulation folder.
-# Path for simulation in cluster machine: /home/username/example/suite_id/experiment_id/simulation_id
+# Here's a simple Python example that runs inside a local Docker container using the idmtools_platform_container package.
+
 import os
 import sys
 from functools import partial
@@ -17,9 +15,9 @@ from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 
 from idmtools_test import COMMON_INPUT_PATH
 
-# job dir should be /home/username/example
+# job dir is where the experiment will be run.
 # job_directory = os.path.join(os.path.expanduser('~'), "example")
-# Define Slurm Platform. Note, this code can only run in slurm cluster.
+# Define Container Platform. For full list of parameters see container_platform.py in idmtools_platform_container
 platform = Platform('CONTAINER', job_directory="DEST")
 
 #Define our base task. Normally, you want to do set any assets/configurations you want across the
@@ -71,7 +69,7 @@ ts.add_builder(builder)
 experiment = Experiment.from_template(ts, name="python example")
 # Add our own custom tag to experiment
 experiment.tags["tag1"] = 1
-# And all files from dir at COMMON_INPUT_PATH/python/Assets folder to experiment folder
+# And all files from dir at ../python_model/python/Assets folder to experiment folder
 experiment.assets.add_directory(assets_directory=os.path.join("..", "python_model", "inputs", "python", "Assets"))
 
 # Create suite
