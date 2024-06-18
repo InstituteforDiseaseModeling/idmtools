@@ -66,6 +66,6 @@ with Platform('CALCULON') as platform:
     # create experiment
     e = Experiment.from_template(ts, name=os.path.split(sys.argv[0])[1], tags=dict(tag1=1))
     # run experiment with scheduling
-    e.run(wait_until_done=True, scheduling=True)
+    e.run(wait_until_done=True)
     # use system status as the exit code
     sys.exit(0 if e.succeeded else -1)

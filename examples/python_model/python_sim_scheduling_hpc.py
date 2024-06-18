@@ -80,6 +80,6 @@ with Platform('IDMCloud') as platform:
     # the order of precedence is WorkOrder.json > Platform() > idmtools.ini
     # with experiment.run method, you can also passin other options like 'priority=Highest' here to override any
     # priority value either passed in from idmtools.ini or defined in Platform(**kwargs)
-    experiment.run(True, scheduling=True, priority='Highest')
+    experiment.run(True, priority='Highest')
     # use system status as the exit code
     sys.exit(0 if experiment.succeeded else -1)

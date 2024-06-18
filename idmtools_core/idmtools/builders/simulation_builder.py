@@ -9,7 +9,7 @@ import pandas as pd
 from functools import partial
 from inspect import signature
 from itertools import product
-from typing import Callable, Any, Iterable, Union, Dict, Sized
+from typing import Callable, Any, Iterable, Union, Dict, Sized, NoReturn
 from idmtools.entities.simulation import Simulation
 from idmtools.utils.collections import duplicate_list_of_generators
 
@@ -51,6 +51,11 @@ class SimulationBuilder:
 
     @property
     def count(self):
+        """
+        Get the count property.
+        Returns:
+            count
+        """
         return self.__count
 
     @count.setter
@@ -177,7 +182,16 @@ class SimulationBuilder:
                                 name != self.SIMULATION_ATTR}
         return remaining_parameters
 
-    def case_args_tuple(self, function: TSweepFunction, remaining_parameters, values):
+    def case_args_tuple(self, function: TSweepFunction, remaining_parameters, values) -> NoReturn:
+        """
+        Handle the case where the values are passed as a tuple.
+        Args:
+            function: sweep function
+            remaining_parameters: parameters
+            values: values
+        Returns:
+            No return
+        """
         # this is len(values) > 0 case
         required_params = self._extract_required_parameters(remaining_parameters)
         _values = [self._validate_value(vals) for vals in values]
@@ -219,7 +233,16 @@ class SimulationBuilder:
 
         self.count = np.prod(list(map(len, _values)))
 
-    def case_kwargs(self, function: TSweepFunction, remaining_parameters, values):
+    def case_kwargs(self, function: TSweepFunction, remaining_parameters, values) -> NoReturn:
+        """
+        Handle the case where the values are passed as a dictionary.
+        Args:
+            function: sweep function
+            remaining_parameters: parameters
+            values: values
+        Returns:
+            No return
+        """
         required_params = self._extract_required_parameters(remaining_parameters)
         extra_inputs = list(set(values) - set(remaining_parameters))
         if len(extra_inputs) > 0:
@@ -286,6 +309,7 @@ class SimulationBuilder:
         Args:
             parameters: Parameters
             value_set: List of values that should be sent to parameter in calls
+            remainder: Remainder
         Returns:
             Dictionary to map our call to our callbacks
         """
