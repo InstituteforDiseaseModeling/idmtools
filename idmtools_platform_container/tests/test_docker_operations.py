@@ -1,4 +1,3 @@
-import os
 import subprocess
 import unittest
 from docker.models.containers import Container
@@ -10,7 +9,8 @@ from docker.errors import NotFound, APIError
 from idmtools_platform_container.container_operations.docker_operations import stop_container, stop_all_containers, \
     validate_container_running, \
     get_container, pull_docker_image, is_docker_daemon_running, check_local_image, find_container_by_image, \
-    is_docker_installed, compare_mounts, compare_container_mount
+    is_docker_installed, compare_mounts, compare_container_mount, sort_containers_by_start
+from idmtools_platform_container.container_platform import ContainerPlatform
 
 
 class TestDockerOperations(unittest.TestCase):
@@ -20,76 +20,96 @@ class TestDockerOperations(unittest.TestCase):
     @patch('idmtools_platform_container.container_operations.docker_operations.check_local_image')
     @patch('idmtools_platform_container.container_operations.docker_operations.pull_docker_image')
     @patch('idmtools_platform_container.container_operations.docker_operations.stop_all_containers')
-    @patch('idmtools_platform_container.container_operations.docker_operations.get_container')
+    @patch('idmtools_platform_container.container_operations.docker_operations.sort_containers_by_start')
+    @patch('idmtools_platform_container.container_platform.ContainerPlatform.retrieve_match_containers')
     @patch('idmtools_platform_container.container_operations.docker_operations.logger')
-    def test_validate_container_running(self, mock_logger, mock_get_container, mock_stop_all_containers,
+    def test_validate_container_running(self, mock_logger, mock_retrieve_match_containers,
+                                        mock_sort_containers_by_start, mock_stop_all_containers,
                                         mock_pull_docker_image, mock_check_local_image, mock_is_docker_daemon_running,
                                         mock_is_docker_installed):
-        with(self.subTest("test_with_running_container")):
-            platform = MagicMock()
-            platform.docker_image = 'test_image'
-            platform.force_start = False
-            platform.new_container = False
-            platform.include_stopped = False
-            mock_is_docker_installed.return_value = True
-            mock_is_docker_daemon_running.return_value = True
-            mock_check_local_image.return_value = True
-            mock_pull_docker_image.return_value = True
-            mock_get_container.return_value = 'new_container_id'
-            platform.retrieve_match_containers.return_value = [('running', mock_get_container)]
-            # Calling ensure_docker_daemon_running function
+        platform = MagicMock(spec=ContainerPlatform)
+        platform.docker_image = 'test_image'
+        platform.force_start = False
+        platform.new_container = False
+        platform.include_stopped = False
+        platform.container_prefix = None
+        mock_is_docker_installed.return_value = True
+        mock_is_docker_daemon_running.return_value = True
+        mock_check_local_image.return_value = True
+        mock_pull_docker_image.return_value = True
+        with (self.subTest("test_with_running_container")):
+            mock_container1 = MagicMock(short_id='test_container_id1')
+            mock_container2 = MagicMock(short_id='test_container_id2')
+            mock_container3 = MagicMock(short_id='test_container_id3')
+            mock_retrieve_match_containers.return_value = [('running', mock_container1),
+                                                           ('running', mock_container2),
+                                                           ('stopped', mock_container3)]
+            mock_sort_containers_by_start.return_value = [mock_container2,
+                                                          mock_container1]  # assume container2 is the latest
+            platform.retrieve_match_containers.return_value = mock_retrieve_match_containers.return_value
             result = validate_container_running(platform)
-            self.assertEqual(result, mock_get_container.short_id)
+            self.assertEqual(result, mock_container2.short_id)
+            mock_logger.debug.assert_called_with(f"Pick running container {mock_container2.short_id}.")
 
-        with(self.subTest("test_with_stopped_container")):
-            platform = MagicMock()
-            platform.docker_image = 'test_image'
-            platform.force_start = False
-            platform.new_container = False
-            platform.include_stopped = False
-            mock_is_docker_installed.return_value = True
-            mock_is_docker_daemon_running.return_value = True
-            mock_check_local_image.return_value = True
-            mock_pull_docker_image.return_value = True
-            mock_get_container.return_value = 'new_container_id'
-            platform.retrieve_match_containers.return_value = [('exited', mock_get_container)]
-            # Calling ensure_docker_daemon_running function
+        with (self.subTest("test_with_stopped_container")):
+            mock_container1 = MagicMock(short_id='test_container_id1')
+            mock_container2 = MagicMock(short_id='test_container_id2')
+            mock_retrieve_match_containers.return_value = [('exited', mock_container1),
+                                                           ('stopped', mock_container2)]
+            mock_sort_containers_by_start.return_value = [mock_container2,
+                                                          mock_container1]  # assume container2 is the latest
+            platform.retrieve_match_containers.return_value = mock_retrieve_match_containers.return_value
             result = validate_container_running(platform)
-            self.assertEqual(result, mock_get_container.short_id)
+            self.assertEqual(result, mock_container2.short_id)
+            mock_logger.debug.assert_called_with(f"Pick and restart the stopped container {mock_container2.short_id}.")
 
-        with(self.subTest("test_with_no_container_start_new_container")):
-            platform = MagicMock()
-            platform.docker_image = 'test_image'
-            platform.force_start = False
-            platform.new_container = False
-            platform.include_stopped = False
+        with (self.subTest("test_with_no_container_start_new_container")):
             platform.retrieve_match_containers.return_value = []
-            mock_is_docker_installed.return_value = True
-            mock_is_docker_daemon_running.return_value = True
-            mock_check_local_image.return_value = True
-            mock_pull_docker_image.return_value = True
-            mock_get_container.return_value = 'new_container_id'
+            mock_sort_containers_by_start.return_value = []
             platform.start_container.return_value = 'new_start_container_id'
-            # Calling ensure_docker_daemon_running function
             result = validate_container_running(platform)
             self.assertEqual(result, 'new_start_container_id')
+            mock_logger.debug.call_args_list[0].assert_called_with(f"Start container: {platform.docker_image}.")
+            mock_logger.debug.call_args_list[1].assert_called_with(f"New container ID: new_start_container_id.")
 
-        with(self.subTest("test_with_running_container_force_start")):
-            platform = MagicMock()
-            platform.docker_image = 'test_image'
+        with (self.subTest("test_with_running_container_force_start")):
             platform.force_start = True
-            platform.new_container = False
-            platform.include_stopped = False
-            mock_is_docker_installed.return_value = True
-            mock_is_docker_daemon_running.return_value = True
-            mock_check_local_image.return_value = True
-            mock_pull_docker_image.return_value = True
-            mock_get_container.return_value = 'new_container_id'
-            platform.retrieve_match_containers.return_value = [('running', mock_get_container)]
-            platform.start_container.return_value = 'new_start_container_short_id'
-            # Calling ensure_docker_daemon_running function
+            mock_container = MagicMock(short_id='test_container_id')
+            platform.retrieve_match_containers.return_value = [('running', mock_container)]
+            platform.start_container.return_value = 'new_container_id'
             result = validate_container_running(platform)
-            self.assertEqual(result, 'new_start_container_short_id')
+            self.assertEqual(result, 'new_container_id')
+            mock_logger.debug.call_args_list[0].assert_called_with(f"Start container: {platform.docker_image}.")
+            mock_logger.debug.call_args_list[1].assert_called_with(f"New container ID: new_container_id.")
+        with (self.subTest("test_with_docker_not_installed")):
+            mock_is_docker_installed.return_value = False
+            with patch(
+                    'idmtools_platform_container.container_operations.docker_operations.user_logger') as mock_user_logger:
+                with self.assertRaises(SystemExit) as ex:
+                    validate_container_running(platform)
+                    mock_user_logger.error.assert_called_with("Docker is not installed.")
+        mock_is_docker_installed.return_value = True  # reset to true from previous subtest
+        with (self.subTest("test_with_is_docker_daemon_running")):
+            with patch(
+                    'idmtools_platform_container.container_operations.docker_operations.user_logger') as mock_user_logger:
+                mock_is_docker_daemon_running.return_value = False
+                with self.assertRaises(SystemExit) as cm:
+                    validate_container_running(platform)
+                mock_user_logger.error.assert_called_once_with("Docker daemon is not running.")
+                self.assertEqual(cm.exception.code, -1)
+        mock_is_docker_daemon_running.return_value = True  # reset to true from previous subtest
+        with (self.subTest("test_with_failed_check_local_image_and_failed_pull_image")):
+            with patch(
+                    'idmtools_platform_container.container_operations.docker_operations.user_logger') as mock_user_logger:
+                mock_check_local_image.return_value = False
+                mock_pull_docker_image.return_value = False
+                with self.assertRaises(SystemExit) as cm:
+                    validate_container_running(platform)
+                mock_user_logger.info.assert_called_once_with(
+                    f"Image {platform.docker_image} does not exist, pull the image first.")
+                mock_user_logger.error.assert_called_once_with(
+                    f"/!\\ ERROR: Failed to pull image {platform.docker_image}.")
+                self.assertEqual(cm.exception.code, -1)
 
     @patch('docker.from_env')
     @patch('idmtools_platform_container.container_operations.docker_operations.user_logger')
@@ -245,7 +265,7 @@ class TestDockerOperations(unittest.TestCase):
             self.assertEqual(mock_docker.call_count, 2)
             self.assertEqual(mock_client.ping.call_count, 2)
             self.assertFalse(result)
-            mock_logger.debug.assert_called_with("Error checking Docker daemon:", mock_client.ping.side_effect)
+            mock_logger.debug.assert_called_with(f"Error checking Docker daemon: {mock_client.ping.side_effect}")
 
         # Test docker daemon running with APIError
         mock_logger.reset_mock()
@@ -256,7 +276,7 @@ class TestDockerOperations(unittest.TestCase):
             self.assertEqual(mock_docker.call_count, 3)
             self.assertEqual(mock_client.ping.call_count, 3)
             self.assertFalse(result)
-            mock_logger.debug.assert_called_with("Docker daemon is not running:", mock_client.ping.side_effect)
+            mock_logger.debug.assert_called_with(f"Docker daemon is not running: {mock_client.ping.side_effect}")
 
     @patch('docker.from_env')
     def test_check_local_image(self, mock_docker):
@@ -479,6 +499,20 @@ class TestDockerOperations(unittest.TestCase):
             mock_container1.stop.assert_called_once()
             mock_container2.stop.assert_called_once()
 
+    def test_sort_containers_by_start(self):
+        # Create mock containers with different 'StartedAt' times
+        mock_container1 = MagicMock(spec=Container)
+        mock_container1.attrs = {'State': {'StartedAt': '2024-01-01T00:00:00.000000Z'}}
+        mock_container2 = MagicMock(spec=Container)
+        mock_container2.attrs = {'State': {'StartedAt': '2024-01-02T00:00:00.000000Z'}}
+        mock_container3 = MagicMock(spec=Container)
+        mock_container3.attrs = {'State': {'StartedAt': '2024-01-03T00:00:00.000000Z'}}
+
+        # Call sort_containers_by_start with the mock containers
+        sorted_containers = sort_containers_by_start([mock_container1, mock_container2, mock_container3])
+
+        # Check if the containers are sorted in the correct order
+        self.assertEqual(sorted_containers, [mock_container3, mock_container2, mock_container1])
 
 if __name__ == '__main__':
     unittest.main()

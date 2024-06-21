@@ -62,7 +62,7 @@ class TestContainerPlatform(unittest.TestCase):
             mock_item.id = "test_container_id"
             container_platform = ContainerPlatform(job_directory="DEST")
             container_platform.submit_job(mock_item, dry_run=True)
-            mock_user_logger.info.assert_called_with(f"Dry run: test_container_id")
+            mock_user_logger.info.assert_called_with(f"\nDry run: True")
 
     @patch('docker.from_env')
     def test_start_container(self, mock_docker):
