@@ -87,7 +87,7 @@ class ContainerPlatform(FilePlatform):
             Any
         """
         if dry_run:
-            user_logger.info(f'Dry run: {item.id}')
+            user_logger.info(f'\nDry run: {dry_run}')
             return
 
         if isinstance(item, Experiment):
@@ -170,9 +170,9 @@ class ContainerPlatform(FilePlatform):
             subprocess.run(full_command, stdout=subprocess.PIPE)
 
         except subprocess.CalledProcessError as e:
-            logger.warning("Error executing command:", e)
+            logger.warning(f"Error executing command: {e}")
         except Exception as ex:
-            logger.warning("Error:", ex)
+            logger.warning(f"Error: {ex}")
 
     def submit_experiment(self, experiment: Experiment, **kwargs) -> NoReturn:
         """
@@ -204,9 +204,9 @@ class ContainerPlatform(FilePlatform):
                 logger.debug(f"Result from submit: {result}")
 
         except subprocess.CalledProcessError as e:
-            logger.debug("Error executing command:", e)
+            logger.debug(f"Error executing command: {e}")
         except Exception as ex:
-            logger.debug("Error:", ex)
+            logger.debug(f"Error: {ex}")
 
     def build_binding_volumes(self) -> Dict:
         """

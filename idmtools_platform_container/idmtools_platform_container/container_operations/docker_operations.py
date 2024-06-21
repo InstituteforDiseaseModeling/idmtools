@@ -7,7 +7,7 @@ import docker
 import subprocess
 from typing import List, Dict, NoReturn, Any, Union
 from logging import getLogger, DEBUG
-from idmtools_platform_container.utils import normalize_path
+from idmtools_platform_container.utils import normalize_path, parse_iso8601
 from docker.models.containers import Container
 from docker.errors import NotFound as ErrorNotFound
 from docker.errors import APIError as DockerAPIError
@@ -29,9 +29,11 @@ def validate_container_running(platform, **kwargs) -> str:
         container id
     """
     if not is_docker_installed():
+        user_logger.error("Docker is not installed.")
         exit(-1)
 
     if not is_docker_daemon_running():
+        user_logger.error("Docker daemon is not running.")
         exit(-1)
 
     # Check image exists
@@ -64,25 +66,23 @@ def validate_container_running(platform, **kwargs) -> str:
             logger.debug(f"Stop all running containers {container_running}")
         stop_all_containers(container_running)
         container_running = []
-
-        if logger.isEnabledFor(DEBUG) and len(container_stopped) > 0 and platform.include_stopped:
-            logger.debug(f"Stop all stopped containers {container_stopped}")
-        stop_all_containers(container_stopped)
         container_stopped = []
 
-    if not platform.new_container:
+    if not platform.new_container and platform.container_prefix is None:
         if len(container_running) > 0:
             # Pick up the first running container
+            container_running = sort_containers_by_start(container_running)
             container_id = container_running[0].short_id
             if logger.isEnabledFor(DEBUG):
                 logger.debug(f"Pick running container {container_id}.")
         elif len(container_stopped) > 0:
             # Pick up the first stopped container and then restart it
+            container_stopped = sort_containers_by_start(container_stopped)
             container = container_stopped[0]
             container.restart()
             container_id = container.short_id
             if logger.isEnabledFor(DEBUG):
-                logger.debug(f"Pick and restart the stopped container {container_stopped[0].short_id}.")
+                logger.debug(f"Pick and restart the stopped container {container.short_id}.")
 
     # Start the container
     if container_id is None:
@@ -187,6 +187,26 @@ def stop_all_containers(containers: List[Union[str, Container]], remove: bool = 
         stop_container(container, remove=remove)
 
 
+def sort_containers_by_start(containers: List[Container], reverse: bool = True) -> List[Container]:
+    """
+    Sort the containers by the start time.
+    Args:
+        containers: list of containers
+        reverse: bool, if sort in reverse order
+    Returns:
+        sorted list of containers
+    """
+
+    # Sort containers by 'StartedAt' in descending order
+    sorted_container_list = sorted(
+        containers,
+        key=lambda container: parse_iso8601(container.attrs['State']['StartedAt']),
+        reverse=reverse
+    )
+
+    return sorted_container_list
+
+
 #############################
 # Check docker
 #############################
@@ -230,11 +250,11 @@ def is_docker_daemon_running() -> bool:
         return True
     except DockerAPIError as e:
         if logger.isEnabledFor(DEBUG):
-            logger.debug("Docker daemon is not running:", e)
+            logger.debug(f"Docker daemon is not running: {e}")
         return False
     except Exception as ex:
         if logger.isEnabledFor(DEBUG):
-            logger.debug("Error checking Docker daemon:", ex)
+            logger.debug(f"Error checking Docker daemon: {ex}")
         return False
 
 
