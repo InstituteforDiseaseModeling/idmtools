@@ -66,6 +66,10 @@ def validate_container_running(platform, **kwargs) -> str:
             logger.debug(f"Stop all running containers {container_running}")
         stop_all_containers(container_running)
         container_running = []
+
+        if logger.isEnabledFor(DEBUG) and len(container_stopped) > 0 and platform.include_stopped:
+            logger.debug(f"Stop all stopped containers {container_stopped}")
+        stop_all_containers(container_stopped)
         container_stopped = []
 
     if not platform.new_container and platform.container_prefix is None:
