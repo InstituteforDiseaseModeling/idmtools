@@ -180,6 +180,21 @@ class TestPlatformExperiment(unittest.TestCase):
             delete_container_by_name(platform2.container_id)
             self.assertEqual(get_container_status_by_id(platform2.container_id), None)
 
+    def test_platform_with_symlink_true(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            # first create experiment with sym_link=True
+            platform = Platform("Container", job_directory=temp_dir, sym_link=True)
+            command = "ls -lat"
+            task = CommandTask(command=command)
+            experiment = Experiment.from_task(task, name="run_command")
+            experiment.run(wait_until_done=True)
+            self.assertEqual(experiment.status, EntityStatus.SUCCEEDED)
+            exp_assets_path = Path(platform.get_directory(experiment), 'Assets')
+            sim_assets_path = Path(platform.get_directory(experiment.simulations[0]), 'Assets')
+            # Make sure experiment and simulations Assets dirs are not symlink
+            self.assertEqual(os.path.islink(exp_assets_path), False)
+            self.assertEqual(os.path.islink(sim_assets_path), False)
+
     # def test_delete_container_by_image_prefix(self):
     #     delete_containers_by_image_prefix("docker-production-public.packages.idmod.org/idmtools/container-test")
 
