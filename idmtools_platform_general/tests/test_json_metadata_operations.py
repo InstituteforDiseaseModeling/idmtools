@@ -56,6 +56,7 @@ class JSONMetadataOperationsTest(unittest.TestCase):
         expected_meta.update({"_uid": sim.id})
         expected_meta.update({"uid": sim.id})
         expected_meta.update({"id": sim.id})
+        expected_meta.update({"dir": str(Path(f"{self.metadata_root}/{_[0].id}/{sim.parent_id}/{sim.id}"))})
         self.assertDictEqual(expected_meta, metadata)
 
     # test get meta for experiment
@@ -64,13 +65,14 @@ class JSONMetadataOperationsTest(unittest.TestCase):
         exp = experiments[1]
         metadata = self.op.get(item=exp)
         expected_meta = {'platform_id': None, 'status': 'CREATED', 'tags': {}, 'item_type': 'Experiment', 'name': None,
-                         'assets': [], 'suite_id': None, 'task_type': 'idmtools.entities.command_task.CommandTask',
+                         'assets': [], 'suite_id': suites[0].id, 'task_type': 'idmtools.entities.command_task.CommandTask',
                          'platform_requirements': None, 'frozen': False, 'gather_common_assets_from_task': True,
                          'parent_id': suites[0].id, 'disable_default_pre_create': False}
         expected_meta.update({"parent_id": suites[0].id})
         expected_meta.update({"_uid": exp.id})
         expected_meta.update({"uid": exp.id})
         expected_meta.update({"id": exp.id})
+        expected_meta.update({"dir": str(Path(f"{self.metadata_root}/{suites[0].id}/{exp.id}"))})
         self.assertDictEqual(expected_meta, metadata)
 
     # test get meta for suite
@@ -91,6 +93,7 @@ class JSONMetadataOperationsTest(unittest.TestCase):
         expected_suite_meta.update({"_uid": suite.id})
         expected_suite_meta.update({"uid": suite.id})
         expected_suite_meta.update({"id": suite.id})
+        expected_suite_meta.update({"dir": str(Path(f"{self.metadata_root}/{suites[0].id}"))})
         self.assertDictEqual(expected_suite_meta, metadata)
 
     # test load with no meta_data file
