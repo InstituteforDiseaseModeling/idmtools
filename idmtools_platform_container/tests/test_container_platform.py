@@ -1,4 +1,5 @@
 import os
+import shutil
 import sys
 import tempfile
 import unittest
@@ -12,6 +13,10 @@ from idmtools_platform_container.container_platform import ContainerPlatform
 
 
 class TestContainerPlatform(unittest.TestCase):
+    @classmethod
+    def tearDownClass(cls) -> None:
+        shutil.rmtree(os.path.join(os.path.dirname(os.path.abspath(__file__)), "DEST"))
+
     @patch('idmtools_platform_container.container_platform.ContainerPlatform.check_container')
     @patch('idmtools_platform_container.container_platform.ContainerPlatform.convert_scripts_to_linux')
     @patch('idmtools_platform_container.container_platform.ContainerPlatform.submit_experiment')

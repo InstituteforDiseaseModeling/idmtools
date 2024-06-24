@@ -194,6 +194,19 @@ class TestPlatformExperiment(unittest.TestCase):
             # Make sure experiment and simulations Assets dirs are not symlink
             self.assertEqual(os.path.islink(exp_assets_path), False)
             self.assertEqual(os.path.islink(sim_assets_path), False)
+            # clean up
+            delete_container_by_name(platform.container_id)
+
+    @patch('idmtools_platform_container.container_platform.user_logger')
+    def test_platform_with_dryrun_true(self, mock_user_logger):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            platform = Platform("Container", job_directory=temp_dir)
+            command = "ls -lat"
+            task = CommandTask(command=command)
+            experiment = Experiment.from_task(task, name="run_command")
+            experiment.run(wait_until_done=False, dry_run=True)
+            self.assertEqual(experiment.status, EntityStatus.CREATED)
+            mock_user_logger.info.assert_called_with(f"\nDry run: True")
 
     # def test_delete_container_by_image_prefix(self):
     #     delete_containers_by_image_prefix("docker-production-public.packages.idmod.org/idmtools/container-test")
