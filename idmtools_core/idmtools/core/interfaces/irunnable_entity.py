@@ -108,6 +108,9 @@ class IRunnableEntity(IEntity, metaclass=ABCMeta):
                           DeprecationWarning, 2)
             user_logger.warning("wait_on_done will be deprecated soon. Please use wait_until_done instead.")
         p.run_items(self, wait_on_done_progress=wait_on_done_progress, **run_opts)
+        dry_run = run_opts.get('dry_run', False)
+        if dry_run:
+            return
         if wait_until_done or run_opts.get('wait_on_done', False):
             self.wait(wait_on_done_progress=wait_on_done_progress, platform=p)
 
