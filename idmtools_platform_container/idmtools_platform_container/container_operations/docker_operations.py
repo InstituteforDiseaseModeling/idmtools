@@ -200,7 +200,6 @@ def sort_containers_by_start(containers: List[Container], reverse: bool = True) 
     Returns:
         sorted list of containers
     """
-
     # Sort containers by 'StartedAt' in descending order
     sorted_container_list = sorted(
         containers,
