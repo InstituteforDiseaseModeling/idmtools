@@ -170,9 +170,9 @@ class ContainerPlatform(FilePlatform):
             subprocess.run(full_command, stdout=subprocess.PIPE)
 
         except subprocess.CalledProcessError as e:
-            logger.warning(f"Error executing command: {e}")
+            user_logger.warning(f"Failed to convert script: {e}")
         except Exception as ex:
-            logger.warning(f"Error: {ex}")
+            user_logger.warning(f"Failed to convert script to Linux: {ex}")
 
     def submit_experiment(self, experiment: Experiment, **kwargs) -> NoReturn:
         """
