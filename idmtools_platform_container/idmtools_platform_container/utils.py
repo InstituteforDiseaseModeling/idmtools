@@ -25,7 +25,7 @@ def normalize_path(path: Union[str, Path]):
     return path.rstrip('/')
 
 
-def map_container_path(source_binding, destination_binding, source_path):
+def map_container_path(source_binding, destination_binding, source_path) -> str:
     """
     Map a source path to its corresponding destination path within the container.
     Args:
@@ -34,6 +34,7 @@ def map_container_path(source_binding, destination_binding, source_path):
         source_path (str): The source file or folder path to map (e.g., /abc/my_path/file_or_folder_path).
     Returns:
         str: The corresponding destination path within the container (e.g., /home/my_path/file_or_folder_path).
+
     Raises:
         ValueError: If the source path does not start with the source binding path.
     """

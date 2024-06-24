@@ -3,7 +3,6 @@ Here we implement the ContainerPlatform experiment operations.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
-import os
 from dataclasses import dataclass
 from idmtools.entities.experiment import Experiment
 from idmtools_platform_container.utils import normalize_path
