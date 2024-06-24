@@ -6,12 +6,15 @@ import unittest
 from subprocess import CalledProcessError
 from unittest.mock import patch, MagicMock
 
+import pytest
+
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools_platform_container.container_platform import ContainerPlatform
 
 
+@pytest.mark.serial
 class TestContainerPlatform(unittest.TestCase):
     @classmethod
     def tearDownClass(cls) -> None:

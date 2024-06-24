@@ -4,6 +4,8 @@ import shutil
 import unittest
 from pathlib import Path
 from unittest.mock import patch
+
+import pytest
 from click.testing import CliRunner
 import idmtools_platform_file.cli.file as file_cli
 from idmtools.core import EntityStatus, ItemType
@@ -12,6 +14,7 @@ from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 
 
+@pytest.mark.serial
 class TestContainerPlatformCli(unittest.TestCase):
     def setUp(self):
         self.runner = CliRunner()
