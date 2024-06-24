@@ -2,6 +2,7 @@ import os
 import sys
 import tempfile
 import unittest
+from subprocess import CalledProcessError
 from unittest.mock import patch, MagicMock
 
 from idmtools.entities import Suite
@@ -123,13 +124,30 @@ class TestContainerPlatform(unittest.TestCase):
 
     @patch('subprocess.run')
     def test_convert_scripts_to_linux(self, mock_subprocess_run):
-        mock_experiment = MagicMock(spec=Experiment)
-        platform = ContainerPlatform(job_directory="DEST")
-        mock_subprocess_run.return_value = MagicMock()
+        with self.subTest("test_convert_scripts_to_linux"):
+            mock_experiment = MagicMock(spec=Experiment)
+            platform = ContainerPlatform(job_directory="DEST")
+            mock_subprocess_run.return_value = MagicMock()
 
-        platform.convert_scripts_to_linux(mock_experiment)
+            platform.convert_scripts_to_linux(mock_experiment)
 
-        mock_subprocess_run.assert_called_once()
+            mock_subprocess_run.assert_called_once()
+        with self.subTest("test_convert_scripts_to_linux_with_exception"):
+            mock_subprocess_run.side_effect = Exception('General exception')
+            mock_experiment = MagicMock(spec=Experiment)
+            platform = ContainerPlatform(job_directory="DEST")
+
+            with self.assertLogs('user', level='WARNING') as cm:
+                platform.convert_scripts_to_linux(mock_experiment)
+                self.assertIn('Failed to convert script to Linux:', cm.output[0])
+        with self.subTest("test_convert_scripts_to_linux_with_CalledProcessError"):
+            mock_subprocess_run.side_effect = CalledProcessError(1, 'command')
+            mock_experiment = MagicMock(spec=Experiment)
+            platform = ContainerPlatform(job_directory="DEST")
+
+            with self.assertLogs('user', level='WARNING') as cm:
+                platform.convert_scripts_to_linux(mock_experiment)
+                self.assertIn('Failed to convert script:', cm.output[0])
 
     def test_get_mounts(self):
         container_platform = ContainerPlatform(job_directory="DEST", user_mounts={"src1": "dest1", "src2": "dest2"})
