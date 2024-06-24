@@ -54,24 +54,6 @@ def stop_container_by_name(container_name):
         print(f"An error occurred: {e}")
 
 
-def wait_for_container_stop(container_name):
-    while True:
-        try:
-            container = client.containers.get(container_name)
-            if container.status == 'running':
-                print(f"Container {container_name} is still running. Waiting...")
-                time.sleep(1)  # wait for 1 second
-            else:
-                print(f"Container {container_name} has been stopped.")
-                break
-        except docker.errors.NotFound:
-            print(f"Container {container_name} does not exist.")
-            break
-        except docker.errors.APIError as e:
-            print(f"An error occurred: {e}")
-            break
-
-
 def is_valid_container_name_with_prefix(container_name, prefix):
     # Check if the container name starts with the prefix
     if not container_name.startswith(prefix):
