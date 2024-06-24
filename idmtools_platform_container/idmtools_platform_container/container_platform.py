@@ -204,9 +204,9 @@ class ContainerPlatform(FilePlatform):
                 logger.debug(f"Result from submit: {result}")
 
         except subprocess.CalledProcessError as e:
-            logger.debug(f"Error executing command: {e}")
+            user_logger.warning(f"Failed to submit job to container: {e}")
         except Exception as ex:
-            logger.debug(f"Error: {ex}")
+            user_logger.warning(f"Commission Encounter Error: {ex}")
 
     def build_binding_volumes(self) -> Dict:
         """
