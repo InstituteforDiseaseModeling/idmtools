@@ -8,6 +8,9 @@ term_handler()
     exit -1
 }
 
+# Register cleanup function to handle SIGINT and SIGTERM signals
+trap 'term_handler' SIGINT SIGTERM
+
 n=0
 until [ "$n" -ge {{retries}} ]
 do
