@@ -43,7 +43,7 @@ setup(
     ],
     description="CLI for IDM-Tools",
     install_requires=requirements,
-    long_description=readme,
+    long_description=None,
     include_package_data=True,
     keywords='modeling, IDM, cli',
     name='idmtools_cli',
