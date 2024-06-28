@@ -9,6 +9,7 @@ on:
       # only run this on
       - dev
       - 'release**'
+      - main
     paths:
       - 'idmtools_cli/**'
 
