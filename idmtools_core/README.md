@@ -45,4 +45,3 @@ On Windows, you can use `pymake` instead of `make`
     * Where does this go?
     * Move current code to Comps
     * Add support for platform specific bootstrap scripts
-
