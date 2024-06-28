@@ -32,11 +32,12 @@ jobs:
       - name: Build and publish
         working-directory: idmtools_cli
         env:
-          TWINE_REPOSITORY_URL: https://packages.idmod.org/api/pypi/idm-pypi-staging/
-          TWINE_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
-          TWINE_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
+          TWINE_REPOSITORY_URL: https://test.pypi.org/legacy/
+          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
         run: |
           python setup.py sdist bdist_wheel
+          twine upload dist/*
       - name: Upload idmtools_cli packages
         uses: actions/upload-artifact@v2
         with:
