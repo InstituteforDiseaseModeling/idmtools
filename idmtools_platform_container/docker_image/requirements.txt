@@ -1,0 +1,4 @@
+emod-api~=1.30
+matplotlib~=3.9.0
+scipy~=1.13.1
+pandas~=2.2.2

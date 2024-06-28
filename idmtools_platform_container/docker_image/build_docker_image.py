@@ -4,12 +4,10 @@ Notes:
     If you are using this script locally, you need to set the environment variables *PYPI_STAGING_USERNAME* and *PYPI_STAGING_PASSWORD*.
     These can be set to your idm email/password
 
-Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+Copyright 2024, Bill Gates Foundation. All rights reserved.
 """
 import argparse
-import glob
 import os
-import shutil
 import subprocess
 from logging import getLogger, basicConfig, DEBUG, INFO
 import sys
@@ -22,34 +20,18 @@ from natsort import natsorted
 
 logger = getLogger(__name__)
 # Global Configurations
-KEYRING_NAME = "idmtools_ssmt_builder"
+KEYRING_NAME = "idmtools_container_docker_builder"
 BASE_REPO = 'packages.idmod.org'
 REPO_KEY = 'idm-docker-staging'
 DOCKER_REPO = f'{REPO_KEY}.{BASE_REPO}'
-IMAGE_NAME = 'idmtools/comps_ssmt_worker'
+IMAGE_NAME = 'idmtools/container-test'
 BASE_IMAGE_NAME = f'{DOCKER_REPO}/{IMAGE_NAME}'
 CURRENT_DIRECTORY = os.path.dirname(__file__)
-BASE_VERSION = open(os.path.join(CURRENT_DIRECTORY, '..', 'VERSION')).read().strip()
+BASE_VERSION = open(os.path.join(CURRENT_DIRECTORY, 'BASE_VERSION')).read().strip()
 
 logger.info("Please be sure you are logged into the docker-production.packages.idmod.org Docker Repo")
 BASE_DIR = os.path.abspath(os.path.join(CURRENT_DIRECTORY, '..', '..'))
-LOCAL_PACKAGE_DIR = os.path.join(BASE_DIR, 'idmtools_platform_comps/ssmt_image')
-
-
-def get_dependency_packages():
-    """
-    Get python packages required to build image.
-
-    Returns:
-        None
-    """
-    os.makedirs(os.path.abspath('.depends'), exist_ok=True)
-    for root, _dirs, files in os.walk(os.path.join(LOCAL_PACKAGE_DIR, '.depends')):
-        for file in files:
-            os.remove(os.path.join(root, file))
-    for package in ['idmtools_core', 'idmtools_models', 'idmtools_platform_comps']:
-        for file in glob.glob(os.path.join(BASE_DIR, package, 'dist', '**.gz')):
-            shutil.copy(file, os.path.join(LOCAL_PACKAGE_DIR, '.depends', os.path.basename(file)))
+LOCAL_PACKAGE_DIR = os.path.join(BASE_DIR, 'idmtools_platform_container/docker_image')
 
 
 def get_username_and_password(disable_keyring_load=False, disable_keyring_save=False):
@@ -103,7 +85,7 @@ def get_latest_image_version_from_registry(username, password):
         raise Exception('Could not load images')
     else:
         images = natsorted(response.json()['tags'], reverse=True)
-        images = [i for i in images if len(i) > 6]
+        images = [i for i in images if len(i) >= 5]
         logger.debug(f"Images: {images}")
         last_version = images[0]
         logger.info(f"Last Version {url}")
@@ -133,9 +115,8 @@ def build_image(username, password, disable_keyring_load, disable_keyring_save):
     """
     if username is None or password is None:
         username, password = get_username_and_password(disable_keyring_load, disable_keyring_save)
-    get_dependency_packages()
     version = get_latest_image_version_from_registry(username, password)
-    cmd = ['docker', 'build', '--network=host', '--build-arg', f'SSMT_VERSION={version}', '--tag',
+    cmd = ['docker', 'build', '--network=host', '--build-arg', f'CONTAINER_VERSION={version}', '--tag',
            f'{DOCKER_REPO}/{IMAGE_NAME}:{version}', '.']
     logger.info(f'Running: {" ".join(cmd)}')
     p = subprocess.Popen(" ".join(cmd), cwd=os.path.abspath(os.path.dirname(__file__)), shell=True)
@@ -148,7 +129,7 @@ def build_image(username, password, disable_keyring_load, disable_keyring_save):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser("Build SSMT Image")
+    parser = argparse.ArgumentParser("Build Container Image")
     parser.add_argument("--username", default=None, help="Docker Production Username")
     parser.add_argument("--password", default=None, help="Docker Production Password")
     parser.add_argument("--disable-keyring-load", default=False, help="Disable loading password from keyring")
