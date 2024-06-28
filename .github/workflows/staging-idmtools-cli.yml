@@ -3,6 +3,7 @@
 name: "Staging: idmtools-cli"
 
 on:
+  workflow_dispatch:
   push:
     branches:
       # only run this on
@@ -40,4 +41,8 @@ jobs:
           TWINE_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
         run: |
           python setup.py sdist bdist_wheel
-          twine upload dist/*
+      - name: Upload idmtools_cli packages
+        uses: actions/upload-artifact@v2
+        with:
+          name: idmtools_packages
+          path: idmtools_cli/dist/
