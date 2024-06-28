@@ -33,9 +33,11 @@ jobs:
         run: |
           python setup.py sdist bdist_wheel
           twine upload dist/*
-      - name: Publish package to PyPI
-        uses: pypa/gh-action-pypi-publish@master
-        with:
-          user: ${{ secrets.pypi_username }}
-          password: ${{ secrets.pypi_password }}
-          repository_url: https://test.pypi.org/legacy/
+      - name: Upload package to TestPyPI
+        working-directory: idmtools_core
+        env:
+          TWINE_USERNAME: ${{ secrets.pypi_username }}
+          TWINE_PASSWORD: ${{ secrets.pypi_password }}
+        run: |
+            twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+
