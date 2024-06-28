@@ -10,6 +10,7 @@ on:
       - 'release**'
     paths:
       - 'idmtools_cli/**'
+  workflow_dispatch:
 
 jobs:
   deploy-cli-staging:
@@ -40,4 +41,8 @@ jobs:
           TWINE_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
         run: |
           python setup.py sdist bdist_wheel
-          twine upload dist/*
+      - name: Upload idmtools_cli packages
+        uses: actions/upload-artifact@v2
+        with:
+          name: idmtools_packages
+          path: idmtools_cli/dist/idmtools_cli-*.tar.gz
