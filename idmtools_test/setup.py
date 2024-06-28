@@ -32,7 +32,7 @@ setup(
     author=[author[0] for author in authors],
     author_email=[author[1] for author in authors],
     classifiers=[
-        'Framework:: IDM-Tools :: Test'
+        'Framework:: IDMtools_test :: 1.7.10.1'
     ],
     description="Test and demo data for IDM-Tools",
     install_requires=requirements,
@@ -49,6 +49,6 @@ setup(
     ),
     test_suite='tests',
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='1.7.10',
+    version='1.7.10.1',
     zip_safe=False
 )
