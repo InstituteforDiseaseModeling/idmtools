@@ -30,11 +30,6 @@ jobs:
           git config --global user.email "clinton.collins@gmail.com"
       - name: Build and publish
         working-directory: idmtools_core
-        run: |
-          python setup.py sdist bdist_wheel
-          twine upload dist/*
-      - name: Build and publish
-        working-directory: idmtools_core
         env:
           TWINE_REPOSITORY_URL: https://test.pypi.org/legacy/
           TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
