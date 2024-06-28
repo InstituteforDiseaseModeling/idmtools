@@ -58,7 +58,7 @@ setup(
     ],
     description="Core tools for modeling",
     install_requires=extra_require_files['requirements'] + conditional_requirements,
-    long_description=readme,
+    long_description=None,
     include_package_data=True,
     keywords='modeling, IDM',
     name='idmtools',

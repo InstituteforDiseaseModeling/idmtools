@@ -8,6 +8,7 @@ on:
       # only run this on
       - dev
       - 'release**'
+      - main
     paths:
       - 'idmtools_platform_general/**'
 
@@ -30,9 +31,9 @@ jobs:
       - name: Build and publish
         working-directory: idmtools_platform_general
         env:
-          TWINE_REPOSITORY_URL: https://packages.idmod.org/api/pypi/idm-pypi-staging/
-          TWINE_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
-          TWINE_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
+          TWINE_REPOSITORY_URL: https://test.pypi.org/legacy/
+          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
         run: |
           python setup.py sdist bdist_wheel
           twine upload dist/*

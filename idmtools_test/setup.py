@@ -36,7 +36,7 @@ setup(
     ],
     description="Test and demo data for IDM-Tools",
     install_requires=requirements,
-    long_description=readme,
+    long_description=None,
     include_package_data=True,
     keywords='modeling, IDM, test, testdata, demodata',
     name='idmtools_test',
