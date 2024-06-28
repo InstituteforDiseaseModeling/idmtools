@@ -54,8 +54,7 @@ setup(
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
-        'Programming Language :: Python :: 3.12',
-        'Framework:: IDM-Tools'
+        'Programming Language :: Python :: 3.12'
     ],
     description="Core tools for modeling",
     install_requires=extra_require_files['requirements'] + conditional_requirements,
