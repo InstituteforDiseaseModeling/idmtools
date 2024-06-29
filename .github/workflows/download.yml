@@ -65,5 +65,5 @@ jobs:
         TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
         TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       run: |
-        find . -type d -name 'dist' -exec sh -c 'twine upload {}/\* --skip-existing' \;
+        find dist -name '*.gz' -or -name '*.whl' -exec twine upload --skip-existing {} +
       
