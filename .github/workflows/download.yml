@@ -41,11 +41,11 @@ jobs:
           echo '{
             "files": [
               {
-                "pattern": "'$ARTIFACT_PATH'",
-                "target": "'$DOWNLOAD_PATH'"
+                "pattern": $ARTIFACT_PATH,
+                "target": $DOWNLOAD_PATH
               }
             ]
           }' > downloadSpec.json
-
+          cat downloadSpec.json
     - name: Download Artifacts
       run: jfrog rt dl --server-id=myartifactory --spec=downloadSpec.json
