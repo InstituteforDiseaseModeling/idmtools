@@ -1,0 +1,44 @@
+name: Download Artifacts from JFrog Artifactory
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version'
+        required: true
+        default: '1.7.9'  # You can specify a default version if desired
+  push:
+    branches:
+      - main  # Adjust this to your desired branch
+
+jobs:
+  download:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up JFrog CLI
+      run: |
+        curl -fL https://getcli.jfrog.io | sh
+        sudo mv jfrog /usr/local/bin/jfrog
+
+    - name: Configure JFrog CLI
+      env:
+        JFROG_URL: https://packages.idmod.org/api/pypi/idm-pypi-staging/
+        JFROG_USER: ${{ secrets.PYPI_STAGING_USERNAME }}
+        JFROG_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
+      run: |
+        jfrog rt c --url=$JFROG_URL --user=$JFROG_USER --password=$JFROG_PASSWORD
+
+    - name: Create downloadSpec.json
+      env:
+        ARTIFACT_PATH: ${{ format('idm-pypi-staging/idmtools*/{0}/', github.event.inputs.version) }}
+        DOWNLOAD_PATH: ${{ format('staging/{0}/', github.event.inputs.version) }}
+      run: |
+          echo "Creating downloadSpec.json with ARTIFACT_PATH=${ARTIFACT_PATH} and DOWNLOAD_PATH=${DOWNLOAD_PATH}"
+          echo '{"files": [{"pattern": "${ARTIFACT_PATH}", "target": "${DOWNLOAD_PATH}"}]}' > downloadSpec.json
+
+    - name: Download Artifacts
+      run: jfrog rt dl --spec=downloadSpec.json
