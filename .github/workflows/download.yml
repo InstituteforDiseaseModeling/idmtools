@@ -35,8 +35,8 @@ jobs:
 
     - name: Create downloadSpec.json
       env:
-        ARTIFACT_PATH: ${{ 'idm-pypi-staging/idmtools*/$VERSION/' }}
-        DOWNLOAD_PATH: ${{ 'staging/$VERSION/' }}
+        ARTIFACT_PATH: ${{ 'idm-pypi-staging/idmtools*/${VERSION}/' }}
+        DOWNLOAD_PATH: ${{ 'staging/${VERSION}/' }}
       run: |
           echo "Creating downloadSpec.json with ARTIFACT_PATH=${ARTIFACT_PATH} and DOWNLOAD_PATH=${DOWNLOAD_PATH}"
           echo '{
