@@ -38,8 +38,14 @@ jobs:
         DOWNLOAD_PATH: ${{ format('staging/{0}/', github.event.inputs.version) }}
       run: |
           echo "Creating downloadSpec.json with ARTIFACT_PATH=${ARTIFACT_PATH} and DOWNLOAD_PATH=${DOWNLOAD_PATH}"
-          echo '{"files": [{"pattern": "${ARTIFACT_PATH}", "target": "${DOWNLOAD_PATH}"}]}' > downloadSpec.json
-          cat downloadSpec.json
+          echo '{
+            "files": [
+              {
+                "pattern": "'$ARTIFACT_PATH'",
+                "target": "'$DOWNLOAD_PATH'"
+              }
+            ]
+          }' > downloadSpec.json
 
     - name: Download Artifacts
       run: jfrog rt dl --server-id=myartifactory --spec=downloadSpec.json
