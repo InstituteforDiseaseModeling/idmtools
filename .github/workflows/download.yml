@@ -41,8 +41,8 @@ jobs:
           echo '{
             "files": [
               {
-                "pattern": $ARTIFACT_PATH,
-                "target": $DOWNLOAD_PATH
+                "pattern": "'"$ARTIFACT_PATH"'",
+                "target": "'"$DOWNLOAD_PATH"'"
               }
             ]
           }' > downloadSpec.json
