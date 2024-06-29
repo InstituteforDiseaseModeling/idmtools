@@ -35,19 +35,19 @@ jobs:
 
     - name: Create downloadSpec.json
       env:
-        ARTIFACT_PATH: ${{ 'idm-pypi-staging/idmtools*/${VERSION}/' }}
-        DOWNLOAD_PATH: ${{ 'staging/${VERSION}/' }}
+        VERSION: ${{ github.event.inputs.version }}
       run: |
-          echo "Creating downloadSpec.json with ARTIFACT_PATH=${ARTIFACT_PATH} and DOWNLOAD_PATH=${DOWNLOAD_PATH}"
-          echo '{
-            "files": [
-              {
-                "pattern": "'"$ARTIFACT_PATH"'",
-                "target": "'"$DOWNLOAD_PATH"'"
-              }
-            ]
-          }' > downloadSpec.json
-          cat downloadSpec.json
+        ARTIFACT_PATH="idm-pypi-staging/idmtools*/${VERSION}/"
+        DOWNLOAD_PATH="staging/${VERSION}/"
+        echo '{
+          "files": [
+            {
+              "pattern": "'"$ARTIFACT_PATH"'",
+              "target": "'"$DOWNLOAD_PATH"'"
+            }
+          ]
+        }' > downloadSpec.json
+        cat downloadSpec.json
     - name: Download Artifacts
       run: |
         jfrog rt dl --server-id=myartifactory --spec=downloadSpec.json
