@@ -29,13 +29,14 @@ jobs:
         JFROG_URL: https://packages.idmod.org:443/artifactory/
         JFROG_USER: ${{ secrets.PYPI_STAGING_USERNAME }}
         JFROG_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
+        VERSION: ${{ github.event.inputs.version }}
       run: |
         jfrog config add myartifactory --artifactory-url=$JFROG_URL --user=$JFROG_USER --access-token=$JFROG_PASSWORD
 
     - name: Create downloadSpec.json
       env:
-        ARTIFACT_PATH: ${{ format('idm-pypi-staging/idmtools*/{0}/', github.event.inputs.version) }}
-        DOWNLOAD_PATH: ${{ format('staging/{0}/', github.event.inputs.version) }}
+        ARTIFACT_PATH: ${{ format('idm-pypi-staging/idmtools*/{0}/', $VERSION) }}
+        DOWNLOAD_PATH: ${{ format('staging/{0}/', $VERSION) }}
       run: |
           echo "Creating downloadSpec.json with ARTIFACT_PATH=${ARTIFACT_PATH} and DOWNLOAD_PATH=${DOWNLOAD_PATH}"
           echo '{
