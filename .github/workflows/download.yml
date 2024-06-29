@@ -38,7 +38,7 @@ jobs:
       run: |
         VERSION=${{ github.event.inputs.version || '1.7.9' }}
         ARTIFACT_PATH="idm-pypi-staging/idmtools*/${VERSION}/"
-        DOWNLOAD_PATH="staging/${VERSION}/"
+        DOWNLOAD_PATH="dist/"
         echo '{
           "files": [
             {
@@ -52,5 +52,12 @@ jobs:
       if: github.event.inputs.version != ''
       run: |
         jfrog rt dl --server-id=myartifactory --spec=downloadSpec.json
-        ls -lR staging/
+        ls -lR dist/
+    - name: Build and publish
+      env:
+        TWINE_REPOSITORY_URL: https://test.pypi.org/legacy/
+        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      run: |
+        twine upload dist/*
       
