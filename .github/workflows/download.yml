@@ -30,7 +30,8 @@ jobs:
         JFROG_USER: ${{ secrets.PYPI_STAGING_USERNAME }}
         JFROG_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
       run: |
-        jfrog rt c --url=$JFROG_URL --user=$JFROG_USER --password=$JFROG_PASSWORD
+        jfrog config add staging_jfrog --artifactory-url=$JFROG_URL --user=$JFROG_USER --password=$JFROG_PASSWORD
+        jfrog rt c staging_jfrog
 
     - name: Create downloadSpec.json
       env:
