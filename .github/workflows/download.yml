@@ -5,7 +5,7 @@ on:
     inputs:
       version:
         description: 'Version'
-        required: true
+        required: false
         default: '1.7.9'  # You can specify a default version if desired
   push:
     branches:
