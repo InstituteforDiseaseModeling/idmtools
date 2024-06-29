@@ -30,8 +30,7 @@ jobs:
         JFROG_USER: ${{ secrets.PYPI_STAGING_USERNAME }}
         JFROG_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
       run: |
-        jfrog config add staging_jfrog --artifactory-url=$JFROG_URL --user=$JFROG_USER --password=$JFROG_PASSWORD
-        jfrog rt c staging_jfrog
+        jfrog config add myartifactory --artifactory-url=$JFROG_URL --user=$JFROG_USER --password=$JFROG_PASSWORD
 
     - name: Create downloadSpec.json
       env:
@@ -42,4 +41,4 @@ jobs:
           echo '{"files": [{"pattern": "${ARTIFACT_PATH}", "target": "${DOWNLOAD_PATH}"}]}' > downloadSpec.json
 
     - name: Download Artifacts
-      run: jfrog rt dl --spec=downloadSpec.json
+      run: jfrog rt dl --server-id=myartifactory --spec=downloadSpec.json
