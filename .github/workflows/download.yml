@@ -34,9 +34,8 @@ jobs:
         jfrog config add myartifactory --artifactory-url=$JFROG_URL --user=$JFROG_USER --access-token=$JFROG_PASSWORD
 
     - name: Create downloadSpec.json
-      env:
-        VERSION: ${{ github.event.inputs.version }}
       run: |
+        VERSION=${{ github.event.inputs.version || '1.7.9' }}
         ARTIFACT_PATH="idm-pypi-staging/idmtools*/${VERSION}/"
         DOWNLOAD_PATH="staging/${VERSION}/"
         echo '{
