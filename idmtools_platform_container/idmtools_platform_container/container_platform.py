@@ -87,7 +87,7 @@ class ContainerPlatform(FilePlatform):
             Any
         """
         if dry_run:
-            user_logger.info(f'Dry run: {item.id}')
+            user_logger.info(f'\nDry run: {dry_run}')
             return
 
         if isinstance(item, Experiment):
@@ -170,9 +170,9 @@ class ContainerPlatform(FilePlatform):
             subprocess.run(full_command, stdout=subprocess.PIPE)
 
         except subprocess.CalledProcessError as e:
-            logger.warning("Error executing command:", e)
+            user_logger.warning(f"Failed to convert script: {e}")
         except Exception as ex:
-            logger.warning("Error:", ex)
+            user_logger.warning(f"Failed to convert script to Linux: {ex}")
 
     def submit_experiment(self, experiment: Experiment, **kwargs) -> NoReturn:
         """
@@ -204,9 +204,9 @@ class ContainerPlatform(FilePlatform):
                 logger.debug(f"Result from submit: {result}")
 
         except subprocess.CalledProcessError as e:
-            logger.debug("Error executing command:", e)
+            user_logger.warning(f"Failed to submit job to container: {e}")
         except Exception as ex:
-            logger.debug("Error:", ex)
+            user_logger.warning(f"Commission Encounter Error: {ex}")
 
     def build_binding_volumes(self) -> Dict:
         """
