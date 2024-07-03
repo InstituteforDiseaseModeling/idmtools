@@ -15,9 +15,8 @@ BASE_VERSION = open(os.path.join(CURRENT_DIRECTORY, 'BASE_VERSION')).read().stri
 BASE_REPO = 'packages.idmod.org'
 REPO_KEY = 'idm-docker-staging'
 DOCKER_REPO = f'{REPO_KEY}.{BASE_REPO}'
-IMAGE_NAME = 'idmtools/container-test'
-
-BASE_IMAGE_NAME = f'{DOCKER_REPO}/{IMAGE_NAME}'
+IMAGE_NAME = 'container-rocky-runtime'
+BASE_IMAGE_NAME = f'{DOCKER_REPO}/idmtools'
 
 if 'PYPI_STAGING_USERNAME' in os.environ:
     username = os.environ['PYPI_STAGING_USERNAME']
@@ -29,7 +28,7 @@ if 'PYPI_STAGING_PASSWORD' in os.environ:
 else:
     password = getpass(prompt='Password:')
 auth = HTTPBasicAuth(username=username, password=password)
-response = requests.get(f'https://{BASE_REPO}/artifactory/api/docker/{REPO_KEY}/v2/{IMAGE_NAME}/tags/list', auth=auth)
+response = requests.get(f'https://{BASE_REPO}/artifactory/api/docker/{REPO_KEY}/v2/idmtools/{IMAGE_NAME}/tags/list', auth=auth)
 if response.status_code == 200:
     images = natsorted(response.json()['tags'], reverse=True)
     images = [i for i in images if len(i) >= 5]
@@ -41,11 +40,13 @@ if response.status_code == 200:
         version = '.'.join(version_parts)
     else:
         version = f'{BASE_VERSION}.0'
+elif response.status_code == 404:
+    version = f'{BASE_VERSION}.0'
 else:
     print(response.content)
     raise Exception('Could not load images')
 
-cmd = ['docker', 'push', f'{REPO_KEY}.{BASE_REPO}/idmtools/container-test:{version}']
+cmd = ['docker', 'push', f'{BASE_IMAGE_NAME}/{IMAGE_NAME}:{version}']
 print(f'Running: {" ".join(cmd)}')
 p = subprocess.Popen(" ".join(cmd), cwd=os.path.abspath(os.path.dirname(__file__)), shell=True)
 p.wait()
