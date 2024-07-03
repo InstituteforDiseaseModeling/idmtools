@@ -24,7 +24,7 @@ KEYRING_NAME = "idmtools_container_docker_builder"
 BASE_REPO = 'packages.idmod.org'
 REPO_KEY = 'idm-docker-staging'
 DOCKER_REPO = f'{REPO_KEY}.{BASE_REPO}'
-IMAGE_NAME = 'idmtools/container-test'
+IMAGE_NAME = 'idmtools/container-rocky-runtime'
 BASE_IMAGE_NAME = f'{DOCKER_REPO}/{IMAGE_NAME}'
 CURRENT_DIRECTORY = os.path.dirname(__file__)
 BASE_VERSION = open(os.path.join(CURRENT_DIRECTORY, 'BASE_VERSION')).read().strip()
@@ -79,10 +79,13 @@ def get_latest_image_version_from_registry(username, password):
     logger.info(f"Loading Credentials from {url}")
     response = requests.get(url, auth=auth)
     logger.debug(f"Return Code: {response.status_code}")
-    if response.status_code != 200:
+    if response.status_code != 200 and response.status_code != 404:
         print(response.status_code)
         print(response.content)
         raise Exception('Could not load images')
+    elif response.status_code == 404:
+        logger.info(f"First Version {url}")
+        return f'{BASE_VERSION}.0'
     else:
         images = natsorted(response.json()['tags'], reverse=True)
         images = [i for i in images if len(i) >= 5]
@@ -100,13 +103,14 @@ def get_latest_image_version_from_registry(username, password):
         return version
 
 
-def build_image(username, password, disable_keyring_load, disable_keyring_save):
+def build_image(username, password, dockerfile, disable_keyring_load, disable_keyring_save):
     """
     Run the docker build command.
 
     Args:
         username: Username to use with registry
         password: Password to use with registry
+        dockerfile: Dockerfile to use for building image
         disable_keyring_load: Disable keyring which caches passwords
         disable_keyring_save: Disable caching password to the keyring
 
@@ -117,7 +121,7 @@ def build_image(username, password, disable_keyring_load, disable_keyring_save):
         username, password = get_username_and_password(disable_keyring_load, disable_keyring_save)
     version = get_latest_image_version_from_registry(username, password)
     cmd = ['docker', 'build', '--network=host', '--build-arg', f'CONTAINER_VERSION={version}', '--tag',
-           f'{DOCKER_REPO}/{IMAGE_NAME}:{version}', '.']
+           f'{DOCKER_REPO}/{IMAGE_NAME}:{version}', '-f', dockerfile, '.']
     logger.info(f'Running: {" ".join(cmd)}')
     p = subprocess.Popen(" ".join(cmd), cwd=os.path.abspath(os.path.dirname(__file__)), shell=True)
     p.wait()
@@ -132,6 +136,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser("Build Container Image")
     parser.add_argument("--username", default=None, help="Docker Production Username")
     parser.add_argument("--password", default=None, help="Docker Production Password")
+    parser.add_argument("--dockerfile", default="Dockerfile", help="Dockerfile to use for building image")
     parser.add_argument("--disable-keyring-load", default=False, help="Disable loading password from keyring")
     parser.add_argument("--disable-keyring-save", default=False, help="Disable saving password to keyring after user prompts")
     parser.add_argument("--verbose", default=False, help="Enable Debug logging")
@@ -139,4 +144,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     basicConfig(filename="build.log", level=DEBUG if any([args.verbose, args.debug]) else INFO)
-    build_image(args.username, args.password, args.disable_keyring_load, args.disable_keyring_save)
+    build_image(args.username, args.password, args.dockerfile, args.disable_keyring_load, args.disable_keyring_save)
