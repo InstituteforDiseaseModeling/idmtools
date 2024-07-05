@@ -4,7 +4,8 @@
 FROM rockylinux:9.2
 # Set the timezone and the frontend
 ENV TZ=America/LosAngeles DEBIAN_FRONTEND=noninteractive
-
+# To suppress warning without altering the installation when pip install with root user
+ENV PIP_ROOT_USER_ACTION=ignore
 # Install the necessary packages
 RUN yum -y install rpm dnf-plugins-core \
  && yum -y update \
