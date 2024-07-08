@@ -233,9 +233,6 @@ class JobHistory:
         # Convert the datetime object to a timestamp (seconds since epoch)
         timestamp = dt_object.timestamp() if dt_object else None
 
-        # print(f"Datetime Object: {dt_object}")
-        # print(f"Timestamp: {timestamp}")
-
         cache = cls.history
         cache.expire(now=timestamp)
         cache.close()
@@ -365,68 +362,3 @@ class JobHistory:
             data[container_id].append(key)
 
         return data
-
-
-def check_logger():
-    from examples.zdu.logger_utils import check_logger
-
-    root = getLogger()
-    check_logger(root)
-    check_logger(logger)
-    check_logger(user_logger)
-
-
-
-def expire_history_new_demo(dt: str = None):
-    from datetime import datetime
-    # Parse the datetime string into a datetime object
-    dt_object = datetime.strptime(dt, '%Y-%m-%d %I:%M:%S %p') if dt else None
-
-    # Convert the datetime object to a timestamp (seconds since epoch)
-    timestamp = dt_object.timestamp() if dt_object else None
-
-    # print(f"Datetime Object: {dt_object}")
-    # print(f"Timestamp: {timestamp}")
-
-    JobHistory.initialization()
-    cache = JobHistory.history
-    cache.expire(now=timestamp)
-    cache.close()
-
-
-if __name__ == '__main__':
-    # JobHistory.count('39030563ca68')
-
-    # JobHistory.container_history()
-
-    # JobHistory.view_history('39030563ca68')
-
-    # check_logger()
-
-    # exp_id = 'c79f8b8a-82ec-42d6-8905-c11b9628dce7'
-    # JobHistory.initialization()
-    # cache = JobHistory.history
-    #
-    # value, expire_time = cache.get(exp_id, expire_time=True)
-    # print(f"Keys: ", list(cache))
-    # print(f"{exp_id} in cache: ", exp_id in cache)
-    # print(f"{exp_id} not in cache: ", exp_id not in cache)
-    # print(f"{exp_id} in list(cache): ", exp_id in list(cache))
-    # print(f"{exp_id} in cache.iterkeys: ", exp_id in cache.iterkeys())
-    # print("value: ", value)
-    # print("expire_time: ", expire_time)
-
-    # expire_time = '2024-08-12 10:25:07 PM'
-    # local_expire_time = datetime.fromtimestamp(expire_time)
-    # local_expire_time = datetime.strptime(expire_time, '%Y-%m-%d %I:%M:%S %p')
-    # cache.expire(local_expire_time)
-
-    # key = '40ef4c6e-1334-4f73-a4a0-274628f2b037'
-    # expire_time = cache.expire(key)
-    # print("expire_time: ", expire_time)
-
-    dt = "2024-07-08 07:47:50 AM"
-    dt = "2024-07-08 08:47:50 AM"
-    dt = "2024-07-08 08:48:50 AM"
-
-    expire_history_new_demo(dt)
