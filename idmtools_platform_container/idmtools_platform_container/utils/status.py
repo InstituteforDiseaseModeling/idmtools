@@ -7,6 +7,8 @@ import os
 from typing import List, NoReturn
 from logging import getLogger
 
+from idmtools_platform_container.utils.general import normalize_path
+
 logger = getLogger(__name__)
 user_logger = getLogger('user')
 
@@ -111,8 +113,6 @@ def summarize_status_files(exp_dir: str, max_display: int = 10, show: bool = Fal
     # Print out the results
     user_logger.info(f'\nExperiment Directory: \n{normalize_path(exp_dir)}\n')
     user_logger.info(f"Simulation Count: {total_simulation_count}\n")
-
-    # print(json.dumps(summary, indent=3))
 
     for status in ['SUCCEEDED', 'FAILED', 'RUNNING', 'PENDING']:
         user_logger.info(f"{status} ({counter[status]})")
