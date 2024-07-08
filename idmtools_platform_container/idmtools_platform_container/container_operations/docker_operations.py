@@ -438,14 +438,12 @@ def list_running_jobs(container_id: str, limit: int = None) -> List[Job]:
     running_jobs = []
     if result.returncode == 0:
         processes = result.stdout
-        # print(processes)
 
         for line in processes.splitlines()[1:]:  # Skip the first headerline
             if 'EXPERIMENT' in line or 'SIMULATION' in line:
                 job = Job(container_id, line)
                 running_jobs.append(job)
     elif result.returncode == 1:
-        # print("No matches found")
         pass
     else:
         user_logger.error(f"Command failed with return code {result.returncode}")

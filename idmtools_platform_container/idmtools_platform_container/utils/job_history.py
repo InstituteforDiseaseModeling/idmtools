@@ -253,7 +253,7 @@ class JobHistory:
             for key in cache:
                 value = cache.get(key)
                 if value is None:
-                    print(f"key {key} not found in cache")
+                    user_logger.info(f"key {key} not found in cache")
                     continue
                 if value['CONTAINER'] == container_id:
                     cache.delete(key)
