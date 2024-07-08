@@ -415,6 +415,13 @@ class Job:
             self.job_id = int(process[0])
         self.container_id = container_id
 
+    def display(self):
+        """Display Job for debugging usage."""
+        user_logger.info(f"Item ID: {self.item_id:15}")
+        user_logger.info(f"Item Type: {self.item_type:15}")
+        user_logger.info(f"Job ID: {self.job_id:15}")
+        user_logger.info(f"Container ID: {self.container_id:15}")
+
 
 def list_running_jobs(container_id: str, limit: int = None) -> List[Job]:
     """
