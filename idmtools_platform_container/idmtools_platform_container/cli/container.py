@@ -364,7 +364,7 @@ def clear_job(item_id: str, remove: bool = True):
                     exp_dir.joinpath(f).unlink(missing_ok=True)
 
         # Delete generated files for each of simulations
-        pattern = f'*/metadata.json'
+        pattern = '*/metadata.json'
         for meta_file in Path(exp_dir).glob(pattern=pattern):
             sim_dir = meta_file.parent
             _clear_simulation(sim_dir, remove)
@@ -437,6 +437,6 @@ def clear_container(container_id: str = None):
 
 @container.command(help="Get History Containers.")
 def container_history():
-    """list of job containers"""
+    """List of job containers."""
     data = JobHistory.container_history()
     user_logger.info(json.dumps(data, indent=2))

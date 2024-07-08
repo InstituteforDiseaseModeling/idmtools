@@ -303,7 +303,7 @@ class JobHistory:
     @classmethod
     @initialize()
     def container_history(cls) -> List:
-        """list of job containers"""
+        """List of job containers."""
         cache = cls.history
         data = {}
 

@@ -391,6 +391,7 @@ PS_QUERY = 'ps xao pid,ppid,pgid,cmd | head -n 1 && ps xao pid,ppid,pgid,cmd | g
 
 @dataclass(repr=False)
 class Job:
+    """Running Job."""
     item_id: str = None
     item_type: ItemType = None
     job_id: int = None
@@ -398,6 +399,12 @@ class Job:
     created: str = None
 
     def __init__(self, container_id: str, process_line: str):
+        """
+        Initialize Job.
+        Args:
+            container_id: Container ID
+            process_line: Pricess Input Line
+        """
         process = process_line.split()
         parts = process[3].split(':')
         self.item_id = parts[1]
@@ -408,16 +415,10 @@ class Job:
             self.job_id = int(process[0])
         self.container_id = container_id
 
-    def display(self):
-        user_logger.info(f"Item ID: {self.item_id}")
-        user_logger.info(f"Item Type: {self.item_type}")
-        user_logger.info(f"Job ID: {self.job_id}")
-        user_logger.info(f"Container ID: {self.container_id}")
-
 
 def list_running_jobs(container_id: str, limit: int = None) -> List[Job]:
     """
-    List all running jobs on the container
+    List all running jobs on the container.
     Args:
         container_id: Container ID
         limit: number of jobs to view
