@@ -84,7 +84,15 @@ def parse_iso8601(date_str):
     return datetime.fromisoformat(date_str.replace('Z', '+00:00'))
 
 
-def is_valid_uuid(uuid_to_test, version=4):
+def is_valid_uuid(uuid_to_test, version=4) -> bool:
+    """
+    Check if the provided string is a valid UUID.
+    Args:
+        uuid_to_test: UUID string to test
+        version: test against a specific UUID version
+    Returns:
+        True/False
+    """
     try:
         # check for validity of Uuid
         _ = uuid.UUID(uuid_to_test, version=version)
@@ -93,7 +101,14 @@ def is_valid_uuid(uuid_to_test, version=4):
         return False
 
 
-def convert_byte_size(size_bytes):
+def convert_byte_size(size_bytes: int) -> str:
+    """
+    Convert byte size to human-readable.
+    Args:
+        size_bytes: byte site in integer
+    Returns:
+        str: human-readable size
+    """
     if size_bytes == 0:
         return "0B"
     size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
