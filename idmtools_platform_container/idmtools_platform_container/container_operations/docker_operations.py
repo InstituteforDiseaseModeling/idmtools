@@ -5,12 +5,14 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import docker
 import subprocess
+from dataclasses import dataclass
 from typing import List, Dict, NoReturn, Any, Union
-from logging import getLogger, DEBUG
-from idmtools_platform_container.utils import normalize_path, parse_iso8601
+from idmtools.core import ItemType
+from idmtools_platform_container.utils.general import normalize_path, parse_iso8601
 from docker.models.containers import Container
 from docker.errors import NotFound as ErrorNotFound
 from docker.errors import APIError as DockerAPIError
+from logging import getLogger, DEBUG
 
 logger = getLogger(__name__)
 user_logger = getLogger('user')
@@ -210,6 +212,36 @@ def sort_containers_by_start(containers: List[Container], reverse: bool = True) 
     return sorted_container_list
 
 
+def list_running_containers() -> List[Container]:
+    """
+    List all running containers.
+    Returns:
+        list of running containers
+    """
+    client = docker.from_env()
+    return client.containers.list()
+
+
+def list_containers(include_stopped: bool = False) -> Dict:
+    """
+    Find the containers that match the image.
+    Args:
+        include_stopped: bool, if consider the stopped containers or not
+    Returns:
+        dict of containers
+    """
+    client = docker.from_env()
+    container_found = {}
+    for container in client.containers.list(all=include_stopped):
+        if container.status not in CONTAINER_STATUS:
+            continue
+        if container_found.get(container.status, None) is None:
+            container_found[container.status] = []
+        container_found[container.status].append(container)
+
+    return container_found
+
+
 #############################
 # Check docker
 #############################
@@ -348,3 +380,94 @@ def compare_container_mount(container_id1: str, container_id2: str) -> bool:
     mounts2 = container2.attrs['Mounts']
 
     return compare_mounts(mounts1, mounts2)
+
+
+#############################
+# Check jobs
+#############################
+
+PS_QUERY = 'ps xao pid,ppid,pgid,cmd | head -n 1 && ps xao pid,ppid,pgid,cmd | grep -e EXPERIMENT -e SIMULATION | grep -v grep'
+
+
+@dataclass(repr=False)
+class Job:
+    item_id: str = None
+    item_type: ItemType = None
+    job_id: int = None
+    container_id: str = None
+    created: str = None
+
+    def __init__(self, container_id: str, process_line: str):
+        process = process_line.split()
+        parts = process[3].split(':')
+        self.item_id = parts[1]
+        self.item_type = ItemType.EXPERIMENT if parts[0] == 'EXPERIMENT' else ItemType.SIMULATION
+        if parts[0] == 'EXPERIMENT':
+            self.job_id = int(process[2])
+        elif parts[0] == 'SIMULATION':
+            self.job_id = int(process[0])
+        self.container_id = container_id
+
+    def display(self):
+        user_logger.info(f"Item ID: {self.item_id}")
+        user_logger.info(f"Item Type: {self.item_type}")
+        user_logger.info(f"Job ID: {self.job_id}")
+        user_logger.info(f"Container ID: {self.container_id}")
+
+
+def list_running_jobs(container_id: str, limit: int = None) -> List[Job]:
+    """
+    List all running jobs on the container
+    Args:
+        container_id: Container ID
+        limit: number of jobs to view
+    Returns:
+        list of running jobs
+    """
+    command = f'docker exec {container_id} bash -c "({PS_QUERY})"'
+    result = subprocess.run(command, shell=True, check=False, capture_output=True, text=True)
+
+    running_jobs = []
+    if result.returncode == 0:
+        processes = result.stdout
+        # print(processes)
+
+        for line in processes.splitlines()[1:]:  # Skip the first headerline
+            if 'EXPERIMENT' in line or 'SIMULATION' in line:
+                job = Job(container_id, line)
+                running_jobs.append(job)
+    elif result.returncode == 1:
+        # print("No matches found")
+        pass
+    else:
+        user_logger.error(f"Command failed with return code {result.returncode}")
+        user_logger.error(result.stderr)
+
+    if limit:
+        running_jobs = running_jobs[:limit]
+    return running_jobs[:limit]
+
+
+def find_running_job(item_id: Union[int, str], container_id: str = None) -> Job:
+    """
+    Check item running on container.
+    Args:
+        item_id: Experiment/Simulation ID or Running Job ID
+        container_id: Container ID
+    Returns:
+        running Job
+    """
+    if container_id:
+        containers = [container_id]
+    else:
+        containers = [container.short_id for container in list_running_containers()]
+
+    for cid in containers:
+        jobs = list_running_jobs(cid)
+        if len(jobs) == 0:
+            continue
+
+        for job in jobs:
+            if job.item_id == item_id or str(job.job_id) == str(item_id):
+                return job
+    return None
