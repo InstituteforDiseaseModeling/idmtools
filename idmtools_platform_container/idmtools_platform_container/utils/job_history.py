@@ -76,7 +76,6 @@ class JobHistory:
                     "EXPERIMENT_ID": experiment.id,
                     "CONTAINER": container_id,
                     "CREATED": current_datetime}
-        # cache.set(experiment.id, new_item, expire=3600 * 24 * 30)     # 30 days
         cache.set(experiment.id, new_item)
         cache.close()
 
@@ -218,14 +217,14 @@ class JobHistory:
 
     @classmethod
     @initialize()
-    def expire_history(cls):
-        cache = cls.history
-        cache.expire()
-        cache.close()
-
-    @classmethod
-    @initialize()
-    def expire_history_new(cls, dt: str = None):
+    def expire_history(cls, dt: str = None) -> NoReturn:
+        """
+        Expire job history based on the input expiration time.
+        Args:
+            dt: datetime to expire (format like "2024-06-30 10:25:07 PM")
+        Returns:
+            NoReturn
+        """
         from datetime import datetime
         # Parse the datetime string into a datetime object
         dt_object = datetime.strptime(dt, '%Y-%m-%d %I:%M:%S %p') if dt else None

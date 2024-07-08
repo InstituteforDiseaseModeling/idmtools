@@ -275,9 +275,16 @@ def volume():
 
 
 @container.command(help="Cancel experiment/simulation.")
-def expire():
-    """Expire job history."""
-    JobHistory.expire_history()
+@click.option('--dt', default=None, help="Datetime to expire (format like '2024-06-30 10:25:07 PM')")
+def expire(dt: str = None):
+    """
+    Expire Job History based on input datetime.
+    Args:
+        dt: datetime to expire
+    Returns:
+        None
+    """
+    JobHistory.expire_history(dt=dt)
 
 
 @container.command(help="Clear Job History.")
