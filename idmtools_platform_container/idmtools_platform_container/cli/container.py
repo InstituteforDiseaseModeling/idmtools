@@ -300,23 +300,6 @@ def clear_history(container_id: str = None):
     JobHistory.clear(container_id)
 
 
-@container.command(help="Clear Job History.")
-@click.argument('container-id', required=False)
-@click.option('--dt', default=None, type=str, help='Datetime to expire (format like "2024-06-30 10:25:07 PM")')
-def cls_history(container_id: str = None, dt: str = None):
-    """
-    Clear Job History.
-    Args:
-        container_id: Container ID
-        dt: Datetime to expire (format like "2024-06-30 10:25:07 PM")
-    Returns:
-        None
-    """
-    # JobHistory.clear(container_id)
-    # print(dt)
-    JobHistory.clear_new(container_id, dt)
-
-
 @container.command(help="Sync file system with job history.")
 def sync_history():
     """Sync file system with job history."""

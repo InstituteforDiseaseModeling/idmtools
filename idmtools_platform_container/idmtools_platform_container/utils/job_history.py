@@ -262,52 +262,6 @@ class JobHistory:
 
     @classmethod
     @initialize()
-    def clear_new(cls, container_id: str = None, dt: str = None) -> NoReturn:
-        """
-        Clear job history.
-        Args:
-            container_id: Container ID
-            dt: Datetime to expire (format like "2024-06-30 10:25:07 PM")
-        Returns:
-            NoReturn
-        """
-        given_datetime = datetime.strptime(dt, '%Y-%m-%d %I:%M:%S %p') if dt else None
-        # print(type(given_datetime))
-
-        cache = cls.history
-        # test
-        # cache.touch('a15a40a5-ed5b-4d58-960e-9d3096bb09c6', expire=10)
-        # cache.touch('a15a40a5-ed5b-4d58-960e-9d3096bb09c6')
-
-        for key in cache:
-            value, expire_time = cache.get(key, expire_time=True)
-            # print("expire_time: ", expire_time)
-            if container_id:
-                if value['CONTAINER'] != container_id:
-                    continue
-                elif given_datetime:
-                    expire_datetime = datetime.fromtimestamp(expire_time) if expire_time else None
-                    if expire_time and expire_datetime > given_datetime:
-                        cache.pop(key)
-                else:
-                    cache.pop(key)
-            else:
-                if given_datetime:
-                    expire_datetime = datetime.fromtimestamp(expire_time) if expire_time else None
-
-                    print("given datetime: ", given_datetime)
-                    print("expire datetime: ", expire_datetime)
-                    if expire_time and expire_datetime > given_datetime:
-                        # cache.pop(key)
-                        print("delete key: ", key)
-                        pass
-                else:
-                    # cache.pop(key)
-                    pass
-        cache.close()
-
-    @classmethod
-    @initialize()
     def volume(cls) -> NoReturn:
         """Clear job history."""
         cache = cls.history
