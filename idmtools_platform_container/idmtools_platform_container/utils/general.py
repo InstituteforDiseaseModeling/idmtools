@@ -4,11 +4,21 @@ Here we implement the ContainerPlatform utils.
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import os
+import uuid
+import math
 from pathlib import Path
 from typing import Union
 from datetime import datetime
 import platform as platform
+from logging import getLogger
 
+logger = getLogger(__name__)
+user_logger = getLogger('user')
+
+
+#############################
+# Utility Functions
+#############################
 
 def normalize_path(path: Union[str, Path]):
     """
@@ -72,3 +82,22 @@ def parse_iso8601(date_str):
     if '.' in date_str:
         date_str = date_str[:date_str.index('.') + 7] + 'Z'
     return datetime.fromisoformat(date_str.replace('Z', '+00:00'))
+
+
+def is_valid_uuid(uuid_to_test, version=4):
+    try:
+        # check for validity of Uuid
+        _ = uuid.UUID(uuid_to_test, version=version)
+        return True
+    except ValueError:
+        return False
+
+
+def convert_byte_size(size_bytes):
+    if size_bytes == 0:
+        return "0B"
+    size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
+    i = int(math.floor(math.log(size_bytes, 1024)))
+    p = math.pow(1024, i)
+    s = round(size_bytes / p, 2)
+    return "%s %s" % (s, size_name[i])
