@@ -51,7 +51,8 @@ setup(
     packages=find_packages(),
     test_suite='tests',
     entry_points={"idmtools_platform": [
-        "idmtools_platform_container = idmtools_platform_container.plugin_info:ContainerPlatformSpecification"]
+        "idmtools_platform_container = idmtools_platform_container.plugin_info:ContainerPlatformSpecification"],
+        "idmtools_cli.cli_plugins": ["container = idmtools_platform_container.cli.container:container"]
     },
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
