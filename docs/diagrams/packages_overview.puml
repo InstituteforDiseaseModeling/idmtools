@@ -23,8 +23,8 @@ note left of [idmtools-platform-comps]
     Provides ability to
     interact with COMPS
 end note
-[idmtools-platform-local]
-note left of [idmtools-platform-local]
+[idmtools-platform-container]
+note left of [idmtools-platform-container]
     Provides ability to run
     locally using Docker containers
 end note
@@ -37,7 +37,7 @@ end note
 [idmtools-cli] --> [idmtools]
 [idmtools-models] --> [idmtools]
 [idmtools-platform-comps] -> idmtools
-[idmtools-platform-local] -up-> idmtools
+[idmtools-platform-container] -up-> idmtools
 [idmtools-platform-slurm] -up-> idmtools
 
 @enduml
