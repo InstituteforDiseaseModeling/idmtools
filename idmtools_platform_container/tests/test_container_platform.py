@@ -5,9 +5,7 @@ import tempfile
 import unittest
 from subprocess import CalledProcessError
 from unittest.mock import patch, MagicMock
-
 import pytest
-
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
@@ -18,7 +16,10 @@ from idmtools_platform_container.container_platform import ContainerPlatform
 class TestContainerPlatform(unittest.TestCase):
     @classmethod
     def tearDownClass(cls) -> None:
-        shutil.rmtree(os.path.join(os.path.dirname(os.path.abspath(__file__)), "DEST"))
+        try:
+            shutil.rmtree(os.path.join(os.path.dirname(os.path.abspath(__file__)), "DEST"))
+        except FileNotFoundError:
+            pass
 
     @patch('idmtools_platform_container.container_platform.ContainerPlatform.check_container')
     @patch('idmtools_platform_container.container_platform.ContainerPlatform.convert_scripts_to_linux')

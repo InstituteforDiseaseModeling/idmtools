@@ -2,7 +2,6 @@ import os
 import unittest
 from pathlib import Path
 from unittest.mock import patch
-
 from idmtools.assets import AssetCollection, Asset
 from idmtools.core import ItemType, EntityStatus
 from idmtools.core.platform_factory import Platform
@@ -10,12 +9,13 @@ from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 import tempfile
 import sys
+
+from idmtools_platform_container.container_operations.docker_operations import stop_container
+
 parent = Path(__file__).resolve().parent
 sys.path.append(str(parent))
-
-from utils import find_containers_by_prefix, delete_container_by_name, \
-    is_valid_container_name_with_prefix, get_container_name_by_id, get_container_status_by_id, \
-    delete_containers_by_image_prefix
+from utils import find_containers_by_prefix, is_valid_container_name_with_prefix, get_container_name_by_id, \
+    get_container_status_by_id
 
 
 class TestPlatformExperiment(unittest.TestCase):
@@ -69,7 +69,7 @@ class TestPlatformExperiment(unittest.TestCase):
                 self.assertIn("Assets/run.sh", content)
 
             # clean up
-            delete_container_by_name(platform.container_id)
+            stop_container(platform.container_id, remove=True)
 
     def test_container_platform_with_custom_docker_image(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -83,7 +83,7 @@ class TestPlatformExperiment(unittest.TestCase):
             # check container exist
             matched_containers = find_containers_by_prefix("", image_name=docker_image)
             for mc in matched_containers:
-                delete_container_by_name(mc)
+                stop_container(mc, remove=True)
 
     @patch('idmtools_platform_container.container_operations.docker_operations.check_local_image')
     @patch('idmtools_platform_container.container_operations.docker_operations.logger')
@@ -106,7 +106,7 @@ class TestPlatformExperiment(unittest.TestCase):
                 self.assertIn(expected_user_log_messages[i], message)
             self.assertEqual(experiment.status, EntityStatus.SUCCEEDED)
             # clean up
-            delete_container_by_name(platform.container_id)
+            stop_container(platform.container_id, remove=True)
 
     def test_platform_with_container_prefix(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -114,7 +114,7 @@ class TestPlatformExperiment(unittest.TestCase):
             # check container exist, if does, delete first
             matched_containers = find_containers_by_prefix(container_prefix)
             for mc in matched_containers:
-                delete_container_by_name(mc)
+                stop_container(mc, remove=True)
 
             platform = Platform("Container", job_directory=temp_dir, container_prefix=container_prefix)
             command = "ls -lat"
@@ -129,7 +129,7 @@ class TestPlatformExperiment(unittest.TestCase):
 
             # clean up
             for mc in new_matched_containers:
-                delete_container_by_name(mc)
+                stop_container(mc, remove=True)
 
     def test_platform_with_reuse_container_id(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -150,7 +150,7 @@ class TestPlatformExperiment(unittest.TestCase):
             # verify that platform1's container and platform2's container are the same
             self.assertEqual(platform1.container_id, platform2.container_id)
             # clean up
-            delete_container_by_name(platform2.container_id)
+            stop_container(platform2.container_id, remove=True)
 
     def test_platform_with_force_start(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -177,8 +177,7 @@ class TestPlatformExperiment(unittest.TestCase):
             # verify that platform2's container is running
             self.assertEqual(get_container_status_by_id(platform2.container_id), "running")
             # clean up, new container 2 should be deleted
-            delete_container_by_name(platform2.container_id)
-            self.assertEqual(get_container_status_by_id(platform2.container_id), None)
+            stop_container(platform2.container_id, remove=True)
 
     def test_platform_with_symlink_true(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -195,7 +194,7 @@ class TestPlatformExperiment(unittest.TestCase):
             self.assertEqual(os.path.islink(exp_assets_path), False)
             self.assertEqual(os.path.islink(sim_assets_path), False)
             # clean up
-            delete_container_by_name(platform.container_id)
+            stop_container(platform.container_id, remove=True)
 
     @patch('idmtools_platform_container.container_platform.user_logger')
     def test_platform_with_dryrun_true(self, mock_user_logger):
@@ -207,7 +206,58 @@ class TestPlatformExperiment(unittest.TestCase):
             experiment.run(wait_until_done=False, dry_run=True)
             self.assertEqual(experiment.status, EntityStatus.CREATED)
             mock_user_logger.info.assert_called_with(f"\nDry run: True")
+            # clean up - dry run should not create container, so nothing to stop and remove
+            with self.assertRaises(TypeError) as ex:
+                stop_container(platform.container_id, remove=True)
+            self.assertEqual(ex.exception.args[0], "Invalid container object.")
+
+    def test_platform_with_retries(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            retries = 2
+            platform = Platform("Container", job_directory=temp_dir, retries=retries)
+            command = "ls -lat"
+            task = CommandTask(command=command)
+            experiment = Experiment.from_task(task, name="run_command")
+            experiment.run(wait_until_done=True)
+            self.assertEqual(experiment.status, EntityStatus.SUCCEEDED)
+            with open(os.path.join(temp_dir, experiment.parent_id, experiment.id, experiment.simulations[0].id,
+                                   "_run.sh"), "r") as file:
+                content = file.read()
+                self.assertIn(f'until [ "$n" -ge {retries} ]', content)
+            # clean up
+            stop_container(platform.container_id, remove=True)
+
+    def test_extra_packages(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            platform = Platform('CONTAINER', job_directory=temp_dir, new_container=True, extra_packages=['astor'])
+            command = "python Assets/model.py"
+            task = CommandTask(command=command)
+
+            model_asset = Asset(absolute_path=os.path.join("inputs", "model.py"))
+            common_assets = AssetCollection()
+            common_assets.add_asset(model_asset)
+            experiment = Experiment.from_task(task, name="run_platform_extra_packages", assets=common_assets)
+            experiment.run(wait_until_done=True, platform=platform)
+            self.assertEqual(experiment.status, EntityStatus.SUCCEEDED)
+            sim_dir = platform.get_directory_by_id(experiment.simulations[0].id, ItemType.SIMULATION)
+            self.assertTrue(os.path.exists(Path(f"{sim_dir}/ast_dump.txt")), f"The ast_dump.txt file should exist.")
+            # clean up
+            stop_container(platform.container_id, remove=True)
+
+    def test_required_extra_packages_not_install(self):
+        # test run model file without install required package 'astor'
+        with tempfile.TemporaryDirectory() as temp_dir:
+            platform = Platform('CONTAINER', job_directory=temp_dir, new_container=True, extra_packages=[])
+            command = "python Assets/model.py"
+            task = CommandTask(command=command)
+            model_asset = Asset(absolute_path=os.path.join("inputs", "model.py"))
+            common_assets = AssetCollection()
+            common_assets.add_asset(model_asset)
+            experiment = Experiment.from_task(task, name="run_platform_extra_packages", assets=common_assets)
+            experiment.run(wait_until_done=True, platform=platform)
+            self.assertEqual(experiment.status, EntityStatus.FAILED)
+            # clean up
+            stop_container(platform.container_id, remove=True)
 
     # def test_delete_container_by_image_prefix(self):
     #     delete_containers_by_image_prefix("docker-production-public.packages.idmod.org/idmtools/container-test")
-

@@ -1,16 +1,16 @@
 import subprocess
 import unittest
+from pathlib import Path
 from docker.models.containers import Container
 from unittest.mock import patch, MagicMock
-
 import docker
 from docker.errors import NotFound, APIError
-
 from idmtools_platform_container.container_operations.docker_operations import stop_container, stop_all_containers, \
     validate_container_running, \
     get_container, pull_docker_image, is_docker_daemon_running, check_local_image, find_container_by_image, \
     is_docker_installed, compare_mounts, compare_container_mount, sort_containers_by_start
 from idmtools_platform_container.container_platform import ContainerPlatform
+from idmtools_platform_container.utils import normalize_path
 
 
 class TestDockerOperations(unittest.TestCase):
@@ -513,6 +513,38 @@ class TestDockerOperations(unittest.TestCase):
 
         # Check if the containers are sorted in the correct order
         self.assertEqual(sorted_containers, [mock_container3, mock_container2, mock_container1])
+
+    def test_test_normalize_path(self):
+        # Test normalize_path with string path
+        with self.subTest("test_normalize_path_with_string_path"):
+            path = "C:\\Users\\Test\\Documents"
+            expected = "c:/users/test/documents"
+            self.assertEqual(normalize_path(path), expected)
+
+        # Test normalize_path with pathlib
+        with self.subTest("test_normalize_path_with_pathlib"):
+            path = Path("C:\\Users\\Test\\Documents")
+            expected = "c:/users/test/documents"
+            self.assertEqual(normalize_path(path), expected)
+
+        # Test normalize_path with forward slashes
+        with self.subTest("test_normalize_path_with_forward_slashes"):
+            path = "C:/Users/Test/Documents"
+            expected = "c:/users/test/documents"
+            self.assertEqual(normalize_path(path), expected)
+
+        # Test normalize_path with backslashes
+        with self.subTest("test_normalize_path_with_backslashes"):
+            path = "C:\\Users\\Test\\Documents\\"
+            expected = "c:/users/test/documents"
+            self.assertEqual(normalize_path(path), expected)
+
+        # Test normalize_path with mix slashes
+        with self.subTest("test_normalize_path_with_mixedslashes"):
+            path = f"C:\\Users\\Test/Documents\\"
+            expected = "c:/users/test/documents"
+            self.assertEqual(normalize_path(path), expected)
+
 
 if __name__ == '__main__':
     unittest.main()
