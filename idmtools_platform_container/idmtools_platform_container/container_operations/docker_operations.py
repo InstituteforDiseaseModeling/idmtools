@@ -395,6 +395,7 @@ class Job:
     item_id: str = None
     item_type: ItemType = None
     job_id: int = None
+    group_pid: int = None
     container_id: str = None
     created: str = None
 
@@ -408,6 +409,7 @@ class Job:
         process = process_line.split()
         parts = process[3].split(':')
         self.item_id = parts[1]
+        self.group_pid = int(process[2])
         self.item_type = ItemType.EXPERIMENT if parts[0] == 'EXPERIMENT' else ItemType.SIMULATION
         if parts[0] == 'EXPERIMENT':
             self.job_id = int(process[2])
@@ -420,6 +422,7 @@ class Job:
         user_logger.info(f"Item ID: {self.item_id:15}")
         user_logger.info(f"Item Type: {self.item_type:15}")
         user_logger.info(f"Job ID: {self.job_id:15}")
+        user_logger.info(f"Group PID: {self.group_pid:15}")
         user_logger.info(f"Container ID: {self.container_id:15}")
 
 
