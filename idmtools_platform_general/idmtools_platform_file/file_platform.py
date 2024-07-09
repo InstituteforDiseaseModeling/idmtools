@@ -53,6 +53,8 @@ class FilePlatform(IPlatform):
     _assets: FilePlatformAssetCollectionOperations = field(**op_defaults, repr=False, init=False)
     _metas: JSONMetadataOperations = field(**op_defaults, repr=False, init=False)
 
+    extra_packages: list = field(default_factory=list, metadata=dict(sbatch=True))
+
     def __post_init__(self):
         self.__init_interfaces()
         self.supported_types = {ItemType.SUITE, ItemType.EXPERIMENT, ItemType.SIMULATION}
