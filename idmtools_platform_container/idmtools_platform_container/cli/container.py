@@ -125,45 +125,26 @@ def status(item_id: Union[int, str], container_id: str = None, limit: int = 10, 
 
 
 @container.command(help="List running Experiment/Simulation jobs")
-@click.argument('container-id', required=False)
-@click.option('-l', '--limit', default=10, help="Max number of simulations to show")
-@click.option('-n', '--next', default=0, type=int, help="Next number of jobs to show")
-def jobs(container_id: str = None, limit: int = 10, next: int = 0):
+@click.argument('c', required=False)
+def jobs(c: str = None):
     """
     List running Experiment/Simulation jobs in Container(s).
     Args:
-        container_id: Container ID
-        limit: number of simulations to display
-        next: next number of jobs to show
+        c: Container ID
     Returns:
         None
     """
-    if container_id is None:
+    if c is None:
         client = docker.from_env()
         containers = [c.short_id for c in client.containers.list()]
     else:
-        containers = [container_id]
+        containers = [c]
 
     for container_id in containers:
         running_jobs = list_running_jobs(container_id)
         if running_jobs:
-            total_jobs = len(running_jobs)
-            # Take the first job which is the experiment
-            exp_job = running_jobs[0]
-            # Skip the first job which is the experiment
-            sim_jobs = running_jobs[1:]
-
-            start = next * limit
-            end = start + limit
-            sim_next = sim_jobs[start:end]
-            # Include the experiment job
-            sim_next.insert(0, exp_job)
-
-            # Skip the first job which is the experiment
-            user_logger.info(f"Container {container_id} has {total_jobs - 1} running simulations.")
-            user_logger.info(
-                tabulate([(job.item_type.name, job.item_id, job.job_id, job.container_id) for job in sim_next],
-                         headers=('Entity Type', "Entity ID", "Job Id", "Container"), tablefmt='psql'))
+            print(tabulate([(job.item_type.name, job.item_id, job.job_id, job.container_id) for job in running_jobs],
+                           headers=('Entity Type', "Entity ID", "Job Id", "Container"), tablefmt='psql'))
 
 
 @container.command(help="Get Suite/Experiment/Simulation file directory.")
