@@ -173,7 +173,7 @@ def jobs(container_id: str = None, limit: int = 10, next: int = 0):
             sim_next.insert(0, exp_job)
 
             # Skip the first job which is the experiment
-            user_logger.info(f"Container {container_id} has {total_jobs - 1} running simulations.")
+            user_logger.info(f"Experiment {exp_job.item_id} on Container {container_id} has {total_jobs - 1} running simulations.")
             # table = Table(title="Running Jobs")
             table = Table()
 
