@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 """The setup script for the idmtools_models platform, core tools for other models such as Python and R models."""
-import sys
 
 from setuptools import setup, find_packages
 
