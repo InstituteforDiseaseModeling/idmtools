@@ -4,7 +4,6 @@ import shutil
 import unittest
 from pathlib import Path
 from unittest.mock import patch
-
 import pytest
 from click.testing import CliRunner
 import idmtools_platform_file.cli.file as file_cli
@@ -12,6 +11,7 @@ from idmtools.core import EntityStatus, ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
+from idmtools_platform_container.container_operations.docker_operations import stop_container
 
 
 @pytest.mark.serial
@@ -25,6 +25,12 @@ class TestContainerPlatformCli(unittest.TestCase):
         self.experiment = Experiment.from_task(task, name="run_command")
         self.experiment.run(wait_until_done=True)
         self.assertEqual(self.experiment.status, EntityStatus.SUCCEEDED)
+
+    def tearDown(self):
+        try:
+            stop_container(self.platform.container_id, remove=True)
+        except Exception as e:
+            pass
 
     @classmethod
     def tearDownClass(cls) -> None:

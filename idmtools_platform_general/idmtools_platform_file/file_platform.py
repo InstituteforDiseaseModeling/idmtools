@@ -45,13 +45,15 @@ class FilePlatform(IPlatform):
     retries: int = field(default=1)
 
     # modules to be load
-    modules: list = field(default_factory=list, metadata=dict(sbatch=True))
+    modules: list = field(default_factory=list)
 
     _suites: FilePlatformSuiteOperations = field(**op_defaults, repr=False, init=False)
     _experiments: FilePlatformExperimentOperations = field(**op_defaults, repr=False, init=False)
     _simulations: FilePlatformSimulationOperations = field(**op_defaults, repr=False, init=False)
     _assets: FilePlatformAssetCollectionOperations = field(**op_defaults, repr=False, init=False)
     _metas: JSONMetadataOperations = field(**op_defaults, repr=False, init=False)
+
+    extra_packages: list = field(default_factory=list)
 
     def __post_init__(self):
         self.__init_interfaces()
