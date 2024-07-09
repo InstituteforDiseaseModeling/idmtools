@@ -1,6 +1,6 @@
+# This file contains examples of how to use different arguments of the Platform class for the CONTAINER platform.
 import os
 from functools import partial
-
 from idmtools.assets import AssetCollection, Asset
 from idmtools.builders import SimulationBuilder
 from idmtools.core.platform_factory import Platform

@@ -1,19 +1,15 @@
 # This example demonstrates how to run a simulation using a container platform alias 'CONTAINER'.
-
 import os
 import sys
 from functools import partial
 from typing import Any, Dict
-
 from idmtools.builders import SimulationBuilder
 from idmtools.core.platform_factory import Platform
-from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 
-from idmtools_test import COMMON_INPUT_PATH
 
 # job dir is where the experiment will be run.
 # Define Container Platform. For full list of parameters see container_platform.py in idmtools_platform_container

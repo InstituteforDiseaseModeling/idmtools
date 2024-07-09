@@ -1,7 +1,6 @@
 # This example demonstrates how to run a model that requires additional packages to be installed in the container.
 import os
 import sys
-
 from idmtools.assets import Asset, AssetCollection
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.command_task import CommandTask

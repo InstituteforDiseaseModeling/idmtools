@@ -1,10 +1,8 @@
 # This example demonstrates how to run a simulation using a container platform with idmtools.ini file.
-
 import os
 import sys
 from functools import partial
 from typing import Any, Dict
-
 from idmtools.builders import SimulationBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import Suite
@@ -13,9 +11,9 @@ from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 
-from idmtools_test import COMMON_INPUT_PATH
 
 assets_directory = os.path.join("..", "python_model", "inputs", "python", "Assets")
+# The platform is created with the name 'My_container' which is defined in the idmtools.ini file
 platform = Platform('My_container')
 task = JSONConfiguredPythonTask(script_path=os.path.join(assets_directory, "model.py"), parameters=(dict(c=0)))
 task.python_path = "python3"
