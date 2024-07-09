@@ -10,7 +10,8 @@ import shutil
 import subprocess
 from typing import Union
 from pathlib import Path
-from tabulate import tabulate
+from rich.console import Console
+from rich.table import Table
 from idmtools.core import ItemType
 from idmtools_platform_container.container_operations.docker_operations import list_running_jobs, \
     list_running_containers, get_container, find_running_job
@@ -126,11 +127,15 @@ def status(item_id: Union[int, str], container_id: str = None, limit: int = 10, 
 
 @container.command(help="List running Experiment/Simulation jobs")
 @click.argument('container-id', required=False)
-def jobs(container_id: str = None):
+@click.option('-l', '--limit', default=10, help="Max number of simulations to show")
+@click.option('-n', '--next', default=0, type=int, help="Next number of jobs to show")
+def jobs(container_id: str = None, limit: int = 10, next: int = 0):
     """
     List running Experiment/Simulation jobs in Container(s).
     Args:
         container_id: Container ID
+        limit: number of simulations to display
+        next: next number of jobs to show
     Returns:
         None
     """
@@ -142,9 +147,46 @@ def jobs(container_id: str = None):
 
     for container_id in containers:
         running_jobs = list_running_jobs(container_id)
-        if running_jobs:
-            print(tabulate([(job.item_type.name, job.item_id, job.job_id, job.container_id) for job in running_jobs],
-                           headers=('Entity Type', "Entity ID", "Job Id", "Container"), tablefmt='psql'))
+        if not running_jobs:
+            continue
+
+        # Separate jobs by group_pid
+        group = {}
+        for job in running_jobs:
+            if job.group_pid not in group:
+                group[job.group_pid] = []
+            group[job.group_pid].append(job)
+
+        for g in group:
+            _jobs = group[g]
+            # Get total number of running simulations
+            total_jobs = len(_jobs)
+            # Take the first job which is the experiment
+            exp_job = _jobs[0]
+            # Skip the first job which is the experiment
+            sim_jobs = _jobs[1:]
+
+            start = next * limit
+            end = start + limit
+            sim_next = sim_jobs[start:end]
+            # Include the experiment job
+            sim_next.insert(0, exp_job)
+
+            # Skip the first job which is the experiment
+            user_logger.info(f"Container {container_id} has {total_jobs - 1} running simulations.")
+            # table = Table(title="Running Jobs")
+            table = Table()
+
+            table.add_column("Entity Type", justify="right", style="cyan", no_wrap=True)
+            table.add_column("Entity ID", style="magenta")
+            table.add_column("Job ID", justify="right", style="green")
+            table.add_column("Container", justify="right", style="red")
+
+            for job in sim_next:
+                table.add_row(job.item_type.name, str(job.item_id), str(job.job_id), job.container_id)
+
+            console = Console()
+            console.print(table)
 
 
 @container.command(help="Get Suite/Experiment/Simulation file directory.")
