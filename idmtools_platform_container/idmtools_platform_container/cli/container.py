@@ -125,20 +125,20 @@ def status(item_id: Union[int, str], container_id: str = None, limit: int = 10, 
 
 
 @container.command(help="List running Experiment/Simulation jobs")
-@click.argument('c', required=False)
-def jobs(c: str = None):
+@click.argument('container-id', required=False)
+def jobs(container_id: str = None):
     """
     List running Experiment/Simulation jobs in Container(s).
     Args:
-        c: Container ID
+        container_id: Container ID
     Returns:
         None
     """
-    if c is None:
+    if container_id is None:
         client = docker.from_env()
         containers = [c.short_id for c in client.containers.list()]
     else:
-        containers = [c]
+        containers = [container_id]
 
     for container_id in containers:
         running_jobs = list_running_jobs(container_id)
