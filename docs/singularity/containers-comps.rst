@@ -1,6 +1,6 @@
-=============================
-Using containers in |COMPS_s|
-=============================
+==============================
+Using Singularity in |COMPS_s|
+==============================
 
 You can use the Singularity container files (.sif) for running simulations 
 on |COMPS_s|.
