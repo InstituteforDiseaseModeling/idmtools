@@ -1,4 +1,4 @@
-# This example demonstrates how to run a simulation using a container platform alias 'CONTAINER'.
+# This example demonstrates how to run a simulation using a container platform with idmtools.ini file.
 
 import os
 import sys
@@ -15,21 +15,15 @@ from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 
 from idmtools_test import COMMON_INPUT_PATH
 
-# job dir is where the experiment will be run.
-# Define Container Platform. For full list of parameters see container_platform.py in idmtools_platform_container
-platform = Platform('CONTAINER', job_directory="DEST")
-# Define path to assets directory
 assets_directory = os.path.join("..", "python_model", "inputs", "python", "Assets")
-# Define task
+platform = Platform('My_container')
 task = JSONConfiguredPythonTask(script_path=os.path.join(assets_directory, "model.py"), parameters=(dict(c=0)))
 task.python_path = "python3"
-# Define templated simulation
+
 ts = TemplatedSimulations(base_task=task)
 ts.base_simulation.tags['tag1'] = 1
-# Define builder
 builder = SimulationBuilder()
 
-# Define partial function to update parameter
 def param_update(simulation: Simulation, param: str, value: Any) -> Dict[str, Any]:
     return simulation.task.set_parameter(param, value)
 
@@ -40,14 +34,20 @@ builder.add_sweep_definition(partial(param_update, param="a"), range(3))
 builder.add_sweep_definition(partial(param_update, param="b"), range(5))
 ts.add_builder(builder)
 
-# Create Experiment using template builder
+# Now we can create our Experiment using our template builder
 experiment = Experiment.from_template(ts, name="python example")
 # Add our own custom tag to experiment
 experiment.tags["tag1"] = 1
-# And all files from assets_directory to experiment folder
+# And all files from dir at ../python_model/python/Assets folder to experiment folder
 experiment.assets.add_directory(assets_directory=assets_directory)
 
-experiment.run(platform=platform, wait_until_done=True)
+# Create suite
+suite = Suite(name='Idm Suite')
+suite.update_tags({'name': 'suite_tag', 'idmtools': '123'})
+# Add experiment to the suite
+suite.add_experiment(experiment)
+
+suite.run(platform=platform, wait_until_done=True)
 # run following command to check status
 print("idmtools file DEST status --exp-id " + experiment.id)
 sys.exit(0 if experiment.succeeded else -1)
