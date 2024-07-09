@@ -65,7 +65,7 @@ class ITask(metaclass=ABCMeta):
         self.__post_creation_hooks = []
 
     @property
-    def command(self):
+    def command(self):  # noqa: F811
         """
         Get the command line.
 
