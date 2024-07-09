@@ -76,13 +76,13 @@ def append_with_limit(lst: List, item: str, limit: int) -> List:
     return lst
 
 
-def summarize_status_files(exp_dir: str, max_display: int = 10, show: bool = False) -> NoReturn:
+def summarize_status_files(exp_dir: str, max_display: int = 10, verbose: bool = False) -> NoReturn:
     """
     Summarize the status of simulations.
     Args:
         exp_dir: Experiment Directory Path
         max_display: the maximum number of items to display
-        show: whether to display the simulation details
+        verbose: whether to display the simulation details
     Returns:
         None
     """
@@ -116,6 +116,6 @@ def summarize_status_files(exp_dir: str, max_display: int = 10, show: bool = Fal
 
     for status in ['SUCCEEDED', 'FAILED', 'RUNNING', 'PENDING']:
         user_logger.info(f"{status} ({counter[status]})")
-        if show:
+        if verbose:
             for folder in summary[status]:
                 user_logger.info(f"    {folder}")

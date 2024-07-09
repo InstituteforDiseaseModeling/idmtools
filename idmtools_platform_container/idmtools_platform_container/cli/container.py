@@ -84,15 +84,15 @@ def cancel(item_id: Union[int, str], container_id: str = None):
 @click.argument('item-id', required=True)
 @click.option('-c', '--container_id', help="Container Id")
 @click.option('-l', '--limit', default=10, help="Max number of simulations to show")
-@click.option('--show/--no-show', default=False, help="Display with working directory or not")
-def status(item_id: Union[int, str], container_id: str = None, limit: int = 10, show: bool = False):
+@click.option('--verbose/--no-verbose', default=False, help="Display with working directory or not")
+def status(item_id: Union[int, str], container_id: str = None, limit: int = 10, verbose: bool = False):
     """
     Check Experiment/Simulation status.
     Args:
         item_id: Experiment/Simulation ID or Job ID
         container_id: Container ID
         limit: number of simulations to display
-        show: display simulation details or not
+        verbose: display simulation details or not
     Returns:
         None
     """
@@ -102,7 +102,7 @@ def status(item_id: Union[int, str], container_id: str = None, limit: int = 10, 
             if job.item_type == ItemType.EXPERIMENT:
                 job_cache = JobHistory.get_job(job.item_id)
                 exp_dir = job_cache['EXPERIMENT_DIR']
-                summarize_status_files(exp_dir, max_display=limit, show=show)
+                summarize_status_files(exp_dir, max_display=limit, verbose=verbose)
             elif job.item_type == ItemType.SIMULATION:
                 user_logger.info(f"Simulation {job.item_id} is RUNNING.")
         else:
@@ -119,7 +119,7 @@ def status(item_id: Union[int, str], container_id: str = None, limit: int = 10, 
             user_logger.info(f"{item_type.name} {item_id} is {st}.")
         elif item_type == ItemType.EXPERIMENT:
             exp_dir = item_dir[0]
-            summarize_status_files(exp_dir, max_display=limit, show=show)
+            summarize_status_files(exp_dir, max_display=limit, verbose=verbose)
         else:
             user_logger.warning(f"{item_type.name} {item_id} status id not defined.")
 
@@ -392,7 +392,7 @@ def check_container(container_id: str = None):
 
 @container.command(help="Remove stopped containers.")
 @click.argument('container-id', required=False)
-def clear_container(container_id: str = None):
+def remove_container(container_id: str = None):
     """
     Clear stopped containers.
     Args:
