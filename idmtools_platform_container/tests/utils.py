@@ -1,9 +1,7 @@
-import time
 import uuid
-
 import docker
 import requests
-
+from idmtools_platform_container.container_operations.docker_operations import stop_container
 
 client = docker.from_env()
 
@@ -26,32 +24,6 @@ def find_containers_by_prefix(prefix, image_name=None):
                 print(f"An error occurred: {e}")
 
     return matched_containers
-
-
-def delete_container_by_name(container_name):
-    try:
-        # Retrieve the container
-        container = client.containers.get(container_name)
-        # Stop the container if it's running
-        container.stop()
-        # Remove the container
-        container.remove()
-        print(f"Container {container_name} has been deleted.")
-    except docker.errors.NotFound:
-        print(f"Container {container_name} not found.")
-    except docker.errors.APIError as e:
-        print(f"An error occurred: {e}")
-
-
-def stop_container_by_name(container_name):
-    try:
-        container = client.containers.get(container_name)
-        container.stop()
-        print(f"Container {container_name} has been stopped.")
-    except docker.errors.NotFound:
-        print(f"Container {container_name} does not exist.")
-    except docker.errors.APIError as e:
-        print(f"An error occurred: {e}")
 
 
 def is_valid_container_name_with_prefix(container_name, prefix):
@@ -94,7 +66,7 @@ def delete_containers_by_image_prefix(image_prefix):
 
     # Delete each matched container
     for container_name in containers_to_delete:
-        delete_container_by_name(container_name)
+        stop_container(container_name, remove=True)
 
 
 def get_container_name_by_id(container_id):
