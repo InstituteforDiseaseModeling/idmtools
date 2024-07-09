@@ -178,7 +178,7 @@ def jobs(container_id: str = None, limit: int = 10, next: int = 0):
             table = Table()
 
             table.add_column("Entity Type", justify="right", style="cyan", no_wrap=True)
-            table.add_column("Entity ID", style="magenta")
+            table.add_column("Entity ID", style="yellow")
             table.add_column("Job ID", justify="right", style="green")
             table.add_column("Container", justify="right", style="red")
 
