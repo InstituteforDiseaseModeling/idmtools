@@ -221,13 +221,13 @@ class JobHistory:
         """
         Expire job history based on the input expiration time.
         Args:
-            dt: datetime to expire (format like "2024-06-30 10:25:07 PM")
+            dt: datetime to expire (format like "2024-07-30 15:12:05")
         Returns:
             NoReturn
         """
         from datetime import datetime
         # Parse the datetime string into a datetime object
-        dt_object = datetime.strptime(dt, '%Y-%m-%d %I:%M:%S %p') if dt else None
+        dt_object = datetime.strptime(dt, '%Y-%m-%d %H:%M:%S') if dt else None
 
         # Convert the datetime object to a timestamp (seconds since epoch)
         timestamp = dt_object.timestamp() if dt_object else None
