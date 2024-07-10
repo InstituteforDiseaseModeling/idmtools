@@ -16,7 +16,7 @@ from typing import List, Optional, Dict
 base_directory = abspath(join(dirname(__file__), '..'))
 modules = ['idmtools_core', 'idmtools_cli', 'idmtools_platform_comps',
            'idmtools_models', 'idmtools_test', 'idmtools_platform_slurm', 'idmtools_slurm_utils',
-           'idmtools_platform_general']
+           'idmtools_platform_general', 'idmtools_platform_container']
 
 
 def run_command_on_all(idm_modules: List[str], command: str, parallel: bool = False, subdir: Optional[str] = None,
