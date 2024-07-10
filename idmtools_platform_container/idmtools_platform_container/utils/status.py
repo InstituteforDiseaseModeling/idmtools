@@ -6,7 +6,6 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 import os
 from typing import List, NoReturn
 from logging import getLogger
-
 from idmtools_platform_container.utils.general import normalize_path
 
 logger = getLogger(__name__)
