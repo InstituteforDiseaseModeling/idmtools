@@ -66,12 +66,12 @@ def validate_container_running(platform, **kwargs) -> str:
     if platform.force_start:
         if logger.isEnabledFor(DEBUG) and len(container_running) > 0:
             logger.debug(f"Stop all running containers {container_running}")
-        stop_all_containers(container_running)
+        stop_all_containers(container_running, keep_running=False)
         container_running = []
 
         if logger.isEnabledFor(DEBUG) and len(container_stopped) > 0 and platform.include_stopped:
             logger.debug(f"Stop all stopped containers {container_stopped}")
-        stop_all_containers(container_stopped)
+        stop_all_containers(container_stopped, keep_running=False)
         container_stopped = []
 
     if not platform.new_container and platform.container_prefix is None:
@@ -166,16 +166,20 @@ def stop_container(container: Union[str, Container], remove: bool = True) -> NoR
             raise TypeError("Invalid container object.")
 
         # Stop the container
-        container.stop()
-        if logger.isEnabledFor(DEBUG):
-            logger.debug(f"Container {str(container)} has been stopped.")
+        if container.status == 'running':
+            container.stop()
+            if logger.isEnabledFor(DEBUG):
+                logger.debug(f"Container {str(container)} has been stopped.")
 
         if remove:
             container.remove()
             if logger.isEnabledFor(DEBUG):
                 logger.debug(f"Container {str(container)} has been removed.")
     except ErrorNotFound:
-        logger.debug(f"Container {str(container)} not found.")
+        if isinstance(container, str):
+            logger.debug(f"Container with ID {container} not found.")
+        else:
+            logger.debug(f"Container {container.short_id} not found.")
     except DockerAPIError as e:
         logger.debug(f"Error stopping container {str(container)}: {str(e)}")
 
