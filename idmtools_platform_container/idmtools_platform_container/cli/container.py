@@ -173,10 +173,10 @@ def jobs(container_id: str = None, limit: int = 10, next: int = 0):
             sim_next.insert(0, exp_job)
 
             # Skip the first job which is the experiment
-            user_logger.info(f"Experiment {exp_job.item_id} on Container {container_id} has {total_jobs - 1} running simulations.")
-            # table = Table(title="Running Jobs")
-            table = Table()
+            user_logger.info(
+                f"Experiment {exp_job.item_id} on Container {container_id} has {total_jobs - 1} running simulations.")
 
+            table = Table()
             table.add_column("Entity Type", justify="right", style="cyan", no_wrap=True)
             table.add_column("Entity ID", style="yellow")
             table.add_column("Job ID", justify="right", style="green")
@@ -456,10 +456,3 @@ def remove_container(container_id: str = None):
         if container.status != 'running':
             # container.stop()
             container.remove()
-
-
-@container.command(help="Get History Containers.")
-def container_history():
-    """List of job containers."""
-    data = JobHistory.container_history()
-    user_logger.info(json.dumps(data, indent=2))
