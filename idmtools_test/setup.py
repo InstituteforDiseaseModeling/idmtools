@@ -32,11 +32,16 @@ setup(
     author=[author[0] for author in authors],
     author_email=[author[1] for author in authors],
     classifiers=[
-        'Framework:: IDM-Tools :: Test'
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12'
     ],
     description="Test and demo data for IDM-Tools",
     install_requires=requirements,
-    long_description=readme,
+    long_description=None,
     include_package_data=True,
     keywords='modeling, IDM, test, testdata, demodata',
     name='idmtools_test',

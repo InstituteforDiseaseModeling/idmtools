@@ -19,6 +19,7 @@ for file_prefix in ['', 'dev_', 'build_']:
 # Conditional dependency based on Python version
 conditional_requirements = ['importlib_metadata; python_version < "3.8"']
 
+
 version = '1.7.10+nightly'
 
 extras = {
@@ -53,12 +54,11 @@ setup(
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
-        'Programming Language :: Python :: 3.12',
-        'Framework:: IDM-Tools'
+        'Programming Language :: Python :: 3.12'
     ],
     description="Core tools for modeling",
     install_requires=extra_require_files['requirements'] + conditional_requirements,
-    long_description=readme,
+    long_description=None,
     include_package_data=True,
     keywords='modeling, IDM',
     name='idmtools',
