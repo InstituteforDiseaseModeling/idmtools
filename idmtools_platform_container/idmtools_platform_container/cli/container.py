@@ -14,7 +14,7 @@ from rich.console import Console
 from rich.table import Table
 from idmtools.core import ItemType
 from idmtools_platform_container.container_operations.docker_operations import list_running_jobs, \
-    list_running_containers, get_container, find_running_job
+    list_running_containers, get_container, find_running_job, list_containers
 from idmtools_platform_container.utils.job_history import JobHistory
 from idmtools_platform_container.utils.status import summarize_status_files, get_simulation_status
 from idmtools_platform_container.utils.general import convert_byte_size
@@ -436,7 +436,7 @@ def check_container(container_id: str = None):
 @click.argument('container-id', required=False)
 def remove_container(container_id: str = None):
     """
-    Clear stopped containers.
+    Remove stopped containers.
     Args:
         container_id: container id
     Returns:
@@ -450,7 +450,7 @@ def remove_container(container_id: str = None):
         else:
             containers = [container]
     else:
-        containers = list_running_containers()
+        containers = list_containers(include_stopped=True)
 
     for container in containers:
         if container.status != 'running':

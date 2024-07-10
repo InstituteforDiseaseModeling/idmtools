@@ -180,16 +180,22 @@ def stop_container(container: Union[str, Container], remove: bool = True) -> NoR
         logger.debug(f"Error stopping container {str(container)}: {str(e)}")
 
 
-def stop_all_containers(containers: List[Union[str, Container]], remove: bool = True) -> NoReturn:
+def stop_all_containers(containers: List[Union[str, Container]], keep_running: bool = True,
+                        remove: bool = True) -> NoReturn:
     """
     Stop all containers.
     Args:
         containers: list of container id or containers to be stopped
+        keep_running: bool, if keep the running containers or not
         remove: bool, if remove the container or not
     Returns:
         No return
     """
     for container in containers:
+        if container.status == 'running' and keep_running:
+            jobs = list_running_jobs(container.short_id)
+            if jobs:
+                continue
         stop_container(container, remove=remove)
 
 
