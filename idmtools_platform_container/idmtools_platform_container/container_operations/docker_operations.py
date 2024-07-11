@@ -481,6 +481,7 @@ def find_running_job(item_id: Union[int, str], container_id: str = None) -> Job:
     else:
         containers = [container.short_id for container in list_running_containers()]
 
+    match_jobs = []
     for cid in containers:
         jobs = list_running_jobs(cid)
         if len(jobs) == 0:
@@ -488,5 +489,15 @@ def find_running_job(item_id: Union[int, str], container_id: str = None) -> Job:
 
         for job in jobs:
             if job.item_id == item_id or str(job.job_id) == str(item_id):
-                return job
-    return None
+                match_jobs.append(job)
+                break  # One running container can't have multiple matches!
+
+    if len(match_jobs) > 1:
+        # item_is must be a Job ID in this case and container_id must be None!
+        user_logger.error(
+            f"Multiple jobs found for Job ID {item_id}, please provide the Container ID or use Entity ID instead.")
+        exit(-1)
+    elif len(match_jobs) == 1:
+        return match_jobs[0]
+    else:
+        return None
