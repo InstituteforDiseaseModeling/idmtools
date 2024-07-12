@@ -14,7 +14,8 @@ from rich.console import Console
 from rich.table import Table
 from idmtools.core import ItemType
 from idmtools_platform_container.container_operations.docker_operations import list_running_jobs, \
-    list_running_containers, get_container, find_running_job, list_containers
+    list_running_containers, get_container, find_running_job, list_containers, is_docker_installed, \
+    is_docker_daemon_running
 from idmtools_platform_container.utils.job_history import JobHistory
 from idmtools_platform_container.utils.status import summarize_status_files, get_simulation_status
 from idmtools_platform_container.utils.general import convert_byte_size
@@ -51,6 +52,22 @@ def possible_jobid(item_id: str):
         return True
     else:
         return False
+
+
+@container.command(help="Check docker environment.")
+def docker():
+    """Check docker environment."""
+    if not is_docker_installed():
+        user_logger.error("Docker is not installed.")
+        exit(-1)
+
+    if not is_docker_daemon_running():
+        user_logger.warning("Docker daemon is not running.")
+        exit(-1)
+
+    # Check docker version
+    result = subprocess.run(['docker', '--version'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    user_logger.info(f"{result.stdout.strip()}.")
 
 
 @container.command(help="Cancel Experiment/Simulation job.")
