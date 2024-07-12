@@ -363,9 +363,9 @@ def clear_job(item_id: str, remove: bool = True):
         exit(-1)
 
 
-@container.command(help="Check container info.")
+@container.command(help="Check container information.")
 @click.argument('container-id', required=False)
-def check_container(container_id: str = None):
+def inspect_container(container_id: str = None):
     """
     Check container information.
     Args:
