@@ -14,7 +14,7 @@ from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools_platform_container.container_operations.docker_operations import validate_container_running, \
-    find_container_by_image, compare_mounts, find_running_job
+    find_container_by_image, compare_mounts
 from idmtools_platform_container.utils.general import map_container_path
 from idmtools_platform_container.utils.job_history import JobHistory
 from idmtools_platform_file.file_platform import FilePlatform
@@ -94,12 +94,6 @@ class ContainerPlatform(FilePlatform):
         if isinstance(item, Experiment):
             if logger.isEnabledFor(DEBUG):
                 logger.debug("Run experiment on container!")
-
-            # Check if the experiment is already running
-            job = find_running_job(item.id)
-            if job:
-                user_logger.warning(f"Experiment {item.id} is already running on Container {job.container_id}.")
-                exit(0)
 
             # Start the container
             self.container_id = self.check_container(**kwargs)
