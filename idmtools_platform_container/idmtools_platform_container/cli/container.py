@@ -204,26 +204,6 @@ def get_job(exp_id: str):
         user_logger.info(json.dumps(item, indent=2))
 
 
-@container.command(help="Update Experiment Expire Time.")
-@click.argument('exp-id', type=str, required=True)
-@click.option('-s', '--second', default=None, type=int, help="New time to expire in seconds")
-def update_expire(exp_id: str, second: int = None):
-    """
-    Get Experiment job history.
-    Args:
-        exp_id: Experiment ID
-        second: New time to expire in seconds
-    Returns:
-        None
-    """
-    item = JobHistory.get_job(exp_id)
-    if item:
-        JobHistory.history.touch(exp_id, expire=second)
-        user_logger.info(f"Experiment {exp_id} expire time updated to {second} seconds.")
-    else:
-        user_logger.warning(f"Experiment {exp_id} not found.")
-
-
 @container.command(help="View job history.")
 @click.argument('container-id', required=False)
 @click.option('-l', '--limit', default=10, type=int, help="Max number of jobs to show")
@@ -295,19 +275,6 @@ def volume():
     v = JobHistory.volume()
     mv = convert_byte_size(v)
     user_logger.info(f"Job history volume: {mv}")
-
-
-@container.command(help="Cancel experiment/simulation.")
-@click.option('--dt', default=None, help="Datetime to expire (format like '2024-07-30 15:12:05')")
-def expire(dt: str = None):
-    """
-    Expire Job History based on input datetime.
-    Args:
-        dt: datetime to expire
-    Returns:
-        None
-    """
-    JobHistory.expire_history(dt=dt)
 
 
 @container.command(help="Clear Job History.")
