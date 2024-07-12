@@ -440,3 +440,35 @@ def remove_container(container_id: str = None):
         if container.status != 'running':
             # container.stop()
             container.remove()
+
+
+@container.command(help="pip install packages on container.")
+@click.argument('package', required=True)
+@click.option('-c', '--container-id', type=str, help="Container ID")
+@click.option('-i', '--index-url', type=str, help="index-url for pip install")
+@click.option('-e', '--extra-index-url', type=str, help="extra-index-url for pip install")
+def install(package: str, container_id: str, index_url: str = None, extra_index_url: str = None):
+    """
+    Pip install package on container.
+    Args:
+        package: package name
+        container_id: Container ID
+        index_url: index-url for pip install
+        extra_index_url: extra-index-url for pip install
+    Returns:
+        None
+    """
+    if index_url:
+        package = f"--index-url {index_url} {package}"
+    elif extra_index_url:
+        package = f"--extra-index-url {extra_index_url} {package}"
+    else:
+        package = f"{package}"
+
+    command = f'docker exec {container_id} bash -c "pip3 install {package}"'
+    try:
+        result = subprocess.run(command, shell=True, check=True, capture_output=True, text=True)
+        # Process the result if needed
+        user_logger.info(result.stdout)
+    except subprocess.CalledProcessError as e:
+        user_logger.error(e.stderr)
