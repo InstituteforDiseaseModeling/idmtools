@@ -489,7 +489,11 @@ def find_running_job(item_id: Union[int, str], container_id: str = None) -> Job:
     if container_id:
         containers = [container_id]
     else:
-        containers = [container.short_id for container in list_running_containers()]
+        his_job = JobHistory.get_job(item_id)
+        if his_job:
+            containers = [his_job['CONTAINER']]
+        else:
+            containers = [container.short_id for container in list_running_containers()]
 
     match_jobs = []
     for cid in containers:
