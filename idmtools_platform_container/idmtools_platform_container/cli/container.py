@@ -157,8 +157,7 @@ def jobs(container_id: str = None, limit: int = 10, next: int = 0):
         None
     """
     if container_id is None:
-        client = docker.from_env()
-        containers = [c.short_id for c in client.containers.list()]
+        containers = [c.short_id for c in list_running_containers()]
     else:
         containers = [container_id]
 
