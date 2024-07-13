@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from typing import List, Dict, NoReturn, Any, Union
 from idmtools.core import ItemType
 from idmtools_platform_container.utils.general import normalize_path, parse_iso8601
+from idmtools_platform_container.utils.job_history import JobHistory
 from docker.models.containers import Container
 from docker.errors import NotFound as ErrorNotFound
 from docker.errors import APIError as DockerAPIError
@@ -228,7 +229,6 @@ def list_running_containers() -> List[Container]:
     Returns:
         list of running containers
     """
-    from idmtools_platform_container.utils.job_history import JobHistory
     JobHistory.initialization()
     client = docker.from_env()
 
@@ -247,9 +247,12 @@ def list_containers(include_stopped: bool = False) -> Dict:
     Returns:
         dict of containers
     """
+    JobHistory.initialization()
     client = docker.from_env()
     container_found = {}
     for container in client.containers.list(all=include_stopped):
+        if not JobHistory.verify_container(container.id):
+            continue
         if container.status not in CONTAINER_STATUS:
             continue
         if container_found.get(container.status, None) is None:
