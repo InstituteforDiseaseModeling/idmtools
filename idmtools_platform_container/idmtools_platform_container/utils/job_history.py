@@ -315,3 +315,15 @@ class JobHistory:
             data[container_id].append(key)
 
         return data
+
+    @classmethod
+    @initialize()
+    def verify_container(cls, container_id) -> bool:
+        """Verify history container."""
+        cache = cls.history
+
+        for key in cache:
+            value = cache[key]
+            if container_id == value['CONTAINER']:
+                return True
+        return False
