@@ -224,12 +224,19 @@ def sort_containers_by_start(containers: List[Container], reverse: bool = True) 
 
 def list_running_containers() -> List[Container]:
     """
-    List all running containers.
+    List all running containers from history.
     Returns:
         list of running containers
     """
+    from idmtools_platform_container.utils.job_history import JobHistory
+    JobHistory.initialization()
     client = docker.from_env()
-    return client.containers.list()
+
+    containers = []
+    for container in client.containers.list():
+        if JobHistory.verify_container(container.short_id):
+            containers.append(container)
+    return containers
 
 
 def list_containers(include_stopped: bool = False) -> Dict:
