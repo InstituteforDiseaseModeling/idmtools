@@ -468,8 +468,9 @@ def list_running_jobs(container_id: str, limit: int = None) -> List[Job]:
     elif result.returncode == 1:
         pass
     else:
+        logger.error(result.stderr)
         user_logger.error(f"Command failed with return code {result.returncode}")
-        user_logger.error(result.stderr)
+        exit(-1)
 
     if limit:
         running_jobs = running_jobs[:limit]
