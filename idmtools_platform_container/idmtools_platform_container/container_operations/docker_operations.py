@@ -136,9 +136,8 @@ def find_container_by_image(image: str, include_stopped: bool = False) -> Dict:
     Returns:
         dict of containers
     """
-    client = docker.from_env()
     container_found = {}
-    for container in client.containers.list(all=include_stopped):
+    for container in list_containers(include_stopped):
         if container.status not in CONTAINER_STATUS:
             continue
         if image in container.image.tags:
