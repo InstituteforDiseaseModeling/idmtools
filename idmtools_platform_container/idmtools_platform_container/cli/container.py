@@ -471,3 +471,21 @@ def install(package: str, container_id: str, index_url: str = None, extra_index_
         user_logger.info(result.stdout)
     except subprocess.CalledProcessError as e:
         user_logger.error(e.stderr)
+
+
+@container.command(help="List packages installed on container.")
+@click.argument('container-id', required=True)
+def packages(container_id: str):
+    command = f'docker exec {container_id} bash -c "pip list"'
+    result = subprocess.run(command, shell=True, check=False, capture_output=True, text=True)
+    if result.returncode == 0:
+        user_logger.info(f"{result.stdout.strip()}")
+
+
+@container.command(help="List running processes in container.")
+@click.argument('container-id', required=True)
+def processes(container_id: str):
+    command = f'docker exec {container_id} bash -c "ps -efj"'
+    result = subprocess.run(command, shell=True, check=False, capture_output=True, text=True)
+    if result.returncode == 0:
+        user_logger.info(f"{result.stdout.strip()}")
