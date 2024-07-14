@@ -114,7 +114,20 @@ def status(item_id: Union[int, str], container_id: str = None, limit: int = 10, 
     Returns:
         None
     """
-    if possible_jobid(item_id):
+    item_dir = JobHistory.get_item_path(item_id)
+    if item_dir is not None:
+        # Experiment/Simulation case
+        item_type = item_dir[1]
+        if item_type == ItemType.SIMULATION:
+            st = get_simulation_status(item_dir[0])
+            user_logger.info(f"{item_type.name} {item_id} is {st}.")
+        elif item_type == ItemType.EXPERIMENT:
+            exp_dir = item_dir[0]
+            summarize_status_files(exp_dir, max_display=limit, verbose=verbose)
+        else:
+            user_logger.warning(f"{item_type.name} {item_id} status id not defined.")
+    else:
+        # Job ID case
         job = find_running_job(item_id, container_id)
         if job:
             if job.item_type == ItemType.EXPERIMENT:
@@ -125,21 +138,6 @@ def status(item_id: Union[int, str], container_id: str = None, limit: int = 10, 
                 user_logger.info(f"Simulation {job.item_id} is RUNNING.")
         else:
             user_logger.warning(f"Job {item_id} not found.")
-    else:
-        item_dir = JobHistory.get_item_path(item_id)
-        if item_dir is None:
-            user_logger.warning(f"Item {item_id} not found in Job History.")
-            exit(-1)
-
-        item_type = item_dir[1]
-        if item_type == ItemType.SIMULATION:
-            st = get_simulation_status(item_dir[0])
-            user_logger.info(f"{item_type.name} {item_id} is {st}.")
-        elif item_type == ItemType.EXPERIMENT:
-            exp_dir = item_dir[0]
-            summarize_status_files(exp_dir, max_display=limit, verbose=verbose)
-        else:
-            user_logger.warning(f"{item_type.name} {item_id} status id not defined.")
 
 
 @container.command(help="List running Experiment/Simulation jobs")
@@ -476,8 +474,10 @@ def install(package: str, container_id: str, index_url: str = None, extra_index_
 @container.command(help="List packages installed on container.")
 @click.argument('container-id', required=True)
 def packages(container_id: str):
+    if not JobHistory.verify_container(container_id):
+        user_logger.error(f"Container {container_id} not found.")
+        return
     command = f'docker exec {container_id} bash -c "pip list"'
-
     try:
         result = subprocess.run(command, shell=True, check=True, capture_output=True, text=True)
         user_logger.info(result.stdout)
@@ -488,6 +488,9 @@ def packages(container_id: str):
 @container.command(help="List running processes in container.")
 @click.argument('container-id', required=True)
 def processes(container_id: str):
+    if not JobHistory.verify_container(container_id):
+        user_logger.error(f"Container {container_id} not found.")
+        return
     command = f'docker exec {container_id} bash -c "ps -efj"'
     try:
         result = subprocess.run(command, shell=True, check=True, capture_output=True, text=True)
