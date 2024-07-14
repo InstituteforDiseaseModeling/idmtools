@@ -457,6 +457,13 @@ def install(package: str, container_id: str, index_url: str = None, extra_index_
 @container.command(help="List packages installed on container.")
 @click.argument('container-id', required=True)
 def packages(container_id: str):
+    """
+    List packages installed on container.
+    Args:
+        container_id: Container ID
+    Returns:
+        None
+    """
     if not JobHistory.verify_container(container_id):
         user_logger.error(f"Container {container_id} not found.")
         return
@@ -471,6 +478,13 @@ def packages(container_id: str):
 @container.command(help="List running processes in container.")
 @click.argument('container-id', required=True)
 def processes(container_id: str):
+    """
+    List running processes in container.
+    Args:
+        container_id: Container ID
+    Returns:
+        None
+    """
     if not JobHistory.verify_container(container_id):
         user_logger.error(f"Container {container_id} not found.")
         return
