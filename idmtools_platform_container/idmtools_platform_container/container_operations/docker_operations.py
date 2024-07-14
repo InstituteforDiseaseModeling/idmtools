@@ -180,8 +180,10 @@ def stop_container(container: Union[str, Container], remove: bool = True) -> NoR
             logger.debug(f"Container with ID {container} not found.")
         else:
             logger.debug(f"Container {container.short_id} not found.")
+        exit(-1)
     except DockerAPIError as e:
         logger.debug(f"Error stopping container {str(container)}: {str(e)}")
+        exit(-1)
 
 
 def stop_all_containers(containers: List[Union[str, Container]], keep_running: bool = True,
@@ -228,9 +230,7 @@ def list_running_containers() -> List[Container]:
     Returns:
         list of running containers
     """
-    JobHistory.initialization()
     client = docker.from_env()
-
     containers = []
     for container in client.containers.list():
         if JobHistory.verify_container(container.short_id):
@@ -246,7 +246,6 @@ def list_containers(include_stopped: bool = False) -> Dict:
     Returns:
         dict of containers
     """
-    JobHistory.initialization()
     client = docker.from_env()
     container_found = {}
     for container in client.containers.list(all=include_stopped):
@@ -460,8 +459,7 @@ def list_running_jobs(container_id: str, limit: int = None) -> List[Job]:
     running_jobs = []
     if result.returncode == 0:
         processes = result.stdout
-
-        for line in processes.splitlines()[1:]:  # Skip the first headerline
+        for line in processes.splitlines()[1:]:  # Skip the first header line
             if 'EXPERIMENT' in line or 'SIMULATION' in line:
                 job = Job(container_id, line)
                 running_jobs.append(job)

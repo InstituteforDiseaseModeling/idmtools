@@ -96,9 +96,9 @@ class ContainerPlatform(FilePlatform):
                 logger.debug("Run experiment on container!")
 
             # Check if the experiment is already running
-            exp_his = JobHistory.get_job(item.id)
-            if exp_his:
-                job = find_running_job(item.id, exp_his['CONTAINER'])
+            his_job = JobHistory.get_job(item.id)
+            if his_job:
+                job = find_running_job(item.id, his_job['CONTAINER'])
                 if job:
                     user_logger.warning(f"Experiment {item.id} is already running on Container {job.container_id}.")
                     exit(-1)
@@ -182,7 +182,6 @@ class ContainerPlatform(FilePlatform):
             full_command = ["docker", "exec", self.container_id, "bash", "-c", ";".join(commands)]
             # Execute the command
             subprocess.run(full_command, stdout=subprocess.PIPE)
-
         except subprocess.CalledProcessError as e:
             user_logger.warning(f"Failed to convert script: {e}")
         except Exception as ex:
@@ -216,7 +215,6 @@ class ContainerPlatform(FilePlatform):
             result = subprocess.run(full_command, shell=True, check=True, capture_output=True, text=True)
             if logger.isEnabledFor(DEBUG):
                 logger.debug(f"Result from submit: {result}")
-
         except subprocess.CalledProcessError as e:
             user_logger.warning(f"Failed to submit job to container: {e}")
         except Exception as ex:
@@ -236,7 +234,6 @@ class ContainerPlatform(FilePlatform):
         if self.user_mounts is not None:
             for key, value in self.user_mounts.items():
                 volumes[key] = {"bind": value, "mode": "rw"}
-
         return volumes
 
     def get_mounts(self) -> List:
@@ -250,7 +247,6 @@ class ContainerPlatform(FilePlatform):
                  'Source': self.job_directory,
                  'Destination': self.data_mount,
                  'Mode': 'rw'}
-
         mounts.append(mount)
 
         # Add user-defined volume mappings
