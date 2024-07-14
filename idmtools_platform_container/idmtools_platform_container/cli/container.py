@@ -55,7 +55,7 @@ def possible_jobid(item_id: str):
 
 
 @container.command(help="Check docker environment.")
-def varify_docker():
+def verify_docker():
     """Check docker environment."""
     if not is_docker_installed():
         user_logger.error("Docker is not installed.")
