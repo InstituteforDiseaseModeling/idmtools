@@ -379,9 +379,9 @@ def clear_results(item_id: str, remove: bool = True):
         exit(-1)
 
 
-@container.command(help="Check container information.")
+@container.command(help="Inspect container.")
 @click.argument('container-id', required=False)
-def inspect_container(container_id: str = None):
+def inspect(container_id: str = None):
     """
     Check container information.
     Args:
