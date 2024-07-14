@@ -325,10 +325,10 @@ def history_count(container_id: str = None):
     user_logger.info(JobHistory.count(container_id))
 
 
-@container.command(help="Clear generated files/folders")
+@container.command(help="Clear job generated files/folders")
 @click.argument('item-id', type=str, required=True)
 @click.option('-r', '--remove', multiple=True, help="list of files/folders to be removed from simulation")
-def clear_job(item_id: str, remove: bool = True):
+def clear_results(item_id: str, remove: bool = True):
     """
     Clear the generated output files for a job.
     Args:
