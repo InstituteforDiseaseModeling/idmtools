@@ -5,7 +5,6 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import json
 import click
-import docker
 import shutil
 import subprocess
 from typing import Union
@@ -13,9 +12,8 @@ from pathlib import Path
 from rich.console import Console
 from rich.table import Table
 from idmtools.core import ItemType
-from idmtools_platform_container.container_operations.docker_operations import list_running_jobs, \
-    list_running_containers, get_container, find_running_job, list_containers, is_docker_installed, \
-    is_docker_daemon_running
+from idmtools_platform_container.container_operations.docker_operations import list_running_jobs, find_running_job, \
+    is_docker_installed, is_docker_daemon_running, get_working_containers
 from idmtools_platform_container.utils.job_history import JobHistory
 from idmtools_platform_container.utils.status import summarize_status_files, get_simulation_status
 from idmtools_platform_container.utils.general import convert_byte_size
@@ -140,10 +138,13 @@ def jobs(container_id: str = None, limit: int = 10, next: int = 0):
     Returns:
         None
     """
-    if container_id is None:
-        containers = [c.short_id for c in list_running_containers()]
-    else:
-        containers = [container_id]
+    containers = get_working_containers(container_id)
+    if len(containers) == 0:
+        if container_id:
+            user_logger.warning(f"Container {container_id} not found.")
+        else:
+            user_logger.warning("No containers found.")
+        return
 
     for container_id in containers:
         running_jobs = list_running_jobs(container_id)
@@ -373,15 +374,13 @@ def inspect(container_id: str = None):
     Returns:
         None
     """
-    if container_id is not None:
-        container = get_container(container_id)
-        if container is None:
-            user_logger.info(f"Container {container_id} not found.")
-            return
+    containers = get_working_containers(container_id, entity=True)
+    if len(containers) == 0:
+        if container_id:
+            user_logger.warning(f"Container {container_id} not found.")
         else:
-            containers = [container]
-    else:
-        containers = list_running_containers()
+            user_logger.warning("No containers found.")
+        return
 
     for container in containers:
         user_logger.info('-' * 100)
@@ -409,15 +408,13 @@ def remove_container(container_id: str = None):
     Returns:
         None
     """
-    if container_id is not None:
-        container = get_container(container_id)
-        if container is None:
-            user_logger.info(f"Container {container_id} not found.")
-            return
+    containers = get_working_containers(container_id, entity=True)
+    if len(containers) == 0:
+        if container_id:
+            user_logger.warning(f"Container {container_id} not found.")
         else:
-            containers = [container]
-    else:
-        containers = list_containers(include_stopped=True)
+            user_logger.warning("No containers found.")
+        return
 
     for container in containers:
         if container.status != 'running':
