@@ -137,15 +137,14 @@ def find_container_by_image(image: str, include_stopped: bool = False) -> Dict:
         dict of containers
     """
     container_found = {}
-    for container in list_containers(include_stopped):
-        if container.status not in CONTAINER_STATUS:
-            continue
-        if image in container.image.tags:
-            if logger.isEnabledFor(DEBUG):
-                logger.debug(f"Image {image} found in container ({container.status}): {container.short_id}")
-            if container_found.get(container.status, None) is None:
-                container_found[container.status] = []
-            container_found[container.status].append(container)
+    for container_list in list_containers(include_stopped).values():
+        for container in container_list:
+            if image in container.image.tags:
+                if logger.isEnabledFor(DEBUG):
+                    logger.debug(f"Image {image} found in container ({container.status}): {container.short_id}")
+                if container_found.get(container.status, None) is None:
+                    container_found[container.status] = []
+                container_found[container.status].append(container)
 
     return container_found
 
