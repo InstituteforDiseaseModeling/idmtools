@@ -40,20 +40,6 @@ def container():
     pass
 
 
-def possible_jobid(item_id: str):
-    """
-    Check if item_id is a job id.
-    Args:
-        item_id: item id
-    Returns:
-        bool
-    """
-    if isinstance(item_id, int) or (isinstance(item_id, str) and item_id.isdigit()):
-        return True
-    else:
-        return False
-
-
 @container.command(help="Check docker environment.")
 def verify_docker():
     """Check docker environment."""
