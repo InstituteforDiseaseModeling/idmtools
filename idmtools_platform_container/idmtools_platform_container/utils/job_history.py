@@ -324,6 +324,6 @@ class JobHistory:
 
         for key in cache:
             value = cache[key]
-            if container_id == value['CONTAINER']:
+            if container_id.startswith(value['CONTAINER']):
                 return True
         return False
