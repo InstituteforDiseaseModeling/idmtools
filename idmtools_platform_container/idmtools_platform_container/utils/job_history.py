@@ -274,7 +274,7 @@ class JobHistory:
 
         for key in cache:
             values = cache.get(key)
-            exp_dir = values.get('EXPERIMENT_ID')
+            exp_dir = values.get('EXPERIMENT_DIR')
 
             root = Path(exp_dir)
             if not root.exists():
