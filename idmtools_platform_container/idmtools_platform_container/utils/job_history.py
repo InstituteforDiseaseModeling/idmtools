@@ -90,8 +90,7 @@ class JobHistory:
             job data in dict
         """
         if not is_valid_uuid(exp_id):
-            user_logger.info(f"Invalid item id: {exp_id}")
-            return
+            return None
 
         cache = cls.history
         value, expire_time = cache.get(exp_id, expire_time=True)
