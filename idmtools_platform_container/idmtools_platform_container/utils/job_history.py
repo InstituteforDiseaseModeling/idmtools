@@ -96,9 +96,9 @@ class JobHistory:
         value, expire_time = cache.get(exp_id, expire_time=True)
         if value is None:
             if exp_id in list(cache):
-                user_logger.info(f"Item {exp_id} expired.")
+                logger.debug(f"Item {exp_id} expired.")
             else:
-                user_logger.info(f"Item {exp_id} not found.")
+                logger.debug(f"Item {exp_id} not found.")
         else:
             local_expire_time = datetime.fromtimestamp(expire_time) if expire_time else None
             expire_time_str = local_expire_time.strftime('%Y-%m-%d %H:%M:%S') if local_expire_time else None
