@@ -218,20 +218,6 @@ def sort_containers_by_start(containers: List[Container], reverse: bool = True) 
     return sorted_container_list
 
 
-def list_running_containers() -> List[Container]:
-    """
-    List all running containers from history.
-    Returns:
-        list of running containers
-    """
-    client = docker.from_env()
-    containers = []
-    for container in client.containers.list():
-        if JobHistory.verify_container(container.short_id):
-            containers.append(container)
-    return containers
-
-
 def list_containers(include_stopped: bool = False) -> Dict:
     """
     Find the containers that match the image.
@@ -265,18 +251,20 @@ def get_working_containers(container_id: str = None, entity: bool = False) -> Li
     """
     if container_id is None:
         if entity:
-            containers = list_running_containers()
+            containers = list_containers().get('running', [])
         else:
-            containers = [c.short_id for c in list_running_containers()]
+            containers = [c.short_id for c in list_containers().get('running', [])]
     else:
         if not JobHistory.verify_container(container_id):
-            logger.error(f"Container {container_id} not found.")
+            logger.error(f"Container {container_id} not found in History.")
             containers = []
         else:
-            if entity:
-                containers = [get_container(container_id)]
+            container = get_container(container_id)
+            if container:
+                containers = [container] if entity else [container.short_id]
             else:
-                containers = [container_id]
+                logger.warning(f"Container {container_id} not found.")
+                containers = []
 
     return containers
 
@@ -512,7 +500,7 @@ def find_running_job(item_id: Union[int, str], container_id: str = None) -> Job:
         if his_job:
             containers = [his_job['CONTAINER']]
         else:
-            containers = [container.short_id for container in list_running_containers()]
+            containers = get_working_containers()
 
     match_jobs = []
     for cid in containers:
@@ -534,3 +522,8 @@ def find_running_job(item_id: Union[int, str], container_id: str = None) -> Job:
         return match_jobs[0]
     else:
         return None
+
+
+if __name__ == "__main__":
+    cl = get_working_containers('404cbd150e26', entity=False)
+    print(cl)
