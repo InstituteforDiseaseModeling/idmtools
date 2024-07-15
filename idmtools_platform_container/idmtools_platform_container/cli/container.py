@@ -270,7 +270,7 @@ def is_running(item_id: str):
             user_logger.info(f"Job {item_id} is not found.")
 
 
-@container.command(help="Cancel experiment/simulation.")
+@container.command(help="Check History Volume.")
 def volume():
     """Get job history volume."""
     v = JobHistory.volume()
@@ -399,12 +399,12 @@ def inspect(container_id: str = None):
         print()
 
 
-@container.command(help="Stopped running container(s).")
+@container.command(help="Stop running container(s).")
 @click.argument('container-id', required=False)
 @click.option('--remove/--no-remove', default=False, help="Display with working directory or not")
 def stop_container(container_id: str = None, remove: bool = False):
     """
-    Sopped running container(s).
+    Sopp running container(s).
     Args:
         container_id: container id
         remove: remove container or not
