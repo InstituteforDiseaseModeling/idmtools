@@ -189,7 +189,7 @@ def jobs(container_id: str = None, limit: int = 10, next: int = 0):
             console.print(table)
 
 
-@container.command(help="Get Experiment History.")
+@container.command(help="Get Experiment history.")
 @click.argument('exp-id', type=str, required=True)
 def get_job(exp_id: str):
     """
@@ -272,7 +272,7 @@ def is_running(item_id: str):
             user_logger.info(f"Job {item_id} is not found.")
 
 
-@container.command(help="Check History Volume.")
+@container.command(help="Check history volume.")
 def volume():
     """Get job history volume."""
     v = JobHistory.volume()
@@ -299,7 +299,7 @@ def sync_history():
     JobHistory.sync()
 
 
-@container.command(help="Get History Count.")
+@container.command(help="Get history count.")
 @click.argument('container-id', required=False)
 def history_count(container_id: str = None):
     """
