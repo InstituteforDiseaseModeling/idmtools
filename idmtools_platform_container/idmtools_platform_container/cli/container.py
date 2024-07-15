@@ -554,16 +554,16 @@ def processes(container_id: str):
 
 
 @container.command(help="List available containers.")
-@click.argument('include-stopped', type=bool, default=False, required=False)
-def containers(include_stopped: bool = False):
+@click.option('--all/--no-all', default=False, help="Include stopped containers or not")
+def containers(all: bool = False):
     """
     List available containers.
     Args:
-        include_stopped: include stopped containers or not
+        all: bool, include stopped containers or not
     Returns:
         None
     """
-    containers = list_containers(include_stopped=include_stopped)
+    containers = list_containers(include_stopped=all)
 
     table = Table()
     table.add_column("Container ID", justify="right", style="cyan", no_wrap=True)
