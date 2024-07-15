@@ -4,6 +4,7 @@ Here we implement the ContainerPlatform status utils.
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import os
+from rich.console import Console
 from typing import List, NoReturn
 from logging import getLogger
 from idmtools_platform_container.utils.general import normalize_path
@@ -110,11 +111,20 @@ def summarize_status_files(exp_dir: str, max_display: int = 10, verbose: bool = 
                 counter['PENDING'] += 1
 
     # Print out the results
-    user_logger.info(f'\nExperiment Directory: \n{normalize_path(exp_dir)}\n')
-    user_logger.info(f"Simulation Count: {total_simulation_count}\n")
+    console = Console()
+    console.print(f'\n[bold][cyan]Experiment Directory[/][/]: \n{normalize_path(exp_dir)}\n')
+    console.print(f"[bold][cyan]Simulation Count[/][/]: {total_simulation_count}\n")
 
     for status in ['SUCCEEDED', 'FAILED', 'RUNNING', 'PENDING']:
-        user_logger.info(f"{status} ({counter[status]})")
+        # console.print(f"{status} ({counter[status]})")
+        if status == 'SUCCEEDED':
+            console.print(f"[bold][green]{status}[/][/] ({counter[status]})")
+        elif status == 'FAILED':
+            console.print(f"[bold][red]{status}[/][/] ({counter[status]})")
+        elif status == 'RUNNING':
+            console.print(f"[bold][cyan]{status}[/][/] ({counter[status]})")
+        elif status == 'PENDING':
+            console.print(f"[bold][blue]{status}[/][/] ({counter[status]})")
         if verbose:
-            for folder in summary[status]:
-                user_logger.info(f"    {folder}")
+            for sim in summary[status]:
+                console.print(f"{sim:>40}")
