@@ -158,6 +158,7 @@ def jobs(container_id: str = None, limit: int = 10, next: int = 0):
                 group[job.group_pid] = []
             group[job.group_pid].append(job)
 
+        console = Console()
         for g in group:
             _jobs = group[g]
             # Get total number of running simulations
@@ -174,9 +175,8 @@ def jobs(container_id: str = None, limit: int = 10, next: int = 0):
             sim_next.insert(0, exp_job)
 
             # Skip the first job which is the experiment
-            user_logger.info(
-                f"Experiment {exp_job.item_id} on Container {container_id} has {total_jobs - 1} running simulations.")
-
+            console.print(
+                f"[bold][cyan]Experiment[/][/] {exp_job.item_id} on [bold][cyan]Container[/][/] [red]{container_id}[/] has {total_jobs - 1} running [bold][cyan]simulations[/][/].")
             table = Table()
             table.add_column("Entity Type", justify="right", style="cyan", no_wrap=True)
             table.add_column("Entity ID", style="yellow")
@@ -186,7 +186,6 @@ def jobs(container_id: str = None, limit: int = 10, next: int = 0):
             for job in sim_next:
                 table.add_row(job.item_type.name, str(job.item_id), str(job.job_id), job.container_id)
 
-            console = Console()
             console.print(table)
 
 
