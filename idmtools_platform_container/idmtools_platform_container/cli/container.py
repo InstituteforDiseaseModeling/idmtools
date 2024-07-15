@@ -548,10 +548,10 @@ def containers(include_stopped: bool = False):
 
     table = Table()
     table.add_column("Container ID", justify="right", style="cyan", no_wrap=True)
-    table.add_column("Image", style="yellow")
-    table.add_column("Status", style="yellow")
+    table.add_column("Image", style="bright_magenta")
+    table.add_column("Status", style="red")
     table.add_column("Created", style="yellow")
-    table.add_column("Name", style="yellow")
+    table.add_column("Name", style="green")
 
     for status, container_list in containers.items():
         for container in container_list:
