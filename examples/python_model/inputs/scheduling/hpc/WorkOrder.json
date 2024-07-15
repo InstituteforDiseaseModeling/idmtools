@@ -1,5 +1,5 @@
 {
-  "Command": "python -c \"print('hello test')\"",
+  "Command": "python Assets/model.py",
   "NodeGroupName": "emod_abcd",
   "NumCores": 2,
   "SingleNode": false,

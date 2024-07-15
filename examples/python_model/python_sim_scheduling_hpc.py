@@ -68,7 +68,7 @@ experiment = Experiment.from_template(ts, name=os.path.split(sys.argv[0])[1])
 # Add our own custom tag to simulation
 experiment.tags["tag1"] = 1
 # And maybe some custom Experiment Level Assets
-experiment.assets.add_directory(assets_directory=os.path.join("inputs", "python_model_with_deps", "Assets"))
+#experiment.assets.add_directory(assets_directory=os.path.join("inputs", "python_model_with_deps", "Assets"))
 
 with Platform('IDMCloud') as platform:
     # Call run() with 'scheduling=True' to run simulations with scheduling using WorkOrder.json(loaded above)
