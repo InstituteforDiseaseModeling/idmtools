@@ -124,7 +124,7 @@ def status(item_id: Union[int, str], container_id: str = None, limit: int = 10, 
             user_logger.warning(f"Job {item_id} not found.")
 
 
-@container.command(help="List running Experiment/Simulation jobs")
+@container.command(help="List running Experiment/Simulation jobs.")
 @click.argument('container-id', required=False)
 @click.option('-l', '--limit', default=10, help="Max number of simulations to show")
 @click.option('-n', '--next', default=0, type=int, help="Next number of jobs to show")
@@ -309,7 +309,7 @@ def history_count(container_id: str = None):
     user_logger.info(JobHistory.count(container_id))
 
 
-@container.command(help="Clear job results files/folders")
+@container.command(help="Clear job results files/folders.")
 @click.argument('item-id', type=str, required=True)
 @click.option('-r', '--remove', multiple=True, help="Extra files/folders to be removed from simulation")
 def clear_results(item_id: str, remove: bool = True):
@@ -536,7 +536,7 @@ def processes(container_id: str):
 
 @container.command(help="List available containers.")
 @click.argument('include-stopped', type=bool, default=False, required=False)
-def containers(include_stopped: bool = False):
+def list_containers(include_stopped: bool = False):
     """
     List available containers.
     Args:
