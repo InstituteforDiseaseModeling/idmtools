@@ -190,7 +190,7 @@ def jobs(container_id: str = None, limit: int = 10, next: int = 0):
             console.print(table)
 
 
-@container.command(help="Get Suite/Experiment/Simulation file directory.")
+@container.command(help="Get Experiment History.")
 @click.argument('exp-id', type=str, required=True)
 def get_job(exp_id: str):
     """
@@ -310,9 +310,9 @@ def history_count(container_id: str = None):
     user_logger.info(JobHistory.count(container_id))
 
 
-@container.command(help="Clear job generated files/folders")
+@container.command(help="Clear job results files/folders")
 @click.argument('item-id', type=str, required=True)
-@click.option('-r', '--remove', multiple=True, help="list of files/folders to be removed from simulation")
+@click.option('-r', '--remove', multiple=True, help="Extra files/folders to be removed from simulation")
 def clear_results(item_id: str, remove: bool = True):
     """
     Clear the generated output files for a job.
