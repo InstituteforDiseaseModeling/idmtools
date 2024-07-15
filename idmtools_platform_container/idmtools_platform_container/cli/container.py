@@ -459,9 +459,14 @@ def remove_container(container_id: str = None):
     """
     if container_id:
         container = get_container(container_id)
-        if container and container.status != 'running':
-            container.remove()
-            user_logger.info(f"Container {container_id} is removed.")
+        if container:
+            if container.status != 'running':
+                container.remove()
+                user_logger.info(f"Container {container_id} is removed.")
+            else:
+                user_logger.warning(f"Container {container_id} is running, need to stop first.")
+        else:
+            user_logger.warning(f"Container {container_id} not found.")
         return
 
     containers = list_containers(include_stopped=True)
