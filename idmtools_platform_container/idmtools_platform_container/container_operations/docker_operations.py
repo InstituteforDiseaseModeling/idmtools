@@ -254,14 +254,14 @@ def list_containers(include_stopped: bool = False) -> Dict:
     return container_found
 
 
-def get_working_containers(container_id: str = None, entity: bool = False) -> List[str]:
+def get_working_containers(container_id: str = None, entity: bool = False) -> List[Any]:
     """
     Get the working containers.
     Args:
         container_id: Container ID
         entity: bool, if return the container object or container id
     Returns:
-        list of working container IDs
+        list of working containers or IDs
     """
     if container_id is None:
         if entity:
