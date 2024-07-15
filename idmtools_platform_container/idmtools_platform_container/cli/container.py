@@ -579,33 +579,3 @@ def containers(include_stopped: bool = False):
 
     console = Console()
     console.print(table)
-
-
-def is_running_demo(item_id: str):
-    """
-    Check if Experiment/Simulation is running.
-    Args:
-        item_id: Experiment/Simulation ID
-    Returns:
-        None
-    """
-    job = find_running_job(item_id)
-    if job:
-        user_logger.info(f"{job.item_type.name} {job.item_id} is running on container {job.container_id}.")
-    else:
-        his = JobHistory.get_item_path(item_id)
-        if his:
-            item_type = his[1]
-            user_logger.info(f"{item_type.name} {item_id} is not running.")
-        else:
-            user_logger.info(f"Job {item_id} is not found.")
-
-
-if __name__ == '__main__':
-    import logging
-    from idmtools import IdmConfigParser
-    from idmtools.core.logging import setup_logging, IdmToolsLoggingConfig
-
-    IdmConfigParser()
-    # setup_logging(IdmToolsLoggingConfig(console=True, level=logging.DEBUG, force=True))
-    is_running_demo('76eedae0-7225-46a8-b6b7-14fb0b1435db')
