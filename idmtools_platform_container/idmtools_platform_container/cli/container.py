@@ -201,7 +201,8 @@ def get_job(exp_id: str):
     """
     item = JobHistory.get_job(exp_id)
     if item:
-        user_logger.info(json.dumps(item, indent=2))
+        console = Console()
+        console.print_json(json.dumps(item, indent=2))
 
 
 @container.command(help="View job history.")
@@ -223,13 +224,15 @@ def history(container_id: str = None, limit: int = 10, next: int = 0):
     start = next * limit
     end = start + limit
     data_next = data[start:end]
+
+    console = Console()
     for job in data_next:
         # user_logger.info("-" * 100)
-        user_logger.info(f"{'':-^100}")
+        console.print(f"{'':-^100}")
         for k, v in job.items():
             if k in ('EXPERIMENT_DIR', 'SUITE_ID'):
                 continue
-            user_logger.info(f"{k:16}: {v}")
+            console.print(f"[bold][cyan]{k:16}[/][/]: {v}")
 
 
 @container.command(help="Find Suite/Experiment/Simulation file directory.")
@@ -365,37 +368,53 @@ def clear_results(item_id: str, remove: bool = True):
 
 @container.command(help="Inspect container.")
 @click.argument('container-id', required=False)
-def inspect(container_id: str = None):
+@click.option('--all/--no-all', default=False, help="Display stopped containers or not")
+def inspect(container_id: str = None, all: bool = True):
     """
     Check container information.
     Args:
         container_id: Container ID
+        all: bool, inspect stopped containers or not
     Returns:
         None
     """
-    containers = get_working_containers(container_id, entity=True)
-    if len(containers) == 0:
-        if container_id:
-            user_logger.warning(f"Container {container_id} not found.")
+    containers = []
+    if container_id is not None:
+        container = get_container(container_id)
+        if container is None:
+            user_logger.info(f"Container {container_id} not found.")
+            return
         else:
-            user_logger.warning("No containers found.")
-        return
+            containers = [container]
+    else:
+        container_dict = list_containers(include_stopped=all)
+        for _, container_list in container_dict.items():
+            containers.extend(container_list)
 
+    # from rich import print_json
+    console = Console()
     for container in containers:
-        user_logger.info('-' * 100)
-        user_logger.info(f"Container ID: {container.short_id}")
-        user_logger.info(f"Container Name: {container.name}")
-        user_logger.info(f"Image: {container.attrs['Config']['Image']}")
-        user_logger.info(f"Image Tags: {container.image.tags}")
-        user_logger.info(f"Status: {container.status}")
-        user_logger.info(f"Created: {container.attrs['Created']}")
-        user_logger.info(f"State: {container.attrs['State']}")
-        user_logger.info(f"StartedAt: {container.attrs['State']['StartedAt']}")
-        user_logger.info(f"Mounts: {container.attrs['Mounts']}")
+        console.print('-' * 100)
+        console.print(f"[bold][cyan]Container ID[/][/]: {container.short_id}")
+        console.print(f"[bold][cyan]Container Name[/][/]: {container.name}")
 
+        console.print(f"[bold][cyan]Image[/][/]:")
+        console.print_json(json.dumps(container.attrs['Config']['Image']))
+
+        console.print(f"[bold][cyan]Image Tags[/][/]:")
+        console.print_json(json.dumps(container.image.tags))
+
+        console.print(f"[bold][cyan]Status[/][/]: {container.status}")
+        console.print(f"[bold][cyan]Created[/][/]: {container.attrs['Created']}")
+
+        console.print(f"[bold][cyan]State[/][/]:")
+        console.print_json(json.dumps(container.attrs['State']))
+
+        console.print(f"[bold][cyan]StartedAt[/][/]: {container.attrs['State']['StartedAt']}")
+
+        console.print(f"[bold][cyan]Mounts[/][/]:")
         mounts = [m for m in container.attrs['Mounts'] if m['Type'] == 'bind']
-        user_logger.info(mounts)
-        print()
+        console.print_json(json.dumps(mounts))
 
 
 @container.command(help="Stop running container(s).")
@@ -536,7 +555,7 @@ def processes(container_id: str):
 
 @container.command(help="List available containers.")
 @click.argument('include-stopped', type=bool, default=False, required=False)
-def list_containers(include_stopped: bool = False):
+def containers(include_stopped: bool = False):
     """
     List available containers.
     Args:
@@ -560,3 +579,33 @@ def list_containers(include_stopped: bool = False):
 
     console = Console()
     console.print(table)
+
+
+def is_running_demo(item_id: str):
+    """
+    Check if Experiment/Simulation is running.
+    Args:
+        item_id: Experiment/Simulation ID
+    Returns:
+        None
+    """
+    job = find_running_job(item_id)
+    if job:
+        user_logger.info(f"{job.item_type.name} {job.item_id} is running on container {job.container_id}.")
+    else:
+        his = JobHistory.get_item_path(item_id)
+        if his:
+            item_type = his[1]
+            user_logger.info(f"{item_type.name} {item_id} is not running.")
+        else:
+            user_logger.info(f"Job {item_id} is not found.")
+
+
+if __name__ == '__main__':
+    import logging
+    from idmtools import IdmConfigParser
+    from idmtools.core.logging import setup_logging, IdmToolsLoggingConfig
+
+    IdmConfigParser()
+    # setup_logging(IdmToolsLoggingConfig(console=True, level=logging.DEBUG, force=True))
+    is_running_demo('76eedae0-7225-46a8-b6b7-14fb0b1435db')
