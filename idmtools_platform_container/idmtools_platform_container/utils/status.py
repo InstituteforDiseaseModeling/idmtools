@@ -124,7 +124,7 @@ def summarize_status_files(exp_dir: str, max_display: int = 10, verbose: bool = 
         elif status == 'RUNNING':
             console.print(f"[bold][cyan]{status}[/][/] ({counter[status]})")
         elif status == 'PENDING':
-            console.print(f"[bold][blue]{status}[/][/] ({counter[status]})")
+            console.print(f"[bold][grey69]{status}[/][/] ({counter[status]})")
         if verbose:
             for sim in summary[status]:
                 console.print(f"{sim:>40}")
