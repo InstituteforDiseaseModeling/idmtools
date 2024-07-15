@@ -120,10 +120,10 @@ def get_container(container_id) -> Any:
         container = client.containers.get(container_id)
         return container
     except ErrorNotFound:
-        user_logger.debug(f"Container with ID {container_id} not found.")
+        logger.debug(f"Container with ID {container_id} not found.")
         return None
     except DockerAPIError as e:
-        user_logger.debug(f"Error retrieving container with ID {container_id}: {str(e)}")
+        logger.debug(f"Error retrieving container with ID {container_id}: {str(e)}")
         return None
 
 
@@ -137,14 +137,8 @@ def find_container_by_image(image: str, include_stopped: bool = False) -> Dict:
         dict of containers
     """
     container_found = {}
-    for container_list in list_containers(include_stopped).values():
-        for container in container_list:
-            if image in container.image.tags:
-                if logger.isEnabledFor(DEBUG):
-                    logger.debug(f"Image {image} found in container ({container.status}): {container.short_id}")
-                if container_found.get(container.status, None) is None:
-                    container_found[container.status] = []
-                container_found[container.status].append(container)
+    for status, container_list in list_containers(include_stopped).items():
+        container_found[status] = [container for container in container_list if image == container.attrs['Config']['Image']]
 
     return container_found
 
