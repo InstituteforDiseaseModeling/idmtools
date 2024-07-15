@@ -13,7 +13,7 @@ from rich.console import Console
 from rich.table import Table
 from idmtools.core import ItemType
 from idmtools_platform_container.container_operations.docker_operations import list_running_jobs, find_running_job, \
-    is_docker_installed, is_docker_daemon_running, get_working_containers
+    is_docker_installed, is_docker_daemon_running, get_working_containers, list_containers
 from idmtools_platform_container.utils.job_history import JobHistory
 from idmtools_platform_container.utils.status import summarize_status_files, get_simulation_status
 from idmtools_platform_container.utils.general import convert_byte_size
@@ -235,7 +235,7 @@ def history(container_id: str = None, limit: int = 10, next: int = 0):
 
 @container.command(help="Find Suite/Experiment/Simulation file directory.")
 @click.argument('item-id', type=str, required=True)
-def item_path(item_id: str):
+def path(item_id: str):
     """
     Find Suite/Experiment/Simulation file directory.
     Args:
@@ -386,7 +386,8 @@ def inspect(container_id: str = None):
         user_logger.info('-' * 100)
         user_logger.info(f"Container ID: {container.short_id}")
         user_logger.info(f"Container Name: {container.name}")
-        user_logger.info(f"Image: {container.image.tags}")
+        user_logger.info(f"Image: {container.attrs['Config']['Image']}")
+        user_logger.info(f"Image Tags: {container.image.tags}")
         user_logger.info(f"Status: {container.status}")
         user_logger.info(f"Created: {container.attrs['Created']}")
         user_logger.info(f"State: {container.attrs['State']}")
@@ -494,3 +495,31 @@ def processes(container_id: str):
         user_logger.info(result.stdout)
     except subprocess.CalledProcessError as e:
         user_logger.error(e.stderr)
+
+
+@container.command(help="List available containers.")
+@click.argument('include-stopped', type=bool, default=False, required=False)
+def containers(include_stopped: bool = False):
+    """
+    List available containers.
+    Args:
+        include_stopped: include stopped containers or not
+    Returns:
+        None
+    """
+    containers = list_containers(include_stopped=include_stopped)
+
+    table = Table()
+    table.add_column("Container ID", justify="right", style="cyan", no_wrap=True)
+    table.add_column("Image", style="yellow")
+    table.add_column("Status", style="yellow")
+    table.add_column("Created", style="yellow")
+    table.add_column("Name", style="yellow")
+
+    for status, container_list in containers.items():
+        for container in container_list:
+            table.add_row(container.short_id, container.attrs['Config']['Image'], container.status,
+                          container.attrs['Created'], container.name)
+
+    console = Console()
+    console.print(table)
