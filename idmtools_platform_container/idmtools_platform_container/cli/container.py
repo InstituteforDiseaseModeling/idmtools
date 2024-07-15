@@ -13,7 +13,7 @@ from rich.console import Console
 from rich.table import Table
 from idmtools.core import ItemType
 from idmtools_platform_container.container_operations.docker_operations import list_running_jobs, find_running_job, \
-    is_docker_installed, is_docker_daemon_running, get_working_containers, list_containers
+    is_docker_installed, is_docker_daemon_running, get_working_containers, list_containers, get_container
 from idmtools_platform_container.utils.job_history import JobHistory
 from idmtools_platform_container.utils.status import summarize_status_files, get_simulation_status
 from idmtools_platform_container.utils.general import convert_byte_size
@@ -399,6 +399,36 @@ def inspect(container_id: str = None):
         print()
 
 
+@container.command(help="Stopped running container(s).")
+@click.argument('container-id', required=False)
+@click.option('--remove/--no-remove', default=False, help="Display with working directory or not")
+def stop_container(container_id: str = None, remove: bool = False):
+    """
+    Sopped running container(s).
+    Args:
+        container_id: container id
+        remove: remove container or not
+    Returns:
+        None
+    """
+    containers = get_working_containers(container_id, entity=True)
+    if len(containers) == 0:
+        if container_id:
+            user_logger.warning(f"Not found running Container {container_id}.")
+        else:
+            user_logger.warning("No running containers found.")
+        return
+
+    for container in containers:
+        if container.status == 'running':
+            container.stop()
+            if remove:
+                container.remove()
+                user_logger.info(f"Container {container.short_id} is stopped and removed.")
+            else:
+                user_logger.info(f"Container {container.short_id} is stopped.")
+
+
 @container.command(help="Remove stopped containers.")
 @click.argument('container-id', required=False)
 def remove_container(container_id: str = None):
@@ -409,18 +439,26 @@ def remove_container(container_id: str = None):
     Returns:
         None
     """
-    containers = get_working_containers(container_id, entity=True)
-    if len(containers) == 0:
-        if container_id:
-            user_logger.warning(f"Container {container_id} not found.")
-        else:
-            user_logger.warning("No containers found.")
+    if container_id:
+        container = get_container(container_id)
+        if container and container.status != 'running':
+            container.remove()
+            user_logger.info(f"Container {container_id} is removed.")
         return
 
-    for container in containers:
-        if container.status != 'running':
-            # container.stop()
+    containers = list_containers(include_stopped=True)
+    container_removed = []
+    for status, container_list in containers.items():
+        if status != 'running':
+            continue
+        for container in container_list:
             container.remove()
+            container_removed.append(container.short_id)
+
+    if len(container_removed) > 0:
+        user_logger.info(f"{len(container_removed)} container(s) removed.")
+    else:
+        user_logger.warning("No container removed.")
 
 
 @container.command(help="pip install packages on container.")
