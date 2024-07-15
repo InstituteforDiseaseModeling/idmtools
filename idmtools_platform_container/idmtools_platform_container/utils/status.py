@@ -53,10 +53,10 @@ def get_simulation_status(sim_path: str) -> str:
         with open(status_file_path, 'r') as file:
             content = file.read().strip()
 
-            status = status_mapping.get(content, 'PENDING')
+            status = status_mapping.get(content, 'Pending')
             return status
     else:
-        return 'PENDING'
+        return 'Pending'
 
 
 def append_with_limit(lst: List, item: str, limit: int) -> List:
