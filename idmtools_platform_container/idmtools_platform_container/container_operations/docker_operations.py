@@ -138,7 +138,8 @@ def find_container_by_image(image: str, include_stopped: bool = False) -> Dict:
     """
     container_found = {}
     for status, container_list in list_containers(include_stopped).items():
-        container_found[status] = [container for container in container_list if image == container.attrs['Config']['Image']]
+        container_found[status] = [container for container in container_list if
+                                   image == container.attrs['Config']['Image']]
 
     return container_found
 
@@ -253,7 +254,7 @@ def list_containers(include_stopped: bool = False) -> Dict:
     return container_found
 
 
-def get_working_containers(container_id: str, entity: bool = False) -> List[str]:
+def get_working_containers(container_id: str = None, entity: bool = False) -> List[str]:
     """
     Get the working containers.
     Args:
