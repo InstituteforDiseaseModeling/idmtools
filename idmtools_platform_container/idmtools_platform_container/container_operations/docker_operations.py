@@ -525,7 +525,7 @@ def find_running_job(item_id: Union[int, str], container_id: str = None) -> Job:
                 break  # One running container can't have multiple matches!
 
     if len(match_jobs) > 1:
-        # item_is must be a Job ID in this case and container_id must be None!
+        # item_id must be a Job ID in this case and container_id must be None!
         user_logger.error(
             f"Multiple jobs found for Job ID {item_id}, please provide the Container ID or use Entity ID instead.")
         exit(-1)
