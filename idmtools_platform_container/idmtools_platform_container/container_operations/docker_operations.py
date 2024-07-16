@@ -137,7 +137,7 @@ def find_container_by_image(image: str, include_stopped: bool = False) -> Dict:
         dict of containers
     """
     container_found = {}
-    for status, container_list in list_containers(include_stopped).items():
+    for status, container_list in get_containers(include_stopped).items():
         container_found[status] = [container for container in container_list if
                                    image == container.attrs['Config']['Image']]
 
@@ -218,7 +218,7 @@ def sort_containers_by_start(containers: List[Container], reverse: bool = True) 
     return sorted_container_list
 
 
-def list_containers(include_stopped: bool = False) -> Dict:
+def get_containers(include_stopped: bool = False) -> Dict:
     """
     Find the containers that match the image.
     Args:
@@ -248,9 +248,9 @@ def get_working_containers(container_id: str = None, entity: bool = False) -> Li
     """
     if container_id is None:
         if entity:
-            containers = list_containers().get('running', [])
+            containers = get_containers().get('running', [])
         else:
-            containers = [c.short_id for c in list_containers().get('running', [])]
+            containers = [c.short_id for c in get_containers().get('running', [])]
     else:
         if not JobHistory.verify_container(container_id):
             logger.error(f"Container {container_id} not found in History.")

@@ -13,7 +13,7 @@ from rich.console import Console
 from rich.table import Table
 from idmtools.core import ItemType
 from idmtools_platform_container.container_operations.docker_operations import list_running_jobs, find_running_job, \
-    is_docker_installed, is_docker_daemon_running, get_working_containers, list_containers, get_container
+    is_docker_installed, is_docker_daemon_running, get_working_containers, get_containers, get_container
 from idmtools_platform_container.utils.job_history import JobHistory
 from idmtools_platform_container.utils.status import summarize_status_files, get_simulation_status
 from idmtools_platform_container.utils.general import convert_byte_size
@@ -400,7 +400,7 @@ def inspect(container_id: str = None, all: bool = True):
         else:
             containers = [container]
     else:
-        container_dict = list_containers(include_stopped=all)
+        container_dict = get_containers(include_stopped=all)
         for _, container_list in container_dict.items():
             containers.extend(container_list)
 
@@ -483,7 +483,7 @@ def remove_container(container_id: str = None):
             user_logger.warning(f"Container {container_id} not found.")
         return
 
-    container_list = list_containers(include_stopped=True)['stopped']
+    container_list = get_containers(include_stopped=True)['stopped']
     container_removed = []
     for container in container_list:
         container.remove()
@@ -581,7 +581,7 @@ def containers(all: bool = False):
     Returns:
         None
     """
-    containers = list_containers(include_stopped=all)
+    containers = get_containers(include_stopped=all)
 
     table = Table()
     table.add_column("Container ID", justify="right", style="cyan", no_wrap=True)
