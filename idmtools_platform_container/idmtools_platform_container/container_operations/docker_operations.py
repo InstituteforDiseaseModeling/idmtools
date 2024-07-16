@@ -228,14 +228,11 @@ def list_containers(include_stopped: bool = False) -> Dict:
     """
     client = docker.from_env()
     container_found = {}
-    for container in client.containers.list(all=include_stopped):
-        if not JobHistory.verify_container(container.id):
-            continue
-        if container.status not in CONTAINER_STATUS:
-            continue
-        if container_found.get(container.status, None) is None:
-            container_found[container.status] = []
-        container_found[container.status].append(container)
+    all_containers = client.containers.list(all=include_stopped)
+    all_containers = [ct for ct in all_containers if
+                      ct.status in CONTAINER_STATUS and JobHistory.verify_container(ct.short_id)]
+    container_found['running'] = [ct for ct in all_containers if ct.status == 'running']
+    container_found['stopped'] = [ct for ct in all_containers if ct.status != 'running']
 
     return container_found
 

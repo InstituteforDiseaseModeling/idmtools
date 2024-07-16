@@ -483,14 +483,11 @@ def remove_container(container_id: str = None):
             user_logger.warning(f"Container {container_id} not found.")
         return
 
-    containers = list_containers(include_stopped=True)
+    container_list = list_containers(include_stopped=True)['stopped']
     container_removed = []
-    for status, container_list in containers.items():
-        if status != 'running':
-            continue
-        for container in container_list:
-            container.remove()
-            container_removed.append(container.short_id)
+    for container in container_list:
+        container.remove()
+        container_removed.append(container.short_id)
 
     if len(container_removed) > 0:
         console.print(f"{len(container_removed)} container(s) removed.")
