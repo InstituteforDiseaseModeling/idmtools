@@ -55,7 +55,9 @@ def verify_docker():
     console.print(f"{result.stdout.strip()}.")
 
 
-@container.command(help="Cancel Experiment/Simulation job.")
+@container.command(help="Cancel Experiment/Simulation job.\n\n"
+                        "Arguments:\n\n"
+                        "  ITEM_ID: Experiment/Simulation ID or Job ID")
 @click.argument('item-id', required=True)
 @click.option('-c', '--container_id', help="Container Id")
 def cancel(item_id: Union[int, str], container_id: str = None):
@@ -84,7 +86,9 @@ def cancel(item_id: Union[int, str], container_id: str = None):
         user_logger.warning(f"Not found job {item_id}.")
 
 
-@container.command(help="Check Experiment/Simulation status.")
+@container.command(help="Check Experiment/Simulation status.\n\n"
+                        "Arguments:\n\n"
+                        "  ITEM_ID: Experiment/Simulation ID or Job ID")
 @click.argument('item-id', required=True)
 @click.option('-c', '--container_id', help="Container Id")
 @click.option('-l', '--limit', default=10, help="Max number of simulations to show")
@@ -127,7 +131,9 @@ def status(item_id: Union[int, str], container_id: str = None, limit: int = 10, 
             user_logger.warning(f"Job {item_id} not found.")
 
 
-@container.command(help="List running Experiment/Simulation jobs.")
+@container.command(help="List running Experiment/Simulation jobs.\n\n"
+                        "Arguments:\n\n"
+                        "  CONTAINER_ID: Container ID (optional)")
 @click.argument('container-id', required=False)
 @click.option('-l', '--limit', default=10, help="Max number of simulations to show")
 @click.option('-n', '--next', default=0, type=int, help="Next number of jobs to show")
@@ -193,7 +199,9 @@ def jobs(container_id: str = None, limit: int = 10, next: int = 0):
             console.print(table)
 
 
-@container.command(help="Get Experiment history.")
+@container.command(help="Get Experiment history.\n\n"
+                        "Arguments:\n\n"
+                        "  EXP_ID: Experiment ID")
 @click.argument('exp-id', type=str, required=True)
 def get_job(exp_id: str):
     """
@@ -209,7 +217,9 @@ def get_job(exp_id: str):
         console.print_json(json.dumps(item, indent=2))
 
 
-@container.command(help="View job history.")
+@container.command(help="View job history.\n\n"
+                        "Arguments:\n\n"
+                        "  CONTAINER_ID: Container ID")
 @click.argument('container-id', required=False)
 @click.option('-l', '--limit', default=10, type=int, help="Max number of jobs to show")
 @click.option('-n', '--next', default=0, type=int, help="Next number of jobs to show")
@@ -239,7 +249,9 @@ def history(container_id: str = None, limit: int = 10, next: int = 0):
             console.print(f"[bold][cyan]{k:16}[/][/]: {v}")
 
 
-@container.command(help="Find Suite/Experiment/Simulation file directory.")
+@container.command(help="Find Suite/Experiment/Simulation file directory.\n\n"
+                        "Arguments:\n\n"
+                        "  ITEM_ID: Suite/Experiment/Simulation ID")
 @click.argument('item-id', type=str, required=True)
 def path(item_id: str):
     """
@@ -255,7 +267,9 @@ def path(item_id: str):
         console.print(f"{item[1].name}: {item[0]}")
 
 
-@container.command(help="Check if Experiment/Simulation is running.")
+@container.command(help="Check if Experiment/Simulation is running.\n\n"
+                        "Arguments:\n\n"
+                        "  ITEM_ID: Experiment/Simulation ID")
 @click.argument('item-id', type=str, required=True)
 def is_running(item_id: str):
     """
@@ -290,7 +304,9 @@ def volume():
     console.print(f"Job history volume: {mv}")
 
 
-@container.command(help="Clear Job History.")
+@container.command(help="Clear Job History.\n\n"
+                        "Arguments:\n\n"
+                        "  CONTAINER_ID: Container ID (optional)")
 @click.argument('container-id', required=False)
 def clear_history(container_id: str = None):
     """
@@ -309,7 +325,9 @@ def sync_history():
     JobHistory.sync()
 
 
-@container.command(help="Get history count.")
+@container.command(help="Get history count.\n\n"
+                        "Arguments:\n\n"
+                        "  CONTAINER_ID: Container ID (optional)")
 @click.argument('container-id', required=False)
 def history_count(container_id: str = None):
     """
@@ -323,7 +341,9 @@ def history_count(container_id: str = None):
     console.print(JobHistory.count(container_id))
 
 
-@container.command(help="Clear job results files/folders.")
+@container.command(help="Clear job results files/folders.\n\n"
+                        "Arguments:\n\n"
+                        "  ITEM_ID: Experiment/Simulation ID")
 @click.argument('item-id', type=str, required=True)
 @click.option('-r', '--remove', multiple=True, help="Extra files/folders to be removed from simulation")
 def clear_results(item_id: str, remove: bool = True):
@@ -377,7 +397,9 @@ def clear_results(item_id: str, remove: bool = True):
         exit(-1)
 
 
-@container.command(help="Inspect container.")
+@container.command(help="Inspect container.\n\n"
+                        "Arguments:\n\n"
+                        "  CONTAINER_ID: Container ID (optional)")
 @click.argument('container-id', required=False)
 @click.option('--all/--no-all', default=False, help="Display stopped containers or not")
 def inspect(container_id: str = None, all: bool = True):
@@ -429,7 +451,9 @@ def inspect(container_id: str = None, all: bool = True):
         console.print_json(json.dumps(mounts))
 
 
-@container.command(help="Stop running container(s).")
+@container.command(help="Stop running container(s).\n\n"
+                        "Arguments:\n\n"
+                        "  CONTAINER_ID: Container ID (optional)")
 @click.argument('container-id', required=False)
 @click.option('--remove/--no-remove', default=False, help="Display with working directory or not")
 def stop_container(container_id: str = None, remove: bool = False):
@@ -460,7 +484,9 @@ def stop_container(container_id: str = None, remove: bool = False):
                 console.print(f"Container {container.short_id} is stopped.")
 
 
-@container.command(help="Remove stopped containers.")
+@container.command(help="Remove stopped containers.\n\n"
+                        "Arguments:\n\n"
+                        "  CONTAINER_ID: Container ID (optional)")
 @click.argument('container-id', required=False)
 def remove_container(container_id: str = None):
     """
@@ -495,7 +521,9 @@ def remove_container(container_id: str = None):
         user_logger.warning("No container removed.")
 
 
-@container.command(help="pip install packages on container.")
+@container.command(help="pip install packages on container.\n\n"
+                        "Arguments:\n\n"
+                        "  PACKAGE: package to be installed")
 @click.argument('package', required=True)
 @click.option('-c', '--container-id', type=str, help="Container ID")
 @click.option('-i', '--index-url', type=str, help="index-url for pip install")
@@ -527,7 +555,9 @@ def install(package: str, container_id: str, index_url: str = None, extra_index_
         user_logger.error(e.stderr)
 
 
-@container.command(help="List packages installed on container.")
+@container.command(help="List packages installed on container.\n\n"
+                        "Arguments:\n\n"
+                        "  CONTAINER_ID: Container ID")
 @click.argument('container-id', required=True)
 def packages(container_id: str):
     """
@@ -549,7 +579,9 @@ def packages(container_id: str):
         user_logger.error(e.stderr)
 
 
-@container.command(help="List running processes in container.")
+@container.command(help="List running processes in container.\n\n"
+                        "Arguments:\n\n"
+                        "  CONTAINER_ID: Container ID")
 @click.argument('container-id', required=True)
 def ps(container_id: str):
     """
