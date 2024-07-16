@@ -573,7 +573,7 @@ def ps(container_id: str):
 
 @container.command(help="List available containers.")
 @click.option('--all/--no-all', default=False, help="Include stopped containers or not")
-def containers(all: bool = False):
+def list_containers(all: bool = False):
     """
     List available containers.
     Args:
