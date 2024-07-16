@@ -522,8 +522,3 @@ def find_running_job(item_id: Union[int, str], container_id: str = None) -> Job:
         return match_jobs[0]
     else:
         return None
-
-
-if __name__ == "__main__":
-    cl = get_working_containers('404cbd150e26', entity=False)
-    print(cl)
