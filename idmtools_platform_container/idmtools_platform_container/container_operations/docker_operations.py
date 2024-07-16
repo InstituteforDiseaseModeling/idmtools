@@ -501,19 +501,25 @@ def find_running_job(item_id: Union[int, str], container_id: str = None) -> Job:
     if container_id:
         containers = [container_id]
     else:
+        # Check if the item is an Experiment ID
         his_job = JobHistory.get_job(item_id)
         if his_job:
+            # item_id is an Experiment ID
             containers = [his_job['CONTAINER']]
         else:
+            # item_id is a Simulation ID or Job ID, we need to check all working containers
             containers = get_working_containers()
 
     match_jobs = []
     for cid in containers:
+        # List all running jobs on the container
         jobs = list_running_jobs(cid)
         if len(jobs) == 0:
             continue
 
+        # Container has running jobs
         for job in jobs:
+            # Check if the job is the one we are looking for
             if job.item_id == item_id or str(job.job_id) == str(item_id):
                 match_jobs.append(job)
                 break  # One running container can't have multiple matches!
