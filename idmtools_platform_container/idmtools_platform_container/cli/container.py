@@ -38,7 +38,7 @@ def container():
     pass
 
 
-@container.command(help="Check docker environment.")
+@container.command(help="Verify the Docker environment.")
 def verify_docker():
     """Check docker environment."""
     if not is_docker_installed():
@@ -55,7 +55,7 @@ def verify_docker():
     console.print(f"{result.stdout.strip()}.")
 
 
-@container.command(help="Cancel Experiment/Simulation job.\n\n"
+@container.command(help="Cancel an Experiment/Simulation job.\n\n"
                         "Arguments:\n\n"
                         "  ITEM_ID: Experiment/Simulation ID or Job ID")
 @click.argument('item-id', required=True)
@@ -86,7 +86,7 @@ def cancel(item_id: Union[int, str], container_id: str = None):
         user_logger.warning(f"Not found job {item_id}.")
 
 
-@container.command(help="Check Experiment/Simulation status.\n\n"
+@container.command(help="Check the status of an Experiment/Simulation.\n\n"
                         "Arguments:\n\n"
                         "  ITEM_ID: Experiment/Simulation ID or Job ID")
 @click.argument('item-id', required=True)
@@ -199,7 +199,7 @@ def jobs(container_id: str = None, limit: int = 10, next: int = 0):
             console.print(table)
 
 
-@container.command(help="Get Experiment history.\n\n"
+@container.command(help="Retrieve Experiment history.\n\n"
                         "Arguments:\n\n"
                         "  EXP_ID: Experiment ID")
 @click.argument('exp-id', type=str, required=True)
@@ -217,7 +217,7 @@ def get_job(exp_id: str):
         console.print_json(json.dumps(item, indent=2))
 
 
-@container.command(help="View job history.\n\n"
+@container.command(help="View the job history.\n\n"
                         "Arguments:\n\n"
                         "  CONTAINER_ID: Container ID")
 @click.argument('container-id', required=False)
@@ -249,7 +249,7 @@ def history(container_id: str = None, limit: int = 10, next: int = 0):
             console.print(f"[bold][cyan]{k:16}[/][/]: {v}")
 
 
-@container.command(help="Find Suite/Experiment/Simulation file directory.\n\n"
+@container.command(help="Locate Suite/Experiment/Simulation file directory.\n\n"
                         "Arguments:\n\n"
                         "  ITEM_ID: Suite/Experiment/Simulation ID")
 @click.argument('item-id', type=str, required=True)
@@ -267,7 +267,7 @@ def path(item_id: str):
         console.print(f"{item[1].name}: {item[0]}")
 
 
-@container.command(help="Check if Experiment/Simulation is running.\n\n"
+@container.command(help="Check if an Experiment/Simulation is running.\n\n"
                         "Arguments:\n\n"
                         "  ITEM_ID: Experiment/Simulation ID")
 @click.argument('item-id', type=str, required=True)
@@ -295,7 +295,7 @@ def is_running(item_id: str):
             console.print(f"Job {item_id} is not found.")
 
 
-@container.command(help="Check history volume.")
+@container.command(help="Check the history volume.")
 def volume():
     """Get job history volume."""
     v = JobHistory.volume()
@@ -304,7 +304,7 @@ def volume():
     console.print(f"Job history volume: {mv}")
 
 
-@container.command(help="Clear Job History.\n\n"
+@container.command(help="Clear the job history.\n\n"
                         "Arguments:\n\n"
                         "  CONTAINER_ID: Container ID (optional)")
 @click.argument('container-id', required=False)
@@ -319,13 +319,13 @@ def clear_history(container_id: str = None):
     JobHistory.clear(container_id)
 
 
-@container.command(help="Sync file system with job history.")
+@container.command(help="Sync the file system with job history.")
 def sync_history():
     """Sync file system with job history."""
     JobHistory.sync()
 
 
-@container.command(help="Get history count.\n\n"
+@container.command(help="Get the count of count histories.\n\n"
                         "Arguments:\n\n"
                         "  CONTAINER_ID: Container ID (optional)")
 @click.argument('container-id', required=False)
@@ -341,7 +341,7 @@ def history_count(container_id: str = None):
     console.print(JobHistory.count(container_id))
 
 
-@container.command(help="Clear job results files/folders.\n\n"
+@container.command(help="Clear job results files and folders.\n\n"
                         "Arguments:\n\n"
                         "  ITEM_ID: Experiment/Simulation ID")
 @click.argument('item-id', type=str, required=True)
@@ -397,58 +397,45 @@ def clear_results(item_id: str, remove: bool = True):
         exit(-1)
 
 
-@container.command(help="Inspect container.\n\n"
+@container.command(help="Inspect a container.\n\n"
                         "Arguments:\n\n"
-                        "  CONTAINER_ID: Container ID (optional)")
-@click.argument('container-id', required=False)
-@click.option('--all/--no-all', default=False, help="Display stopped containers or not")
-def inspect(container_id: str = None, all: bool = True):
+                        "  CONTAINER_ID: Container ID")
+@click.argument('container-id', required=True)
+def inspect(container_id: str):
     """
     Check container information.
     Args:
         container_id: Container ID
-        all: bool, inspect stopped containers or not
     Returns:
         None
     """
     console = Console()
+    container = get_container(container_id)
+    if container is None:
+        console.print(f"Container {container_id} not found.")
+        return
 
-    containers = []
-    if container_id is not None:
-        container = get_container(container_id)
-        if container is None:
-            console.print(f"Container {container_id} not found.")
-            return
-        else:
-            containers = [container]
-    else:
-        container_dict = get_containers(include_stopped=all)
-        for _, container_list in container_dict.items():
-            containers.extend(container_list)
+    console.print('-' * 100)
+    console.print(f"[bold][cyan]Container ID[/][/]: {container.short_id}")
+    console.print(f"[bold][cyan]Container Name[/][/]: {container.name}")
 
-    # from rich import print_json
-    for container in containers:
-        console.print('-' * 100)
-        console.print(f"[bold][cyan]Container ID[/][/]: {container.short_id}")
-        console.print(f"[bold][cyan]Container Name[/][/]: {container.name}")
+    console.print("[bold][cyan]Image[/][/]:")
+    console.print_json(json.dumps(container.attrs['Config']['Image']))
 
-        console.print("[bold][cyan]Image[/][/]:")
-        console.print_json(json.dumps(container.attrs['Config']['Image']))
+    console.print("[bold][cyan]Image Tags[/][/]:")
+    console.print_json(json.dumps(container.image.tags))
 
-        console.print("[bold][cyan]Image Tags[/][/]:")
-        console.print_json(json.dumps(container.image.tags))
+    console.print(f"[bold][cyan]Status[/][/]: {container.status}")
+    console.print(f"[bold][cyan]Created[/][/]: {container.attrs['Created']}")
 
-        console.print(f"[bold][cyan]Status[/][/]: {container.status}")
-        console.print(f"[bold][cyan]Created[/][/]: {container.attrs['Created']}")
+    console.print("[bold][cyan]State[/][/]:")
+    console.print_json(json.dumps(container.attrs['State']))
 
-        console.print("[bold][cyan]State[/][/]:")
-        console.print_json(json.dumps(container.attrs['State']))
+    console.print(f"[bold][cyan]StartedAt[/][/]: {container.attrs['State']['StartedAt']}")
 
-        console.print(f"[bold][cyan]StartedAt[/][/]: {container.attrs['State']['StartedAt']}")
-
-        console.print("[bold][cyan]Mounts[/][/]:")
-        mounts = [m for m in container.attrs['Mounts'] if m['Type'] == 'bind']
-        console.print_json(json.dumps(mounts))
+    console.print("[bold][cyan]Mounts[/][/]:")
+    mounts = [m for m in container.attrs['Mounts'] if m['Type'] == 'bind']
+    console.print_json(json.dumps(mounts))
 
 
 @container.command(help="Stop running container(s).\n\n"
@@ -521,7 +508,7 @@ def remove_container(container_id: str = None):
         user_logger.warning("No container removed.")
 
 
-@container.command(help="pip install packages on container.\n\n"
+@container.command(help="pip install a package on a container.\n\n"
                         "Arguments:\n\n"
                         "  PACKAGE: package to be installed")
 @click.argument('package', required=True)
@@ -555,7 +542,7 @@ def install(package: str, container_id: str, index_url: str = None, extra_index_
         user_logger.error(e.stderr)
 
 
-@container.command(help="List packages installed on container.\n\n"
+@container.command(help="List packages installed on a container.\n\n"
                         "Arguments:\n\n"
                         "  CONTAINER_ID: Container ID")
 @click.argument('container-id', required=True)
@@ -579,7 +566,7 @@ def packages(container_id: str):
         user_logger.error(e.stderr)
 
 
-@container.command(help="List running processes in container.\n\n"
+@container.command(help="List running processes in a container.\n\n"
                         "Arguments:\n\n"
                         "  CONTAINER_ID: Container ID")
 @click.argument('container-id', required=True)
@@ -603,7 +590,7 @@ def ps(container_id: str):
         user_logger.error(e.stderr)
 
 
-@container.command(help="List available containers.")
+@container.command(help="List all available containers.")
 @click.option('--all/--no-all', default=False, help="Include stopped containers or not")
 def list_containers(all: bool = False):
     """
