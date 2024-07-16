@@ -252,13 +252,21 @@ def get_working_containers(container_id: str = None, entity: bool = False) -> Li
         else:
             containers = [c.short_id for c in get_containers().get('running', [])]
     else:
+        # Check if the container is in the history and running
         if not JobHistory.verify_container(container_id):
+            # The container is not in the history.
             logger.error(f"Container {container_id} not found in History.")
             containers = []
         else:
+            # The container is in the history, we need to verify if it still exists.
             container = get_container(container_id)
             if container:
-                containers = [container] if entity else [container.short_id]
+                # We only consider the running container
+                if container.status == 'running':
+                    containers = [container] if entity else [container.short_id]
+                else:
+                    logger.warning(f"Container {container_id} is not running.")
+                    containers = []
             else:
                 logger.warning(f"Container {container_id} not found.")
                 containers = []
