@@ -51,7 +51,8 @@ def verify_docker():
 
     # Check docker version
     result = subprocess.run(['docker', '--version'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    user_logger.info(f"{result.stdout.strip()}.")
+    console = Console()
+    console.print(f"{result.stdout.strip()}.")
 
 
 @container.command(help="Cancel Experiment/Simulation job.")
@@ -66,6 +67,7 @@ def cancel(item_id: Union[int, str], container_id: str = None):
     Returns:
         None
     """
+    console = Console()
     job = find_running_job(item_id, container_id)
     if job:
         if job.item_type == ItemType.EXPERIMENT:
@@ -75,9 +77,9 @@ def cancel(item_id: Union[int, str], container_id: str = None):
 
         result = subprocess.run(kill_cmd, shell=True, stderr=subprocess.PIPE, text=True)  # default: check=False
         if result.returncode == 0:
-            user_logger.info(f"Successfully killed {job.item_type.name} {job.job_id}")
+            console.print(f"Successfully killed {job.item_type.name} {job.job_id}")
         else:
-            user_logger.info(f"Error killing {job.item_type.name} {job.item_id}: {result.stderr}")
+            console.print(f"Error killing {job.item_type.name} {job.item_id}: {result.stderr}")
     else:
         user_logger.warning(f"Not found job {item_id}.")
 
@@ -98,13 +100,14 @@ def status(item_id: Union[int, str], container_id: str = None, limit: int = 10, 
     Returns:
         None
     """
+    console = Console()
     item_dir = JobHistory.get_item_path(item_id)
     if item_dir is not None:
         # Experiment/Simulation case
         item_type = item_dir[1]
         if item_type == ItemType.SIMULATION:
             st = get_simulation_status(item_dir[0])
-            user_logger.info(f"{item_type.name} {item_id} is {st}.")
+            console.print(f"{item_type.name} {item_id} is {st}.")
         elif item_type == ItemType.EXPERIMENT:
             exp_dir = item_dir[0]
             summarize_status_files(exp_dir, max_display=limit, verbose=verbose)
@@ -119,7 +122,7 @@ def status(item_id: Union[int, str], container_id: str = None, limit: int = 10, 
                 exp_dir = job_cache['EXPERIMENT_DIR']
                 summarize_status_files(exp_dir, max_display=limit, verbose=verbose)
             elif job.item_type == ItemType.SIMULATION:
-                user_logger.info(f"Simulation {job.item_id} is RUNNING.")
+                console.print(f"Simulation {job.item_id} is RUNNING.")
         else:
             user_logger.warning(f"Job {item_id} not found.")
 
@@ -181,10 +184,11 @@ def jobs(container_id: str = None, limit: int = 10, next: int = 0):
             table.add_column("Entity Type", justify="right", style="cyan", no_wrap=True)
             table.add_column("Entity ID", style="yellow")
             table.add_column("Job ID", justify="right", style="green")
-            table.add_column("Container", justify="right", style="red")
+            table.add_column("Container", justify="right", style="plum2")
+            table.add_column("Status", justify="right", style="red")
 
             for job in sim_next:
-                table.add_row(job.item_type.name, str(job.item_id), str(job.job_id), job.container_id)
+                table.add_row(job.item_type.name, str(job.item_id), str(job.job_id), job.container_id, 'running')
 
             console.print(table)
 
@@ -247,7 +251,8 @@ def path(item_id: str):
     """
     item = JobHistory.get_item_path(item_id)
     if item:
-        user_logger.info(f"{item[1].name}: {item[0]}")
+        console = Console()
+        console.print(f"{item[1].name}: {item[0]}")
 
 
 @container.command(help="Check if Experiment/Simulation is running.")
@@ -260,16 +265,20 @@ def is_running(item_id: str):
     Returns:
         None
     """
+    console = Console()
     job = find_running_job(item_id)
     if job:
-        user_logger.info(f"{job.item_type.name} {job.item_id} is running on container {job.container_id}.")
+        console.print(f"{job.item_type.name} {job.item_id} is running on container {job.container_id}.")
     else:
         his = JobHistory.get_item_path(item_id)
         if his:
             item_type = his[1]
-            user_logger.info(f"{item_type.name} {item_id} is not running.")
+            if item_type == ItemType.SUITE:
+                console.print(f"{item_id} is not a valid Experiment/Simulation ID.")
+            else:
+                console.print(f"{item_type.name} {item_id} is not running.")
         else:
-            user_logger.info(f"Job {item_id} is not found.")
+            console.print(f"Job {item_id} is not found.")
 
 
 @container.command(help="Check history volume.")
@@ -277,7 +286,8 @@ def volume():
     """Get job history volume."""
     v = JobHistory.volume()
     mv = convert_byte_size(v)
-    user_logger.info(f"Job history volume: {mv}")
+    console = Console()
+    console.print(f"Job history volume: {mv}")
 
 
 @container.command(help="Clear Job History.")
@@ -309,7 +319,8 @@ def history_count(container_id: str = None):
     Returns:
         None
     """
-    user_logger.info(JobHistory.count(container_id))
+    console = Console()
+    console.print(JobHistory.count(container_id))
 
 
 @container.command(help="Clear job results files/folders.")
@@ -378,11 +389,13 @@ def inspect(container_id: str = None, all: bool = True):
     Returns:
         None
     """
+    console = Console()
+
     containers = []
     if container_id is not None:
         container = get_container(container_id)
         if container is None:
-            user_logger.info(f"Container {container_id} not found.")
+            console.print(f"Container {container_id} not found.")
             return
         else:
             containers = [container]
@@ -392,7 +405,6 @@ def inspect(container_id: str = None, all: bool = True):
             containers.extend(container_list)
 
     # from rich import print_json
-    console = Console()
     for container in containers:
         console.print('-' * 100)
         console.print(f"[bold][cyan]Container ID[/][/]: {container.short_id}")
@@ -429,6 +441,7 @@ def stop_container(container_id: str = None, remove: bool = False):
     Returns:
         None
     """
+    console = Console()
     containers = get_working_containers(container_id, entity=True)
     if len(containers) == 0:
         if container_id:
@@ -442,9 +455,9 @@ def stop_container(container_id: str = None, remove: bool = False):
             container.stop()
             if remove:
                 container.remove()
-                user_logger.info(f"Container {container.short_id} is stopped and removed.")
+                console.print(f"Container {container.short_id} is stopped and removed.")
             else:
-                user_logger.info(f"Container {container.short_id} is stopped.")
+                console.print(f"Container {container.short_id} is stopped.")
 
 
 @container.command(help="Remove stopped containers.")
@@ -457,12 +470,13 @@ def remove_container(container_id: str = None):
     Returns:
         None
     """
+    console = Console()
     if container_id:
         container = get_container(container_id)
         if container:
             if container.status != 'running':
                 container.remove()
-                user_logger.info(f"Container {container_id} is removed.")
+                console.print(f"Container {container_id} is removed.")
             else:
                 user_logger.warning(f"Container {container_id} is running, need to stop first.")
         else:
@@ -479,7 +493,7 @@ def remove_container(container_id: str = None):
             container_removed.append(container.short_id)
 
     if len(container_removed) > 0:
-        user_logger.info(f"{len(container_removed)} container(s) removed.")
+        console.print(f"{len(container_removed)} container(s) removed.")
     else:
         user_logger.warning("No container removed.")
 
@@ -500,6 +514,7 @@ def install(package: str, container_id: str, index_url: str = None, extra_index_
     Returns:
         None
     """
+    console = Console()
     if index_url:
         package = f"--index-url {index_url} {package}"
     elif extra_index_url:
@@ -510,8 +525,7 @@ def install(package: str, container_id: str, index_url: str = None, extra_index_
     command = f'docker exec {container_id} bash -c "pip3 install {package}"'
     try:
         result = subprocess.run(command, shell=True, check=True, capture_output=True, text=True)
-        # Process the result if needed
-        user_logger.info(result.stdout)
+        console.print(result.stdout)
     except subprocess.CalledProcessError as e:
         user_logger.error(e.stderr)
 
@@ -526,20 +540,21 @@ def packages(container_id: str):
     Returns:
         None
     """
+    console = Console()
     if not JobHistory.verify_container(container_id):
         user_logger.error(f"Container {container_id} not found.")
         return
     command = f'docker exec {container_id} bash -c "pip list"'
     try:
         result = subprocess.run(command, shell=True, check=True, capture_output=True, text=True)
-        user_logger.info(result.stdout)
+        console.print(result.stdout)
     except subprocess.CalledProcessError as e:
         user_logger.error(e.stderr)
 
 
 @container.command(help="List running processes in container.")
 @click.argument('container-id', required=True)
-def processes(container_id: str):
+def ps(container_id: str):
     """
     List running processes in container.
     Args:
@@ -553,7 +568,8 @@ def processes(container_id: str):
     command = f'docker exec {container_id} bash -c "ps -efj"'
     try:
         result = subprocess.run(command, shell=True, check=True, capture_output=True, text=True)
-        user_logger.info(result.stdout)
+        console = Console()
+        console.print(result.stdout)
     except subprocess.CalledProcessError as e:
         user_logger.error(e.stderr)
 
