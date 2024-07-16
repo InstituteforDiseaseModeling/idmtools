@@ -418,6 +418,9 @@ def inspect(container_id: str):
     console.print('-' * 100)
     console.print(f"[bold][cyan]Container ID[/][/]: {container.short_id}")
     console.print(f"[bold][cyan]Container Name[/][/]: {container.name}")
+    console.print(f"[bold][cyan]Status[/][/]: {container.status}")
+    console.print(f"[bold][cyan]Created[/][/]: {container.attrs['Created']}")
+    console.print(f"[bold][cyan]StartedAt[/][/]: {container.attrs['State']['StartedAt']}")
 
     console.print("[bold][cyan]Image[/][/]:")
     console.print_json(json.dumps(container.attrs['Config']['Image']))
@@ -425,13 +428,8 @@ def inspect(container_id: str):
     console.print("[bold][cyan]Image Tags[/][/]:")
     console.print_json(json.dumps(container.image.tags))
 
-    console.print(f"[bold][cyan]Status[/][/]: {container.status}")
-    console.print(f"[bold][cyan]Created[/][/]: {container.attrs['Created']}")
-
     console.print("[bold][cyan]State[/][/]:")
     console.print_json(json.dumps(container.attrs['State']))
-
-    console.print(f"[bold][cyan]StartedAt[/][/]: {container.attrs['State']['StartedAt']}")
 
     console.print("[bold][cyan]Mounts[/][/]:")
     mounts = [m for m in container.attrs['Mounts'] if m['Type'] == 'bind']
