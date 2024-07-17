@@ -619,4 +619,5 @@ def list_containers(all: bool = False):
                           container.attrs['Created'], container.name)
 
     console = Console()
+    console.print(f"There are {table.row_count} container(s).")
     console.print(table)
