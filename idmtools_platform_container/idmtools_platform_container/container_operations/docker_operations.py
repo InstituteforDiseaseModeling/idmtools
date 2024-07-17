@@ -228,9 +228,12 @@ def get_containers(include_stopped: bool = False) -> Dict:
     """
     client = docker.from_env()
     container_found = {}
+    # Get all containers
     all_containers = client.containers.list(all=include_stopped)
+    # Filter the containers
     all_containers = [ct for ct in all_containers if
                       ct.status in CONTAINER_STATUS and JobHistory.verify_container(ct.short_id)]
+    # Separate the containers
     container_found['running'] = [ct for ct in all_containers if ct.status == 'running']
     container_found['stopped'] = [ct for ct in all_containers if ct.status != 'running']
 
@@ -353,11 +356,13 @@ def pull_docker_image(image_name, tag='latest') -> bool:
     Returns:
         True/False
     """
+    # Check if the image name contains the tag
     if ':' in image_name:
         full_image_name = image_name
     else:
         full_image_name = f'{image_name}:{tag}'
 
+    # Pull the image
     user_logger.info(f'Pulling image {full_image_name} ...')
     try:
         client = docker.from_env()
@@ -405,9 +410,10 @@ def compare_container_mount(container_id1: str, container_id2: str) -> bool:
     Returns:
         True/False
     """
+    # Get the container objects
     container1 = get_container(container_id1)
     container2 = get_container(container_id2)
-
+    # Get the mount configurations
     mounts1 = container1.attrs['Mounts']
     mounts2 = container2.attrs['Mounts']
 
@@ -436,7 +442,7 @@ class Job:
         Initialize Job.
         Args:
             container_id: Container ID
-            process_line: Pricess Input Line
+            process_line: Process Input Line
         """
         process = process_line.split()
         parts = process[3].split(':')
@@ -475,6 +481,7 @@ def list_running_jobs(container_id: str, limit: int = None) -> List[Job]:
         processes = result.stdout
         for line in processes.splitlines()[1:]:  # Skip the first header line
             if 'EXPERIMENT' in line or 'SIMULATION' in line:
+                # Create a new job
                 job = Job(container_id, line)
                 running_jobs.append(job)
     elif result.returncode == 1:

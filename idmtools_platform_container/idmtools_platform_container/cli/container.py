@@ -240,10 +240,11 @@ def history(container_id: str = None, limit: int = 10, next: int = 0):
     data_next = data[start:end]
 
     console = Console()
+    console.print(f"There are {len(data)} jobs in history.")
     for job in data_next:
-        # user_logger.info("-" * 100)
         console.print(f"{'':-^100}")
         for k, v in job.items():
+            # Skip some keys
             if k in ('EXPERIMENT_DIR', 'SUITE_ID'):
                 continue
             console.print(f"[bold][cyan]{k:16}[/][/]: {v}")
@@ -284,9 +285,11 @@ def is_running(item_id: str):
     if job:
         console.print(f"{job.item_type.name} {job.item_id} is running on container {job.container_id}.")
     else:
-        his = JobHistory.get_item_path(item_id)
-        if his:
-            item_type = his[1]
+        # Check if it is a valid Experiment/Simulation ID
+        his_path = JobHistory.get_item_path(item_id)
+        if his_path:
+            # Check item type
+            item_type = his_path[1]
             if item_type == ItemType.SUITE:
                 console.print(f"{item_id} is not a valid Experiment/Simulation ID.")
             else:
@@ -372,7 +375,9 @@ def clear_results(item_id: str, remove: bool = True):
                 else:
                     sim_dir.joinpath(f).unlink(missing_ok=True)
 
+    # Get item path
     item = JobHistory.get_item_path(item_id)
+    # Check item type
     item_type = item[1]
     if item_type == ItemType.SIMULATION:
         sim_dir = item[0]
@@ -451,6 +456,7 @@ def stop_container(container_id: str = None, remove: bool = False):
         None
     """
     console = Console()
+    # Get working containers
     containers = get_working_containers(container_id, entity=True)
     if len(containers) == 0:
         if container_id:
@@ -460,13 +466,12 @@ def stop_container(container_id: str = None, remove: bool = False):
         return
 
     for container in containers:
-        if container.status == 'running':
-            container.stop()
-            if remove:
-                container.remove()
-                console.print(f"Container {container.short_id} is stopped and removed.")
-            else:
-                console.print(f"Container {container.short_id} is stopped.")
+        container.stop()
+        if remove:
+            container.remove()
+            console.print(f"Container {container.short_id} is stopped and removed.")
+        else:
+            console.print(f"Container {container.short_id} is stopped.")
 
 
 @container.command(help="Remove stopped containers.\n\n"
@@ -494,6 +499,7 @@ def remove_container(container_id: str = None):
             user_logger.warning(f"Container {container_id} not found.")
         return
 
+    # Remove all stopped containers
     container_list = get_containers(include_stopped=True)['stopped']
     container_removed = []
     for container in container_list:
