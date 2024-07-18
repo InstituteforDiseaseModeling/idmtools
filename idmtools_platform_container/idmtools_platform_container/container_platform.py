@@ -14,8 +14,9 @@ from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools_platform_container.container_operations.docker_operations import validate_container_running, \
-    find_container_by_image, compare_mounts
-from idmtools_platform_container.utils import map_container_path
+    find_container_by_image, compare_mounts, find_running_job
+from idmtools_platform_container.utils.general import map_container_path
+from idmtools_platform_container.utils.job_history import JobHistory
 from idmtools_platform_file.file_platform import FilePlatform
 from idmtools_platform_container.platform_operations.experiment_operations import ContainerPlatformExperimentOperations
 from logging import getLogger, DEBUG
@@ -93,18 +94,31 @@ class ContainerPlatform(FilePlatform):
         if isinstance(item, Experiment):
             if logger.isEnabledFor(DEBUG):
                 logger.debug("Run experiment on container!")
+
+            # Check if the experiment is already running
+            his_job = JobHistory.get_job(item.id)
+            if his_job:
+                job = find_running_job(item.id, his_job['CONTAINER'])
+                if job:
+                    user_logger.warning(f"Experiment {item.id} is already running on Container {job.container_id}.")
+                    exit(-1)
+
+            # Start the container
             self.container_id = self.check_container(**kwargs)
 
+            # If the platform is Windows, convert the scripts to Linux format
             if platform.system() in ["Windows"]:
                 if logger.isEnabledFor(DEBUG):
                     logger.debug("Script runs on Windows!")
                 self.convert_scripts_to_linux(item, **kwargs)
 
-            # submit the experiment/simulations
+            # Submit the experiment/simulations
             if logger.isEnabledFor(DEBUG):
                 logger.debug(f"Submit experiment/simulations to container: {self.container_id}")
             self.submit_experiment(item, **kwargs)
 
+            # Save the job to history
+            JobHistory.save_job(self.job_directory, self.container_id, item, self)
         elif isinstance(item, Simulation):
             raise NotImplementedError("submit_job directly for simulation is not implemented on ContainerPlatform.")
         else:
@@ -168,7 +182,6 @@ class ContainerPlatform(FilePlatform):
             full_command = ["docker", "exec", self.container_id, "bash", "-c", ";".join(commands)]
             # Execute the command
             subprocess.run(full_command, stdout=subprocess.PIPE)
-
         except subprocess.CalledProcessError as e:
             user_logger.warning(f"Failed to convert script: {e}")
         except Exception as ex:
@@ -192,17 +205,16 @@ class ContainerPlatform(FilePlatform):
             # Commands to change directory and run the script
             commands = [
                 f"cd {directory}",
-                "bash batch.sh &"
+                f"exec -a EXPERIMENT:{experiment.id} bash batch.sh &"
             ]
 
             # Constructing the overall command
             full_command = ["docker", "exec", self.container_id, "bash", "-c", ";".join(commands)]
 
             # Execute the command
-            result = subprocess.run(full_command, stdout=subprocess.PIPE)
+            result = subprocess.run(full_command, shell=True, check=True, capture_output=True, text=True)
             if logger.isEnabledFor(DEBUG):
                 logger.debug(f"Result from submit: {result}")
-
         except subprocess.CalledProcessError as e:
             user_logger.warning(f"Failed to submit job to container: {e}")
         except Exception as ex:
@@ -222,7 +234,6 @@ class ContainerPlatform(FilePlatform):
         if self.user_mounts is not None:
             for key, value in self.user_mounts.items():
                 volumes[key] = {"bind": value, "mode": "rw"}
-
         return volumes
 
     def get_mounts(self) -> List:
@@ -236,7 +247,6 @@ class ContainerPlatform(FilePlatform):
                  'Source': self.job_directory,
                  'Destination': self.data_mount,
                  'Mode': 'rw'}
-
         mounts.append(mount)
 
         # Add user-defined volume mappings

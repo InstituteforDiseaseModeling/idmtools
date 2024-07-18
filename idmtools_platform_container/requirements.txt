@@ -1,2 +1,3 @@
 idmtools-platform-general~=1.7.10
 docker
+rich

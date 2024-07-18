@@ -5,7 +5,6 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 from dataclasses import dataclass
 from idmtools.entities.experiment import Experiment
-from idmtools_platform_container.utils import normalize_path
 from idmtools_platform_file.platform_operations.experiment_operations import FilePlatformExperimentOperations
 from logging import getLogger
 
@@ -46,4 +45,4 @@ class ContainerPlatformExperimentOperations(FilePlatformExperimentOperations):
         if not dry_run:
             user_logger.info(f"\nContainer ID: {self.platform.container_id}")
             user_logger.info(
-                f'\nYou may try the following command to check simulations running status: \n  idmtools file {normalize_path(self.platform.job_directory)} status --exp-id {experiment.id}')
+                f'\nYou may try the following command to check simulations running status: \n  idmtools container status {experiment.id}')
