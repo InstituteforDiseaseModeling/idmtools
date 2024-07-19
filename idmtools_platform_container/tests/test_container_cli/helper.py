@@ -10,7 +10,7 @@ def get_jobs_from_cli(runner, container_id=None):
         runner:
 
     Returns:
-        jobs table
+        jobs table which containers row like [EXPERIMENT, experiment_id, job_id, container_id, status]
     """
     with mock.patch('rich.console.Console.print') as mock_console:
         if container_id:
@@ -29,15 +29,16 @@ def get_jobs_from_cli(runner, container_id=None):
                     actual_jobs_table.append(actual_rows)
         return actual_jobs_table
 
-def found_job_id_by_experiment(actual_jobs_table, experiment_id):
+
+def found_job_id_by_experiment(actual_jobs_table, experiment_id=None):
     """
     Find job id by experiment id
     Args:
-        actual_jobs_table:
+        actual_jobs_table: the actual jobs table from 'idmtools container jobs' cli command
         experiment_id:
 
     Returns:
-        job_id
+        job_id, container_id
     """
     for row in actual_jobs_table:
         if row[1] == experiment_id:
