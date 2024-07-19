@@ -21,15 +21,17 @@ class TestContainerPlatform(unittest.TestCase):
         except FileNotFoundError:
             pass
 
+    @patch('idmtools_platform_container.utils.job_history.JobHistory.save_job')
+    @patch('idmtools_platform_container.container_platform.find_running_job', return_value=None)
     @patch('idmtools_platform_container.container_platform.ContainerPlatform.check_container')
     @patch('idmtools_platform_container.container_platform.ContainerPlatform.convert_scripts_to_linux')
     @patch('idmtools_platform_container.container_platform.ContainerPlatform.submit_experiment')
     @patch('idmtools_platform_container.container_platform.logger')
     @patch('idmtools_platform_container.container_platform.user_logger')
     def test_submit_job(self, mock_user_logger, mock_logger, mock_submit_experiment, mock_convert_scripts_to_linux,
-                        mock_check_container):
+                        mock_check_container, mock_find_running_job, mock_save_job):
         # test submit_job with Experiment instance
-        with self.subTest("test_stop_container_by_experiment_instance"):
+        with self.subTest("test_submit_job_by_experiment_instance"):
             mock_check_container.return_value = '12345'  # Mocked container ID
             mock_experiment = MagicMock(spec=Experiment)
             container_platform = ContainerPlatform(job_directory="DEST")
@@ -37,6 +39,8 @@ class TestContainerPlatform(unittest.TestCase):
             container_platform.submit_job(mock_experiment)
             # assert
             mock_check_container.assert_called_once()
+            mock_save_job.assert_called_once_with(container_platform.job_directory, '12345', mock_experiment,
+                                                  container_platform)
             mock_submit_experiment.assert_called_once_with(mock_experiment)
             mock_logger.debug.call_args_list[0].assert_called_with(f"Run experiment on container!")
             if sys.platform == "win32":
@@ -45,7 +49,7 @@ class TestContainerPlatform(unittest.TestCase):
             mock_logger.debug.call_args_list[2].assert_called_with(f"Submit experiment/simulations to container: 12345")
 
         # test submit_job with Simulation instance
-        with self.subTest("test_stop_container_by_simulation_instance"):
+        with self.subTest("test_submit_job_by_simulation_instance"):
             mock_check_container.return_value = '12345'  # Mocked container ID
             mock_simulation = MagicMock(spec=Simulation)
             container_platform = ContainerPlatform(job_directory="DEST")
@@ -56,7 +60,7 @@ class TestContainerPlatform(unittest.TestCase):
                           ex.exception.args[0])
 
         # test submit_job with random instance
-        with self.subTest("test_stop_container_by_random_instance"):
+        with self.subTest("test_submit_job_by_random_instance"):
             mock_check_container.return_value = '12345'  # Mocked container ID
             mock_item = MagicMock()
             container_platform = ContainerPlatform(job_directory="DEST")
@@ -67,7 +71,7 @@ class TestContainerPlatform(unittest.TestCase):
 
         # test submit_job with dry_run
         mock_logger.reset_mock()
-        with self.subTest("test_stop_container_dry_run"):
+        with self.subTest("test_submit_job_dry_run"):
             mock_item = MagicMock(spec=Simulation)
             mock_item.id = "test_container_id"
             container_platform = ContainerPlatform(job_directory="DEST")

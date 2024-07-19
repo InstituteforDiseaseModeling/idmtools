@@ -15,7 +15,7 @@ from idmtools_platform_container.container_operations.docker_operations import s
 
 
 @pytest.mark.serial
-class TestContainerPlatformCli(unittest.TestCase):
+class TestFileContainerPlatformCli(unittest.TestCase):
     def setUp(self):
         self.runner = CliRunner()
         self.job_directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), "DEST")
@@ -36,8 +36,8 @@ class TestContainerPlatformCli(unittest.TestCase):
     def tearDownClass(cls) -> None:
         shutil.rmtree(os.path.join(os.path.dirname(os.path.abspath(__file__)), "DEST"))
 
-    # Test cli: test experiment or simulation status report
-    # idmtools file job_directory status-report --suite-id <suite_id>
+    # Test cli: test status
+    # idmtools status
     @patch('idmtools_platform_file.tools.status_report.status_report.user_logger')
     def test_status_report(self, mock_user_logger):
         result = self.runner.invoke(file_cli.file,
@@ -116,6 +116,10 @@ class TestContainerPlatformCli(unittest.TestCase):
         self.assertEqual(result.exit_code, 0)
         exp_dir = str(self.platform.get_directory_by_id(self.experiment.id, ItemType.EXPERIMENT))
         mock_user_logger.info.assert_called_with(Path(exp_dir))
+
+
+if __name__ == '__main__':
+    unittest.main()
 
 
 if __name__ == '__main__':

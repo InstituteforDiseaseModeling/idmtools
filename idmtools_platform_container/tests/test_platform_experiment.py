@@ -2,6 +2,9 @@ import os
 import unittest
 from pathlib import Path
 from unittest.mock import patch
+
+import pytest
+
 from idmtools.assets import AssetCollection, Asset
 from idmtools.core import ItemType, EntityStatus
 from idmtools.core.platform_factory import Platform
@@ -85,6 +88,7 @@ class TestPlatformExperiment(unittest.TestCase):
             for mc in matched_containers:
                 stop_container(mc, remove=True)
 
+    @pytest.mark.serial
     @patch('idmtools_platform_container.container_operations.docker_operations.check_local_image')
     @patch('idmtools_platform_container.container_operations.docker_operations.logger')
     @patch('idmtools_platform_container.container_operations.docker_operations.user_logger')
@@ -93,11 +97,11 @@ class TestPlatformExperiment(unittest.TestCase):
             # mock that the image does not exist in local, so it should be pulled from artifactory
             mock_check_local_image.return_value = False
 
-            platform = Platform("Container", job_directory=temp_dir)
+            platform = Platform("Container", job_directory=temp_dir, debug=True)
             command = "ls -lat"
             task = CommandTask(command=command)
             experiment = Experiment.from_task(task, name="run_command")
-            experiment.run(wait_until_done=True)
+            experiment.run(wait_until_done=True, platform=platform)
 
             expected_user_log_messages = [f"Image {platform.docker_image} does not exist, pull the image first.",
                                           f"Pulling image {platform.docker_image} ..."]
@@ -120,7 +124,7 @@ class TestPlatformExperiment(unittest.TestCase):
             command = "ls -lat"
             task = CommandTask(command=command)
             experiment = Experiment.from_task(task, name="run_command")
-            experiment.run(wait_until_done=True)
+            experiment.run(wait_until_done=True, platform=platform)
             self.assertEqual(experiment.status, EntityStatus.SUCCEEDED)
             # check container exist
             new_matched_containers = find_containers_by_prefix(container_prefix)
