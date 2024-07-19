@@ -148,11 +148,6 @@ def add_schedule_config(item: Union[Experiment, Simulation, TemplatedSimulations
 
     Returns:
         None
-
-    Raises:
-        ValueError - If experiment is empty
-                     If item is not an experiment, simulation, or TemplatedSimulations
-
     """
     config = dict(Command=command)
     config.update(config_opts)

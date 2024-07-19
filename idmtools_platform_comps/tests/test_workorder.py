@@ -5,10 +5,8 @@ from functools import partial
 from typing import Any, Dict
 import pytest
 from COMPS.Data import QueryCriteria
-
 from idmtools.assets import Asset, AssetCollection
 from idmtools.builders import SimulationBuilder
-from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import CommandLine
 from idmtools.entities.command_task import CommandTask
@@ -387,7 +385,7 @@ class TestWorkOrder(ITestWithPersistence):
               |_model.py
               |_site-packages
                     |_numpy
-        in order for model.py to call MyExternalLibarary.function which uses numpy package, MyExternalLibarary.function
+        in order for model.py to call MyExternalLibarary.Function which uses numpy package, MyExternalLibarary.Function
         and numpy must be in PYTHONPATH
         So we add "PYTHONPATH": "$PYTHONPATH:$PWD/Assets:$PWD/Assets/site-packages" in WorkOrder.json
 
@@ -423,13 +421,13 @@ class TestWorkOrder(ITestWithPersistence):
 
     def test_workorder_in_workitem(self):
         """
-          To test WorkItem's WorkOrder.json, user can dynamically pull docker image from idm's production artifactory directly
-          instead of old way which had to deploy docker image to docker worker host machine
-          in this example, we pull nyu dtk docker image to docker worker, then execute Eradication command in comps's
+          To test WorkItem's WorkOrder.json, user can dynamically pull docker image from idm's production artifactory
+          directly instead of old way which had to deploy docker image to docker worker host machine
+          in this example, we pull nyu dtk docker image to docker worker, then execute Eradication command in COMPS's
           WorkItem
           Returns:
           """
-        command = "ls -lart"  # anything since it will be override with WorkOrder.json file
+        command = "ls -lart"  # anything since it will be overridden with WorkOrder.json file
         from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
         wi = SSMTWorkItem(name=self.case_name, command=command,tags={'idmtools': self.case_name})
         # overrode workorder.json with user provide file

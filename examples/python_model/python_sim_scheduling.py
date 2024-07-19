@@ -21,7 +21,6 @@ WorkOrder.json in this exmaple:
 
 import os
 import sys
-
 from idmtools.builders import SimulationBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
@@ -49,7 +48,7 @@ with Platform('CALCULON') as platform:
     builder.add_sweep_definition(JSONConfiguredPythonTask.set_parameter_partial("a"), range(3))
     builder.add_sweep_definition(JSONConfiguredPythonTask.set_parameter_partial("b"), [1, 2])
 
-    # add builder to templatedsimulation
+    # add builder to TemplatedSimulations
     ts.add_builder(builder)
     # create experiment
     e = Experiment.from_template(ts, name=os.path.split(sys.argv[0])[1], tags=dict(tag1=1))
