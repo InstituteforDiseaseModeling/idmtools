@@ -6,10 +6,9 @@ from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 import idmtools_platform_container.cli.container as container_cli
 from idmtools_platform_container.utils.job_history import JobHistory
-from .test_base import TestContainerPlatformCliBase
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from helper import get_jobs_from_cli
-
+from test_base import TestContainerPlatformCliBase
 
 @pytest.mark.serial
 class TestContainerPlatformJobCli(TestContainerPlatformCliBase):

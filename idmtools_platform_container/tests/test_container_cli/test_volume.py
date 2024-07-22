@@ -3,9 +3,8 @@ import sys
 from unittest.mock import patch
 import pytest
 import idmtools_platform_container.cli.container as container_cli
-from .test_base import TestContainerPlatformCliBase
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
+from test_base import TestContainerPlatformCliBase
 
 @pytest.mark.serial
 class TestContainerPlatformVolumeCli(TestContainerPlatformCliBase):
