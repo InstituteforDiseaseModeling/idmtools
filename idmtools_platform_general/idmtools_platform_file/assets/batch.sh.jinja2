@@ -1,8 +1,7 @@
 #!/bin/bash
 
-echo "Installing custom packages"
-
 {% for package in packages %}
+    echo "Installing custom packages" 1>> stdout.txt 2>> stderr.txt
     echo "Installing {{ package }}" 1>> stdout.txt 2>> stderr.txt
     pip install {{ package }} --extra-index-url=https://packages.idmod.org/api/pypi/pypi-production/simple --upgrade 1>> stdout.txt 2>> stderr.txt
 {% endfor %}
