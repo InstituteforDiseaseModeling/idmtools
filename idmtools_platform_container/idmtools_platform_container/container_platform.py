@@ -208,9 +208,10 @@ class ContainerPlatform(FilePlatform):
             full_command = ["docker", "exec", "--workdir", directory, self.container_id, "bash", "-c", command]
 
             # Execute the command using Popen for handling background processes
-            process = subprocess.Popen(full_command)
+            subprocess.Popen(full_command)
 
             # Optionally, you can wait for a short period to ensure the command starts
+            # process = subprocess.Popen(full_command)
             # process.wait(timeout=5)
 
             logger.debug(f"Submit experiment {experiment.id} successfully")
