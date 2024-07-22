@@ -240,7 +240,7 @@ def history(container_id: str = None, limit: int = 10, next: int = 0):
     data_next = data[start:end]
 
     console = Console()
-    console.print(f"There are {len(data)} jobs in history.")
+    console.print(f"There are {len(data)} Experiment cache in history.")
     for job in data_next:
         console.print(f"{'':-^100}")
         for k, v in job.items():
@@ -615,7 +615,11 @@ def list_containers(all: bool = False):
 
     for status, container_list in containers.items():
         for container in container_list:
-            table.add_row(container.short_id, container.attrs['Config']['Image'], container.status,
+            if container.status == 'running':
+                status = f"[green]{container.status}[/]"
+            else:
+                status = f"[red]{container.status}[/]"
+            table.add_row(container.short_id, container.attrs['Config']['Image'], status,
                           container.attrs['Created'], container.name)
 
     console = Console()
