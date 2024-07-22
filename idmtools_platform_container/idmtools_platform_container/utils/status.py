@@ -113,7 +113,7 @@ def summarize_status_files(exp_dir: str, max_display: int = 10, verbose: bool = 
     # Print out the results
     console = Console()
     console.print(f'\n[bold][cyan]Experiment Directory[/][/]: \n{normalize_path(exp_dir)}\n')
-    console.print(f"[bold][cyan]Simulation Count[/][/]: {total_simulation_count}\n")
+    console.print(f"[bold][cyan]Simulation Count[/][/]: [yellow]{total_simulation_count}[/]\n")
 
     for status in ['SUCCEEDED', 'FAILED', 'RUNNING', 'PENDING']:
         # console.print(f"{status} ({counter[status]})")
