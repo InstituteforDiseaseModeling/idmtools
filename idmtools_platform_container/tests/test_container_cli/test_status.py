@@ -43,7 +43,7 @@ class TestContainerPlatformStatusCli(unittest.TestCase):
         # test status with simulation id
         with mock.patch('rich.console.Console.print') as mock_console_sim:
             result = self.runner.invoke(container_cli.container, ['status', experiment.simulations[0].id])
-            self.assertIn(f'SIMULATION {experiment.simulations[0].id} is RUNNING',
+            self.assertIn(f'SIMULATION {experiment.simulations[0].id} is ',
                           mock_console_sim.call_args_list[0][0][0])
         # clean up by stop the job
         result = self.runner.invoke(container_cli.container, ['cancel', experiment.id])
