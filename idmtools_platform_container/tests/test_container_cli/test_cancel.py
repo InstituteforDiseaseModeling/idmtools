@@ -6,8 +6,9 @@ import pytest
 from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 import idmtools_platform_container.cli.container as container_cli
-from .test_base import TestContainerPlatformCliBase
+
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from test_base import TestContainerPlatformCliBase
 from helper import get_jobs_from_cli, found_job_id_by_experiment
 
 
