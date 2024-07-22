@@ -4,31 +4,16 @@ import unittest
 from unittest import mock
 from unittest.mock import patch
 import pytest
-from click.testing import CliRunner
-from idmtools.core.platform_factory import Platform
 from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 import idmtools_platform_container.cli.container as container_cli
-from idmtools_platform_container.container_operations.docker_operations import stop_container
 from idmtools_platform_container.utils.general import normalize_path
-
+from .test_base import TestContainerPlatformCliBase
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 
 @pytest.mark.serial
-class TestContainerPlatformStatusCli(unittest.TestCase):
-    def setUp(self):
-        self.runner = CliRunner()
-        self.job_directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), "DEST")
-        self.platform = Platform("Container", job_directory=self.job_directory)
-
-    @classmethod
-    def tearDownClass(cls):
-        try:
-            stop_container(cls.platform.container_id, remove=True)
-        except Exception as e:
-            pass
-
+class TestContainerPlatformStatusCli(TestContainerPlatformCliBase):
     @patch('rich.console.Console.print')
     def test_status_with_experiment_id(self, mock_console):
         command = "sleep 100"

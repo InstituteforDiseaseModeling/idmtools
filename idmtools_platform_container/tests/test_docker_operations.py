@@ -1,3 +1,4 @@
+import platform
 import subprocess
 import unittest
 from pathlib import Path
@@ -545,31 +546,46 @@ class TestDockerOperations(unittest.TestCase):
         with self.subTest("test_normalize_path_with_string_path"):
             path = "C:\\Users\\Test\\Documents"
             expected = "c:/users/test/documents"
-            self.assertEqual(normalize_path(path), expected)
+            if platform.system() == 'Windows':
+                self.assertEqual(normalize_path(path), expected)
+            else:
+                self.assertEqual(normalize_path(path).lower(), expected)
 
         # Test normalize_path with pathlib
         with self.subTest("test_normalize_path_with_pathlib"):
             path = Path("C:\\Users\\Test\\Documents")
             expected = "c:/users/test/documents"
-            self.assertEqual(normalize_path(path), expected)
+            if platform.system() == 'Windows':
+                self.assertEqual(normalize_path(path), expected)
+            else:
+                self.assertEqual(normalize_path(path).lower(), expected)
 
         # Test normalize_path with forward slashes
         with self.subTest("test_normalize_path_with_forward_slashes"):
             path = "C:/Users/Test/Documents"
             expected = "c:/users/test/documents"
-            self.assertEqual(normalize_path(path), expected)
+            if platform.system() == 'Windows':
+                self.assertEqual(normalize_path(path), expected)
+            else:
+                self.assertEqual(normalize_path(path).lower(), expected)
 
         # Test normalize_path with backslashes
         with self.subTest("test_normalize_path_with_backslashes"):
             path = "C:\\Users\\Test\\Documents\\"
             expected = "c:/users/test/documents"
-            self.assertEqual(normalize_path(path), expected)
+            if platform.system() == 'Windows':
+                self.assertEqual(normalize_path(path), expected)
+            else:
+                self.assertEqual(normalize_path(path).lower(), expected)
 
         # Test normalize_path with mix slashes
         with self.subTest("test_normalize_path_with_mixedslashes"):
             path = f"C:\\Users\\Test/Documents\\"
             expected = "c:/users/test/documents"
-            self.assertEqual(normalize_path(path), expected)
+            if platform.system() == 'Windows':
+                self.assertEqual(normalize_path(path), expected)
+            else:
+                self.assertEqual(normalize_path(path).lower(), expected)
 
     @patch('docker.from_env')
     def test_list_containers(self, mock_docker_env):

@@ -1,30 +1,15 @@
 import os
 import sys
-import unittest
 from unittest.mock import patch
-from click.testing import CliRunner
 import pytest
 import idmtools_platform_container.cli.container as container_cli
-from idmtools.core.platform_factory import Platform
-from idmtools_platform_container.container_operations.docker_operations import stop_container
-
+from .test_base import TestContainerPlatformCliBase
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 
 @pytest.mark.serial
-class TestContainerPlatformVolumeCli(unittest.TestCase):
+class TestContainerPlatformVolumeCli(TestContainerPlatformCliBase):
 
-    def setUp(self):
-        self.runner = CliRunner()
-        self.job_directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), "DEST")
-        self.platform = Platform("Container", job_directory=self.job_directory)
-
-    @classmethod
-    def tearDownClass(cls):
-        try:
-            stop_container(cls.platform.container_id, remove=True)
-        except Exception as e:
-            pass
     @patch('rich.console.Console.print')
     def test_volume(self, mock_console):
         result = self.runner.invoke(container_cli.container, ['volume'])
