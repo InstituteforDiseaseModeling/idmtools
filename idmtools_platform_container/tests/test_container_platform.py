@@ -46,7 +46,7 @@ class TestContainerPlatform(unittest.TestCase):
             if sys.platform == "win32":
                 mock_convert_scripts_to_linux.assert_called_once_with(mock_experiment)
                 mock_logger.debug.call_args_list[1].assert_called_with(f"Script runs on Windows!")
-            mock_logger.debug.call_args_list[2].assert_called_with(f"Submit experiment/simulations to container: 12345")
+            mock_logger.debug.call_args_list[1].assert_called_with(f"Submit experiment/simulations to container: 12345")
 
         # test submit_job with Simulation instance
         with self.subTest("test_submit_job_by_simulation_instance"):

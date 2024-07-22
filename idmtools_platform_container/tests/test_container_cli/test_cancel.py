@@ -8,6 +8,8 @@ from idmtools.core.platform_factory import Platform
 from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 import idmtools_platform_container.cli.container as container_cli
+from idmtools_platform_container.container_operations.docker_operations import stop_container
+
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from helper import get_jobs_from_cli, found_job_id_by_experiment
 
@@ -19,13 +21,12 @@ class TestContainerPlatformCancelCli(unittest.TestCase):
         self.job_directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), "DEST")
         self.platform = Platform("Container", job_directory=self.job_directory)
 
-
-    def tearDown(self):
-        pass
-        # try:
-        #     stop_container(self.platform.container_id, remove=True)
-        # except Exception as e:
-        #     pass
+    @classmethod
+    def tearDownClass(cls):
+        try:
+            stop_container(cls.platform.container_id, remove=True)
+        except Exception as e:
+            pass
 
     @patch('rich.console.Console.print')
     def test_cancel_with_experiment_id(self, mock_console):
