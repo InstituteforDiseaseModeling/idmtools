@@ -16,6 +16,7 @@ from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools_platform_container.container_operations.docker_operations import validate_container_running, \
     find_container_by_image, compare_mounts, find_running_job, get_container, CONTAINER_STATUS, restart_container
+from idmtools_platform_container.platform_operations.simulation_operations import ContainerPlatformSimulationOperations
 from idmtools_platform_container.utils.general import map_container_path
 from idmtools_platform_container.utils.job_history import JobHistory
 from idmtools_platform_file.file_platform import FilePlatform
@@ -47,6 +48,7 @@ class ContainerPlatform(FilePlatform):
     def __post_init__(self):
         super().__post_init__()
         self._experiments = ContainerPlatformExperimentOperations(platform=self)
+        self._simulations = ContainerPlatformSimulationOperations(platform=self)
         self.job_directory = os.path.abspath(self.job_directory)
         self.sym_link = False
         self.run_sequence = False
