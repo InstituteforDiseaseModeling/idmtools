@@ -203,22 +203,24 @@ class ContainerPlatform(FilePlatform):
 
         try:
             # Commands to change directory and run the script
-            commands = [
-                f"cd {directory}",
-                f"exec -a EXPERIMENT:{experiment.id} bash batch.sh &"
-            ]
-
+            command = f'exec -a "EXPERIMENT:{experiment.id}" bash batch.sh &'
             # Constructing the overall command
-            full_command = ["docker", "exec", self.container_id, "bash", "-c", ";".join(commands)]
+            full_command = ["docker", "exec", "--workdir", directory, self.container_id, "bash", "-c", command]
 
-            # Execute the command
-            result = subprocess.run(full_command, shell=True, check=True, capture_output=True, text=True)
-            if logger.isEnabledFor(DEBUG):
-                logger.debug(f"Result from submit: {result}")
-        except subprocess.CalledProcessError as e:
-            user_logger.warning(f"Failed to submit job to container: {e}")
+            # Execute the command using Popen for handling background processes
+            subprocess.Popen(full_command)
+
+            # Optionally, you can wait for a short period to ensure the command starts
+            # process = subprocess.Popen(full_command)
+            # process.wait(timeout=5)
+
+            logger.debug(f"Submit experiment {experiment.id} successfully")
+        except subprocess.TimeoutExpired:
+            user_logger.error(f"Submit experiment {experiment.id} timed out")
+            exit(-1)
         except Exception as ex:
-            user_logger.warning(f"Commission Encounter Error: {ex}")
+            user_logger.error(f"Submit experiment {experiment.id} encounter Error: {ex}")
+            exit(-1)
 
     def build_binding_volumes(self) -> Dict:
         """
