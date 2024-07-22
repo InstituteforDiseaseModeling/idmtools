@@ -7,7 +7,7 @@ import json
 import click
 import shutil
 import subprocess
-from typing import Union
+from typing import Union, List
 from pathlib import Path
 from rich.console import Console
 from rich.table import Table
@@ -25,16 +25,52 @@ user_logger = getLogger('user')
 EXPERIMENT_FILES = ['stdout.txt', 'stderr.txt']
 SIMULATION_FILES = ['stdout.txt', 'stderr.txt', 'job_status.txt', 'status.txt', 'output']
 
-
 ##########################
 # Container Commands
 #########################
 
-@click.group(short_help="Container PLATFORM Related Commands")
-def container():
-    """
-    Commands related to managing the Container Platform.
-    """
+IMPORTANT_COMMANDS = ['status', 'cancel', 'jobs', 'history']
+
+
+class CustomGroup(click.Group):
+    """ Custom Group class for Container Platform CLI commands."""
+
+    def __init__(self, *args, **kwargs):
+        self.allowed_commands = kwargs.pop('allowed_commands', None)
+        super().__init__(*args, **kwargs)
+
+    def parse_args(self, ctx, args):
+        """
+        Parse arguments.
+        Args:
+            ctx: click context
+            args: user arguments
+        Returns:
+            None
+        """
+        # Intercept and process --all flag early
+        if '--all' in args:
+            ctx.params['all'] = True
+            self.allowed_commands = None
+        super().parse_args(ctx, args)
+
+    def list_commands(self, ctx) -> List[str]:
+        """
+        List commands.
+        Args:
+            ctx: click context
+        Returns:
+            list of commands
+        """
+        commands = super().list_commands(ctx)
+        if not ctx.params.get('all') and self.allowed_commands:
+            commands = [cmd for cmd in commands if cmd in self.allowed_commands]
+        return commands
+
+
+@click.group(cls=CustomGroup, allowed_commands=IMPORTANT_COMMANDS, short_help="ContainerPlatform related commands.")
+@click.option('--all', is_flag=True, help="Show all commands")
+def container(all):
     pass
 
 
