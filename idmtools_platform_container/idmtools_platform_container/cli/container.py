@@ -203,7 +203,7 @@ def jobs(container_id: str = None, limit: int = 10, next: int = 0):
                         "Arguments:\n\n"
                         "  EXP_ID: Experiment ID")
 @click.argument('exp-id', type=str, required=True)
-def get_job(exp_id: str):
+def get_detail(exp_id: str):
     """
     Get Experiment job history.
     Args:
