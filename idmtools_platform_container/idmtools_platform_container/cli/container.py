@@ -481,7 +481,7 @@ def inspect(container_id: str):
                         "Arguments:\n\n"
                         "  CONTAINER_ID: Container ID (optional)")
 @click.argument('container-id', required=False)
-@click.option('--remove/--no-remove', default=False, help="Display with working directory or not")
+@click.option('--remove/--no-remove', default=False, help="Remove the container or not")
 def stop_container(container_id: str = None, remove: bool = False):
     """
     Sopp running container(s).
