@@ -22,8 +22,8 @@ from logging import getLogger
 logger = getLogger(__name__)
 user_logger = getLogger('user')
 
-EXPERIMENT_FILES = ['stdout.txt', 'stderr.txt']
-SIMULATION_FILES = ['stdout.txt', 'stderr.txt', 'job_status.txt', 'status.txt', 'output']
+EXPERIMENT_FILES = ['stdout.txt', 'stderr.txt', 'job_id.txt']
+SIMULATION_FILES = ['stdout.txt', 'stderr.txt', 'job_status.txt', 'job_id.txt', 'status.txt', 'output']
 
 
 ##########################
