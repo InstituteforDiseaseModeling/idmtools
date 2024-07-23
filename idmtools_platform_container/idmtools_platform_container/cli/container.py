@@ -660,7 +660,8 @@ def list_containers(all: bool = False):
     table.add_column("Image", style="bright_magenta")
     table.add_column("Status", style="red")
     table.add_column("Created", style="yellow")
-    table.add_column("Name", style="green")
+    table.add_column("Started", style="orange1")
+    table.add_column("Name", style="wheat4")
 
     for status, container_list in containers.items():
         for container in container_list:
@@ -669,7 +670,8 @@ def list_containers(all: bool = False):
             else:
                 status = f"[red]{container.status}[/]"
             table.add_row(container.short_id, container.attrs['Config']['Image'], status,
-                          format_timestamp(container.attrs['Created']), container.name)
+                          format_timestamp(container.attrs['Created']),
+                          format_timestamp(container.attrs['State']['StartedAt']), container.name)
 
     console = Console()
     console.print(f"There are {table.row_count} container(s).")
