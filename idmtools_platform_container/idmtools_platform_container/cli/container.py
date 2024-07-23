@@ -36,6 +36,12 @@ class CustomGroup(click.Group):
     """ Custom Group class for Container Platform CLI commands."""
 
     def __init__(self, *args, **kwargs):
+        """
+        Initialize CustomGroup.
+        Args:
+            args: Positional arguments
+            kwargs: USer defined arguments
+        """
         self.allowed_commands = kwargs.pop('allowed_commands', None)
         super().__init__(*args, **kwargs)
 
@@ -71,6 +77,13 @@ class CustomGroup(click.Group):
 @click.group(cls=CustomGroup, allowed_commands=IMPORTANT_COMMANDS, short_help="ContainerPlatform related commands.")
 @click.option('--all', is_flag=True, help="Show all commands")
 def container(all):
+    """
+    Container Platform CLI commands.
+    Args:
+        all: Bool, show all commands
+    Returns:
+        None
+    """
     pass
 
 
