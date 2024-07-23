@@ -21,6 +21,9 @@ class TestContainerPlatformPackagesCli(TestContainerPlatformCliBase):
         result = self.runner.invoke(container_cli.container, ['packages', self.platform.container_id])
         self.assertIn('Package             Version', mock_console.call_args_list[0][0][0])
         self.assertIn('numpy', mock_console.call_args_list[0][0][0])
+        # clean up by stop the job
+        result = self.runner.invoke(container_cli.container, ['stop-container', self.platform.container_id], '--remove')
+        self.assertEqual(result.exit_code, 0)
 
     def test_packages_help(self):
         result = self.runner.invoke(container_cli.container, ['packages', "--help"])

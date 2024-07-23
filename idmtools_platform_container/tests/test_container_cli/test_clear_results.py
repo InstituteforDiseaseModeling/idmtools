@@ -33,6 +33,9 @@ class TestContainerPlatformClearResultsCli(TestContainerPlatformCliBase):
         self.assertFalse(os.path.exists(
             os.path.join(self.job_directory, experiment.parent_id, experiment.id, experiment.simulations[0].id,
                          "Assets")))
+        # clean up by stop the job
+        result = self.runner.invoke(container_cli.container, ['stop-container', self.platform.container_id], '--remove')
+        self.assertEqual(result.exit_code, 0)
 
     def test_clear_results_help(self):
         result = self.runner.invoke(container_cli.container, ['clear-results', "--help"])

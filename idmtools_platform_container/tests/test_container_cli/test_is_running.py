@@ -25,6 +25,9 @@ class TestContainerPlatformIsRunningCli(TestContainerPlatformCliBase):
         self.assertEqual(result.exit_code, 0)
         self.assertEqual(f'EXPERIMENT {experiment.id} is running on container {self.platform.container_id}.',
                          mock_console.call_args_list[0][0][0])
+        # clean up by stop the job
+        result = self.runner.invoke(container_cli.container, ['stop-container', self.platform.container_id], '--remove')
+        self.assertEqual(result.exit_code, 0)
 
     def test_is_running_help(self):
         result = self.runner.invoke(container_cli.container, ['is-running', "--help"])

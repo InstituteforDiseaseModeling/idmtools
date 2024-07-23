@@ -38,6 +38,9 @@ class TestContainerPlatformGetJobCli(TestContainerPlatformCliBase):
                       mock_console.call_args_list[0].args[0].text)
         self.assertIn(f'"CREATED": ',
                       mock_console.call_args_list[0].args[0].text)
+        # clean up by stop the job
+        result = self.runner.invoke(container_cli.container, ['stop-container', self.platform.container_id], '--remove')
+        self.assertEqual(result.exit_code, 0)
 
     def test_get_job_help(self):
         result = self.runner.invoke(container_cli.container, ['get-job', "--help"])
