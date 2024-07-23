@@ -15,7 +15,8 @@ from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools_platform_container.container_operations.docker_operations import validate_container_running, \
-    find_container_by_image, compare_mounts, find_running_job, get_container, CONTAINER_STATUS, restart_container
+    find_container_by_image, compare_mounts, find_running_job, get_container, CONTAINER_STATUS, restart_container, \
+    is_docker_installed, is_docker_daemon_running
 from idmtools_platform_container.platform_operations.simulation_operations import ContainerPlatformSimulationOperations
 from idmtools_platform_container.utils.general import map_container_path
 from idmtools_platform_container.utils.job_history import JobHistory
@@ -61,6 +62,14 @@ class ContainerPlatform(FilePlatform):
             root_logger = getLogger()
             root_logger.setLevel(DEBUG)
 
+        # Check if Docker is installed and running
+        if not is_docker_installed():
+            user_logger.error("Docker is not installed.")
+            exit(-1)
+        if not is_docker_daemon_running():
+            user_logger.error("Docker daemon is not running.")
+            exit(-1)
+
         # Invoke setter to verify the container id
         if self.container is not None:
             self.container_id = self.container
@@ -84,16 +93,16 @@ class ContainerPlatform(FilePlatform):
             None
         """
         if cid is not None:
-            self.validate_container(cid)
+            cid = self.validate_container(cid)
         self._container_id = cid
 
-    def validate_container(self, container_id: str) -> NoReturn:
+    def validate_container(self, container_id: str) -> str:
         """
         Validate the container.
         Args:
             container_id: container id
         Returns:
-            No return
+            Container short id
         """
         # Check if the container exists
         container = get_container(container_id)
@@ -120,6 +129,8 @@ class ContainerPlatform(FilePlatform):
         # Restart the container if it is not running
         if container.status != 'running':
             restart_container(container)
+
+        return container.short_id
 
     def submit_job(self, item: Union[Experiment, Simulation], dry_run: bool = False, **kwargs) -> NoReturn:
         """
