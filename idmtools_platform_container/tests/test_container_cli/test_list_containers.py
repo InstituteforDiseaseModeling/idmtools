@@ -9,6 +9,7 @@ from idmtools.entities.experiment import Experiment
 import idmtools_platform_container.cli.container as container_cli
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from test_base import TestContainerPlatformCliBase
+from helper import get_actual_rich_table_values
 
 
 @pytest.mark.serial
@@ -24,7 +25,9 @@ class TestContainerPlatformListContainersCli(TestContainerPlatformCliBase):
         # verify there are at least 1 container show up in result
         expected_result = bool(re.match(r'There are [1-9]\d* container\(s\)\.', mock_console.call_args_list[0].args[0]))
         self.assertTrue(expected_result)
-        # clean up by stop the job
+        table = get_actual_rich_table_values(mock_console)
+        self.assertTrue(self.platform.container_id in table[0])
+        # clean up by stop the container
         result = self.runner.invoke(container_cli.container, ['stop-container', self.platform.container_id])
         self.assertEqual(result.exit_code, 0)
 
