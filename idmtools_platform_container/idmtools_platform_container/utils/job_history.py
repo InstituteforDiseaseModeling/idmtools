@@ -165,12 +165,11 @@ class JobHistory:
 
     @classmethod
     @initialize()
-    def view_history(cls, container_id: str = None, limit: int = 10) -> List:
+    def view_history(cls, container_id: str = None) -> List:
         """
         View job history.
         Args:
             container_id: Container ID
-            limit: number of jobs to view
         Returns:
             list of job data
         """
@@ -198,7 +197,7 @@ class JobHistory:
 
         # Sort data by datetime
         sorted_data = sorted(data, key=lambda x: datetime.strptime(x["CREATED"], "%Y-%m-%d %H:%M:%S"), reverse=True)
-        return sorted_data[0:limit]
+        return sorted_data
 
     @classmethod
     @initialize()
