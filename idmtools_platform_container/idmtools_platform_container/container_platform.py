@@ -8,13 +8,16 @@ import docker
 import platform
 import subprocess
 from uuid import uuid4
+from docker.models.containers import Container
 from typing import Union, NoReturn, List, Dict
 from dataclasses import dataclass, field
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools_platform_container.container_operations.docker_operations import validate_container_running, \
-    find_container_by_image, compare_mounts, find_running_job
+    find_container_by_image, compare_mounts, find_running_job, get_container, CONTAINER_STATUS, restart_container, \
+    is_docker_installed, is_docker_daemon_running
+from idmtools_platform_container.platform_operations.simulation_operations import ContainerPlatformSimulationOperations
 from idmtools_platform_container.utils.general import map_container_path
 from idmtools_platform_container.utils.job_history import JobHistory
 from idmtools_platform_file.file_platform import FilePlatform
@@ -41,10 +44,12 @@ class ContainerPlatform(FilePlatform):
     include_stopped: bool = field(default=False)
     debug: bool = field(default=False)
     _container_id: str = field(default=None, init=False)
+    container: str = field(default=None)
 
     def __post_init__(self):
         super().__post_init__()
         self._experiments = ContainerPlatformExperimentOperations(platform=self)
+        self._simulations = ContainerPlatformSimulationOperations(platform=self)
         self.job_directory = os.path.abspath(self.job_directory)
         self.sym_link = False
         self.run_sequence = False
@@ -57,6 +62,18 @@ class ContainerPlatform(FilePlatform):
             root_logger = getLogger()
             root_logger.setLevel(DEBUG)
 
+        # Check if Docker is installed and running
+        if not is_docker_installed():
+            user_logger.error("Docker is not installed.")
+            exit(-1)
+        if not is_docker_daemon_running():
+            user_logger.error("Docker daemon is not running.")
+            exit(-1)
+
+        # Invoke setter to verify the container id
+        if self.container is not None:
+            self.container_id = self.container
+
     @property
     def container_id(self):  # noqa: F811
         """
@@ -67,21 +84,59 @@ class ContainerPlatform(FilePlatform):
         return self._container_id
 
     @container_id.setter
-    def container_id(self, _id):
+    def container_id(self, cid):
         """
         Set the container id property.
         Args:
-            _id: container id
+            cid: container id
         Returns:
             None
         """
-        self._container_id = _id
+        if cid is not None:
+            cid = self.validate_container(cid)
+        self._container_id = cid
+
+    def validate_container(self, container_id: str) -> str:
+        """
+        Validate the container.
+        Args:
+            container_id: container id
+        Returns:
+            Container short id
+        """
+        # Check if the container exists
+        container = get_container(container_id)
+        if not container:
+            user_logger.warning(f"Container {container_id} is not found.")
+            exit(-1)
+
+        # Check if the container is in the right status
+        if container.status not in CONTAINER_STATUS:
+            user_logger.warning(
+                f"Container {container_id} is in {container.status} status, but we only support status: {CONTAINER_STATUS}.")
+            exit(-1)
+
+        # Check if the container is running if we do not include stopped containers
+        if not self.include_stopped and container.status != 'running':
+            user_logger.warning(f"Container {container_id} is not running.")
+            exit(-1)
+
+        # Check if the container matches the platform mounts
+        if not self.validate_mount(container):
+            user_logger.warning(f"Container {container_id} does not match the platform mounts.")
+            exit(-1)
+
+        # Restart the container if it is not running
+        if container.status != 'running':
+            restart_container(container)
+
+        return container.short_id
 
     def submit_job(self, item: Union[Experiment, Simulation], dry_run: bool = False, **kwargs) -> NoReturn:
         """
         Submit a Process job in a docker container.
         Args:
-            item: idmtools Experiment or Simulation
+            item: Experiment or Simulation
             dry_run: True/False
             kwargs: keyword arguments used to expand functionality
         Returns:
@@ -104,7 +159,11 @@ class ContainerPlatform(FilePlatform):
                     exit(-1)
 
             # Start the container
-            self.container_id = self.check_container(**kwargs)
+            if self.container_id is None:
+                if logger.isEnabledFor(DEBUG):
+                    logger.debug("Check provided container!")
+                # Avoid double container id checking
+                self._container_id = self.check_container(**kwargs)
 
             # If the platform is Windows, convert the scripts to Linux format
             if platform.system() in ["Windows"]:
@@ -262,16 +321,24 @@ class ContainerPlatform(FilePlatform):
 
         return mounts
 
-    def validate_mount(self, container) -> bool:
+    def validate_mount(self, container: Union[str, Container]) -> bool:
         """
         Compare the mounts of the container with the platform.
         Args:
-            container: a container to be compared.
+            container: a container object or id.
         Returns:
             True/False
         """
+        if isinstance(container, str):
+            ct = get_container(container)
+        else:
+            ct = container
+
+        if ct is None:
+            logger.warning(f"Container {container} is not found.")
+            return False
         mounts1 = self.get_mounts()
-        mounts2 = container.attrs['Mounts']
+        mounts2 = ct.attrs['Mounts']
         return compare_mounts(mounts1, mounts2)
 
     def get_container_directory(self, item: Union[Suite, Experiment, Simulation]) -> str:
