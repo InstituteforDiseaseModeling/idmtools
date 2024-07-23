@@ -31,14 +31,6 @@ def validate_container_running(platform, **kwargs) -> str:
     Returns:
         container id
     """
-    if not is_docker_installed():
-        user_logger.error("Docker is not installed.")
-        exit(-1)
-
-    if not is_docker_daemon_running():
-        user_logger.error("Docker daemon is not running.")
-        exit(-1)
-
     # Check image exists
     if not check_local_image(platform.docker_image):
         user_logger.info(f"Image {platform.docker_image} does not exist, pull the image first.")
