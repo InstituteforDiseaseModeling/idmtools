@@ -7,7 +7,7 @@ import json
 import click
 import shutil
 import subprocess
-from typing import Union
+from typing import Union, Optional, List
 from pathlib import Path
 from rich.console import Console
 from rich.table import Table
@@ -349,7 +349,7 @@ def history_count(container_id: str = None):
                         "  ITEM_ID: Experiment/Simulation ID")
 @click.argument('item-id', type=str, required=True)
 @click.option('-r', '--remove', multiple=True, help="Extra files/folders to be removed from simulation")
-def clear_results(item_id: str, remove: bool = True):
+def clear_results(item_id: str, remove: Optional[List[str]] = None):
     """
     Clear the generated output files for a job.
     Args:

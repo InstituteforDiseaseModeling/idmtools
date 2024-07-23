@@ -6,10 +6,9 @@ import pytest
 from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 import idmtools_platform_container.cli.container as container_cli
-
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from test_base import TestContainerPlatformCliBase
-from helper import get_jobs_from_cli, found_job_id_by_experiment
+from helper import found_job_id_by_experiment, get_actual_rich_table_values
 
 
 @pytest.mark.serial
@@ -31,12 +30,14 @@ class TestContainerPlatformCancelCli(TestContainerPlatformCliBase):
         task = CommandTask(command=command)
         experiment = Experiment.from_task(task, name="run_command")
         experiment.run(wait_until_done=False)
-        actual_table = get_jobs_from_cli(self.runner)
+        result = self.runner.invoke(container_cli.container, ['jobs'])
+        self.assertEqual(result.exit_code, 0)
+        actual_table = get_actual_rich_table_values(mock_console)
         job_id, container_id = found_job_id_by_experiment(actual_table, experiment.id)
         # test cancel with job_id and container_id
         result = self.runner.invoke(container_cli.container, ['cancel', job_id, '-c', container_id])
+        self.assertTrue(f'Successfully killed EXPERIMENT {job_id}', mock_console.call_args[0][0])
         self.assertEqual(result.exit_code, 0)
-        self.assertEqual(f'Successfully killed EXPERIMENT {job_id}', mock_console.call_args_list[0].args[0])
 
     def test_cancel_help(self):
         result = self.runner.invoke(container_cli.container, ['cancel', "--help"])
