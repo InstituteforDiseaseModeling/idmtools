@@ -16,7 +16,7 @@ from idmtools_platform_container.container_operations.docker_operations import l
     is_docker_installed, is_docker_daemon_running, get_working_containers, get_containers, get_container
 from idmtools_platform_container.utils.job_history import JobHistory
 from idmtools_platform_container.utils.status import summarize_status_files, get_simulation_status
-from idmtools_platform_container.utils.general import convert_byte_size
+from idmtools_platform_container.utils.general import convert_byte_size, format_timestamp
 from logging import getLogger
 
 logger = getLogger(__name__)
@@ -473,8 +473,8 @@ def inspect(container_id: str):
     console.print(f"[bold][cyan]Container ID[/][/]: {container.short_id}")
     console.print(f"[bold][cyan]Container Name[/][/]: {container.name}")
     console.print(f"[bold][cyan]Status[/][/]: {container.status}")
-    console.print(f"[bold][cyan]Created[/][/]: {container.attrs['Created']}")
-    console.print(f"[bold][cyan]StartedAt[/][/]: {container.attrs['State']['StartedAt']}")
+    console.print(f"[bold][cyan]Created[/][/]: {format_timestamp(container.attrs['Created'])}")
+    console.print(f"[bold][cyan]StartedAt[/][/]: {format_timestamp(container.attrs['State']['StartedAt'])}")
 
     console.print("[bold][cyan]Image[/][/]:")
     console.print_json(json.dumps(container.attrs['Config']['Image']))
@@ -669,7 +669,7 @@ def list_containers(all: bool = False):
             else:
                 status = f"[red]{container.status}[/]"
             table.add_row(container.short_id, container.attrs['Config']['Image'], status,
-                          container.attrs['Created'], container.name)
+                          format_timestamp(container.attrs['Created']), container.name)
 
     console = Console()
     console.print(f"There are {table.row_count} container(s).")

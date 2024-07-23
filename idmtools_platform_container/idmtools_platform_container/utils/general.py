@@ -84,6 +84,24 @@ def parse_iso8601(date_str):
     return datetime.fromisoformat(date_str.replace('Z', '+00:00'))
 
 
+def format_timestamp(timestamp) -> str:
+    """
+    Format the timestamp to a human-readable format.
+    Args:
+        timestamp: timestamp in ISO 8601 format
+    Returns:
+        Human-readable timestamp
+    """
+    # Remove the 'Z' at the end and truncate the fractional seconds to 6 digits
+    if timestamp.endswith('Z'):
+        timestamp = timestamp[:-1]
+    if '.' in timestamp:
+        timestamp = timestamp[:timestamp.index('.') + 7]
+    dt = datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%f")
+    formatted_timestamp = dt.strftime("%Y-%m-%d %H:%M:%S")
+    return formatted_timestamp
+
+
 def is_valid_uuid(uuid_to_test, version=4) -> bool:
     """
     Check if the provided string is a valid UUID.
