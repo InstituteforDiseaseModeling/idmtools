@@ -33,7 +33,7 @@ IMPORTANT_COMMANDS = ['status', 'cancel', 'jobs', 'history']
 
 
 class CustomGroup(click.Group):
-    """ Custom Group class for Container Platform CLI commands."""
+    """Custom Group class for Container Platform CLI commands."""
 
     def __init__(self, *args, **kwargs):
         """
