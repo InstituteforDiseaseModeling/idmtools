@@ -450,7 +450,7 @@ def compare_container_mount(container1: Union[str, Container], container2: Union
 # Check jobs
 #############################
 
-PS_QUERY = 'ps xao pid,ppid,pgid,cmd | head -n 1 && ps xao pid,ppid,pgid,cmd | grep -e EXPERIMENT -e SIMULATION | grep -v grep'
+PS_QUERY = 'ps xao pid,ppid,pgid,etime,cmd | head -n 1 && ps xao pid,ppid,pgid,etime,cmd | grep -e EXPERIMENT -e SIMULATION | grep -v grep'
 
 
 @dataclass(repr=False)
@@ -461,7 +461,7 @@ class Job:
     job_id: int = None
     group_pid: int = None
     container_id: str = None
-    created: str = None
+    elapsed: str = None
 
     def __init__(self, container_id: str, process_line: str):
         """
@@ -471,7 +471,7 @@ class Job:
             process_line: Process Input Line
         """
         process = process_line.split()
-        parts = process[3].split(':')
+        parts = process[4].split(':')
         self.item_id = parts[1]
         self.group_pid = int(process[2])
         self.item_type = ItemType.EXPERIMENT if parts[0] == 'EXPERIMENT' else ItemType.SIMULATION
@@ -480,6 +480,7 @@ class Job:
         elif parts[0] == 'SIMULATION':
             self.job_id = int(process[0])
         self.container_id = container_id
+        self.elapsed = process[3]
 
     def display(self):
         """Display Job for debugging usage."""
@@ -488,6 +489,7 @@ class Job:
         user_logger.info(f"Job ID: {self.job_id:15}")
         user_logger.info(f"Group PID: {self.group_pid:15}")
         user_logger.info(f"Container ID: {self.container_id:15}")
+        user_logger.info(f"Elapsed: {self.elapsed:15}")
 
 
 def list_running_jobs(container_id: str, limit: int = None) -> List[Job]:
