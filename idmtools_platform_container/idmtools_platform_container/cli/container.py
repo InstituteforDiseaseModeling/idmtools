@@ -241,9 +241,11 @@ def jobs(container_id: str = None, limit: int = 10, next: int = 0):
             table.add_column("Job ID", justify="right", style="green")
             table.add_column("Container", justify="right", style="plum2")
             table.add_column("Status", justify="right", style="red")
+            table.add_column("Elapsed", justify="right", style="blue")
 
             for job in sim_next:
-                table.add_row(job.item_type.name, str(job.item_id), str(job.job_id), job.container_id, 'running')
+                table.add_row(job.item_type.name, str(job.item_id), str(job.job_id), job.container_id, 'running',
+                              job.elapsed)
 
             console.print(table)
 
