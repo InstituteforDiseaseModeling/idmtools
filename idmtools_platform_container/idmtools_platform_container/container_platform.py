@@ -149,8 +149,7 @@ class ContainerPlatform(FilePlatform):
             if self.container_id is None:
                 if logger.isEnabledFor(DEBUG):
                     logger.debug("Check provided container!")
-                # Avoid double container id checking
-                self._container_id = self.check_container(**kwargs)
+                self.container_id = self.check_container(**kwargs)
 
             # If the platform is Windows, convert the scripts to Linux format
             if platform.system() in ["Windows"]:
