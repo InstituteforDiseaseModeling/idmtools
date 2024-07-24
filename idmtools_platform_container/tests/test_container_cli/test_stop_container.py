@@ -35,7 +35,7 @@ class TestContainerPlatformStopContainerCli(TestContainerPlatformCliBase):
                          '    CONTAINER_ID: Container ID (optional)\n'
                          '\n'
                          'Options:\n'
-                         '  --remove / --no-remove  Display with working directory or not\n'
+                         '  --remove / --no-remove  Remove the container or not\n'
                          '  --help                  Show this message and exit.\n')
         self.assertEqual(result.exit_code, 0)
         self.assertEqual(result.output, expected_help)

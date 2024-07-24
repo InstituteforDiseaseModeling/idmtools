@@ -12,16 +12,16 @@ from test_base import TestContainerPlatformCliBase
 
 
 @pytest.mark.serial
-class TestContainerPlatformGetJobCli(TestContainerPlatformCliBase):
+class TestContainerPlatformGetDetailCli(TestContainerPlatformCliBase):
 
     @patch('rich.console.Console.print')
-    def test_get_job(self, mock_console):
+    def test_get_details(self, mock_console):
         command = "sleep 100"
         task = CommandTask(command=command)
         experiment = Experiment.from_task(task, name="run_command")
         experiment.run(wait_until_done=False)
         sleep(1)
-        result = self.runner.invoke(container_cli.container, ['get-job', experiment.id])
+        result = self.runner.invoke(container_cli.container, ['get-detail', experiment.id])
         self.assertEqual(result.exit_code, 0)
         self.assertIn(f'"JOB_DIRECTORY": "{normalize_path(self.job_directory)}",',
                       mock_console.call_args_list[0].args[0].text)
@@ -38,13 +38,13 @@ class TestContainerPlatformGetJobCli(TestContainerPlatformCliBase):
                       mock_console.call_args_list[0].args[0].text)
         self.assertIn(f'"CREATED": ',
                       mock_console.call_args_list[0].args[0].text)
-        # clean up by stop the job
+        # clean up container
         result = self.runner.invoke(container_cli.container, ['stop-container', self.platform.container_id], '--remove')
         self.assertEqual(result.exit_code, 0)
 
-    def test_get_job_help(self):
-        result = self.runner.invoke(container_cli.container, ['get-job', "--help"])
-        expected_help = ('Usage: container get-job [OPTIONS] EXP_ID\n'
+    def test_get_detail_help(self):
+        result = self.runner.invoke(container_cli.container, ['get-detail', "--help"])
+        expected_help = ('Usage: container get-detail [OPTIONS] EXP_ID\n'
                          '\n'
                          '  Retrieve Experiment history.\n'
                          '\n'

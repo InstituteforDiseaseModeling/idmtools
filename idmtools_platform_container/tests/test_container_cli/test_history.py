@@ -10,6 +10,7 @@ from idmtools_platform_container.utils.general import normalize_path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from test_base import TestContainerPlatformCliBase
 
+
 @pytest.mark.serial
 class TestContainerPlatformHistoryCli(TestContainerPlatformCliBase):
     @patch('rich.console.Console.print')
@@ -24,7 +25,7 @@ class TestContainerPlatformHistoryCli(TestContainerPlatformCliBase):
         # test history
         result = self.runner.invoke(container_cli.container, ['history'])
         self.assertEqual(result.exit_code, 0)
-        self.assertEqual('There are 1 jobs in history.', mock_console.call_args_list[0].args[0])
+        self.assertEqual('There are 1 Experiment cache in history.', mock_console.call_args_list[0].args[0])
         self.assertIn(normalize_path(f"{self.platform.job_directory}"),
                       mock_console.call_args_list[2].args[0])
         self.assertIn('EXPERIMENT_NAME', mock_console.call_args_list[3][0][0])
@@ -35,8 +36,8 @@ class TestContainerPlatformHistoryCli(TestContainerPlatformCliBase):
         self.assertIn(self.platform.container_id, mock_console.call_args_list[5][0][0])
         self.assertIn('CREATED', mock_console.call_args_list[6][0][0])
 
-        # clean up by stop the job
-        result = self.runner.invoke(container_cli.container, ['cancel', experiment.id])
+        # clean up container
+        result = self.runner.invoke(container_cli.container, ['stop-container', self.platform.container_id])
         self.assertEqual(result.exit_code, 0)
 
     def test_history_help(self):

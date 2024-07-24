@@ -32,7 +32,7 @@ class TestContainerPlatformInspectCli(TestContainerPlatformCliBase):
         self.assertIn('Image Tags', mock_console.call_args_list[8][0][0])
         self.assertIn('State', mock_console.call_args_list[10][0][0])
         self.assertIn('Mounts', mock_console.call_args_list[12][0][0])
-        # clean up by stop the job
+        # clean up container
         result = self.runner.invoke(container_cli.container, ['stop-container', self.platform.container_id], '--remove')
         self.assertEqual(result.exit_code, 0)
 

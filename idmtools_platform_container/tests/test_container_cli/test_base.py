@@ -3,7 +3,6 @@ import os
 import pytest
 from click.testing import CliRunner
 from idmtools.core.platform_factory import Platform
-from idmtools_platform_container.container_operations.docker_operations import stop_container
 
 
 @pytest.mark.serial

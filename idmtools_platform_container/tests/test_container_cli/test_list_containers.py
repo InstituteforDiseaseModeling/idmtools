@@ -27,7 +27,7 @@ class TestContainerPlatformListContainersCli(TestContainerPlatformCliBase):
         self.assertTrue(expected_result)
         table = get_actual_rich_table_values(mock_console)
         self.assertTrue(self.platform.container_id in table[0])
-        # clean up by stop the container
+        # clean up container
         result = self.runner.invoke(container_cli.container, ['stop-container', self.platform.container_id])
         self.assertEqual(result.exit_code, 0)
 

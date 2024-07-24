@@ -26,14 +26,14 @@ class TestContainerPlatformJobCli(TestContainerPlatformCliBase):
         result = self.runner.invoke(container_cli.container, ['jobs'])
         self.assertEqual(result.exit_code, 0)
         actual_table = get_actual_rich_table_values(mock_console)
-        expected_job = ['EXPERIMENT', experiment.id, job['CONTAINER']]
+        expected_job = ['EXPERIMENT', experiment.id, job['CONTAINER']]  # make sure we expect this 3 items in the result
         found = False
         for row in actual_table:
             if all(item in row for item in expected_job):  # if all items in expected_job are in row
                 found = True  # set found to True
         self.assertEqual(found, True)
-        # clean up by stop the job
-        result = self.runner.invoke(container_cli.container, ['cancel', experiment.id])
+        # clean up container
+        result = self.runner.invoke(container_cli.container, ['stop-container', self.platform.container_id], '--remove')
         self.assertEqual(result.exit_code, 0)
 
     @patch('rich.console.Console.print')

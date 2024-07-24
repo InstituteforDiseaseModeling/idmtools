@@ -38,6 +38,9 @@ class TestContainerPlatformCancelCli(TestContainerPlatformCliBase):
         result = self.runner.invoke(container_cli.container, ['cancel', job_id, '-c', container_id])
         self.assertTrue(f'Successfully killed EXPERIMENT {job_id}', mock_console.call_args[0][0])
         self.assertEqual(result.exit_code, 0)
+        # clean up container
+        result = self.runner.invoke(container_cli.container, ['stop-container', self.platform.container_id], '--remove')
+        self.assertEqual(result.exit_code, 0)
 
     def test_cancel_help(self):
         result = self.runner.invoke(container_cli.container, ['cancel', "--help"])

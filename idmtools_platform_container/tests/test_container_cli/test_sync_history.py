@@ -24,22 +24,22 @@ class TestContainerPlatformSyncHistoryCli(TestContainerPlatformCliBase):
         # verify there is 1 job in history
         result = self.runner.invoke(container_cli.container, ['history'])
         self.assertEqual(result.exit_code, 0)
-        self.assertEqual('There are 1 jobs in history.', mock_console.call_args_list[0].args[0])
+        self.assertEqual('There are 1 Experiment cache in history.', mock_console.call_args_list[0].args[0])
         # remove experiment folder
         shutil.rmtree(f"{self.platform.job_directory}/{experiment.parent_id}/{experiment.id}", ignore_errors=False)
         result = self.runner.invoke(container_cli.container, ['history'])
         self.assertEqual(result.exit_code, 0)
-        self.assertEqual('There are 1 jobs in history.', mock_console.call_args_list[0].args[0])
+        self.assertEqual('There are 1 Experiment cache in history.', mock_console.call_args_list[0].args[0])
         # call sync-history
         result = self.runner.invoke(container_cli.container, ['sync-history'])
         self.assertEqual(result.exit_code, 0)
         with patch('rich.console.Console.print') as mock_console1:
             result = self.runner.invoke(container_cli.container, ['history'])
             self.assertEqual(result.exit_code, 0)
-            self.assertEqual('There are 0 jobs in history.', mock_console1.call_args_list[0].args[0])
+            self.assertEqual('There are 0 Experiment cache in history.', mock_console1.call_args_list[0].args[0])
 
-        # clean up by stop the job
-        result = self.runner.invoke(container_cli.container, ['cancel', experiment.id])
+        # clean up container
+        result = self.runner.invoke(container_cli.container, ['stop-container', self.platform.container_id], '--remove')
         self.assertEqual(result.exit_code, 0)
 
     def test_sync_history_help(self):

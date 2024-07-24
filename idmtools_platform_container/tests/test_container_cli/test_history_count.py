@@ -28,7 +28,7 @@ class TestContainerPlatformHistoryCountCli(TestContainerPlatformCliBase):
         result = self.runner.invoke(container_cli.container, ['history-count'])
         self.assertEqual(result.exit_code, 0)
         self.assertTrue(mock_console.call_args_list[0].args[0] == 2)  # Make sure there are 2 jobs in history
-        # clean up by stop the job
+        # clean up container
         result = self.runner.invoke(container_cli.container, ['stop-container', self.platform.container_id], '--remove')
         self.assertEqual(result.exit_code, 0)
 

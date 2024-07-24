@@ -11,6 +11,7 @@ from idmtools_platform_container.utils.general import normalize_path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from test_base import TestContainerPlatformCliBase
 
+
 @pytest.mark.serial
 class TestContainerPlatformStatusCli(TestContainerPlatformCliBase):
     @patch('rich.console.Console.print')
@@ -34,8 +35,8 @@ class TestContainerPlatformStatusCli(TestContainerPlatformCliBase):
             result = self.runner.invoke(container_cli.container, ['status', experiment.simulations[0].id])
             self.assertIn(f'SIMULATION {experiment.simulations[0].id} is ',
                           mock_console_sim.call_args_list[0][0][0])
-        # clean up by stop the job
-        result = self.runner.invoke(container_cli.container, ['cancel', experiment.id])
+        # clean up container
+        result = self.runner.invoke(container_cli.container, ['stop-container', self.platform.container_id], '--remove')
         self.assertEqual(result.exit_code, 0)
 
     def test_status_help(self):

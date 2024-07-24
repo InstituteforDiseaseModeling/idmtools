@@ -25,7 +25,7 @@ class TestContainerPlatformPathCli(TestContainerPlatformCliBase):
 
         self.assertIn(normalize_path(f'{self.platform.job_directory}/{experiment.parent_id}/{experiment.id}'),
                       normalize_path(mock_console.call_args.args[0].split(' ')[1]))
-        # clean up by stop the job
+        # clean up container
         result = self.runner.invoke(container_cli.container, ['stop-container', self.platform.container_id], '--remove')
         self.assertEqual(result.exit_code, 0)
 
