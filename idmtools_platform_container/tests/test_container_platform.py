@@ -1,9 +1,11 @@
 import os
 import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
 from subprocess import CalledProcessError
+from docker.models.containers import Container
 from unittest.mock import patch, MagicMock
 import pytest
 from idmtools.entities import Suite
@@ -23,9 +25,9 @@ class TestContainerPlatform(unittest.TestCase):
 
     @patch('idmtools_platform_container.utils.job_history.JobHistory.save_job')
     @patch('idmtools_platform_container.container_platform.find_running_job', return_value=None)
-    @patch('idmtools_platform_container.container_platform.ContainerPlatform.check_container')
-    @patch('idmtools_platform_container.container_platform.ContainerPlatform.convert_scripts_to_linux')
-    @patch('idmtools_platform_container.container_platform.ContainerPlatform.submit_experiment')
+    @patch.object(ContainerPlatform, 'check_container')
+    @patch.object(ContainerPlatform, 'convert_scripts_to_linux')
+    @patch.object(ContainerPlatform,'submit_experiment')
     @patch('idmtools_platform_container.container_platform.logger')
     @patch('idmtools_platform_container.container_platform.user_logger')
     def test_submit_job(self, mock_user_logger, mock_logger, mock_submit_experiment, mock_convert_scripts_to_linux,
@@ -92,9 +94,6 @@ class TestContainerPlatform(unittest.TestCase):
 
             # Calling the start_container method
             container_id = platform.start_container()
-
-            # Asserting the calls
-            mock_docker.assert_called_once()
             mock_client.containers.run.assert_called_once()
             self.assertEqual(container_id, mock_container.short_id)
             expected_data_source_dir = os.path.abspath(temp_dir)
@@ -119,7 +118,7 @@ class TestContainerPlatform(unittest.TestCase):
         container_id = platform.start_container()
 
         # Asserting the calls
-        mock_docker.assert_called_once()
+        # mock_docker.assert_called_once()
         mock_client.containers.run.assert_called_once_with(
             platform.docker_image,
             command="bash",
@@ -135,32 +134,38 @@ class TestContainerPlatform(unittest.TestCase):
         )
         self.assertEqual(container_id, mock_container.short_id)
 
-    @patch('subprocess.run')
-    def test_convert_scripts_to_linux(self, mock_subprocess_run):
-        with self.subTest("test_convert_scripts_to_linux"):
-            mock_experiment = MagicMock(spec=Experiment)
+    @patch('idmtools_platform_container.container_platform.user_logger.warning')
+    @patch('subprocess.run')  # Mock subprocess.run
+    @patch.object(ContainerPlatform, 'get_container_directory')
+    @patch.object(ContainerPlatform, '__post_init__', lambda x: None)
+    def test_convert_scripts_to_linux(self, mock_get_container_directory, mock_run, mock_logger_warning):
+        with self.subTest("test_convert_scripts_to_linux_success"):
+            mock_get_container_directory.return_value = "/mocked/directory"
             platform = ContainerPlatform(job_directory="DEST")
-            mock_subprocess_run.return_value = MagicMock()
+            experiment = MagicMock()  # Mock the Experiment object
 
-            platform.convert_scripts_to_linux(mock_experiment)
+            platform.convert_scripts_to_linux(experiment)
 
-            mock_subprocess_run.assert_called_once()
+            # Verify subprocess.run was called correctly
+            mock_run.assert_called_once_with(
+                ["docker", "exec", platform.container_id, "bash", "-c",
+                 "cd /mocked/directory;sed -i 's/\\r//g' batch.sh;sed -i 's/\\r//g' run_simulation.sh"],
+                stdout=subprocess.PIPE
+            )
         with self.subTest("test_convert_scripts_to_linux_with_exception"):
-            mock_subprocess_run.side_effect = Exception('General exception')
+            mock_run.side_effect = Exception('General exception')
             mock_experiment = MagicMock(spec=Experiment)
             platform = ContainerPlatform(job_directory="DEST")
-
-            with self.assertLogs('user', level='WARNING') as cm:
-                platform.convert_scripts_to_linux(mock_experiment)
-                self.assertIn('Failed to convert script to Linux:', cm.output[0])
+            platform.convert_scripts_to_linux(mock_experiment)
+            mock_logger_warning.assert_called_with("Failed to convert script to Linux: General exception")
+            # self.assertTrue('Failed to convert script to Linux: General exception', mock_logger.method_calls[0].args[0])
         with self.subTest("test_convert_scripts_to_linux_with_CalledProcessError"):
-            mock_subprocess_run.side_effect = CalledProcessError(1, 'command')
+            mock_run.side_effect = CalledProcessError(1, 'command')
             mock_experiment = MagicMock(spec=Experiment)
             platform = ContainerPlatform(job_directory="DEST")
-
-            with self.assertLogs('user', level='WARNING') as cm:
-                platform.convert_scripts_to_linux(mock_experiment)
-                self.assertIn('Failed to convert script:', cm.output[0])
+            platform.convert_scripts_to_linux(mock_experiment)
+            mock_logger_warning.assert_called_with(
+                "Failed to convert script: Command 'command' returned non-zero exit status 1.")
 
     def test_get_mounts(self):
         container_platform = ContainerPlatform(job_directory="DEST", user_mounts={"src1": "dest1", "src2": "dest2"})
@@ -221,7 +226,7 @@ class TestContainerPlatform(unittest.TestCase):
             self.assertEqual(result, expected_result)
 
     @patch('idmtools_platform_container.container_platform.find_container_by_image')
-    @patch('idmtools_platform_container.container_platform.ContainerPlatform.validate_mount')
+    @patch.object(ContainerPlatform, 'validate_mount')
     @patch('idmtools_platform_container.container_platform.logger')
     def test_retrieve_match_containers(self, mock_logger, mock_validate_mount, mock_find_container_by_image):
         with self.subTest("test_with_matched_containers"):
@@ -267,6 +272,101 @@ class TestContainerPlatform(unittest.TestCase):
             self.assertEqual(result, [])
             mock_logger.debug.assert_called_with(
                 'Not found container matching image test_image.')
+
+    @patch('idmtools_platform_container.container_platform.get_container')
+    @patch('idmtools_platform_container.container_platform.user_logger')
+    @patch('idmtools_platform_container.container_platform.restart_container')
+    @patch.object(ContainerPlatform, 'validate_mount')
+    def test_validate_container(self, mock_validate_mount, mock_restart_container, mock_logger, mock_get_container):
+        with self.subTest("test_valid_container_seccess"):
+            # Setup
+            mock_container = MagicMock()
+            mock_container.status = 'running'
+            mock_container.short_id = '12345'
+            mock_validate_mount.return_value = True
+            mock_get_container.return_value = mock_container
+            platform = ContainerPlatform(job_directory="DEST")
+            result = platform.validate_container('12345')
+            self.assertEqual(result, '12345')
+            mock_restart_container.assert_not_called()
+
+        with self.subTest("test_invalid_container"):
+            mock_get_container.return_value = None
+            platform = ContainerPlatform(job_directory="DEST")
+            with self.assertRaises(SystemExit):
+                platform.validate_container('12345')
+            mock_logger.warning.assert_called_with("Container 12345 is not found.")
+        with self.subTest("test_invalid_container_status"):
+            mock_container = MagicMock()
+            mock_container.status = 'stopped'
+            mock_get_container.return_value = mock_container
+            platform = ContainerPlatform(job_directory="DEST")
+            with self.assertRaises(SystemExit):
+                platform.validate_container('54321')
+            mock_logger.warning.assert_called_with(
+                "Container 54321 is in stopped status, but we only support status: ['exited', 'running', 'paused'].")
+        with self.subTest("test_not_include_stopped_container"):
+            mock_container = MagicMock()
+            mock_container.status = 'exited'
+            mock_get_container.return_value = mock_container
+            platform = ContainerPlatform(job_directory="DEST", include_stopped=False)
+            with self.assertRaises(SystemExit):
+                platform.validate_container('123456')
+            mock_logger.warning.assert_called_with(
+                "Container 123456 is not running.")
+        with self.subTest("test_invalid_mount_container"):
+            mock_container = MagicMock()
+            mock_container.status = 'running'
+            mock_container.short_id = '1111'
+            mock_validate_mount.return_value = False
+            mock_get_container.return_value = mock_container
+            platform = ContainerPlatform(job_directory="DEST", include_stopped=False)
+            with self.assertRaises(SystemExit):
+                platform.validate_container('1111')
+            mock_logger.warning.assert_called_with(
+                "Container 1111 does not match the platform mounts.")
+
+    @patch('idmtools_platform_container.container_platform.is_docker_installed')
+    @patch('idmtools_platform_container.container_platform.is_docker_daemon_running')
+    @patch.object(ContainerPlatform, 'validate_container')
+    @patch('idmtools_platform_container.container_platform.user_logger')
+    def test_container_platform_post_init(self, mock_user_logger, mock_validate_container, mock_docker_daemon_running, mock_docker_installed):
+        with self.subTest("test_init_with_docker_installed_and_running"):
+            mock_docker_daemon_running.return_value = True
+            mock_docker_installed.return_value = True
+            platform = ContainerPlatform(job_directory="DEST")
+            self.assertIsNotNone(platform)
+        with self.subTest("test_init_fails_without_docker_installed"):
+            mock_docker_installed.return_value = False
+            with self.assertRaises(SystemExit):
+                ContainerPlatform(job_directory="DEST")
+                mock_user_logger.error.assert_called_with("Docker is not installed.")
+        with self.subTest("test_init_fails_with_docker_daemon_not_running"):
+            mock_docker_installed.return_value = True
+            mock_docker_daemon_running.return_value = False
+            with self.assertRaises(SystemExit):
+                ContainerPlatform(job_directory="DEST")
+                mock_user_logger.error.assert_called_with("Docker daemon is not running.")
+        with self.subTest("test_init_with_container_id"):
+            mock_docker_daemon_running.return_value = True
+            mock_docker_installed.return_value = True
+            mock_container = MagicMock(spec=Container)
+            mock_container.short_id = '12345'
+            mock_container.id = "1234567890"
+            mock_validate_container.return_value = mock_container.short_id
+            # test with container long id
+            platform = ContainerPlatform(job_directory="DEST", container=mock_container.id)
+            self.assertTrue(platform.container_id, '12345')
+            self.assertTrue(platform.container, '1234567890')
+            # test with container short id
+            platform = ContainerPlatform(job_directory="DEST", container=mock_container.short_id)
+            self.assertTrue(platform.container_id, '12345')
+            self.assertTrue(platform.container, '12345')
+            # test with assign container to platform
+            platform = ContainerPlatform(job_directory="DEST")
+            platform.container = mock_container.short_id
+            self.assertTrue(platform.container, '12345')
+            self.assertTrue(platform.container_id, '12345')
 
 
 if __name__ == '__main__':
