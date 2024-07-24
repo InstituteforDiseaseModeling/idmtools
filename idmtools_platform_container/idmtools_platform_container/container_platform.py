@@ -11,6 +11,7 @@ from uuid import uuid4
 from docker.models.containers import Container
 from typing import Union, NoReturn, List, Dict
 from dataclasses import dataclass, field
+from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
@@ -43,8 +44,7 @@ class ContainerPlatform(FilePlatform):
     new_container: bool = field(default=False)
     include_stopped: bool = field(default=False)
     debug: bool = field(default=False)
-    _container_id: str = field(default=None, init=False)
-    container: str = field(default=None)
+    container_id: str = field(default=None)
 
     def __post_init__(self):
         super().__post_init__()
@@ -69,32 +69,6 @@ class ContainerPlatform(FilePlatform):
         if not is_docker_daemon_running():
             user_logger.error("Docker daemon is not running.")
             exit(-1)
-
-        # Invoke setter to verify the container id
-        if self.container is not None:
-            self.container_id = self.container
-
-    @property
-    def container_id(self):  # noqa: F811
-        """
-        Returns container id.
-        Returns:
-            container id
-        """
-        return self._container_id
-
-    @container_id.setter
-    def container_id(self, cid):
-        """
-        Set the container id property.
-        Args:
-            cid: container id
-        Returns:
-            None
-        """
-        if cid is not None:
-            cid = self.validate_container(cid)
-        self._container_id = cid
 
     def validate_container(self, container_id: str) -> str:
         """
@@ -131,6 +105,19 @@ class ContainerPlatform(FilePlatform):
             restart_container(container)
 
         return container.short_id
+
+    def run_items(self, items: Union[IEntity, List[IEntity]], **kwargs):
+        """
+        Run items on the platform.
+        Args:
+            items: Runnable items
+            kwargs: additional arguments
+        Returns:
+            None
+        """
+        if self.container_id is not None:
+            self.container_id = self.validate_container(self.container_id)
+        super().run_items(items, **kwargs)
 
     def submit_job(self, item: Union[Experiment, Simulation], dry_run: bool = False, **kwargs) -> NoReturn:
         """
