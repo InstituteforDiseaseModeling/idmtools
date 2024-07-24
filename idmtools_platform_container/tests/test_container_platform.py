@@ -355,17 +355,14 @@ class TestContainerPlatform(unittest.TestCase):
             mock_container.id = "1234567890"
             mock_validate_container.return_value = mock_container.short_id
             # test with container long id
-            platform = ContainerPlatform(job_directory="DEST", container=mock_container.id)
+            platform = ContainerPlatform(job_directory="DEST", container_id=mock_container.id)
             self.assertTrue(platform.container_id, '12345')
-            self.assertTrue(platform.container, '1234567890')
             # test with container short id
-            platform = ContainerPlatform(job_directory="DEST", container=mock_container.short_id)
+            platform = ContainerPlatform(job_directory="DEST", container_id=mock_container.short_id)
             self.assertTrue(platform.container_id, '12345')
-            self.assertTrue(platform.container, '12345')
             # test with assign container to platform
             platform = ContainerPlatform(job_directory="DEST")
-            platform.container = mock_container.short_id
-            self.assertTrue(platform.container, '12345')
+            platform.container_id = mock_container.short_id
             self.assertTrue(platform.container_id, '12345')
 
     @patch('idmtools_platform_container.container_platform.get_container')

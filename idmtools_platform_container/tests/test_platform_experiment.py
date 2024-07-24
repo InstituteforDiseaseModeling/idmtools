@@ -274,7 +274,7 @@ class TestPlatformExperiment(unittest.TestCase):
             task = CommandTask(command=command)
             experiment = Experiment.from_task(task, name="run_command1")
             experiment.run(wait_until_done=True, platform=platform1)
-            platform2 = ContainerPlatform(job_directory=temp_dir, container=platform1.container_id)
+            platform2 = ContainerPlatform(job_directory=temp_dir, container_id=platform1.container_id)
             command = "sleep 100"
             task = CommandTask(command=command)
             experiment2 = Experiment.from_task(task, name="run_command2")

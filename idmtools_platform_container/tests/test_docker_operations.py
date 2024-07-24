@@ -25,7 +25,7 @@ class TestDockerOperations(unittest.TestCase):
     @patch('idmtools_platform_container.container_operations.docker_operations.sort_containers_by_start')
     @patch('idmtools_platform_container.container_platform.ContainerPlatform.retrieve_match_containers')
     @patch('idmtools_platform_container.container_operations.docker_operations.logger')
-    def test_validate_container_running(self, mock_logger, mock_retrieve_match_containers,
+    def test_validate_container(self, mock_logger, mock_retrieve_match_containers,
                                         mock_sort_containers_by_start, mock_stop_all_containers,
                                         mock_pull_docker_image, mock_check_local_image, mock_is_docker_daemon_running,
                                         mock_is_docker_installed):
@@ -39,7 +39,7 @@ class TestDockerOperations(unittest.TestCase):
         mock_is_docker_daemon_running.return_value = True
         mock_check_local_image.return_value = True
         mock_pull_docker_image.return_value = True
-        with (self.subTest("test_with_running_container")):
+        with self.subTest("test_with_running_container"):
             mock_container1 = MagicMock(short_id='test_container_id1')
             mock_container2 = MagicMock(short_id='test_container_id2')
             mock_container3 = MagicMock(short_id='test_container_id3')
@@ -53,7 +53,7 @@ class TestDockerOperations(unittest.TestCase):
             self.assertEqual(result, mock_container2.short_id)
             mock_logger.debug.assert_called_with(f"Pick running container {mock_container2.short_id}.")
 
-        with (self.subTest("test_with_stopped_container")):
+        with self.subTest("test_with_stopped_container"):
             mock_container1 = MagicMock(short_id='test_container_id1')
             mock_container2 = MagicMock(short_id='test_container_id2')
             mock_retrieve_match_containers.return_value = [('exited', mock_container1),
@@ -65,7 +65,7 @@ class TestDockerOperations(unittest.TestCase):
             self.assertEqual(result, mock_container2.short_id)
             mock_logger.debug.assert_called_with(f"Pick and restart the stopped container {mock_container2.short_id}.")
 
-        with (self.subTest("test_with_no_container_start_new_container")):
+        with self.subTest("test_with_no_container_start_new_container"):
             platform.retrieve_match_containers.return_value = []
             mock_sort_containers_by_start.return_value = []
             platform.start_container.return_value = 'new_start_container_id'
@@ -74,7 +74,7 @@ class TestDockerOperations(unittest.TestCase):
             mock_logger.debug.call_args_list[0].assert_called_with(f"Start container: {platform.docker_image}.")
             mock_logger.debug.call_args_list[1].assert_called_with(f"New container ID: new_start_container_id.")
 
-        with (self.subTest("test_with_running_container_force_start")):
+        with self.subTest("test_with_running_container_force_start"):
             platform.force_start = True
             mock_container = MagicMock(short_id='test_container_id')
             platform.retrieve_match_containers.return_value = [('running', mock_container)]
@@ -83,7 +83,7 @@ class TestDockerOperations(unittest.TestCase):
             self.assertEqual(result, 'new_container_id')
             mock_logger.debug.call_args_list[0].assert_called_with(f"Start container: {platform.docker_image}.")
             mock_logger.debug.call_args_list[1].assert_called_with(f"New container ID: new_container_id.")
-        with (self.subTest("test_with_failed_check_local_image_and_failed_pull_image")):
+        with self.subTest("test_with_failed_check_local_image_and_failed_pull_image"):
             with patch(
                     'idmtools_platform_container.container_operations.docker_operations.user_logger') as mock_user_logger:
                 mock_check_local_image.return_value = False
@@ -94,6 +94,22 @@ class TestDockerOperations(unittest.TestCase):
                     f"Image {platform.docker_image} does not exist, pull the image first.")
                 mock_user_logger.error.assert_called_once_with(
                     f"/!\\ ERROR: Failed to pull image {platform.docker_image}.")
+                self.assertEqual(cm.exception.code, -1)
+        with self.subTest("test_with_docker_not_installed"):
+            mock_is_docker_installed.return_value = False
+            with patch(
+                    'idmtools_platform_container.container_operations.docker_operations.user_logger') as mock_user_logger:
+                with self.assertRaises(SystemExit) as ex:
+                    validate_container_running(platform)
+                    mock_user_logger.error.assert_called_with("Docker is not installed.")
+        mock_is_docker_installed.return_value = True  # reset to true from previous subtest
+        with self.subTest("test_with_is_docker_daemon_running"):
+            with patch(
+                    'idmtools_platform_container.container_operations.docker_operations.user_logger') as mock_user_logger:
+                mock_is_docker_daemon_running.return_value = False
+                with self.assertRaises(SystemExit) as cm:
+                    validate_container_running(platform)
+                mock_user_logger.error.assert_called_once_with("Docker daemon is not running.")
                 self.assertEqual(cm.exception.code, -1)
 
     @patch('docker.from_env')
@@ -663,11 +679,11 @@ class TestDockerOperations(unittest.TestCase):
 
     @patch('subprocess.run')
     @patch('idmtools_platform_container.container_operations.docker_operations.user_logger')
-    def test_list_running_jobs_success(self, mock_user_logger, mock_run):
+    def test_list_running_jobs(self, mock_user_logger, mock_run):
         mock_container = MagicMock(spec=Container, short_id="container_id")
         with self.subTest("test_list_running_jobs_success"):
             # Mock subprocess.run to simulate docker command output
-            mock_output = "PID  PPID  PGID CMD\n1234 5678 1234 EXPERIMENT:exp_id batch.sh\n2345 6789 2345 SIMULATION:sim_id"
+            mock_output = "PID  PPID  PGID CMD\n1234 5678 1234 01:23 EXPERIMENT:exp_id batch.sh\n2345 6789 2345 01:24 SIMULATION:sim_id"
             mock_run.return_value = MagicMock(returncode=0, stdout=mock_output)
             result = list_running_jobs("123")
             self.assertEqual(len(result), 2)
@@ -693,7 +709,7 @@ class TestDockerOperations(unittest.TestCase):
                 mock_user_logger.error.assert_called_with("Command failed with return code -1")
         with self.subTest("test_list_running_jobs_with_limit"):
             # Mock subprocess.run to simulate docker command output
-            mock_output = "PID  PPID  PGID CMD\n1234 5678 1234 EXPERIMENT:exp_id\n2345 6789 2345 SIMULATION:sim_id"
+            mock_output = "PID  PPID  PGID STIME CMD\n1234 5678 1234 01:23 EXPERIMENT:exp_id\n2345 6789 2345 01:23 SIMULATION:sim_id"
             mock_run.return_value = MagicMock(returncode=0, stdout=mock_output)
             result = list_running_jobs(mock_container.short_id, limit=1) # expected only get exp_id back
             self.assertEqual(len(result), 1)
@@ -708,21 +724,21 @@ class TestDockerOperations(unittest.TestCase):
     def test_find_running_job(self, mock_user_logger, mock_list_running_jobs, mock_get_working_containers,
                                                 mock_get_job):
         with self.subTest("test_find_running_job_with_container_id"):
-            mock_job = Job(container_id='container1', process_line='1234 5678 1234 EXPERIMENT:exp_id')
+            mock_job = Job(container_id='container1', process_line='1234 5678 1234 00:55 EXPERIMENT:exp_id')
             mock_list_running_jobs.return_value = [mock_job]
             result = find_running_job(item_id='exp_id', container_id='container1')
             self.assertIsNotNone(result)
             self.assertEqual(result.item_id, 'exp_id')
         with self.subTest("test_find_running_job_without_container_id"):
             mock_get_job.return_value = {'CONTAINER': 'container1'}
-            mock_job = Job(container_id='container1', process_line='1234 5678 1234 EXPERIMENT:exp_id')
+            mock_job = Job(container_id='container1', process_line='1234 5678 1234 00:55 EXPERIMENT:exp_id')
             mock_list_running_jobs.return_value = [mock_job]
             result = find_running_job(item_id='exp_id')
             self.assertIsNotNone(result)
             self.assertEqual(result.item_id, 'exp_id')
         with self.subTest("test_find_running_job_with_job_id"):
             mock_container1 = MagicMock(spec=Container, short_id="container_id1")
-            mock_job = Job(container_id=mock_container1.short_id, process_line='1234 5678 1234 EXPERIMENT:exp_id')
+            mock_job = Job(container_id=mock_container1.short_id, process_line='1234 5678 1234 00:55 EXPERIMENT:exp_id')
             mock_job.job_id = "123"
 
             def side_effect(item_id):
@@ -740,7 +756,7 @@ class TestDockerOperations(unittest.TestCase):
         with self.subTest("test_find_running_job_with_job_id_match_multiple_containers"):
             mock_container1 = MagicMock(spec=Container, short_id="container_id1")
             mock_container2 = MagicMock(spec=Container, short_id="container_id2")
-            mock_job = Job(container_id=mock_container1.short_id, process_line='1234 5678 1234 EXPERIMENT:exp_id')
+            mock_job = Job(container_id=mock_container1.short_id, process_line='1234 5678 1234 00:55 EXPERIMENT:exp_id')
             mock_job.job_id = "123"
             def side_effect(item_id):
                 if not is_valid_uuid(item_id):
@@ -753,6 +769,16 @@ class TestDockerOperations(unittest.TestCase):
             with self.assertRaises(SystemExit) as ex:
                 result = find_running_job(item_id="123")
                 mock_user_logger.error.assert_called_with(f"Multiple jobs found for Job ID {mock_job.job_id}, please provide the Container ID or use Entity ID instead.")
+        with self.subTest("test_find_running_job_with_simulation_id"):
+            mock_container1 = MagicMock(spec=Container, short_id="container_id1")
+            mock_container2 = MagicMock(spec=Container, short_id="container_id2")
+            mock_get_job.return_value = None
+            mock_job = Job(container_id='container_id1', process_line='1234 5678 1234 00:55 SIMULATION:sim_id')
+            mock_get_working_containers.return_value = [mock_container1]
+            mock_list_running_jobs.return_value = [mock_job]
+            result = find_running_job(item_id='sim_id')
+            self.assertIsNotNone(result)
+            self.assertEqual(result.item_id, 'sim_id')
 
 
 if __name__ == '__main__':
