@@ -368,6 +368,31 @@ class TestContainerPlatform(unittest.TestCase):
             self.assertTrue(platform.container, '12345')
             self.assertTrue(platform.container_id, '12345')
 
+    @patch('idmtools_platform_container.container_platform.get_container')
+    @patch('idmtools_platform_container.container_platform.logger.warning')
+    def test_validate_mount(self, mock_logger_warning, mock_get_container):
+        with self.subTest("test_container_found_and_mounts_match"):
+            mock_container = MagicMock()
+            mock_get_container.return_value = mock_container
+            platform = ContainerPlatform(job_directory="DEST")
+            with patch('idmtools_platform_container.container_platform.compare_mounts', return_value=True):
+                result = platform.validate_mount('12345')
+                self.assertTrue(result)
+                mock_logger_warning.assert_not_called()
+        with self.subTest("test_container_not_found"):
+            mock_get_container.return_value = None
+            platform = ContainerPlatform(job_directory="DEST")
+            result = platform.validate_mount('12345')
+            self.assertFalse(result)
+            mock_logger_warning.assert_called_with("Container 12345 is not found.")
+        with self.subTest("test_container_found_but_mounts_do_not_match"):
+            mock_container = MagicMock()
+            mock_container.attrs = {'Mounts': []}
+            mock_get_container.return_value = mock_container
+            platform = ContainerPlatform(job_directory="DEST")
+            result = platform.validate_mount('12345')
+            self.assertFalse(result)
+
 
 if __name__ == '__main__':
     unittest.main()
