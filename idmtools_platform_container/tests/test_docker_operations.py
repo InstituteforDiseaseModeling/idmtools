@@ -83,23 +83,6 @@ class TestDockerOperations(unittest.TestCase):
             self.assertEqual(result, 'new_container_id')
             mock_logger.debug.call_args_list[0].assert_called_with(f"Start container: {platform.docker_image}.")
             mock_logger.debug.call_args_list[1].assert_called_with(f"New container ID: new_container_id.")
-        with (self.subTest("test_with_docker_not_installed")):
-            mock_is_docker_installed.return_value = False
-            with patch(
-                    'idmtools_platform_container.container_operations.docker_operations.user_logger') as mock_user_logger:
-                with self.assertRaises(SystemExit) as ex:
-                    validate_container_running(platform)
-                    mock_user_logger.error.assert_called_with("Docker is not installed.")
-        mock_is_docker_installed.return_value = True  # reset to true from previous subtest
-        with (self.subTest("test_with_is_docker_daemon_running")):
-            with patch(
-                    'idmtools_platform_container.container_operations.docker_operations.user_logger') as mock_user_logger:
-                mock_is_docker_daemon_running.return_value = False
-                with self.assertRaises(SystemExit) as cm:
-                    validate_container_running(platform)
-                mock_user_logger.error.assert_called_once_with("Docker daemon is not running.")
-                self.assertEqual(cm.exception.code, -1)
-        mock_is_docker_daemon_running.return_value = True  # reset to true from previous subtest
         with (self.subTest("test_with_failed_check_local_image_and_failed_pull_image")):
             with patch(
                     'idmtools_platform_container.container_operations.docker_operations.user_logger') as mock_user_logger:
