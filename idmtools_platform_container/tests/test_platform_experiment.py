@@ -4,6 +4,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
+from click.testing import CliRunner
 
 from idmtools.assets import AssetCollection, Asset
 from idmtools.core import ItemType, EntityStatus
@@ -14,7 +15,8 @@ import tempfile
 import sys
 
 from idmtools_platform_container.container_operations.docker_operations import stop_container
-
+from idmtools_platform_container.container_platform import ContainerPlatform
+import idmtools_platform_container.cli.container as container_cli
 parent = Path(__file__).resolve().parent
 sys.path.append(str(parent))
 from utils import find_containers_by_prefix, is_valid_container_name_with_prefix, get_container_name_by_id, \
@@ -262,6 +264,61 @@ class TestPlatformExperiment(unittest.TestCase):
             self.assertEqual(experiment.status, EntityStatus.FAILED)
             # clean up
             stop_container(platform.container_id, remove=True)
+
+    def test_platform_with_existing_container_id(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            platform1 = ContainerPlatform(job_directory=temp_dir)
+            command = "ls -lart"
+            task = CommandTask(command=command)
+            experiment = Experiment.from_task(task, name="run_command1")
+            experiment.run(wait_until_done=True, platform=platform1)
+            platform2 = ContainerPlatform(job_directory=temp_dir, container=platform1.container_id)
+            command = "sleep 100"
+            task = CommandTask(command=command)
+            experiment2 = Experiment.from_task(task, name="run_command2")
+            experiment2.run(wait_until_done=False, platform=platform2)
+
+            with patch('rich.console.Console.print') as mock_console:
+                runner = CliRunner()
+                # get detail of experiment2
+                result = runner.invoke(container_cli.container, ['get-detail', experiment2.id])
+                # verify experiment2 is running in platform1's container
+                self.assertIn(f'"CONTAINER": "{platform1.container_id}",',
+                          mock_console.call_args_list[0].args[0].text)
+                self.assertIn(f'"EXPERIMENT_NAME": "run_command2",',
+                              mock_console.call_args_list[0].args[0].text)
+                self.assertIn(f'"EXPERIMENT_ID": "{experiment2.id}",',
+                              mock_console.call_args_list[0].args[0].text)
+            # clean up
+            stop_container(platform1.container_id, remove=True)
+
+    def test_platform_with_existing_container_id1(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            platform1 = ContainerPlatform(job_directory=temp_dir)
+            command = "ls -lart"
+            task = CommandTask(command=command)
+            experiment = Experiment.from_task(task, name="run_command1")
+            experiment.run(wait_until_done=True, platform=platform1)
+            platform2 = ContainerPlatform(job_directory=temp_dir)
+            platform2.container = platform1.container_id
+            command = "sleep 100"
+            task = CommandTask(command=command)
+            experiment2 = Experiment.from_task(task, name="run_command2")
+            experiment2.run(wait_until_done=False, platform=platform2)
+
+            with patch('rich.console.Console.print') as mock_console:
+                runner = CliRunner()
+                # get detail of experiment2
+                result = runner.invoke(container_cli.container, ['get-detail', experiment2.id])
+                # verify experiment2 is running in platform1's container
+                self.assertIn(f'"CONTAINER": "{platform1.container_id}",',
+                              mock_console.call_args_list[0].args[0].text)
+                self.assertIn(f'"EXPERIMENT_NAME": "run_command2",',
+                              mock_console.call_args_list[0].args[0].text)
+                self.assertIn(f'"EXPERIMENT_ID": "{experiment2.id}",',
+                              mock_console.call_args_list[0].args[0].text)
+            # clean up
+            stop_container(platform1.container_id, remove=True)
 
     # def test_delete_container_by_image_prefix(self):
     #     delete_containers_by_image_prefix("docker-production-public.packages.idmod.org/idmtools/container-test")
