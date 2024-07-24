@@ -63,7 +63,7 @@ class TestContainerPlatformAnalyzer(unittest.TestCase):
         ts.add_builder(builder)
         experiment = Experiment.from_template(ts, name=case_name, tags=tags)
         experiment.assets.add_directory(assets_directory=os.path.join("inputs", "Assets"))
-        experiment.run(True)
+        experiment.run(True, platform=cls.platform)
         cls.exp_id = experiment.uid
 
     def test_AddAnalyzer(self):
