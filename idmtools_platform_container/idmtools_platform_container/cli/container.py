@@ -7,7 +7,7 @@ import json
 import click
 import shutil
 import subprocess
-from typing import Union
+from typing import Union, List, Tuple
 from pathlib import Path
 from rich.console import Console
 from rich.table import Table
@@ -16,7 +16,7 @@ from idmtools_platform_container.container_operations.docker_operations import l
     is_docker_installed, is_docker_daemon_running, get_working_containers, get_containers, get_container
 from idmtools_platform_container.utils.job_history import JobHistory
 from idmtools_platform_container.utils.status import summarize_status_files, get_simulation_status
-from idmtools_platform_container.utils.general import convert_byte_size
+from idmtools_platform_container.utils.general import convert_byte_size, format_timestamp
 from logging import getLogger
 
 logger = getLogger(__name__)
@@ -25,15 +25,64 @@ user_logger = getLogger('user')
 EXPERIMENT_FILES = ['stdout.txt', 'stderr.txt']
 SIMULATION_FILES = ['stdout.txt', 'stderr.txt', 'job_status.txt', 'status.txt', 'output']
 
-
 ##########################
 # Container Commands
 #########################
 
-@click.group(short_help="Container PLATFORM Related Commands")
-def container():
+IMPORTANT_COMMANDS = ['status', 'cancel', 'jobs', 'history']
+
+
+class CustomGroup(click.Group):
+    """Custom Group class for Container Platform CLI commands."""
+
+    def __init__(self, *args, **kwargs):
+        """
+        Initialize CustomGroup.
+        Args:
+            args: Positional arguments
+            kwargs: USer defined arguments
+        """
+        self.allowed_commands = kwargs.pop('allowed_commands', None)
+        super().__init__(*args, **kwargs)
+
+    def parse_args(self, ctx, args):
+        """
+        Parse arguments.
+        Args:
+            ctx: click context
+            args: user arguments
+        Returns:
+            None
+        """
+        # Intercept and process --all flag early
+        if '--all' in args:
+            ctx.params['all'] = True
+            self.allowed_commands = None
+        super().parse_args(ctx, args)
+
+    def list_commands(self, ctx) -> List[str]:
+        """
+        List commands.
+        Args:
+            ctx: click context
+        Returns:
+            list of commands
+        """
+        commands = super().list_commands(ctx)
+        if not ctx.params.get('all') and self.allowed_commands:
+            commands = [cmd for cmd in commands if cmd in self.allowed_commands]
+        return commands
+
+
+@click.group(cls=CustomGroup, allowed_commands=IMPORTANT_COMMANDS, short_help="ContainerPlatform related commands.")
+@click.option('--all', is_flag=True, help="Show all commands")
+def container(all):
     """
-    Commands related to managing the Container Platform.
+    Container Platform CLI commands.
+    Args:
+        all: Bool, show all commands
+    Returns:
+        None
     """
     pass
 
@@ -192,9 +241,11 @@ def jobs(container_id: str = None, limit: int = 10, next: int = 0):
             table.add_column("Job ID", justify="right", style="green")
             table.add_column("Container", justify="right", style="plum2")
             table.add_column("Status", justify="right", style="red")
+            table.add_column("Elapsed", justify="right", style="blue")
 
             for job in sim_next:
-                table.add_row(job.item_type.name, str(job.item_id), str(job.job_id), job.container_id, 'running')
+                table.add_row(job.item_type.name, str(job.item_id), str(job.job_id), job.container_id, 'running',
+                              job.elapsed)
 
             console.print(table)
 
@@ -203,7 +254,7 @@ def jobs(container_id: str = None, limit: int = 10, next: int = 0):
                         "Arguments:\n\n"
                         "  EXP_ID: Experiment ID")
 @click.argument('exp-id', type=str, required=True)
-def get_job(exp_id: str):
+def get_detail(exp_id: str):
     """
     Get Experiment job history.
     Args:
@@ -240,7 +291,7 @@ def history(container_id: str = None, limit: int = 10, next: int = 0):
     data_next = data[start:end]
 
     console = Console()
-    console.print(f"There are {len(data)} jobs in history.")
+    console.print(f"There are {len(data)} Experiment cache in history.")
     for job in data_next:
         console.print(f"{'':-^100}")
         for k, v in job.items():
@@ -349,7 +400,7 @@ def history_count(container_id: str = None):
                         "  ITEM_ID: Experiment/Simulation ID")
 @click.argument('item-id', type=str, required=True)
 @click.option('-r', '--remove', multiple=True, help="Extra files/folders to be removed from simulation")
-def clear_results(item_id: str, remove: bool = True):
+def clear_results(item_id: str, remove: Tuple = None):
     """
     Clear the generated output files for a job.
     Args:
@@ -424,8 +475,8 @@ def inspect(container_id: str):
     console.print(f"[bold][cyan]Container ID[/][/]: {container.short_id}")
     console.print(f"[bold][cyan]Container Name[/][/]: {container.name}")
     console.print(f"[bold][cyan]Status[/][/]: {container.status}")
-    console.print(f"[bold][cyan]Created[/][/]: {container.attrs['Created']}")
-    console.print(f"[bold][cyan]StartedAt[/][/]: {container.attrs['State']['StartedAt']}")
+    console.print(f"[bold][cyan]Created[/][/]: {format_timestamp(container.attrs['Created'])}")
+    console.print(f"[bold][cyan]StartedAt[/][/]: {format_timestamp(container.attrs['State']['StartedAt'])}")
 
     console.print("[bold][cyan]Image[/][/]:")
     console.print_json(json.dumps(container.attrs['Config']['Image']))
@@ -445,7 +496,7 @@ def inspect(container_id: str):
                         "Arguments:\n\n"
                         "  CONTAINER_ID: Container ID (optional)")
 @click.argument('container-id', required=False)
-@click.option('--remove/--no-remove', default=False, help="Display with working directory or not")
+@click.option('--remove/--no-remove', default=False, help="Remove the container or not")
 def stop_container(container_id: str = None, remove: bool = False):
     """
     Sopp running container(s).
@@ -611,12 +662,18 @@ def list_containers(all: bool = False):
     table.add_column("Image", style="bright_magenta")
     table.add_column("Status", style="red")
     table.add_column("Created", style="yellow")
-    table.add_column("Name", style="green")
+    table.add_column("Started", style="orange1")
+    table.add_column("Name", style="wheat4")
 
     for status, container_list in containers.items():
         for container in container_list:
-            table.add_row(container.short_id, container.attrs['Config']['Image'], container.status,
-                          container.attrs['Created'], container.name)
+            if container.status == 'running':
+                status = f"[green]{container.status}[/]"
+            else:
+                status = f"[red]{container.status}[/]"
+            table.add_row(container.short_id, container.attrs['Config']['Image'], status,
+                          format_timestamp(container.attrs['Created']),
+                          format_timestamp(container.attrs['State']['StartedAt']), container.name)
 
     console = Console()
     console.print(f"There are {table.row_count} container(s).")

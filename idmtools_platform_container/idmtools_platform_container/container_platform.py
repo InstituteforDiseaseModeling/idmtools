@@ -8,13 +8,17 @@ import docker
 import platform
 import subprocess
 from uuid import uuid4
+from docker.models.containers import Container
 from typing import Union, NoReturn, List, Dict
 from dataclasses import dataclass, field
+from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools_platform_container.container_operations.docker_operations import validate_container_running, \
-    find_container_by_image, compare_mounts, find_running_job
+    find_container_by_image, compare_mounts, find_running_job, get_container, CONTAINER_STATUS, restart_container, \
+    is_docker_installed, is_docker_daemon_running
+from idmtools_platform_container.platform_operations.simulation_operations import ContainerPlatformSimulationOperations
 from idmtools_platform_container.utils.general import map_container_path
 from idmtools_platform_container.utils.job_history import JobHistory
 from idmtools_platform_file.file_platform import FilePlatform
@@ -40,11 +44,12 @@ class ContainerPlatform(FilePlatform):
     new_container: bool = field(default=False)
     include_stopped: bool = field(default=False)
     debug: bool = field(default=False)
-    _container_id: str = field(default=None, init=False)
+    container_id: str = field(default=None)
 
     def __post_init__(self):
         super().__post_init__()
         self._experiments = ContainerPlatformExperimentOperations(platform=self)
+        self._simulations = ContainerPlatformSimulationOperations(platform=self)
         self.job_directory = os.path.abspath(self.job_directory)
         self.sym_link = False
         self.run_sequence = False
@@ -57,31 +62,68 @@ class ContainerPlatform(FilePlatform):
             root_logger = getLogger()
             root_logger.setLevel(DEBUG)
 
-    @property
-    def container_id(self):  # noqa: F811
-        """
-        Returns container id.
-        Returns:
-            container id
-        """
-        return self._container_id
+        # Check if Docker is installed and running
+        if not is_docker_installed():
+            user_logger.error("Docker is not installed.")
+            exit(-1)
+        if not is_docker_daemon_running():
+            user_logger.error("Docker daemon is not running.")
+            exit(-1)
 
-    @container_id.setter
-    def container_id(self, _id):
+    def validate_container(self, container_id: str) -> str:
         """
-        Set the container id property.
+        Validate the container.
         Args:
-            _id: container id
+            container_id: container id
+        Returns:
+            Container short id
+        """
+        # Check if the container exists
+        container = get_container(container_id)
+        if not container:
+            user_logger.warning(f"Container {container_id} is not found.")
+            exit(-1)
+
+        # Check if the container is in the right status
+        if container.status not in CONTAINER_STATUS:
+            user_logger.warning(
+                f"Container {container_id} is in {container.status} status, but we only support status: {CONTAINER_STATUS}.")
+            exit(-1)
+
+        # Check if the container is running if we do not include stopped containers
+        if not self.include_stopped and container.status != 'running':
+            user_logger.warning(f"Container {container_id} is not running.")
+            exit(-1)
+
+        # Check if the container matches the platform mounts
+        if not self.validate_mount(container):
+            user_logger.warning(f"Container {container_id} does not match the platform mounts.")
+            exit(-1)
+
+        # Restart the container if it is not running
+        if container.status != 'running':
+            restart_container(container)
+
+        return container.short_id
+
+    def run_items(self, items: Union[IEntity, List[IEntity]], **kwargs):
+        """
+        Run items on the platform.
+        Args:
+            items: Runnable items
+            kwargs: additional arguments
         Returns:
             None
         """
-        self._container_id = _id
+        if self.container_id is not None:
+            self.container_id = self.validate_container(self.container_id)
+        super().run_items(items, **kwargs)
 
     def submit_job(self, item: Union[Experiment, Simulation], dry_run: bool = False, **kwargs) -> NoReturn:
         """
         Submit a Process job in a docker container.
         Args:
-            item: idmtools Experiment or Simulation
+            item: Experiment or Simulation
             dry_run: True/False
             kwargs: keyword arguments used to expand functionality
         Returns:
@@ -104,7 +146,10 @@ class ContainerPlatform(FilePlatform):
                     exit(-1)
 
             # Start the container
-            self.container_id = self.check_container(**kwargs)
+            if self.container_id is None:
+                if logger.isEnabledFor(DEBUG):
+                    logger.debug("Check provided container!")
+                self.container_id = self.check_container(**kwargs)
 
             # If the platform is Windows, convert the scripts to Linux format
             if platform.system() in ["Windows"]:
@@ -262,16 +307,24 @@ class ContainerPlatform(FilePlatform):
 
         return mounts
 
-    def validate_mount(self, container) -> bool:
+    def validate_mount(self, container: Union[str, Container]) -> bool:
         """
         Compare the mounts of the container with the platform.
         Args:
-            container: a container to be compared.
+            container: a container object or id.
         Returns:
             True/False
         """
+        if isinstance(container, str):
+            ct = get_container(container)
+        else:
+            ct = container
+
+        if ct is None:
+            logger.warning(f"Container {container} is not found.")
+            return False
         mounts1 = self.get_mounts()
-        mounts2 = container.attrs['Mounts']
+        mounts2 = ct.attrs['Mounts']
         return compare_mounts(mounts1, mounts2)
 
     def get_container_directory(self, item: Union[Suite, Experiment, Simulation]) -> str:

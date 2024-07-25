@@ -31,14 +31,6 @@ def validate_container_running(platform, **kwargs) -> str:
     Returns:
         container id
     """
-    if not is_docker_installed():
-        user_logger.error("Docker is not installed.")
-        exit(-1)
-
-    if not is_docker_daemon_running():
-        user_logger.error("Docker daemon is not running.")
-        exit(-1)
-
     # Check image exists
     if not check_local_image(platform.docker_image):
         user_logger.info(f"Image {platform.docker_image} does not exist, pull the image first.")
@@ -197,6 +189,36 @@ def stop_all_containers(containers: List[Union[str, Container]], keep_running: b
             if jobs:
                 continue
         stop_container(container, remove=remove)
+
+
+def restart_container(container: Union[str, Container]) -> NoReturn:
+    """
+    Restart a container.
+    Args:
+        container: container id or container object to be restarted
+    Returns:
+        No return
+    """
+    try:
+        if isinstance(container, str):
+            container = get_container(container)
+        elif not isinstance(container, Container):
+            raise TypeError("Invalid container object.")
+
+        if container is None:
+            user_logger.error(f"Container {container} not found.")
+            exit(-1)
+
+        # Restart the container
+        container.restart()
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f"Container {container.short_id} has been restarted.")
+    except DockerAPIError as e:
+        user_logger.error(f"Error restarting container {container.short_id}: {str(e)}")
+        exit(-1)
+    except Exception as e:
+        user_logger.error(f"Restarting container {container.short_id} encounters an unexpected error: {e}")
+        exit(-1)
 
 
 def sort_containers_by_start(containers: List[Container], reverse: bool = True) -> List[Container]:
@@ -401,18 +423,22 @@ def compare_mounts(mounts1: List[Dict], mounts2: List[Dict]) -> bool:
     return mounts_set1 == mounts_set2
 
 
-def compare_container_mount(container_id1: str, container_id2: str) -> bool:
+def compare_container_mount(container1: Union[str, Container], container2: Union[str, Container]) -> bool:
     """
     Compare the mount configurations of two containers.
     Args:
-        container_id1: container id
-        container_id2: container id
+        container1: container object or id
+        container2: container object or id
     Returns:
         True/False
     """
     # Get the container objects
-    container1 = get_container(container_id1)
-    container2 = get_container(container_id2)
+    if isinstance(container1, str):
+        container1 = get_container(container1)
+
+    if isinstance(container2, str):
+        container2 = get_container(container2)
+
     # Get the mount configurations
     mounts1 = container1.attrs['Mounts']
     mounts2 = container2.attrs['Mounts']
@@ -424,7 +450,7 @@ def compare_container_mount(container_id1: str, container_id2: str) -> bool:
 # Check jobs
 #############################
 
-PS_QUERY = 'ps xao pid,ppid,pgid,cmd | head -n 1 && ps xao pid,ppid,pgid,cmd | grep -e EXPERIMENT -e SIMULATION | grep -v grep'
+PS_QUERY = 'ps xao pid,ppid,pgid,etime,cmd | head -n 1 && ps xao pid,ppid,pgid,etime,cmd | grep -e EXPERIMENT -e SIMULATION | grep -v grep'
 
 
 @dataclass(repr=False)
@@ -435,7 +461,7 @@ class Job:
     job_id: int = None
     group_pid: int = None
     container_id: str = None
-    created: str = None
+    elapsed: str = None
 
     def __init__(self, container_id: str, process_line: str):
         """
@@ -445,7 +471,7 @@ class Job:
             process_line: Process Input Line
         """
         process = process_line.split()
-        parts = process[3].split(':')
+        parts = process[4].split(':')
         self.item_id = parts[1]
         self.group_pid = int(process[2])
         self.item_type = ItemType.EXPERIMENT if parts[0] == 'EXPERIMENT' else ItemType.SIMULATION
@@ -454,6 +480,7 @@ class Job:
         elif parts[0] == 'SIMULATION':
             self.job_id = int(process[0])
         self.container_id = container_id
+        self.elapsed = process[3]
 
     def display(self):
         """Display Job for debugging usage."""
@@ -462,6 +489,7 @@ class Job:
         user_logger.info(f"Job ID: {self.job_id:15}")
         user_logger.info(f"Group PID: {self.group_pid:15}")
         user_logger.info(f"Container ID: {self.container_id:15}")
+        user_logger.info(f"Elapsed: {self.elapsed:15}")
 
 
 def list_running_jobs(container_id: str, limit: int = None) -> List[Job]:
