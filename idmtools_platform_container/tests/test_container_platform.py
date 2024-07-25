@@ -16,12 +16,12 @@ from idmtools_platform_container.container_platform import ContainerPlatform
 
 @pytest.mark.serial
 class TestContainerPlatform(unittest.TestCase):
-    @classmethod
-    def tearDownClass(cls) -> None:
-        try:
-            shutil.rmtree(os.path.join(os.path.dirname(os.path.abspath(__file__)), "DEST"))
-        except FileNotFoundError:
-            pass
+    # @classmethod
+    # def tearDownClass(cls) -> None:
+    #     try:
+    #         shutil.rmtree(os.path.join(os.path.dirname(os.path.abspath(__file__)), "DEST"))
+    #     except FileNotFoundError:
+    #         pass
 
     @patch('idmtools_platform_container.utils.job_history.JobHistory.save_job')
     @patch('idmtools_platform_container.container_platform.find_running_job', return_value=None)
