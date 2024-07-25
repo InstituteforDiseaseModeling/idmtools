@@ -2,6 +2,8 @@ import allure
 import os
 import sys
 from functools import partial
+
+import numpy as np
 import pandas as pd
 import pytest
 from COMPS.Data import Experiment as COMPSExperiment
@@ -110,9 +112,9 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         self.assertTrue(os.path.exists(file_path))
         df = pd.read_csv(file_path, names=['index', 'key', 'value'], header=None)
         self.assertTrue(df['key'].values[1:5].size == 4)
-        self.assertTrue(df['key'].values[1:5].all() == 'b')
+        self.assertTrue(np.all(df['key'].values[1:5] == 'b'))
         self.assertTrue(df['value'].values[1:5].size == 4)
-        self.assertTrue(df['value'].values[1:5].all() == '2')
+        self.assertTrue(np.all(df['value'].values[1:5] == '2'))
 
     @pytest.mark.serial
     @run_in_temp_dir
