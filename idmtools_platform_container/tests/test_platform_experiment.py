@@ -1,24 +1,20 @@
 import os
+import sys
 import unittest
 from pathlib import Path
 from unittest.mock import patch
-
 import pytest
 from click.testing import CliRunner
-
 from idmtools.assets import AssetCollection, Asset
 from idmtools.core import ItemType, EntityStatus
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 import tempfile
-import sys
-
 from idmtools_platform_container.container_operations.docker_operations import stop_container, find_running_job
 from idmtools_platform_container.container_platform import ContainerPlatform
 import idmtools_platform_container.cli.container as container_cli
 from idmtools_platform_container.utils.job_history import JobHistory
-
 parent = Path(__file__).resolve().parent
 sys.path.append(str(parent))
 from utils import find_containers_by_prefix, is_valid_container_name_with_prefix, get_container_name_by_id, \

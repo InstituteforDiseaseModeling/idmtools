@@ -6,9 +6,7 @@ import os
 import sys
 from functools import partial
 from typing import Any, Dict
-
 from idmtools.builders import SimulationBuilder
-from idmtools.core.platform_factory import Platform
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation

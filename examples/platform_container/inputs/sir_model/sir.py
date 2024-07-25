@@ -1,6 +1,4 @@
 from argparse import ArgumentParser
-from logging import getLogger, INFO, basicConfig
-
 from scipy.integrate import odeint
 import numpy as np
 import matplotlib.pyplot as plt

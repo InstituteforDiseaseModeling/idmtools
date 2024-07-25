@@ -3,10 +3,8 @@
 # printed to stdout.txt file and output/result.txt file in each simulation folder.
 # Path for simulation in cluster machine: /home/username/example/suite_id/experiment_id/simulation_id
 import os
-import sys
 from functools import partial
 from typing import Any, Dict
-
 from idmtools.builders import SimulationBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import Suite
