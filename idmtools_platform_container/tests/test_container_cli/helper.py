@@ -2,6 +2,14 @@ from rich.table import Table
 
 
 def get_actual_rich_table_values(mock_console):
+    """
+    Get actual table values from the mock console
+    Args:
+        mock_console: rich.console.Console
+
+    Returns:
+        list for actual table values
+    """
     actual_table = []
     for call in mock_console.call_args_list:
         args, _ = call
