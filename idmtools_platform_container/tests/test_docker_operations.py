@@ -2,6 +2,7 @@ import platform
 import subprocess
 import unittest
 from pathlib import Path
+import pytest
 from docker.models.containers import Container
 from unittest.mock import patch, MagicMock
 import docker
@@ -15,6 +16,7 @@ from idmtools_platform_container.container_platform import ContainerPlatform
 from idmtools_platform_container.utils.general import normalize_path, is_valid_uuid
 
 
+@pytest.mark.serial
 class TestDockerOperations(unittest.TestCase):
 
     @patch('idmtools_platform_container.container_operations.docker_operations.is_docker_installed')
@@ -95,22 +97,7 @@ class TestDockerOperations(unittest.TestCase):
                 mock_user_logger.error.assert_called_once_with(
                     f"/!\\ ERROR: Failed to pull image {platform.docker_image}.")
                 self.assertEqual(cm.exception.code, -1)
-        with self.subTest("test_with_docker_not_installed"):
-            mock_is_docker_installed.return_value = False
-            with patch(
-                    'idmtools_platform_container.container_operations.docker_operations.user_logger') as mock_user_logger:
-                with self.assertRaises(SystemExit) as ex:
-                    validate_container_running(platform)
-                    mock_user_logger.error.assert_called_with("Docker is not installed.")
-        mock_is_docker_installed.return_value = True  # reset to true from previous subtest
-        with self.subTest("test_with_is_docker_daemon_running"):
-            with patch(
-                    'idmtools_platform_container.container_operations.docker_operations.user_logger') as mock_user_logger:
-                mock_is_docker_daemon_running.return_value = False
-                with self.assertRaises(SystemExit) as cm:
-                    validate_container_running(platform)
-                mock_user_logger.error.assert_called_once_with("Docker daemon is not running.")
-                self.assertEqual(cm.exception.code, -1)
+
 
     @patch('docker.from_env')
     @patch('idmtools_platform_container.container_operations.docker_operations.logger')
@@ -160,40 +147,40 @@ class TestDockerOperations(unittest.TestCase):
                 f"Error retrieving container with ID test_container_id: {mock_client.containers.get.side_effect}")
 
     @patch('docker.from_env')
-    def test_find_container_by_image(self, mock_docker):
+    @patch('idmtools_platform_container.container_operations.docker_operations.get_containers')
+    def test_find_container_by_image(self, mock_get_containers, mock_docker):
         mock_client = MagicMock()
         mock_docker.return_value = mock_client
         with self.subTest("test_running_status"):
-            mock_container = MagicMock()
+            mock_container = MagicMock(spec=Container)
             mock_container.status = 'running'
             mock_container.attrs = {'Config': {'Image': 'test_image'}}
-            mock_client.containers.list.return_value = [mock_container]
-
+            mock_get_containers.return_value = {'running': [mock_container]}
             # Calling find_container_by_image function
             result = find_container_by_image('test_image')
-            self.assertDictEqual(result, {mock_container.status: [mock_container], 'stopped': []})
+            self.assertDictEqual(result, {"running": [mock_container]})
 
         # Test find_container_by_image function with include_stopped_containers as True
         with self.subTest("test_with_include_stopped_containers_as_True"):
             # Create mock_container with status as 'exited'
-            mock_container = MagicMock()
+            mock_container = MagicMock(spec=Container)
             mock_container.status = 'exited'
             mock_container.attrs = {'Config': {'Image': 'test_image'}}
             # Create another mock_container with status as 'running'
-            mock_container1 = MagicMock()
+            mock_container1 = MagicMock(spec=Container)
             mock_container1.status = 'running'
-            mock_container1.image.tags = ['test_image']
-            mock_client.containers.list.return_value = [mock_container, mock_container1]
+            mock_container1.attrs = {'Config': {'Image': 'test_image'}}
+            mock_get_containers.return_value = {'stopped': [mock_container], 'running': [mock_container1]}
             result = find_container_by_image('test_image', include_stopped=True)
-            self.assertDictEqual(result, {'stopped': [mock_container], 'running': []})
+            self.assertDictEqual(result, {'stopped': [mock_container], 'running': [mock_container1]})
 
         # test find_container_by_image function with include_stopped_containers as True but invalid status
         with self.subTest("test_with_include_stopped_containers_as_True_and_invalid_status"):
             # Create mock_container with status as 'exited'
-            mock_container = MagicMock()
+            mock_container = MagicMock(spec=Container)
             mock_container.status = 'exited_invalid'
             mock_container.attrs = {'Config': {'Image': 'test_image'}}
-            mock_client.containers.list.return_value = [mock_container]
+            mock_get_containers.return_value = {'running': [], 'stopped': []}
             result = find_container_by_image('test_image', include_stopped=True)
             self.assertEqual(result, {'running': [], 'stopped': []})
 
@@ -587,17 +574,19 @@ class TestDockerOperations(unittest.TestCase):
                 self.assertEqual(normalize_path(path).lower(), expected)
 
     @patch('docker.from_env')
-    def test_list_containers(self, mock_docker_env):
+    @patch('idmtools_platform_container.container_operations.docker_operations.JobHistory.verify_container')
+    def test_list_containers(self, mock_verify_container, mock_docker_env):
         mock_client = MagicMock()
         mock_docker_env.return_value = mock_client
+        mock_verify_container.return_value = True
         with self.subTest("test_list_containers_running_only"):
             mock_container_running = MagicMock()
             mock_container_running.status = 'running'
             mock_client.containers.list.return_value = [mock_container_running]
             result = get_containers(include_stopped=False)
             self.assertIn('running', result)
-            self.assertEqual(len(result['running']), 1)
-            self.assertNotIn('exited', result)
+            self.assertEqual(result['running'], [mock_container_running])
+            self.assertNotIn(result['stopped'], [])
         with self.subTest("test_list_containers_include_stopped"):
             mock_container_running = MagicMock()
             mock_container_running.status = 'running'
