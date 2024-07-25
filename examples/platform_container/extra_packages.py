@@ -2,13 +2,13 @@
 import os
 import sys
 from idmtools.assets import Asset, AssetCollection
+from idmtools.core.platform_factory import Platform
 from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
-from idmtools_platform_container.container_platform import ContainerPlatform
 
 
 def run_with_extra_packages():
-    platform = ContainerPlatform(job_directory="DEST", new_container=True, extra_packages=['astor'])
+    platform = Platform("Container", job_directory="DEST", new_container=True, extra_packages=['astor'])
     command = "python Assets/model_file.py"
     task = CommandTask(command=command)
 

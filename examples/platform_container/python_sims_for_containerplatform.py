@@ -4,15 +4,15 @@ import sys
 from functools import partial
 from typing import Any, Dict
 from idmtools.builders import SimulationBuilder
+from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
-from idmtools_platform_container.container_platform import ContainerPlatform
 
 # job dir is where the experiment will be run.
 # Define Container Platform. For full list of parameters see container_platform.py in idmtools_platform_container
-platform = ContainerPlatform(job_directory="DEST")
+platform = Platform("Container", job_directory="DEST")
 # Define path to assets directory
 assets_directory = os.path.join("..", "python_model", "inputs", "python", "Assets")
 # Define task
