@@ -22,15 +22,19 @@ do
             singularity exec {{simulation.task.sif_path}} {{simulation.task.command.cmd}}
         {% endif %}
     {% else %}
-        {{simulation.task.command.cmd}}
+        exec -a "SIMULATION:{{simulation.id}}" {{simulation.task.command.cmd}} &
     {% endif %}
+   child_pid=$!
+   echo "Running simulation with PID: $child_pid"
+   # Wait for the child process to complete
+   wait $child_pid
+
    RESULT=$?
    if [ $RESULT -eq 0 ]; then
       echo "0" > job_status.txt
       exit $RESULT
    fi
    n=$((n+1))
-   sleep 15
 done
 echo "-1" > job_status.txt
 exit $RESULT
