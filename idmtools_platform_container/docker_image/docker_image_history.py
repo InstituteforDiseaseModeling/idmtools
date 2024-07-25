@@ -1,4 +1,5 @@
 """This script fetches the history of a Docker image and prints it in a tabular format."""
+import argparse
 import re
 import shutil
 import subprocess
@@ -72,14 +73,13 @@ def get_docker_image_history(image_id_or_name):
     return df
 
 
-def main():
+def main(image_id):
     """
     This script fetches the history of a Docker image and prints it in a tabular format.
     Returns:
         None
     """
-    image_id_or_name = "428ad92fcc4c"
-    df = get_docker_image_history(image_id_or_name)
+    df = get_docker_image_history(image_id)
     total_size = sum(parse_size(size) for size in df['SIZE'])
     size = format_size(total_size)
     if df is not None:
@@ -94,4 +94,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    if __name__ == "__main__":
+        parser = argparse.ArgumentParser("Get Image Build History")
+        parser.add_argument("--image_id", default="10bed3221522", help="Docker image id")
+        args = parser.parse_args()
+        main(args.image_id)
