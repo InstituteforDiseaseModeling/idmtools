@@ -6,8 +6,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use('Agg')
-basicConfig(level=INFO)
-logger = getLogger(__name__)
 
 
 def run_simulation(N, I0, R0, beta, gamma, days):
@@ -71,5 +69,4 @@ if __name__ == "__main__":
     parser.add_argument("--days", default=160, help="Total Days")
 
     args = parser.parse_args()
-    logger.info(f"Using the following args: {args}")
     run_simulation(args.N, args.I0, args.R0, args.beta, args.gamma, args.days)
