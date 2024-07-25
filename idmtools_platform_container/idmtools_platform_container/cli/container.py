@@ -7,7 +7,7 @@ import json
 import click
 import shutil
 import subprocess
-from typing import Union, Optional, List
+from typing import Union, List, Tuple
 from pathlib import Path
 from rich.console import Console
 from rich.table import Table
@@ -22,8 +22,8 @@ from logging import getLogger
 logger = getLogger(__name__)
 user_logger = getLogger('user')
 
-EXPERIMENT_FILES = ['stdout.txt', 'stderr.txt', 'job_id.txt']
-SIMULATION_FILES = ['stdout.txt', 'stderr.txt', 'job_status.txt', 'job_id.txt', 'status.txt', 'output']
+EXPERIMENT_FILES = ['stdout.txt', 'stderr.txt']
+SIMULATION_FILES = ['stdout.txt', 'stderr.txt', 'job_status.txt', 'status.txt', 'output']
 
 ##########################
 # Container Commands
@@ -400,7 +400,7 @@ def history_count(container_id: str = None):
                         "  ITEM_ID: Experiment/Simulation ID")
 @click.argument('item-id', type=str, required=True)
 @click.option('-r', '--remove', multiple=True, help="Extra files/folders to be removed from simulation")
-def clear_results(item_id: str, remove: Optional[List[str]] = None):
+def clear_results(item_id: str, remove: Tuple = None):
     """
     Clear the generated output files for a job.
     Args:
