@@ -2,7 +2,7 @@
 # Replace the following lines with above line after the offical image is available
 #############################################################
 FROM rockylinux:9.2
-ENV TZ=America/LosAngeles DEBIAN_FRONTEND=noninteractive
+ENV TZ=UTC DEBIAN_FRONTEND=noninteractive
 ENV GNUMAKEFLAGS=-j4
 
 RUN yum -y install rpm dnf-plugins-core \
