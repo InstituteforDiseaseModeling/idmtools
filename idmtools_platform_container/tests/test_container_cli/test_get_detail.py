@@ -4,9 +4,11 @@ from time import sleep
 from unittest.mock import patch
 import pytest
 import idmtools_platform_container.cli.container as container_cli
+from idmtools.core import ItemType
 from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 from idmtools_platform_container.utils.general import normalize_path
+
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from test_base import TestContainerPlatformCliBase
 
@@ -27,8 +29,9 @@ class TestContainerPlatformGetDetailCli(TestContainerPlatformCliBase):
                       mock_console.call_args_list[0].args[0].text)
         self.assertIn(f'"SUITE_ID": "{experiment.parent_id}",',
                       mock_console.call_args_list[0].args[0].text)
+        exp_dir = self.platform.get_directory_by_id(experiment.id, ItemType.EXPERIMENT)
         self.assertIn(
-            f'"EXPERIMENT_DIR": "{normalize_path(self.job_directory)}/{experiment.parent_id}/{experiment.id}",',
+            f'"EXPERIMENT_DIR": "{normalize_path(exp_dir)}",',
             mock_console.call_args_list[0].args[0].text)
         self.assertIn(f'"EXPERIMENT_NAME": "run_command",',
                       mock_console.call_args_list[0].args[0].text)
