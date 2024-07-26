@@ -6,6 +6,7 @@ import pytest
 from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 import idmtools_platform_container.cli.container as container_cli
+
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from test_base import TestContainerPlatformCliBase
 from helper import found_job_id_by_experiment, get_actual_rich_table_values
@@ -25,6 +26,18 @@ class TestContainerPlatformCancelCli(TestContainerPlatformCliBase):
         self.assertIn('Successfully killed EXPERIMENT', mock_console.call_args_list[0].args[0])
 
     @patch('rich.console.Console.print')
+    def test_cancel_with_simulation_id(self, mock_console):
+        command = "python3 Assets/sleep.py"
+        task = CommandTask(command=command)
+        task.common_assets.add_asset("../inputs/sleep.py")
+        experiment = Experiment.from_task(task, name="run_command")
+        experiment.run(wait_until_done=False)
+        # test cancel with experiment id
+        result = self.runner.invoke(container_cli.container, ['cancel', experiment.simulations[0].id])
+        self.assertEqual(result.exit_code, 0)
+        self.assertIn('Successfully killed SIMULATION', mock_console.call_args_list[0].args[0])
+
+    @patch('rich.console.Console.print')
     def test_cancel_with_experiment_job_id_and_container_id(self, mock_console):
         command = "sleep 100"
         task = CommandTask(command=command)
@@ -33,13 +46,25 @@ class TestContainerPlatformCancelCli(TestContainerPlatformCliBase):
         result = self.runner.invoke(container_cli.container, ['jobs'])
         self.assertEqual(result.exit_code, 0)
         actual_table = get_actual_rich_table_values(mock_console)
-        job_id, container_id = found_job_id_by_experiment(actual_table, experiment.id)
+        job_id, container_id = found_job_id_by_experiment(actual_table[1:], experiment.id)
         # test cancel with job_id and container_id
         result = self.runner.invoke(container_cli.container, ['cancel', job_id, '-c', container_id])
         self.assertTrue(f'Successfully killed EXPERIMENT {job_id}', mock_console.call_args[0][0])
         self.assertEqual(result.exit_code, 0)
-        # clean up container
-        result = self.runner.invoke(container_cli.container, ['stop-container', self.platform.container_id], '--remove')
+
+    @patch('rich.console.Console.print')
+    def test_cancel_with_job_id_only(self, mock_console):
+        command = "sleep 100"
+        task = CommandTask(command=command)
+        experiment = Experiment.from_task(task, name="run_command")
+        experiment.run(wait_until_done=False)
+        result = self.runner.invoke(container_cli.container, ['jobs'])
+        self.assertEqual(result.exit_code, 0)
+        actual_table = get_actual_rich_table_values(mock_console)
+        job_id, container_id = found_job_id_by_experiment(actual_table[1:], experiment.id)
+        # test cancel with job_id and container_id
+        result = self.runner.invoke(container_cli.container, ['cancel', job_id])
+        self.assertTrue(f'Successfully killed EXPERIMENT {job_id}', mock_console.call_args[0][0])
         self.assertEqual(result.exit_code, 0)
 
     def test_cancel_help(self):
