@@ -8,7 +8,7 @@ from idmtools.entities.experiment import Experiment
 
 
 def run_with_extra_packages():
-    platform = Platform('CONTAINER', job_directory="DEST", new_container=True, extra_packages=['astor'])
+    platform = Platform("Container", job_directory="DEST", new_container=True, extra_packages=['astor'])
     command = "python Assets/model_file.py"
     task = CommandTask(command=command)
 

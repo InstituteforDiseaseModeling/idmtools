@@ -1,23 +1,27 @@
 import os
+import sys
 import unittest
 from pathlib import Path
 from unittest.mock import patch
+import pytest
+from click.testing import CliRunner
 from idmtools.assets import AssetCollection, Asset
 from idmtools.core import ItemType, EntityStatus
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 import tempfile
-import sys
-
-from idmtools_platform_container.container_operations.docker_operations import stop_container
-
+from idmtools_platform_container.container_operations.docker_operations import stop_container, find_running_job
+from idmtools_platform_container.container_platform import ContainerPlatform
+import idmtools_platform_container.cli.container as container_cli
+from idmtools_platform_container.utils.job_history import JobHistory
 parent = Path(__file__).resolve().parent
 sys.path.append(str(parent))
 from utils import find_containers_by_prefix, is_valid_container_name_with_prefix, get_container_name_by_id, \
     get_container_status_by_id
 
 
+@pytest.mark.serial
 class TestPlatformExperiment(unittest.TestCase):
     def test_container_platform_integration(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -93,11 +97,11 @@ class TestPlatformExperiment(unittest.TestCase):
             # mock that the image does not exist in local, so it should be pulled from artifactory
             mock_check_local_image.return_value = False
 
-            platform = Platform("Container", job_directory=temp_dir)
+            platform = Platform("Container", job_directory=temp_dir, debug=True)
             command = "ls -lat"
             task = CommandTask(command=command)
             experiment = Experiment.from_task(task, name="run_command")
-            experiment.run(wait_until_done=True)
+            experiment.run(wait_until_done=True, platform=platform)
 
             expected_user_log_messages = [f"Image {platform.docker_image} does not exist, pull the image first.",
                                           f"Pulling image {platform.docker_image} ..."]
@@ -120,7 +124,7 @@ class TestPlatformExperiment(unittest.TestCase):
             command = "ls -lat"
             task = CommandTask(command=command)
             experiment = Experiment.from_task(task, name="run_command")
-            experiment.run(wait_until_done=True)
+            experiment.run(wait_until_done=True, platform=platform)
             self.assertEqual(experiment.status, EntityStatus.SUCCEEDED)
             # check container exist
             new_matched_containers = find_containers_by_prefix(container_prefix)
@@ -258,6 +262,118 @@ class TestPlatformExperiment(unittest.TestCase):
             self.assertEqual(experiment.status, EntityStatus.FAILED)
             # clean up
             stop_container(platform.container_id, remove=True)
+
+    def test_platform_with_existing_container_id(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            platform1 = ContainerPlatform(job_directory=temp_dir)
+            command = "ls -lart"
+            task = CommandTask(command=command)
+            experiment = Experiment.from_task(task, name="run_command1")
+            experiment.run(wait_until_done=True, platform=platform1)
+            platform2 = ContainerPlatform(job_directory=temp_dir, container_id=platform1.container_id)
+            command = "sleep 100"
+            task = CommandTask(command=command)
+            experiment2 = Experiment.from_task(task, name="run_command2")
+            experiment2.run(wait_until_done=False, platform=platform2)
+
+            with patch('rich.console.Console.print') as mock_console:
+                runner = CliRunner()
+                # get detail of experiment2
+                result = runner.invoke(container_cli.container, ['get-detail', experiment2.id])
+                # verify experiment2 is running in platform1's container
+                self.assertIn(f'"CONTAINER": "{platform1.container_id}",',
+                              mock_console.call_args_list[0].args[0].text)
+                self.assertIn(f'"EXPERIMENT_NAME": "run_command2",',
+                              mock_console.call_args_list[0].args[0].text)
+                self.assertIn(f'"EXPERIMENT_ID": "{experiment2.id}",',
+                              mock_console.call_args_list[0].args[0].text)
+            # clean up
+            stop_container(platform1.container_id, remove=True)
+
+    def test_platform_with_existing_container_id1(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            platform1 = ContainerPlatform(job_directory=temp_dir)
+            command = "ls -lart"
+            task = CommandTask(command=command)
+            experiment = Experiment.from_task(task, name="run_command1")
+            experiment.run(wait_until_done=True, platform=platform1)
+            platform2 = ContainerPlatform(job_directory=temp_dir)
+            platform2.container = platform1.container_id
+            command = "sleep 100"
+            task = CommandTask(command=command)
+            experiment2 = Experiment.from_task(task, name="run_command2")
+            experiment2.run(wait_until_done=False, platform=platform2)
+
+            with patch('rich.console.Console.print') as mock_console:
+                runner = CliRunner()
+                # get detail of experiment2
+                result = runner.invoke(container_cli.container, ['get-detail', experiment2.id])
+                # verify experiment2 is running in platform1's container
+                self.assertIn(f'"CONTAINER": "{platform1.container_id}",',
+                              mock_console.call_args_list[0].args[0].text)
+                self.assertIn(f'"EXPERIMENT_NAME": "run_command2",',
+                              mock_console.call_args_list[0].args[0].text)
+                self.assertIn(f'"EXPERIMENT_ID": "{experiment2.id}",',
+                              mock_console.call_args_list[0].args[0].text)
+            # clean up
+            stop_container(platform1.container_id, remove=True)
+
+    def test_platform_cancel_experiment(self):
+        job_directory = tempfile.gettempdir()
+        platform = ContainerPlatform(job_directory=job_directory)
+        command = "sleep 100"
+        task = CommandTask(command=command)
+        experiment = Experiment.from_task(task, name="run_command")
+        experiment.run(wait_until_done=False, platform=platform)
+        with patch('idmtools_platform_container.platform_operations.experiment_operations.logger') as mock_logger:
+            platform._experiments.platform_cancel(experiment.id)
+            # verify process is cancelled
+            self.assertTrue(mock_logger.method_calls[0].args[
+                                0] == f"EXPERIMENT {experiment.id} is running on Container {platform.container_id}.")
+            self.assertTrue(mock_logger.method_calls[1].args[0] == f"Successfully killed EXPERIMENT {experiment.id}")
+        # clean up
+        stop_container(platform.container_id, remove=True)
+
+    def test_platform_delete_experiment(self):
+        job_directory = tempfile.gettempdir()
+        platform = ContainerPlatform(job_directory=job_directory)
+        command = "sleep 100"
+        task = CommandTask(command=command)
+        experiment = Experiment.from_task(task, name="run_command")
+        experiment.run(wait_until_done=False, platform=platform)
+        platform._experiments.platform_delete(experiment.id)
+        # make sure we don't delete suite in this case
+        self.assertTrue(os.path.exists(os.path.join(job_directory, experiment.parent_id)))
+        # make sure we only delete experiment folder under suite
+        self.assertFalse(os.path.exists(os.path.join(job_directory, experiment.parent_id, experiment.id)))
+        # verify the job is deleted from history
+        job = JobHistory.get_job(experiment.id)
+        self.assertIsNone(job)
+        # clean up
+        stop_container(platform.container_id, remove=True)
+
+    def test_platform_delete_simulation(self):
+        job_directory = tempfile.gettempdir()
+        platform = ContainerPlatform(job_directory=job_directory)
+        command = "sleep 100"
+        task = CommandTask(command=command)
+        experiment = Experiment.from_task(task, name="run_command")
+        experiment.run(wait_until_done=False, platform=platform)
+        # delete simulation
+        platform._simulations.platform_delete(experiment.simulations[0].id)
+        # make sure we don't delete suite or experiment in this case
+        self.assertTrue(os.path.exists(os.path.join(job_directory, experiment.parent_id, experiment.id)))
+        # make sure we only delete simulation folder under experiment
+        self.assertFalse(os.path.exists(
+            os.path.join(job_directory, experiment.parent_id, experiment.id, experiment.simulations[0].id)))
+        # verify simulation job is deleted from history
+        job = find_running_job(experiment.simulations[0].id, platform.container_id)
+        self.assertIsNone(job)
+        # verify experiment job is still in history
+        job_exp = find_running_job(experiment.id, platform.container_id)
+        self.assertIsNotNone(job_exp)
+        # clean up
+        stop_container(platform.container_id, remove=True)
 
     # def test_delete_container_by_image_prefix(self):
     #     delete_containers_by_image_prefix("docker-production-public.packages.idmod.org/idmtools/container-test")

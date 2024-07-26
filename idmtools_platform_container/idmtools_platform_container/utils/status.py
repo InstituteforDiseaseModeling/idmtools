@@ -22,20 +22,6 @@ status_mapping = {
     '-1': 'FAILED'
 }
 
-summary = {
-    'SUCCEEDED': [],
-    'RUNNING': [],
-    'FAILED': [],
-    'PENDING': []
-}
-
-counter = {
-    'SUCCEEDED': 0,
-    'RUNNING': 0,
-    'FAILED': 0,
-    'PENDING': 0
-}
-
 FILE_NAME = 'job_status.txt'
 
 
@@ -86,6 +72,20 @@ def summarize_status_files(exp_dir: str, max_display: int = 10, verbose: bool = 
     Returns:
         None
     """
+    summary = {
+        'SUCCEEDED': [],
+        'RUNNING': [],
+        'FAILED': [],
+        'PENDING': []
+    }
+
+    counter = {
+        'SUCCEEDED': 0,
+        'RUNNING': 0,
+        'FAILED': 0,
+        'PENDING': 0
+    }
+
     total_simulation_count = 0
 
     # Traverse through all sub-folders in the given folder path
