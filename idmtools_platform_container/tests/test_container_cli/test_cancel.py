@@ -7,7 +7,8 @@ from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 import idmtools_platform_container.cli.container as container_cli
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+script_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(script_dir)
 from test_base import TestContainerPlatformCliBase
 from helper import found_job_id_by_experiment, get_actual_rich_table_values
 
@@ -29,10 +30,10 @@ class TestContainerPlatformCancelCli(TestContainerPlatformCliBase):
     def test_cancel_with_simulation_id(self, mock_console):
         command = "python3 Assets/sleep.py"
         task = CommandTask(command=command)
-        task.common_assets.add_asset("../inputs/sleep.py")
+        task.common_assets.add_asset(os.path.join(script_dir, "..", "inputs", "sleep.py"))
         experiment = Experiment.from_task(task, name="run_command")
         experiment.run(wait_until_done=False)
-        # test cancel with experiment id
+        # test cancel with simulation id
         result = self.runner.invoke(container_cli.container, ['cancel', experiment.simulations[0].id])
         self.assertEqual(result.exit_code, 0)
         self.assertIn('Successfully killed SIMULATION', mock_console.call_args_list[0].args[0])

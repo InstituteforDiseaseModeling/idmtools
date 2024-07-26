@@ -8,7 +8,8 @@ from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 import idmtools_platform_container.cli.container as container_cli
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+script_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(script_dir)
 from test_base import TestContainerPlatformCliBase
 
 
@@ -18,7 +19,7 @@ class TestContainerPlatformIsRunningCli(TestContainerPlatformCliBase):
     def test_is_running(self):
         command = "python3 Assets/sleep.py"
         task = CommandTask(command=command)
-        task.common_assets.add_asset("../inputs/sleep.py")
+        task.common_assets.add_asset(os.path.join(script_dir, "..", "inputs", "sleep.py"))
         experiment = Experiment.from_task(task, name="run_command")
         experiment.run(wait_until_done=False)
         sleep(10)

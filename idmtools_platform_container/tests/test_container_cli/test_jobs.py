@@ -9,9 +9,10 @@ from idmtools.entities.experiment import Experiment
 import idmtools_platform_container.cli.container as container_cli
 from idmtools_platform_container.utils.job_history import JobHistory
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from helper import get_actual_rich_table_values
+script_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(script_dir)
 from test_base import TestContainerPlatformCliBase
+from helper import get_actual_rich_table_values
 
 
 @pytest.mark.serial
@@ -21,7 +22,7 @@ class TestContainerPlatformJobCli(TestContainerPlatformCliBase):
     def test_jobs(self, mock_console):
         command = "python3 Assets/sleep.py 100"
         task = CommandTask(command=command)
-        task.common_assets.add_asset("../inputs/sleep.py")
+        task.common_assets.add_asset(os.path.join(script_dir, "..", "inputs", "sleep.py"))
         experiment = Experiment.from_task(task, name="run_command")
         experiment.run(wait_until_done=False)
         job = JobHistory.get_job(experiment.id)

@@ -34,9 +34,9 @@ class TestContainerPlatformHistoryCli(TestContainerPlatformCliBase):
         self.assertEqual('There are 1 Experiment cache in history.', mock_console.call_args_list[0].args[0])
         self.assertIn(normalize_path(f"{platform.job_directory}"),
                       mock_console.call_args_list[2].args[0])
-        self.assertEquals('EXPERIMENT_NAME : run_command', cleaned_str(mock_console.call_args_list[3][0][0]))
-        self.assertEquals(f'EXPERIMENT_ID   : {experiment.id}', cleaned_str(mock_console.call_args_list[4][0][0]))
-        self.assertEquals(f'CONTAINER       : {platform.container_id}',
+        self.assertEqual('EXPERIMENT_NAME : run_command', cleaned_str(mock_console.call_args_list[3][0][0]))
+        self.assertEqual(f'EXPERIMENT_ID   : {experiment.id}', cleaned_str(mock_console.call_args_list[4][0][0]))
+        self.assertEqual(f'CONTAINER       : {platform.container_id}',
                           cleaned_str(mock_console.call_args_list[5][0][0]))
         match_created_time = re.match(r'^CREATED         : \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$',
                                       cleaned_str(mock_console.call_args_list[6][0][0]))
@@ -68,9 +68,9 @@ class TestContainerPlatformHistoryCli(TestContainerPlatformCliBase):
         self.assertEqual('There are 1 Experiment cache in history.', mock_console.call_args_list[0].args[0])
         self.assertIn(normalize_path(f"{platform.job_directory}"),
                       mock_console.call_args_list[2].args[0])
-        self.assertEquals('EXPERIMENT_NAME : run_command', cleaned_str(mock_console.call_args_list[3][0][0]))
-        self.assertEquals(f'EXPERIMENT_ID   : {experiment.id}', cleaned_str(mock_console.call_args_list[4][0][0]))
-        self.assertEquals(f'CONTAINER       : {platform.container_id}',
+        self.assertEqual('EXPERIMENT_NAME : run_command', cleaned_str(mock_console.call_args_list[3][0][0]))
+        self.assertEqual(f'EXPERIMENT_ID   : {experiment.id}', cleaned_str(mock_console.call_args_list[4][0][0]))
+        self.assertEqual(f'CONTAINER       : {platform.container_id}',
                           cleaned_str(mock_console.call_args_list[5][0][0]))
         match_created_time = re.match(r'^CREATED         : \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$',
                                       cleaned_str(mock_console.call_args_list[6][0][0]))

@@ -12,7 +12,8 @@ from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_platform_container.container_platform import ContainerPlatform
 from idmtools_platform_container.utils.general import normalize_path
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+script_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(script_dir)
 from test_base import TestContainerPlatformCliBase
 from helper import get_actual_rich_table_values, found_job_id_by_experiment, cleaned_str
 
@@ -22,7 +23,7 @@ class TestContainerPlatformStatusCli(TestContainerPlatformCliBase):
     def test_status(self):
         command = "python3 Assets/sleep.py"
         task = CommandTask(command=command)
-        task.common_assets.add_asset("../inputs/sleep.py")
+        task.common_assets.add_asset(os.path.join(script_dir, "..", "inputs", "sleep.py"))
         experiment = Experiment.from_task(task, name="run_command")
         experiment.run(wait_until_done=False)
         exp_dir = self.platform.get_directory_by_id(experiment.id, ItemType.EXPERIMENT)
@@ -92,7 +93,7 @@ class TestContainerPlatformStatusCli(TestContainerPlatformCliBase):
         platform = ContainerPlatform(job_directory=self.job_directory, new_container=True)
         command = "python3 Assets/sleep.py"
         task = CommandTask(command=command)
-        task.common_assets.add_asset("../inputs/sleep.py")
+        task.common_assets.add_asset(os.path.join(script_dir, "..", "inputs", "sleep.py"))
         ts = TemplatedSimulations(base_task=task)
         sb = SimulationBuilder()
 

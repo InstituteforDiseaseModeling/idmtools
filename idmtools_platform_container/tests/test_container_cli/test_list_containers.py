@@ -37,9 +37,9 @@ class TestContainerPlatformListContainersCli(TestContainerPlatformCliBase):
         self.assertTrue(expected_result)
         table = get_actual_rich_table_values(mock_console)
         expected_head = ["Container ID", "Image", "Status", "Created", "Started", "Name"]
-        self.assertEquals(table[0], expected_head)
-        self.assertEquals(self.platform.container_id, table[1][0])
-        self.assertEquals(self.platform.docker_image, table[1][1])
+        self.assertEqual(table[0], expected_head)
+        self.assertEqual(self.platform.container_id, table[1][0])
+        self.assertEqual(self.platform.docker_image, table[1][1])
         self.assertIn("running", cleaned_str(table[1][2]))
         match_created_time = re.match(r'^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$', table[1][3])
         match_started_time = re.match(r'^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$', table[1][4])
