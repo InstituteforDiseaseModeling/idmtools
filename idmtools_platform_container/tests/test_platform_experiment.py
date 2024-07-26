@@ -21,6 +21,7 @@ from utils import find_containers_by_prefix, is_valid_container_name_with_prefix
     get_container_status_by_id
 
 
+@pytest.mark.serial
 class TestPlatformExperiment(unittest.TestCase):
     def test_container_platform_integration(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -88,7 +89,6 @@ class TestPlatformExperiment(unittest.TestCase):
             for mc in matched_containers:
                 stop_container(mc, remove=True)
 
-    @pytest.mark.serial
     @patch('idmtools_platform_container.container_operations.docker_operations.check_local_image')
     @patch('idmtools_platform_container.container_operations.docker_operations.logger')
     @patch('idmtools_platform_container.container_operations.docker_operations.user_logger')
