@@ -2,5 +2,8 @@ import sys
 import time
 
 if __name__ == "__main__":
-    sleep_time = 10 if sys.argv[1] is None else int(sys.argv[1])
+    if len(sys.argv) > 1:
+        sleep_time = int(sys.argv[1])
+    else:
+        sleep_time = 100
     time.sleep(sleep_time)
