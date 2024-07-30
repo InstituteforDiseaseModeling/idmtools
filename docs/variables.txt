@@ -19,14 +19,14 @@
 .. |EMOD_l| replace:: Epidemiological MODeling software (EMOD)
 .. |EMOD_s| replace:: EMOD
 .. |IT_s| replace:: idmtools
-.. |Python_IT| replace:: Python 3.7, or 3.8 64-bit
+.. |Python_IT| replace:: Python 3.8 or 3.8+
 .. |SSMT_l| replace:: Server-Side Modeling Tools (SSMT)
 .. |SSMT_s| replace:: SSMT
 .. |DT| replace:: DTK-Tools
 .. |DTM| replace:: DTK-Tools-Malaria
-.. |COMPS_l| replace:: COmputational Modeling Platform Service (COMPS)
+.. |COMPS_l| replace:: Computational Modeling Platform Service (COMPS)
 .. |COMPS_s| replace:: COMPS
-.. |Python_supp| replace:: Python 3.6.5 64-bit
+.. |Python_supp| replace:: Python 3.8 64-bit
 .. |exe_l| replace:: EMOD executable (Eradication.exe)
 .. |exe_s| replace:: Eradication.exe
 .. |linux_binary| replace:: Eradication binary
@@ -34,3 +34,5 @@
 .. |EMODPY_s| replace:: emodpy
 .. |SLURM_s| replace:: SLURM
 .. |SLURM_l| replace:: Simple Linux Utility for Resource Management (SLURM)
+.. |CONTAINER_s| replace:: Container
+.. |CONTAINER_l| replace:: Docker container for running EMOD and other jobs

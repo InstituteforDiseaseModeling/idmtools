@@ -103,7 +103,7 @@ Exact workflows for using |IT_s| is user-dependent, and can include any of the t
    configuration
    platforms/platforms
    create-sims
-   containers/containers
+   singularity/singularity-containers
    parameter-sweeps
    reports
    analyzers/analyzers

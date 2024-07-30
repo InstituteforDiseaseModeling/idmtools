@@ -24,10 +24,10 @@ Core and job orchestration
 .. uml:: /diagrams/core.puml
 
 
-Local platform
---------------
+Container platform
+------------------
 
-.. uml:: /diagrams/local.puml
+.. uml:: /diagrams/platform_container.puml
 
 
 |COMPS_s| platform
@@ -72,3 +72,4 @@ API Documentation
    api/idmtools_platform_comps_index
    api/idmtools_platform_slurm_index
    api/idmtools_slurm_utils_index
+   api/idmtools_platform_container_index

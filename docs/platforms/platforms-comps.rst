@@ -5,8 +5,6 @@ COMPS
 The |COMPS_s| platform allows use of the |COMPS_s| HPC. |COMPS_s| has multiple environments. Most have predefined aliases that can be used
 to quickly use the environments. Here are a list of predefined environments:
 
-* BELEGOST
-* BAYESIAN
 * SLURMSTAGE
 * CALCULON
 * SLURM
@@ -21,6 +19,7 @@ Utilities Unique to COMPS
 -------------------------
 
 .. toctree::
+   comps/options
    comps/add_2ac
    comps/assetize_output
    comps/download.rst

@@ -8,7 +8,9 @@ Platforms
 
 .. include:: /reuse/comps_note.txt
 
-**SLURM**: You can also run simulations on the open-source |SLURM_s| platform for large and small Linux clusters.". For more information, see :doc:`slurm/index`.
+**SLURM**: OR you can run simulations on the open-source |SLURM_s| platform for large and small Linux clusters. For more information, see :doc:`slurm/index`.
+
+**CONTAINER**: Or You can run simulations on the docker |CONTAINER_s| platform on your local host. For more information, see :doc:`container/index`.
 
 If you need to use a different platform, you can also add a new platform to |IT_s| by creating a new platform plugin, as described in :doc:`platforms-plugin`. 
 
@@ -38,6 +40,9 @@ You use the :py:class:`~idmtools.core.platform_factory.Platform` class whether y
 For additional information about configuring idmtools.ini, see :doc:`../configuration`.
 
 .. toctree::
+
    platforms-comps
    slurm/index
+   container/index
    platforms-plugin
+
