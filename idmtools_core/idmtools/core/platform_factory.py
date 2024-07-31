@@ -95,7 +95,6 @@ class Platform:
 
         ContainerPlatform Keyword Args:
            - job_directory (str, optional): Job directory. Default is None
-           - max_job (int, optional): Max job. Default is 4
            - docker_image (str, optional): Docker image to use for the simulation. Default is None
            - extra_packages (list, optional): Extra packages to install. Default is None
            - data_mount (str, optional): Data mount point. Default is None
@@ -104,8 +103,11 @@ class Platform:
            - force_start (bool, optional): Force start container. Default is False
            - new_container (bool, optional): Start a new container. Default is False
            - include_stopped (bool, optional): Include stopped containers. Default is False
+           - container_id (str, optional): The ID of the container being used.
+           - max_job (int, optional): Max job. Default is 4
            - modules (list, optional): Modules to load. Default is None
            - debug (bool, optional): Debug mode. Default is False
+           - retries (int, optional): The number of retries to attempt for a job.
 
         Returns:
             The requested platform.
