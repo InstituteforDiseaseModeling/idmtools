@@ -1,27 +1,18 @@
-=========
-CONTAINER
-=========
+.. _Container Platform:
+
+==================
+Container Platform
+==================
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
 
+    utilis
     options
-    cancel
     docker_image
 
-The |CONTAINER_s| platform allows use of the |CONTAINER_l| on local host along with docker container.
-This platform facilitates the submission of jobs to a Docker container. Functioning as a wrapper around the file
-platform, it constructs simulation job directory structures on the local host and then dispatches these files to a
-Docker container for execution. Consequently, the Docker image used for running simulations only needs to have MPI and
-Python 3.9 installed for EMOD simulations. Any additional requirements for the simulation should be incorporated into
-the host’s virtual environment. The Container platform automatically mounts the job directory, created on the host
-machine, to the Docker container. It also can dynamically install required packages into container. For more details on
-the architecture and the packages included in |IT_s| and |CONTAINER_s|, please refer to the documentation
-(:doc:`../../reference`).
-
-
 Prerequisites
-=============
+-------------
 * Docker installed
 * Linux or Windows with WSL2
 * |Python_IT| (https://www.python.org/downloads/release)
@@ -33,69 +24,69 @@ Prerequisites
     want to install, which will remain separate from other Python environments. You may use
     ``virtualenv``, which requires a separate installation, but ``venv`` is recommended and included with Python 3.8+.
 
-Configuration
-=============
-The |CONTAINER_s| platform requires to provide some configuration elements to define its operation.
+ContainerPlatform
+-----------------
 
-You can define these parameters in your ``idmtools.ini`` file by adding a configuration block for Slurm.
+The **ContainerPlatform** class is a part of the |IT_s| platform. This platform leverages Docker's containerization capabilities to provide a consistent and isolated environment for running computational tasks. The **ContainerPlatform** is responsible for managing the creation, execution, and cleanup of Docker containers used to run simulations. It offers a high-level interface for interacting with Docker containers, allowing users to submit jobs, monitor their progress, and retrieve results.
+For more details on the architecture and the packages included in |IT_s| and **ContainerPlatform**, please refer to the documentation
+(:doc:`../../reference`).
+
+Key Features
+------------
+
+- **Docker Integration**: Ensures that Docker is installed and the Docker daemon is running before executing any tasks.
+- **Experiment and Simulation Management**: Provides methods to run and manage experiments and simulations within Docker containers.
+- **Volume Binding**: Supports binding host directories to container directories, allowing for data sharing between the host and the container.
+- **Container Validation**: Validates the status and configuration of Docker containers to ensure they meet the platform's requirements.
+- **Script Conversion**: Converts scripts to Linux format if the host platform is Windows, ensuring compatibility within the container environment.
+- **Job History Management**: Keeps track of job submissions and their corresponding container IDs for easy reference and management.
+
+.. _attributes:
+
+Attributes
+----------
+
+- **job\_directory**: The directory where job data is stored.
+- **docker\_image**: The Docker image to run the container.
+- **extra_\packages**: Additional packages to install in the container.
+- **data\_mount**: The data mount point in the container.
+- **user\_mounts**: User-defined mounts for additional volume bindings.
+- **container\_prefix**: Prefix for container names.
+- **force\_start**: Flag to force start a new container.
+- **new\_container**: Flag to start a new container.
+- **include\_stopped**: Flag to include stopped containers in operations.
+- **debug**: Flag to enable debug mode.
+- **container\_id**: The ID of the container being used.
+- **max\_job**: The maximum number of jobs to run in parallel.
+- **retries**: The number of retries to attempt for a job.
+
+Usage
+-----
+
+The `ContainerPlatform` class is typically used to run computational experiments and simulations within Docker containers, ensuring a consistent and isolated environment. It provides various methods to manage and validate containers, submit jobs, and handle data volumes.
+
+Example
+-------
+
+.. code-block:: python
+
+    from idmtools_platform_container.container_platform import ContainerPlatform
+
+    # Initialize the platform
+    platform = ContainerPlatform(job_directory="destination_directory")
+    # OR
+    # Platform('Container', job_directory='destination_directory')
+
+    # Define task
+    command = "echo 'Hello, World!'"
+    task = CommandTask(command=command)
+    # Run an experiment
+    experiment = Experiment.from_task(task, name="example")
+    experiment.run(platform=platform)
 
 
-  idmtools.ini example::
-
-    [CONTAINER]
-    type = Container
-    job_directory = /home/userxyz/any_directory_for_suite
-
-
-You can also do this directly from code by passing the minimum requirements
-  Python script example::
-
-    Platform('Container', job_directory='/home/userxyz/any_directory_for_suite')
-
-
-
-Configuration Options
-`````````````````````
-.. list-table:: Title
-   :header-rows: 1
-
-   * - Parameter
-     - Description
-   * - **job_directory**
-     - This defines the location that |IT_s| will use to manage experiments on the |CONTAINER_s| platform. The directory should be located somewhere in your local host.
-   * - docker_image
-     - The docker image to use for the simulation. This is optional, and if not provided, the default image docker-production-public.packages.idmod.org/idmtools/container-rocky-runtime:0.0.1 will be used which will be pulled from idmtools docker public artifactory at first time.
-   * - other options:
-     - Other options can be passed Platform, please see documentation about the :ref:`Container Platform options <options>`.
-
-.. note::
-
-    Bold parameters are required
-
-
-
-Recommendations
-===============
-
-* Simulation results and files should be backed up
-
-Getting started
-===============
-After you have installed |IT_s| (:doc:`../../basic-installation` or :doc:`../../dev-installation`) and met the
-above listed prerequisites, you can begin submitting and running jobs to your |CONTAINER_s| with |IT_s|.
-
-Verify docker is running
-````````````````````````````````````
-Type the following at a terminal session to verify that docker is running::
-
-    docker info
-    docker version
-
-This will provide Docker's current status or an error message if Docker is not running.
-
-
-Submit a job
-````````````
+More Examples
+-------------
 Run the following included Python example to submit and run a job on your |CONTAINER_s| platform:
 
 .. literalinclude:: ../../../examples/platform_container/python_sims_for_containerplatform.py

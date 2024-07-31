@@ -1,55 +1,65 @@
-============
-Docker Image
-============
+ContainerPlatform Docker Image
+==============================
 
-This Docker image is designed to facilitate idmtools_platform_container. It serves as local running platform with all
-necessary tools and dependencies installed. The image is based on rockylinux 9.2 and includes the following tools:
+This document provides an overview of the Docker image build process.
 
-python 3.9
-mipch 4.1.1
-emod-api 1.33.3
-emod-api's dependencies like numpy, pandas, scipy, matplotlib etc.
+Docker Image Overview
+----------------------
+
+The Docker image for `ContainerPlatform` is designed to facilitate the platform by providing a local running environment with all necessary tools and dependencies installed. The image is based on Rocky Linux 9.2 and includes the following tools:
+
+- Python 3.9
+- mipch 4.1.1
+- emod-api 1.33.3
+- Dependencies like numpy, pandas, scipy, matplotlib, etc.
 
 Prerequisites
-=============
-* Docker
-* Build Docker Image
+-------------
+- Docker
 
-Note, you do not need to build the image locally. The image is auto built in github action and pushed to idmod artifactory.
+Building the Docker Image
+-------------------------
 
-Build Docker Image
-==================
-To build Docker image locally, run following script:
+Note: You do not need to build the image locally. The image is automatically built in GitHub Actions and pushed to the IDMOD Artifactory.
 
-::
+To build the Docker image locally, run:
 
-    python Run build_docker_image.py --username <username> --password <password>
+.. code-block:: bash
 
-where <username> and <password> are the username and password for the idmod artifactory account.
+   python build_docker_image.py --username <username> --password <password>
 
-You can also build the image with different docker file and image name --dockerfile and --image_name arguments.
+
+where <username> and <password> are the username and password for the IDMOD Artifactory account.  You can also build the image with a different Dockerfile and image name by specifying the --dockerfile and --imagename arguments:
+
+.. code-block:: bash
+
+   python build_docker_image.py --username <username> --password <password> --dockerfile Dockerfile_buildenv --imagename container-rocky-buildenv
+
+
+This will build the image with the name idm-docker-staging.packages.idmod.org/idmtools/container-rocky-buildenv:x.x.x.
 
 Docker Image Versioning
-=======================
-The Docker image version is determined by the version in idm docker-staging artifactory. It will advance the version number by 0.0.1 for each new build.
+-----------------------
 
+The Docker image version is determined by the version in the IDM Docker-staging Artifactory. The version number advances by 0.0.1 for each new build.
 Docker Image Usage
-==================
-By default, you DO NOT need to worry about the image build and where to call image. The image is auto built in github action whenever there is new pull request with any changes to Dockerfile or idmtools_platform_container package. The image is called in idmtools_platform_container Platform object. For example,
+By default, you do not need to worry about building and using the Docker image. The image is automatically built in GitHub Actions and pushed to the IDM Artifactory. The image is used in the ContainerPlatform object. For example:
 
-.. code-block:: python
+.. code-block:: bash
 
-    from idmtools_platform_container import Platform
-    platform = Platform('CONTAINER', docker_image='idm-docker-public.packages.idmod.org/idmtools/container-rocky-runtime:x.x.x')
+   from idmtools_platform_container import Platform
+   platform = Platform('CONTAINER', docker_image='idm-docker-public.packages.idmod.org/idmtools/container-rocky-runtime:x.x.x')
 
-where docker_image can be your local built image or the image in idmod artifactory. If you do not provide docker_image, the default image will be used.
 
-Publish Docker Image
-====================
-Note, you do not need to push docker image to artifactory. The image is auto built in github action and pushed to idmod artifactory. If you want to push the local built image to artifactory, run:
+where docker_image can be your locally built image or the image in the IDM Artifactory. If you do not provide a docker_image, the default image will be used.
 
-::
+Publishing the Docker Image
+---------------------------
 
-    python push_docker_image.py --username <username> --password <password>
+Note: You do not need to push the Docker image to the Artifactory. The image is automatically built in GitHub Actions and pushed to the IDM Artifactory.  If you want to push the image to the Artifactory, run:
 
-where <username> and <password> are the username and password for the idmod artifactory account.
+.. code-block:: bash
+
+   python push_docker_image.py --username <username> --password <password>
+
+where <username> and <password> are the username and password for the IDM Artifactory account.
