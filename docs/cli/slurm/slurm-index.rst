@@ -1,4 +1,4 @@
-.. _Slurm CLI:
+.. _CLI Slurm Platform:
 
 ==================
 CLI Slurm Platform

@@ -1,8 +1,8 @@
-.. _COMPS CLI:
+.. _CLI COMPS Platform:
 
-=========
-CLI COMPS
-=========
+==================
+CLI COMPS Platform
+==================
 
 .. toctree::
 

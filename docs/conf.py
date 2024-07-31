@@ -214,7 +214,7 @@ html_theme_options = {
     ],
     "navbar_end": ["theme-switcher", "navbar-icon-links"],
     "secondary_sidebar_items": ["navbar-side"],
-    "header_links_before_dropdown": 5,
+    "header_links_before_dropdown": 6,
     "footer_start": ["copyright", "footer_start"],
     "footer_end": ["theme-version", "footer_end"],
 }

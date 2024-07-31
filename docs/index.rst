@@ -103,6 +103,7 @@ Exact workflows for using |IT_s| is user-dependent, and can include any of the t
    configuration
    platforms/platforms
    create-sims
+   cli/cli_index
    singularity/singularity-containers
    parameter-sweeps
    reports
@@ -111,7 +112,6 @@ Exact workflows for using |IT_s| is user-dependent, and can include any of the t
    reference
    plugin_documentation/index
    recipes_index
-   cli/cli_index
    dtkt-convert
    faq
    glossary
