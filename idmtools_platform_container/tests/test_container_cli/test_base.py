@@ -5,7 +5,6 @@ from click.testing import CliRunner
 from idmtools.core.platform_factory import Platform
 
 
-@pytest.mark.serial
 class TestContainerPlatformCliBase(unittest.TestCase):
 
     @classmethod
