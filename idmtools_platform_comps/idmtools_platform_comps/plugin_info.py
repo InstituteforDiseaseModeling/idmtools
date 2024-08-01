@@ -77,10 +77,6 @@ class COMPSPlatformSpecification(PlatformSpecification):
     def get_configuration_aliases(self) -> Dict[str, Dict]:
         """Provides configuration aliases that exist in COMPS."""
         config_aliases = dict(
-            BELEGOST=dict(
-                endpoint="https://comps.idmod.org",
-                environment="Belegost"
-            ),
             CALCULON=dict(
                 endpoint="https://comps.idmod.org",
                 environment="Calculon"
@@ -101,9 +97,9 @@ class COMPSPlatformSpecification(PlatformSpecification):
                 endpoint="https://comps.idmod.org",
                 environment="Qstart"
             ),
-            BAYESIAN=dict(
-                endpoint="https://comps2.idmod.org",
-                environment="Bayesian"
+            NIBBLER=dict(
+                endpoint="https://comps.idmod.org",
+                environment="Nibbler"
             ),
             SLURMSTAGE=dict(
                 endpoint="https://comps2.idmod.org",
