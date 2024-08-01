@@ -38,7 +38,7 @@ class ContainerPlatform(FilePlatform):
     __CONTAINER_MOUNT = "/home/container_data"
     docker_image: str = field(default=None, metadata=dict(help="Docker image to run the container"))
     data_mount: str = field(default=None, metadata=dict(help="Data mount point in the container"))
-    user_mounts: Dict = field(default=None, metadata=dict(help="User-defined mounts"))
+    user_mounts: dict = field(default=None, metadata=dict(help="User-defined mounts"))
     container_prefix: str = field(default=None, metadata=dict(help="Container name prefix"))
     force_start: bool = field(default=False, metadata=dict(help="Force start a new container"))
     new_container: bool = field(default=False, metadata=dict(help="Start a new container"))
