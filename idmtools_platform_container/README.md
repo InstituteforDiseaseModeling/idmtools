@@ -6,10 +6,15 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Introduction](##Introduction)
-- [Setting Up Virtual Environment](##Setting-Up-Virtual-Environment)
-- [Running a Simple Example with ContainerPlatform](##Running-a-Simple-Example-with-ContainerPlatform)
-- [Basic CLI Commands](##Basic-CLI-Commands)
+- [Introduction](#introduction)
+- [Setting Up Virtual Environment](#setting-up-virtual-environment)
+- [Running a Simple Example with ContainerPlatform](#running-a-simple-example-with-containerplatform)
+- [Basic CLI Commands](#basic-cli-commands)
+  - [List Running Jobs](#list-running-jobs)
+  - [Check Status](#check-status)
+  - [Cancel Job](#cancel-job)
+  - [View Experiments History](#view-experiments-history)
+- [Note](#note)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
