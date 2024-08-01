@@ -36,24 +36,23 @@ class FilePlatform(IPlatform):
     """
     File Platform definition.
     """
-    job_directory: str = field(default=None)
-    max_job: int = field(default=4)
-    run_sequence: bool = field(default=True)
-    sym_link: bool = field(default=True)
+    job_directory: str = field(default=None, metadata=dict(help="Job Directory"))
+    max_job: int = field(default=4, metadata=dict(help="Maximum number of jobs to run concurrently"))
+    run_sequence: bool = field(default=True, metadata=dict(help="Run jobs in sequence"))
+    sym_link: bool = field(default=True, metadata=dict(help="Use symbolic links"))
 
     # Default retries for jobs
-    retries: int = field(default=1)
-
+    retries: int = field(default=1, metadata=dict(help="Number of retries for failed jobs"))
     # modules to be load
-    modules: list = field(default_factory=list)
+    modules: list = field(default_factory=list, metadata=dict(help="Modules to load"))
+    # extra packages to install
+    extra_packages: list = field(default_factory=list, metadata=dict(help="Extra packages to install"))
 
     _suites: FilePlatformSuiteOperations = field(**op_defaults, repr=False, init=False)
     _experiments: FilePlatformExperimentOperations = field(**op_defaults, repr=False, init=False)
     _simulations: FilePlatformSimulationOperations = field(**op_defaults, repr=False, init=False)
     _assets: FilePlatformAssetCollectionOperations = field(**op_defaults, repr=False, init=False)
     _metas: JSONMetadataOperations = field(**op_defaults, repr=False, init=False)
-
-    extra_packages: list = field(default_factory=list)
 
     def __post_init__(self):
         self.__init_interfaces()
@@ -99,7 +98,7 @@ class FilePlatform(IPlatform):
             exp_dir = self.get_directory(exp)
             item_dir = Path(exp_dir, item.id)
         else:
-            raise RuntimeError(f"Get directory is not supported for {type(item)} object on FilePlatform")
+            raise RuntimeError(f"Get directory is not supported for {type(item)} object on {self.__class__.__name__}")
 
         return item_dir
 

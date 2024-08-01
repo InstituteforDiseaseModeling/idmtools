@@ -376,4 +376,4 @@ class TestPlatformExperiment(unittest.TestCase):
         stop_container(platform.container_id, remove=True)
 
     # def test_delete_container_by_image_prefix(self):
-    #     delete_containers_by_image_prefix("docker-production-public.packages.idmod.org/idmtools/container-test")
+    #     delete_containers_by_image_prefix("docker-production-public.packages.idmod.org/idmtools/container-rocky-runtime")

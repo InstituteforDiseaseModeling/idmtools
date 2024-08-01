@@ -34,17 +34,17 @@ class ContainerPlatform(FilePlatform):
     """
     Container Platform definition.
     """
-    __CONTAINER_IMAGE = "docker-production-public.packages.idmod.org/idmtools/container-test:0.0.3"
+    __CONTAINER_IMAGE = "docker-production-public.packages.idmod.org/idmtools/container-rocky-runtime:0.0.2"
     __CONTAINER_MOUNT = "/home/container_data"
-    docker_image: str = field(default=None)
-    data_mount: str = field(default=None)
-    user_mounts: dict = field(default=None)
-    container_prefix: str = field(default=None)
-    force_start: bool = field(default=False)
-    new_container: bool = field(default=False)
-    include_stopped: bool = field(default=False)
-    debug: bool = field(default=False)
-    container_id: str = field(default=None)
+    docker_image: str = field(default=None, metadata=dict(help="Docker image to run the container"))
+    data_mount: str = field(default=None, metadata=dict(help="Data mount point in the container"))
+    user_mounts: Dict = field(default=None, metadata=dict(help="User-defined mounts"))
+    container_prefix: str = field(default=None, metadata=dict(help="Container name prefix"))
+    force_start: bool = field(default=False, metadata=dict(help="Force start a new container"))
+    new_container: bool = field(default=False, metadata=dict(help="Start a new container"))
+    include_stopped: bool = field(default=False, metadata=dict(help="Include stopped containers"))
+    debug: bool = field(default=False, metadata=dict(help="Debug mode"))
+    container_id: str = field(default=None, metadata=dict(help="Container Id"))
 
     def __post_init__(self):
         super().__post_init__()
