@@ -45,7 +45,7 @@ class SlurmPlatform(IPlatform):
         default=Path.home().joinpath(".idmtools").joinpath("singularity-bridge").joinpath("results"),
         metadata=dict(help="Bridged Results Directory"))
 
-    mode: SlurmOperationalMode = field(default=None, metadata=dict(help="Slurm Operational Mode"))
+    mode: SlurmOperationalMode = field(default=SlurmOperationalMode.LOCAL, metadata=dict(help="Slurm Operational Mode"))
 
     # region: Resources request
 
