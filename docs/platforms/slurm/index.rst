@@ -1,9 +1,12 @@
-=====
-SLURM
-=====
+.. _Slurm Platform:
+
+==============
+Slurm Platform
+==============
+
 The |SLURM_s| platform allows use of the |SLURM_l|. "Slurm is an open source, fault-tolerant, and highly scalable cluster management and job scheduling system for large and small Linux clusters.", as quoted from (https://slurm.schedmd.com/overview.html). For high-level architecture information about |SLURM_s|,
 see (https://slurm.schedmd.com/quickstart.html#arch).
-For architecure and included packages information about |IT_s| and |SLURM_s|,
+For architecture and included packages information about |IT_s| and |SLURM_s|,
 see (:doc:`../../reference`).
 
 

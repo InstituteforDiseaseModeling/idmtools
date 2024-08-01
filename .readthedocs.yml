@@ -59,6 +59,14 @@ python:
       path: idmtools_slurm_utils
       extra_requirements:
         - test
+    - method: pip
+      path: idmtools_platform_general
+      extra_requirements:
+        - test
+    - method: pip
+      path: idmtools_platform_container
+      extra_requirements:
+        - test
 
 
 

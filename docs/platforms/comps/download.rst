@@ -14,7 +14,7 @@ You can see a list of files that will be downloaded without downloading them by 
 
 Also review the class details :py:class:`~idmtools_platform_comps.utils.download.download.DownloadWorkItem`.
 
-You can also run this command from the CLI. For details, see :ref:`COMPS CLI reference<COMPS CLI>`
+You can also run this command from the CLI. For details, see :ref:`COMPS CLI reference<CLI COMPS Platform>`
 
 Download errors
 ---------------

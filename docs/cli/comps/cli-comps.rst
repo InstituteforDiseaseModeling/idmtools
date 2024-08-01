@@ -1,11 +1,17 @@
-.. _COMPS CLI:
+.. _CLI COMPS Platform:
 
-=========
-CLI COMPS
-=========
+==================
+CLI COMPS Platform
+==================
+
+.. toctree::
+
+   cli-templates
+   cli-examples
+   cli-troubleshoot
 
 The |COMPS_s| platform related commands can be accessed with either
-``idmtools comps`` or ``comps-cli``. All comps command require a target configuration
+``idmtools comps``. All comps command require a target configuration
 block or alias to use to configure the connection to |COMPS_s|. See the details
 of the top level command below for detailed help:
 
