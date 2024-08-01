@@ -36,80 +36,82 @@ CONFIG_PARAMETERS = ['ntasks', 'partition', 'nodes', 'mail_type', 'mail_user', '
 
 @dataclass(repr=False)
 class SlurmPlatform(IPlatform):
-    job_directory: str = field(default=None)
+    job_directory: str = field(default=None, metadata=dict(help="Job Directory"))
 
     #: Needed for bridge mode
-    bridged_jobs_directory: str = field(default=Path.home().joinpath(".idmtools").joinpath("singularity-bridge"))
+    bridged_jobs_directory: str = field(default=Path.home().joinpath(".idmtools").joinpath("singularity-bridge"),
+                                        metadata=dict(help="Bridged Jobs Directory"))
     bridged_results_directory: str = field(
-        default=Path.home().joinpath(".idmtools").joinpath("singularity-bridge").joinpath("results"))
+        default=Path.home().joinpath(".idmtools").joinpath("singularity-bridge").joinpath("results"),
+        metadata=dict(help="Bridged Results Directory"))
 
-    mode: SlurmOperationalMode = field(default=None)
+    mode: SlurmOperationalMode = field(default=None, metadata=dict(help="Slurm Operational Mode"))
 
     # region: Resources request
 
     # choose e-mail type
-    mail_type: Optional[str] = field(default=None, metadata=dict(sbatch=True))
+    mail_type: Optional[str] = field(default=None, metadata=dict(sbatch=True, help="e-mail type"))
 
     # send e=mail notification
     # TODO Add Validations here from https://slurm.schedmd.com/sbatch.html#OPT_mail-type
-    mail_user: Optional[str] = field(default=None, metadata=dict(sbatch=True))
+    mail_user: Optional[str] = field(default=None, metadata=dict(sbatch=True, help="e-mail address"))
 
     # How many nodes to be used
-    nodes: Optional[int] = field(default=None, metadata=dict(sbatch=True))
+    nodes: Optional[int] = field(default=None, metadata=dict(sbatch=True, help="Number of nodes"))
 
     # Num of tasks
-    ntasks: Optional[int] = field(default=None, metadata=dict(sbatch=True))
+    ntasks: Optional[int] = field(default=None, metadata=dict(sbatch=True, help="Number of tasks"))
 
     # CPU # per task
-    cpus_per_task: Optional[int] = field(default=None, metadata=dict(sbatch=True))
+    cpus_per_task: Optional[int] = field(default=None, metadata=dict(sbatch=True, help="Number of CPUs per task"))
 
     # Task # per core
-    ntasks_per_core: Optional[int] = field(default=None, metadata=dict(sbatch=True))
+    ntasks_per_core: Optional[int] = field(default=None, metadata=dict(sbatch=True, help="Number of tasks per core"))
 
     # Maximum of running jobs(Per experiment)
-    max_running_jobs: Optional[int] = field(default=None, metadata=dict(sbatch=True))
+    max_running_jobs: Optional[int] = field(default=None, metadata=dict(sbatch=True, help="Maximum of running jobs"))
 
     # Memory per core: MB of memory
-    mem: Optional[int] = field(default=None, metadata=dict(sbatch=True))
+    mem: Optional[int] = field(default=None, metadata=dict(sbatch=True, help="Memory per core"))
 
     # Memory per core: MB of memory
-    mem_per_cpu: Optional[int] = field(default=None, metadata=dict(sbatch=True))
+    mem_per_cpu: Optional[int] = field(default=None, metadata=dict(sbatch=True, help="Memory per CPU"))
 
     # Which partition to use
-    partition: Optional[str] = field(default=None, metadata=dict(sbatch=True))
+    partition: Optional[str] = field(default=None, metadata=dict(sbatch=True, help="Partition"))
 
     # Specify compute node
-    constraint: Optional[str] = field(default=None, metadata=dict(sbatch=True))
+    constraint: Optional[str] = field(default=None, metadata=dict(sbatch=True, help="Constraint"))
 
     # Limit time on this job hrs:min:sec
-    time: str = field(default=None, metadata=dict(sbatch=True))
+    time: str = field(default=None, metadata=dict(sbatch=True, help="Limit time on this job"))
 
     # if set to something, jobs will run with the specified account in slurm
-    account: str = field(default=None, metadata=dict(sbatch=True))
+    account: str = field(default=None, metadata=dict(sbatch=True, help="Account"))
 
     # Allocated nodes can not be shared with other jobs/users
-    exclusive: bool = field(default=False, metadata=dict(sbatch=True))
+    exclusive: bool = field(default=False, metadata=dict(sbatch=True, help="Exclusive"))
 
     # Specifies that the batch job should be eligible for requeuing
-    requeue: bool = field(default=True, metadata=dict(sbatch=True))
+    requeue: bool = field(default=True, metadata=dict(sbatch=True, help="Requeue"))
 
     # Default retries for jobs
-    retries: int = field(default=1, metadata=dict(sbatch=False))
+    retries: int = field(default=1, metadata=dict(sbatch=False, help="Default retries for jobs"))
 
     # Pass custom commands to sbatch generation script
-    sbatch_custom: Optional[str] = field(default=None, metadata=dict(sbatch=True))
+    sbatch_custom: Optional[str] = field(default=None, metadata=dict(sbatch=True, help="Custom sbatch commands"))
 
     # modules to be load
-    modules: list = field(default_factory=list, metadata=dict(sbatch=True))
+    modules: list = field(default_factory=list, metadata=dict(sbatch=True, help="Modules to be loaded"))
 
     # Specifies default setting of whether slurm should fail if item directory already exists
-    dir_exist_ok: bool = field(default=False, repr=False, compare=False)
+    dir_exist_ok: bool = field(default=False, repr=False, compare=False, metadata=dict(help="Directory exist ok"))
 
     # Set array max size for Slurm job
-    array_batch_size: int = field(default=None, metadata=dict(sbatch=False))
+    array_batch_size: int = field(default=None, metadata=dict(sbatch=False, help="Array batch size"))
 
     # determine if run script as Slurm job
-    run_on_slurm: bool = field(default=False, repr=False, compare=False)
+    run_on_slurm: bool = field(default=False, repr=False, compare=False, metadata=dict(help="Run script as Slurm job"))
 
     # endregion
 
