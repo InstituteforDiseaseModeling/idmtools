@@ -173,7 +173,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
             raise RuntimeError("Clear method supports Suite/Experiment/Simulation only.")
         self.update(item=item, metadata={}, replace=True)
 
-    def get_children(self, item: Union[Suite, Experiment]) -> List[Dict]:
+    def get_children(self, item: Union[Suite, Experiment, FileSuite, FileExperiment]) -> List[Dict]:
         """
         Fetch item's children.
         Args:
