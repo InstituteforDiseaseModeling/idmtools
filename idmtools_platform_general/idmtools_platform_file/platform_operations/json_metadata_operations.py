@@ -93,6 +93,8 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
 
         if isinstance(item, Experiment):
             meta['suite_id'] = meta["parent_id"]
+        elif isinstance(item, Simulation):
+            meta['experiment_id'] = meta["parent_id"]
 
         return meta
 
