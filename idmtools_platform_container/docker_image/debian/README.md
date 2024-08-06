@@ -5,10 +5,8 @@
 - [idmtools_platform_container Docker Image](#idmtools_platform_container-docker-image)
   - [Introduction](#introduction)
   - [Prerequisites](#prerequisites)
-  - [Build Docker Image](#build-docker-image)
-  - [Use docker image in idmtools](#docker-image-versioning)
-  - [Docker Image Usage](#docker-image-usage)
-  - [Publish Docker Image](#publish-docker-image)
+  - [Build Docker Image locally](#build-docker-image-locally)
+  - [Use docker image in idmtools](#use-docker-image-in-idmtools)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
