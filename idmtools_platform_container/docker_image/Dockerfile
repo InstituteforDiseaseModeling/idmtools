@@ -13,6 +13,8 @@ RUN yum -y install rpm dnf-plugins-core \
     python3 \
     python3-devel \
     mpich \
+    snappy \
+    glibc-devel \
     epel-release \
     wget \
     nano
