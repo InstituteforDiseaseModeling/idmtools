@@ -10,7 +10,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# idmtools_platform_container Docker Image
+# Debian12 Docker Image
 
 ## Introduction
 This Docker image is designed to facilitate idmtools_platform_container. It serves as local running platform with all necessary tools and dependencies installed. 
