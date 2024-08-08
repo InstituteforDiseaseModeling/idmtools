@@ -7,6 +7,7 @@
   - [Prerequisites](#prerequisites)
   - [Build Docker Image locally](#build-docker-image-locally)
   - [Use docker image in idmtools](#use-docker-image-in-idmtools)
+  - [Build and Publish Debian Docker Image in GitHub Actions](#build-and-publish-debian-docker-image-in-github-actions)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -42,3 +43,6 @@ platform = Platform('CONTAINER', docker_image='debian12-env', extra_packages=['e
 
 # or use idmtools cli command to install before run script: idmtools container install <package>
 ```
+
+## Build and Publish Debian Docker Image in GitHub Actions
+You can build and publish the docker image to idmod artifactory using GitHub Actions. The script is located at `.github/workflows/build_debian_image.yml`.
