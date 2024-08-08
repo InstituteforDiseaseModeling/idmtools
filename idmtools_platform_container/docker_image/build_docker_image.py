@@ -1,20 +1,16 @@
-"""This script is currently a workaround so that we can use bump2version with docker since the nightly versions doesn't work with docker registry.
-
-Notes:
-    If you are using this script locally, you need to set the environment variables *PYPI_STAGING_USERNAME* and *PYPI_STAGING_PASSWORD*.
-    These can be set to your idm email/password
+"""This script is used to build a docker image for the idmtools_platform_container.
 
 Copyright 2024, Bill Gates Foundation. All rights reserved.
 """
 import argparse
 import os
 import subprocess
-from logging import getLogger, basicConfig, DEBUG, INFO
 import sys
-from getpass import getpass
 import requests
-from requests.auth import HTTPBasicAuth
 import keyring
+from logging import getLogger, basicConfig, DEBUG, INFO
+from getpass import getpass
+from requests.auth import HTTPBasicAuth
 from natsort import natsorted
 
 
@@ -24,14 +20,11 @@ KEYRING_NAME = "idmtools_container_docker_builder"
 BASE_REPO = 'packages.idmod.org'
 REPO_KEY = 'idm-docker-staging'
 DOCKER_REPO = f'{REPO_KEY}.{BASE_REPO}'
-IMAGE_NAME = 'container-rocky-runtime'
 BASE_IMAGE_NAME = f'{DOCKER_REPO}/idmtools'
-CURRENT_DIRECTORY = os.path.dirname(__file__)
-BASE_VERSION = open(os.path.join(CURRENT_DIRECTORY, 'BASE_VERSION')).read().strip()
+current_working_directory = os.getcwd()
+BASE_VERSION = open(os.path.join(current_working_directory, 'BASE_VERSION')).read().strip()
 
 logger.info("Please be sure you are logged into the docker-production.packages.idmod.org Docker Repo")
-BASE_DIR = os.path.abspath(os.path.join(CURRENT_DIRECTORY, '..', '..'))
-LOCAL_PACKAGE_DIR = os.path.join(BASE_DIR, 'idmtools_platform_container/docker_image')
 
 
 def get_username_and_password(disable_keyring_load=False, disable_keyring_save=False):
@@ -127,7 +120,7 @@ def build_image(username, password, dockerfile, image_name, disable_keyring_load
     cmd = ['docker', 'build', '--network=host', '--build-arg', f'CONTAINER_VERSION={version}', '--tag',
            f'{BASE_IMAGE_NAME}/{image_name}:{version}', '-f', dockerfile, '.']
     logger.info(f'Running: {" ".join(cmd)}')
-    p = subprocess.Popen(" ".join(cmd), cwd=os.path.abspath(os.path.dirname(__file__)), shell=True)
+    p = subprocess.Popen(" ".join(cmd), cwd=current_working_directory, shell=True)
     p.wait()
 
     if p.returncode == 0:
