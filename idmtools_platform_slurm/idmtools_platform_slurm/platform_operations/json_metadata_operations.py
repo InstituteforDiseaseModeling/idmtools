@@ -3,6 +3,7 @@ Here we implement the JSON Metadata operations.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+import os
 import json
 from pathlib import Path
 from typing import TYPE_CHECKING, Dict, List, Type, Union
