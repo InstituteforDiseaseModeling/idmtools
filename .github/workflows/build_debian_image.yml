@@ -35,4 +35,4 @@ jobs:
             PYPI_STAGING_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
         run: |
           python ../build_docker_image.py --username ${{ secrets.PYPI_STAGING_USERNAME }} --password ${{ secrets.PYPI_STAGING_PASSWORD }} --image_name container-debian12-env
-          python ../publish_docker_image.py --username ${{ env.PYPI_STAGING_USERNAME }} --password ${{ env.PYPI_STAGING_PASSWORD }} --image_name container-debian12-env
+          python ../push_docker_image.py --username ${{ env.PYPI_STAGING_USERNAME }} --password ${{ env.PYPI_STAGING_PASSWORD }} --image_name container-debian12-env
