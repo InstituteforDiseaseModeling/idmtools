@@ -7,6 +7,7 @@
   - [Prerequisites](#prerequisites)
   - [Build Docker Image locally](#build-docker-image-locally)
   - [Use docker image in idmtools](#use-docker-image-in-idmtools)
+  - [Build and Publish Debian Docker Image in GitHub Actions](#build-and-publish-debian-docker-image-in-github-actions)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
