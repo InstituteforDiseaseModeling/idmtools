@@ -2,7 +2,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [idmtools_platform_container Docker Image](#idmtools_platform_container-docker-image)
+- [Debian12 Docker Image](#debian12-docker-image)
   - [Introduction](#introduction)
   - [Prerequisites](#prerequisites)
   - [Build Docker Image locally](#build-docker-image-locally)
