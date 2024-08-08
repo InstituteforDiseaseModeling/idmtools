@@ -34,11 +34,11 @@ class ContainerPlatform(FilePlatform):
     """
     Container Platform definition.
     """
-    __CONTAINER_IMAGE = "docker-production-public.packages.idmod.org/idmtools/container-rocky-runtime:0.0.2"
+    __CONTAINER_IMAGE = "docker-production-public.packages.idmod.org/idmtools/container-rocky-runtime:0.0.3"
     __CONTAINER_MOUNT = "/home/container_data"
     docker_image: str = field(default=None, metadata=dict(help="Docker image to run the container"))
     data_mount: str = field(default=None, metadata=dict(help="Data mount point in the container"))
-    user_mounts: Dict = field(default=None, metadata=dict(help="User-defined mounts"))
+    user_mounts: dict = field(default=None, metadata=dict(help="User-defined mounts"))
     container_prefix: str = field(default=None, metadata=dict(help="Container name prefix"))
     force_start: bool = field(default=False, metadata=dict(help="Force start a new container"))
     new_container: bool = field(default=False, metadata=dict(help="Start a new container"))
