@@ -91,7 +91,7 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
             List of file simulations
         """
         sim_list = []
-        sim_meta_list = self.platform._metas.get_children(parent)
+        sim_meta_list = self.platform._metas.get_children(experiment)
         for meta in sim_meta_list:
             file_sim = FileSimulation(meta)
             file_sim.status = self.platform.get_simulation_status(file_sim.id)

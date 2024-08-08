@@ -32,7 +32,7 @@ To set up a virtual environment for **ContainerPlatform**, follow these steps:
 
 2. **Create Virtual Environment**
    
-   There are muktiple ways to create a virtual environment. Below is an example using `venv`:
+   There are multiple ways to create a virtual environment. Below is an example using `venv`:
 
     ```bash
     python -m venv container_env
@@ -60,7 +60,7 @@ To set up a virtual environment for **ContainerPlatform**, follow these steps:
 
 ## Running a Simple Example with ContainerPlatform
 
-To run a simple example using **ContainerPlatform**, please pay attention to the **Note** at the end of the README. Other than that, for a general existing COMPS example, user just need to change one line code to replace COMPS Platform with Container Platform. Below are the steps:
+To run a simple example using **ContainerPlatform**, please pay attention to the **Note** at the end of the README. Other than that, for a general existing COMPS example, user just needs to change one line code to replace COMPS Platform with Container Platform. Below are the steps:
 
 1. **Initialize Platform**:
 

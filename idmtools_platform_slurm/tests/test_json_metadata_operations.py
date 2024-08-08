@@ -53,6 +53,7 @@ class JSONMetadataOperationsTest(unittest.TestCase):
         expected_meta = {'platform_id': None, 'status': 'CREATED', 'tags': {}, 'item_type': 'Simulation', 'name': None,
                          'assets': [], 'task': None}
         expected_meta.update({"parent_id": experiments[1].id})
+        expected_meta.update({"experiment_id": experiments[1].id})
         expected_meta.update({"_uid": sim.id})
         expected_meta.update({"uid": sim.id})
         expected_meta.update({"id": sim.id})
@@ -67,7 +68,7 @@ class JSONMetadataOperationsTest(unittest.TestCase):
                          'assets': [], 'suite_id': None, 'task_type': 'idmtools.entities.command_task.CommandTask',
                          'platform_requirements': None, 'frozen': False, 'gather_common_assets_from_task': True,
                          'parent_id': suites[0].id, 'disable_default_pre_create': False}
-        expected_meta.update({"parent_id": suites[0].id})
+        # expected_meta.update({"parent_id": suites[0].id})
         expected_meta.update({"_uid": exp.id})
         expected_meta.update({"uid": exp.id})
         expected_meta.update({"id": exp.id})
@@ -80,13 +81,13 @@ class JSONMetadataOperationsTest(unittest.TestCase):
         metadata = self.op.get(item=suite)
         expected_suite_meta = {'platform_id': None, 'parent_id': None, 'status': 'CREATED', 'tags': {}, 'item_type': 'Suite',
                                'name': None, 'description': None}
-        exp_meta_dict1 = {'platform_id': None, 'status': None, 'tags': {}, 'item_type': 'Experiment', 'name': None,
-                          'assets': [], 'suite_id': None, 'task_type': 'idmtools.entities.command_task.CommandTask',
-                          'platform_requirements': None, 'frozen': False, 'gather_common_assets_from_task': True}
-        exp_meta_dict2 = exp_meta_dict1.copy()
-        exp_meta_dict1.update({"parent_id": suites[0].id})
-        exp_meta_dict2.update({"parent_id": suites[0].id})
-        exp_meta_dict2.update({"_uid": experiments[1].id})
+        # exp_meta_dict1 = {'platform_id': None, 'status': None, 'tags': {}, 'item_type': 'Experiment', 'name': None,
+        #                   'assets': [], 'suite_id': None, 'task_type': 'idmtools.entities.command_task.CommandTask',
+        #                   'platform_requirements': None, 'frozen': False, 'gather_common_assets_from_task': True}
+        # exp_meta_dict2 = exp_meta_dict1.copy()
+        # exp_meta_dict1.update({"parent_id": suites[0].id})
+        # exp_meta_dict2.update({"parent_id": suites[0].id})
+        # exp_meta_dict2.update({"_uid": experiments[1].id})
         expected_suite_meta.update({"parent_id": None})
         expected_suite_meta.update({"_uid": suite.id})
         expected_suite_meta.update({"uid": suite.id})

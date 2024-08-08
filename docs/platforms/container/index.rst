@@ -75,7 +75,8 @@ Example
     # Initialize the platform
     platform = ContainerPlatform(job_directory="destination_directory")
     # OR
-    # Platform('Container', job_directory='destination_directory')
+    # from idmtools.core.platform_factory import Platform
+    # platform = Platform('Container', job_directory="destination_directory")
 
     # Define task
     command = "echo 'Hello, World!'"
