@@ -29,7 +29,7 @@ jobs:
           username: ${{ secrets.PYPI_STAGING_USERNAME }}
           password: ${{ secrets.PYPI_STAGING_PASSWORD }}
       - name: Build debian docker image
-        working-directory: idmtools_platform_container/docker_image
+        working-directory: idmtools_platform_container/docker_image/debian
         env:
             PYPI_STAGING_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
             PYPI_STAGING_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
