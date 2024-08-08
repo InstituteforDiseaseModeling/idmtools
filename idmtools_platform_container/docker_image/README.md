@@ -45,7 +45,7 @@ The Docker image version is determined by the version in idm docker-staging arti
 ## Docker Image Usage
 By default, you DO NOT need to worry about the image build and how to use image. The image is auto built in github action and pushed to idmod artifactory. The image is used in idmtools_platform_container Platform object. For example, 
 ```python
-from idmtools_platform_container import Platform
+from idmtools.core.platform_factory import Platform
 platform = Platform('CONTAINER', docker_image='idm-docker-public.packages.idmod.org/idmtools/container-rocky-runtime:x.x.x')
 ```
 where docker_image can be your local built image or the image in idmod artifactory.
