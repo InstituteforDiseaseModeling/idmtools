@@ -24,7 +24,7 @@ Core and job orchestration
 .. uml:: /diagrams/core.puml
 
 
-|CONTAINER_s| platform
+|CONTAINER_s| Platform
 ----------------------
 
 .. uml:: /diagrams/platform_container.puml
