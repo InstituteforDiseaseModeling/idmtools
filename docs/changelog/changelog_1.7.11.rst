@@ -1,12 +1,12 @@
-.. _container-platform-changelog-1.7.11:
+.. _changelog-1.7.11:
 
 ======
 1.7.11
 ======
 
 
-Container Platform
-------------------
+Platform
+--------
 * `#2253 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2253>`_ - ContainerPlatform: Design Container Platform
 * `#2254 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2254>`_ - ContainerPlatform: Task list
 * `#2266 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2266>`_ - ContainerPlatform: Platform implementation (basic class)
