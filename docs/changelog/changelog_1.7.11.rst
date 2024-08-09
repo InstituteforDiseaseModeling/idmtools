@@ -35,7 +35,8 @@ Bugs
 * `#2306 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2306>`_ - idmtoolscore experiment run can wait long time until timeout in certain case
 * `#2298 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2298>`_ - idmtools package should not include the tests folder
 * `#2251 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2251>`_ -local doc build (make html) errors out and does not complete
-
+* `#2169 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2169>`_ - idmtools should stop support python3.For dry run, we better not to display 'check status message
+* `#2208 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2208>`_ - SlurmPlatform: experiment's metadata.json file has suite_id is null
 
 Feature Request
 ---------------
@@ -44,6 +45,7 @@ Feature Request
 * `#2326 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2326>`_ - SlurmPlatform should have default mode to 'Local' instead of None
 * `#2319 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2319>`_ - Add new alias for COMPS new environment: Nibbler
 * `#2317 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2317>`_ - idmtools should stop support python3.7
+* `#2377 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2377>`_ - Add container, slurm options in idmtools setup for customized installation
 
 
 Developer/Test
