@@ -14,8 +14,52 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
+## Introduction
 
-# Development Tips
+**SlurmPlatform** is a platform designed to facilitate the execution of experiments and simulations in slurm cluster. 
+
+## Setting Up Virtual Environment
+
+To set up a virtual environment for **SlurmPlatform**, follow these steps:
+
+1. **Install Python**
+
+   Ensure you have Python 3.8+ installed on your system.
+
+2. **Create Virtual Environment**
+   
+   There are multiple ways to create a virtual environment. Below is an example using `venv`:
+
+    ```bash
+    python -m venv slurm_env
+    ```
+
+3. **Activate Virtual Environment**
+    - On Windows:
+        ```bash
+        slurm_env\Scripts\activate
+        ```
+    - On Linux:
+        ```bash
+        source slurm_env/bin/activate
+        ```
+
+4. **Install SlurmPlatform**
+    ```bash
+    pip install idmtools-platform-slurm --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+    ```
+
+5. **Install Dependencies**
+    ```bash
+    pip install -r requirements.txt
+    ```
+6. **Optional(No need step #4 and #5), Install all slurm platform related packages**
+    ```bash
+    pip install idmtools[slurm] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+    ```
+#
+
+## Development Tips
 
 There is a Makefile file available for most common development tasks. Here is a list of commands
 
@@ -29,7 +73,7 @@ coverage    -   Run tests and generate coverage report that is shown in browser
 On Windows, you can use `pymake` instead of `make`
 
 
-# Manually run a script as a Slurm job
+## Manually run a script as a Slurm job
 
 Preparation
 
@@ -70,37 +114,46 @@ Note: the content here is based on Northwestern University QUEST Slurm system. F
 
    cd path_to_script_folder
 
-then
-
-   sbatch sbatch.sh
+   `sbatch sbatch.sh`
 
 Note: any output information from my_script.py is stored in file stdout.txt under the current folder. For example, if my_script.py kicks out another Slurm job, then its Slurm id information can be found in file stdout.txt.
 
 
-# Use SlurmJob to run a script as a Slurm job
+## Use SlurmJob to run a script as a Slurm job
 
 The example can be simple as the following:
 
 --script.py--
 
-from idmtools.core.platform_factory import Platform
-from idmtools_platform_slurm.utils.slurm_job.slurm_job import SlurmJob
+```python
 
-script = '<user script path>'
-# script = 'example_path/python_sim_slurm.py'   # example
-platform = Platform('SLURM_LOCAL', job_directory='<job_directory>')
-sj = SlurmJob(script_path=script, platform=platform)
-sj.run()
+   from idmtools.core.platform_factory import Platform
+   from idmtools_platform_slurm.utils.slurm_job.slurm_job import SlurmJob
 
+   script = '<user script path>'
+   # script = 'example_path/python_sim_slurm.py'   # example
+   platform = Platform('SLURM_LOCAL', job_directory='<job_directory>')
+   sj = SlurmJob(script_path=script, platform=platform)
+   sj.run()
+```
 
-# With SlurmPlaform to run a script as a Slurm job
+## With SlurmPlatform to run a script as a Slurm job
 
 We have SlurmJob integrated into SlurmPlatform and any Python script can run as a Slurm job simply doing:
 
 --script.py--
+```python
 
-from idmtools.core.platform_factory import Platform
-platform = Platform('SLURM_LOCAL', job_directory='<job_directory>', run_on_slurm=True)
-print('below content will run on Slurm as a job.')
-......
+   from idmtools.entities.command_task import CommandTask
+   from idmtools.entities.experiment import Experiment
+   from idmtools.core.platform_factory import Platform
+   
+   platform = Platform('SLURM_LOCAL', job_directory='<job_directory>')
+   # Define task
+   command = "echo 'Hello, World!'"
+   task = CommandTask(command=command)
+   # Run an experiment
+   experiment = Experiment.from_task(task, name="example")
+   experiment.run(platform=platform)
+```
 
