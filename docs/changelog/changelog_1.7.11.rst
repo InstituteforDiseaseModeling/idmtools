@@ -1,3 +1,4 @@
+.. _container-platform-changelog-1.7.11:
 
 ======
 1.7.11
