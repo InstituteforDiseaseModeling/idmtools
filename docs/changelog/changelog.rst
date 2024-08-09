@@ -25,7 +25,6 @@ Changelog
     changelog_1.6.7
     changelog_1.7.0
     changelog_1.7.1
-    changelog_1.7.10
     changelog_1.7.3
     changelog_1.7.4
     changelog_1.7.5
@@ -33,4 +32,5 @@ Changelog
     changelog_1.7.7
     changelog_1.7.8
     changelog_1.7.9
+    changelog_1.7.10
     changelog_1.7.11
