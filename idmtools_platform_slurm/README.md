@@ -59,7 +59,6 @@ To set up a virtual environment for **SlurmPlatform**, follow these steps:
     ```bash
     pip install idmtools[slurm] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
     ```
-#
 
 ## Development Tips
 
