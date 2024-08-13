@@ -174,7 +174,7 @@ class TestAssetsInComps(unittest.TestCase):
         try:
             generate_ac_from_asset_md5(file_name, asset_md5)
         except Exception as e:
-            assert "400 Bad Request - Unknown assets referenced in request: " in str(e)
+            assert "Unknown assets referenced in request: " in str(e)
 
     # Test we can not generate an asset collection (COMPS) from an kwown asset id in a file.
     @patch('builtins.open', new_callable=mock_open, read_data='my_shiny_new1.sif:asset_md5:8ced1fc3-cc4e-d3c5-b3fd-2919739deb2c')

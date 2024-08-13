@@ -368,6 +368,8 @@ class AnalyzeManager:
                 for item, data in results.items():
                     if analyzer.uid in data:
                         item_data_for_analyzer[item] = data[analyzer.uid]
+                if item_data_for_analyzer.__len__() == 0:
+                    user_logger.warning(f"Note: {analyzer.uid} has no simulation data to analyze. Please verify the filter or map function of the analyzer.")
                 future = executor.submit(analyzer.reduce, item_data_for_analyzer)
                 future.add_done_callback(lambda p: progress.update())
 

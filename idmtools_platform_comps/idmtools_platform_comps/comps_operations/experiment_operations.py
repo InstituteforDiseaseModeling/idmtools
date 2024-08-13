@@ -143,7 +143,16 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             exclusive=self.platform.exclusive
         )
 
-        if kwargs.get("scheduling", False):
+        if isinstance(experiment.simulations.items, TemplatedSimulations):
+            scheduling = getattr(experiment.simulations.items.base_simulation, 'scheduling', False)
+        elif isinstance(experiment.simulations.items, List):
+            scheduling = getattr(experiment.simulations.items[0], 'scheduling', False)
+        else:
+            scheduling = False
+
+        # kwargs.get("scheduling", False) case is for adding work_order file during sweeping call back which is too late
+        # to detect the scheduling flag from the simulation
+        if scheduling or kwargs.get("scheduling", False):
             import copy
             # save a copy of default config
             setattr(self.platform, 'comps_config', copy.deepcopy(comps_config))

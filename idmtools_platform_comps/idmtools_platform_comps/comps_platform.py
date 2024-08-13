@@ -74,8 +74,8 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
     MAX_SUBDIRECTORY_LENGTH = 35  # avoid maxpath issues on COMPS
 
-    endpoint: str = field(default="https://comps2.idmod.org", metadata={"help": "URL of the COMPS endpoint to use"})
-    environment: str = field(default="Bayesian",
+    endpoint: str = field(default="https://comps.idmod.org", metadata={"help": "URL of the COMPS endpoint to use"})
+    environment: str = field(default="Calculon",
                              metadata=dict(help="Name of the COMPS environment to target", callback=environment_list))
     priority: str = field(default=COMPSPriority.Lowest.value,
                           metadata=dict(help="Priority of the job", choices=[p.value for p in COMPSPriority]))
@@ -90,11 +90,11 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     batch_size: int = field(default=10, metadata=dict(help="How many simulations per batch",
                                                       validate=partial(validate_range, min=1, max=100)))
     min_time_between_commissions: int = field(default=15, metadata=dict(
-        help="How many seconds between commission calls on an experiment. ",
+        help="How many seconds between commission calls on an experiment",
         validate=partial(validate_range, min=10, max=300)))
     exclusive: bool = field(default=False,
                             metadata=dict(help="Enable exclusive mode? (one simulation per node on the cluster)"))
-    docker_image: str = field(default=None)
+    docker_image: str = field(default=None, metadata={"help": "Docker image to use for simulations"})
 
     _platform_supports: List[PlatformRequirements] = field(default_factory=lambda: copy.deepcopy(supported_types),
                                                            repr=False, init=False)

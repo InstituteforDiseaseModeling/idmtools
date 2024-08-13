@@ -213,8 +213,8 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             Configuration
         """
         global_scheduling = kwargs.get("scheduling", False)
-        sim_scheduling = getattr(simulation, 'scheduling', False)
-        scheduling = global_scheduling and sim_scheduling
+        sim_scheduling = scheduled(simulation)
+        scheduling = global_scheduling or sim_scheduling
 
         comps_configuration = dict()
         if global_scheduling:
@@ -322,12 +322,10 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         Returns:
             None
         """
-        scheduling = kwargs.get("scheduling", False) and scheduled(simulation)
-
         if comps_sim is None:
             comps_sim = simulation.get_platform_object()
         for asset in simulation.assets:
-            if asset.filename.lower() == 'workorder.json' and scheduling:
+            if asset.filename.lower() == 'workorder.json' and scheduled(simulation):
                 comps_sim.add_file(simulationfile=SimulationFile(asset.filename, 'WorkOrder'), data=asset.bytes)
             else:
                 comps_sim.add_file(simulationfile=SimulationFile(asset.filename, 'input'), data=asset.bytes)

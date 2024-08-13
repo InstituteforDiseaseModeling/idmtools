@@ -24,7 +24,7 @@ See the :ref:`Cookbook <Assetize Outputs>` for examples of assetizing outputs.
 
 Also review the class details :py:class:`~idmtools_platform_comps.utils.assetize_output.assetize_output.AssetizeOutput`
 
-You can also run this command from the CLI. For details, see :ref:`COMPS CLI reference<COMPS CLI>`.
+You can also run this command from the CLI. For details, see :ref:`COMPS CLI reference<CLI COMPS Platform>`.
 
 Errors
 ------

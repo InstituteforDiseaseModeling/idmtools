@@ -95,6 +95,11 @@ class ArmSimulationBuilder:
 
     @property
     def count(self):
+        """
+        Total simulations to be built by builder.
+        Returns:
+            arm count
+        """
         return sum([arm.count for arm in self.arms])
 
     def add_arm(self, arm):

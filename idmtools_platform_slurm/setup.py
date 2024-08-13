@@ -31,7 +31,6 @@ setup(
     author=", ".join([author[0] for author in authors]),
     author_email=", ".join([author[1] for author in authors]),
     classifiers=[
-        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
@@ -45,7 +44,7 @@ setup(
     include_package_data=True,
     keywords='modeling, IDM',
     name='idmtools_platform_slurm',
-    packages=find_packages(),
+    packages=find_packages(exclude=["tests"]),
     setup_requires=setup_requirements,
     entry_points={"idmtools_platform": [
         "idmtools_platform_slurm = idmtools_platform_slurm.plugin_info:SlurmPlatformSpecification"],
@@ -54,5 +53,5 @@ setup(
     test_suite='tests',
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='1.7.10'
+    version='1.7.11'
 )

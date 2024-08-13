@@ -326,7 +326,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         return any([s.failed for s in self.simulations])
 
     @property
-    def simulations(self) -> ExperimentParentIterator:
+    def simulations(self) -> ExperimentParentIterator:  # noqa: F811
         """
         Returns the Simulations.
 

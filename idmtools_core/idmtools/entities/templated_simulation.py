@@ -239,7 +239,7 @@ class TemplatedSimulations:
         return sim
 
     @property
-    def tags(self):
+    def tags(self):  # noqa: F811
         """
         Get tags for the base simulation.
 
