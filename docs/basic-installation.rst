@@ -20,9 +20,23 @@ source code changes.
 
         source idmtools/bin/activate
 
-#.  Install |IT_s| packages::
+#.  Install |IT_s| packages:
+
+    -  Install |IT_s| COMPS Platform related packages::
 
         pip install idmtools[idm] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+
+    -  Or, Install |CONTAINER_s| Platform related packages::
+
+        pip install idmtools[container] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+
+    -  Or, Install |SLURM_s| Platform related packages::
+
+        pip install idmtools[slurm] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+
+    - Or, Install all |IT_s| platform packages::
+
+        pip install idmtools[full] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
 
     .. note::
 

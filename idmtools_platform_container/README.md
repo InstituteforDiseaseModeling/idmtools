@@ -57,7 +57,10 @@ To set up a virtual environment for **ContainerPlatform**, follow these steps:
     ```bash
     pip install -r requirements.txt
     ```
-
+6. **Optional(No need step #4 and #5), Install all container platform related packages**
+    ```bash
+    pip install idmtools[container] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+    ```
 ## Running a Simple Example with ContainerPlatform
 
 To run a simple example using **ContainerPlatform**, please pay attention to the **Note** at the end of the README. Other than that, for a general existing COMPS example, user just needs to change one line code to replace COMPS Platform with Container Platform. Below are the steps:
@@ -66,8 +69,10 @@ To run a simple example using **ContainerPlatform**, please pay attention to the
 
     This is an example using COMPS Platform
     ```python
+   
     from idmtools.core.platform_factory import Platform
     platform = Platform('CALCULON')
+   
     ```
 
     This is the example using Container Platform
@@ -84,6 +89,13 @@ To run a simple example using **ContainerPlatform**, please pay attention to the
     ```bash
     idmtools container status <experiment id>
     ```
+4. **Check simulation results in files**
+
+    Once the experiment is completed, the results can be viewed in the output directory. The output directory is like
+    `<job_directory>/<suite_path>/<experiment_path>/<simulation_path>/`.
+
+    The same results can be viewed in the container as well. The output directory in the container is like
+    `/home/container-data/<suite_path>/<experiment_path>/<simulation_path>/`.
 
 ## Basic CLI Commands
 

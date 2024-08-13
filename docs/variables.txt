@@ -30,7 +30,7 @@
 .. |exe_l| replace:: EMOD executable (Eradication.exe)
 .. |exe_s| replace:: Eradication.exe
 .. |linux_binary| replace:: Eradication binary
-.. |dev_install| replace:: https://github.com/InstituteforDiseaseModeling/idmtools#development-environment-setup
+.. |dev_install| replace:: https://github.com/InstituteforDiseaseModeling/idmtools/blob/main/DEVELOPMENT_README.md
 .. |EMODPY_s| replace:: emodpy
 .. |SLURM_s| replace:: SLURM
 .. |SLURM_l| replace:: Simple Linux Utility for Resource Management (SLURM)

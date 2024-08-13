@@ -19,7 +19,7 @@ for file_prefix in ['', 'dev_', 'build_']:
 # Conditional dependency based on Python version
 conditional_requirements = ['importlib_metadata; python_version < "3.8"']
 
-version = '1.7.10+nightly'
+version = '1.7.11'
 
 extras = {
     'test': extra_require_files['build'] + extra_require_files['dev'],
@@ -28,7 +28,12 @@ extras = {
     'packaging': extra_require_files['build'],
     'idm': ['idmtools_platform_comps', 'idmtools_cli', 'idmtools_models'],
     # our full install include all common plugins
-    'full': ['idmtools_platform_comps', 'idmtools_cli', 'idmtools_models', 'idmtools_platform_slurm', 'idmtools_slurm_utils', 'idmtools_platform_general', 'idmtools_platform_container']
+    'full': ['idmtools_platform_comps', 'idmtools_cli', 'idmtools_models', 'idmtools_platform_slurm', 'idmtools_slurm_utils', 'idmtools_platform_general', 'idmtools_platform_container'],
+    # container install include all container plugins
+    'container': ['idmtools_cli', 'idmtools_models', 'idmtools_platform_general', 'idmtools_platform_container'],
+    # slurm install include all slurm plugins
+    'slurm': ['idmtools_cli', 'idmtools_models', 'idmtools_platform_slurm', 'idmtools_slurm_utils']
+
 }
 
 authors = [

@@ -9,20 +9,42 @@ Container Platform
 
     utilis
     options
+    ../../cli/container/cli-detail
     docker_image
+
 
 Prerequisites
 -------------
 * Docker installed
 * Linux or Windows with WSL2
 * |Python_IT| (https://www.python.org/downloads/release)
-* Python virtual environments
+* Create a Virtual Environment
 
-    Python virtual environments enable you to isolate your Python environments from one
-    another and give you the option to run multiple versions of Python on the same computer. When using a
-    virtual environment, you can indicate the version of Python you want to use and the packages you
-    want to install, which will remain separate from other Python environments. You may use
-    ``virtualenv``, which requires a separate installation, but ``venv`` is recommended and included with Python 3.8+.
+  There are multiple ways to create a virtual environment. Below is an example using `venv`:
+
+  .. code-block:: bash
+
+     python -m venv container_env
+
+
+* Activate Virtual Environment
+
+  - On Windows:
+
+  .. code-block:: bash
+
+     container_env\Scripts\activate
+
+  - On Linux:
+
+  .. code-block:: bash
+
+     source container_env/bin/activate
+* Install Container Platform
+
+  .. code-block:: bash
+
+     pip install idmtools[container] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
 
 ContainerPlatform
 -----------------
@@ -40,11 +62,12 @@ Key Features
 - **Container Validation**: Validates the status and configuration of Docker containers to ensure they meet the platform's requirements.
 - **Script Conversion**: Converts scripts to Linux format if the host platform is Windows, ensuring compatibility within the container environment.
 - **Job History Management**: Keeps track of job submissions and their corresponding container IDs for easy reference and management.
+- **Minimal libraries and packages in Docker image**: Requires only Linux os, python3, mpich installed in docker image. ContainerPlatform will bind the host directory to the container directory for running the simulation.
 
 .. _attributes:
 
-Attributes
-----------
+ContainerPlatform Attributes
+----------------------------
 
 - **job\_directory**: The directory where job data is stored.
 - **docker\_image**: The Docker image to run the container.
@@ -68,22 +91,38 @@ The `ContainerPlatform` class is typically used to run computational experiments
 Example
 -------
 
+This example demonstrates how to use the `ContainerPlatform` class to run a simple command task within a Docker container.
+
+Create a Python file named `example.py` on your host machine and add the following code:
+
 .. code-block:: python
 
-    from idmtools_platform_container.container_platform import ContainerPlatform
+   from idmtools.entities.command_task import CommandTask
+   from idmtools.entities.experiment import Experiment
+   from idmtools_platform_container.container_platform import ContainerPlatform
 
-    # Initialize the platform
-    platform = ContainerPlatform(job_directory="destination_directory")
-    # OR
-    # from idmtools.core.platform_factory import Platform
-    # platform = Platform('Container', job_directory="destination_directory")
+   # Initialize the platform
+   platform = ContainerPlatform(job_directory="destination_directory")
+   # OR
+   # from idmtools.core.platform_factory import Platform
+   # platform = Platform('Container', job_directory="destination_directory")
 
-    # Define task
-    command = "echo 'Hello, World!'"
-    task = CommandTask(command=command)
-    # Run an experiment
-    experiment = Experiment.from_task(task, name="example")
-    experiment.run(platform=platform)
+   # Define task
+   command = "echo 'Hello, World!'"
+   task = CommandTask(command=command)
+   # Run an experiment
+   experiment = Experiment.from_task(task, name="example")
+   experiment.run(platform=platform)
+
+To run `example.py` in the virtual environment on the host machine:
+
+.. code-block:: bash
+
+    python example.py
+
+You can find the simulation results in the `job_directory/<suite_path>/<experiment_path>/<simulation_path>` directory on the host machine.
+
+Additionally, You can view the same results inside the Docker container at `/home/container-data/<suite_path>/<experiment_path>/<simulation_path>`.
 
 
 More Examples
