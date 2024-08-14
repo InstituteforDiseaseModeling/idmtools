@@ -137,6 +137,7 @@ Run the following included Python example to submit and run a job on your |CONTA
    - **AssetCollection** creation or referencing to an existing AssetCollection are not supported on the Container Platform with current release. If you've used the COMPS Platform, you may have scripts using these objects. You would need to update these scripts without using these objects in order to run them on the Container Platform.
 
      For example, you may need to remove the following code which used in COMPS Platform:
+
      .. code-block:: python
 
         asset_collection = AssetCollection.from_asset_collection_id('50002755-20f1-ee11-aa12-b88303911bc1')
@@ -144,6 +145,7 @@ Run the following included Python example to submit and run a job on your |CONTA
    - Run with Singularity is not needed with Container Platform. If you take existing COMPS example and try to run it with Container Platform, you may need to remove the code that setups the singularity image.
 
      For example for singularity, you make need to remove the following code which used in COMPS Platform:
+
      .. code-block:: python
 
         emod_task.set_sif(sif_path)
