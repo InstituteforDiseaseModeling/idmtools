@@ -2,8 +2,8 @@
 
 [idmtools]
 note right of idmtools
-Provides Plugin Infrastructure and
-common APIS like Experiments,
+Provides plugin infrastructure and
+common APIs like Experiments,
 Simulations, Suites, Workitems,
 Tasks, and Platforms. Also contains
 tools for building Simulations in bulk
@@ -11,7 +11,7 @@ end note
 [idmtools-cli]
 note left of [idmtools-cli]
     Provides the CLI for
-    idmtools. (Optional)
+    idmtools. (optional)
 end note
 [idmtools-models]
 note right of [idmtools-models]
