@@ -17,7 +17,7 @@ You must also have |Python_IT| and Python virtual environments installed to isol
 |IT_s| installation in a separate Python environment. If you do not already have these installed,
 see the links below for instructions.
 
-* Windows 10 Pro or Enterprise, or Linux a operating system
+* Windows 10 Pro or Enterprise, or a Linux operating system
 * |Python_IT| (https://www.python.org/downloads/release)
 * Python virtual environments
 
