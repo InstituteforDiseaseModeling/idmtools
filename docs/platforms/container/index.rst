@@ -142,7 +142,7 @@ Run the following included Python example to submit and run a job on your |CONTA
 
         asset_collection = AssetCollection.from_asset_collection_id('50002755-20f1-ee11-aa12-b88303911bc1')
 
-   - Run with Singularity is not needed with Container Platform. If you take existing COMPS example and try to run it with Container Platform, you may need to remove the code that setups the singularity image.
+   - Run with **Singularity** is not needed with Container Platform. If you take existing COMPS example and try to run it with Container Platform, you may need to remove the code that setups the singularity image.
 
      For example for singularity, you make need to remove the following code which used in COMPS Platform:
 
