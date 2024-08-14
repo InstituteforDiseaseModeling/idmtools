@@ -58,7 +58,7 @@ as information relevant to using |IT_s|.
         The individual actions that are processed for each simulation.
 
     container
-        A Docker container which contains linux operating system, python3 and mpich and dependencies. This container is used to run the |IT_s| software.
+        A Docker container that includes a Linux operating system, Python 3.9, MPICH, and all necessary dependencies. This container is used to run the |IT_s| software.
 
         .. Is this correct?
 
