@@ -13,12 +13,11 @@ installation method you choose, the prerequisites are the same.
 Prerequisites
 =============
 
-|IT_s| uses Docker to run |IT_s| within a container to keep the |IT_s| environment securely
-isolated. You must also have |Python_IT| and Python virtual environments installed to isolate your
+You must also have |Python_IT| and Python virtual environments installed to isolate your
 |IT_s| installation in a separate Python environment. If you do not already have these installed,
 see the links below for instructions.
 
-* Windows 10 Pro or Enterprise
+* Windows 10 Pro or Enterprise, or Linux a operating system
 * |Python_IT| (https://www.python.org/downloads/release)
 * Python virtual environments
 
@@ -30,8 +29,10 @@ see the links below for instructions.
 
 * Docker (https://docs.docker.com/)
 
+  On Windows or Mac, please use Docker Desktop 2.1.0.5 or 2.2.0.1
+
   Docker is optional for the basic installation of |IT_s|; it is needed only for running simulations
-  or analysis locally. It is required for the developer installation.
+  or analysis locally with ``ContainerPlatform``.
 
 .. toctree::
 
