@@ -246,7 +246,7 @@ sync-history
 
 .. code-block:: bash
 
-   $idmtools container sync-history
+   $ idmtools container sync-history
 
 
 history-count
