@@ -7,13 +7,14 @@
 **Table of Contents**
 
 - [Introduction](#introduction)
-- [Setting Up Virtual Environment](#setting-up-virtual-environment)
-- [Running a Simple Example with ContainerPlatform](#running-a-simple-example-with-containerplatform)
-- [Basic CLI Commands](#basic-cli-commands)
-  - [List Running Jobs](#list-running-jobs)
-  - [Check Status](#check-status)
-  - [Cancel Job](#cancel-job)
-  - [View Experiments History](#view-experiments-history)
+- [Pre-requisites](#pre-requisites)
+- [Setting up virtual environment](#setting-up-virtual-environment)
+- [Running a simple example with ContainerPlatform](#running-a-simple-example-with-containerplatform)
+- [Basic CLI commands](#basic-cli-commands)
+  - [List running jobs](#list-running-jobs)
+  - [Check status](#check-status)
+  - [Cancel job](#cancel-job)
+  - [View Experiments history](#view-experiments-history)
 - [Note](#note)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->

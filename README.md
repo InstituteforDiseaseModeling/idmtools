@@ -18,13 +18,13 @@
 
 - [User Installation](#user-installation)
   - [Recommended install](#recommended-install)
-  - [Advanced Install](#advanced-install)
-  - [Installing Development/Early Release Versions](#installing-developmentearly-release-versions)
+  - [Advanced install](#advanced-install)
+  - [Installing development/early release versions](#installing-developmentearly-release-versions)
     - [PyPI](#pypi)
   - [Pre-requisites](#pre-requisites)
 - [Reporting issues](#reporting-issues)
 - [Requesting a feature](#requesting-a-feature)
-- [Development Documentation](#development-documentation)
+- [Development documentation](#development-documentation)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 

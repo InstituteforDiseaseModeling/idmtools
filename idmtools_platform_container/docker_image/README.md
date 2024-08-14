@@ -2,13 +2,14 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [idmtools_platform_container Docker Image](#idmtools_platform_container-docker-image)
+- [idmtools_platform_container Docker image](#idmtools_platform_container-docker-image)
   - [Introduction](#introduction)
   - [Prerequisites](#prerequisites)
-  - [Build Docker Image](#build-docker-image)
-  - [Docker Image Versioning](#docker-image-versioning)
-  - [Docker Image Usage](#docker-image-usage)
-  - [Publish Docker Image](#publish-docker-image)
+  - [Build Docker image](#build-docker-image)
+  - [Docker image versioning](#docker-image-versioning)
+  - [Docker image usage](#docker-image-usage)
+  - [Publish Docker image](#publish-docker-image)
+  - [Extend the Docker image](#extend-the-docker-image)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
