@@ -15,7 +15,7 @@ The main container-related commands in idmtools can be accessed using ``idmtools
 .. command-output:: idmtools container --help
    :returncode: 0
 
-To review all the commands available for the ``ContainerPlatform``, use the ``--all`` option:
+To review all the commands available for the ``idmtools container``, use the ``--all`` option:
 
 .. command-output:: idmtools container --all --help
    :returncode: 0
