@@ -22,7 +22,7 @@ Prerequisites
 Building the Docker image
 -------------------------
 
-Note: In general you do not need to run following command. The image is automatically built in GitHub Actions and pushed to the `IDMOD Artifactory <https://packages.idmod.org/>`_.
+Note: In general you do not need to run following commands. The image is automatically built in GitHub Actions and pushed to the `IDMOD Artifactory <https://packages.idmod.org/>`_.
 
 To build the Docker image locally, run:
 
@@ -31,9 +31,9 @@ To build the Docker image locally, run:
    python build_docker_image.py --username <username> --password <password>
 
 
-where <username> and <password> are the username and password for the IDMOD Artifactory account.  You can also build the image with a different Dockerfile and image name by specifying the --dockerfile and --imagename arguments:
+where `<username>` and `<password>` refer to your IDMOD Artifactory account credentials, which are the same as IDMOD email and password.
 
-If you want to build different Dockerfile and image name, run:
+Additionally, you can build the image with a different Dockerfile and image name by specifying the `--dockerfile` and `--image_name` arguments:
 
 .. code-block:: bash
 
@@ -72,11 +72,11 @@ where <username> and <password> are the username and password for the IDM Artifa
 
 Extend the Docker image
 -----------------------
-If you want to build you own Docker image, please use our ``container-rocky-runtime`` as your baseline image and add the following line to the top of your Dockerfile:
+If you want to build your own Docker image, please use our ``container-rocky-runtime`` as your baseline image and add the following line to the top of your Dockerfile:
 
 .. code-block:: bash
 
-   FROM docker-production-public/idmtools/container-rocky-runtime/0.0.3
+   FROM docker-production-public/idmtools/container-rocky-runtime:0.0.3
 
 You can use general Docker build `command <https://docs.docker.com/reference/cli/docker/buildx/build/>`_ to build your own Docker image.
 Then use that image in the Platform object. For example:
