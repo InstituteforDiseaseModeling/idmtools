@@ -86,7 +86,7 @@ If you have your authentication defined in your pip.conf or pip.ini file, you ca
 - `pip install idmtools-models --index-url=https://<USERNAME>:<PASSWORD>@packages.idmod.org/api/pypi/pypi-staging/simple` - Python and generic models
 
 ## Pre-requisites
-- Python 3.8/3.9/3.10/3.11 x64
+- Python 3.8/3.9/3.10/3.11/3.12 x64-bit
 - Docker(required for the container platform)
   On Windows or Mac, please use Docker Desktop 2.1.0.5 or 2.2.0.1
 
