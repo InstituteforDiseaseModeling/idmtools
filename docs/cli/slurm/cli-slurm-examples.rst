@@ -1,6 +1,6 @@
 
 ==================
-CLI Slurm Examples
+CLI Slurm examples
 ==================
 
 You can use |IDM_s| CLI to get all kind of statuses for |Slurm_s|.

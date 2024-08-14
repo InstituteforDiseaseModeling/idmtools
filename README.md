@@ -53,7 +53,7 @@ To build the documentation locally, do the following:
 
 ## Recommended install
 
-The recommended install is to use
+The recommended installation is to use
 ```bash
 pip install idmtools[full] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
 ```
@@ -65,7 +65,7 @@ pip install idmtools[idm] --index-url=https://packages.idmod.org/api/pypi/pypi-p
 ```
 This will install the core tools, the cli, the comps, support for EMOD models, and python models
 
-## Advanced Install
+## Advanced install
 You can also install just the individual packages to create minimal environments
 
 - `pip install idmtools --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - Core package
@@ -73,7 +73,7 @@ You can also install just the individual packages to create minimal environments
 - `pip install idmtools-platform-comps --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - Support for COMPS
 - `pip install idmtools-models --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - Python and generic models
 
-## Installing Development/Early Release Versions
+## Installing development/early release versions
 
 Development versions are available through both IDM's pypi registry and through Github.
 
@@ -87,7 +87,7 @@ If you have your authentication defined in your pip.conf or pip.ini file, you ca
 
 ## Pre-requisites
 - Python 3.8/3.9/3.10/3.11 x64
-- Docker(Required for the local platform)
+- Docker(required for the container platform)
   On Windows or Mac, please use Docker Desktop 2.1.0.5 or 2.2.0.1
 
 # Reporting issues
@@ -107,7 +107,7 @@ You can report an issue directly on GitHub or by emailing [idmtools-issue@idmod.
 
 You can request a feature but opening a ticket on the repo or by emailing [idmtools-feature@idmod.org](mailto:idmtools-feature@idmod.org)
 
-# Development Documentation
+# Development documentation
 
 [![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/InstituteforDiseaseModeling/idmtools)
 

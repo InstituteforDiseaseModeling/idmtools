@@ -1,8 +1,8 @@
 ======================
-Container CLI Commands
+Container CLI commands
 ======================
 
-This document provides an overview of the CLI commands available for the Container Platform.
+This document provides an overview of the CLI(command-line interface) commands available for the container platform.
 
 .. contents:: Table of Contents
    :depth: 2
@@ -11,9 +11,9 @@ This document provides an overview of the CLI commands available for the Contain
 Introduction
 ------------
 
-The Container Platform CLI provides a set of commands to manage and interact with containers. These commands allow you to verify the Docker environment, manage experiments and simulations, and inspect containers.
+The Container platform CLI provides a set of commands to manage and interact with containers. These commands allow you to verify the Docker environment, manage experiments and simulations, and inspect containers.
 
-Command List
+Command list
 ------------
 
 **Main commands**:
@@ -45,7 +45,7 @@ Command List
 - `inspect-image`: Inspect a container image.
 - `parameters`: List parameter info for a platform.
 
-Detailed Command Descriptions
+Detailed command descriptions
 -----------------------------
 
 cancel

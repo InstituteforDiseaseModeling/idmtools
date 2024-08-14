@@ -1,5 +1,5 @@
 ============
-CLI Examples
+CLI examples
 ============
 
 You can use |IDM_s| CLI to download the included Python example scripts from

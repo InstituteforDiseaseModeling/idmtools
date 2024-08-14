@@ -1,6 +1,6 @@
 .. _options:
 
-Examples for ContainerPlatform Attributes
+Examples for ContainerPlatform attributes
 =========================================
 
 The ContainerPlatform supports various attributes for configuring, submitting, and running jobs. See the  list of available :ref:`attributes<attributes>` used when making calls to :py:class:`idmtools_platform_container.container_platform.ContainerPlatform`.
