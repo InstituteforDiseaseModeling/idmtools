@@ -76,7 +76,7 @@ If you want to build your own Docker image, please use our ``container-rocky-run
 
 .. code-block:: bash
 
-   FROM docker-production-public/idmtools/container-rocky-runtime:0.0.3
+   FROM docker-production-public.packages.idmod.org/idmtools/container-rocky-runtime:0.0.3
 
 You can use general Docker build `command <https://docs.docker.com/reference/cli/docker/buildx/build/>`_ to build your own Docker image.
 Then use that image in the Platform object. For example:
