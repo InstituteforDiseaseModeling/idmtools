@@ -2,7 +2,7 @@
 Container CLI commands
 ======================
 
-This document provides an overview of the CLI(command-line interface) commands available for the container platform.
+This document provides an overview of the CLI(command-line interface) commands available for the ``ContainerPlatform``.
 
 .. contents:: Table of Contents
    :depth: 2
@@ -11,7 +11,7 @@ This document provides an overview of the CLI(command-line interface) commands a
 Introduction
 ------------
 
-The Container platform CLI provides a set of commands to manage and interact with containers. These commands allow you to verify the Docker environment, manage experiments and simulations, and inspect containers.
+The ``ContainerPlatform`` CLI provides a set of commands to manage and interact with containers. These commands allow you to verify the Docker environment, manage experiments and simulations, and inspect containers.
 
 Command list
 ------------

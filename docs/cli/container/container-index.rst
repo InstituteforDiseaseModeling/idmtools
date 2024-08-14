@@ -10,12 +10,12 @@ CLI Container Platform
 
    cli-detail
 
-The main container-related commands in idmtools can be accessed using ``idmtools container``. Refer to the details of the top-level command below for more detailed help:
+The main container-related commands in idmtools can be accessed using ``idmtools container``. To view the top-level commands, use ``--help``:
 
 .. command-output:: idmtools container --help
    :returncode: 0
 
-To review all the commands available for the |CONTAINER_s| platform, use the ``--all`` option:
+To review all the commands available for the ``ContainerPlatform``, use the ``--all`` option:
 
 .. command-output:: idmtools container --all --help
    :returncode: 0

@@ -8,8 +8,8 @@ Container Platform
     :maxdepth: 1
 
     utilis
-    options
     ../../cli/container/cli-detail
+    options
     docker_image
 
 
@@ -20,7 +20,7 @@ Prerequisites
 * |Python_IT| (https://www.python.org/downloads/release)
 * Create a virtual environment
 
-  There are multiple ways to create a virtual environment. Below is an example using `venv`:
+  There are multiple ways to create a virtual environment. Below is an example using ``venv``:
 
   .. code-block:: bash
 
@@ -49,8 +49,8 @@ Prerequisites
 ContainerPlatform
 -----------------
 
-The **ContainerPlatform** allows the use of Docker containers and the ability to run jobs locally. This platform leverages Docker's containerization capabilities to provide a consistent and isolated environment for running computational tasks. The **ContainerPlatform** is responsible for managing the creation, execution, and cleanup of Docker containers used to run simulations. It offers a high-level interface for interacting with Docker containers, allowing users to submit jobs, monitor their progress, and retrieve results.
-For more details on the architecture and the packages included in |IT_s| and **ContainerPlatform**, please refer to the documentation
+The ``ContainerPlatform`` allows the use of Docker containers and the ability to run jobs locally. This platform leverages Docker's containerization capabilities to provide a consistent and isolated environment for running computational tasks. The ``ContainerPlatform`` is responsible for managing the creation, execution, and cleanup of Docker containers used to run simulations. It offers a high-level interface for interacting with Docker containers, allowing users to submit jobs, monitor their progress, and retrieve results.
+For more details on the architecture and the packages included in |IT_s| and ``ContainerPlatform``, please refer to the documentation
 (:doc:`../../reference`).
 
 Key features
@@ -86,12 +86,12 @@ ContainerPlatform attributes
 Usage
 -----
 
-The `ContainerPlatform` class is typically used to run computational experiments and simulations within Docker containers, ensuring a consistent and isolated environment. It provides various methods to manage and validate containers, submit jobs, and handle data volumes.
+The ``ContainerPlatform`` class is typically used to run computational experiments and simulations within Docker containers, ensuring a consistent and isolated environment. It provides various methods to manage and validate containers, submit jobs, and handle data volumes.
 
 Example
 -------
 
-This example demonstrates how to use the `ContainerPlatform` class to run a simple command task within a Docker container.
+This example demonstrates how to use the ``ContainerPlatform`` class to run a simple command task within a Docker container.
 
 Create a Python file named `example.py` on your host machine and add the following code:
 
@@ -149,7 +149,5 @@ Run the following included Python example to submit and run a job on your |CONTA
      .. code-block:: python
 
         emod_task.set_sif(sif_path)
-
-
 
 
