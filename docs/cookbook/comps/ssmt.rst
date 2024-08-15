@@ -4,7 +4,7 @@ SSMT recipes
 
 
 Run analysis remotely (platform analysis)
-----------------------------------------
+-----------------------------------------
 
 The following example demonstrates using the PlatformAnalysis object to run AnalyzerManager server-side. Running on the
 server side has the advantage of not needing to download the files required for analysis, as well as additional computational power.
