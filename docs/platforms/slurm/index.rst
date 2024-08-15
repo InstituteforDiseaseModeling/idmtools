@@ -48,7 +48,7 @@ You can also do this directly from code by passing the minimum requirements
 
 
 
-Configuration Options
+Configuration options
 `````````````````````
 .. list-table:: Title
    :header-rows: 1
@@ -67,7 +67,7 @@ Configuration Options
 
     Bold parameters are required
 
-Operation Modes
+Operation modes
 ===============
 
 The |SLURM_s| platform supports two modes of operation, Local and Bridged. Local is the default mode.

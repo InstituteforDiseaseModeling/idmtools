@@ -1,5 +1,5 @@
 =======================
-Run Script As Slurm Job
+Run script as Slurm job
 =======================
 
 This is a temporary workaround solution and user can follow the steps to run a Python script as a Slurm job.

@@ -8,14 +8,14 @@ When using |IT_s| and containers on |COMPS_s| you can use the following two opti
 * Running simulations using containers
 
 
-Container Builder Service
+Container builder service
 -------------------------
 
 The container builder service in |IT_s| allows you to create a Singularity Image File (SIF), 
 the Singularity container file to run in your HPC environment. For more in-depth information 
 about the container builder service, see :doc:`containers-builder-service`.
 
-Running Simulations using Containers
+Running simulations using containers
 ------------------------------------
 
 Whether you've used the container builder service in |IT_s| to create a new SIF file or you've 

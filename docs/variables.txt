@@ -19,7 +19,7 @@
 .. |EMOD_l| replace:: Epidemiological MODeling software (EMOD)
 .. |EMOD_s| replace:: EMOD
 .. |IT_s| replace:: idmtools
-.. |Python_IT| replace:: Python 3.8 or 3.8+
+.. |Python_IT| replace:: Python 3.8/3.9/3.10/3.11/3.12 x64-bit
 .. |SSMT_l| replace:: Server-Side Modeling Tools (SSMT)
 .. |SSMT_s| replace:: SSMT
 .. |DT| replace:: DTK-Tools
