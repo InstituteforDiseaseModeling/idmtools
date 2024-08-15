@@ -1,4 +1,4 @@
-Assetize outputs Workitem
+Assetize outputs workitem
 =========================
 
 Assetizing outputs allows you to create an :py:class:`~idmtools.assets.asset_collection.AssetCollection`

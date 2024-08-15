@@ -1,9 +1,9 @@
-ContainerPlatform Docker Utilities
+ContainerPlatform Docker utilities
 ==================================
 
-The `docker_operations.py` module provides various utilities to manage Docker containers within the `ContainerPlatform`. These utilities include functions to validate, start, stop, and manage Docker containers, as well as to check Docker installation and daemon status.
+The ``docker_operations.py`` module provides various utilities to manage Docker containers within the ``ContainerPlatform``. These utilities include functions to validate, start, stop, and manage Docker containers, as well as to check Docker installation and daemon status.
 
-Key Functions
+Key functions
 -------------
 
 - **validate\_container\_running(platform, \*\*kwargs)**: Checks if the Docker daemon is running, finds an existing container, or starts a new container.
@@ -27,7 +27,7 @@ Key Functions
 Usage
 -----
 
-These utilities are typically used to manage Docker containers within the `ContainerPlatform`, ensuring that the necessary containers are running and properly configured for executing experiments and simulations.
+These utilities are typically used to manage Docker containers within the ``idmtools_platform_container``, ensuring that the necessary containers are running and properly configured for executing experiments and simulations.
 
 Example
 -------

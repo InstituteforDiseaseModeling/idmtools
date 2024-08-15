@@ -8,8 +8,8 @@ Container Platform
     :maxdepth: 1
 
     utilis
-    options
     ../../cli/container/cli-detail
+    options
     docker_image
 
 
@@ -18,16 +18,16 @@ Prerequisites
 * Docker installed
 * Linux or Windows with WSL2
 * |Python_IT| (https://www.python.org/downloads/release)
-* Create a Virtual Environment
+* Create a virtual environment
 
-  There are multiple ways to create a virtual environment. Below is an example using `venv`:
+  There are multiple ways to create a virtual environment. Below is an example using ``venv``:
 
   .. code-block:: bash
 
      python -m venv container_env
 
 
-* Activate Virtual Environment
+* Activate virtual environment
 
   - On Windows:
 
@@ -40,7 +40,7 @@ Prerequisites
   .. code-block:: bash
 
      source container_env/bin/activate
-* Install Container Platform
+* Install container platform
 
   .. code-block:: bash
 
@@ -49,11 +49,11 @@ Prerequisites
 ContainerPlatform
 -----------------
 
-The **ContainerPlatform** class is a part of the |IT_s| platform. This platform leverages Docker's containerization capabilities to provide a consistent and isolated environment for running computational tasks. The **ContainerPlatform** is responsible for managing the creation, execution, and cleanup of Docker containers used to run simulations. It offers a high-level interface for interacting with Docker containers, allowing users to submit jobs, monitor their progress, and retrieve results.
-For more details on the architecture and the packages included in |IT_s| and **ContainerPlatform**, please refer to the documentation
+The ``ContainerPlatform`` allows the use of Docker containers and the ability to run jobs locally. This platform leverages Docker's containerization capabilities to provide a consistent and isolated environment for running computational tasks. The ``ContainerPlatform`` is responsible for managing the creation, execution, and cleanup of Docker containers used to run simulations. It offers a high-level interface for interacting with Docker containers, allowing users to submit jobs, monitor their progress, and retrieve results.
+For more details on the architecture and the packages included in |IT_s| and ``ContainerPlatform``, please refer to the documentation
 (:doc:`../../reference`).
 
-Key Features
+Key features
 ------------
 
 - **Docker Integration**: Ensures that Docker is installed and the Docker daemon is running before executing any tasks.
@@ -66,7 +66,7 @@ Key Features
 
 .. _attributes:
 
-ContainerPlatform Attributes
+ContainerPlatform attributes
 ----------------------------
 
 - **job\_directory**: The directory where job data is stored.
@@ -86,12 +86,12 @@ ContainerPlatform Attributes
 Usage
 -----
 
-The `ContainerPlatform` class is typically used to run computational experiments and simulations within Docker containers, ensuring a consistent and isolated environment. It provides various methods to manage and validate containers, submit jobs, and handle data volumes.
+The ``ContainerPlatform`` class is typically used to run computational experiments and simulations within Docker containers, ensuring a consistent and isolated environment. It provides various methods to manage and validate containers, submit jobs, and handle data volumes.
 
 Example
 -------
 
-This example demonstrates how to use the `ContainerPlatform` class to run a simple command task within a Docker container.
+This example demonstrates how to use the ``ContainerPlatform`` class to run a simple command task within a Docker container.
 
 Create a Python file named `example.py` on your host machine and add the following code:
 
@@ -125,7 +125,7 @@ You can find the simulation results in the `job_directory/<suite_path>/<experime
 Additionally, You can view the same results inside the Docker container at `/home/container-data/<suite_path>/<experiment_path>/<simulation_path>`.
 
 
-More Examples
+More examples
 -------------
 Run the following included Python example to submit and run a job on your |CONTAINER_s| platform:
 
@@ -133,8 +133,21 @@ Run the following included Python example to submit and run a job on your |CONTA
 
 .. note::
 
-    ``workitems`` and ``AssetCollection`` are not supported on the |CONTAINER_s| platform with |IT_s|. If you've
-    used the |COMPS_s| platform with |IT_s| you may have scripts using these objects. You would need
-    to update these scripts without using these objects in order to run them on the |CONTAINER_s| platform.
+   - **WorkItem** is not supported on the Container Platform as it is not needed in most cases since the code already runs on user's local computer.
+   - **AssetCollection** creation or referencing to an existing AssetCollection are not supported on the Container Platform with current release. If you've used the COMPS Platform, you may have scripts using these objects. You would need to update these scripts without using these objects in order to run them on the Container Platform.
+
+     For example, you may need to remove the following code which used in COMPS Platform:
+
+     .. code-block:: python
+
+        asset_collection = AssetCollection.from_asset_collection_id('50002755-20f1-ee11-aa12-b88303911bc1')
+
+   - Run with **Singularity** is not needed with Container Platform. If you take existing COMPS example and try to run it with Container Platform, you may need to remove the code that setups the singularity image.
+
+     For example for singularity, you make need to remove the following code which used in COMPS Platform:
+
+     .. code-block:: python
+
+        emod_task.set_sif(sif_path)
 
 

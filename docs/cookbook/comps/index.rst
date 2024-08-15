@@ -1,5 +1,5 @@
 =============
-COMPS Recipes
+COMPS recipes
 =============
 
 .. toctree::

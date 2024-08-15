@@ -17,7 +17,7 @@ You can also see a list of aliases and configuration options using the CLI comma
 
 .. command-output:: idmtools info plugins platform-aliases
 
-Utilities Unique to COMPS
+Utilities unique to COMPS
 -------------------------
 
 .. toctree::

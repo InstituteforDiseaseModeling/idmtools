@@ -38,8 +38,8 @@ Bugs
 * `#2169 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2169>`_ - For dry run, we better not to display 'check status message
 * `#2208 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2208>`_ - SlurmPlatform: experiment's metadata.json file has suite_id is null
 
-Feature Request
----------------
+Feature requests
+----------------
 * `#2261 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2261>`_ - Consider changes to new COMPS scheduling support
 * `#2328 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2328>`_ - COMPSPlatform should set default values for endpoint and environment set to production instead of staging
 * `#2326 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2326>`_ - SlurmPlatform should have default mode to 'Local' instead of None

@@ -1,5 +1,5 @@
 =========================
-Container Builder Service
+Container builder service
 =========================
 
 The container builder service in |IT_s| uses the 
