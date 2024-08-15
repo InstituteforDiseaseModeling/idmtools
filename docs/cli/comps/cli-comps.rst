@@ -11,7 +11,7 @@ CLI COMPS Platform
    cli-troubleshoot
 
 The |COMPS_s| platform related commands can be accessed with
-``idmtools comps`` cli command. All comps command require a target configuration
+``idmtools comps`` cli command. All comps commands require a target configuration
 block or alias to use to configure the connection to |COMPS_s|. See the details
 of the top level command below for detailed help:
 

@@ -87,8 +87,9 @@ If you have your authentication defined in your pip.conf or pip.ini file, you ca
 
 ## Pre-requisites
 - Python 3.8/3.9/3.10/3.11/3.12 x64-bit
+- Windows 10 Pro or Enterprise, or a Linux operating system
 - Docker(required for the container platform)
-  On Windows or Mac, please use Docker Desktop 2.1.0.5 or 2.2.0.1
+  On Windows, please use Docker Desktop 4.0.0 or later
 
 # Reporting issues
 
