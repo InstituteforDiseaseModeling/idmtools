@@ -53,37 +53,61 @@ To build the documentation locally, do the following:
 
 ## Recommended install
 
-The recommended installation is to use
+- The recommended installation is to use:
 ```bash
 pip install idmtools[full] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
 ```
-This will install the core tools, the cli, the comps and local platforms, support for EMOD models, and python models
-
-If you do not need the local platform, you can use the following command
+This will install all idmtools packages, except the idmtools-test package. The installation includes core, CLI, models, COMPS, General, Container, and Slurm platforms.
+- For only run simulations on COMPS:
 ```bash
 pip install idmtools[idm] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
 ```
-This will install the core tools, the cli, the comps, support for EMOD models, and python models
+This will install the idmtools core, CLI, models, and COMPS platform.
+
+- For only run simulations in Slurm cluster:
+```bash
+pip install idmtools[slurm] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+```
+This will install the idmtools core, CLI, models, slurm_utils, and Slurm platform.
+
+- For only run simulations in Docker container locally:
+```bash
+pip install idmtools[container] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+```
+This will install the idmtools core, CLI, models, General, and Container platforms.
+
+- For run unittests, you may need to install the idmtools-test package:
+```bash
+pip install idmtools-test --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+```
 
 ## Advanced install
-You can also install just the individual packages to create minimal environments
+You can also install just the individual packages to create minimal environments:
 
 - `pip install idmtools --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - Core package
 - `pip install idmtools-cli --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - Adds the idmtools cli commands
 - `pip install idmtools-platform-comps --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - Support for COMPS
 - `pip install idmtools-models --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - Python and generic models
+- `pip install idmtools-platform-general --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - Support for File/Process Platforms
+- `pip install idmtools-platform-slurm --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - Support for Slurm Platform
+- `pip install idmtools-platform-container --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - Support for Container Platform
+- `pip install idmtools-test --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple` - Test package
 
 ## Installing development/early release versions
 
 Development versions are available through both IDM's pypi registry and through Github.
 
-### PyPI
+### IDMOD's PyPI staging registry
 
-If you have your authentication defined in your pip.conf or pip.ini file, you can use the following commands to install from staging
+If you have your authentication defined in your pip.conf or pip.ini file, you can use the following commands to install from staging:
 - `pip install idmtools --index-url=https://<USERNAME>:<PASSWORD>@packages.idmod.org/api/pypi/pypi-staging/simple` - Core package
 - `pip install idmtools-cli --index-url=https://<USERNAME>:<PASSWORD>@packages.idmod.org/api/pypi/pypi-staging/simple` - Adds the idmtools cli commands
 - `pip install idmtools-platform-comps --index-url=https://<USERNAME>:<PASSWORD>@packages.idmod.org/api/pypi/pypi-staging/simple` - Support for COMPS
 - `pip install idmtools-models --index-url=https://<USERNAME>:<PASSWORD>@packages.idmod.org/api/pypi/pypi-staging/simple` - Python and generic models
+- `pip install idmtools-platform-general --index-url=https://<USERNAME>:<PASSWORD>@packages.idmod.org/api/pypi/pypi-staging/simple` - Support for File/Process Platforms
+- `pip install idmtools-platform-slurm --index-url=https://<USERNAME>:<PASSWORD>@packages.idmod.org/api/pypi/pypi-staging/simple` - Support for Slurm Platform
+- `pip install idmtools-platform-container --index-url=https://<USERNAME>:<PASSWORD>@packages.idmod.org/api/pypi/pypi-staging/simple` - Support for Container Platform
+- `pip install idmtools-test --index-url=https://<USERNAME>:<PASSWORD>@packages.idmod.org/api/pypi/pypi-staging/simple` - Test package
 
 ## Pre-requisites
 - Python 3.8/3.9/3.10/3.11/3.12 x64-bit

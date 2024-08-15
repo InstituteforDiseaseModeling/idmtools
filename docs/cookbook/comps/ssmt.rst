@@ -3,7 +3,7 @@ SSMT recipes
 ============
 
 
-Run analysis remotely(platform analysis)
+Run analysis remotely (platform analysis)
 ----------------------------------------
 
 The following example demonstrates using the PlatformAnalysis object to run AnalyzerManager server-side. Running on the
