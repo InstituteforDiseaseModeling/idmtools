@@ -20,7 +20,7 @@
   - [Recommended install](#recommended-install)
   - [Advanced install](#advanced-install)
   - [Installing development/early release versions](#installing-developmentearly-release-versions)
-    - [PyPI](#pypi)
+    - [IDMOD's PyPI staging registry](#idmods-pypi-staging-registry)
   - [Pre-requisites](#pre-requisites)
 - [Reporting issues](#reporting-issues)
 - [Requesting a feature](#requesting-a-feature)
