@@ -107,8 +107,9 @@ def get_latest_image_version_from_registry(username, password):
         logger.debug(f"Images: {images}")
         last_version = images[0]
         logger.info(f"Last Version {url}")
-        if BASE_VERSION in last_version:
-            version_parts = last_version.split('.')
+        version_parts = last_version.split('.')
+        base_part = '.'.join(version_parts[:-1])
+        if BASE_VERSION in base_part:
             version_parts[-1] = str(int(version_parts[-1]) + 1)
             version = '.'.join(version_parts)
         else:

@@ -24,13 +24,13 @@ user_logger = getLogger('user')
 
 
 @contextmanager
-def platform(*args, **kwds):
+def platform(*args, **kwargs):
     """
     Utility function to create platform.
 
     Args:
         *args: Arguments to pass to platform
-        **kwds: Keyword args to pass to platform
+        **kwargs: Keyword args to pass to platform
 
     Returns:
         Platform created.
@@ -38,7 +38,7 @@ def platform(*args, **kwds):
     logger.debug(f'Acquiring platform context with options: {str(*args)}')
     try:
         # check if we are already in a platform context and if so add to stack
-        pl = Platform(*args, **kwds)
+        pl = Platform(*args, **kwargs)
         set_current_platform(pl)
         yield pl
     finally:
@@ -58,7 +58,56 @@ class Platform:
 
         Args:
             block: The INI configuration file block name.
-            kwargs: User inputs may overwrite the entries in the block.
+            missing_ok: If the block is missing, should we error or not.
+
+        COMPSPlatform Keyword Args:
+           - endpoint (str, optional): URL of the COMPS endpoint to use. Default is 'https://comps.idmod.org'
+           - environment (str, optional):  Name of the COMPS environment to target, Default is Calculon, Options are Calculon, IDMcloud, SlurmStage, Cumulus, etc
+           - priority (str, optional): Priority of the job. Default is 'Lowest'. Options are Lowest, BelowNormal, Normal, AboveNormal, Highest
+           - node_group (str, optional): node group to target. Default is None. Options are 'idm_abcd', 'idm_ab', idm_cd', 'idm_a', 'idm_b', 'idm_c', 'idm_d', 'idm_48cores'
+           - num_retries (int, optional): How retries if the simulation fails, Default is 0, max is 10
+           - num_cores (int, optional): How many cores per simulation. Default is 1, max is 32
+           - max_workers (int, optional): The number of processes to spawn locally. Defaults to 16, min is 1, max is 32
+           - batch_size (int, optional): How many simulations per batch. Default is 10, min is 1 and max is 100
+           - exclusive (bool, optional): Enable exclusive mode? (one simulation per node on the cluster). Default is False
+           - docker_image (str, optional): Docker image to use for the simulation. Default is None
+
+        SlurmPlatform Keyword Args:
+           - nodes (int, optional): How many nodes to be used. Default is None
+           - ntasks (int, optional):  Num of tasks. Default is None
+           - cpus_per_task (int, optional): CPU # per task. Default is None
+           - ntasks_per_core (int, optional): Task # per core. Default is None
+           - max_running_jobs (int, optional): Maximum of running jobs(Per experiment). Default is None
+           - mem (int, optional): Memory per core: MB of memory. Default is None
+           - mem_per_cpu (int, optional): Memory per core: MB of memory. Default is None
+           - partition (str, optional): Which partition to use. Default is None
+           - constraint (str, optional): Specify compute node. Default is None
+           - time (str, optional): Limit time on this job hrs:min:sec. Default is None
+           - account (str, optional): if set to something, jobs will run with the specified account in slurm. Default is None
+           - exclusive (bool, optional): Allocated nodes can not be shared with other jobs/users. Default is False
+           - requeue (bool, optional): Specifies that the batch job should be eligible for re-queuing. Default is True
+           - retries (int, optional): Default retries for jobs. Default is 1
+           - sbatch_custom (str, optional): Pass custom commands to sbatch generation script. Default is None
+           - modules (list, optional): modules to be load, for example load 'mpi' module. Default is []
+           - dir_exist_ok (bool, optional): Specifies default setting of whether slurm should fail if item directory already exists. Default is False
+           - array_batch_size (int, optional): Set array max size for Slurm job. Default is None
+           - run_on_slurm (bool, optional): determine if run script as Slurm job. Default is False
+
+        ContainerPlatform Keyword Args:
+           - job_directory (str, optional): Job directory. Default is None
+           - docker_image (str, optional): Docker image to use for the simulation. Default is None
+           - extra_packages (list, optional): Extra packages to install. Default is None
+           - data_mount (str, optional): Data mount point. Default is None
+           - user_mounts (dict, optional): User mounts. Default is None
+           - container_prefix (str, optional): Prefix for container name. Default is None
+           - force_start (bool, optional): Force start container. Default is False
+           - new_container (bool, optional): Start a new container. Default is False
+           - include_stopped (bool, optional): Include stopped containers. Default is False
+           - container_id (str, optional): The ID of the container being used.
+           - max_job (int, optional): Max job. Default is 4
+           - modules (list, optional): Modules to load. Default is None
+           - debug (bool, optional): Debug mode. Default is False
+           - retries (int, optional): The number of retries to attempt for a job.
 
         Returns:
             The requested platform.

@@ -3,6 +3,7 @@ Here we implement the JSON Metadata operations.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+import os
 import json
 from pathlib import Path
 from typing import TYPE_CHECKING, Dict, List, Type, Union
@@ -88,6 +89,13 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         meta['id'] = meta['_uid']
         meta['uid'] = meta['_uid']
         meta['status'] = 'CREATED'
+        meta['dir'] = os.path.abspath(self.platform.get_directory(item))
+
+        if isinstance(item, Experiment):
+            meta['suite_id'] = meta["parent_id"]
+        elif isinstance(item, Simulation):
+            meta['experiment_id'] = meta["parent_id"]
+
         return meta
 
     def dump(self, item: Union[Suite, Experiment, Simulation]) -> None:
@@ -165,7 +173,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
             raise RuntimeError("Clear method supports Suite/Experiment/Simulation only.")
         self.update(item=item, metadata={}, replace=True)
 
-    def get_children(self, item: Union[Suite, Experiment]) -> List[Dict]:
+    def get_children(self, item: Union[Suite, Experiment, FileSuite, FileExperiment]) -> List[Dict]:
         """
         Fetch item's children.
         Args:

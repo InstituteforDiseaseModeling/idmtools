@@ -93,7 +93,7 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
             List of Slurm experiments
         """
         exp_list = []
-        exp_meta_list = self.platform._metas.get_children(parent)
+        exp_meta_list = self.platform._metas.get_children(suite)
         for meta in exp_meta_list:
             slurm_exp = SlurmExperiment(meta)
             if raw:

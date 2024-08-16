@@ -44,7 +44,7 @@ class SweepArm(SimulationBuilder):
 
     @property
     def count(self):
-        """return simulations count."""
+        """Return simulations count."""
         return self.__count
 
     @count.setter
@@ -68,6 +68,11 @@ class SweepArm(SimulationBuilder):
 
     @property
     def functions(self):
+        """
+        Get functions.
+        Returns:
+            functions
+        """
         old_sw, new_sw = tee(self.__functions, 2)
         self.__functions = new_sw
         return old_sw

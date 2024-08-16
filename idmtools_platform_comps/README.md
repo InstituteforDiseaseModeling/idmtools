@@ -54,8 +54,8 @@ There are three ways to choose which ssmt docker image to use in your script:
 ```bash
     [COMPS2]
     type = COMPS
-    endpoint = https://comps2.idmod.org
-    environment = Bayesian
+    endpoint = https://comps.idmod.org
+    environment = Calculon
     ......
     docker_image = my_test_ssmt_docker_image
 ```

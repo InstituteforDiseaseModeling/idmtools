@@ -36,15 +36,17 @@ class FilePlatform(IPlatform):
     """
     File Platform definition.
     """
-    job_directory: str = field(default=None)
-    max_job: int = field(default=4)
-    run_sequence: bool = field(default=True)
+    job_directory: str = field(default=None, metadata=dict(help="Job Directory"))
+    max_job: int = field(default=4, metadata=dict(help="Maximum number of jobs to run concurrently"))
+    run_sequence: bool = field(default=True, metadata=dict(help="Run jobs in sequence"))
+    sym_link: bool = field(default=True, metadata=dict(help="Use symbolic links"))
 
     # Default retries for jobs
-    retries: int = field(default=1)
-
+    retries: int = field(default=1, metadata=dict(help="Number of retries for failed jobs"))
     # modules to be load
-    modules: list = field(default_factory=list, metadata=dict(sbatch=True))
+    modules: list = field(default_factory=list, metadata=dict(help="Modules to load"))
+    # extra packages to install
+    extra_packages: list = field(default_factory=list, metadata=dict(help="Extra packages to install"))
 
     _suites: FilePlatformSuiteOperations = field(**op_defaults, repr=False, init=False)
     _experiments: FilePlatformExperimentOperations = field(**op_defaults, repr=False, init=False)
@@ -96,7 +98,7 @@ class FilePlatform(IPlatform):
             exp_dir = self.get_directory(exp)
             item_dir = Path(exp_dir, item.id)
         else:
-            raise RuntimeError(f"Get directory is not supported for {type(item)} object on FilePlatform")
+            raise RuntimeError(f"Get directory is not supported for {type(item)} object on {self.__class__.__name__}")
 
         return item_dir
 
@@ -142,9 +144,8 @@ class FilePlatform(IPlatform):
             raise RuntimeError('Only support Suite/Experiment/Simulation or not None dest.')
         target.mkdir(parents=True, exist_ok=exist_ok)
 
-    @staticmethod
     @check_symlink_capabilities
-    def link_file(target: Union[Path, str], link: Union[Path, str]) -> None:
+    def link_file(self, target: Union[Path, str], link: Union[Path, str]) -> None:
         """
         Link files.
         Args:
@@ -155,11 +156,13 @@ class FilePlatform(IPlatform):
         """
         target = Path(target).absolute()
         link = Path(link).absolute()
-        link.symlink_to(target)
+        if self.sym_link:
+            link.symlink_to(target)
+        else:
+            shutil.copyfile(target, link)
 
-    @staticmethod
     @check_symlink_capabilities
-    def link_dir(target: Union[Path, str], link: Union[Path, str]) -> None:
+    def link_dir(self, target: Union[Path, str], link: Union[Path, str]) -> None:
         """
         Link directory/files.
         Args:
@@ -170,7 +173,10 @@ class FilePlatform(IPlatform):
         """
         target = Path(target).absolute()
         link = Path(link).absolute()
-        link.symlink_to(target)
+        if self.sym_link:
+            link.symlink_to(target)
+        else:
+            shutil.copytree(target, link)
 
     def create_batch_file(self, item: Union[Experiment, Simulation], **kwargs) -> None:
         """
