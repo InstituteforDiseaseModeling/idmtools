@@ -51,7 +51,7 @@ CALLER_LIST = ['_create_from_block',  # create platform through Platform Factory
                'fetch',  # create platform through un-pickle
                'get',  # create platform through platform spec' get method
                '__newobj__',  # create platform through copy.deepcopy
-               '_main', # create platform through analyzer manager
+               '_main',  # create platform through analyzer manager
                '<module>']  # create platform through specific module
 
 # Maps an object type to a platform interface object. We use strings to use getattr. This also let's us also reduce
