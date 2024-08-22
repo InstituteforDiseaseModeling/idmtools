@@ -5,7 +5,6 @@ Notes:
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
-import warnings
 from logging import getLogger
 from pathlib import PurePath
 from uuid import UUID

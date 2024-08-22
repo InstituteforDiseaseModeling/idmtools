@@ -8,7 +8,6 @@ TemplatedSimulations are useful for building large numbers of similar simulation
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import copy
-import warnings
 from dataclasses import dataclass, field, InitVar, fields
 from logging import getLogger, DEBUG
 from types import GeneratorType
