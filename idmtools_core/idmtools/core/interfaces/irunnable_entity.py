@@ -104,14 +104,12 @@ class IRunnableEntity(IEntity, metaclass=ABCMeta):
         """
         p = super()._check_for_platform_from_context(platform)
         if 'wait_on_done' in run_opts:
-            warnings.warn("wait_on_done will be deprecated soon. Please use wait_until_done instead.",
-                          DeprecationWarning, 2)
-            user_logger.warning("wait_on_done will be deprecated soon. Please use wait_until_done instead.")
+            raise TypeError("The 'wait_on_done' parameter has been removed in idmtools 1.8.0. Please update your code with 'wait_until_done'.")
         p.run_items(self, wait_on_done_progress=wait_on_done_progress, **run_opts)
         dry_run = run_opts.get('dry_run', False)
         if dry_run:
             return
-        if wait_until_done or run_opts.get('wait_on_done', False):
+        if wait_until_done:
             self.wait(wait_on_done_progress=wait_on_done_progress, platform=p)
 
     def wait(self, wait_on_done_progress: bool = True, timeout: int = None, refresh_interval=None, platform: 'IPlatform' = None, **kwargs):

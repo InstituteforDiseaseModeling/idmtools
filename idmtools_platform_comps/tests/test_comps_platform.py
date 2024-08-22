@@ -262,6 +262,12 @@ class TestCOMPSPlatform(ITestWithPersistence):
             self.platform.get_item(experiment.id, item_type=ItemType.EXPERIMENT, raw=True)
         self.assertTrue('404 NotFound - Failed to retrieve experiment for given id' in str(context.exception.args[0]))
 
+    def test_wait_on_done_removed(self):
+        experiment = self.get_working_model_experiment()
+        with self.assertRaises(TypeError) as context:
+            experiment.run(wait_on_done=True)
+        self.assertTrue("The 'wait_on_done' parameter has been removed in idmtools 1.8.0. Please update your code with 'wait_until_done'." in str(context.exception.args[0]))
+
 
 if __name__ == '__main__':
     unittest.main()
