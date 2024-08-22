@@ -18,7 +18,7 @@ from pathlib import PureWindowsPath, PurePath
 from itertools import groupby
 from logging import getLogger, DEBUG
 from typing import Dict, List, NoReturn, Type, TypeVar, Any, Union, Tuple, Set, Iterator, Callable, Optional
-
+from idmtools.core.context import set_current_platform
 from idmtools import IdmConfigParser
 from idmtools.core import CacheEnabled, UnknownItemException, EntityContainer, UnsupportedPlatformType
 from idmtools.core.enums import ItemType, EntityStatus
@@ -51,7 +51,8 @@ CALLER_LIST = ['_create_from_block',  # create platform through Platform Factory
                'fetch',  # create platform through un-pickle
                'get',  # create platform through platform spec' get method
                '__newobj__',  # create platform through copy.deepcopy
-               '_main']  # create platform through analyzer manager
+               '_main', # create platform through analyzer manager
+               '<module>']  # create platform through specific module
 
 # Maps an object type to a platform interface object. We use strings to use getattr. This also let's us also reduce
 # all the if else crud
@@ -139,7 +140,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
                 self.platform_type_map[getattr(self, interface).platform_type] = item_type
 
         self.validate_inputs_types()
-
+        set_current_platform(self)
         # Initialize the cache
         self.initialize_cache()
 
@@ -862,7 +863,6 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         Returns:
             Platform
         """
-        from idmtools.core.context import set_current_platform
         set_current_platform(self)
         return self
 
