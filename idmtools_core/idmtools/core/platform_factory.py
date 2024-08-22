@@ -158,6 +158,7 @@ class Platform:
         """
         # Read block details
         platform_type = None
+        is_alias = False
         section = {}
 
         if block:
@@ -179,24 +180,24 @@ class Platform:
                     props = cls._aliases[block.upper()]
                     platform_type = props[0].get_name()
                     section = props[1]
-                else:  # If block is not in aliases, create section from platform constructor
+                    is_alias = True
+                else:  # If block is not in aliases and not in ini, create section from platform constructor
                     section = {'block': block}
                     section.update(kwargs)
         else:  # If block is None, try to get type from kwargs
             platform_type = kwargs.get('type')
             if not platform_type:
-                raise Exception("Type must be specified in Platform constructor")
+                raise Exception("Type must be specified in Platform constructor.")
 
         if platform_type is None:
             try:
                 # Make sure block has type entry
                 platform_type = section.pop('type')
             except KeyError:
-                # try to use the block name as the type
                 user_logger.warning(
                     "You are specifying a platform without a configuration file or configuration block. Be sure you have supplied all required parameters for the Platform as this can result in unexpected behaviour. Running this way is only recommended for development mode. Instead, "
                     "it is recommended you create an idmtools.ini to capture the config once you have tested and confirmed your configuration.")
-                platform_type = block
+                platform_type = block  # This is just for print correct error message by _validate_platform_type next
 
         # Make sure we support platform_type
         cls._validate_platform_type(platform_type)
@@ -234,7 +235,7 @@ class Platform:
             # is output enabled and is showing of platform config enabled?
             if IdmConfigParser.is_output_enabled() and IdmConfigParser.get_option(None, "SHOW_PLATFORM_CONFIG", 't').lower() in TRUTHY_VALUES:
                 if block is not None:
-                    if inputs != section:  # Display section based on code first
+                    if is_alias or inputs != section:  # second condition is to show updated values from kwargs for the block
                         for k, v in section.items():
                             if k in inputs:
                                 section[k] = inputs[k]
@@ -243,10 +244,10 @@ class Platform:
                     else:
                         IdmConfigParser.display_config_block_details(block)
         except ValueError:
-            # This block is triggered by the call to IdmConfigParser.display_config_block_details(block) above when the specified block is not found in the INI config file. Typically, this occurs in cases where the input is an alias for a block. We still want to display the section to inform the user of what is being used."
+            # This block is triggered by the call to IdmConfigParser.display_config_block_details(block) above when the specified block is not found in the INI config file but all other fields are valid for creating platform
             if block is not None:
                 user_logger.log(VERBOSE, f"\n[{block}]")
-                section.pop(block)  # Remove block from section
+                section.pop('block')  # Remove block from section
                 user_logger.log(VERBOSE, json.dumps(section, indent=3))
 
         # Display not used fields of the block
