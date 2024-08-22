@@ -6,15 +6,15 @@ The Platform allows us to lookup a platform via its plugin name, "COMPS" or via 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import json
-import os
 from contextlib import contextmanager
 from dataclasses import fields
 from logging import getLogger, DEBUG
-from typing import Dict, Any, TYPE_CHECKING
+from typing import TYPE_CHECKING
 from idmtools.config import IdmConfigParser
 from idmtools.core import TRUTHY_VALUES
 from idmtools.core.context import set_current_platform, remove_current_platform
 from idmtools.utils.entities import validate_user_inputs_against_dataclass
+
 
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
@@ -51,14 +51,12 @@ class Platform:
     """
     Platform Factory.
     """
-
-    def __new__(cls, block, missing_ok: bool = None, **kwargs):
+    def __new__(cls, block: str = None, **kwargs):
         """
         Create a platform based on the block and all other inputs.
 
         Args:
-            block: The INI configuration file block name.
-            missing_ok: If the block is missing, should we error or not.
+            block(str, optional): The INI configuration file block name.
 
         COMPSPlatform Keyword Args:
            - endpoint (str, optional): URL of the COMPS endpoint to use. Default is 'https://comps.idmod.org'
@@ -118,26 +116,13 @@ class Platform:
         global current_platform, current_platform_stack
         from idmtools.registry.platform_specification import PlatformPlugins
 
-        if block is None:
-            raise ValueError("Must have a valid Block name to create a Platform!")
-
-        if missing_ok is None:
-            env_value = os.getenv("IDMTOOLS_ERROR_NO_CONFIG", None)
-            if env_value:
-                user_logger.warning("Using IDMTOOLS_ERROR_NO_CONFIG environment variable to control behaviour of missing ini file")
-                # here missing ok is the opposite of the config. We want to error by default, so missing ok it if the user said NOT to error, so therefore not in truthy values
-                missing_ok = os.getenv("IDMTOOLS_ERROR_NO_CONFIG", "1").lower() not in ["1", "y", "t", "true", "yes"]
-            else:
-                missing_ok = False
-
         # Load all Platform plugins
         cls._platforms = PlatformPlugins().get_plugin_map()
         cls._aliases = PlatformPlugins().get_aliases()
 
-        platform = cls._create_from_block(block, missing_ok=missing_ok, **kwargs)
+        platform = cls._create_from_block(block, **kwargs)
         set_current_platform(platform)
         platform._config_block = block
-        platform._missing_ok = missing_ok
         platform._kwargs = kwargs
         return platform
 
@@ -160,13 +145,12 @@ class Platform:
                              f"Supported platforms are {', '.join(cls._platforms.keys())}")
 
     @classmethod
-    def _create_from_block(cls, block: str, missing_ok: bool = False, default_missing: Dict[str, Any] = None, **kwargs) -> 'IPlatform':
+    def _create_from_block(cls, block: str, **kwargs) -> 'IPlatform':
         """
         Retrieve section entries from the INI configuration file by giving block.
 
         Args:
-            block: The section name in the configuration file.
-            missing_ok: Is it ok if section is missing(uses all default options)
+            block: The section name in the configuration file or platform alias.
             overrides: Optional override of parameters from the configuration file.
 
         Returns:
@@ -174,30 +158,34 @@ class Platform:
         """
         # Read block details
         platform_type = None
-        is_alias = False
-        try:
-            section = IdmConfigParser.get_section(block)
-            if not section and missing_ok:
-                # its possible our logger is not setup
-                from idmtools.core.logging import setup_logging, LOGGING_STARTED, IdmToolsLoggingConfig
-                if not LOGGING_STARTED:
-                    setup_logging(IdmToolsLoggingConfig())
-        except ValueError as e:
-            if logger.isEnabledFor(DEBUG):
-                logger.debug(f"Checking aliases for {block.upper()}")
-            # attempt alias load
-            if block.upper() in cls._aliases:
+        section = {}
+
+        if block:
+            try:
+                # If block is a section in the config file
+                section = IdmConfigParser.get_section(block)
+                if not section:
+                    # its possible our logger is not setup
+                    from idmtools.core.logging import setup_logging, LOGGING_STARTED, IdmToolsLoggingConfig
+                    if not LOGGING_STARTED:
+                        setup_logging(IdmToolsLoggingConfig())
+            except ValueError:  # If block is not found in the ini config file
                 if logger.isEnabledFor(DEBUG):
-                    logger.debug(f"Loading plugin from alias {block.upper()}")
-                props = cls._aliases[block.upper()]
-                platform_type = props[0].get_name()
-                section = props[1]
-                is_alias = True
-            else:
-                if not missing_ok:
-                    raise e
-                else:
-                    section = dict() if default_missing is None else default_missing
+                    logger.debug(f"Checking aliases for {block.upper()}")
+                # If block is in aliases
+                if block.upper() in cls._aliases:
+                    if logger.isEnabledFor(DEBUG):
+                        logger.debug(f"Loading plugin from alias {block.upper()}")
+                    props = cls._aliases[block.upper()]
+                    platform_type = props[0].get_name()
+                    section = props[1]
+                else:  # If block is not in aliases, create section from platform constructor
+                    section = {'block': block}
+                    section.update(kwargs)
+        else:  # If block is None, try to get type from kwargs
+            platform_type = kwargs.get('type')
+            if not platform_type:
+                raise Exception("Type must be specified in Platform constructor")
 
         if platform_type is None:
             try:
@@ -205,13 +193,10 @@ class Platform:
                 platform_type = section.pop('type')
             except KeyError:
                 # try to use the block name as the type
-                if not missing_ok:
-                    raise ValueError("When creating a Platform you must specify the type in the block. For example:\n    type = COMPS")
-                else:
-                    user_logger.warning(
-                        "You are specifying a platform without a configuration file or configuration block. Be sure you have supplied all required parameters for the Platform as this can result in unexpected behaviour. Running this way is only recommended for development mode. Instead, "
-                        "it is recommended you create an idmtools.ini to capture the config once you have tested and confirmed your configuration.")
-                    platform_type = block
+                user_logger.warning(
+                    "You are specifying a platform without a configuration file or configuration block. Be sure you have supplied all required parameters for the Platform as this can result in unexpected behaviour. Running this way is only recommended for development mode. Instead, "
+                    "it is recommended you create an idmtools.ini to capture the config once you have tested and confirmed your configuration.")
+                platform_type = block
 
         # Make sure we support platform_type
         cls._validate_platform_type(platform_type)
@@ -236,35 +221,41 @@ class Platform:
             inputs[fn] = kwargs[fn]
 
         extra_kwargs = set(kwargs.keys()) - set(field_name)
+        if "type" in extra_kwargs and platform_type == kwargs["type"]:
+            extra_kwargs.remove("type")  # type is not extra input
         if len(extra_kwargs) > 0:
             field_not_used_display = [" - {} = {}".format(fn, kwargs[fn]) for fn in extra_kwargs]
-            user_logger.warning("\n/!\\ WARNING: The following User Inputs are not used:")
-            user_logger.warning("\n".join(field_not_used_display))
+            logger.warning("\n/!\\ WARNING: The following User Inputs are not used:")
+            logger.warning("\n".join(field_not_used_display))
 
         # Display block info
         try:
             from idmtools.core.logging import VERBOSE
             # is output enabled and is showing of platform config enabled?
             if IdmConfigParser.is_output_enabled() and IdmConfigParser.get_option(None, "SHOW_PLATFORM_CONFIG", 't').lower() in TRUTHY_VALUES:
-                if is_alias:
-                    for k, v in section.items():
-                        if k in inputs:
-                            section[k] = inputs[k]
-                    user_logger.log(VERBOSE, f"\n[{block}]")
-                    user_logger.log(VERBOSE, json.dumps(section, indent=3))
-                else:
-                    IdmConfigParser.display_config_block_details(block)
+                if block is not None:
+                    if inputs != section:  # Display section based on code first
+                        for k, v in section.items():
+                            if k in inputs:
+                                section[k] = inputs[k]
+                        user_logger.log(VERBOSE, f"\n[{block}]")
+                        user_logger.log(VERBOSE, json.dumps(section, indent=3))
+                    else:
+                        IdmConfigParser.display_config_block_details(block)
         except ValueError:
-            if missing_ok:
-                pass
+            # This block is triggered by the call to IdmConfigParser.display_config_block_details(block) above when the specified block is not found in the INI config file. Typically, this occurs in cases where the input is an alias for a block. We still want to display the section to inform the user of what is being used."
+            if block is not None:
+                user_logger.log(VERBOSE, f"\n[{block}]")
+                section.pop(block)  # Remove block from section
+                user_logger.log(VERBOSE, json.dumps(section, indent=3))
 
         # Display not used fields of the block
         field_not_used = set(inputs.keys()) - set(field_type.keys())
         if len(field_not_used) > 0:
             field_not_used_display = [" - {} = {}".format(fn, inputs[fn]) for fn in field_not_used]
-            user_logger.warning(f"\n[{block}]: /!\\ WARNING: the following Config Settings are not used when creating "
-                                f"Platform:")
-            user_logger.warning("\n".join(field_not_used_display))
+            logger.warning(f"\n[{block}]: /!\\ WARNING: the following Config Settings are not used when creating "
+                           f"Platform:")
+            logger.warning("\n".join(field_not_used_display))
 
         # Remove extra fields
         for f in field_not_used:
