@@ -199,12 +199,9 @@ class IdmConfigParser:
 
         # If we didn't find a file, warn the user and init logging
         if ini_file is None:
-            if os.getenv("IDMTOOLS_NO_CONFIG_WARNING", "F").lower() not in TRUTHY_VALUES:
-                # We use print since logger isn't configured unless there is an override(cli)
-                print(f"/!\\ WARNING: File '{file_name}' Not Found! For details on how to configure idmtools, see {get_help_version_url('configuration.html')} for details on how to configure idmtools.")
             if os.getenv("NO_LOGGING_INIT", "f").lower() not in TRUTHY_VALUES:
                 cls._init_logging()
-
+            logger.warning(f"/!\\ WARNING: File '{file_name}' Not Found! For details on how to configure idmtools, see {get_help_version_url('configuration.html')} for details on how to configure idmtools.")
             return
 
         # Load file
@@ -273,6 +270,8 @@ class IdmConfigParser:
             ValueError: If the block doesn't exist
         """
         original_case_section = section
+        if section is None:
+            return None
         lower_case_section = section.lower()
         if (not cls.found_ini() or not cls.has_section(section=lower_case_section)) and error:
             raise ValueError(f"Block '{original_case_section}' doesn't exist!")
