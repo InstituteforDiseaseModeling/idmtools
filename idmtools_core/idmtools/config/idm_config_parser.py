@@ -11,7 +11,7 @@ import json
 import os
 from configparser import ConfigParser
 from logging import getLogger, DEBUG
-from typing import Any, Dict
+from typing import Any, Dict, List
 from idmtools.core import TRUTHY_VALUES
 from idmtools.utils.info import get_help_version_url
 
@@ -311,7 +311,7 @@ class IdmConfigParser:
             return fallback
 
         if section:
-            return cls._config.get(section, option, fallback=fallback)
+            return cls._config.get(section.lower(), option, fallback=fallback)
         else:
             return cls._config.get("COMMON", option, fallback=fallback)
 
@@ -467,3 +467,17 @@ class IdmConfigParser:
         cls._instance = None
         cls._config_path = None
         cls._block = None
+
+    @classmethod
+    @initialization()
+    def ini_file_sections(cls) -> List[str]:
+        """
+        Get the sections in the INI file.
+        Returns:
+            A list of the section name in the INI file.
+        """
+        # Get the section names
+        if cls._config is None:
+            return []
+        sections = cls._config.sections()
+        return list(map(str.upper, sections))

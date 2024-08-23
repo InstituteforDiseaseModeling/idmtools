@@ -156,48 +156,8 @@ class Platform:
         Returns:
             A dictionary with entries from the block.
         """
-        # Read block details
-        platform_type = None
-        is_alias = False
-        section = {}
-
-        if block:
-            try:
-                # If block is a section in the config file
-                section = IdmConfigParser.get_section(block)
-                if not section:
-                    # its possible our logger is not setup
-                    from idmtools.core.logging import setup_logging, LOGGING_STARTED, IdmToolsLoggingConfig
-                    if not LOGGING_STARTED:
-                        setup_logging(IdmToolsLoggingConfig())
-            except ValueError:  # If block is not found in the ini config file
-                if logger.isEnabledFor(DEBUG):
-                    logger.debug(f"Checking aliases for {block.upper()}")
-                # If block is in aliases
-                if block.upper() in cls._aliases:
-                    if logger.isEnabledFor(DEBUG):
-                        logger.debug(f"Loading plugin from alias {block.upper()}")
-                    props = cls._aliases[block.upper()]
-                    platform_type = props[0].get_name()
-                    section = props[1]
-                    is_alias = True
-                else:  # If block is not in aliases and not in ini, create section from platform constructor
-                    section = {'block': block}
-                    section.update(kwargs)
-        else:  # If block is None, try to get type from kwargs
-            platform_type = kwargs.get('type')
-            if not platform_type:
-                raise Exception("Type must be specified in Platform constructor.")
-
-        if platform_type is None:
-            try:
-                # Make sure block has type entry
-                platform_type = section.pop('type')
-            except KeyError:
-                user_logger.warning(
-                    "You are specifying a platform without a configuration file or configuration block. Be sure you have supplied all required parameters for the Platform as this can result in unexpected behaviour. Running this way is only recommended for development mode. Instead, "
-                    "it is recommended you create an idmtools.ini to capture the config once you have tested and confirmed your configuration.")
-                platform_type = block  # This is just for print correct error message by _validate_platform_type next
+        # Get the type of the platform and the section from block and kwargs
+        platform_type, section, is_alias = cls.get_platform_type(block, kwargs)
 
         # Make sure we support platform_type
         cls._validate_platform_type(platform_type)
@@ -222,7 +182,7 @@ class Platform:
             inputs[fn] = kwargs[fn]
 
         extra_kwargs = set(kwargs.keys()) - set(field_name)
-        if "type" in extra_kwargs and platform_type == kwargs["type"]:
+        if "type" in extra_kwargs and platform_type == kwargs["type"] and not is_alias:
             extra_kwargs.remove("type")  # type is not extra input
         if len(extra_kwargs) > 0:
             field_not_used_display = [" - {} = {}".format(fn, kwargs[fn]) for fn in extra_kwargs]
@@ -230,6 +190,121 @@ class Platform:
             logger.warning("\n".join(field_not_used_display))
 
         # Display block info
+        cls.display_block(block, section, inputs, is_alias)
+
+        # Display not used fields of the block
+        field_not_used = set(inputs.keys()) - set(field_type.keys())
+        if len(field_not_used) > 0:
+            field_not_used_display = [" - {} = {}".format(fn, inputs[fn]) for fn in field_not_used]
+            logger.warning(f"\n[{block}]: /!\\ WARNING: the following Config Settings are not used when creating "
+                           f"Platform:")
+            logger.warning("\n".join(field_not_used_display))
+
+        # Remove extra fields
+        for f in field_not_used:
+            inputs.pop(f)
+
+        # Now create Platform using the data with the correct data types
+        return platform_cls(**inputs)
+
+    @classmethod
+    def get_platform_type(cls, block: str, kwargs: dict):
+        """
+        Get the type of the platform from the INI configuration file, platform alias, or platform_kwargs.
+
+        Args:
+            block: The section name in the configuration file or alias name.
+            kwargs: Keyword args to pass to platform
+
+        Returns:
+            The type of the platform, section, and whether it is an alias.
+        """
+        if block:
+            # if block is a section in the idmtools.ini file
+            if block.upper() in IdmConfigParser.ini_file_sections():
+                platform_type, section, is_alias = cls.get_type_from_ini(block)
+            # else if block is an alias
+            elif block.upper() in cls._aliases:
+                platform_type, section, is_alias = cls.get_type_from_platform_aliases(block)
+            # else, create section from platform_kwargs
+            else:
+                platform_type, section, is_alias = cls.get_type_from_platform_kwargs(block, **kwargs)
+        else:
+            # handle type retrieval from Platform constructor when there is no block
+            section = kwargs
+            platform_type = kwargs.get('type', None)
+            is_alias = False
+            if not platform_type:
+                raise ValueError("Type must be specified in Platform constructor.")
+
+        return platform_type, section, is_alias
+
+    @classmethod
+    def get_type_from_ini(cls, block: str):
+        """
+        Get the type of the platform from the INI configuration file.
+
+        Args:
+            block: The section name in the configuration file.
+
+        Returns:
+            The type of the platform, section, and whether it is an alias.
+        """
+        section = IdmConfigParser.get_section(block)
+        platform_type = IdmConfigParser.get_option(block, 'type')
+        is_alias = False
+        return platform_type, section, is_alias
+
+    @classmethod
+    def get_type_from_platform_aliases(cls, block: str):
+        """
+        Get the type of the platform from the platform alias.
+
+        Args:
+            block: The alias name.
+
+        Returns:
+            The type of the platform, section, and whether it is an alias.
+        """
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f"Loading plugin from alias {block.upper()}")
+        props = cls._aliases[block.upper()]
+        platform_type = props[0].get_name()
+        section = props[1]
+        is_alias = True
+        return platform_type, section, is_alias
+
+    @classmethod
+    def get_type_from_platform_kwargs(cls, block: str, **kwargs):
+        """
+        Get the type of the platform from platform_kwargs.
+
+        Args:
+            kwargs: Keyword args to pass to platform
+            block: The block name
+
+        Returns:
+            The type of the platform, section, and whether it is an alias.
+        """
+        section = {'block': block}
+        section.update(kwargs)
+        is_alias = False
+        platform_type = section.pop('type', None)
+        if not platform_type:
+            raise ValueError("Type must be specified in Platform constructor.")
+        return platform_type, section, is_alias
+
+    @classmethod
+    def display_block(cls, block: str, section: dict, inputs: dict, is_alias: bool = False):
+        """
+        Display block info on the console.
+
+        Args:
+            block: The block name.
+            section: The section.
+            inputs: The inputs.
+            is_alias: Is this an alias?
+        """
         try:
             from idmtools.core.logging import VERBOSE
             # is output enabled and is showing of platform config enabled?
@@ -249,18 +324,3 @@ class Platform:
                 user_logger.log(VERBOSE, f"\n[{block}]")
                 section.pop('block')  # Remove block from section
                 user_logger.log(VERBOSE, json.dumps(section, indent=3))
-
-        # Display not used fields of the block
-        field_not_used = set(inputs.keys()) - set(field_type.keys())
-        if len(field_not_used) > 0:
-            field_not_used_display = [" - {} = {}".format(fn, inputs[fn]) for fn in field_not_used]
-            logger.warning(f"\n[{block}]: /!\\ WARNING: the following Config Settings are not used when creating "
-                           f"Platform:")
-            logger.warning("\n".join(field_not_used_display))
-
-        # Remove extra fields
-        for f in field_not_used:
-            inputs.pop(f)
-
-        # Now create Platform using the data with the correct data types
-        return platform_cls(**inputs)
