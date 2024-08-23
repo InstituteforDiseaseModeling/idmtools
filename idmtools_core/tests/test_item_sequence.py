@@ -84,7 +84,7 @@ class TestItemSequence(unittest.TestCase):
         self.assertTrue(sequence_file.exists())
         e = Experiment(name='Test Sequential IDs')
         self.assertTrue(e.id, "Experiment000000")
-        platform = Platform('Test', missing_ok=True)
+        platform = Platform('Test', type='Test')
 
         e2 = Experiment(name='Test2')
         self.assertEqual(e2.id, "Experiment000001")
@@ -157,7 +157,7 @@ class TestItemSequence(unittest.TestCase):
         self.assertTrue(run_time_a <= run_time_b or (run_time_a - run_time_b) > (run_time_b * .10))
 
     def _run_experiment(self, ):
-        platform = Platform('TestExecute', missing_ok=True)
+        platform = Platform('TestExecute', type='TestExecute')
 
         task = task = TestTask()
         ts = TemplatedSimulations(base_task=task)
@@ -183,7 +183,7 @@ class TestItemSequence(unittest.TestCase):
         sequence_file = self.get_sequence_file()
         mp = Path(COMMON_INPUT_PATH).joinpath("python").joinpath("model3.py")
         task = TestTask()
-        platform = Platform('TestExecute', missing_ok=True)
+        platform = Platform('TestExecute', type='TestExecute')
         ts = TemplatedSimulations(base_task=task)
         e = Experiment.from_template(ts)
         from idmtools.builders import SimulationBuilder
@@ -213,7 +213,7 @@ class TestItemSequence(unittest.TestCase):
         sequence_file = self.get_sequence_file()
         mp = Path(COMMON_INPUT_PATH).joinpath("python").joinpath("model3.py")
         task = TestTask()
-        platform = Platform('TestExecute', missing_ok=True)
+        platform = Platform('TestExecute', type='TestExecute')
         ts = TemplatedSimulations(base_task=task)
         e = Experiment.from_template(ts)
         from idmtools.builders import SimulationBuilder

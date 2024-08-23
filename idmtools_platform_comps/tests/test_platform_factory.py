@@ -73,7 +73,7 @@ class TestPlatformFactory(ITestWithPersistence):
         with self.assertRaises(ValueError) as context:
             platform = Platform('COMPS1', endpoint='https://comps.idmod.org', environment='Calculon')
         self.assertTrue(
-            "COMPS1 is an unknown Platform Type. Supported platforms are " in str(context.exception.args[0]))
+            "Type must be specified in Platform constructor." in str(context.exception.args[0]))
     @pytest.mark.comps
     @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
     def test_platform_factory_with_ini(self, mock_login):
@@ -111,7 +111,8 @@ class TestPlatformFactory(ITestWithPersistence):
         platform = Platform('COMPS2', environment='Calculon')
         self.assertEqual(platform.__class__.__name__, 'COMPSPlatform')
         self.assertEqual(platform._config_block, 'COMPS2')
-        mock_logger.warning.assert_not_called()
+        mock_logger.warning.call_args_list[0].assert_called_with("The following User Inputs are not used:")
+        mock_logger.warning.call_args_list[1].assert_called_with("- type = Container")
         mock_user_logger.log.call_args_list[0].assert_called_with('\n[COMPS2]')
         mock_user_logger.log.call_args_list[1].assert_called_with('"environment": "Calculon"')
 
@@ -123,9 +124,10 @@ class TestPlatformFactory(ITestWithPersistence):
         platform = Platform('COMPS2', environment='Calculon')
         self.assertEqual(platform.__class__.__name__, 'COMPSPlatform')
         self.assertEqual(platform._config_block, 'COMPS2')
-        mock_logger.warning.assert_not_called()
         mock_user_logger.log.call_args_list[0].assert_called_with('\n[COMPS2]')
         mock_user_logger.log.call_args_list[1].assert_called_with('"environment": "Calculon"')
+        mock_logger.warning.call_args_list[0].assert_called_with("WARNING: the following Config Settings are not used when creating Platform:")
+        mock_logger.warning.call_args_list[1].assert_called_with("- type = Container")
 
 
     @pytest.mark.comps
@@ -205,5 +207,5 @@ class TestPlatformFactory(ITestWithPersistence):
                 platform = Platform(block="SlurmStage1")
                 exp = run_python_version("test_no_alias_block")
                 exp.run(platform=platform)
-            self.assertTrue("SlurmStage1 is an unknown Platform Type. Supported platforms are " in str(context.exception.args[0]))
+            self.assertTrue("Type must be specified in Platform constructor." in str(context.exception.args[0]))
 

@@ -43,15 +43,15 @@ class TestNoConfig(unittest.TestCase):
         os.chdir(cls.current_directory)
         IdmConfigParser.clear_instance()
 
-    @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
+    @unittest.mock.patch("idmtools.config.idm_config_parser.logger")
     @pytest.mark.comps
     @pytest.mark.serial
     @run_in_temp_dir
-    def test_success(self, output):
+    def test_success(self, mock_logger):
         logger.info(f'Current Directory: {os.getcwd()}')
         logger.info(f'Current idmtools file: {IdmConfigParser.get_config_path()}')
         sim_root_dir = os.path.join('$COMPS_PATH(USER)', 'output')
-        plat_obj = Platform('COMPS',
+        plat_obj = Platform('SlurmStage',
                             endpoint='https://comps2.idmod.org',
                             environment='SlurmStage',
                             priority='Normal',
@@ -66,16 +66,16 @@ class TestNoConfig(unittest.TestCase):
             experiment = Experiment.from_id('73ba8f3b-8848-ee11-92fb-f0921c167864')
         except:  # noqa: E722
             pass
-        self.assertIn("File 'idmtools.ini' Not Found!", output.getvalue())
+        mock_logger.warning.call_args_list[0].assert_called_with("File 'idmtools.ini' Not Found!")
 
     @pytest.mark.comps
-    @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
+    @unittest.mock.patch("idmtools.config.idm_config_parser.logger")
     @run_in_temp_dir
-    def test_failure(self, output):
+    def test_failure(self, mock_logger):
         logger.info(f'Current Directory: {os.getcwd()}')
         sim_root_dir = os.path.join('$COMPS_PATH(USER)', 'output')
         with self.assertRaises(ValueError) as a:
-            plat_obj = Platform('COMPS',
+            plat_obj = Platform('SlurmStage',
                                 endpoint='https://comps2.idmod.org',
                                 environment='SlurmStage',
                                 priority='Normal',
@@ -85,17 +85,17 @@ class TestNoConfig(unittest.TestCase):
                                 num_retries='0',
                                 exclusive='False', missing_ok=True)
             experiment = Experiment.from_id('73ba8f3b-8848-ee11-92fb-f0921c167864')
-        self.assertIn("File 'idmtools.ini' Not Found!", output.getvalue())
+        mock_logger.warning.call_args_list[0].assert_called_with("File 'idmtools.ini' Not Found!")
         # Need to identify how to capture output after log changes
         # self.assertIn("The field num_cores requires a value of type int. You provided <abc>", output.getvalue())
 
     @pytest.mark.comps
-    @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
+    @unittest.mock.patch("idmtools.config.idm_config_parser.logger")
     @run_in_temp_dir
-    def test_env_success(self, output):
+    def test_env_success(self, mock_logger):
         logger.info(f'Current Directory: {os.getcwd()}')
         sim_root_dir = os.path.join('$COMPS_PATH(USER)', 'output')
-        plat_obj = Platform('COMPS',
+        plat_obj = Platform('SlurmStage',
                             endpoint='https://comps2.idmod.org',
                             environment='SlurmStage',
                             priority='Normal',
@@ -112,6 +112,6 @@ class TestNoConfig(unittest.TestCase):
             # ignore error is it is comps error about not finding id
             if "404 Not Found" in ex.args[0]:
                 pass
-        self.assertIn("File 'idmtools.ini' Not Found!", output.getvalue())
+        mock_logger.warning.call_args_list[0].assert_called_with("File 'idmtools.ini' Not Found!")
         # Need to identify how to capture output after log changes
         # self.assertIn("The field num_cores requires a value of type int. You provided <abc>", output.getvalue())
