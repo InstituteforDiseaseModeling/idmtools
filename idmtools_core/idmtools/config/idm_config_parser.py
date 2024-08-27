@@ -11,7 +11,7 @@ import json
 import os
 from configparser import ConfigParser
 from logging import getLogger, DEBUG
-from typing import Any, Dict, List
+from typing import Any, Dict
 from idmtools.core import TRUTHY_VALUES
 from idmtools.utils.info import get_help_version_url
 
@@ -467,4 +467,3 @@ class IdmConfigParser:
         cls._instance = None
         cls._config_path = None
         cls._block = None
-
