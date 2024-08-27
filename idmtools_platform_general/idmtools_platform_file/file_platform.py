@@ -118,6 +118,20 @@ class FilePlatform(IPlatform):
         else:
             raise RuntimeError(f"Not found path for item_id: {item_id} with type: {item_type}.")
 
+        # if item_type is ItemType.SIMULATION:
+        #     pattern = f"*/*/{item_id}"
+        # elif item_type is ItemType.EXPERIMENT:
+        #     pattern = f"*/{item_id}"
+        # elif item_type is ItemType.SUITE:
+        #     pattern = f"{item_id}"
+        # else:
+        #     raise RuntimeError(f"Unknown item type: {item_type}")
+        #
+        # root = Path(self.job_directory)
+        # for item_path in root.glob(pattern=pattern):
+        #     return item_path
+        # raise RuntimeError(f"Not found path for item_id: {item_id} with type: {item_type}.")
+
     def mk_directory(self, item: Union[Suite, Experiment, Simulation] = None, dest: Union[Path, str] = None,
                      exist_ok: bool = True) -> None:
         """
@@ -264,7 +278,12 @@ class FilePlatform(IPlatform):
         Returns:
             str
         """
-        title = f"{clean_experiment_name(item.name)}_{item.id}"
+        id_only = getattr(self, 'id_only', None)
+        id_only = id_only in TRUTHY_VALUES
+        if id_only:
+            title = item.id
+        else:
+            title = f"{clean_experiment_name(item.name)}_{item.id}"
         return title
 
     def flatten_item(self, item: IEntity, raw=False, **kwargs) -> List[object]:
