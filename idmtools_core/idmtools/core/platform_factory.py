@@ -116,7 +116,6 @@ class Platform:
         Raises:
             ValueError or Exception: If the platform is of an unknown type.
         """
-        global current_platform, current_platform_stack
         from idmtools.registry.platform_specification import PlatformPlugins
 
         # Load all Platform plugins
@@ -204,8 +203,8 @@ class Platform:
         for f in field_not_used:
             inputs.pop(f)
 
-        # Display block info
-        cls._display_inputs(platform_type, inputs)
+        # Display input info
+        cls._display_inputs(platform_cls, inputs)
 
         # Now create Platform using the data with the correct data types
         return platform_cls(**inputs)
@@ -290,17 +289,17 @@ class Platform:
         return platform_type, section, is_alias
 
     @classmethod
-    def _display_inputs(cls, platform_type: str, inputs: dict):
+    def _display_inputs(cls, platform_cls: object, inputs: dict):
         """
         Display inputs required for platform creation  on the console.
 
         Args:
-            platform_type: The platform type.
+            platform_cls: The platform object.
             inputs: The inputs.
         """
         from idmtools.core.logging import VERBOSE
 
         if IdmConfigParser.is_output_enabled() and IdmConfigParser.get_option(None, "SHOW_PLATFORM_CONFIG",
                                                                               't').lower() in TRUTHY_VALUES:
-            user_logger.log(VERBOSE, f"\nInitializing {platform_type}Platform with:")
+            user_logger.log(VERBOSE, f"\nInitializing {platform_cls.__name__} with:")
             user_logger.log(VERBOSE, json.dumps(inputs, indent=3))
