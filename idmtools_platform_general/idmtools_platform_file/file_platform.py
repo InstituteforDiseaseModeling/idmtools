@@ -118,20 +118,6 @@ class FilePlatform(IPlatform):
         else:
             raise RuntimeError(f"Not found path for item_id: {item_id} with type: {item_type}.")
 
-        # if item_type is ItemType.SIMULATION:
-        #     pattern = f"*/*/{item_id}"
-        # elif item_type is ItemType.EXPERIMENT:
-        #     pattern = f"*/{item_id}"
-        # elif item_type is ItemType.SUITE:
-        #     pattern = f"{item_id}"
-        # else:
-        #     raise RuntimeError(f"Unknown item type: {item_type}")
-        #
-        # root = Path(self.job_directory)
-        # for item_path in root.glob(pattern=pattern):
-        #     return item_path
-        # raise RuntimeError(f"Not found path for item_id: {item_id} with type: {item_type}.")
-
     def mk_directory(self, item: Union[Suite, Experiment, Simulation] = None, dest: Union[Path, str] = None,
                      exist_ok: bool = True) -> None:
         """
