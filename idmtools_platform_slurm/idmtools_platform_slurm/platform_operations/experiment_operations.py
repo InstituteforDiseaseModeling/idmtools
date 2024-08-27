@@ -92,7 +92,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
             List of slurm simulations
         """
         sim_list = []
-        sim_meta_list = self.platform._metas.get_children(parent)
+        sim_meta_list = self.platform._metas.get_children(experiment)
         for meta in sim_meta_list:
             slurm_sim = SlurmSimulation(meta)
             slurm_sim.status = self.platform._op_client.get_simulation_status(slurm_sim.id)

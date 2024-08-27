@@ -29,7 +29,7 @@ def create_singularity_sif(platform):
 
 
 def create_experiment_with_sif(platform):
-    # get the asset collection from the md5 file (asset id of sin
+    # get the asset collection from the md5 file (asset id of sim)
     ac = generate_ac_from_asset_md5_file(f"{image_name}.md5")
     sif_asset = ac.assets[0]
     sif_filename = [
@@ -69,7 +69,7 @@ def create_experiment_with_sif(platform):
     sys.exit(0 if experiment.succeeded else -1)
 
 if __name__ == '__main__':
-    platform = Platform("SlurmStage")
+    platform = Platform("Calculon")
     # create singularity sif image which will store md5 of singularity sif asset id to the file. Note, this is function
     #
     create_singularity_sif(platform)

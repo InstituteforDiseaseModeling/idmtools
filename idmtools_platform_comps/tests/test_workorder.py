@@ -4,6 +4,7 @@ import os
 from functools import partial
 from typing import Any, Dict
 import pytest
+from COMPS.Data import QueryCriteria
 from idmtools.assets import Asset, AssetCollection
 from idmtools.builders import SimulationBuilder
 from idmtools.core.platform_factory import Platform
@@ -235,7 +236,7 @@ class TestWorkOrder(ITestWithPersistence):
         ts = TemplatedSimulations(base_task=task)
 
         # use dynamic WorkOrder.json which override input commandline command and arguments
-        add_schedule_config(ts, command="python -c \"print('hello test')\"", node_group='idm_abcd', num_cores=2,
+        add_schedule_config(ts, command="python -c \"print('hello test')\"", NodeGroupName='idm_abcd', NumCores=2,
                             NumProcesses=1, NumNodes=1,
                             Environment={"key1": "value1", "key2": "value2"})
 
@@ -284,9 +285,8 @@ class TestWorkOrder(ITestWithPersistence):
         sb.add_sweep_definition(partial(set_value, name="rand_seed"), [1234, 4567])
         sb.add_sweep_definition(
             partial(default_add_schedule_config_sweep_callback,
-                    command="python3 Assets/commandline_model.py {pop_size} {pop_infected} {n_days} {rand_seed}",
-                    node_group='idm_cd', num_cores=1),
-            [dict(NumProcesses=1, NumNodes=1, Environment={"key1": "value1", "key2": "value2"})])
+                    command="python3 Assets/commandline_model.py {pop_size} {pop_infected} {n_days} {rand_seed}"),
+            [dict(NodeGroupName='idm_cd', NumProcesses=1, NumNodes=2, Environment={"key1": "value1", "key2": "value2"})])
 
         ts.add_builder(sb)
 
@@ -302,11 +302,18 @@ class TestWorkOrder(ITestWithPersistence):
         self.assertIn(
             "{'pop_size': '10000', 'pop_infected': '10', 'n_days': 100, 'rand_seed': '1234', 'pop_type': 'hybrid'}",
             stdout_content)
-
+        # verify workorder.json
         workorder_content = files['WorkOrder.json'].decode('utf-8').replace("\\\\", "\\")
         s1 = json.loads(workorder_content)
-        s2 = json.loads("{\"Command\": \"python3 Assets/commandline_model.py 10000 10 100 1234\", \"NodeGroupName\": \"idm_cd\", \"NumCores\": 1, \"NumProcesses\": 1, \"NumNodes\": 1, \"Environment\": {\"key1\": \"value1\", \"key2\": \"value2\"}}")
+        s2 = json.loads("{\"Command\": \"python3 Assets/commandline_model.py 10000 10 100 1234\", \"NodeGroupName\": \"idm_cd\", \"NumProcesses\": 1, \"NumNodes\": 2, \"Environment\": {\"key1\": \"value1\", \"key2\": \"value2\"}}")
         self.assertDictEqual(s1, s2)
+        # verify hpc_jobs configuration especially node_group_name and min_cores since we do not set num_cores in workorder.json
+        # comps will pick whatever available cores in the node_group it picks
+        for sim in experiment.simulations:
+            comps_sim = sim.get_platform_object(load_children=["files", "configuration", "hpc_jobs"])
+            comps_sim.refresh(QueryCriteria().select_children(['files', 'hpc_jobs'])) # refresh hpc_jobs
+            self.assertTrue(comps_sim.hpc_jobs[0].configuration.node_group_name == 'idm_cd')
+            self.assertTrue(comps_sim.hpc_jobs[0].configuration.min_cores >= 1)
 
     @pytest.mark.timeout(60)
     def test_schedule_config_with_wrapper_script_execute_comps(self):
@@ -329,7 +336,7 @@ class TestWorkOrder(ITestWithPersistence):
         experiment = Experiment.from_task(wrapper_task, name=self.case_name)
 
         # upload dynamic WorkOrder.json to simulation root dir
-        add_schedule_config(experiment, command="python3.6 --version", node_group='idm_abcd', num_cores=1,
+        add_schedule_config(experiment, command="python3.6 --version", NodeGroupName='idm_abcd', NumCores=1,
                             NumProcesses=1, NumNodes=1, Environment={"key1": "value1", "key2": "value2"})
 
         wait_on_experiment_and_check_all_sim_status(self, experiment, self.platform)
@@ -354,8 +361,8 @@ class TestWorkOrder(ITestWithPersistence):
             parameters=(dict(c=0)))
 
         experiment = Experiment.from_task(task, name=self.case_name)
-        add_schedule_config(experiment, command="python -c \"print('hello test')\"", node_group='emod_abcd',
-                            num_cores=1, SingleNode=False, Exclusive=False)
+        add_schedule_config(experiment, command="python -c \"print('hello test')\"", NodeGroupName='emod_abcd',
+                            NumCores=1, SingleNode=False, Exclusive=False)
 
         with Platform('Cumulus') as platform:
             experiment.run(wait_until_done=True)
@@ -378,7 +385,7 @@ class TestWorkOrder(ITestWithPersistence):
               |_model.py
               |_site-packages
                     |_numpy
-        in order for model.py to call MyExternalLibarary.function which uses numpy package, MyExternalLibarary.function
+        in order for model.py to call MyExternalLibarary.Function which uses numpy package, MyExternalLibarary.Function
         and numpy must be in PYTHONPATH
         So we add "PYTHONPATH": "$PYTHONPATH:$PWD/Assets:$PWD/Assets/site-packages" in WorkOrder.json
 
@@ -398,7 +405,7 @@ class TestWorkOrder(ITestWithPersistence):
         task.common_assets.add_directory(assets_directory=os.path.join(COMMON_INPUT_PATH, "python", "Assets"))
         experiment = Experiment.from_task(task, name=self.case_name)
         # add dynamic WorkOrder2.json to comps and change file name to WorkOrder.json
-        add_schedule_config(experiment, command="python3 Assets/model.py", node_group='idm_abcd', num_cores=1,
+        add_schedule_config(experiment, command="python3 Assets/model.py", NodeGroupName='idm_abcd',
                             NumProcesses=1, NumNodes=1,
                             Environment={"key1": "value1", "key2": "value2",
                                          "PYTHONPATH": "$PYTHONPATH:$PWD/Assets:$PWD/Assets/site-packages",
@@ -414,13 +421,13 @@ class TestWorkOrder(ITestWithPersistence):
 
     def test_workorder_in_workitem(self):
         """
-          To test WorkItem's WorkOrder.json, user can dynamically pull docker image from idm's production artifactory directly
-          instead of old way which had to deploy docker image to docker worker host machine
-          in this example, we pull nyu dtk docker image to docker worker, then execute Eradication command in comps's
+          To test WorkItem's WorkOrder.json, user can dynamically pull docker image from idm's production artifactory
+          directly instead of old way which had to deploy docker image to docker worker host machine
+          in this example, we pull nyu dtk docker image to docker worker, then execute Eradication command in COMPS's
           WorkItem
           Returns:
           """
-        command = "ls -lart"  # anything since it will be override with WorkOrder.json file
+        command = "ls -lart"  # anything since it will be overridden with WorkOrder.json file
         from idmtools_platform_comps.ssmt_work_items.comps_workitems import SSMTWorkItem
         wi = SSMTWorkItem(name=self.case_name, command=command,tags={'idmtools': self.case_name})
         # overrode workorder.json with user provide file

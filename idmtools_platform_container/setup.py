@@ -48,12 +48,13 @@ setup(
     include_package_data=True,
     keywords='modeling, IDM',
     name='idmtools_platform_container',
-    packages=find_packages(),
+    packages=find_packages(exclude=["tests"]),
     test_suite='tests',
     entry_points={"idmtools_platform": [
-        "idmtools_platform_container = idmtools_platform_container.plugin_info:ContainerPlatformSpecification"]
+        "idmtools_platform_container = idmtools_platform_container.plugin_info:ContainerPlatformSpecification"],
+        "idmtools_cli.cli_plugins": ["container = idmtools_platform_container.cli.container:container"]
     },
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='1.7.10+nightly'
+    version='1.7.11+nightly'
 )

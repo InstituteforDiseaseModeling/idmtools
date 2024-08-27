@@ -1,2 +1,4 @@
-idmtools-platform-general~=1.7.10
+idmtools~=1.7.11
+idmtools-platform-general~=1.7.11
 docker
+rich

@@ -40,7 +40,7 @@ setup(
     include_package_data=True,
     keywords='modeling, IDM, test, testdata, demodata',
     name='idmtools_test',
-    packages=find_packages(),
+    packages=find_packages(exclude=["tests"]),
     setup_requires=setup_requirements,
     entry_points=dict(
         idmtools_platform=["idmtools_platform_test = idmtools_test.utils.test_platform:TestPlatformSpecification", "idmtools_platform_testex = idmtools_test.utils.test_execute_platform:TestExecutePlatformSpecification"],
@@ -49,6 +49,6 @@ setup(
     ),
     test_suite='tests',
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='1.7.10+nightly',
+    version='1.7.11+nightly',
     zip_safe=False
 )
