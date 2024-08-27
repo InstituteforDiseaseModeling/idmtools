@@ -208,7 +208,6 @@ class TestPlatformFactory(ITestWithPersistence):
             platform = Platform('COMPS2', environment="Calculon")
             exp = self.run_python_version("test_with_ini_and_invalid_update")
             exp.run(platform=platform)
-        print(str(context.exception.args[0]))
         self.assertTrue("invalid environment-name: Calculon" in str(context.exception.args[0]))
 
     @pytest.mark.comps
