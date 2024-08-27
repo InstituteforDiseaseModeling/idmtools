@@ -20,7 +20,7 @@ class TestPythonSimulation(ITestWithPersistence):
         print(self.case_name)
 
     def test_add_task_tag(self):
-        test_platform = Platform("TestExecute", type='TestExecute')
+        test_platform = Platform("Test")
         base_task = TestTask()
         sim = Simulation.from_task(base_task)
         # The tag for type is added at runtime during the pre_creation event

@@ -84,7 +84,7 @@ class TestItemSequence(unittest.TestCase):
         self.assertTrue(sequence_file.exists())
         e = Experiment(name='Test Sequential IDs')
         self.assertTrue(e.id, "Experiment000000")
-        platform = Platform('Test', type='Test')
+        platform = Platform('TestExecute', type='TestExecute')
 
         e2 = Experiment(name='Test2')
         self.assertEqual(e2.id, "Experiment000001")

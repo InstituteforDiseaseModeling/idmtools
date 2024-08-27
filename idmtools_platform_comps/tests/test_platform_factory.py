@@ -126,8 +126,7 @@ class TestPlatformFactory(ITestWithPersistence):
         self.assertEqual(platform._config_block, 'COMPS2')
         mock_user_logger.log.call_args_list[0].assert_called_with('\n[COMPS2]')
         mock_user_logger.log.call_args_list[1].assert_called_with('"environment": "Calculon"')
-        mock_logger.warning.call_args_list[0].assert_called_with("WARNING: the following Config Settings are not used when creating Platform:")
-        mock_logger.warning.call_args_list[1].assert_called_with("- type = Container")
+        mock_logger.warning.not_called()
 
 
     @pytest.mark.comps
