@@ -44,10 +44,12 @@ class TestNoConfig(unittest.TestCase):
         IdmConfigParser.clear_instance()
 
     @unittest.mock.patch("idmtools.config.idm_config_parser.logger")
+    @unittest.mock.patch("idmtools.core.platform_factory.user_logger")
+    @unittest.mock.patch("idmtools.core.platform_factory.logger")
     @pytest.mark.comps
     @pytest.mark.serial
     @run_in_temp_dir
-    def test_success(self, mock_logger):
+    def test_success(self, mock_logger, mock_user_logger, mock_config_logger):
         logger.info(f'Current Directory: {os.getcwd()}')
         logger.info(f'Current idmtools file: {IdmConfigParser.get_config_path()}')
         sim_root_dir = os.path.join('$COMPS_PATH(USER)', 'output')
@@ -66,12 +68,17 @@ class TestNoConfig(unittest.TestCase):
             experiment = Experiment.from_id('73ba8f3b-8848-ee11-92fb-f0921c167864')
         except:  # noqa: E722
             pass
-        mock_logger.warning.call_args_list[0].assert_called_with("File 'idmtools.ini' Not Found!")
+        mock_config_logger.warning.call_args_list[0].assert_called_with("File 'idmtools.ini' Not Found!")
+        mock_user_logger.log.call_args_list[0].assert_called_with("\n[SlurmStage]")
+        mock_user_logger.log.call_args_list[1].assert_called_with('"endpoint": "http://comps2.idmod.org"')
+        mock_user_logger.log.call_args_list[1].assert_called_with('"environment": "SlurmStage"')
+        mock_logger.warning.call_args_list[0].assert_called_with(
+            "the following Config Settings are not used when creating Platform:")
+        mock_logger.warning.call_args_list[1].assert_called_with("- missing_ok = True")
 
     @pytest.mark.comps
-    @unittest.mock.patch("idmtools.config.idm_config_parser.logger")
     @run_in_temp_dir
-    def test_failure(self, mock_logger):
+    def test_failure(self):
         logger.info(f'Current Directory: {os.getcwd()}')
         sim_root_dir = os.path.join('$COMPS_PATH(USER)', 'output')
         with self.assertRaises(ValueError) as a:
@@ -85,14 +92,15 @@ class TestNoConfig(unittest.TestCase):
                                 num_retries='0',
                                 exclusive='False', missing_ok=True)
             experiment = Experiment.from_id('73ba8f3b-8848-ee11-92fb-f0921c167864')
-        mock_logger.warning.call_args_list[0].assert_called_with("File 'idmtools.ini' Not Found!")
+        self.assertIn("invalid literal for int() with base 10: 'abc'", a.exception.args[0])
         # Need to identify how to capture output after log changes
         # self.assertIn("The field num_cores requires a value of type int. You provided <abc>", output.getvalue())
 
     @pytest.mark.comps
-    @unittest.mock.patch("idmtools.config.idm_config_parser.logger")
+    @unittest.mock.patch("idmtools.core.platform_factory.user_logger")
+    @unittest.mock.patch("idmtools.core.platform_factory.logger")
     @run_in_temp_dir
-    def test_env_success(self, mock_logger):
+    def test_env_success(self, mock_logger, mock_user_logger):
         logger.info(f'Current Directory: {os.getcwd()}')
         sim_root_dir = os.path.join('$COMPS_PATH(USER)', 'output')
         plat_obj = Platform('SlurmStage',
@@ -112,6 +120,11 @@ class TestNoConfig(unittest.TestCase):
             # ignore error is it is comps error about not finding id
             if "404 Not Found" in ex.args[0]:
                 pass
-        mock_logger.warning.call_args_list[0].assert_called_with("File 'idmtools.ini' Not Found!")
+        mock_user_logger.log.call_args_list[0].assert_called_with("\n[SlurmStage]")
+        mock_user_logger.log.call_args_list[1].assert_called_with('"endpoint": "http://comps2.idmod.org"')
+        mock_user_logger.log.call_args_list[1].assert_called_with('"environment": "SlurmStage"')
+        mock_logger.warning.call_args_list[0].assert_called_with(
+            "the following Config Settings are not used when creating Platform:")
+        mock_logger.warning.call_args_list[1].assert_called_with("- missing_ok = True")
         # Need to identify how to capture output after log changes
         # self.assertIn("The field num_cores requires a value of type int. You provided <abc>", output.getvalue())

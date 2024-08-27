@@ -223,15 +223,15 @@ class Platform:
         Returns:
             The type of the platform, section, and whether it is an alias.
         """
-        # if block is a section in the idmtools.ini file
-        if block and IdmConfigParser.has_section(block):
-            platform_type, section, is_alias = cls._get_type_from_ini(block)
-
-        # else if block is an alias
-        elif block and block.upper() in cls._aliases:
+        # If block is an alias
+        if block and block.upper() in cls._aliases:
             platform_type, section, is_alias = cls._get_type_from_platform_aliases(block)
 
-        # all other cases
+        # Else if block is a section in the idmtools.ini file
+        elif block and IdmConfigParser.has_section(block):
+            platform_type, section, is_alias = cls._get_type_from_ini(block)
+
+        # Else, all other cases
         else:
             platform_type, section, is_alias = cls._get_type_from_platform_kwargs(block, **kwargs)
 
@@ -305,7 +305,7 @@ class Platform:
         """
         try:
             from idmtools.core.logging import VERBOSE
-            # is output enabled and is showing of platform config enabled?
+            # Is output enabled and is showing of platform config enabled?
             if IdmConfigParser.is_output_enabled() and IdmConfigParser.get_option(None, "SHOW_PLATFORM_CONFIG", 't').lower() in TRUTHY_VALUES:
                 if block is not None:
                     if is_alias or inputs != section:  # second condition is to show updated values from kwargs for the block
