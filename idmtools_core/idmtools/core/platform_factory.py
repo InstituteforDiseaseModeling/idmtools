@@ -15,7 +15,6 @@ from idmtools.core import TRUTHY_VALUES
 from idmtools.core.context import set_current_platform, remove_current_platform
 from idmtools.utils.entities import validate_user_inputs_against_dataclass
 
-
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
 
@@ -117,6 +116,8 @@ class Platform:
             ValueError or Exception: If the platform is of an unknown type.
         """
         from idmtools.registry.platform_specification import PlatformPlugins
+
+        IdmConfigParser.ensure_init()
 
         # Load all Platform plugins
         cls._platform_plugins = PlatformPlugins().get_plugin_map()
