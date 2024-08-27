@@ -51,6 +51,9 @@ class Platform:
     """
     Platform Factory.
     """
+    _aliases = None
+    _platform_plugins = None
+
     def __new__(cls, block: str = None, **kwargs):
         """
         Create a platform based on the block and all other inputs.
@@ -111,28 +114,28 @@ class Platform:
             The requested platform.
 
         Raises:
-            ValueError if the block is None
+            ValueError or Exception: If the platform is of an unknown type.
         """
         global current_platform, current_platform_stack
         from idmtools.registry.platform_specification import PlatformPlugins
 
         # Load all Platform plugins
-        cls._platforms = PlatformPlugins().get_plugin_map()
+        cls._platform_plugins = PlatformPlugins().get_plugin_map()
         cls._aliases = PlatformPlugins().get_aliases()
 
-        platform = cls._create_from_block(block, **kwargs)
-        set_current_platform(platform)
-        platform._config_block = block
-        platform._kwargs = kwargs
-        return platform
+        _platform = cls._create_platform_from_block(block, **kwargs)
+        set_current_platform(_platform)
+        _platform._config_block = block
+        _platform._kwargs = kwargs
+        return _platform
 
     @classmethod
-    def _validate_platform_type(cls, name):
+    def _validate_platform_type(cls, platform_type):
         """
         Check if the requested platform exists.
 
         Args:
-            name: The platform type.
+            platform_type: The platform type.
 
         Returns:
             None
@@ -140,30 +143,33 @@ class Platform:
         Raise:
             ValueError: when the platform is of an unknown type
         """
-        if name not in cls._platforms:
-            raise ValueError(f"{name} is an unknown Platform Type. "
-                             f"Supported platforms are {', '.join(cls._platforms.keys())}")
+        if platform_type not in cls._platform_plugins:
+            raise ValueError(f"{platform_type} is an unknown Platform Type. "
+                             f"Supported platforms are {', '.join(cls._platform_plugins.keys())}")
 
     @classmethod
-    def _create_from_block(cls, block: str, **kwargs) -> 'IPlatform':
+    def _create_platform_from_block(cls, block: str, **kwargs) -> 'IPlatform':
         """
-        Retrieve section entries from the INI configuration file by giving block.
+        Create a platform based on the block and all other inputs.
 
         Args:
             block: The section name in the configuration file or platform alias.
-            overrides: Optional override of parameters from the configuration file.
+            kwargs: Keyword args to pass to platform
 
         Returns:
-            A dictionary with entries from the block.
+            A platform instance.
         """
         # Get the type of the platform and the section from block and kwargs
-        platform_type, section, is_alias = cls.get_platform_type(block, kwargs)
+        platform_type, section, is_alias = cls._get_platform_type(block, **kwargs)
+        if 'type' in kwargs:
+            platform_type = kwargs['type']
+            kwargs.pop('type')
 
-        # Make sure we support platform_type
+            # Make sure we support platform_type
         cls._validate_platform_type(platform_type)
 
         # Find the correct Platform type
-        platform_spec = cls._platforms.get(platform_type)
+        platform_spec = cls._platform_plugins.get(platform_type)
         platform_cls = platform_spec.get_type()
 
         # Collect fields types
@@ -173,7 +179,7 @@ class Platform:
 
         # Make data to the requested type
         inputs = IdmConfigParser.retrieve_dict_config_block(field_type, section)
-
+        inputs.pop('type', None)  # Remove 'type' dict from inputs since it is not a field to create platform
         # Make sure the user values have the requested type
         fs_kwargs = validate_user_inputs_against_dataclass(field_type, kwargs)  # noqa: F841
 
@@ -182,15 +188,13 @@ class Platform:
             inputs[fn] = kwargs[fn]
 
         extra_kwargs = set(kwargs.keys()) - set(field_name)
-        if "type" in extra_kwargs and platform_type == kwargs["type"] and not is_alias:
-            extra_kwargs.remove("type")  # type is not extra input
         if len(extra_kwargs) > 0:
             field_not_used_display = [" - {} = {}".format(fn, kwargs[fn]) for fn in extra_kwargs]
             logger.warning("\n/!\\ WARNING: The following User Inputs are not used:")
             logger.warning("\n".join(field_not_used_display))
 
         # Display block info
-        cls.display_block(block, section, inputs, is_alias)
+        cls._display_block(block, section, inputs, is_alias)
 
         # Display not used fields of the block
         field_not_used = set(inputs.keys()) - set(field_type.keys())
@@ -208,7 +212,7 @@ class Platform:
         return platform_cls(**inputs)
 
     @classmethod
-    def get_platform_type(cls, block: str, kwargs: dict):
+    def _get_platform_type(cls, block: str, **kwargs):
         """
         Get the type of the platform from the INI configuration file, platform alias, or platform_kwargs.
 
@@ -219,28 +223,22 @@ class Platform:
         Returns:
             The type of the platform, section, and whether it is an alias.
         """
-        if block:
-            # if block is a section in the idmtools.ini file
-            if block.upper() in IdmConfigParser.ini_file_sections():
-                platform_type, section, is_alias = cls.get_type_from_ini(block)
-            # else if block is an alias
-            elif block.upper() in cls._aliases:
-                platform_type, section, is_alias = cls.get_type_from_platform_aliases(block)
-            # else, create section from platform_kwargs
-            else:
-                platform_type, section, is_alias = cls.get_type_from_platform_kwargs(block, **kwargs)
+        # if block is a section in the idmtools.ini file
+        if block and IdmConfigParser.has_section(block):
+            platform_type, section, is_alias = cls._get_type_from_ini(block)
+
+        # else if block is an alias
+        elif block and block.upper() in cls._aliases:
+            platform_type, section, is_alias = cls._get_type_from_platform_aliases(block)
+
+        # all other cases
         else:
-            # handle type retrieval from Platform constructor when there is no block
-            section = kwargs
-            platform_type = kwargs.get('type', None)
-            is_alias = False
-            if not platform_type:
-                raise ValueError("Type must be specified in Platform constructor.")
+            platform_type, section, is_alias = cls._get_type_from_platform_kwargs(block, **kwargs)
 
         return platform_type, section, is_alias
 
     @classmethod
-    def get_type_from_ini(cls, block: str):
+    def _get_type_from_ini(cls, block: str):
         """
         Get the type of the platform from the INI configuration file.
 
@@ -256,7 +254,7 @@ class Platform:
         return platform_type, section, is_alias
 
     @classmethod
-    def get_type_from_platform_aliases(cls, block: str):
+    def _get_type_from_platform_aliases(cls, block: str):
         """
         Get the type of the platform from the platform alias.
 
@@ -275,18 +273,18 @@ class Platform:
         return platform_type, section, is_alias
 
     @classmethod
-    def get_type_from_platform_kwargs(cls, block: str, **kwargs):
+    def _get_type_from_platform_kwargs(cls, block: str, **kwargs):
         """
         Get the type of the platform from platform_kwargs.
 
         Args:
-            kwargs: Keyword args to pass to platform
             block: The block name
+            kwargs: Keyword args to pass to platform
 
         Returns:
             The type of the platform, section, and whether it is an alias.
         """
-        section = {'block': block}
+        section = {'block': block} if block else {}
         section.update(kwargs)
         is_alias = False
         platform_type = section.pop('type', None)
@@ -295,7 +293,7 @@ class Platform:
         return platform_type, section, is_alias
 
     @classmethod
-    def display_block(cls, block: str, section: dict, inputs: dict, is_alias: bool = False):
+    def _display_block(cls, block: str, section: dict, inputs: dict, is_alias: bool = False):
         """
         Display block info on the console.
 
