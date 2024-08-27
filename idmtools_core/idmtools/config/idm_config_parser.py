@@ -95,7 +95,7 @@ class IdmConfigParser:
             ft = field_type[fn]
             if ft in (int, float, str):
                 inputs[fn] = ft(section[fn])
-            elif ft is bool:
+            elif ft is bool and not isinstance(section[fn], bool):
                 inputs[fn] = ast.literal_eval(section[fn])
         return inputs
 
@@ -232,7 +232,7 @@ class IdmConfigParser:
         from idmtools.core.logging import setup_logging, IdmToolsLoggingConfig
         # set up default log values
         log_config = dict()
-        # try to fetch options from config file and from environment vars
+        # try to fetch logging options from config file and from environment vars
         for field in fields(IdmToolsLoggingConfig):
             value = cls.get_option("logging", field.name, fallback=None)
             if value is not None:
@@ -426,7 +426,7 @@ class IdmConfigParser:
         Returns:
             True if the section exists, False otherwise
         """
-        return cls._config.has_section(section.lower())
+        return cls._config.has_section(section.lower()) if cls._config else False
 
     @classmethod
     @initialization
@@ -468,16 +468,3 @@ class IdmConfigParser:
         cls._config_path = None
         cls._block = None
 
-    @classmethod
-    @initialization()
-    def ini_file_sections(cls) -> List[str]:
-        """
-        Get the sections in the INI file.
-        Returns:
-            A list of the section name in the INI file.
-        """
-        # Get the section names
-        if cls._config is None:
-            return []
-        sections = cls._config.sections()
-        return list(map(str.upper, sections))
