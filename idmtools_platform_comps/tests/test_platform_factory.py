@@ -24,6 +24,12 @@ class TestPlatformFactory(ITestWithPersistence):
     def tearDown(self):
         super().tearDown()
 
+    def run_python_version(self, name):
+        command = "python3 --version"
+        task = CommandTask(command=command)
+        experiment = Experiment.from_task(task, name=name)
+        return experiment
+
     @pytest.mark.comps
     @pytest.mark.timeout(60)
     @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
@@ -128,7 +134,6 @@ class TestPlatformFactory(ITestWithPersistence):
         mock_user_logger.log.call_args_list[1].assert_called_with('"environment": "Calculon"')
         mock_logger.warning.not_called()
 
-
     @pytest.mark.comps
     @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
     def test_platform_factory_with_random_block_and_valid_platform_fields(self, mock_login):
@@ -158,53 +163,68 @@ class TestPlatformFactory(ITestWithPersistence):
 
     @pytest.mark.comps
     @pytest.mark.timeout(60)
-    def test_with_experiment(self):
-        def run_python_version(name):
-            command = "python3 --version"
-            task = CommandTask(command=command)
-            experiment = Experiment.from_task(task, name=name)
-            return experiment
-        with self.subTest("test_with_alias"):
-            platform = Platform('SlurmStage')
-            exp = run_python_version("test_with_alias")
-            exp.run(wait_until_done=True, platform=platform)
-            self.assertTrue(exp.succeeded)
-        with self.subTest("test_with_ini"):
-            platform = Platform('COMPS2')
-            exp = run_python_version("test_with_ini")
-            exp.run(wait_until_done=True, platform=platform)
-            self.assertTrue(exp.succeeded)
-        with self.subTest("test_with_no_block"):
-            platform = Platform(endpoint='https://comps2.idmod.org', environment='SlurmStage', type='COMPS')
-            exp = run_python_version("test_with_no_block")
-            exp.run(wait_until_done=True, platform=platform)
-            self.assertTrue(exp.succeeded)
-        with self.subTest("test_with_block_and_valid_fields"):
-            platform = Platform("my_block", endpoint='https://comps2.idmod.org', environment='SlurmStage', type='COMPS')
-            exp = run_python_version("test_with_block_and_valid_fields")
-            exp.run(wait_until_done=True, platform=platform)
-            self.assertTrue(exp.succeeded)
-        with self.subTest("test_with_ini_and_update"):
-            platform = Platform('COMPS2', node_group="idm_abcd")
-            exp = run_python_version("test_with_ini_and_update")
-            exp.run(wait_until_done=True, platform=platform)
-            self.assertTrue(exp.succeeded)
-        with self.subTest("test_with_ini_and_invalid_update"):
-            with self.assertRaises(RuntimeError) as context:
-                platform = Platform('COMPS2', environment="Calculon")
-                exp = run_python_version("test_with_ini_and_invalid_update")
-                exp.run(platform=platform)
-            self.assertTrue("invalid environment-name: Calculon" in str(context.exception.args[0]))
-        with self.subTest("test_with_no_type_no_block"):
-            with self.assertRaises(Exception) as context:
-                platform = Platform(endpoint='https://comps2.idmod.org', environment='SlurmStage')
-                exp = run_python_version("test_with_no_type_no_block")
-                exp.run(platform=platform)
-            self.assertEqual("Type must be specified in Platform constructor.", str(context.exception.args[0]))
-        with self.subTest("test_no_alias_block"):
-            with self.assertRaises(ValueError) as context:
-                platform = Platform(block="SlurmStage1")
-                exp = run_python_version("test_no_alias_block")
-                exp.run(platform=platform)
-            self.assertTrue("Type must be specified in Platform constructor." in str(context.exception.args[0]))
+    def test_with_experiment_with_alias(self):
+        platform = Platform('SlurmStage')
+        exp = self.run_python_version("test_with_alias")
+        exp.run(wait_until_done=True, platform=platform)
+        self.assertTrue(exp.succeeded)
+
+    @pytest.mark.comps
+    @pytest.mark.timeout(60)
+    def test_with_experiment_with_ini(self):
+        platform = Platform('COMPS2')
+        exp = self.run_python_version("test_with_ini")
+        exp.run(wait_until_done=True, platform=platform)
+        self.assertTrue(exp.succeeded)
+
+    @pytest.mark.comps
+    @pytest.mark.timeout(60)
+    def test_with_experiment_with_no_block(self):
+        platform = Platform(endpoint='https://comps2.idmod.org', environment='SlurmStage', type='COMPS')
+        exp = self.run_python_version("test_with_no_block")
+        exp.run(wait_until_done=True, platform=platform)
+        self.assertTrue(exp.succeeded)
+
+    @pytest.mark.comps
+    @pytest.mark.timeout(60)
+    def test_with_experiment_with_block_and_valid_fields(self):
+        platform = Platform("my_block", endpoint='https://comps2.idmod.org', environment='SlurmStage', type='COMPS')
+        exp = self.run_python_version("test_with_block_and_valid_fields")
+        exp.run(wait_until_done=True, platform=platform)
+        self.assertTrue(exp.succeeded)
+
+    @pytest.mark.comps
+    @pytest.mark.timeout(60)
+    def test_with_experiment_with_ini_and_update(self):
+        platform = Platform('COMPS2', node_group="idm_abcd")
+        exp = self.run_python_version("test_with_ini_and_update")
+        exp.run(wait_until_done=True, platform=platform)
+        self.assertTrue(exp.succeeded)
+
+    @pytest.mark.comps
+    @pytest.mark.timeout(60)
+    def test_with_experiment_with_ini_and_invalid_update(self):
+        with self.assertRaises(RuntimeError) as context:
+            platform = Platform('COMPS2', environment="Calculon")
+            exp = self.run_python_version("test_with_ini_and_invalid_update")
+            exp.run(platform=platform)
+        self.assertTrue("invalid environment-name: Calculon" in str(context.exception.args[0]))
+
+    @pytest.mark.comps
+    @pytest.mark.timeout(60)
+    def test_with_experiment_with_no_type_no_block(self):
+        with self.assertRaises(Exception) as context:
+            platform = Platform(endpoint='https://comps2.idmod.org', environment='SlurmStage')
+            exp = self.run_python_version("test_with_no_type_no_block")
+            exp.run(platform=platform)
+        self.assertEqual("Type must be specified in Platform constructor.", str(context.exception.args[0]))
+
+    @pytest.mark.comps
+    @pytest.mark.timeout(60)
+    def test_with_experiment_with_no_alias_block(self):
+        with self.assertRaises(ValueError) as context:
+            platform = Platform(block="My_Stage")
+            exp = self.run_python_version("test_no_alias_block")
+            exp.run(platform=platform)
+        self.assertTrue("Type must be specified in Platform constructor." in str(context.exception.args[0]))
 
