@@ -59,7 +59,7 @@ class TestNoConfig(unittest.TestCase):
                             priority='Normal',
                             simulation_root=sim_root_dir,
                             node_group='idm_abcd',
-                            num_cores='1',
+                            num_cores=1,
                             num_retries='0',
                             exclusive='False', missing_ok=True)
 
@@ -69,9 +69,15 @@ class TestNoConfig(unittest.TestCase):
         except:  # noqa: E722
             pass
         mock_config_logger.warning.call_args_list[0].assert_called_with("File 'idmtools.ini' Not Found!")
-        mock_user_logger.log.call_args_list[0].assert_called_with("\n[SlurmStage]")
-        mock_user_logger.log.call_args_list[1].assert_called_with('"endpoint": "http://comps2.idmod.org"')
-        mock_user_logger.log.call_args_list[1].assert_called_with('"environment": "SlurmStage"')
+        self.assertIn('\nInitializing COMPSPlatform with:', mock_user_logger.log.call_args_list[0].args[1])
+        self.assertIn('"endpoint": "https://comps2.idmod.org"', mock_user_logger.log.call_args_list[1].args[1])
+        self.assertIn('"environment": "SlurmStage"', mock_user_logger.log.call_args_list[1].args[1])
+        self.assertIn('"node_group": "idm_abcd"', mock_user_logger.log.call_args_list[1].args[1])
+        self.assertIn('"num_cores": 1', mock_user_logger.log.call_args_list[1].args[1])
+        self.assertIn('"priority": "Normal"', mock_user_logger.log.call_args_list[1].args[1])
+        self.assertIn('"exclusive": false', mock_user_logger.log.call_args_list[1].args[1])
+        self.assertIn('"num_retries": 0', mock_user_logger.log.call_args_list[1].args[1])
+        self.assertIn('"simulation_root": "$COMPS_PATH(USER)', mock_user_logger.log.call_args_list[1].args[1])
         mock_logger.warning.call_args_list[0].assert_called_with(
             "the following Config Settings are not used when creating Platform:")
         mock_logger.warning.call_args_list[1].assert_called_with("- missing_ok = True")
@@ -120,9 +126,15 @@ class TestNoConfig(unittest.TestCase):
             # ignore error is it is comps error about not finding id
             if "404 Not Found" in ex.args[0]:
                 pass
-        mock_user_logger.log.call_args_list[0].assert_called_with("\n[SlurmStage]")
-        mock_user_logger.log.call_args_list[1].assert_called_with('"endpoint": "http://comps2.idmod.org"')
-        mock_user_logger.log.call_args_list[1].assert_called_with('"environment": "SlurmStage"')
+        self.assertIn('\nInitializing COMPSPlatform with:', mock_user_logger.log.call_args_list[0].args[1])
+        self.assertIn('"endpoint": "https://comps2.idmod.org"', mock_user_logger.log.call_args_list[1].args[1])
+        self.assertIn('"environment": "SlurmStage"', mock_user_logger.log.call_args_list[1].args[1])
+        self.assertIn('"node_group": "idm_abcd"', mock_user_logger.log.call_args_list[1].args[1])
+        self.assertIn('"num_cores": 1', mock_user_logger.log.call_args_list[1].args[1])
+        self.assertIn('"priority": "Normal"', mock_user_logger.log.call_args_list[1].args[1])
+        self.assertIn('"exclusive": false', mock_user_logger.log.call_args_list[1].args[1])
+        self.assertIn('"num_retries": 0', mock_user_logger.log.call_args_list[1].args[1])
+        self.assertIn('"simulation_root": "$COMPS_PATH(USER)', mock_user_logger.log.call_args_list[1].args[1])
         mock_logger.warning.call_args_list[0].assert_called_with(
             "the following Config Settings are not used when creating Platform:")
         mock_logger.warning.call_args_list[1].assert_called_with("- missing_ok = True")

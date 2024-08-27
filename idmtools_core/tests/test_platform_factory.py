@@ -96,8 +96,8 @@ class TestPlatformFactory(ITestWithPersistence):
         self.assertIn('MY_JOB_DIRECTORY', platform.job_directory)
         # verify print correct block and job_directory
         mock_config_user_logger.log.call_args_list[0].assert_called_with('INI File Used: ')
-        mock_user_logger.log.call_args_list[0].assert_called_with('[File_Platform]')
-        mock_user_logger.log.call_args_list[1].assert_called_with('"job_directory": "MY_JOB_DIRECTORY"')
+        self.assertIn('\nInitializing FilePlatform with:', mock_user_logger.log.call_args_list[0].args[1])
+        self.assertIn('"job_directory": "MY_JOB_DIRECTORY"', mock_user_logger.log.call_args_list[1].args[1])
         # verify there is no warning printed
         mock_logger.warning.not_called()
 
@@ -111,8 +111,8 @@ class TestPlatformFactory(ITestWithPersistence):
         self.assertEqual(platform._kwargs, {'job_directory': 'my_directory'})
         # job_directory from block should be used
         self.assertIn('my_directory', platform.job_directory)
-        mock_user_logger.log.call_args_list[0].assert_called_with('[File_Platform]')
-        mock_user_logger.log.call_args_list[1].assert_called_with('"job_directory": "my_directory"')
+        self.assertIn('\nInitializing FilePlatform with:', mock_user_logger.log.call_args_list[0].args[1])
+        self.assertIn('"job_directory": "my_directory"', mock_user_logger.log.call_args_list[1].args[1])
         # verify there is no warning printed
         mock_logger.warning.not_called()
 
@@ -125,8 +125,9 @@ class TestPlatformFactory(ITestWithPersistence):
         self.assertEqual(platform._kwargs, {'max_job': 3})
         # job_directory from block should be used
         self.assertIn('MY_JOB_DIRECTORY', platform.job_directory)
-        mock_user_logger.log.call_args_list[0].assert_called_with('[File_Platform]')
-        mock_user_logger.log.call_args_list[1].assert_called_with('"job_directory": "MY_JOB_DIRECTORY"')
+        self.assertIn('\nInitializing FilePlatform with:', mock_user_logger.log.call_args_list[0].args[1])
+        self.assertIn('"job_directory": "MY_JOB_DIRECTORY"', mock_user_logger.log.call_args_list[1].args[1])
+        self.assertIn('"max_job": 3', mock_user_logger.log.call_args_list[1].args[1])
 
     @patch("idmtools.core.platform_factory.user_logger")
     def test_create_platform_with_alias(self, mock_user_logger):
@@ -137,8 +138,8 @@ class TestPlatformFactory(ITestWithPersistence):
         self.assertEqual(platform._kwargs, kwargs)
         self.assertIn('destination_directory', platform.job_directory)
         # verify print correct block and job_directory
-        mock_user_logger.log.call_args_list[0].assert_called_with('[File]')
-        mock_user_logger.log.call_args_list[1].assert_called_with('"job_directory": "destination_directory"')
+        self.assertIn('\nInitializing FilePlatform with:', mock_user_logger.log.call_args_list[0].args[1])
+        self.assertIn('"job_directory": "destination_directory"', mock_user_logger.log.call_args_list[1].args[1])
 
     def test_create_platform_with_random_block(self):
         kwargs = {'job_directory': 'destination_directory'}
@@ -165,14 +166,13 @@ class TestPlatformFactory(ITestWithPersistence):
         self.assertEqual(platform._config_block, 'File')
         self.assertEqual(platform._kwargs, kwargs)
         self.assertIn('destination_directory', platform.job_directory)
-        mock_user_logger.log.call_args_list[0].assert_called_with('[File]')
-        mock_user_logger.log.call_args_list[1].assert_called_with('"job_directory": "destination_directory"')
+        self.assertIn('\nInitializing FilePlatform with:', mock_user_logger.log.call_args_list[0].args[1])
+        self.assertIn('"job_directory": "destination_directory"', mock_user_logger.log.call_args_list[1].args[1])
         mock_logger.warning.not_called()
 
-    @patch("idmtools.config.idm_config_parser.user_logger")
     @patch('idmtools.core.platform_factory.user_logger')
     @patch('idmtools.core.platform_factory.logger')
-    def test_create_platform_valid_kwargs(self, mock_logger, mock_user_logger, mock_config_user_logger):
+    def test_create_platform_valid_kwargs(self, mock_logger, mock_user_logger):
         kwargs = {'job_directory': 'destination_directory', 'type': 'File'}
         platform = Platform(**kwargs)
         self.assertEqual(platform.__class__.__name__, 'FilePlatform')
@@ -180,9 +180,9 @@ class TestPlatformFactory(ITestWithPersistence):
         self.assertEqual(platform._kwargs, kwargs)
         self.assertIn('destination_directory', platform.job_directory)
         # verify there is no user_logger printed from either platform_factory or idm_config_parser
+        self.assertIn('\nInitializing FilePlatform with:', mock_user_logger.log.call_args_list[0].args[1])
+        self.assertIn('"job_directory": "destination_directory"', mock_user_logger.log.call_args_list[1].args[1])
         mock_logger.warning.not_called()
-        mock_user_logger.log.not_called()
-        mock_config_user_logger.log.not_called()
 
     def test_create_platform_with_no_block_and_invalid_type(self):
         with self.assertRaises(Exception) as context:
@@ -210,11 +210,8 @@ class TestPlatformFactory(ITestWithPersistence):
         self.assertEqual(platform._config_block, 'my_block')
         self.assertEqual(platform._kwargs, kwargs)
         self.assertIn('destination_directory', platform.job_directory)
-        mock_logger.warning.call_args_list[0].assert_called_with(
-            "the following Config Settings are not used when creating Platform:")
-        mock_logger.warning.call_args_list[1].assert_called_with("- block = my_block")
-        mock_user_logger.log.call_args_list[0].assert_called_with('[my_block]')
-        mock_user_logger.log.call_args_list[1].assert_called_with('"job_directory": "destination_directory"')
+        self.assertIn('\nInitializing FilePlatform with:', mock_user_logger.log.call_args_list[0].args[1])
+        self.assertIn('"job_directory": "destination_directory"', mock_user_logger.log.call_args_list[1].args[1])
 
     @patch('idmtools.core.platform_factory.user_logger')
     @patch('idmtools.core.platform_factory.logger')
