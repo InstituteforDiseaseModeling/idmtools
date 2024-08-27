@@ -93,10 +93,18 @@ class IdmConfigParser:
         fs = set(field_type.keys()).intersection(set(section.keys()))
         for fn in fs:
             ft = field_type[fn]
-            if ft in (int, float, str):
-                inputs[fn] = ft(section[fn])
-            elif ft is bool and not isinstance(section[fn], bool):
-                inputs[fn] = ast.literal_eval(section[fn])
+            try:
+                if ft in (int, float, str):
+                    inputs[fn] = ft(section[fn])
+                elif ft is bool:
+                    if isinstance(section[fn], str):
+                        inputs[fn] = ast.literal_eval(section[fn])
+                    else:
+                        inputs[fn] = section[fn]
+            except ValueError as e:
+                user_logger.error(
+                    f"The field {fn} requires a value of type {ft.__name__}. You provided <{section[fn]}>")
+                raise e
         return inputs
 
     @classmethod
