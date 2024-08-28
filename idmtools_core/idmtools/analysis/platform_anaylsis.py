@@ -257,7 +257,6 @@ class PlatformAnalysis:
         """
         # Pickle the platform args
         platform_kwargs = self.platform._kwargs
-        platform_kwargs["missing_ok"] = self.platform._missing_ok
         self.additional_files.add_or_replace_asset(
             Asset(filename="platform_args.pkl", content=pickle.dumps(platform_kwargs)))
 
