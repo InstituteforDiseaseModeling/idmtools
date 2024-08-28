@@ -25,7 +25,7 @@ model_path = os.path.abspath(os.path.join("..", "..", "examples", "python_model"
 @allure.suite("idmtools_core")
 class TestAddingSimulationsToExistingExperiment(unittest.TestCase):
     def setUp(self):
-        self.platform = Platform("TestExecute", missing_ok=True, default_missing=dict(type='TestExecute'))
+        self.platform = Platform("TestExecute", type='TestExecute')
 
     def test_adding_template_to_existing(self):
         base_task = JSONConfiguredPythonTask(script_path=model_path, python_path=sys.executable)
@@ -64,8 +64,7 @@ class TestAddingSimulationsToExistingExperiment(unittest.TestCase):
         sim = Simulation.from_task(base_task)
         exp = Experiment(disable_default_pre_create=True)
         exp.simulations.append(sim)
-        platform = Platform("TestExecute", missing_ok=True)
-        exp.pre_creation(platform=platform)
+        exp.pre_creation(platform=self.platform)
         self.assertEqual(exp.tags, {})
 
     def test_empty_experiment_template(self):

@@ -221,7 +221,7 @@ class TestEntity(ITestWithPersistence):
         s.post_creation(fake_platform)
 
     def test_experiment_pre_creation_hooks(self):
-        fake_platform = Platform("TestExecute", missing_ok=True)
+        fake_platform = Platform("TestExecute", type="TestExecute")
         base_task = TestTask()
         sim = Simulation.from_task(base_task)
         builder = SimulationBuilder()
@@ -234,7 +234,7 @@ class TestEntity(ITestWithPersistence):
             self.assertEqual(mock_hook.call_count, 1)
 
     def test_experiment_post_creation_hooks(self):
-        fake_platform = Platform("TestExecute", missing_ok=True)
+        fake_platform = Platform("TestExecute", type="TestExecute")
         base_task = TestTask()
         sim = Simulation.from_task(base_task)
         builder = SimulationBuilder()
