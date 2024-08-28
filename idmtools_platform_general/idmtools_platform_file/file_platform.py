@@ -97,7 +97,9 @@ class FilePlatform(IPlatform):
             if exp is None:
                 raise RuntimeError("Simulation missing parent!")
             exp_dir = self.get_directory(exp)
-            item_dir = Path(exp_dir, self.entity_display_name(item))
+            # TODO: make it optional to use the id or not
+            # item_dir = Path(exp_dir, self.entity_display_name(item))
+            item_dir = Path(exp_dir, item.id)
         else:
             raise RuntimeError(f"Get directory is not supported for {type(item)} object on FilePlatform")
 
