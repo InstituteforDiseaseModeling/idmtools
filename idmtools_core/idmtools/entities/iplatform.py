@@ -7,7 +7,6 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import os
 import copy
-import warnings
 from abc import ABCMeta
 from dataclasses import dataclass
 from dataclasses import fields, field
@@ -47,7 +46,7 @@ from idmtools.utils.entities import validate_user_inputs_against_dataclass
 logger = getLogger(__name__)
 user_logger = getLogger('user')
 
-CALLER_LIST = ['_create_from_block',  # create platform through Platform Factory
+CALLER_LIST = ['_create_platform_from_block',  # create platform through Platform Factory
                'fetch',  # create platform through un-pickle
                'get',  # create platform through platform spec' get method
                '__newobj__',  # create platform through copy.deepcopy
@@ -122,8 +121,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         # Action based on the caller
         if caller not in CALLER_LIST:
-            warnings.warn(
-                "Please use Factory to create Platform! For example: \n    platform = Platform('COMPS', **kwargs)")
+            logger.warning("Please use Factory to create Platform! For example: \n    platform = Platform('COMPS', **kwargs)")
         return super().__new__(cls)
 
     def __post_init__(self) -> NoReturn:

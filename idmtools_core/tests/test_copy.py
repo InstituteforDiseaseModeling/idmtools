@@ -49,7 +49,7 @@ class TestCopy(ITestWithPersistence):
         super().tearDown()
 
     def test_deepcopy_assets(self):
-        test_platform = Platform("TestExecute", missing_ok=True)
+        test_platform = Platform("Test")
         task = CommandTask(command="python --version")
         e = Experiment.from_task(task=task, name="Example of experiment from task")
         e.add_asset(os.path.join(COMMON_INPUT_PATH, 'python_experiments', "model.py"))
@@ -72,7 +72,7 @@ class TestCopy(ITestWithPersistence):
         self.assertEqual(sim.assets, sim.assets)
 
     def test_deepcopy_experiment(self):
-        test_platform = Platform("TestExecute", missing_ok=True)
+        test_platform = Platform("Test")
         task = TestTask()
         ts = TemplatedSimulations(base_task=task)
         e = Experiment.from_template(ts)
@@ -104,7 +104,7 @@ class TestCopy(ITestWithPersistence):
         self.assertIn('Set self.maxDiff to None to see it', context.exception.args[0])
 
     def test_deepcopy_simulation(self):
-        test_platform = Platform("TestExecute", missing_ok=True)
+        test_platform = Platform("Test")
         task = TestTask()
         sim = Simulation.from_task(task=task)
 

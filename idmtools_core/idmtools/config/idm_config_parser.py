@@ -93,10 +93,18 @@ class IdmConfigParser:
         fs = set(field_type.keys()).intersection(set(section.keys()))
         for fn in fs:
             ft = field_type[fn]
-            if ft in (int, float, str):
-                inputs[fn] = ft(section[fn])
-            elif ft is bool:
-                inputs[fn] = ast.literal_eval(section[fn])
+            try:
+                if ft in (int, float, str):
+                    inputs[fn] = ft(section[fn])
+                elif ft is bool:
+                    if isinstance(section[fn], str):
+                        inputs[fn] = ast.literal_eval(section[fn])
+                    else:
+                        inputs[fn] = section[fn]
+            except ValueError as e:
+                user_logger.error(
+                    f"The field {fn} requires a value of type {ft.__name__}. You provided <{section[fn]}>")
+                raise e
         return inputs
 
     @classmethod
@@ -199,12 +207,9 @@ class IdmConfigParser:
 
         # If we didn't find a file, warn the user and init logging
         if ini_file is None:
-            if os.getenv("IDMTOOLS_NO_CONFIG_WARNING", "F").lower() not in TRUTHY_VALUES:
-                # We use print since logger isn't configured unless there is an override(cli)
-                print(f"/!\\ WARNING: File '{file_name}' Not Found! For details on how to configure idmtools, see {get_help_version_url('configuration.html')} for details on how to configure idmtools.")
             if os.getenv("NO_LOGGING_INIT", "f").lower() not in TRUTHY_VALUES:
                 cls._init_logging()
-
+            logger.warning(f"/!\\ WARNING: File '{file_name}' Not Found! For details on how to configure idmtools, see {get_help_version_url('configuration.html')} for details on how to configure idmtools.")
             return
 
         # Load file
@@ -235,7 +240,7 @@ class IdmConfigParser:
         from idmtools.core.logging import setup_logging, IdmToolsLoggingConfig
         # set up default log values
         log_config = dict()
-        # try to fetch options from config file and from environment vars
+        # try to fetch logging options from config file and from environment vars
         for field in fields(IdmToolsLoggingConfig):
             value = cls.get_option("logging", field.name, fallback=None)
             if value is not None:
@@ -273,6 +278,8 @@ class IdmConfigParser:
             ValueError: If the block doesn't exist
         """
         original_case_section = section
+        if section is None:
+            return None
         lower_case_section = section.lower()
         if (not cls.found_ini() or not cls.has_section(section=lower_case_section)) and error:
             raise ValueError(f"Block '{original_case_section}' doesn't exist!")
@@ -312,7 +319,7 @@ class IdmConfigParser:
             return fallback
 
         if section:
-            return cls._config.get(section, option, fallback=fallback)
+            return cls._config.get(section.lower(), option, fallback=fallback)
         else:
             return cls._config.get("COMMON", option, fallback=fallback)
 
@@ -427,7 +434,7 @@ class IdmConfigParser:
         Returns:
             True if the section exists, False otherwise
         """
-        return cls._config.has_section(section.lower())
+        return cls._config.has_section(section.lower()) if cls._config else False
 
     @classmethod
     @initialization
