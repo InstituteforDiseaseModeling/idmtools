@@ -142,6 +142,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         user_logger.info(f'job_directory: {Path(self.platform.job_directory).resolve()}')
         user_logger.info(f'suite: {str(suite_id)}')
         user_logger.info(f'experiment: {experiment.id}')
+        user_logger.info(f"\nExperiment Directory: \n{self.platform.get_directory(experiment)}")
 
     def send_assets(self, experiment: Experiment, **kwargs):
         """
