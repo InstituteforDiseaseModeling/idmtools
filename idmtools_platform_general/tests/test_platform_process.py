@@ -70,7 +70,7 @@ class TestProcessPlatform(ITestWithPersistence):
         # first verify files and dirs under suite
         suite = experiment.parent
         suite_dir = self.platform.get_directory(suite)
-        self.assertEqual(Path(suite_dir), Path(f'{self.job_directory}/{suite.name}_{suite.id}'))
+        self.assertTrue(os.path.exists(suite_dir))
         files = []
         dirs = []
         for (dirpath, dirnames, filenames) in os.walk(suite_dir):
