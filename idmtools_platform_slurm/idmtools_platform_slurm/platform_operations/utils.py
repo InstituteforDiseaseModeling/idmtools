@@ -65,7 +65,8 @@ def clean_experiment_name(experiment_name: str) -> str:
     Returns:the experiment name allowed for use
     """
     import re
-    chars_to_replace = ['/', '\\', ':', "'", '"', '?', '<', '>', '*', '|', "\0", "(", ")", '`']
+    chars_to_replace = ['/', '\\', ':', "'", '"', '?', '<', '>', '*', '|', "\0", "(", ")", "[", "]", '`', ',', '!', '$',
+                        '&', '"', ' ']
     clean_names_expr = re.compile(f'[{re.escape("".join(chars_to_replace))}]')
 
     experiment_name = clean_names_expr.sub("_", experiment_name)
@@ -83,7 +84,7 @@ def add_dummy_suite(experiment: Experiment, suite_name: str = None, tags: Dict =
         Suite
     """
     if suite_name is None:
-        suite_name = 'Dummy Suite'
+        suite_name = 'Suite'
     suite = Suite(name=suite_name)
 
     if not tags:
