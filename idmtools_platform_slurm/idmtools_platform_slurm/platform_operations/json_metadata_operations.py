@@ -147,6 +147,8 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         Returns:
              None
         """
+        if metadata is None:
+            metadata = {}
         if not isinstance(item, (Suite, Experiment, Simulation)):
             raise RuntimeError(f"Set method supports Suite/Experiment/Simulation only.")
         meta = metadata
