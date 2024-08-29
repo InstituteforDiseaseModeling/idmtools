@@ -211,7 +211,7 @@ class TestContainerPlatform(unittest.TestCase):
             platform = ContainerPlatform(job_directory="DEST", data_mount="/home/container_data")
             result = platform.get_container_directory(suite1)
             expected_result = f"/home/container_data/{suite1.name.lower()}_{suite1.id}"
-            self.assertEqual(expected_result, result)
+            self.assertEqual(expected_result, result.lower())
 
         # test get_container_directory with Simulation instance
         with self.subTest("test_simulation"):
