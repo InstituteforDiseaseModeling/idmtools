@@ -76,7 +76,8 @@ class TestFileContainerPlatformCli(unittest.TestCase):
         result = self.runner.invoke(file_cli.file, [self.job_directory, 'get-latest'])
         self.assertEqual(result.exit_code, 0)
         exp_dir = str(self.platform.get_directory_by_id(self.experiment.id, ItemType.EXPERIMENT))
-        expected_dict = dict(suite_id=self.experiment.parent_id, experiment_id=self.experiment.id,
+        expected_dict = dict(suite_id=f"{self.experiment.parent.name}_{self.experiment.parent_id}",
+                             experiment_id=f"{self.experiment.name}_{self.experiment.id}",
                              experiment_directory=exp_dir,
                              job_directory=self.job_directory)
         actual_messages = [call[0][0] for call in mock_user_logger.info.call_args_list]
@@ -120,7 +121,6 @@ class TestFileContainerPlatformCli(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
 
 if __name__ == '__main__':
     unittest.main()
