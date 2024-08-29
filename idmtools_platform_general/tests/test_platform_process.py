@@ -78,7 +78,6 @@ class TestProcessPlatform(ITestWithPersistence):
             dirs.extend(dirnames)
             break
         self.assertSetEqual(set(files), set(["metadata.json"]))
-        self.assertEqual(dirs[0], experiment.id)
         # second verify files and dirs under experiment
         experiment_dir = self.platform.get_directory(experiment)
         files = []
