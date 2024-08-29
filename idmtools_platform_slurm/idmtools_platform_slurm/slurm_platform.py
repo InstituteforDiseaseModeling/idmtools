@@ -3,12 +3,13 @@ Here we implement the SlurmPlatform object.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+import os
 from pathlib import Path
 from typing import Optional, Any, Dict, List, Union
 from dataclasses import dataclass, field, fields
 from logging import getLogger
-from idmtools.core import ItemType
-from idmtools.core import EntityStatus
+from idmtools import IdmConfigParser
+from idmtools.core import ItemType, EntityStatus, TRUTHY_VALUES
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities.suite import Suite
 from idmtools.entities.experiment import Experiment
@@ -131,6 +132,9 @@ class SlurmPlatform(IPlatform):
         self.supported_types = {ItemType.SUITE, ItemType.EXPERIMENT, ItemType.SIMULATION}
         if self.job_directory is None:
             raise ValueError("Job Directory is required.")
+        self.job_directory = os.path.abspath(self.job_directory)
+        self.name_directory = IdmConfigParser.get_option(None, "name_directory", 'True').lower() in TRUTHY_VALUES
+        self.sim_name_directory = IdmConfigParser.get_option(None, "sim_name_directory", 'False').lower() in TRUTHY_VALUES
 
         # check max_array_size from slurm configuration
         self._max_array_size = None
