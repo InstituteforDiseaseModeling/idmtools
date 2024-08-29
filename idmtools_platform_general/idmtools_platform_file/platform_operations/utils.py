@@ -113,7 +113,7 @@ def add_dummy_suite(experiment: Experiment, suite_name: str = None, tags: Dict =
         Suite
     """
     if suite_name is None:
-        suite_name = 'Dummy Suite'
+        suite_name = 'Suite'
     suite = Suite(name=suite_name)
 
     if not tags:
