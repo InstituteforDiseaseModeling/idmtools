@@ -199,7 +199,10 @@ class TestContainerPlatform(unittest.TestCase):
             exp1.parent = suite1
             platform = ContainerPlatform(job_directory="DEST", data_mount="/home/container_data")
             result = platform.get_container_directory(exp1)
-            expected_result = f"/home/container_data/{suite1.name.lower()}_{suite1.id}/{exp1.name.lower()}_{exp1.id}"
+            if sys.platform == "win32":
+                expected_result = f"/home/container_data/{suite1.name.lower()}_{suite1.id}/{exp1.name.lower()}_{exp1.id}"
+            else:
+                expected_result = f"/home/container_data/{suite1.name}_{suite1.id}/{exp1.name}_{exp1.id}"
             self.assertEqual(expected_result, result)
 
         # test get_container_directory with Suite instance
@@ -220,7 +223,7 @@ class TestContainerPlatform(unittest.TestCase):
             platform = ContainerPlatform(job_directory="DEST", data_mount="/home/container_data")
             result = platform.get_container_directory(sim1)
             expected_result = f"/home/container_data/{suite1.name.lower()}_{suite1.id}/{exp1.name.lower()}_{exp1.id}/{sim1.id}"
-            self.assertEqual(expected_result, result)
+            self.assertEqual(expected_result, result.lower())
 
         # test get_container_directory with Simulation instance
         with self.subTest("test_simulation_with_sim_name"):
@@ -236,7 +239,7 @@ class TestContainerPlatform(unittest.TestCase):
             platform = ContainerPlatform(job_directory="DEST", data_mount="/home/container_data")
             result = platform.get_container_directory(sim1)
             expected_result = f"/home/container_data/{suite1.name.lower()}_{suite1.id}/{exp1.name.lower()}_{exp1.id}/{sim1.name.lower()}_{sim1.id}"
-            self.assertEqual(expected_result, result)
+            self.assertEqual(expected_result, result.lower())
 
         # test get_container_directory with Simulation instance
         with self.subTest("test_exp_without_name"):
@@ -244,6 +247,7 @@ class TestContainerPlatform(unittest.TestCase):
             config_ini = 'idmtools_container_exp_dir.ini'
             parser._load_config_file(dir_path=os.path.dirname(os.path.realpath(__file__)), file_name=config_ini)
             parser.ensure_init(file_name=config_ini, force=True)
+            name_directory = IdmConfigParser.get_option(None, "name_directory")
             exp1 = Experiment(name='Test1')
             sim1 = Simulation(name='Simulation1')
             sim1.parent = exp1
@@ -252,7 +256,7 @@ class TestContainerPlatform(unittest.TestCase):
             platform = ContainerPlatform(job_directory="DEST", data_mount="/home/container_data")
             result = platform.get_container_directory(sim1)
             expected_result = f"/home/container_data/{suite1.id}/{exp1.id}/{sim1.id}"
-            self.assertEqual(expected_result, result)
+            self.assertEqual(expected_result, result.lower())
 
     @patch('idmtools_platform_container.container_platform.find_container_by_image')
     @patch.object(ContainerPlatform, 'validate_mount')
