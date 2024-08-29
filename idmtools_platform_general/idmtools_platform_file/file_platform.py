@@ -10,6 +10,7 @@ from pathlib import Path
 from logging import getLogger
 from typing import Union, List
 from dataclasses import dataclass, field
+from idmtools import IdmConfigParser
 from idmtools.core import ItemType, EntityStatus, TRUTHY_VALUES
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities import Suite
@@ -60,6 +61,8 @@ class FilePlatform(IPlatform):
         if self.job_directory is None:
             raise ValueError("Job Directory is required.")
         self.job_directory = os.path.abspath(self.job_directory)
+        self.name_directory = IdmConfigParser.get_option(None, "name_directory", 'True').lower() in TRUTHY_VALUES
+        self.sim_name_directory = IdmConfigParser.get_option(None, "sim_name_directory", 'False').lower() in TRUTHY_VALUES
         super().__post_init__()
 
     def __init_interfaces(self):
@@ -97,9 +100,7 @@ class FilePlatform(IPlatform):
             if exp is None:
                 raise RuntimeError("Simulation missing parent!")
             exp_dir = self.get_directory(exp)
-            # TODO: make it optional to use the id or not
-            # item_dir = Path(exp_dir, self.entity_display_name(item))
-            item_dir = Path(exp_dir, item.id)
+            item_dir = Path(exp_dir, self.entity_display_name(item))
         else:
             raise RuntimeError(f"Get directory is not supported for {type(item)} object on FilePlatform")
 
@@ -266,12 +267,16 @@ class FilePlatform(IPlatform):
         Returns:
             str
         """
-        id_only = getattr(self, 'id_only', None)
-        id_only = id_only in TRUTHY_VALUES
-        if id_only:
-            title = item.id
+        if self.name_directory:
+            if isinstance(item, Simulation):
+                if self.sim_name_directory:
+                    title = f"{clean_experiment_name(item.name)}_{item.id}"
+                else:
+                    title = item.id
+            else:
+                title = f"{clean_experiment_name(item.name)}_{item.id}"
         else:
-            title = f"{clean_experiment_name(item.name)}_{item.id}"
+            title = item.id
         return title
 
     def flatten_item(self, item: IEntity, raw=False, **kwargs) -> List[object]:
