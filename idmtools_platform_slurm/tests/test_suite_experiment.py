@@ -19,7 +19,7 @@ cwd = os.path.dirname(__file__)
 
 @pytest.mark.smoke
 @pytest.mark.serial
-@linux_only
+#@linux_only
 class TestSuiteExperiment(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + '--' + self._testMethodName
@@ -245,7 +245,7 @@ class TestSuiteExperiment(ITestWithPersistence):
         experiment.parent_id = suite.id
         with self.assertRaises(RuntimeError) as ex:
             experiment.run(platform=self.platform, wait_until_done=False, dry_run=True)
-        self.assertEqual(ex.exception.args[0], f"Not found Suite with id '{suite.id}'")
+        self.assertEqual(ex.exception.args[0], f"Not found Experiment with id '{experiment.id}'")
 
     # Case 17, 18 test with experiment.suite_id = suite.id
     # Verify experiment.run with existing suite.id
