@@ -63,7 +63,10 @@ class LocalSlurmOperations(SlurmOperations):
             suite_id = item.parent_id or item.suite_id
             if suite_id is None:
                 raise RuntimeError("Experiment missing parent!")
-            suite = self.platform.get_item(suite_id, ItemType.SUITE)
+            if item.parent:
+                suite = item.parent
+            else:
+                suite = self.platform.get_item(suite_id, ItemType.SUITE)
             suite_dir = Path(self.platform.job_directory, self.entity_display_name(suite))
             item_dir = Path(suite_dir, self.entity_display_name(item))
         elif isinstance(item, Simulation):
