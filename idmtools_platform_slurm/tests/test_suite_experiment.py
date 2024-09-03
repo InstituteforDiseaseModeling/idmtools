@@ -294,3 +294,14 @@ class TestSuiteExperiment(ITestWithPersistence):
         self.platform.run_items(items=suite, wait_until_done=False, dry_run=True)
         self.verify_result(suite)
 
+    def test_23(self):
+        # create suite first without name
+        suite = Suite()
+        suite.run(platform=self.platform, wait_until_done=False, dry_run=True)
+        self.verify_suite_only_case(suite)
+        # add suite.id as experiment.parent_id
+        experiment = Experiment.from_task(self.task, name="run_task")
+        experiment.parent_id = suite.id
+        experiment.run(platform=self.platform, wait_until_done=False, dry_run=True)
+        self.verify_result(suite)
+
