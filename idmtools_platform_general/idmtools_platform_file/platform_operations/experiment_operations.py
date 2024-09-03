@@ -171,9 +171,10 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         """
         assets = AssetCollection()
         assets_dir = Path(self.platform.get_directory_by_id(experiment.id, ItemType.EXPERIMENT), 'Assets')
-        assets_list = AssetCollection.assets_from_directory(assets_dir, recursive=True)
-        for a in assets_list:
-            assets.add_asset(a)
+        if assets_dir.exists():
+            assets_list = AssetCollection.assets_from_directory(assets_dir, recursive=True)
+            for a in assets_list:
+                assets.add_asset(a)
         return assets
 
     def to_entity(self, file_exp: FileExperiment, parent: Optional[Suite] = None, children: bool = True,
