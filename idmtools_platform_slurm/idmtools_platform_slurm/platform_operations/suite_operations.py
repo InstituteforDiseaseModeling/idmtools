@@ -164,7 +164,7 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
         Returns:
             None
         """
-        suite = self.platform.get_item(suite_id, ItemType.SUITE, raw=False)
+        suite = self.platform.get_item(suite_id, ItemType.SUITE, force=True, raw=False)
         exps = suite.experiments
         for exp in exps:
             try:
@@ -187,7 +187,7 @@ class SlurmPlatformSuiteOperations(IPlatformSuiteOperations):
         Returns:
             None
         """
-        suite = self.platform.get_item(suite_id, ItemType.SUITE, raw=False)
+        suite = self.platform.get_item(suite_id, ItemType.SUITE, force=True, raw=False)
         logger.debug(f"cancel slurm job for suite: {suite_id}...")
         for exp in suite.experiments:
             self.platform._experiments.platform_cancel(exp.id, force)
