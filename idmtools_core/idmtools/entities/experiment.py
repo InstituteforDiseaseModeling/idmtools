@@ -546,7 +546,8 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         """
         p = super()._check_for_platform_from_context(platform)
         if 'wait_on_done' in run_opts:
-            warnings.warn("wait_on_done will be deprecated soon. Please use wait_until_done instead.", DeprecationWarning, 2)
+            warnings.warn("wait_on_done will be deprecated soon. Please use wait_until_done instead.",
+                          DeprecationWarning, 2)
             user_logger.warning("wait_on_done will be deprecated soon. Please use wait_until_done instead.")
         if regather_common_assets is None:
             regather_common_assets = p.is_regather_assets_on_modify()
@@ -626,6 +627,26 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         if verbose:
             user_logger.info(f"Simulation Type: {type(self.__simulations)}")
             user_logger.info(f"Assets: {self.assets}")
+
+    def add_simulation(self, item: 'Simulation'):  # noqa F821
+        """
+        Adds a simulation to an experiment.
+        Args:
+            item: Item to add
+        Returns:
+            None
+        """
+        self.simulations.append(item)
+
+    def add_simulations(self, item: Union[List['Simulation'], 'TemplatedSimulations']):  # noqa F821
+        """
+        Extends experiment's simulations.
+        Args:
+            item: Item to extend
+        Returns:
+            None
+        """
+        self.simulations.extend(item)
 
 
 class ExperimentSpecification(ExperimentPluginSpecification):
