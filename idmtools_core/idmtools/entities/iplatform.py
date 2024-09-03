@@ -208,7 +208,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             UnknownItemException: If the item type is not found on platform
         """
         if not item_type or item_type not in self.platform_type_map.values():
-            raise ValueError("The provided type is invalid or not supported by this platform...")
+            raise ValueError(f"The provided type {item_type} is invalid or not supported by this platform...")
 
         cache_key = self.get_cache_key(force, item_id, item_type, kwargs, raw, 'r' if raw else 'o')
 
