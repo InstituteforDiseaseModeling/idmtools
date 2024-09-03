@@ -40,11 +40,17 @@ class LocalSlurmOperations(SlurmOperations):
         if self.platform.name_directory:
             if isinstance(item, Simulation):
                 if self.platform.sim_name_directory:
-                    title = f"{clean_experiment_name(item.name)}_{item.id}"
+                    if item.name:
+                        title = f"{clean_experiment_name(item.name)}_{item.id}"
+                    else:
+                        title = item.id
                 else:
                     title = item.id
             else:
-                title = f"{clean_experiment_name(item.name)}_{item.id}"
+                if item.name:
+                    title = f"{clean_experiment_name(item.name)}_{item.id}"
+                else:
+                    title = item.id
         else:
             title = item.id
         return title
