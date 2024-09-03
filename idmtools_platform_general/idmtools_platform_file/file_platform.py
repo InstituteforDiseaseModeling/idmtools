@@ -62,7 +62,8 @@ class FilePlatform(IPlatform):
             raise ValueError("Job Directory is required.")
         self.job_directory = os.path.abspath(self.job_directory)
         self.name_directory = IdmConfigParser.get_option(None, "name_directory", 'True').lower() in TRUTHY_VALUES
-        self.sim_name_directory = IdmConfigParser.get_option(None, "sim_name_directory", 'False').lower() in TRUTHY_VALUES
+        self.sim_name_directory = IdmConfigParser.get_option(None, "sim_name_directory",
+                                                             'False').lower() in TRUTHY_VALUES
         super().__post_init__()
 
     def __init_interfaces(self):
@@ -270,11 +271,17 @@ class FilePlatform(IPlatform):
         if self.name_directory:
             if isinstance(item, Simulation):
                 if self.sim_name_directory:
-                    title = f"{clean_experiment_name(item.name)}_{item.id}"
+                    if item.name:
+                        title = f"{clean_experiment_name(item.name)}_{item.id}"
+                    else:
+                        title = item.id
                 else:
                     title = item.id
             else:
-                title = f"{clean_experiment_name(item.name)}_{item.id}"
+                if item.name:
+                    title = f"{clean_experiment_name(item.name)}_{item.id}"
+                else:
+                    title = item.id
         else:
             title = item.id
         return title
