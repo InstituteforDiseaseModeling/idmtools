@@ -12,11 +12,12 @@ from logging import getLogger
 from pathlib import Path
 from idmtools import IdmConfigParser
 from typing import Union, Any, List
-from idmtools.core import ItemType, EntityStatus
+from idmtools.core import ItemType, EntityStatus, TRUTHY_VALUES
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools_platform_slurm.assets import generate_batch, generate_script, generate_simulation_script
+from idmtools_platform_slurm.platform_operations.utils import clean_experiment_name
 from idmtools_platform_slurm.slurm_operations.operations_interface import SlurmOperations
 from idmtools_platform_slurm.slurm_operations.slurm_constants import SLURM_MAPS
 
@@ -28,6 +29,32 @@ logger = getLogger(__name__)
 @dataclass
 class LocalSlurmOperations(SlurmOperations):
 
+    def entity_display_name(self, item: Union[Suite, Experiment, Simulation]) -> str:
+        """
+        Get display name for entity.
+        Args:
+            item: Suite, Experiment or Simulation
+        Returns:
+            str
+        """
+        if self.platform.name_directory:
+            if isinstance(item, Simulation):
+                if self.platform.sim_name_directory:
+                    if item.name:
+                        title = f"{clean_experiment_name(item.name)}_{item.id}"
+                    else:
+                        title = item.id
+                else:
+                    title = item.id
+            else:
+                if item.name:
+                    title = f"{clean_experiment_name(item.name)}_{item.id}"
+                else:
+                    title = item.id
+        else:
+            title = item.id
+        return title
+
     def get_directory(self, item: Union[Suite, Experiment, Simulation]) -> Path:
         """
         Get item's path.
@@ -37,7 +64,7 @@ class LocalSlurmOperations(SlurmOperations):
             item file directory
         """
         if isinstance(item, Suite):
-            item_dir = Path(self.platform.job_directory, item.id)
+            item_dir = Path(self.platform.job_directory, self.entity_display_name(item))
         elif isinstance(item, Experiment):
             suite_id = item.parent_id or item.suite_id
             if suite_id is None:
@@ -50,13 +77,13 @@ class LocalSlurmOperations(SlurmOperations):
             if suite is None:
                 suite = item.parent
             suite_dir = Path(self.platform.job_directory, self.entity_display_name(suite))
-            item_dir = Path(suite_dir, item.id)
+            item_dir = Path(suite_dir, self.entity_display_name(item))
         elif isinstance(item, Simulation):
             exp = item.parent
             if exp is None:
                 raise RuntimeError("Simulation missing parent!")
             exp_dir = self.get_directory(exp)
-            item_dir = Path(exp_dir, item.id)
+            item_dir = Path(exp_dir, self.entity_display_name(item))
         else:
             raise RuntimeError(f"Get directory is not supported for {type(item)} object on SlurmPlatform")
 
@@ -71,19 +98,11 @@ class LocalSlurmOperations(SlurmOperations):
         Returns:
             item file directory
         """
-        if item_type is ItemType.SIMULATION:
-            pattern = f"*/*/{item_id}"
-        elif item_type is ItemType.EXPERIMENT:
-            pattern = f"*/{item_id}"
-        elif item_type is ItemType.SUITE:
-            pattern = f"{item_id}"
+        metas = self.platform._metas.filter(item_type=item_type, property_filter={'id': str(item_id)})
+        if len(metas) > 0:
+            return Path(metas[0]['dir'])
         else:
-            raise RuntimeError(f"Unknown item type: {item_type}")
-
-        root = Path(self.platform.job_directory)
-        for item_path in root.glob(pattern=pattern):
-            return item_path
-        raise RuntimeError(f"Not found path for item_id: {item_id} with type: {item_type}.")
+            raise RuntimeError(f"Not found path for item_id: {item_id} with type: {item_type}.")
 
     def mk_directory(self, item: Union[Suite, Experiment, Simulation] = None, dest: Union[Path, str] = None,
                      exist_ok: bool = None) -> None:
