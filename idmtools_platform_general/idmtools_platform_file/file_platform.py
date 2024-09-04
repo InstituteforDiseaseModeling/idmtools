@@ -10,14 +10,15 @@ from pathlib import Path
 from logging import getLogger
 from typing import Union, List
 from dataclasses import dataclass, field
-from idmtools.core import ItemType, EntityStatus
+from idmtools import IdmConfigParser
+from idmtools.core import ItemType, EntityStatus, TRUTHY_VALUES
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.iplatform import IPlatform, ITEM_TYPE_TO_OBJECT_INTERFACE
 from idmtools.utils.decorators import check_symlink_capabilities
-from idmtools_platform_file.platform_operations.utils import FILE_MAPS
+from idmtools_platform_file.platform_operations.utils import FILE_MAPS, clean_experiment_name
 from idmtools_platform_file.assets import generate_script, generate_simulation_script
 from idmtools_platform_file.platform_operations.asset_collection_operations import FilePlatformAssetCollectionOperations
 from idmtools_platform_file.platform_operations.experiment_operations import FilePlatformExperimentOperations
@@ -59,6 +60,10 @@ class FilePlatform(IPlatform):
         self.supported_types = {ItemType.SUITE, ItemType.EXPERIMENT, ItemType.SIMULATION}
         if self.job_directory is None:
             raise ValueError("Job Directory is required.")
+        self.job_directory = os.path.abspath(self.job_directory)
+        self.name_directory = IdmConfigParser.get_option(None, "name_directory", 'True').lower() in TRUTHY_VALUES
+        self.sim_name_directory = IdmConfigParser.get_option(None, "sim_name_directory",
+                                                             'False').lower() in TRUTHY_VALUES
         super().__post_init__()
 
     def __init_interfaces(self):
@@ -84,21 +89,21 @@ class FilePlatform(IPlatform):
             item file directory
         """
         if isinstance(item, Suite):
-            item_dir = Path(self.job_directory, item.id)
+            item_dir = Path(self.job_directory, self.entity_display_name(item))
         elif isinstance(item, Experiment):
             suite_id = item.parent_id or item.suite_id
             if suite_id is None:
                 raise RuntimeError("Experiment missing parent!")
-            suite_dir = Path(self.job_directory, str(suite_id))
-            item_dir = Path(suite_dir, item.id)
+            suite_dir = Path(self.job_directory, self.entity_display_name(item.parent))
+            item_dir = Path(suite_dir, self.entity_display_name(item))
         elif isinstance(item, Simulation):
             exp = item.parent
             if exp is None:
                 raise RuntimeError("Simulation missing parent!")
             exp_dir = self.get_directory(exp)
-            item_dir = Path(exp_dir, item.id)
+            item_dir = Path(exp_dir, self.entity_display_name(item))
         else:
-            raise RuntimeError(f"Get directory is not supported for {type(item)} object on {self.__class__.__name__}")
+            raise RuntimeError(f"Get directory is not supported for {type(item)} object on FilePlatform")
 
         return item_dir
 
@@ -111,19 +116,11 @@ class FilePlatform(IPlatform):
         Returns:
             item file directory
         """
-        if item_type is ItemType.SIMULATION:
-            pattern = f"*/*/{item_id}"
-        elif item_type is ItemType.EXPERIMENT:
-            pattern = f"*/{item_id}"
-        elif item_type is ItemType.SUITE:
-            pattern = f"{item_id}"
+        metas = self._metas.filter(item_type=item_type, property_filter={'id': str(item_id)})
+        if len(metas) > 0:
+            return Path(metas[0]['dir'])
         else:
-            raise RuntimeError(f"Unknown item type: {item_type}")
-
-        root = Path(self.job_directory)
-        for item_path in root.glob(pattern=pattern):
-            return item_path
-        raise RuntimeError(f"Not found path for item_id: {item_id} with type: {item_type}.")
+            raise RuntimeError(f"Not found path for item_id: {item_id} with type: {item_type}.")
 
     def mk_directory(self, item: Union[Suite, Experiment, Simulation] = None, dest: Union[Path, str] = None,
                      exist_ok: bool = True) -> None:
@@ -262,6 +259,32 @@ class FilePlatform(IPlatform):
             status = FILE_MAPS['None']
 
         return status
+
+    def entity_display_name(self, item: Union[Suite, Experiment, Simulation]) -> str:
+        """
+        Get display name for entity.
+        Args:
+            item: Suite, Experiment or Simulation
+        Returns:
+            str
+        """
+        if self.name_directory:
+            if isinstance(item, Simulation):
+                if self.sim_name_directory:
+                    if item.name:
+                        title = f"{clean_experiment_name(item.name)}_{item.id}"
+                    else:
+                        title = item.id
+                else:
+                    title = item.id
+            else:
+                if item.name:
+                    title = f"{clean_experiment_name(item.name)}_{item.id}"
+                else:
+                    title = item.id
+        else:
+            title = item.id
+        return title
 
     def flatten_item(self, item: IEntity, raw=False, **kwargs) -> List[object]:
         """
