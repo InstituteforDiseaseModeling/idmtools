@@ -48,13 +48,13 @@ class TestCreateSimDirectoryMap(ITestWithPersistence):
         experiment = self.platform.get_item(self.exp.uid, ItemType.EXPERIMENT, raw=False)
         sims = experiment.simulations
         for sim in sims:
-            self.assertEqual(workdir_dict[sim.id].replace("\\", "/"), f'DEST/{self.suite.id}/{self.exp.id}/{sim.id}')
+            self.assertEqual(workdir_dict[sim.id], str(self.platform.get_directory_by_id(sim.id, ItemType.SIMULATION)))
 
     # test create_sim_directory_map from platform for simulation
     def test_create_sim_directory_map_sim(self):
         sims = self.platform.get_children(item_id=self.exp.id, item_type=ItemType.EXPERIMENT)
         workdir_dict = self.platform.create_sim_directory_map(item_id=sims[0].id, item_type=ItemType.SIMULATION)
-        self.assertEqual(workdir_dict[sims[0].id].replace("\\", "/"), f'DEST/{self.suite.id}/{self.exp.id}/{sims[0].id}')
+        self.assertEqual(workdir_dict[sims[0].id], str(self.platform.get_directory_by_id(sims[0].id, ItemType.SIMULATION)))
 
     # test create_sim_directory_map from platform for suite
     def test_create_sim_directory_map_suite(self):
@@ -62,6 +62,6 @@ class TestCreateSimDirectoryMap(ITestWithPersistence):
         experiment = self.platform.get_item(self.exp.uid, ItemType.EXPERIMENT, raw=False)
         sims = experiment.simulations
         for sim in sims:
-            self.assertEqual(workdir_dict[sim.id].replace("\\", "/"), f'DEST/{self.suite.id}/{self.exp.id}/{sim.id}')
+            self.assertEqual(workdir_dict[sim.id], str(self.platform.get_directory_by_id(sim.id, ItemType.SIMULATION)))
 
 

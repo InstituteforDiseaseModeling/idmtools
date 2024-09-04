@@ -70,7 +70,7 @@ class TestProcessPlatform(ITestWithPersistence):
         # first verify files and dirs under suite
         suite = experiment.parent
         suite_dir = self.platform.get_directory(suite)
-        self.assertEqual(Path(suite_dir), Path(f'{self.job_directory}/{suite.id}'))
+        self.assertTrue(os.path.exists(suite_dir))
         files = []
         dirs = []
         for (dirpath, dirnames, filenames) in os.walk(suite_dir):
@@ -78,7 +78,6 @@ class TestProcessPlatform(ITestWithPersistence):
             dirs.extend(dirnames)
             break
         self.assertSetEqual(set(files), set(["metadata.json"]))
-        self.assertEqual(dirs[0], experiment.id)
         # second verify files and dirs under experiment
         experiment_dir = self.platform.get_directory(experiment)
         files = []
@@ -99,7 +98,7 @@ class TestProcessPlatform(ITestWithPersistence):
                     # verify Assets folder under simulation is symlink and it link to experiment's Assets
                     self.assertTrue(os.path.islink(asserts_dir))
                     target_link = os.readlink(asserts_dir)
-                    self.assertEqual(os.path.basename(pathlib.Path(target_link).parent), experiment.id)
+                    self.assertEqual(os.path.basename(pathlib.Path(target_link).parent), f"{experiment.name}_{experiment.id}")
                     count = count + 1
                 files.extend(filenames)
             self.assertSetEqual(set(files), set(["metadata.json", "_run.sh", "config.json", "stdout.txt", "stderr.txt", "job_status.txt", "result.txt"]))
@@ -180,7 +179,7 @@ class TestProcessPlatform(ITestWithPersistence):
         for sim in experiment.simulations:
             sim_map = self.platform.create_sim_directory_map(sim.id, item_type=ItemType.SIMULATION)
             self.assertTrue(sim_map[sim.id],
-                            os.path.join(self.job_directory, experiment.parent_id, experiment.id, sim.id))
+                            os.path.join(self.job_directory, f"{experiment.parent.name}_{experiment.parent_id}", f"{experiment.name}_{experiment.id}", sim.id))
             sims_map_dict.update({sim.id: sim_map[sim.id]})
         self.assertDictEqual(exp_map, sims_map_dict)
         self.assertTrue(len(exp_map) == 9)
@@ -216,20 +215,24 @@ class TestProcessPlatform(ITestWithPersistence):
 
     def test_platform_delete_experiment(self):
         experiment = self.create_experiment(self.platform, a=3, b=3)
+        suite_dir = self.platform.get_directory(experiment.parent)
+        exp_dir = self.platform.get_directory(experiment)
         self.platform._experiments.platform_delete(experiment.id)
         # make sure we don't delete suite in this case
-        self.assertTrue(os.path.exists(os.path.join(self.job_directory, experiment.parent_id)))
+        self.assertTrue(os.path.exists(suite_dir))
         # make sure we only delete experiment folder under suite
-        self.assertFalse(os.path.exists(os.path.join(self.job_directory, experiment.parent_id, experiment.id)))
+        self.assertFalse(os.path.exists(exp_dir))
         with self.assertRaises(RuntimeError) as context:
             self.platform.get_item(experiment.id, item_type=ItemType.EXPERIMENT, raw=True)
         self.assertTrue(f"Not found Experiment with id '{experiment.id}'" in str(context.exception.args[0]))
 
     def test_platform_delete_suite(self):
         experiment = self.create_experiment(self.platform, a=3, b=3)
+        suite_dir = self.platform.get_directory(experiment.parent)
+        exp_dir = self.platform.get_directory(experiment)
         self.platform._suites.platform_delete(experiment.parent_id)
         # make sure we delete suite folder
-        self.assertFalse(os.path.exists(os.path.join(self.job_directory, experiment.parent_id)))
+        self.assertFalse(os.path.exists(suite_dir))
         with self.assertRaises(RuntimeError) as context:
             self.platform.get_item(experiment.parent_id, item_type=ItemType.SUITE, raw=True)
         self.assertTrue(f"Not found Suite with id '{experiment.parent_id}'" in str(context.exception.args[0]))

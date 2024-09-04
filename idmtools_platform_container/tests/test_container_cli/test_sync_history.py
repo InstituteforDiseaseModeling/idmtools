@@ -4,6 +4,8 @@ import sys
 import unittest
 from unittest.mock import patch
 import pytest
+
+from idmtools.core import ItemType
 from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 import idmtools_platform_container.cli.container as container_cli
@@ -26,7 +28,8 @@ class TestContainerPlatformSyncHistoryCli(TestContainerPlatformCliBase):
         self.assertEqual(result.exit_code, 0)
         self.assertEqual('There are 1 Experiment cache in history.', mock_console.call_args_list[0].args[0])
         # remove experiment folder
-        shutil.rmtree(f"{self.platform.job_directory}/{experiment.parent_id}/{experiment.id}", ignore_errors=False)
+        exp_folder = self.platform.get_directory_by_id(experiment.id, ItemType.EXPERIMENT)
+        shutil.rmtree(exp_folder, ignore_errors=False)
         result = self.runner.invoke(container_cli.container, ['history'])
         self.assertEqual(result.exit_code, 0)
         self.assertEqual('There are 1 Experiment cache in history.', mock_console.call_args_list[0].args[0])

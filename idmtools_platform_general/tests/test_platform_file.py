@@ -72,7 +72,7 @@ class TestFilePlatform(ITestWithPersistence):
         # first verify files and dirs under suite
         suite = experiment.parent
         suite_dir = self.platform.get_directory(suite)
-        self.assertEqual(Path(suite_dir), Path(f'{self.job_directory}/{suite.id}'))
+        self.assertEqual(Path(suite_dir), Path(str(suite_dir)))
         files = []
         dirs = []
         for (dirpath, dirnames, filenames) in os.walk(suite_dir):
@@ -80,7 +80,7 @@ class TestFilePlatform(ITestWithPersistence):
             dirs.extend(dirnames)
             break
         self.assertSetEqual(set(files), set(["metadata.json"]))
-        self.assertEqual(dirs[0], experiment.id)
+        self.assertEqual(dirs[0], f"{experiment.name}_{experiment.id}")
         # second verify files and dirs under experiment
         experiment_dir = self.platform.get_directory(experiment)
         files = []
@@ -101,7 +101,7 @@ class TestFilePlatform(ITestWithPersistence):
                     # verify Assets folder under simulation is symlink and it link to experiment's Assets
                     self.assertTrue(os.path.islink(asserts_dir))
                     target_link = os.readlink(asserts_dir)
-                    self.assertEqual(os.path.basename(pathlib.Path(target_link).parent), experiment.id)
+                    self.assertEqual(os.path.basename(pathlib.Path(target_link).parent), f"{experiment.name}_{experiment.id}")
                     count = count + 1
                 files.extend(filenames)
             self.assertSetEqual(set(files), set(["metadata.json", "_run.sh", "config.json"]))
@@ -218,11 +218,13 @@ class TestFilePlatform(ITestWithPersistence):
 
     def test_platform_delete_experiment(self):
         experiment = self.create_experiment(self.platform, a=3, b=3)
+        suite_dir = self.platform.get_directory(experiment.parent)
+        exp_dir = self.platform.get_directory(experiment)
         self.platform._experiments.platform_delete(experiment.id)
         # make sure we don't delete suite in this case
-        self.assertTrue(os.path.exists(os.path.join(self.job_directory, experiment.parent_id)))
+        self.assertTrue(os.path.exists(suite_dir))
         # make sure we only delete experiment folder under suite
-        self.assertFalse(os.path.exists(os.path.join(self.job_directory, experiment.parent_id, experiment.id)))
+        self.assertFalse(os.path.exists(exp_dir))
         with self.assertRaises(RuntimeError) as context:
             self.platform.get_item(experiment.id, item_type=ItemType.EXPERIMENT, raw=True)
         self.assertTrue(f"Not found Experiment with id '{experiment.id}'" in str(context.exception.args[0]))

@@ -224,8 +224,8 @@ class TestPlatformExperiment(unittest.TestCase):
             experiment = Experiment.from_task(task, name="run_command")
             experiment.run(wait_until_done=True)
             self.assertEqual(experiment.status, EntityStatus.SUCCEEDED)
-            with open(os.path.join(temp_dir, experiment.parent_id, experiment.id, experiment.simulations[0].id,
-                                   "_run.sh"), "r") as file:
+            sim_dir = platform.get_directory_by_id(experiment.simulations[0].id, ItemType.SIMULATION)
+            with open(os.path.join(str(sim_dir), "_run.sh"), "r") as file:
                 content = file.read()
                 self.assertIn(f'until [ "$n" -ge {retries} ]', content)
             # clean up
@@ -341,11 +341,14 @@ class TestPlatformExperiment(unittest.TestCase):
         task = CommandTask(command=command)
         experiment = Experiment.from_task(task, name="run_command")
         experiment.run(wait_until_done=False, platform=platform)
+        suite_dir = platform.get_directory_by_id(experiment.parent_id, ItemType.SUITE)
+        exp_dir = platform.get_directory(experiment)
         platform._experiments.platform_delete(experiment.id)
         # make sure we don't delete suite in this case
-        self.assertTrue(os.path.exists(os.path.join(job_directory, experiment.parent_id)))
+
+        self.assertTrue(os.path.exists(suite_dir))
         # make sure we only delete experiment folder under suite
-        self.assertFalse(os.path.exists(os.path.join(job_directory, experiment.parent_id, experiment.id)))
+        self.assertFalse(os.path.exists(exp_dir))
         # verify the job is deleted from history
         job = JobHistory.get_job(experiment.id)
         self.assertIsNone(job)
@@ -359,13 +362,14 @@ class TestPlatformExperiment(unittest.TestCase):
         task = CommandTask(command=command)
         experiment = Experiment.from_task(task, name="run_command")
         experiment.run(wait_until_done=False, platform=platform)
+        exp_dir = platform.get_directory(experiment)
+        sim_dir = platform.get_directory_by_id(experiment.simulations[0].id, ItemType.SIMULATION)
         # delete simulation
         platform._simulations.platform_delete(experiment.simulations[0].id)
         # make sure we don't delete suite or experiment in this case
-        self.assertTrue(os.path.exists(os.path.join(job_directory, experiment.parent_id, experiment.id)))
+        self.assertTrue(os.path.exists(exp_dir))
         # make sure we only delete simulation folder under experiment
-        self.assertFalse(os.path.exists(
-            os.path.join(job_directory, experiment.parent_id, experiment.id, experiment.simulations[0].id)))
+        self.assertFalse(os.path.exists(sim_dir))
         # verify simulation job is deleted from history
         job = find_running_job(experiment.simulations[0].id, platform.container_id)
         self.assertIsNone(job)

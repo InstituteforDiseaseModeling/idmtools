@@ -23,7 +23,7 @@ cwd = os.path.dirname(__file__)
 class TestSuiteExperiment(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + '--' + self._testMethodName
-        self.job_directory = os.path.join(cwd, 'DEST')
+        self.job_directory = os.path.join(cwd, 'DEST11')
         self.platform = Platform('SLURM_LOCAL', job_directory=self.job_directory)
         command = "Assets/hello.sh"
         self.task = CommandTask(command=command)
@@ -49,21 +49,22 @@ class TestSuiteExperiment(ITestWithPersistence):
     def verify_result(self, suite):
         experiments = self.platform.get_children(suite.id, item_type=ItemType.SUITE)
         experiment = experiments[0]
-        suite_dir = self.platform.get_directory(suite)
-        suite_sub_dirs, suite_files = self.get_dirs_and_files(suite_dir)
+        suite_dir = str(self.platform.get_directory(suite))
+        exp_dir = str(self.platform.get_directory(experiment))
+        suite_sub_dirs, suite_files = self.get_dirs_and_files(pathlib.Path(suite_dir))
         # Verify all files under suite
         self.assertTrue(len(suite_files) == 1)
-        self.assertEqual(suite_files[0], pathlib.Path(self.job_directory + "/" + suite.id + "/metadata.json"))
+        self.assertEqual(suite_files[0], pathlib.Path(suite_dir + "/metadata.json"))
         # Verify all sub directories under suite
         self.assertTrue(len(suite_sub_dirs) == 1)
-        self.assertEqual(suite_sub_dirs[0], pathlib.Path(self.job_directory + "/" + suite.id + "/" + experiment.id))
+        self.assertEqual(suite_sub_dirs[0], pathlib.Path(exp_dir))
 
         for experiment in suite.experiments:
             experiment_dir = self.platform.get_directory(experiment)
             experiment_sub_dirs, experiment_files = self.get_dirs_and_files(experiment_dir)
             # Verify all files under experiment
             self.assertTrue(len(experiment_files) == 4)
-            experiment_path_prefix = self.job_directory + "/" + suite.id + "/" + experiment.id + "/"
+            experiment_path_prefix = exp_dir + "/"
             expected_files = set([pathlib.Path(experiment_path_prefix + "metadata.json"),
                                   pathlib.Path(experiment_path_prefix + "run_simulation.sh"),
                                   pathlib.Path(experiment_path_prefix + "sbatch.sh"),
@@ -71,15 +72,14 @@ class TestSuiteExperiment(ITestWithPersistence):
             self.assertSetEqual(set(experiment_files), expected_files)
             # Verify all sub directories under experiment
             self.assertTrue(len(experiment_sub_dirs) == 2)
-            self.assertSetEqual(set(experiment_sub_dirs), set([pathlib.Path(
-                self.job_directory + "/" + suite.id + "/" + experiment.id + "/" + experiment.simulations[0].id),
+            self.assertSetEqual(set(experiment_sub_dirs), set([pathlib.Path(exp_dir + "/" + experiment.simulations[0].id),
                 pathlib.Path(experiment_path_prefix + "Assets")]))
 
     def verify_suite_only_case(self, suite):
         suite_dir = self.platform.get_directory(suite)
         suite_sub_dirs, suite_files = self.get_dirs_and_files(suite_dir)
         self.assertTrue(len(suite_files) == 1)
-        self.assertEqual(suite_files[0], pathlib.Path(self.job_directory + "/" + suite.id + "/metadata.json"))
+        self.assertEqual(suite_files[0], pathlib.Path(str(suite_dir) + "/metadata.json"))
         # Verify no sub directory under suite at this point
         self.assertTrue(len(suite_sub_dirs) == 0)
 
@@ -245,7 +245,7 @@ class TestSuiteExperiment(ITestWithPersistence):
         experiment.parent_id = suite.id
         with self.assertRaises(RuntimeError) as ex:
             experiment.run(platform=self.platform, wait_until_done=False, dry_run=True)
-        self.assertEqual(ex.exception.args[0], f"Not found Suite with id '{suite.id}'")
+        self.assertEqual(ex.exception.args[0], f"Not found Experiment with id '{experiment.id}'")
 
     # Case 17, 18 test with experiment.suite_id = suite.id
     # Verify experiment.run with existing suite.id
@@ -292,5 +292,16 @@ class TestSuiteExperiment(ITestWithPersistence):
         experiment = Experiment.from_task(self.task, name="run_task")
         suite = add_dummy_suite(experiment)
         self.platform.run_items(items=suite, wait_until_done=False, dry_run=True)
+        self.verify_result(suite)
+
+    def test_23(self):
+        # create suite first without name
+        suite = Suite()
+        suite.run(platform=self.platform, wait_until_done=False, dry_run=True)
+        self.verify_suite_only_case(suite)
+        # add suite.id as experiment.parent_id
+        experiment = Experiment.from_task(self.task, name="run_task")
+        experiment.parent_id = suite.id
+        experiment.run(platform=self.platform, wait_until_done=False, dry_run=True)
         self.verify_result(suite)
 

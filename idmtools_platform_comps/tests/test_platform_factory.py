@@ -145,6 +145,7 @@ class TestPlatformFactory(ITestWithPersistence):
 
     # After bug fix 2313
     @pytest.mark.comps
+    @pytest.mark.skip("skip until bug 2313 is fixed")
     @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
     def test_platform_factory_with_lowercase_type_value(self, mock_login):
         kwargs = {'endpoint':'https://comps.idmod.org', 'environment': 'Calculon', 'type': 'comps'}

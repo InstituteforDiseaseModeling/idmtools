@@ -147,7 +147,7 @@ class SlurmPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         """
         if isinstance(item, Experiment):
             self.pre_create(item.assets)
-            exp_asset_dir = Path(self.platform._op_client.get_directory(item), 'Assets')
+            exp_asset_dir = Path(self.platform.get_directory(item), 'Assets')
             self.platform._op_client.mk_directory(dest=exp_asset_dir)
             for asset in item.assets:
                 self.platform._op_client.mk_directory(dest=exp_asset_dir.joinpath(asset.relative_path), exist_ok=True)
@@ -155,9 +155,8 @@ class SlurmPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
             self.post_create(item.assets)
         elif isinstance(item, Simulation):
             self.pre_create(item.assets)
-            exp_dir = self.platform._op_client.get_directory(item.parent)
+            sim_dir = self.platform.get_directory(item)
             for asset in item.assets:
-                sim_dir = Path(exp_dir, item.id)
                 self.copy_asset(asset, sim_dir)
             self.post_create(item.assets)
         else:
