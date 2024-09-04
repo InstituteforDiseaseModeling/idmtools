@@ -122,6 +122,7 @@ class Platform:
         # Load all Platform plugins
         cls._platform_plugins = PlatformPlugins().get_plugin_map()
         cls._aliases = PlatformPlugins().get_aliases()
+        cls._type_map = {key.upper(): key for key in cls._platform_plugins.keys()}
 
         _platform = cls._create_platform_from_block(block, **kwargs)
         set_current_platform(_platform)
@@ -143,7 +144,7 @@ class Platform:
         Raise:
             ValueError: when the platform is of an unknown type
         """
-        if platform_type not in cls._platform_plugins:
+        if platform_type.upper() not in cls._type_map:
             raise ValueError(f"{platform_type} is an unknown Platform Type. "
                              f"Supported platforms are {', '.join(cls._platform_plugins.keys())}")
 
@@ -168,7 +169,8 @@ class Platform:
             # Make sure we support platform_type
         cls._validate_platform_type(platform_type)
 
-        # Find the correct Platform type
+        # Find the correct Platform
+        platform_type = cls._type_map[platform_type.upper()]
         platform_spec = cls._platform_plugins.get(platform_type)
         platform_cls = platform_spec.get_type()
 
