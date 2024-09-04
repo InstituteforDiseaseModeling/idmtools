@@ -870,7 +870,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         if not valid:
             raise UnsupportedPlatformType(
-                f"The provided type {_type} is invalid or not supported by platform {self.__class__.__name__}. It only supports types: {self.platform_type_map.values()}")
+                f"The provided type {_type} is invalid or not supported by platform {self.__class__.__name__}. It only supports ItemType: {', '.join([value.name for value in self.platform_type_map.values()])}")
 
     def __enter__(self):
         """
