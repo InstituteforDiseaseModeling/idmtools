@@ -1,3 +1,6 @@
+import shutil
+from os.path import exists, join, abspath, dirname
+
 import allure
 import os
 import unittest
@@ -65,6 +68,11 @@ class TestRetrieval(ITestWithPersistence):
         self.assertIsNone(comps_experiment.tags)
         self.assertEqual(self.exp.uid, comps_experiment.id)
 
+        # Test retrieving with wrong type
+        with self.assertRaises(ValueError) as e:
+            self.platform.get_item(self.exp.uid, "my_type")
+        self.assertEqual("The provided type my_type is invalid or not supported by this platform...", e.exception.args[0])
+
     def test_retrieve_simulation(self):
         base = self.exp.simulations[0]
         sim = self.platform.get_item(base.uid, ItemType.SIMULATION)
@@ -94,6 +102,21 @@ class TestRetrieval(ITestWithPersistence):
         for s in self.exp.simulations:
             self.assertIn(s.uid, [s.uid for s in children])
         self.assertCountEqual(self.platform.get_children(self.exp.simulations[0].uid, ItemType.SIMULATION), [])
+
+    def test_get_files_by_id_with_invalid_type(self):
+        base = self.exp.simulations[0]
+        self.platform.get_files_by_id(base.id, ItemType.SIMULATION, files=["output/result.json"], output=".")
+        self.assertTrue(exists(join(dirname(abspath(__file__)), base.id, "output/result.json")))
+
+        # test get_files_by_id with invalid type
+        with self.assertRaises(ValueError) as e:
+            self.platform.get_files_by_id(base.id, "my_type", files=["output/result.json"], output=".")
+        self.assertEqual("The provided type my_type is invalid or not supported by this platform...", e.exception.args[0])
+        # cleanup folder after test done
+        try:
+            shutil.rmtree(join(dirname(abspath(__file__)), base.id))
+        except:
+            pass
 
 
 if __name__ == '__main__':

@@ -94,7 +94,7 @@ class TestAddingSimulationsToExistingExperiment(unittest.TestCase):
         # add new simulations
         new_sim = Simulation.from_task(base_task)
         new_sim.task.set_parameter("Run_Number", 6)
-        exp.simulations.append(new_sim)
+        exp.add_simulation(new_sim)
 
         count = 0
         for sim in exp.simulations:
