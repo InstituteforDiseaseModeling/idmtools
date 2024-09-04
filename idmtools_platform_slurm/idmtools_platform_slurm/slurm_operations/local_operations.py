@@ -85,7 +85,7 @@ class LocalSlurmOperations(SlurmOperations):
             exp_dir = self.get_directory(exp)
             item_dir = Path(exp_dir, self.entity_display_name(item))
         else:
-            raise RuntimeError(f"Get directory is not supported for {type(item)} object on FilePlatform")
+            raise RuntimeError(f"Get directory is not supported for {type(item)} object on SlurmPlatform")
 
         return item_dir
 
