@@ -14,6 +14,7 @@ from idmtools.config import IdmConfigParser
 from idmtools.core import TRUTHY_VALUES
 from idmtools.core.context import set_current_platform, remove_current_platform
 from idmtools.utils.entities import validate_user_inputs_against_dataclass
+from idmtools.utils.json import IDMJSONEncoder
 
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
@@ -144,7 +145,7 @@ class Platform:
         Raise:
             ValueError: when the platform is of an unknown type
         """
-        if platform_type.upper() not in cls._type_map:
+        if platform_type is None or platform_type.upper() not in cls._type_map:
             raise ValueError(f"{platform_type} is an unknown Platform Type. "
                              f"Supported platforms are {', '.join(cls._platform_plugins.keys())}")
 
@@ -305,4 +306,4 @@ class Platform:
         if IdmConfigParser.is_output_enabled() and IdmConfigParser.get_option(None, "SHOW_PLATFORM_CONFIG",
                                                                               't').lower() in TRUTHY_VALUES:
             user_logger.log(VERBOSE, f"\nInitializing {platform_cls.__name__} with:")
-            user_logger.log(VERBOSE, json.dumps(inputs, indent=3))
+            user_logger.log(VERBOSE, json.dumps(inputs, indent=3, cls=IDMJSONEncoder))
