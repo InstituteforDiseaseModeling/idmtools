@@ -154,9 +154,8 @@ class FilePlatformAssetCollectionOperations(IPlatformAssetCollectionOperations):
             self.post_create(item.assets)
         elif isinstance(item, Simulation):
             self.pre_create(item.assets)
-            exp_dir = self.platform.get_directory(item.parent)
+            sim_dir = self.platform.get_directory(item)
             for asset in item.assets:
-                sim_dir = Path(exp_dir, item.id)
                 self.copy_asset(asset, sim_dir)
             self.post_create(item.assets)
         else:
