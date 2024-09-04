@@ -121,7 +121,8 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         # Action based on the caller
         if caller not in CALLER_LIST:
-            logger.warning("Please use Factory to create Platform! For example: \n    platform = Platform('COMPS', **kwargs)")
+            logger.warning(
+                "Please use Factory to create Platform! For example: \n    platform = Platform('COMPS', **kwargs)")
         return super().__new__(cls)
 
     def __post_init__(self) -> NoReturn:
@@ -207,8 +208,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             ValueError: If the item type is not supported
             UnknownItemException: If the item type is not found on platform
         """
-        if not item_type or item_type not in self.platform_type_map.values():
-            raise ValueError(f"The provided type {item_type} is invalid or not supported by this platform...")
+        self.validate_type(item_type)
 
         cache_key = self.get_cache_key(force, item_id, item_type, kwargs, raw, 'r' if raw else 'o')
 
@@ -393,8 +393,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             The parent of the object or None.
 
         """
-        if not item_type or item_type not in self.platform_type_map.values():
-            raise UnsupportedPlatformType("The provided type is invalid or not supported by this platform...")
+        self.validate_type(item_type)
 
         # Create the cache key based on everything we pass to the function
         cache_key = f'p_{item_id}' + ('r' if raw else 'o') + '_'.join(f"{k}_{v}" for k, v in kwargs.items())
@@ -579,8 +578,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         Args:
             item: The item to check status for.
         """
-        if item.item_type not in self.platform_type_map.values():
-            raise UnsupportedPlatformType("The provided type is invalid or not supported by this platform...")
+        self.validate_type(item)
         interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
         if item.platform is None:
             item.platform = self
@@ -604,8 +602,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             For experiments, this returns a dictionary with key as sim id and then the values as a dict of the
             simulations described above
         """
-        if item.item_type not in self.platform_type_map.values():
-            raise UnsupportedPlatformType("The provided type is invalid or not supported by this platform...")
+        self.validate_type(item)
         interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
         ret = getattr(self, interface).get_assets(item, files, **kwargs)
 
@@ -849,10 +846,31 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         Returns: dict with key the object type
         """
-        if item.item_type != ItemType.WORKFLOW_ITEM:
-            raise UnsupportedPlatformType("The provided type is invalid or not supported by this platform...")
+        self.validate_type(item, ItemType.WORKFLOW_ITEM)
         interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
         return getattr(self, interface).get_related_items(item, relation_type)
+
+    def validate_type(self, item: Union[IEntity, ItemType], target: ItemType = None) -> NoReturn:
+        """
+        Validate if the item is supported by the platform.
+
+        Args:
+            item: Item to validate
+            target: Target type to validate against
+
+        Returns:
+            No return
+        """
+        valid = True
+        _type = item.item_type if isinstance(item, IEntity) else item
+        if target is not None and _type != target:
+            valid = False
+        elif _type not in self.platform_type_map.values():
+            valid = False
+
+        if not valid:
+            raise UnsupportedPlatformType(
+                f"The provided type {_type} is invalid or not supported by platform {self.__class__.__name__}. It only supports types: {self.platform_type_map.values()}")
 
     def __enter__(self):
         """
