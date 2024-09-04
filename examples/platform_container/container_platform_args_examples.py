@@ -31,9 +31,10 @@ def run_platform_with_new_container():
         ts.add_builder(builder)
         # create experiment from task
         experiment = Experiment.from_template(ts, name="run_platform_with_new_container")
-        experiment.run(wait_until_done=True, platform=platform)
+        experiment.run(wait_until_done=True)
         assert experiment.succeeded, f"Experiment {experiment.id} failed."
-        assert os.path.exists(f"DEST/{experiment.parent_id}/{experiment.id}"), "experiment directory does not exist."
+        exp_dir = platform.get_directory(experiment)
+        assert os.path.exists(exp_dir), "experiment directory does not exist."
         # clean up
         stop_container(platform.container_id, remove=True)
 
