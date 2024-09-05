@@ -109,9 +109,10 @@ class TestRetrieval(ITestWithPersistence):
         self.assertTrue(exists(join(dirname(abspath(__file__)), base.id, "output/result.json")))
 
         # test get_files_by_id with invalid type
-        with self.assertRaises(ValueError) as e:
+        from idmtools.core import UnsupportedPlatformType
+        with self.assertRaises(UnsupportedPlatformType) as e:
             self.platform.get_files_by_id(base.id, "my_type", files=["output/result.json"], output=".")
-        self.assertEqual("The provided type my_type is invalid or not supported by this platform...", e.exception.args[0])
+        self.assertEqual("The provided type my_type is invalid or not supported by platform COMPSPlatform. It only supports ItemType: EXPERIMENT, SIMULATION, SUITE, WORKFLOW_ITEM, ASSETCOLLECTION", e.exception.args[0])
         # cleanup folder after test done
         try:
             shutil.rmtree(join(dirname(abspath(__file__)), base.id))
