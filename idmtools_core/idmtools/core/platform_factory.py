@@ -167,10 +167,10 @@ class Platform:
             platform_type = kwargs['type']
             kwargs.pop('type')
 
-            # Make sure we support platform_type
+        # Make sure we support platform_type
         cls._validate_platform_type(platform_type)
 
-        # Find the correct Platform
+        # Find the correct Platform type
         platform_type = cls._type_map[platform_type.upper()]
         platform_spec = cls._platform_plugins.get(platform_type)
         platform_cls = platform_spec.get_type()
