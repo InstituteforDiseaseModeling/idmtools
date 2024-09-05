@@ -862,7 +862,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             No return
         """
         valid = True
-        _type = item if isinstance(item, ItemType) else item.item_type
+        _type = item if isinstance(item, (str, ItemType)) else item.item_type
         if target is not None and _type != target:
             valid = False
         elif _type not in self.platform_type_map.values():
