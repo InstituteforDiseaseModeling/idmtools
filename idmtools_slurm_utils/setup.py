@@ -47,6 +47,7 @@ setup(
     description="idmtools slurm utils",
     install_requires=extra_require_files['requirements'],
     long_description=readme,
+    long_description_content_type="text/markdown",
     include_package_data=True,
     keywords='modeling, IDM',
     name='idmtools-slurm-utils',

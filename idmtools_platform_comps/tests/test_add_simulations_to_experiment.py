@@ -40,7 +40,7 @@ class TestAddSimulationsToExperiment(ITestWithPersistence):
         experiment.assets = experiment.assets.copy()
         model_path = os.path.join(COMMON_INPUT_PATH, "python", "hello_world.py")
         sims_template = self.get_templatedsimluation(model_path, n=3)
-        experiment.simulations.extend(sims_template)
+        experiment.add_simulations(sims_template)
         experiment.run(wait_until_done=True, regather_common_assets=True)
         self.assertTrue(experiment.succeeded)
         self.assertEqual(3, len(experiment.simulations))

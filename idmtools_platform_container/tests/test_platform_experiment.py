@@ -379,5 +379,17 @@ class TestPlatformExperiment(unittest.TestCase):
         # clean up
         stop_container(platform.container_id, remove=True)
 
+    def test_experiment_name_with_special_chars(self):
+        job_directory = tempfile.gettempdir()
+        platform = ContainerPlatform(job_directory=job_directory)
+        command = "sleep 100"
+        task = CommandTask(command=command)
+        experiment = Experiment.from_task(task, name="run*$!&command")
+        experiment.run(wait_until_done=True, platform=platform)
+        exp_dir = platform.get_directory_by_id(experiment.id, ItemType.EXPERIMENT)
+        self.assertEqual(str(exp_dir).replace("\\", "/"), os.path.join(job_directory, f"Suite_{experiment.parent_id}/run____command_{experiment.id}").replace("\\", "/"))
+        # clean up
+        stop_container(platform.container_id, remove=True)
+
     # def test_delete_container_by_image_prefix(self):
     #     delete_containers_by_image_prefix("docker-production-public.packages.idmod.org/idmtools/container-rocky-runtime")

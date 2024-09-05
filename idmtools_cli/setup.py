@@ -38,12 +38,12 @@ setup(
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
-        'Programming Language :: Python :: 3.12',
-        'Framework:: IDM-Tools :: CLI'
+        'Programming Language :: Python :: 3.12'
     ],
     description="CLI for IDM-Tools",
     install_requires=requirements,
     long_description=readme,
+    long_description_content_type="text/markdown",
     include_package_data=True,
     keywords='modeling, IDM, cli',
     name='idmtools_cli',
