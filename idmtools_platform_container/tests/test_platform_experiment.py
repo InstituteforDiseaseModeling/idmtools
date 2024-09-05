@@ -387,6 +387,8 @@ class TestPlatformExperiment(unittest.TestCase):
         experiment = Experiment.from_task(task, name="run*$!&command")
         experiment.run(wait_until_done=True, platform=platform)
         exp_dir = platform.get_directory_by_id(experiment.id, ItemType.EXPERIMENT)
+        self.assertEqual(platform.name_directory, True)
+        self.assertEqual(platform.sim_name_directory, False)
         self.assertEqual(str(exp_dir).replace("\\", "/"), os.path.join(job_directory, f"Suite_{experiment.parent_id}/run____command_{experiment.id}").replace("\\", "/"))
         # clean up
         stop_container(platform.container_id, remove=True)
