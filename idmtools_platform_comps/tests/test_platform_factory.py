@@ -227,3 +227,10 @@ class TestPlatformFactory(ITestWithPersistence):
             exp.run(platform=platform)
         self.assertTrue("Type must be specified in Platform constructor." in str(context.exception.args[0]))
 
+    @pytest.mark.comps
+    @pytest.mark.timeout(60)
+    def test_type_case_ini(self):
+        platform = Platform(block='Test_Type')
+        exp = self.run_python_version("test_type_case_ini")
+        exp.run(wait_until_done=True, platform=platform)
+        self.assertTrue(exp.succeeded)
