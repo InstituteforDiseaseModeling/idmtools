@@ -234,3 +234,10 @@ class TestPlatformFactory(ITestWithPersistence):
         platform = Platform(**kwargs)
         self.assertEqual(platform.__class__.__name__, 'SlurmPlatform')
         self.assertEqual(platform._kwargs, kwargs)
+
+    def test_slurm_platform(self):
+        from idmtools_platform_slurm.slurm_operations.slurm_constants import SlurmOperationalMode
+        kwargs = {'job_directory': 'destination_directory', 'type': 'Slurm'}
+        platform = Platform(**kwargs)
+        self.assertEqual(platform.__class__.__name__, 'SlurmPlatform')
+        self.assertEqual(platform._kwargs, kwargs)
