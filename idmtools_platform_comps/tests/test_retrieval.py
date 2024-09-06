@@ -10,7 +10,7 @@ import pytest
 from COMPS.Data import Experiment as COMPSExperiment, Simulation as COMPSSimulation
 
 from idmtools.builders import SimulationBuilder
-from idmtools.core import ItemType
+from idmtools.core import ItemType, UnsupportedPlatformType
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.templated_simulation import TemplatedSimulations
@@ -69,9 +69,9 @@ class TestRetrieval(ITestWithPersistence):
         self.assertEqual(self.exp.uid, comps_experiment.id)
 
         # Test retrieving with wrong type
-        with self.assertRaises(ValueError) as e:
+        with self.assertRaises(UnsupportedPlatformType) as e:
             self.platform.get_item(self.exp.uid, "my_type")
-        self.assertEqual("The provided type my_type is invalid or not supported by this platform...", e.exception.args[0])
+        self.assertEqual("The provided type my_type is invalid or not supported by platform COMPSPlatform. It only supports ItemType: EXPERIMENT, SIMULATION, SUITE, WORKFLOW_ITEM, ASSETCOLLECTION", e.exception.args[0])
 
     def test_retrieve_simulation(self):
         base = self.exp.simulations[0]
@@ -109,7 +109,6 @@ class TestRetrieval(ITestWithPersistence):
         self.assertTrue(exists(join(dirname(abspath(__file__)), base.id, "output/result.json")))
 
         # test get_files_by_id with invalid type
-        from idmtools.core import UnsupportedPlatformType
         with self.assertRaises(UnsupportedPlatformType) as e:
             self.platform.get_files_by_id(base.id, "my_type", files=["output/result.json"], output=".")
         self.assertEqual("The provided type my_type is invalid or not supported by platform COMPSPlatform. It only supports ItemType: EXPERIMENT, SIMULATION, SUITE, WORKFLOW_ITEM, ASSETCOLLECTION", e.exception.args[0])
