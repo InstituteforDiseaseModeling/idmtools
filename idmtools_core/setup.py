@@ -59,11 +59,11 @@ setup(
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
         'Programming Language :: Python :: 3.12',
-        'Framework:: IDM-Tools'
     ],
     description="Core tools for modeling",
     install_requires=extra_require_files['requirements'] + conditional_requirements,
     long_description=readme,
+    long_description_content_type="text/markdown",
     include_package_data=True,
     keywords='modeling, IDM',
     name='idmtools',

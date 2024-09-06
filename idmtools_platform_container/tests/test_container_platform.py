@@ -18,6 +18,8 @@ from idmtools_platform_container.container_platform import ContainerPlatform
 
 @pytest.mark.serial
 class TestContainerPlatform(unittest.TestCase):
+    def setUp(self):
+        IdmConfigParser.clear_instance()
     # @classmethod
     # def tearDownClass(cls) -> None:
     #     try:

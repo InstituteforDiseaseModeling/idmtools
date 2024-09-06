@@ -5,6 +5,8 @@ from pathlib import Path
 from unittest.mock import patch
 import pytest
 from click.testing import CliRunner
+
+from idmtools import IdmConfigParser
 from idmtools.assets import AssetCollection, Asset
 from idmtools.core import ItemType, EntityStatus
 from idmtools.core.platform_factory import Platform
@@ -23,6 +25,10 @@ from utils import find_containers_by_prefix, is_valid_container_name_with_prefix
 
 @pytest.mark.serial
 class TestPlatformExperiment(unittest.TestCase):
+
+    def setUp(self):
+        IdmConfigParser.clear_instance()
+
     def test_container_platform_integration(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             platform = Platform("Container", job_directory=temp_dir)
@@ -378,6 +384,21 @@ class TestPlatformExperiment(unittest.TestCase):
         self.assertIsNotNone(job_exp)
         # clean up
         stop_container(platform.container_id, remove=True)
+
+    def test_experiment_name_with_special_chars(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            platform = ContainerPlatform(job_directory=temp_dir)
+            command = "sleep 100"
+            task = CommandTask(command=command)
+            experiment = Experiment.from_task(task, name="run*$!&command")
+            experiment.run(wait_until_done=True)
+            exp_dir = platform.get_directory_by_id(experiment.id, ItemType.EXPERIMENT)
+            from idmtools.core import TRUTHY_VALUES
+            self.assertTrue(str(platform.name_directory).lower() in TRUTHY_VALUES)
+            self.assertFalse(str(platform.sim_name_directory).lower() in TRUTHY_VALUES)
+            self.assertEqual(str(exp_dir).replace("\\", "/"), os.path.join(temp_dir, f"Suite_{experiment.parent_id}/run____command_{experiment.id}").replace("\\", "/"))
+            # clean up
+            stop_container(platform.container_id, remove=True)
 
     # def test_delete_container_by_image_prefix(self):
     #     delete_containers_by_image_prefix("docker-production-public.packages.idmod.org/idmtools/container-rocky-runtime")

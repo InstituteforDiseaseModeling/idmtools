@@ -143,9 +143,7 @@ class TestPlatformFactory(ITestWithPersistence):
         self.assertEqual(platform._config_block, 'COMPS1')
         self.assertEqual(platform._kwargs, kwargs)
 
-    # After bug fix 2313
     @pytest.mark.comps
-    @pytest.mark.skip("skip until bug 2313 is fixed")
     @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
     def test_platform_factory_with_lowercase_type_value(self, mock_login):
         kwargs = {'endpoint':'https://comps.idmod.org', 'environment': 'Calculon', 'type': 'comps'}
@@ -229,3 +227,10 @@ class TestPlatformFactory(ITestWithPersistence):
             exp.run(platform=platform)
         self.assertTrue("Type must be specified in Platform constructor." in str(context.exception.args[0]))
 
+    @pytest.mark.comps
+    @pytest.mark.timeout(60)
+    def test_type_case_ini(self):
+        platform = Platform(block='Test_Type')
+        exp = self.run_python_version("test_type_case_ini")
+        exp.run(wait_until_done=True, platform=platform)
+        self.assertTrue(exp.succeeded)

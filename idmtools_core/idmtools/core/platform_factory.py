@@ -14,6 +14,7 @@ from idmtools.config import IdmConfigParser
 from idmtools.core import TRUTHY_VALUES
 from idmtools.core.context import set_current_platform, remove_current_platform
 from idmtools.utils.entities import validate_user_inputs_against_dataclass
+from idmtools.utils.json import IDMJSONEncoder
 
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
@@ -122,6 +123,7 @@ class Platform:
         # Load all Platform plugins
         cls._platform_plugins = PlatformPlugins().get_plugin_map()
         cls._aliases = PlatformPlugins().get_aliases()
+        cls._type_map = {key.upper(): key for key in cls._platform_plugins.keys()}
 
         _platform = cls._create_platform_from_block(block, **kwargs)
         set_current_platform(_platform)
@@ -143,7 +145,7 @@ class Platform:
         Raise:
             ValueError: when the platform is of an unknown type
         """
-        if platform_type not in cls._platform_plugins:
+        if platform_type is None or platform_type.upper() not in cls._type_map:
             raise ValueError(f"{platform_type} is an unknown Platform Type. "
                              f"Supported platforms are {', '.join(cls._platform_plugins.keys())}")
 
@@ -165,10 +167,11 @@ class Platform:
             platform_type = kwargs['type']
             kwargs.pop('type')
 
-            # Make sure we support platform_type
+        # Make sure we support platform_type
         cls._validate_platform_type(platform_type)
 
         # Find the correct Platform type
+        platform_type = cls._type_map[platform_type.upper()]
         platform_spec = cls._platform_plugins.get(platform_type)
         platform_cls = platform_spec.get_type()
 
@@ -303,4 +306,4 @@ class Platform:
         if IdmConfigParser.is_output_enabled() and IdmConfigParser.get_option(None, "SHOW_PLATFORM_CONFIG",
                                                                               't').lower() in TRUTHY_VALUES:
             user_logger.log(VERBOSE, f"\nInitializing {platform_cls.__name__} with:")
-            user_logger.log(VERBOSE, json.dumps(inputs, indent=3))
+            user_logger.log(VERBOSE, json.dumps(inputs, indent=3, cls=IDMJSONEncoder))
