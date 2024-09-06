@@ -21,7 +21,7 @@ from idmtools_cli.utils.cols import columns
 logger = getLogger(__name__)
 
 
-@cli.command(help="List version info about idmtools and plugins")
+@cli.command(help="List version info about idmtools and plugins.")
 @click.option('--no-plugins/--plugins', default=False, help="Control whether we display plugins with modules")
 def version(no_plugins: bool):
     """Returns version of all idmtools components."""
@@ -60,7 +60,7 @@ def version(no_plugins: bool):
             click.echo(click.style(columns((module.replace("_", "-"), 36), (f'Version: {module_map[module]}', 40)), fg='green'))
 
 
-@cli.group(help="Troubleshooting and debugging information")
+@cli.group(help="Troubleshooting and debugging information.")
 def info():
     """Info cli subcommand."""
     pass

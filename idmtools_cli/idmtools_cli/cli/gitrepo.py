@@ -15,7 +15,7 @@ from idmtools.registry.master_plugin_registry import MasterPluginRegistry
 user_logger = getLogger('user')
 
 
-@cli.group(short_help="Contains commands related to examples download")
+@cli.group(short_help="Contains commands related to examples download.")
 def gitrepo():
     """Contains command to download examples."""
     pass
@@ -52,7 +52,7 @@ def list_examples(raw: bool):
 
 
 # alias under examples
-@cli.group(help="Display a list of examples organized by plugin type")
+@cli.group(help="Display a list of examples organized by plugin type.")
 def examples():
     """Examples group command. alias for gitrepo command."""
     pass
