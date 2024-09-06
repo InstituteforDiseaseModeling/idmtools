@@ -625,6 +625,26 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
             user_logger.info(f"Simulation Type: {type(self.__simulations)}")
             user_logger.info(f"Assets: {self.assets}")
 
+    def add_simulation(self, item: 'Simulation'):  # noqa F821
+        """
+        Adds a simulation to an experiment.
+        Args:
+            item: Item to add
+        Returns:
+            None
+        """
+        self.simulations.append(item)
+
+    def add_simulations(self, item: Union[List['Simulation'], 'TemplatedSimulations']):  # noqa F821
+        """
+        Extends experiment's simulations.
+        Args:
+            item: Item to extend
+        Returns:
+            None
+        """
+        self.simulations.extend(item)
+
 
 class ExperimentSpecification(ExperimentPluginSpecification):
     """
