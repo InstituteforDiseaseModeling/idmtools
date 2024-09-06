@@ -71,7 +71,7 @@ class TestRetrieval(ITestWithPersistence):
         # Test retrieving with wrong type
         with self.assertRaises(ValueError) as e:
             self.platform.get_item(self.exp.uid, "my_type")
-        self.assertEqual("The provided type my_type is invalid or not supported by this platform...", e.exception.args[0])
+        self.assertEqual("The provided type my_type is invalid or not supported by platform COMPSPlatform. It only supports ItemType: EXPERIMENT, SIMULATION, SUITE, WORKFLOW_ITEM, ASSETCOLLECTION", e.exception.args[0])
 
     def test_retrieve_simulation(self):
         base = self.exp.simulations[0]
