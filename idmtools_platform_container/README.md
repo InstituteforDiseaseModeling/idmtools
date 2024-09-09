@@ -84,19 +84,35 @@ To run a simple example using **ContainerPlatform**, please pay attention to the
 
     This is the example using Container Platform
     ```python
+   
     from idmtools.core.platform_factory import Platform
     platform = Platform('CONTAINER', job_directory='<user job directory>')
+   
     ```
+   
+2. **Folder structure**:
 
-2. **Create and run an Experiment**
+    By default, `idmtools` will generate simulations with the following structure:
+    `job_directory/suite_name_uuid/experiment_name_uuid/simulation_uuid`
+
+    - `job_directory` is the directory where the simulation will be run.
+    - `suite_name_uuid` is the name of the suite as prefix plus a suite uuid.
+    - `experiment_name_uuid` is the name of the experiment plus a experiment uuid.
+    - `simulation_uuid` is only simulation uuid.
+
+    The user can customize the folder structure by setting the following parameters in the `idmtools.ini` file:
+    - `name_directory = False`: The suite and experiment names will be excluded in the simulation path.
+    - `sim_name_directory = True`: The simulation name will be included in the simulation path.
+
+3. **Create and run an Experiment**
 
    This step is the same as running an experiment on the COMPS Platform.
    
-3. **Use CLI command to check status**
+4. **Use CLI command to check status**
     ```bash
     idmtools container status <experiment id>
     ```
-4. **Check simulation results in files**
+5. **Check simulation results in files**
 
     Once the experiment is completed, the results can be viewed in the output directory. The output directory is like
     `<job_directory>/<suite_path>/<experiment_path>/<simulation_path>/`.
