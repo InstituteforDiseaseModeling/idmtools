@@ -141,25 +141,6 @@ def get_max_filepath_length(dir_path: str):
     for root, dirs, files in os.walk(dir_path):
         for file in files:
             full_path = os.path.join(root, file)
-            # print(full_path)
-            # file_name = os.path.basename(full_path)  # Extract the filename
-            # max_length = max(max_length, len(file_name))  # Update max_length if current file is longer
-            max_length = max(max_length, len(os.path.abspath(full_path)))  # Update max_length if current file is longer
+            max_length = max(max_length, len(os.path.abspath(full_path)))
 
     return max_length
-
-
-def validate_file_path_length(dir_path: str):
-    """
-    Validate the length of the file path.
-    Args:
-        dir_path: file path
-
-    Returns:
-        None
-    """
-    import platform as python_platform
-    if python_platform.system() in ["Windows"]:
-        max_length = get_max_filepath_length(dir_path)
-        if max_length > 255:
-            raise ValueError(f"File path length is too long: {max_length} > 255.")

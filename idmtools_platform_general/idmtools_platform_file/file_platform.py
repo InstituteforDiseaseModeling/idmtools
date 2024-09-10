@@ -173,9 +173,6 @@ class FilePlatform(IPlatform):
         if self.sym_link:
             link.symlink_to(target)
         else:
-            # Validate file path length
-            validate_file_path_length(target)
-            # Copy files
             shutil.copytree(target, link)
 
     def create_batch_file(self, item: Union[Experiment, Simulation], **kwargs) -> None:
