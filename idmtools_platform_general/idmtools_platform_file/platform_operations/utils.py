@@ -3,6 +3,7 @@ This is FilePlatform operations utils.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+import os
 from typing import Dict
 from idmtools.entities import Suite
 from idmtools.core import ItemType, EntityStatus
@@ -123,3 +124,42 @@ def add_dummy_suite(experiment: Experiment, suite_name: str = None, tags: Dict =
     suite.add_experiment(experiment)
 
     return suite
+
+
+def get_max_filepath_length(dir_path: str):
+    """
+    Get the maximum filename length in a directory and its subdirectories.
+    Args:
+        dir_path: directory path
+
+    Returns:
+        int: maximum full filepath length
+    """
+    max_length = 0  # Variable to store the maximum filename length
+
+    # Walk through all files and subdirectories recursively
+    for root, dirs, files in os.walk(dir_path):
+        for file in files:
+            full_path = os.path.join(root, file)
+            # print(full_path)
+            # file_name = os.path.basename(full_path)  # Extract the filename
+            # max_length = max(max_length, len(file_name))  # Update max_length if current file is longer
+            max_length = max(max_length, len(os.path.abspath(full_path)))  # Update max_length if current file is longer
+
+    return max_length
+
+
+def validate_file_path_length(dir_path: str):
+    """
+    Validate the length of the file path.
+    Args:
+        dir_path: file path
+
+    Returns:
+        None
+    """
+    import platform as python_platform
+    if python_platform.system() in ["Windows"]:
+        max_length = get_max_filepath_length(dir_path)
+        if max_length > 255:
+            raise ValueError(f"File path length is too long: {max_length} > 255.")

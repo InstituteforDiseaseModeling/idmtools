@@ -18,7 +18,7 @@ from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.iplatform import IPlatform, ITEM_TYPE_TO_OBJECT_INTERFACE
 from idmtools.utils.decorators import check_symlink_capabilities
-from idmtools_platform_file.platform_operations.utils import FILE_MAPS, clean_experiment_name
+from idmtools_platform_file.platform_operations.utils import FILE_MAPS, clean_experiment_name, validate_file_path_length
 from idmtools_platform_file.assets import generate_script, generate_simulation_script
 from idmtools_platform_file.platform_operations.asset_collection_operations import FilePlatformAssetCollectionOperations
 from idmtools_platform_file.platform_operations.experiment_operations import FilePlatformExperimentOperations
@@ -173,6 +173,9 @@ class FilePlatform(IPlatform):
         if self.sym_link:
             link.symlink_to(target)
         else:
+            # Validate file path length
+            validate_file_path_length(target)
+            # Copy files
             shutil.copytree(target, link)
 
     def create_batch_file(self, item: Union[Experiment, Simulation], **kwargs) -> None:
