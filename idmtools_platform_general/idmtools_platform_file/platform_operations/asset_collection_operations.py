@@ -3,7 +3,6 @@ Here we implement the FilePlatform asset collection operations.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
-import os
 import shutil
 from uuid import UUID
 from pathlib import Path
@@ -16,7 +15,7 @@ from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.iplatform_ops.iplatform_asset_collection_operations import IPlatformAssetCollectionOperations
 from idmtools_platform_file.platform_operations.utils import FileSimulation, validate_common_assets_path_length, \
-    is_windows
+    validate_file_copy_path_length, validate_file_path_length
 
 if TYPE_CHECKING:
     from idmtools_platform_file.file_platform import FilePlatform
@@ -71,14 +70,12 @@ class FilePlatformAssetCollectionOperations(IPlatformAssetCollectionOperations):
         link_dir = Path(self.platform.get_directory(simulation), 'Assets')
 
         # Validate common_asset file path
-        if is_windows():
-            validate_common_assets_path_length(common_asset_dir, link_dir)
+        validate_common_assets_path_length(common_asset_dir, link_dir)
 
         # Copy common assets to simulation directory
         self.platform.link_dir(common_asset_dir, link_dir)
 
-    def get_assets(self, simulation: Union[Simulation, FileSimulation], files: List[str], **kwargs) -> Dict[
-        str, bytearray]:
+    def get_assets(self, simulation: Union[Simulation, FileSimulation], files: List[str], **kwargs) -> Dict[str, bytearray]:
         """
         Get assets for simulation.
         Args:
@@ -137,11 +134,14 @@ class FilePlatformAssetCollectionOperations(IPlatformAssetCollectionOperations):
         """
         if isinstance(src, Asset):
             if src.absolute_path:
+                validate_file_copy_path_length(src.absolute_path, dest)
                 shutil.copy(src.absolute_path, dest)
             elif src.content:
                 dest_filepath = Path(dest, src.filename)
+                validate_file_path_length(dest_filepath)
                 dest_filepath.write_bytes(src.bytes)
         else:
+            validate_file_copy_path_length(src, dest)
             shutil.copy(src, dest)
 
     def dump_assets(self, item: Union[Experiment, Simulation], **kwargs) -> None:
