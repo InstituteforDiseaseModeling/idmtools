@@ -3,6 +3,7 @@ Here we implement the FilePlatform asset collection operations.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+import os
 import shutil
 from uuid import UUID
 from pathlib import Path
@@ -14,7 +15,8 @@ from idmtools.assets import AssetCollection, Asset
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.iplatform_ops.iplatform_asset_collection_operations import IPlatformAssetCollectionOperations
-from idmtools_platform_file.platform_operations.utils import FileSimulation, get_max_filepath_length
+from idmtools_platform_file.platform_operations.utils import FileSimulation, validate_common_assets_path_length, \
+    is_windows
 
 if TYPE_CHECKING:
     from idmtools_platform_file.file_platform import FilePlatform
@@ -68,12 +70,9 @@ class FilePlatformAssetCollectionOperations(IPlatformAssetCollectionOperations):
             common_asset_dir = Path(self.platform.get_directory(simulation.parent), 'Assets')
         link_dir = Path(self.platform.get_directory(simulation), 'Assets')
 
-        # Validate common_asset file path length
-        max_asset_length = get_max_filepath_length(common_asset_dir)
-        sim_filename_length = len(self.platform.entity_display_name(simulation))
-        total_length = max_asset_length + sim_filename_length + 1
-        if total_length > 255:
-            raise ValueError(f"Common asset directory path length is too long: {total_length} > 255.")
+        # Validate common_asset file path
+        if is_windows():
+            validate_common_assets_path_length(common_asset_dir, link_dir)
 
         # Copy common assets to simulation directory
         self.platform.link_dir(common_asset_dir, link_dir)
