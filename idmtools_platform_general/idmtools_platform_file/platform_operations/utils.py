@@ -189,8 +189,8 @@ def validate_common_assets_path_length(common_asset_dir: Union[Path, str], link_
     """
     if not is_windows():
         return
-    # if is_long_paths_enabled():
-    #     return
+    if is_long_paths_enabled():
+        return
     asset_path = get_max_filepath(common_asset_dir)
     if asset_path is None:
         validate_file_path_length(link_dir, limit)
