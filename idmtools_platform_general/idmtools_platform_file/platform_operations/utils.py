@@ -236,7 +236,7 @@ def validate_file_path_length(file_path: Union[Path, str], limit: int = 256):
         user_logger.warning(
             f"\nFile path length too long: {total_length} > {limit}. Refer to file: '{file_path}'")
         user_logger.warning(
-            "You may want to adjust your job_directory to reduce the file path length. Or you can enable long paths in Windows, refer to https://www.autodesk.com/support/technical/article/caas/sfdcarticles/sfdcarticles/The-Windows-10-default-path-length-limitation-MAX-PATH-is-256-characters.html.")
+            "You may want to adjust your job_directory location, short Experiment name or Suite name to reduce the file path length. Or you can enable long paths in Windows, refer to https://www.autodesk.com/support/technical/article/caas/sfdcarticles/sfdcarticles/The-Windows-10-default-path-length-limitation-MAX-PATH-is-256-characters.html.")
         exit(-1)
 
 
