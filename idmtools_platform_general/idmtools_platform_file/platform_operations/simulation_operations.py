@@ -210,15 +210,3 @@ class FilePlatformSimulationOperations(IPlatformSimulationOperations):
             Any
         """
         pass
-
-    def create_sim_directory_map(self, simulation_id: str) -> Dict:
-        """
-        Build simulation working directory mapping.
-        Args:
-            simulation_id: simulation id
-
-        Returns:
-            Dict of simulation id as key and working dir as value
-        """
-        sim = self.platform.get_item(simulation_id, ItemType.SIMULATION, raw=False)
-        return {sim.id: str(self.platform.get_container_directory(sim))}
