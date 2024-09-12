@@ -149,7 +149,7 @@ By default, `idmtools` will generate simulations with the following structure:
 
 `job_directory/suite_name_uuid/experiment_name_uuid/simulation_uuid`
 
-    - `job_directory` is the directory where the simulation will be run.
+    - `job_directory` is the base directory for suite, experiment and simulations.
     - `suite_name_uuid` is the name of the suite as prefix plus a suite uuid.
     - `experiment_name_uuid` is the name of the experiment plus a experiment uuid.
     - `simulation_uuid` is only simulation uuid.
