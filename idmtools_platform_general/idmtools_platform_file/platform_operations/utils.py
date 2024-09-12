@@ -131,21 +131,6 @@ def add_dummy_suite(experiment: Experiment, suite_name: str = None, tags: Dict =
     return suite
 
 
-def normalize_path(path: Union[str, Path]):
-    """
-    Normalize the binding path to handle case insensitivity and path separators for Windows.
-    Args:
-        path (str): The path to normalize.
-    Returns:
-        str: The normalized path.
-    """
-    path = str(path)
-    if is_windows():
-        path = path.lower()
-    path = os.path.normpath(path).replace('\\', '/')
-    return path.rstrip('/')
-
-
 def get_max_filepath(dir_path: Union[Path, str]) -> str:
     """
     Get the maximum file path in a directory.
@@ -231,7 +216,7 @@ def validate_file_path_length(file_path: Union[Path, str], limit: int = 256):
         return
     if is_long_paths_enabled():
         return
-    total_length = len(normalize_path(file_path))
+    total_length = len(file_path)
     if total_length > limit:
         user_logger.warning(
             f"\nFile path length too long: {total_length} > {limit}. Refer to file: '{file_path}'")
@@ -239,6 +224,7 @@ def validate_file_path_length(file_path: Union[Path, str], limit: int = 256):
             "You may want to adjust your job_directory location, short Experiment name or Suite name to reduce the file path length. Or you can enable long paths in Windows, refer to https://www.autodesk.com/support/technical/article/caas/sfdcarticles/sfdcarticles/The-Windows-10-default-path-length-limitation-MAX-PATH-is-256-characters.html.")
         # raise FileNotFoundError(f"File path length too long: {total_length} > {limit}. Refer to file: '{file_path}'")
         exit(-1)
+
 
 def is_windows() -> bool:
     """
