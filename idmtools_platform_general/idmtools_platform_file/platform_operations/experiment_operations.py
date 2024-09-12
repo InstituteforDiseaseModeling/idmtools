@@ -261,16 +261,3 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
             Any
         """
         pass
-
-    def create_sim_directory_map(self, experiment_id: str) -> Dict:
-        """
-        Build simulation working directory mapping.
-        Args:
-            experiment_id: experiment id
-
-        Returns:
-            Dict of simulation id as key and working dir as value
-        """
-        exp = self.platform.get_item(experiment_id, ItemType.EXPERIMENT, raw=False)
-        sims = exp.simulations
-        return {sim.id: str(self.platform.get_container_directory(sim)) for sim in sims}
