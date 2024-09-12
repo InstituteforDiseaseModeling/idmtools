@@ -79,8 +79,10 @@ class CustomGroup(click.Group):
 def container(all):
     """
     Container Platform CLI commands.
+
     Args:
         all: Bool, show all commands
+
     Returns:
         None
     """
