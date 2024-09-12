@@ -1,4 +1,4 @@
-idmtools~=1.7.11
+idmtools~=2.0.0
 idmtools-platform-general~=1.7.11
 docker
 rich
