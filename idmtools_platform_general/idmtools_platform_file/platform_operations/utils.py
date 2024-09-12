@@ -4,7 +4,6 @@ This is FilePlatform operations utils.
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import os
-import winreg
 from pathlib import Path
 from logging import getLogger
 from typing import Dict, Union
@@ -162,26 +161,68 @@ def get_max_filepath(dir_path: Union[Path, str]) -> str:
     return max_file_path
 
 
-def validate_common_assets_path_length(common_asset_dir: Union[Path, str], link_dir: Union[Path, str],
-                                       limit: int = 256):
+def validate_folder_files_path_length(common_asset_dir: Union[Path, str], link_dir: Union[Path, str],
+                                      limit: int = 256):
     """
     Validate common asset path length.
     Args:
         common_asset_dir: common asset directory
         link_dir: link directory
+        limit: path length limit
     Returns:
         None
     """
+    if not is_windows():
+        return
     if is_long_paths_enabled():
         return
     asset_path = get_max_filepath(common_asset_dir)
-    sim_asset_path = os.path.join(str(link_dir), asset_path)
-    total_length = len(str(sim_asset_path))
+    if asset_path is None:
+        validate_file_path_length(link_dir, limit)
+    else:
+        sim_asset_path = os.path.join(str(link_dir), asset_path)
+        validate_file_path_length(sim_asset_path, limit)
+
+
+def validate_file_copy_path_length(src: Union[Path, str], dest: Union[Path, str], limit: int = 256):
+    """
+    Validate file copy path length.
+    Args:
+        src: source path
+        dest: destination path
+        limit: path length limit
+    Returns:
+        None
+    """
+    if not is_windows():
+        return
+    if is_long_paths_enabled():
+        return
+    filename = Path(src).name
+    dest_file = Path(dest, filename)
+    validate_file_path_length(dest_file, limit)
+
+
+def validate_file_path_length(file_path: Union[Path, str], limit: int = 256):
+    """
+    Validate file path length.
+    Args:
+        file_path: file path
+        limit: path length limit
+    Returns:
+        None
+    """
+    if not is_windows():
+        return
+    if is_long_paths_enabled():
+        return
+    total_length = len(str(file_path))
     if total_length > limit:
         user_logger.warning(
-            f"\nSome file has path length too long: {total_length} > {limit}. For example, '{sim_asset_path}'")
+            f"\nFile path length too long: {total_length} > {limit}. Refer to file: '{file_path}'")
         user_logger.warning(
-            "You may want to adjust your job_directory to reduce the file path length. Or you can enable long paths in Windows, refer to https://www.autodesk.com/support/technical/article/caas/sfdcarticles/sfdcarticles/The-Windows-10-default-path-length-limitation-MAX-PATH-is-256-characters.html.")
+            "You may want to adjust your job_directory location, short Experiment name or Suite name to reduce the file path length. Or you can enable long paths in Windows, refer to https://www.autodesk.com/support/technical/article/caas/sfdcarticles/sfdcarticles/The-Windows-10-default-path-length-limitation-MAX-PATH-is-256-characters.html.")
+        # raise FileNotFoundError(f"File path length too long: {total_length} > {limit}. Refer to file: '{file_path}'")
         exit(-1)
 
 
@@ -198,6 +239,7 @@ def is_windows() -> bool:
 
 def is_long_paths_enabled() -> bool:
     """Check if long paths are enabled in Windows."""
+    import winreg
     try:
         # Open the registry key where LongPathsEnabled is stored
         registry_key = winreg.OpenKey(
@@ -217,4 +259,4 @@ def is_long_paths_enabled() -> bool:
         return False
     except Exception as e:
         print(f"Error checking long paths: {e}")
-        return False
+        return

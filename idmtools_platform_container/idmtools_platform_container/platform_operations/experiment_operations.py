@@ -6,7 +6,8 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 import shutil
 import subprocess
 from dataclasses import dataclass
-from typing import NoReturn
+from typing import NoReturn, Dict
+from idmtools.core import ItemType
 from idmtools.entities.experiment import Experiment
 from idmtools_platform_file.platform_operations.experiment_operations import FilePlatformExperimentOperations
 from idmtools_platform_container.container_operations.docker_operations import find_running_job
@@ -91,3 +92,16 @@ class ContainerPlatformExperimentOperations(FilePlatformExperimentOperations):
             JobHistory.delete(experiment_id)
         except RuntimeError:
             logger.debug(f"Could not delete the associated experiment {experiment_id}")
+
+    def create_sim_directory_map(self, experiment_id: str) -> Dict:
+        """
+        Build simulation working directory mapping.
+        Args:
+            experiment_id: experiment id
+
+        Returns:
+            Dict of simulation id as key and working dir as value
+        """
+        exp = self.platform.get_item(experiment_id, ItemType.EXPERIMENT, raw=False)
+        sims = exp.simulations
+        return {sim.id: str(self.platform.get_container_directory(sim)) for sim in sims}
