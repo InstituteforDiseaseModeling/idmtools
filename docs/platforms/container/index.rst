@@ -158,9 +158,11 @@ By default, `idmtools` will generate simulations with the following structure:
     - `name_directory = False`: The suite and experiment names will be excluded in the simulation path.
     - `sim_name_directory = True`: The simulation name will be included in the simulation path.
 
-
 Additionally, You can view the same results inside the Docker container at `/home/container-data/<suite_path>/<experiment_path>/<simulation_path>`.
 The `container-data` directory is the default data mount point in the container.
+
+Note: If running the script on Windows, be aware of the file path length limitation (less than 255 characters).
+If you really need to run the script with long file paths, you can set the Enable Long Path Support in Windows Group Policy Editor. refer to https://www.autodesk.com/support/technical/article/caas/sfdcarticles/sfdcarticles/The-Windows-10-default-path-length-limitation-MAX-PATH-is-256-characters.html.
 
 .. note::
 

@@ -104,6 +104,10 @@ To run a simple example using **ContainerPlatform**, please pay attention to the
     - `name_directory = False`: The suite and experiment names will be excluded in the simulation path.
     - `sim_name_directory = True`: The simulation name will be included in the simulation path.
 
+    **Note**: If running the script on Windows, be aware of the file path length limitation (less than 255 characters).
+    If you really need to run the script with long file paths, you can set the Enable Long Path Support in Windows Group Policy Editor. refer to https://www.autodesk.com/support/technical/article/caas/sfdcarticles/sfdcarticles/The-Windows-10-default-path-length-limitation-MAX-PATH-is-256-characters.html.
+     
+
 3. **Create and run an Experiment**
 
    This step is the same as running an experiment on the COMPS Platform.
