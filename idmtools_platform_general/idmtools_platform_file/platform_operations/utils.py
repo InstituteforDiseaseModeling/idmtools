@@ -216,7 +216,7 @@ def validate_file_path_length(file_path: Union[Path, str], limit: int = 256):
         return
     if is_long_paths_enabled():
         return
-    total_length = len(file_path)
+    total_length = len(str(file_path))
     if total_length > limit:
         user_logger.warning(
             f"\nFile path length too long: {total_length} > {limit}. Refer to file: '{file_path}'")
