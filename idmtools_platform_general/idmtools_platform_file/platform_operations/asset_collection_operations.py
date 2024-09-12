@@ -14,7 +14,7 @@ from idmtools.assets import AssetCollection, Asset
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.iplatform_ops.iplatform_asset_collection_operations import IPlatformAssetCollectionOperations
-from idmtools_platform_file.platform_operations.utils import FileSimulation, validate_common_assets_path_length, \
+from idmtools_platform_file.platform_operations.utils import FileSimulation, validate_folder_files_path_length, \
     validate_file_copy_path_length, validate_file_path_length
 
 if TYPE_CHECKING:
@@ -68,9 +68,6 @@ class FilePlatformAssetCollectionOperations(IPlatformAssetCollectionOperations):
         if common_asset_dir is None:
             common_asset_dir = Path(self.platform.get_directory(simulation.parent), 'Assets')
         link_dir = Path(self.platform.get_directory(simulation), 'Assets')
-
-        # Validate common_asset file path
-        validate_common_assets_path_length(common_asset_dir, link_dir)
 
         # Copy common assets to simulation directory
         self.platform.link_dir(common_asset_dir, link_dir)
