@@ -189,7 +189,8 @@ class IdmConfigParser:
         if dir_path is None:
             dir_path = os.getcwd()
 
-        logger.debug(f"Looking for config file in {dir_path}")  # This log will generally only happen on recreation of config after clearing config
+        logger.debug(
+            f"Looking for config file in {dir_path}")  # This log will generally only happen on recreation of config after clearing config
 
         # Look for the config file. First check environment vars
         if "IDMTOOLS_CONFIG_FILE" in os.environ:
@@ -209,7 +210,8 @@ class IdmConfigParser:
         if ini_file is None:
             if os.getenv("NO_LOGGING_INIT", "f").lower() not in TRUTHY_VALUES:
                 cls._init_logging()
-            logger.warning(f"/!\\ WARNING: File '{file_name}' Not Found! For details on how to configure idmtools, see {get_help_version_url('configuration.html')} for details on how to configure idmtools.")
+            logger.warning(
+                f"/!\\ WARNING: File '{file_name}' Not Found! For details on how to configure idmtools, see {get_help_version_url('configuration.html')} for details on how to configure idmtools.")
             return
 
         # Load file
@@ -229,11 +231,15 @@ class IdmConfigParser:
             cls._init_logging()
             from idmtools.core.logging import VERBOSE
 
-            if IdmConfigParser.get_option("NO_PRINT_CONFIG_USED", fallback="F").lower() not in TRUTHY_VALUES and IdmConfigParser.get_option("logging", "USER_OUTPUT", fallback="t").lower() in TRUTHY_VALUES:
+            if IdmConfigParser.get_option("NO_PRINT_CONFIG_USED",
+                                          fallback="F").lower() not in TRUTHY_VALUES and IdmConfigParser.get_option(
+                    "logging", "USER_OUTPUT", fallback="t").lower() in TRUTHY_VALUES:
                 # let users know when they are using environment variable to local config
                 if "IDMTOOLS_CONFIG_FILE" in os.environ:
                     user_logger.warning("idmtools config defined through 'IDMTOOLS_CONFIG_FILE' environment variable")
-                user_logger.log(VERBOSE, "INI File Used: {}".format(ini_file))
+
+                if IdmConfigParser.found_ini():
+                    user_logger.log(VERBOSE, "INI File Found: {}".format(ini_file))
 
     @classmethod
     def _init_logging(cls):
@@ -258,7 +264,8 @@ class IdmConfigParser:
 
         # Do import locally to prevent load error
         from idmtools import __version__
-        if "+nightly" in __version__ and os.getenv('IDMTOOLS_HIDE_DEV_WARNING', None) is None and os.getenv("_IDMTOOLS_COMPLETE", None) is None:
+        if "+nightly" in __version__ and os.getenv('IDMTOOLS_HIDE_DEV_WARNING', None) is None and os.getenv(
+                "_IDMTOOLS_COMPLETE", None) is None:
             if logger.isEnabledFor(DEBUG):
                 logger.debug(f"You are using a development version of idmtools, version {__version__}!")
 
@@ -332,7 +339,8 @@ class IdmConfigParser:
         Returns:
             Return is progress bars should be enabled
         """
-        return all([x.lower() in TRUTHY_VALUES for x in [IdmConfigParser.get_option(None, "DISABLE_PROGRESS_BAR", 'f')]])
+        return all(
+            [x.lower() in TRUTHY_VALUES for x in [IdmConfigParser.get_option(None, "DISABLE_PROGRESS_BAR", 'f')]])
 
     @classmethod
     def is_output_enabled(cls) -> bool:

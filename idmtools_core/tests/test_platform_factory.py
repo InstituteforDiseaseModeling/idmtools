@@ -95,7 +95,7 @@ class TestPlatformFactory(ITestWithPersistence):
         self.assertEqual(platform._kwargs, {})
         self.assertIn('MY_JOB_DIRECTORY', platform.job_directory)
         # verify print correct block and job_directory
-        mock_config_user_logger.log.call_args_list[0].assert_called_with('INI File Used: ')
+        mock_config_user_logger.log.call_args_list[0].assert_called_with('INI File Found: ')
         self.assertIn('\nInitializing FilePlatform with:', mock_user_logger.log.call_args_list[0].args[1])
         self.assertIn('"job_directory": "MY_JOB_DIRECTORY"', mock_user_logger.log.call_args_list[1].args[1])
         # verify there is no warning printed
