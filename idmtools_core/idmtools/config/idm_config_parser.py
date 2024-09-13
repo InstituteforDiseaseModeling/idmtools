@@ -227,7 +227,6 @@ class IdmConfigParser:
         if os.getenv("NO_LOGGING_INIT", "f").lower() not in TRUTHY_VALUES:
             # init logging here as this is our most likely entry-point into an idmtools "application"
             cls._init_logging()
-            from idmtools.core.logging import VERBOSE
 
             if IdmConfigParser.get_option("NO_PRINT_CONFIG_USED", fallback="F").lower() not in TRUTHY_VALUES and IdmConfigParser.get_option("logging", "USER_OUTPUT", fallback="t").lower() in TRUTHY_VALUES:
                 # let users know when they are using environment variable to local config
