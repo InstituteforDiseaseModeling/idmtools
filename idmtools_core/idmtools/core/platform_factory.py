@@ -6,6 +6,7 @@ The Platform allows us to lookup a platform via its plugin name, "COMPS" or via 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import json
+import os
 from contextlib import contextmanager
 from dataclasses import fields
 from logging import getLogger, DEBUG
@@ -305,5 +306,9 @@ class Platform:
 
         if IdmConfigParser.is_output_enabled() and IdmConfigParser.get_option(None, "SHOW_PLATFORM_CONFIG",
                                                                               't').lower() in TRUTHY_VALUES:
-            user_logger.log(VERBOSE, f"\nInitializing {platform_cls.__name__} with:")
-            user_logger.log(VERBOSE, json.dumps(inputs, indent=3, cls=IDMJSONEncoder))
+            if os.getenv("IDMTOOLS_NO_CONFIG_WARNING", "F").lower() not in TRUTHY_VALUES:
+                user_logger.log(VERBOSE, f"\nInitializing {platform_cls.__name__} with:")
+                user_logger.log(VERBOSE, json.dumps(inputs, indent=3, cls=IDMJSONEncoder))
+            else:
+                user_logger.debug(f"\nInitializing {platform_cls.__name__} with:")
+                user_logger.debug(json.dumps(inputs, indent=3, cls=IDMJSONEncoder))

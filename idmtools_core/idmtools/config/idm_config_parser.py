@@ -233,7 +233,7 @@ class IdmConfigParser:
                 # let users know when they are using environment variable to local config
                 if "IDMTOOLS_CONFIG_FILE" in os.environ:
                     user_logger.warning("idmtools config defined through 'IDMTOOLS_CONFIG_FILE' environment variable")
-                user_logger.log(VERBOSE, "INI File Used: {}".format(ini_file))
+                user_logger.debug("INI File Used: {}".format(ini_file))
 
     @classmethod
     def _init_logging(cls):
