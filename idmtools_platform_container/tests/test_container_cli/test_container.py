@@ -13,7 +13,10 @@ class TestContainerPlatformCliContainer(TestContainerPlatformCliBase):
         result = self.runner.invoke(container_cli.container, ["--help"])
         expected_help = ('Usage: container [OPTIONS] COMMAND [ARGS]...\n'
                          '\n'
-                         '  Container Platform CLI commands. Args:     all: Bool, show all commands\n'
+                         '  Container Platform CLI commands.\n'
+                         '\n'
+                         '  Args:     all: Bool, show all commands\n'
+                         '\n'
                          '  Returns:     None\n'
                          '\n'
                          'Options:\n'
@@ -33,7 +36,10 @@ class TestContainerPlatformCliContainer(TestContainerPlatformCliBase):
         result = self.runner.invoke(container_cli.container, ["--all", "--help"])
         expected_help_all = ('Usage: container [OPTIONS] COMMAND [ARGS]...\n'
                              '\n'
-                             '  Container Platform CLI commands. Args:     all: Bool, show all commands\n'
+                             '  Container Platform CLI commands.\n'
+                             '\n'
+                             '  Args:     all: Bool, show all commands\n'
+                             '\n'
                              '  Returns:     None\n'
                              '\n'
                              'Options:\n'
