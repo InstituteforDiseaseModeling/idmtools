@@ -112,7 +112,7 @@ class TestPythonTask(TestCase):
         Returns:
 
         """
-        with Platform("TestExecute", missing_ok=True, default_missing=dict(type='TestExecute')):
+        with Platform("TestExecute", type='TestExecute'):
             fpath = os.path.join(COMMON_INPUT_PATH, "python", "model1.py")
             # here we test a script
             params = dict(a=1, b=2, c=3)
@@ -161,7 +161,7 @@ class TestPythonTask(TestCase):
         Returns:
 
         """
-        with Platform("TestExecute", missing_ok=True, default_missing=dict(type='TestExecute')):
+        with Platform("TestExecute", type='TestExecute'):
             fpath = os.path.join(COMMON_INPUT_PATH, "python", "model1.py")
             # here we test a script that may have no config
             task = JSONConfiguredPythonTask(script_path=fpath, configfile_argument=None, python_path=sys.executable)

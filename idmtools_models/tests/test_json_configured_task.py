@@ -84,7 +84,7 @@ class TestJSONConfiguredTask(TestCase):
     @pytest.mark.timeout(60)
     @pytest.mark.serial
     def test_reload_from_simulation_task(self):
-        with Platform("TestExecute", missing_ok=True, default_missing=dict(type='TestExecute')) as p:
+        with Platform("TestExecute", type='TestExecute') as p:
             task = ExampleExtendedJSONConfiguredTask(parameters=dict(a=1, b=2, c=3))
             experiment = Experiment.from_task(task=task, name="Test Reload Simulation")
             experiment.run(wait_until_done=True)

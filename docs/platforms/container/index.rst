@@ -63,6 +63,7 @@ Key features
 - **Script Conversion**: Converts scripts to Linux format if the host platform is Windows, ensuring compatibility within the container environment.
 - **Job History Management**: Keeps track of job submissions and their corresponding container IDs for easy reference and management.
 - **Minimal libraries and packages in Docker image**: Requires only Linux os, python3, mpich installed in docker image. ContainerPlatform will bind the host directory to the container directory for running the simulation.
+- **Flexible simulation directory**: The user can customize the simulation output's folder structure by including/excluding the suite, experiment or simulations names in the simulation path.
 
 .. _attributes:
 
@@ -93,7 +94,7 @@ Example
 
 This example demonstrates how to use the ``ContainerPlatform`` class to run a simple command task within a Docker container.
 
-Create a Python file named `example.py` on your host machine and add the following code:
+Create a Python file named `example_demo.py` on your host machine and add the following code:
 
 .. code-block:: python
 
@@ -102,11 +103,10 @@ Create a Python file named `example.py` on your host machine and add the followi
    from idmtools_platform_container.container_platform import ContainerPlatform
 
    # Initialize the platform
-   platform = ContainerPlatform(job_directory="destination_directory")
-   # OR
-   # from idmtools.core.platform_factory import Platform
-   # platform = Platform('Container', job_directory="destination_directory")
-
+   from idmtools.core.platform_factory import Platform
+   platform = Platform('Container', job_directory="destination_directory")
+   # Or
+   # platform = ContainerPlatform(job_directory="destination_directory")
    # Define task
    command = "echo 'Hello, World!'"
    task = CommandTask(command=command)
@@ -114,22 +114,55 @@ Create a Python file named `example.py` on your host machine and add the followi
    experiment = Experiment.from_task(task, name="example")
    experiment.run(platform=platform)
 
-To run `example.py` in the virtual environment on the host machine:
+To run `example_demo.py` in the virtual environment on the host machine:
 
 .. code-block:: bash
 
-    python example.py
+    python example_demo.py
 
-You can find the simulation results in the `job_directory/<suite_path>/<experiment_path>/<simulation_path>` directory on the host machine.
+The running this example will output the following:
 
-Additionally, You can view the same results inside the Docker container at `/home/container-data/<suite_path>/<experiment_path>/<simulation_path>`.
+.. image:: images/example_demo.png
+   :scale: 55%
 
+The output will be saved in the `destination_directory` folder on the host machine:
+
+.. image:: images/example_demo_host_result.png
+   :scale: 55%
+
+User can also view the same results inside the Docker container:
+
+.. image:: images/example_demo_container_result.png
+   :scale: 55%
 
 More examples
 -------------
 Run the following included Python example to submit and run a job on your |CONTAINER_s| platform:
 
 .. literalinclude:: ../../../examples/platform_container/python_sims_for_containerplatform.py
+
+
+Folder structure
+----------------
+
+By default, `idmtools` will generate simulations with the following structure:
+
+`job_directory/suite_name_uuid/experiment_name_uuid/simulation_uuid`
+
+    - `job_directory` is the base directory for suite, experiment and simulations.
+    - `suite_name_uuid` is the name of the suite as prefix plus a suite uuid.
+    - `experiment_name_uuid` is the name of the experiment plus a experiment uuid.
+    - `simulation_uuid` is only simulation uuid.
+
+    The user can customize the folder structure by setting the following parameters in the `idmtools.ini` file:
+    - `name_directory = False`: The suite and experiment names will be excluded in the simulation path.
+    - `sim_name_directory = True`: The simulation name will be included in the simulation path.
+
+Additionally, You can view the same results inside the Docker container at `/home/container-data/<suite_path>/<experiment_path>/<simulation_path>`.
+The `container-data` directory is the default data mount point in the container.
+
+Note: If running the script on Windows, be aware of the file path length limitation (less than 255 characters).
+If you really need to run the script with long file paths, you can set the Enable Long Path Support in Windows Group Policy Editor. refer to https://www.autodesk.com/support/technical/article/caas/sfdcarticles/sfdcarticles/The-Windows-10-default-path-length-limitation-MAX-PATH-is-256-characters.html.
 
 .. note::
 

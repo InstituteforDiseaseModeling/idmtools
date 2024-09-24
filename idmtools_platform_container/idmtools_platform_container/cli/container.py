@@ -74,13 +74,15 @@ class CustomGroup(click.Group):
         return commands
 
 
-@click.group(cls=CustomGroup, allowed_commands=IMPORTANT_COMMANDS, short_help="ContainerPlatform related commands.")
+@click.group(cls=CustomGroup, allowed_commands=IMPORTANT_COMMANDS, short_help="Container platform related commands.")
 @click.option('--all', is_flag=True, help="Show all commands")
 def container(all):
     """
     Container Platform CLI commands.
+
     Args:
         all: Bool, show all commands
+
     Returns:
         None
     """

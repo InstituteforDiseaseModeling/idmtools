@@ -165,7 +165,7 @@ class FilePlatformSuiteOperations(IPlatformSuiteOperations):
         Returns:
             None
         """
-        suite = self.platform.get_item(suite_id, ItemType.SUITE, raw=False)
+        suite = self.platform.get_item(suite_id, ItemType.SUITE, force=True, raw=False)
         exps = suite.experiments
         for exp in exps:
             try:
