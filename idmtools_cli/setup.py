@@ -38,12 +38,12 @@ setup(
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
-        'Programming Language :: Python :: 3.12',
-        'Framework:: IDM-Tools :: CLI'
+        'Programming Language :: Python :: 3.12'
     ],
     description="CLI for IDM-Tools",
     install_requires=requirements,
     long_description=readme,
+    long_description_content_type="text/markdown",
     include_package_data=True,
     keywords='modeling, IDM, cli',
     name='idmtools_cli',
@@ -53,5 +53,5 @@ setup(
     entry_points={"console_scripts": ["idmtools=idmtools_cli.main:main"]},
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='1.7.11'
+    version='2.0.0'
 )

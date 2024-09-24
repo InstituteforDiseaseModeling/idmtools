@@ -39,13 +39,17 @@ an end-to-end workflow using |EMOD_s| as the disease transmission model.
    hide stereotype
    skinparam component {
      BackgroundColor<<emodpy-disease>> F9BA9D
-     BackgroundColor<<idmtools>> 006CA6
+     BackgroundColor<<idmtools>> 40FF40
      BackgroundColor<<calibration>> gray
      BackgroundColor<<emodpy-core>> F18153
-     BackgroundColor<<COMPS>> lightgray
+     BackgroundColor<<Platforms>> lightgray
      BackgroundColor<<EMOD>> 47C8F5
    }
-
+    package "Platforms" {
+        [Slurm]
+        [COMPS]
+        [Container]
+    }
 
    [emodpy-generic] <<emodpy-disease>>
    [emodpy-generic] --> [emodpy]
@@ -70,16 +74,14 @@ an end-to-end workflow using |EMOD_s| as the disease transmission model.
    [emodpy] <-> [idmtools]
 
    [idmtools] <<idmtools>>
-   [COMPS] <<COMPS>>
-   [idmtools] <-> [COMPS] : Commission and status
+
+   [idmtools] <--> [Platforms] : Commission and status
+
 
    [idmtools-calibra] <<calibration>>
    [idmtools-calibra] <--> [idmtools] : Commission and analysis
    [idmtools-calibra] <--> [emodpy] : Calibration
 
-   [emodpy-calibra] <<calibration>>
-   [emodpy-calibra] <--> [emodpy]: EMOD-specific calibration utils
-   [emodpy-calibra] <--> [idmtools-calibra]
    [Input files] <<EMOD>>
    [emod-api] --> [Input files] : Create
 

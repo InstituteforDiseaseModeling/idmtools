@@ -60,39 +60,39 @@ class TestSlurmPlatform(ITestWithPersistence):
         self.assertEqual(set(slurm_configs_dict), set(expected_config_dict))
 
         # validate custom default config get override with Platform parameters
-        self.assertEqual(platform.job_directory, '.')
+        self.assertEqual(platform.job_directory, os.getcwd())
         self.assertEqual(platform.mode.name, "LOCAL")
         self.assertEqual(platform.mode.value, "local")
 
     # Test LocalSlurmOperations get_directory for suite only case
     def test_localSlurmOperations_get_directory_suite(self):
-        suite = Suite()
+        suite = Suite(name="Suite")
         local = LocalSlurmOperations(platform=self.platform)
         actual_entity_path = local.get_directory(suite)
-        expected_path = os.path.join(job_dir, suite.id)
-        self.assertEqual(str(actual_entity_path), expected_path)
+        suite_dir = str(self.platform.get_directory(suite))
+        self.assertEqual(str(actual_entity_path), suite_dir)
 
     # Test LocalSlurmOperations get_directory for multiple experiments case
     def test_localSlurmOperations_get_directory_experiments(self):
-        suite = Suite()
-        exp1 = Experiment()
+        suite = Suite(name="Suite")
+        exp1 = Experiment(name="Exp1")
         exp1.parent = suite
-        exp2 = Experiment()
+        exp2 = Experiment(name="Exp2")
         exp2.parent = suite
-        exp3 = Experiment()
+        exp3 = Experiment(name="Exp3")
         exp3.parent = suite
+        exp_dir1 = str(self.platform.get_directory(exp1))
+        suite_dir = str(self.platform.get_directory(suite))
         local = LocalSlurmOperations(platform=self.platform)
         actual_suite_path = local.get_directory(suite)
-        expected_suite_path = os.path.join(job_dir, suite.id)
-        self.assertEqual(str(actual_suite_path), expected_suite_path)
+        self.assertEqual(str(actual_suite_path), suite_dir)
 
         actual_exp1_path = local.get_directory(exp1)
-        expected_exp1_path = os.path.join(job_dir, suite.id, exp1.id)
-        self.assertEqual(str(actual_exp1_path), expected_exp1_path)
+        self.assertEqual(str(actual_exp1_path), exp_dir1)
 
     # Test LocalSlurmOperations get_directory for experiment only
     def test__localSlurmOperations_get_directory_experiment_no_suite(self):
-        exp = Experiment()
+        exp = Experiment(name="Exp1")
         local = LocalSlurmOperations(platform=self.platform)
         with self.assertRaises(RuntimeError) as ex:
             actual_entity_path = local.get_directory(exp)
@@ -100,19 +100,19 @@ class TestSlurmPlatform(ITestWithPersistence):
 
     # Test LocalSlurmOperations get_directory for simulation and experiment as parent
     def test_localSlurmOperations_get_directory_simulation(self):
-        suite = Suite()
-        experiment = Experiment()
+        suite = Suite(name="Suite")
+        experiment = Experiment(name="Exp1")
         experiment.parent = suite
         simulation = Simulation()
         simulation.parent = experiment
         local = LocalSlurmOperations(platform=self.platform)
         actual_entity_path = local.get_directory(simulation)
-        expected_path = os.path.join(job_dir, suite.id, experiment.id, simulation.id)
-        self.assertEqual(str(actual_entity_path), expected_path)
+        sim_dir = str(self.platform.get_directory(simulation))
+        self.assertEqual(str(actual_entity_path), sim_dir)
 
     # Test LocalSlurmOperations get_directory for simulation without parent, it should throw error
     def test_localSlurmOperations_get_simulation_no_experiment_entity_dir(self):
-        simulation = Simulation()
+        simulation = Simulation(name="Sim1")
         local = LocalSlurmOperations(platform=self.platform)
         with self.assertRaises(RuntimeError) as ex:
             actual_entity_path = local.get_directory(simulation)
@@ -120,18 +120,18 @@ class TestSlurmPlatform(ITestWithPersistence):
 
     # Test LocalSlurmOperations mk_directory with suite and without dest
     def test_localSlurmOperations_make_dir_no_dest_suite(self):
-        suite = Suite()
+        suite = Suite(name="Suite")
+        suite_dir = str(self.platform.get_directory(suite))
         local = LocalSlurmOperations(platform=self.platform)
         local.mk_directory(suite)
-        expected_dir = os.path.join(job_dir, suite.id)
-        self.assertTrue(os.path.isdir(expected_dir))
+        self.assertTrue(os.path.isdir(suite_dir))
         # delete dir after test
-        shutil.rmtree(expected_dir)
-        self.assertFalse(os.path.isdir(expected_dir))
+        shutil.rmtree(suite_dir)
+        self.assertFalse(os.path.isdir(suite_dir))
 
     # Test LocalSlurmOperations mk_directory with dest
     def test_localSlurmOperations_make_dir_dest_suite(self):
-        suite = Suite()
+        suite = Suite(name="Suite")
         local = LocalSlurmOperations(platform=self.platform)
         dest_dir = tempfile.mkdtemp()
         local.mk_directory(suite, dest=dest_dir, exist_ok=True)
@@ -151,34 +151,37 @@ class TestSlurmPlatform(ITestWithPersistence):
     # Test LocalSlurmOperations mk_directory for simulation
     def test_localSlurmOperations_make_dir_dest_simulations(self):
         local = LocalSlurmOperations(platform=self.platform)
-        suite = Suite()
-        experiment = Experiment()
+        suite = Suite(name="Suite")
+        experiment = Experiment(name="Exp1")
         experiment.parent = suite
-        simulation1 = Simulation()  # create uniq simulation
-        simulation2 = Simulation()
+        simulation1 = Simulation(name="Sim1")  # create uniq simulation
+        simulation2 = Simulation(name="Sim2")
         simulation1.parent = experiment
         simulation2.parent = experiment
         local.mk_directory(simulation1)
         local.mk_directory(simulation2)
-        expected_dir1 = os.path.join(job_dir, suite.id, experiment.id, simulation1.id)
-        expected_dir2 = os.path.join(job_dir, suite.id, experiment.id, simulation2.id)
-        self.assertTrue(os.path.isdir(expected_dir1))
-        self.assertTrue(os.path.isdir(expected_dir2))
+        suite_dir = str(self.platform.get_directory(suite))
+        sim_dir1 = str(self.platform.get_directory(simulation1))
+        sim_dir2 = str(self.platform.get_directory(simulation2))
+        self.assertTrue(os.path.isdir(sim_dir1))
+        self.assertTrue(os.path.isdir(sim_dir2))
         # delete dir after test
-        shutil.rmtree(os.path.join(job_dir, suite.id))
-        self.assertFalse(os.path.isdir(expected_dir1))
-        self.assertFalse(os.path.isdir(expected_dir2))
+        shutil.rmtree(suite_dir)
+        self.assertFalse(os.path.isdir(sim_dir1))
+        self.assertFalse(os.path.isdir(sim_dir2))
 
     # Test LocalSlurmOperations create_batch_file for experiment
     def test_localSlurmOperations_create_batch_file_experiment(self):
         local = LocalSlurmOperations(platform=self.platform)
-        suite = Suite()
-        experiment = Experiment()
+        suite = Suite(name="Suite")
+        experiment = Experiment(name="Exp1")
         experiment.parent = suite
+        exp_dir = str(self.platform.get_directory(experiment))
+        suite_dir = str(self.platform.get_directory(suite))
         local.mk_directory(experiment)
         local.create_batch_file(experiment)
         # verify batch file locally
-        job_path = os.path.join(job_dir, suite.id, experiment.id, "sbatch.sh")
+        job_path = os.path.join(exp_dir, "sbatch.sh")
         self.assertTrue(os.path.exists(job_path))
         # TODO validation sbatch.sh content
         with open(job_path) as f:
@@ -188,32 +191,34 @@ class TestSlurmPlatform(ITestWithPersistence):
             "run run_simulation.sh",
             contents)
         # clean up suite folder
-        shutil.rmtree(os.path.join(job_dir, suite.id))
+        shutil.rmtree(suite_dir)
         self.assertFalse(os.path.exists(job_path))
 
     # Test LocalSlurmOperations create_batch_file for simulation
     def test_localSlurmOperations_create_batch_file_simulation(self):
         local = LocalSlurmOperations(platform=self.platform)
-        suite = Suite()
-        experiment = Experiment()
+        suite = Suite(name="Suite")
+        experiment = Experiment(name="Exp1")
         experiment.parent = suite
         simulation = Simulation(task=TestTask())
         simulation.parent = experiment
+        suite_dir = str(self.platform.get_directory(suite))
+        simulation_dir = str(self.platform.get_directory(simulation))
         local.mk_directory(simulation)
         local.create_batch_file(simulation)
         # verify batch file
-        job_path = os.path.join(job_dir, suite.id, experiment.id, simulation.id, "_run.sh")
+        job_path = os.path.join(simulation_dir, "_run.sh")
         self.assertTrue(os.path.exists(job_path))
         # TODO validation _run.sh content
         # clean up suite folder
-        shutil.rmtree(os.path.join(job_dir, suite.id))
+        shutil.rmtree(suite_dir)
         self.assertFalse(os.path.exists(job_path))
 
     # Test LocalSlurmOperations create_batch_file with simulation and item_path
     def test_localSlurmOperations_create_batch_file_simulation_and_item_path(self):
         local = LocalSlurmOperations(platform=self.platform)
-        suite = Suite()
-        experiment = Experiment()
+        suite = Suite(name="Suite")
+        experiment = Experiment(name="Exp1")
         experiment.parent = suite
         simulation = Simulation(task=TestTask())
         simulation.parent = experiment
@@ -228,7 +233,7 @@ class TestSlurmPlatform(ITestWithPersistence):
     # Test LocalSlurmOperations create_batch_file with suite and item_path. this case will throw error
     def test_localSlurmOperations_create_batch_file_simulation_and_item_path(self):
         local = LocalSlurmOperations(platform=self.platform)
-        suite = Suite()
+        suite = Suite(name="Suite")
         temp_path = tempfile.mkdtemp()
         local.mk_directory(suite, dest=temp_path, exist_ok=True)
         with self.assertRaises(NotImplementedError) as ex:

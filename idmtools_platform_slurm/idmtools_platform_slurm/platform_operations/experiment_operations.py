@@ -142,6 +142,7 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         user_logger.info(f'job_directory: {Path(self.platform.job_directory).resolve()}')
         user_logger.info(f'suite: {str(suite_id)}')
         user_logger.info(f'experiment: {experiment.id}')
+        user_logger.info(f"\nExperiment Directory: \n{self.platform.get_directory(experiment)}")
 
     def send_assets(self, experiment: Experiment, **kwargs):
         """
@@ -177,9 +178,10 @@ class SlurmPlatformExperimentOperations(IPlatformExperimentOperations):
         """
         assets = AssetCollection()
         assets_dir = Path(self.platform._op_client.get_directory_by_id(experiment.id, ItemType.EXPERIMENT), 'Assets')
-        assets_list = AssetCollection.assets_from_directory(assets_dir, recursive=True)
-        for a in assets_list:
-            assets.add_asset(a)
+        if assets_dir.exists():
+            assets_list = AssetCollection.assets_from_directory(assets_dir, recursive=True)
+            for a in assets_list:
+                assets.add_asset(a)
         return assets
 
     def to_entity(self, slurm_exp: SlurmExperiment, parent: Optional[Suite] = None, children: bool = True,

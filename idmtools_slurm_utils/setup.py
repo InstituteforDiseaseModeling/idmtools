@@ -47,6 +47,7 @@ setup(
     description="idmtools slurm utils",
     install_requires=extra_require_files['requirements'],
     long_description=readme,
+    long_description_content_type="text/markdown",
     include_package_data=True,
     keywords='modeling, IDM',
     name='idmtools-slurm-utils',
@@ -59,5 +60,5 @@ setup(
             'idmtools-slurm-bridge = idmtools_slurm_utils.singularity_bridge:main',
         ],
     },
-    version='1.7.11'
+    version='2.0.0'
 )

@@ -5,7 +5,7 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import subprocess
 from dataclasses import dataclass
-from typing import NoReturn
+from typing import NoReturn, Dict
 from idmtools.core import ItemType
 from idmtools_platform_file.platform_operations.simulation_operations import FilePlatformSimulationOperations
 from idmtools_platform_container.container_operations.docker_operations import find_running_job
@@ -44,3 +44,15 @@ class ContainerPlatformSimulationOperations(FilePlatformSimulationOperations):
                 print(f"Error killing {job.item_type.name} {sim_id}: {result.stderr}")
         else:
             user_logger.info(f"Simulation {sim_id} is not running, no cancel needed...")
+
+    def create_sim_directory_map(self, simulation_id: str) -> Dict:
+        """
+        Build simulation working directory mapping.
+        Args:
+            simulation_id: simulation id
+
+        Returns:
+            Dict of simulation id as key and working dir as value
+        """
+        sim = self.platform.get_item(simulation_id, ItemType.SIMULATION, raw=False)
+        return {sim.id: str(self.platform.get_container_directory(sim))}

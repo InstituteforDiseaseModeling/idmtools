@@ -15,14 +15,14 @@ class JSONMetadataOperationsTest(unittest.TestCase):
     @staticmethod
     def _initialize_data(self):
         # create 1 suite, 2 experiments, 3 simulations for general usage. Meta is default one for each item
-        suite = Suite()
-        exp1 = Experiment()
+        suite = Suite(name="Suite1")
+        exp1 = Experiment(name="Exp1")
         exp1.suite = suite
-        exp2 = Experiment()
+        exp2 = Experiment(name="Exp2")
         exp2.suite = suite
-        simulation1 = Simulation()
-        simulation2 = Simulation()
-        simulation3 = Simulation()
+        simulation1 = Simulation(name="Sim1")
+        simulation2 = Simulation(name="Sim2")
+        simulation3 = Simulation(name="Sim3")
         simulation1.experiment = exp1
         simulation2.experiment = exp1
         simulation3.experiment = exp2
@@ -57,7 +57,8 @@ class JSONMetadataOperationsTest(unittest.TestCase):
         expected_meta.update({"_uid": sim.id})
         expected_meta.update({"uid": sim.id})
         expected_meta.update({"id": sim.id})
-        expected_meta.update({"dir": str(Path(f"{self.metadata_root}/{_[0].id}/{sim.parent_id}/{sim.id}"))})
+        expected_meta.update({"name": sim.name})
+        expected_meta.update({"dir": str(Path(f"{self.metadata_root}/{_[0].name}_{_[0].id}/{experiments[1].name}_{sim.parent_id}/{sim.id}"))})
         self.assertDictEqual(expected_meta, metadata)
 
     # test get meta for experiment
@@ -72,7 +73,8 @@ class JSONMetadataOperationsTest(unittest.TestCase):
         expected_meta.update({"_uid": exp.id})
         expected_meta.update({"uid": exp.id})
         expected_meta.update({"id": exp.id})
-        expected_meta.update({"dir": str(Path(f"{self.metadata_root}/{suites[0].id}/{exp.id}"))})
+        expected_meta.update({"name": exp.name})
+        expected_meta.update({"dir": str(Path(f"{self.metadata_root}/{suites[0].name}_{suites[0].id}/{exp.name}_{exp.id}"))})
         self.assertDictEqual(expected_meta, metadata)
 
     # test get meta for suite
@@ -93,17 +95,18 @@ class JSONMetadataOperationsTest(unittest.TestCase):
         expected_suite_meta.update({"_uid": suite.id})
         expected_suite_meta.update({"uid": suite.id})
         expected_suite_meta.update({"id": suite.id})
-        expected_suite_meta.update({"dir": str(Path(f"{self.metadata_root}/{suites[0].id}"))})
+        expected_suite_meta.update({"name": suite.name})
+        expected_suite_meta.update({"dir": str(Path(f"{self.metadata_root}/{suites[0].name}_{suites[0].id}"))})
         self.assertDictEqual(expected_suite_meta, metadata)
 
     # test load with no meta_data file
     def test_errors_for_no_existent_metadata_file(self):
-        sim = Simulation()
+        sim = Simulation(name="sim")
         sim.uid = 'totally-brand-new'
-        exp = Experiment()
+        exp = Experiment(name="exp")
         exp.uid = 'very-shiny-new'
         sim.experiment = exp
-        suite = Suite()
+        suite = Suite(name="suite")
         suite.uid = 'is-it-new-or-knew'
         exp.suite = suite
 
