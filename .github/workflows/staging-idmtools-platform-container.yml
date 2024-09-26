@@ -63,8 +63,8 @@ jobs:
             file2_changed=$(git diff --name-only HEAD^ HEAD | grep -c 'docker_image/requirements.txt')
           else
             echo "No previous commit"
-            file1_changed=$(git ls-files --modified | grep -c 'docker_image/Dockerfile')
-            file2_changed=$(git ls-files --modified | grep -c 'docker_image/requirements.txt')
+            file1_changed=$(git status --porcelain | grep -c 'docker_image/Dockerfile')
+            file2_changed=$(git status --porcelain | grep -c 'docker_image/requirements.txt')
             echo "hello"
           fi
           if [ "$file1_changed" -gt 0 ] && [ "$file2_changed" -gt 0 ]; then
