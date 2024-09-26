@@ -13,6 +13,11 @@ on:
       - 'idmtools_platform_container/**'
       - 'idmtools_platform_general/**'
   workflow_dispatch:
+  pull_request:
+    paths:
+      - 'idmtools_platform_container/Dockerfile'
+      - 'idmtools_platform_container/requirements.txt'
+
 
 jobs:
   deploy-container-staging:
