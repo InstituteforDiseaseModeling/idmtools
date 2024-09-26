@@ -61,8 +61,8 @@ jobs:
         id: verify-changed-files
         with:
           files: |
-            idmtools_platform_container/docker_image/Dockerfile
-            idmtools_platform_container/docker_image/requirements.txt
+            **/*/docker_image/Dockerfile
+            **/*/docker_image/requirements.txt
 
       - name: Build container docker image
         working-directory: idmtools_platform_container/docker_image

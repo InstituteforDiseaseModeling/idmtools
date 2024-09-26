@@ -44,7 +44,7 @@ ADD requirements.txt /tmp/
 # make the PIP index configurable so we can build against staging, production, or a local PyPI server
 ARG CONTAINER_VERSION
 
-# Install emod-api packages
+# Install packages
 RUN bash -c "pip3 install -r /tmp/requirements.txt"
 
 
