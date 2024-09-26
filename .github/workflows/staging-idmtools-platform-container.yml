@@ -44,7 +44,7 @@ jobs:
           login-server: docker-production.packages.idmod.org
           username: ${{ secrets.PYPI_STAGING_USERNAME }}
           password: ${{ secrets.PYPI_STAGING_PASSWORD }}
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Build and publish
         working-directory: idmtools_platform_container
         env:
@@ -53,31 +53,20 @@ jobs:
           TWINE_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
         run: |
           python setup.py sdist bdist_wheel
-          # twine upload dist/*
-      - name: Check if files has changed
-        working-directory: idmtools_platform_container
-        run: |
-          if git rev-parse HEAD^ >/dev/null 2>&1; then
-            echo "Previous commit exists"
-            file1_changed=$(git diff --name-only HEAD^ HEAD | grep -c 'docker_image/Dockerfile')
-            file2_changed=$(git diff --name-only HEAD^ HEAD | grep -c 'docker_image/requirements.txt')
-          else
-            echo "No previous commit"
-            file1_changed=$(git status --porcelain | grep -c 'docker_image/Dockerfile')
-            file2_changed=$(git status --porcelain | grep -c 'docker_image/requirements.txt')
-            echo "hello"
-          fi
-          if [ "$file1_changed" -gt 0 ] && [ "$file2_changed" -gt 0 ]; then
-            echo "files_changed=true" >> $GITHUB_ENV
-          else
-            echo "files_changed=false" >> $GITHUB_ENV
-          fi
+          twine upload dist/*
+      - name: Verify Changed files
+        uses: tj-actions/verify-changed-files@v20
+        id: verify-changed-files
+        with:
+          files: |
+             idmtools_platform_container/docker_image/Dockerfile
+             idmtools_platform_container/docker_image/requirements.txt
       - name: Build container docker image
         working-directory: idmtools_platform_container/docker_image
         env:
           PYPI_STAGING_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
           PYPI_STAGING_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
-        if: env.files_changed == 'true'
+        if: steps.verify-changed-files.outputs.files_changed == 'true'
         run: |
           python build_docker_image.py --username ${{ secrets.PYPI_STAGING_USERNAME }} --password ${{ secrets.PYPI_STAGING_PASSWORD }}
-          # python push_docker_image.py --username ${{ env.PYPI_STAGING_USERNAME }} --password ${{ env.PYPI_STAGING_PASSWORD }}
+          python push_docker_image.py --username ${{ env.PYPI_STAGING_USERNAME }} --password ${{ env.PYPI_STAGING_PASSWORD }}
