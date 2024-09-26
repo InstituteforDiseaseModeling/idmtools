@@ -45,6 +45,8 @@ jobs:
           username: ${{ secrets.PYPI_STAGING_USERNAME }}
           password: ${{ secrets.PYPI_STAGING_PASSWORD }}
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
       - name: Build and publish
         working-directory: idmtools_platform_container
         env:
