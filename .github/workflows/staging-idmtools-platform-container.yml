@@ -57,8 +57,15 @@ jobs:
       - name: Check if files has changed
         working-directory: idmtools_platform_container
         run: |
-          file1_changed=$(git diff --name-only HEAD^ HEAD | grep -c 'docker_image/Dockerfile')
-          file2_changed=$(git diff --name-only HEAD^ HEAD | grep -c 'docker_image/requirements.txt')
+          if git rev-parse HEAD^ >/dev/null 2>&1; then
+            echo "Previous commit exists"
+            file1_changed=$(git diff --name-only HEAD^ HEAD | grep -c 'docker_image/Dockerfile')
+            file2_changed=$(git diff --name-only HEAD^ HEAD | grep -c 'docker_image/requirements.txt')
+          else
+            echo "No previous commit"
+            file1_changed=$(git diff --name-only HEAD | grep -c 'docker_image/Dockerfile')
+            file2_changed=$(git diff --name-only HEAD | grep -c 'docker_image/requirements.txt')
+          fi
           echo file1_changed=$file1_changed
           echo file2_changed=$file2_changed
           if [ "$file1_changed" -gt 0 ] && [ "$file2_changed" -gt 0 ]; then
