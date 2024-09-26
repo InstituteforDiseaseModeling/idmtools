@@ -47,4 +47,5 @@ ARG CONTAINER_VERSION
 # Install emod-api packages
 RUN bash -c "pip3 install -r /tmp/requirements.txt"
 
+# Install the idmtools package
 
