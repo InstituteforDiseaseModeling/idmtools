@@ -61,14 +61,15 @@ jobs:
         id: verify-changed-files
         with:
           files: |
-             idmtools_platform_container/docker_image/Dockerfile
-             idmtools_platform_container/docker_image/requirements.txt
+            *_container/docker_image/Dockerfile
+            *_container/docker_image/requirements.txt
+
       - name: Build container docker image
         working-directory: idmtools_platform_container/docker_image
         env:
           PYPI_STAGING_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
           PYPI_STAGING_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
-        if: steps.verify-changed-files.outputs.any_changed == 'true'
+        if: steps.verify-changed-files.outputs.file_changed == 'true'
         run: |
           python build_docker_image.py --username ${{ secrets.PYPI_STAGING_USERNAME }} --password ${{ secrets.PYPI_STAGING_PASSWORD }}
           python push_docker_image.py --username ${{ env.PYPI_STAGING_USERNAME }} --password ${{ env.PYPI_STAGING_PASSWORD }}
