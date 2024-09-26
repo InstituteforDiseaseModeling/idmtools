@@ -66,8 +66,10 @@ jobs:
             file1_changed=$(git diff --name-only HEAD | grep -c 'docker_image/Dockerfile')
             file2_changed=$(git diff --name-only HEAD | grep -c 'docker_image/requirements.txt')
           fi
-          echo file1_changed=$file1_changed
-          echo file2_changed=$file2_changed
+#          file1_changed=${file1_changed:-0}
+#          file2_changed=${file2_changed:-0}
+#          echo file1_changed=$file1_changed
+#          echo file2_changed=$file2_changed
           if [ "$file1_changed" -gt 0 ] && [ "$file2_changed" -gt 0 ]; then
             echo "files_changed=true" >> $GITHUB_ENV
           else
