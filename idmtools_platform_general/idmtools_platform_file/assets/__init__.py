@@ -69,7 +69,7 @@ def generate_simulation_script(platform: 'FilePlatform', simulation: Simulation,
                 platform=platform,
                 simulation=simulation,
                 retries=retries if retries else platform.retries,
-                mpi_procs = platform.mpi_procs
+                mpi_procs=platform.mpi_procs
             )
             tout.write(t.render(tvars))
 
