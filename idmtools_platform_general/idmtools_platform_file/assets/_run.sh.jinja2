@@ -19,10 +19,10 @@ do
         {% if simulation.task.command.cmd.startswith('singularity') %}
             {{simulation.task.command.cmd}}
         {% else %}
-            singularity exec {{simulation.task.sif_path}} {{simulation.task.command.cmd}}
+            singularity exec {{simulation.task.sif_path}} {% if mpi_procs > 1 %}mpirun -n {{mpi_procs}} {% endif %}{{simulation.task.command.cmd}}
         {% endif %}
     {% else %}
-        exec -a "SIMULATION:{{simulation.id}}" {{simulation.task.command.cmd}} &
+        exec -a "SIMULATION:{{simulation.id}}" {% if mpi_procs > 1 %}mpirun -n {{mpi_procs}} {% endif %}{{simulation.task.command.cmd}} &
     {% endif %}
    child_pid=$!
    echo "Running simulation with PID: $child_pid"
