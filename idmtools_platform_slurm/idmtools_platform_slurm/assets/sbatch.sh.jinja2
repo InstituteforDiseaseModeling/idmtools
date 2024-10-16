@@ -56,7 +56,14 @@ module load {{m}}
 {% endif %}
 
 # All submissions happen at the experiment level
-srun run_simulation.sh $1
+# Check if ntasks is greater than 1 to include --mpi=pmi2
+if [ "$SLURM_NTASKS" -gt 1 ]; then
+    echo "Running with MPI (ntasks=$SLURM_NTASKS)"
+    srun --mpi=pmi2 run_simulation.sh "$1"
+else
+    echo "Running without MPI (ntasks=$SLURM_NTASKS)"
+    srun run_simulation.sh "$1"
+fi
 wait
 
 
