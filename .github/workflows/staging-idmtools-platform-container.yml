@@ -44,7 +44,9 @@ jobs:
           login-server: docker-production.packages.idmod.org
           username: ${{ secrets.PYPI_STAGING_USERNAME }}
           password: ${{ secrets.PYPI_STAGING_PASSWORD }}
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Build and publish
         working-directory: idmtools_platform_container
         env:
@@ -54,11 +56,22 @@ jobs:
         run: |
           python setup.py sdist bdist_wheel
           twine upload dist/*
+      - name: Verify if files changed
+        uses: tj-actions/changed-files@v45
+        id: changed_files
+        with:
+          files: |
+            idmtools_platform_container/docker_image/Dockerfile
+            idmtools_platform_container/docker_image/requirements.txt
+      - name: Print any_modified output
+        run: |
+          echo "Any modified: ${{ steps.changed_files.outputs.any_modified }}"
       - name: Build container docker image
         working-directory: idmtools_platform_container/docker_image
         env:
           PYPI_STAGING_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
           PYPI_STAGING_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
+        if: steps.changed_files.outputs.any_modified == 'true'
         run: |
           python build_docker_image.py --username ${{ secrets.PYPI_STAGING_USERNAME }} --password ${{ secrets.PYPI_STAGING_PASSWORD }}
           python push_docker_image.py --username ${{ env.PYPI_STAGING_USERNAME }} --password ${{ env.PYPI_STAGING_PASSWORD }}
