@@ -62,10 +62,10 @@ nodes={{nodes|default(1)}}
 # All submissions happen at the experiment level
 # Check if ntasks or $nodes is greater than 1 to include --mpi=pmi2
 if [ "$ntasks" -gt 1 ] || [ "$nodes" -gt 1 ]; then
-    echo "Running with MPI (ntasks=$ntasks) or (tasks_per_core=$ntasks_per_core)"
+    echo "Running with MPI (ntasks=$ntasks) or (nodes=$nodes)"
     srun --mpi=pmi2 run_simulation.sh "$1"
 else
-    echo "Running without MPI (ntasks=$ntasks) or (tasks_per_core=$ntasks_per_core)"
+    echo "Running without MPI (ntasks=$ntasks) or (nodes=$nodes)"
     srun run_simulation.sh "$1"
 fi
 wait
