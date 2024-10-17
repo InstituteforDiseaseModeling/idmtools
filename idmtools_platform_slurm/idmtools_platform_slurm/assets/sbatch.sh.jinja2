@@ -55,15 +55,20 @@ module load {{m}}
 {% endfor %}
 {% endif %}
 
+# Assign the values from the template
+ntasks={{ntasks|default(1)}}
+nodes={{nodes|default(1)}}
+
 # All submissions happen at the experiment level
-# Check if ntasks is greater than 1 to include --mpi=pmi2
-if [ "$SLURM_NTASKS" -gt 1 ]; then
-    echo "Running with MPI (ntasks=$SLURM_NTASKS)"
+# Check if ntasks or $nodes is greater than 1 to include --mpi=pmi2
+if [ "$ntasks" -gt 1 ] || [ "$nodes" -gt 1 ]; then
+    echo "Running with MPI (ntasks=$ntasks) or (tasks_per_core=$ntasks_per_core)"
     srun --mpi=pmi2 run_simulation.sh "$1"
 else
-    echo "Running without MPI (ntasks=$SLURM_NTASKS)"
+    echo "Running without MPI (ntasks=$ntasks) or (tasks_per_core=$ntasks_per_core)"
     srun run_simulation.sh "$1"
 fi
 wait
+
 
 
