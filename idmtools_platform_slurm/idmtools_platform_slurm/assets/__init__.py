@@ -102,6 +102,10 @@ def generate_script(platform: 'SlurmPlatform', experiment: Experiment, max_runni
     for p in CONFIG_PARAMETERS:
         if getattr(platform, p) is not None:
             template_vars[p] = getattr(platform, p)
+    # Set task type
+    if experiment.simulation_count > 0:
+        if str(type(experiment.simulations.items.base_task)).lower().__contains__("emodtask"):
+            template_vars['task_type'] = "emodtask"
 
     # Set default here
     if max_running_jobs is not None:
@@ -112,7 +116,6 @@ def generate_script(platform: 'SlurmPlatform', experiment: Experiment, max_runni
     # Add any overides. We need some validation here later
     # TODO add validation for valid config options
     template_vars.update(kwargs)
-
     if platform.modules:
         template_vars['modules'] = platform.modules
 
