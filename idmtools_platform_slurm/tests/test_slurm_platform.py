@@ -30,7 +30,7 @@ class TestSlurmPlatform(ITestWithPersistence):
         actual_field_set = self.platform.slurm_fields
         expected_field_set = {'mem', 'partition', 'time', 'requeue', 'mail_user', 'ntasks', 'modules',
                               'exclusive', 'mail_type', 'sbatch_custom', 'nodes', 'ntasks_per_core', 'account',
-                              'mem_per_cpu', 'max_running_jobs', 'cpus_per_task', 'constraint'}
+                              'mem_per_cpu', 'max_running_jobs', 'cpus_per_task', 'constraint', 'mpi_type'}
 
         self.assertEqual(set(expected_field_set), set(actual_field_set))
 
@@ -41,7 +41,7 @@ class TestSlurmPlatform(ITestWithPersistence):
                                 'exclusive': False, 'sbatch_custom': None, 'nodes': None, 'mail_type': None,
                                 'partition': None, 'account': None, 'ntasks_per_core': None, 'requeue': True,
                                 'max_running_jobs': None, 'mem_per_cpu': None, 'ntasks': None, 'cpus_per_task': None,
-                                'constraint': None}
+                                'constraint': None, 'mpi_type': 'pmi2'}
 
         self.assertEqual(set(slurm_configs_dict), set(expected_config_dict))
 
@@ -55,7 +55,8 @@ class TestSlurmPlatform(ITestWithPersistence):
                                 'mail_user': 'test@test.com', 'max_running_jobs': None, 'mem': None,
                                 'mem_per_cpu': 2048, 'modules': [], 'nodes': None, 'ntasks': None,
                                 'ntasks_per_core': None, 'partition': None, 'requeue': True,
-                                'sbatch_custom': None, 'time': None, 'cpus_per_task': None, 'constraint': None}
+                                'sbatch_custom': None, 'time': None, 'cpus_per_task': None, 'constraint': None,
+                                'mpi_type': 'pmi2'}
 
         self.assertEqual(set(slurm_configs_dict), set(expected_config_dict))
 
@@ -188,7 +189,7 @@ class TestSlurmPlatform(ITestWithPersistence):
             contents = f.read()
         # check srun run_simulation.sh in sbatch.sh file
         self.assertIn(
-            "run run_simulation.sh",
+            "bash run_simulation.sh",
             contents)
         # clean up suite folder
         shutil.rmtree(suite_dir)

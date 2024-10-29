@@ -16,7 +16,7 @@ from helper import remove_dir, verify_result, get_dirs_and_files
 
 @pytest.mark.smoke
 @pytest.mark.serial
-@linux_only
+#@linux_only
 class TestSuiteExperiment(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + '--' + self._testMethodName
