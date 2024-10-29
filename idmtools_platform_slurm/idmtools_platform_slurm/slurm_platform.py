@@ -5,7 +5,7 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import os
 from pathlib import Path
-from typing import Optional, Any, Dict, List, Union
+from typing import Optional, Any, Dict, List, Union, Literal
 from dataclasses import dataclass, field, fields
 from logging import getLogger
 from idmtools import IdmConfigParser
@@ -32,7 +32,7 @@ logger = getLogger(__name__)
 op_defaults = dict(default=None, compare=False, metadata={"pickle_ignore": True})
 CONFIG_PARAMETERS = ['ntasks', 'partition', 'nodes', 'mail_type', 'mail_user', 'ntasks_per_core', 'cpus_per_task',
                      'mem_per_cpu', 'time', 'constraint', 'account', 'mem', 'exclusive', 'requeue', 'sbatch_custom',
-                     'max_running_jobs', 'array_batch_size']
+                     'max_running_jobs', 'array_batch_size', 'mpi_type']
 
 
 @dataclass(repr=False)
@@ -113,6 +113,10 @@ class SlurmPlatform(IPlatform):
 
     # determine if run script as Slurm job
     run_on_slurm: bool = field(default=False, repr=False, compare=False, metadata=dict(help="Run script as Slurm job"))
+
+    # mpi type: default to pmi2 for older versions of MPICH or OpenMPI or an MPI library that explicitly requires PMI2
+    mpi_type: Optional[Literal['pmi2', 'pmix']] = field(default="pmi2", metadata=dict(sbatch=True,
+                                                                                      help="MPI type (pmi2 for older MPICH/OpenMPI; pmix for newer versions and larger jobs)"))
 
     # endregion
 

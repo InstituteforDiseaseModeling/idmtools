@@ -61,14 +61,18 @@ ntasks={{ntasks|default(1)}}
 # Set task type
 task_type={{task_type}}
 
+# Get mpi_type
+mpi_type={{mpi_type}}
+
+
 # All submissions happen at the experiment level
 # Check if ntasks is greater than 1 and is emodtask to include --mpi=pmi2
 if [ "$ntasks" -gt 1 ]  && [ "$task_type" == "emodtask" ]; then
   echo "Running with MPI (ntasks=$ntasks)"
-  srun --mpi=pmi2 run_simulation.sh "$1"
+  bash run_simulation.sh "$1" "$mpi_type" "mpi"
 else
     echo "Running without MPI (ntasks=$ntasks)"
-    srun run_simulation.sh "$1"
+    bash run_simulation.sh "$1" "no-mpi"
 fi
 wait
 
