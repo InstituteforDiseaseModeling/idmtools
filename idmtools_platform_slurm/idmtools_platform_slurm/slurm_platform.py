@@ -115,8 +115,8 @@ class SlurmPlatform(IPlatform):
     run_on_slurm: bool = field(default=False, repr=False, compare=False, metadata=dict(help="Run script as Slurm job"))
 
     # mpi type: default to pmi2 for older versions of MPICH or OpenMPI or an MPI library that explicitly requires PMI2
-    mpi_type: Optional[Literal['pmi2', 'pmix']] = field(default="pmi2", metadata=dict(sbatch=True,
-                                                                                      help="MPI type (pmi2 for older MPICH/OpenMPI; pmix for newer versions and larger jobs)"))
+    mpi_type: Optional[Literal['pmi2', 'pmix', 'mpirun']] = field(default="pmi2", metadata=dict(sbatch=True,
+                                                                                                help="MPI types ('pmi2', 'pmix' for slurm MPI, 'mpirun' for independently MPI)"))
 
     # endregion
 

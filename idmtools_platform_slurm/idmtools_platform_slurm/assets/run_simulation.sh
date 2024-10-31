@@ -5,11 +5,17 @@ mpi_type="$2"
 SIMULATION_INDEX=$((${SLURM_ARRAY_TASK_ID} + $1))
 JOB_DIRECTORY=$(find . -type d -maxdepth 1 -mindepth 1  | grep -v Assets | head -$SIMULATION_INDEX | tail -1)
 cd $JOB_DIRECTORY
+current_dir=$(pwd)
+echo "The script is running from: $current_dir"
+
 # Run the simulation based on whether MPI is required
 if [ "mpi_type" == "no-mpi" ]; then
     echo "run without mpi"
     srun _run.sh 1> stdout.txt 2> stderr.txt
-else
+elif [ "mpi_type" == "mpirun" ]; then
+    echo "run mpirun"
+    mpirun "$current_dir"/_run.sh 1> stdout.txt 2> stderr.txt
+else # pmi2 or pmix
     echo "run mpi with $mpi_type"
     srun --mpi=$mpi_type _run.sh 1> stdout.txt 2> stderr.txt
 fi

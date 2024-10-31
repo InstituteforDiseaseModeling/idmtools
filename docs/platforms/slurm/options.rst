@@ -15,4 +15,4 @@ that are used when making calls to :py:class:`idmtools_platform_slurm.platform_o
 * partition (https://slurm.schedmd.com/sbatch.html#OPT_partition)
 * requeue (https://slurm.schedmd.com/sbatch.html#OPT_requeue)
 * time (https://slurm.schedmd.com/sbatch.html#OPT_time)
-* mpi_type: MPI type to use in slurm. Default is pmi2. Options are pmi2, pmix
+* mpi_type: MPI types ('pmi2', 'pmix' for slurm MPI, 'mpirun' for independently MPI)
