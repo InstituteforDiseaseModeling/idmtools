@@ -64,8 +64,8 @@ mpi_type={{mpi_type}}
 # All submissions happen at the experiment level
 # Check if ntasks is greater than 1 to include --mpi=$mpi_type
 if [ "$ntasks" -gt 1 ]; then
-  echo "Running with MPI (ntasks=$ntasks)"
-  bash run_simulation.sh "$1" "$mpi_type" "mpi"
+    echo "Running with MPI (ntasks=$ntasks)"
+    bash run_simulation.sh "$1" "$mpi_type"
 else
     echo "Running without MPI (ntasks=$ntasks)"
     bash run_simulation.sh "$1" "no-mpi"
