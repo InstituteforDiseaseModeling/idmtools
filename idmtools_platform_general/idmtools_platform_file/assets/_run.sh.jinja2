@@ -19,7 +19,7 @@ do
         {% if simulation.task.command.cmd.startswith('singularity') %}
             {{simulation.task.command.cmd}}
         {% else %}
-           {% if ntasks > 1 %}mpirun -n {{ntasks}} {% endif %}singularity exec {{simulation.task.sif_path}} {{simulation.task.command.cmd}}
+           singularity exec {{simulation.task.sif_path}} {% if ntasks > 1 %}mpirun -n {{ntasks}} {% endif %}{{simulation.task.command.cmd}} &
         {% endif %}
     {% else %}
         exec -a "SIMULATION:{{simulation.id}}" {% if ntasks > 1 %}mpirun -n {{ntasks}} {% endif %}{{simulation.task.command.cmd}} &
