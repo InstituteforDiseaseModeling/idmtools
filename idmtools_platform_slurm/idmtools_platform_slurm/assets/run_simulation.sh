@@ -9,10 +9,10 @@ current_dir=$(pwd)
 echo "The script is running from: $current_dir"
 
 # Run the simulation based on whether MPI is required
-if [ "mpi_type" == "no-mpi" ]; then
+if [ "$mpi_type" == "no-mpi" ]; then
     echo "run without mpi"
     srun _run.sh 1> stdout.txt 2> stderr.txt
-elif [ "mpi_type" == "mpirun" ]; then
+elif [ "$mpi_type" == "mpirun" ]; then
     echo "run mpirun"
     mpirun "$current_dir"/_run.sh 1> stdout.txt 2> stderr.txt
 else # pmi2 or pmix
