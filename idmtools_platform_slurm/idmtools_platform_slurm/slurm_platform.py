@@ -151,6 +151,9 @@ class SlurmPlatform(IPlatform):
         if slurm_installed():
             self._max_array_size = get_max_array_size()
 
+        if self.mpi_type not in {'pmi2', 'pmix', 'mpirun'}:
+            raise ValueError(f"Invalid mpi_type '{self.mpi_type}'. Allowed values are 'pmi2', 'pmix', or 'mpirun'.")
+
         super().__post_init__()
 
         # check if run script as a slurm job
