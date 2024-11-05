@@ -402,9 +402,9 @@ class TestPlatformExperiment(unittest.TestCase):
 
     def test_platform_with_mpi_procs(self):
         with tempfile.TemporaryDirectory() as temp_dir:
-            # case1: mpi_procs=4
-            mpi_procs = 4
-            platform = Platform("Container", job_directory=temp_dir, mpi_procs=mpi_procs)
+            # case1: ntasks=4
+            ntasks = 4
+            platform = Platform("Container", job_directory=temp_dir, ntasks=ntasks)
             command = "ls -lat"
             task = CommandTask(command=command)
             experiment = Experiment.from_task(task, name="run_command")
@@ -413,8 +413,8 @@ class TestPlatformExperiment(unittest.TestCase):
             sim_dir = platform.get_directory_by_id(experiment.simulations[0].id, ItemType.SIMULATION)
             with open(os.path.join(str(sim_dir), "_run.sh"), "r") as file:
                 content = file.read()
-                self.assertIn(f'exec -a "SIMULATION:{experiment.simulations[0].id}" mpirun -n {mpi_procs} {command} &', content)
-            # case2: default mpi_procs=1
+                self.assertIn(f'exec -a "SIMULATION:{experiment.simulations[0].id}" mpirun -n {ntasks} {command} &', content)
+            # case2: default ntasks=1
             platform1 = Platform("Container", job_directory=temp_dir)
             experiment = Experiment.from_task(task, name="run_command")
             experiment.run(wait_until_done=True, platform=platform1)
