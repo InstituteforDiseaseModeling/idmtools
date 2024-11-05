@@ -15,7 +15,10 @@ if [ "$mpi_type" == "no-mpi" ]; then
 elif [ "$mpi_type" == "mpirun" ]; then
     echo "run mpirun"
     mpirun "$current_dir"/_run.sh 1> stdout.txt 2> stderr.txt
-else # pmi2 or pmix
+elif [ "$mpi_type" == "pmi2" ] || [ "$mpi_type" == "pmix" ]; then # pmi2 or pmix
     echo "run mpi with $mpi_type"
     srun --mpi=$mpi_type _run.sh 1> stdout.txt 2> stderr.txt
+else
+    echo "Invalid MPI type: $mpi_type"
+    exit 1
 fi
