@@ -59,7 +59,7 @@ module load {{m}}
 ntasks={{ntasks|default(1)}}
 
 # Get mpi_type
-mpi_type={{mpi_type}}
+mpi_type={{mpi_type|lower}}
 
 # All submissions happen at the experiment level
 # Check if ntasks is greater than 1 to include --mpi=$mpi_type

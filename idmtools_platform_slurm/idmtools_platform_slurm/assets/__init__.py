@@ -112,6 +112,7 @@ def generate_script(platform: 'SlurmPlatform', experiment: Experiment, max_runni
     # Add any overides. We need some validation here later
     # TODO add validation for valid config options
     template_vars.update(kwargs)
+
     if platform.modules:
         template_vars['modules'] = platform.modules
 

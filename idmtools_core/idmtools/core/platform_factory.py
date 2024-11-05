@@ -94,7 +94,7 @@ class Platform:
            - dir_exist_ok (bool, optional): Specifies default setting of whether slurm should fail if item directory already exists. Default is False
            - array_batch_size (int, optional): Set array max size for Slurm job. Default is None
            - run_on_slurm (bool, optional): determine if run script as Slurm job. Default is False
-           - mpi_type (str, optional): MPI type to use in slurm. Default is pmi2. Options are pmi2, pmix
+           - mpi_type (str, optional): MPI type to use in slurm. Default is pmi2. Options are pmi2, pmix, mpirun
 
         ContainerPlatform Keyword Args:
            - job_directory (str, optional): Job directory. Default is None
