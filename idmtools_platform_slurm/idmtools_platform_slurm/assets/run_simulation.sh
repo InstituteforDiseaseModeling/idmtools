@@ -20,5 +20,4 @@ elif [ "$mpi_type" == "pmi2" ] || [ "$mpi_type" == "pmix" ]; then # pmi2 or pmix
     srun --mpi=$mpi_type _run.sh 1> stdout.txt 2> stderr.txt
 else
     echo "Invalid MPI type: $mpi_type"
-    exit 1
 fi
