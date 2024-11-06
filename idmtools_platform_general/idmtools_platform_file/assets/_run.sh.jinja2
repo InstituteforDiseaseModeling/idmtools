@@ -12,10 +12,9 @@ term_handler()
 trap 'term_handler' SIGINT SIGTERM
 
 n=0
-until [ "$n" -ge {{retries}} ]
-
 {% set mpi_command = "mpirun -n " + ntasks|string if ntasks > 1 else "" %}
 
+until [ "$n" -ge {{retries}} ]
 do
     echo "100" > job_status.txt
     {% if simulation.task.sif_path is defined and simulation.task.sif_path %}
