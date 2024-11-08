@@ -5,7 +5,7 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import os
 from pathlib import Path
-from typing import Optional, Any, Dict, List, Union
+from typing import Optional, Any, Dict, List, Union, Literal
 from dataclasses import dataclass, field, fields
 from logging import getLogger
 from idmtools import IdmConfigParser
@@ -32,7 +32,7 @@ logger = getLogger(__name__)
 op_defaults = dict(default=None, compare=False, metadata={"pickle_ignore": True})
 CONFIG_PARAMETERS = ['ntasks', 'partition', 'nodes', 'mail_type', 'mail_user', 'ntasks_per_core', 'cpus_per_task',
                      'mem_per_cpu', 'time', 'constraint', 'account', 'mem', 'exclusive', 'requeue', 'sbatch_custom',
-                     'max_running_jobs', 'array_batch_size']
+                     'max_running_jobs', 'array_batch_size', 'mpi_type']
 
 
 @dataclass(repr=False)
@@ -70,7 +70,7 @@ class SlurmPlatform(IPlatform):
     ntasks_per_core: Optional[int] = field(default=None, metadata=dict(sbatch=True, help="Number of tasks per core"))
 
     # Maximum of running jobs(Per experiment)
-    max_running_jobs: Optional[int] = field(default=None, metadata=dict(sbatch=True, help="Maximum of running jobs"))
+    max_running_jobs: Optional[int] = field(default=100, metadata=dict(sbatch=True, help="Maximum of running jobs"))
 
     # Memory per core: MB of memory
     mem: Optional[int] = field(default=None, metadata=dict(sbatch=True, help="Memory per core"))
@@ -114,6 +114,10 @@ class SlurmPlatform(IPlatform):
     # determine if run script as Slurm job
     run_on_slurm: bool = field(default=False, repr=False, compare=False, metadata=dict(help="Run script as Slurm job"))
 
+    # mpi type: default to pmi2 for older versions of MPICH or OpenMPI or an MPI library that explicitly requires PMI2
+    mpi_type: Optional[Literal['pmi2', 'pmix', 'mpirun']] = field(default="pmi2", metadata=dict(sbatch=True,
+                                                                                                help="MPI types ('pmi2', 'pmix' for slurm MPI, 'mpirun' for independently MPI)"))
+
     # endregion
 
     _suites: SlurmPlatformSuiteOperations = field(**op_defaults, repr=False, init=False)
@@ -146,6 +150,9 @@ class SlurmPlatform(IPlatform):
         self._max_array_size = None
         if slurm_installed():
             self._max_array_size = get_max_array_size()
+
+        if self.mpi_type.lower() not in {'pmi2', 'pmix', 'mpirun'}:
+            raise ValueError(f"Invalid mpi_type '{self.mpi_type}'. Allowed values are 'pmi2', 'pmix', or 'mpirun'.")
 
         super().__post_init__()
 
