@@ -111,6 +111,7 @@ class Platform:
            - modules (list, optional): Modules to load. Default is None
            - debug (bool, optional): Debug mode. Default is False
            - retries (int, optional): The number of retries to attempt for a job.
+           - ntasks (int, optional): Number of MPI processes. Default is 1
 
         Returns:
             The requested platform.

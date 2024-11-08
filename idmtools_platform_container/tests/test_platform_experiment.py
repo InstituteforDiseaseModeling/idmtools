@@ -400,5 +400,31 @@ class TestPlatformExperiment(unittest.TestCase):
             # clean up
             stop_container(platform.container_id, remove=True)
 
+    def test_platform_with_mpi_procs(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            # case1: ntasks=4
+            ntasks = 4
+            platform = Platform("Container", job_directory=temp_dir, ntasks=ntasks)
+            command = "ls -lat"
+            task = CommandTask(command=command)
+            experiment = Experiment.from_task(task, name="run_command")
+            experiment.run(wait_until_done=True)
+            self.assertEqual(experiment.status, EntityStatus.SUCCEEDED)
+            sim_dir = platform.get_directory_by_id(experiment.simulations[0].id, ItemType.SIMULATION)
+            with open(os.path.join(str(sim_dir), "_run.sh"), "r") as file:
+                content = file.read()
+                self.assertIn(f'exec -a "SIMULATION:{experiment.simulations[0].id}" mpirun -n {ntasks} {command} &', content)
+            # case2: default ntasks=1
+            platform1 = Platform("Container", job_directory=temp_dir)
+            experiment = Experiment.from_task(task, name="run_command")
+            experiment.run(wait_until_done=True, platform=platform1)
+            sim_dir1 = platform1.get_directory_by_id(experiment.simulations[0].id, ItemType.SIMULATION)
+            with open(os.path.join(str(sim_dir1), "_run.sh"), "r") as file:
+                content = file.read()
+                self.assertIn(f'exec -a "SIMULATION:{experiment.simulations[0].id}" {command} &', content)
+
+            # clean up
+            stop_container(platform.container_id, remove=True)
+
     # def test_delete_container_by_image_prefix(self):
     #     delete_containers_by_image_prefix("docker-production-public.packages.idmod.org/idmtools/container-rocky-runtime")

@@ -45,6 +45,8 @@ class FilePlatform(IPlatform):
 
     # Default retries for jobs
     retries: int = field(default=1, metadata=dict(help="Number of retries for failed jobs"))
+    # number of MPI processes
+    ntasks: int = field(default=1, metadata=dict(help="Number of MPI processes. If greater than 1, it triggers mpirun."))
     # modules to be load
     modules: list = field(default_factory=list, metadata=dict(help="Modules to load"))
     # extra packages to install
