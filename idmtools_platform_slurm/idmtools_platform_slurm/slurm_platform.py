@@ -126,7 +126,7 @@ class SlurmPlatform(IPlatform):
     _assets: SlurmPlatformAssetCollectionOperations = field(**op_defaults, repr=False, init=False)
     _metas: JSONMetadataOperations = field(**op_defaults, repr=False, init=False)
     _op_client: SlurmOperations = field(**op_defaults, repr=False, init=False)
-    _object_cache_expiration: 'int' = field(default=600, repr=False, init=False)
+
     def __post_init__(self):
         if isinstance(self.mode, str):
             if self.mode.upper() not in [mode.value.upper() for mode in SlurmOperationalMode]:
@@ -155,6 +155,7 @@ class SlurmPlatform(IPlatform):
             raise ValueError(f"Invalid mpi_type '{self.mpi_type}'. Allowed values are 'pmi2', 'pmix', or 'mpirun'.")
 
         super().__post_init__()
+        self._object_cache_expiration = 600
 
         # check if run script as a slurm job
         r = run_script_on_slurm(self, run_on_slurm=self.run_on_slurm)

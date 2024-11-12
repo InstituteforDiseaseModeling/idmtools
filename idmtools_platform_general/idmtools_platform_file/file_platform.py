@@ -57,7 +57,6 @@ class FilePlatform(IPlatform):
     _simulations: FilePlatformSimulationOperations = field(**op_defaults, repr=False, init=False)
     _assets: FilePlatformAssetCollectionOperations = field(**op_defaults, repr=False, init=False)
     _metas: JSONMetadataOperations = field(**op_defaults, repr=False, init=False)
-    _object_cache_expiration: 'int' = field(default=600, repr=False, init=False)
 
     def __post_init__(self):
         self.__init_interfaces()
@@ -69,6 +68,7 @@ class FilePlatform(IPlatform):
         self.sim_name_directory = IdmConfigParser.get_option(None, "sim_name_directory",
                                                              'False').lower() in TRUTHY_VALUES
         super().__post_init__()
+        self._object_cache_expiration = 600
 
     def __init_interfaces(self):
         self._suites = FilePlatformSuiteOperations(platform=self)
