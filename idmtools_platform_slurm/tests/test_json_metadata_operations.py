@@ -15,14 +15,14 @@ class JSONMetadataOperationsTest(unittest.TestCase):
     @staticmethod
     def _initialize_data(self):
         # create 1 suite, 2 experiments, 3 simulations for general usage. Meta is default one for each item
-        suite = Suite()
-        exp1 = Experiment()
+        suite = Suite(name="Suite")
+        exp1 = Experiment(name="Experiment1")
         exp1.suite = suite
-        exp2 = Experiment()
+        exp2 = Experiment(name="Experiment2")
         exp2.suite = suite
-        simulation1 = Simulation()
-        simulation2 = Simulation()
-        simulation3 = Simulation()
+        simulation1 = Simulation(name="Simulation1")
+        simulation2 = Simulation(name="Simulation2")
+        simulation3 = Simulation(name="Simulation3")
         simulation1.experiment = exp1
         simulation2.experiment = exp1
         simulation3.experiment = exp2
@@ -50,12 +50,16 @@ class JSONMetadataOperationsTest(unittest.TestCase):
         _, experiments, simulations = self._initialize_data(self)
         sim = simulations[2]  # test simulation3 and experiment2
         metadata = self.op.get(item=sim)
-        expected_meta = {'platform_id': None, 'status': 'CREATED', 'tags': {}, 'item_type': 'Simulation', 'name': None,
+        expected_meta = {'platform_id': None, 'status': 'CREATED', 'tags': {}, 'item_type': 'Simulation', 'name': 'Simulation3',
                          'assets': [], 'task': None}
         expected_meta.update({"parent_id": experiments[1].id})
+        expected_meta.update({"experiment_id": experiments[1].id})
         expected_meta.update({"_uid": sim.id})
         expected_meta.update({"uid": sim.id})
         expected_meta.update({"id": sim.id})
+        sim_dir = str(self.platform.get_directory_by_id(sim.id, ItemType.SIMULATION))
+        expected_meta.update({"dir": sim_dir.replace("\\", "/")})
+        metadata['dir'] = metadata['dir'].replace("\\", "/")
         self.assertDictEqual(expected_meta, metadata)
 
     # test get meta for experiment
@@ -63,14 +67,17 @@ class JSONMetadataOperationsTest(unittest.TestCase):
         suites, experiments, _ = self._initialize_data(self)
         exp = experiments[1]
         metadata = self.op.get(item=exp)
-        expected_meta = {'platform_id': None, 'status': 'CREATED', 'tags': {}, 'item_type': 'Experiment', 'name': None,
-                         'assets': [], 'suite_id': None, 'task_type': 'idmtools.entities.command_task.CommandTask',
+        expected_meta = {'platform_id': None, 'status': 'CREATED', 'tags': {}, 'item_type': 'Experiment', 'name': "Experiment2",
+                         'assets': [], 'suite_id': suites[0].id, 'task_type': 'idmtools.entities.command_task.CommandTask',
                          'platform_requirements': None, 'frozen': False, 'gather_common_assets_from_task': True,
                          'parent_id': suites[0].id, 'disable_default_pre_create': False}
-        expected_meta.update({"parent_id": suites[0].id})
+        # expected_meta.update({"parent_id": suites[0].id})
         expected_meta.update({"_uid": exp.id})
         expected_meta.update({"uid": exp.id})
         expected_meta.update({"id": exp.id})
+        exp_dir = str(self.platform.get_directory_by_id(exp.id, ItemType.EXPERIMENT))
+        expected_meta.update({"dir": exp_dir.replace("\\", "/")})
+        metadata['dir'] = metadata['dir'].replace("\\", "/")
         self.assertDictEqual(expected_meta, metadata)
 
     # test get meta for suite
@@ -79,28 +86,31 @@ class JSONMetadataOperationsTest(unittest.TestCase):
         suite = suites[0]
         metadata = self.op.get(item=suite)
         expected_suite_meta = {'platform_id': None, 'parent_id': None, 'status': 'CREATED', 'tags': {}, 'item_type': 'Suite',
-                               'name': None, 'description': None}
-        exp_meta_dict1 = {'platform_id': None, 'status': None, 'tags': {}, 'item_type': 'Experiment', 'name': None,
-                          'assets': [], 'suite_id': None, 'task_type': 'idmtools.entities.command_task.CommandTask',
-                          'platform_requirements': None, 'frozen': False, 'gather_common_assets_from_task': True}
-        exp_meta_dict2 = exp_meta_dict1.copy()
-        exp_meta_dict1.update({"parent_id": suites[0].id})
-        exp_meta_dict2.update({"parent_id": suites[0].id})
-        exp_meta_dict2.update({"_uid": experiments[1].id})
+                               'name': 'Suite', 'description': None}
+        # exp_meta_dict1 = {'platform_id': None, 'status': None, 'tags': {}, 'item_type': 'Experiment', 'name': None,
+        #                   'assets': [], 'suite_id': None, 'task_type': 'idmtools.entities.command_task.CommandTask',
+        #                   'platform_requirements': None, 'frozen': False, 'gather_common_assets_from_task': True}
+        # exp_meta_dict2 = exp_meta_dict1.copy()
+        # exp_meta_dict1.update({"parent_id": suites[0].id})
+        # exp_meta_dict2.update({"parent_id": suites[0].id})
+        # exp_meta_dict2.update({"_uid": experiments[1].id})
         expected_suite_meta.update({"parent_id": None})
         expected_suite_meta.update({"_uid": suite.id})
         expected_suite_meta.update({"uid": suite.id})
         expected_suite_meta.update({"id": suite.id})
+        suite_dir = str(self.platform.get_directory_by_id(suite.id, ItemType.SUITE))
+        expected_suite_meta.update({"dir": suite_dir.replace("\\", "/")})
+        metadata['dir'] = metadata['dir'].replace("\\", "/")
         self.assertDictEqual(expected_suite_meta, metadata)
 
     # test load with no meta_data file
     def test_errors_for_no_existent_metadata_file(self):
-        sim = Simulation()
+        sim = Simulation(name="Simulation")
         sim.uid = 'totally-brand-new'
-        exp = Experiment()
+        exp = Experiment(name="Experiment")
         exp.uid = 'very-shiny-new'
         sim.experiment = exp
-        suite = Suite()
+        suite = Suite(name="Suite")
         suite.uid = 'is-it-new-or-knew'
         exp.suite = suite
 
@@ -170,9 +180,9 @@ class JSONMetadataOperationsTest(unittest.TestCase):
         self.assertEqual({}, metadata)
 
     def test_clear_errors_for_previously_non_existant_id(self):
-        sim = Simulation()
+        sim = Simulation(name="Simulation")
         sim.uid = 'mars-university'
-        exp = Experiment()
+        exp = Experiment(name="Experiment")
         exp.uid = 'blah'
         sim.experiment = exp
         suite = Suite()

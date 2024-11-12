@@ -3,12 +3,13 @@ Here we implement the SlurmPlatform object.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+import os
 from pathlib import Path
-from typing import Optional, Any, Dict, List, Union
+from typing import Optional, Any, Dict, List, Union, Literal
 from dataclasses import dataclass, field, fields
 from logging import getLogger
-from idmtools.core import ItemType
-from idmtools.core import EntityStatus
+from idmtools import IdmConfigParser
+from idmtools.core import ItemType, EntityStatus, TRUTHY_VALUES
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities.suite import Suite
 from idmtools.entities.experiment import Experiment
@@ -31,85 +32,91 @@ logger = getLogger(__name__)
 op_defaults = dict(default=None, compare=False, metadata={"pickle_ignore": True})
 CONFIG_PARAMETERS = ['ntasks', 'partition', 'nodes', 'mail_type', 'mail_user', 'ntasks_per_core', 'cpus_per_task',
                      'mem_per_cpu', 'time', 'constraint', 'account', 'mem', 'exclusive', 'requeue', 'sbatch_custom',
-                     'max_running_jobs', 'array_batch_size']
+                     'max_running_jobs', 'array_batch_size', 'mpi_type']
 
 
 @dataclass(repr=False)
 class SlurmPlatform(IPlatform):
-    job_directory: str = field(default=None)
+    job_directory: str = field(default=None, metadata=dict(help="Job Directory"))
 
     #: Needed for bridge mode
-    bridged_jobs_directory: str = field(default=Path.home().joinpath(".idmtools").joinpath("singularity-bridge"))
+    bridged_jobs_directory: str = field(default=Path.home().joinpath(".idmtools").joinpath("singularity-bridge"),
+                                        metadata=dict(help="Bridged Jobs Directory"))
     bridged_results_directory: str = field(
-        default=Path.home().joinpath(".idmtools").joinpath("singularity-bridge").joinpath("results"))
+        default=Path.home().joinpath(".idmtools").joinpath("singularity-bridge").joinpath("results"),
+        metadata=dict(help="Bridged Results Directory"))
 
-    mode: SlurmOperationalMode = field(default=None)
+    mode: SlurmOperationalMode = field(default=SlurmOperationalMode.LOCAL, metadata=dict(help="Slurm Operational Mode"))
 
     # region: Resources request
 
     # choose e-mail type
-    mail_type: Optional[str] = field(default=None, metadata=dict(sbatch=True))
+    mail_type: Optional[str] = field(default=None, metadata=dict(sbatch=True, help="e-mail type"))
 
     # send e=mail notification
     # TODO Add Validations here from https://slurm.schedmd.com/sbatch.html#OPT_mail-type
-    mail_user: Optional[str] = field(default=None, metadata=dict(sbatch=True))
+    mail_user: Optional[str] = field(default=None, metadata=dict(sbatch=True, help="e-mail address"))
 
     # How many nodes to be used
-    nodes: Optional[int] = field(default=None, metadata=dict(sbatch=True))
+    nodes: Optional[int] = field(default=None, metadata=dict(sbatch=True, help="Number of nodes"))
 
     # Num of tasks
-    ntasks: Optional[int] = field(default=None, metadata=dict(sbatch=True))
+    ntasks: Optional[int] = field(default=None, metadata=dict(sbatch=True, help="Number of tasks"))
 
     # CPU # per task
-    cpus_per_task: Optional[int] = field(default=None, metadata=dict(sbatch=True))
+    cpus_per_task: Optional[int] = field(default=None, metadata=dict(sbatch=True, help="Number of CPUs per task"))
 
     # Task # per core
-    ntasks_per_core: Optional[int] = field(default=None, metadata=dict(sbatch=True))
+    ntasks_per_core: Optional[int] = field(default=None, metadata=dict(sbatch=True, help="Number of tasks per core"))
 
     # Maximum of running jobs(Per experiment)
-    max_running_jobs: Optional[int] = field(default=None, metadata=dict(sbatch=True))
+    max_running_jobs: Optional[int] = field(default=100, metadata=dict(sbatch=True, help="Maximum of running jobs"))
 
     # Memory per core: MB of memory
-    mem: Optional[int] = field(default=None, metadata=dict(sbatch=True))
+    mem: Optional[int] = field(default=None, metadata=dict(sbatch=True, help="Memory per core"))
 
     # Memory per core: MB of memory
-    mem_per_cpu: Optional[int] = field(default=None, metadata=dict(sbatch=True))
+    mem_per_cpu: Optional[int] = field(default=None, metadata=dict(sbatch=True, help="Memory per CPU"))
 
     # Which partition to use
-    partition: Optional[str] = field(default=None, metadata=dict(sbatch=True))
+    partition: Optional[str] = field(default=None, metadata=dict(sbatch=True, help="Partition"))
 
     # Specify compute node
-    constraint: Optional[str] = field(default=None, metadata=dict(sbatch=True))
+    constraint: Optional[str] = field(default=None, metadata=dict(sbatch=True, help="Constraint"))
 
     # Limit time on this job hrs:min:sec
-    time: str = field(default=None, metadata=dict(sbatch=True))
+    time: str = field(default=None, metadata=dict(sbatch=True, help="Limit time on this job"))
 
     # if set to something, jobs will run with the specified account in slurm
-    account: str = field(default=None, metadata=dict(sbatch=True))
+    account: str = field(default=None, metadata=dict(sbatch=True, help="Account"))
 
     # Allocated nodes can not be shared with other jobs/users
-    exclusive: bool = field(default=False, metadata=dict(sbatch=True))
+    exclusive: bool = field(default=False, metadata=dict(sbatch=True, help="Exclusive"))
 
     # Specifies that the batch job should be eligible for requeuing
-    requeue: bool = field(default=True, metadata=dict(sbatch=True))
+    requeue: bool = field(default=True, metadata=dict(sbatch=True, help="Requeue"))
 
     # Default retries for jobs
-    retries: int = field(default=1, metadata=dict(sbatch=False))
+    retries: int = field(default=1, metadata=dict(sbatch=False, help="Default retries for jobs"))
 
     # Pass custom commands to sbatch generation script
-    sbatch_custom: Optional[str] = field(default=None, metadata=dict(sbatch=True))
+    sbatch_custom: Optional[str] = field(default=None, metadata=dict(sbatch=True, help="Custom sbatch commands"))
 
     # modules to be load
-    modules: list = field(default_factory=list, metadata=dict(sbatch=True))
+    modules: list = field(default_factory=list, metadata=dict(sbatch=True, help="Modules to be loaded"))
 
     # Specifies default setting of whether slurm should fail if item directory already exists
-    dir_exist_ok: bool = field(default=False, repr=False, compare=False)
+    dir_exist_ok: bool = field(default=False, repr=False, compare=False, metadata=dict(help="Directory exist ok"))
 
     # Set array max size for Slurm job
-    array_batch_size: int = field(default=None, metadata=dict(sbatch=False))
+    array_batch_size: int = field(default=None, metadata=dict(sbatch=False, help="Array batch size"))
 
     # determine if run script as Slurm job
-    run_on_slurm: bool = field(default=False, repr=False, compare=False)
+    run_on_slurm: bool = field(default=False, repr=False, compare=False, metadata=dict(help="Run script as Slurm job"))
+
+    # mpi type: default to pmi2 for older versions of MPICH or OpenMPI or an MPI library that explicitly requires PMI2
+    mpi_type: Optional[Literal['pmi2', 'pmix', 'mpirun']] = field(default="pmi2", metadata=dict(sbatch=True,
+                                                                                                help="MPI types ('pmi2', 'pmix' for slurm MPI, 'mpirun' for independently MPI)"))
 
     # endregion
 
@@ -121,21 +128,34 @@ class SlurmPlatform(IPlatform):
     _op_client: SlurmOperations = field(**op_defaults, repr=False, init=False)
 
     def __post_init__(self):
-        if self.mode.upper() not in [mode.value.upper() for mode in SlurmOperationalMode]:
-            raise ValueError(
-                f"{self.mode} is not a value mode. Please select one of the following {', '.join([mode.value for mode in SlurmOperationalMode])}")
-        self.mode = SlurmOperationalMode[self.mode.upper()] if self.mode else self.mode
+        if isinstance(self.mode, str):
+            if self.mode.upper() not in [mode.value.upper() for mode in SlurmOperationalMode]:
+                raise ValueError(
+                    f"{self.mode} is not a value mode. Please select one of the following {', '.join([mode.value for mode in SlurmOperationalMode])}")
+            self.mode = SlurmOperationalMode[self.mode.upper()]
+
+        if not isinstance(self.mode, SlurmOperationalMode):
+            raise ValueError(f"{self.mode} is not a valid mode. Please use enum {SlurmOperationalMode}")
+
         self.__init_interfaces()
         self.supported_types = {ItemType.SUITE, ItemType.EXPERIMENT, ItemType.SIMULATION}
         if self.job_directory is None:
             raise ValueError("Job Directory is required.")
+        self.job_directory = os.path.abspath(self.job_directory)
+        self.name_directory = IdmConfigParser.get_option(None, "name_directory", 'True').lower() in TRUTHY_VALUES
+        self.sim_name_directory = IdmConfigParser.get_option(None, "sim_name_directory",
+                                                             'False').lower() in TRUTHY_VALUES
 
         # check max_array_size from slurm configuration
         self._max_array_size = None
         if slurm_installed():
             self._max_array_size = get_max_array_size()
 
+        if self.mpi_type.lower() not in {'pmi2', 'pmix', 'mpirun'}:
+            raise ValueError(f"Invalid mpi_type '{self.mpi_type}'. Allowed values are 'pmi2', 'pmix', or 'mpirun'.")
+
         super().__post_init__()
+        self._object_cache_expiration = 600
 
         # check if run script as a slurm job
         r = run_script_on_slurm(self, run_on_slurm=self.run_on_slurm)

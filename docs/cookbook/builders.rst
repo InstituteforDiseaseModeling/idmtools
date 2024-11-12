@@ -2,7 +2,7 @@
 Builders
 ========
 
-Simulation Builder
+Simulation builder
 ------------------
 
 The follow demonstrates how to build a sweep using the standard builder, :py:class:`~idmtools.builders.simulation_builder.SimulationBuilder`
@@ -20,7 +20,7 @@ It then builds sweeps through *Arms*
 See :py:class:`~idmtools.builders.simulation_builder.SimulationBuilder` for more details.
 
 
-Arm Experiment Builder
+Arm experiment builder
 ----------------------
 
 The follow demonstrates how to build a sweep using :py:class:`~idmtools.builders.arm_simulation_builder.ArmSimulationBuilder`

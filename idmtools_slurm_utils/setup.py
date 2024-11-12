@@ -38,7 +38,6 @@ setup(
     author=", ".join([author[0] for author in authors]),
     author_email=", ".join([author[1] for author in authors]),
     classifiers=[
-        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
@@ -48,10 +47,11 @@ setup(
     description="idmtools slurm utils",
     install_requires=extra_require_files['requirements'],
     long_description=readme,
+    long_description_content_type="text/markdown",
     include_package_data=True,
     keywords='modeling, IDM',
     name='idmtools-slurm-utils',
-    packages=find_packages(),
+    packages=find_packages(exclude=["tests"]),
     setup_requires=[],
     test_suite='tests',
     extras_require=extras,
@@ -60,5 +60,5 @@ setup(
             'idmtools-slurm-bridge = idmtools_slurm_utils.singularity_bridge:main',
         ],
     },
-    version='1.7.10'
+    version='2.0.1+nightly'
 )

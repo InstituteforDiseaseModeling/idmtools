@@ -23,15 +23,18 @@ import sys
 #import sphinx_rtd_theme
 from datetime import datetime
 
+
 if sys.platform in ["linux", "darwin"]:
     subprocess.check_output(["make", "generate-api"], cwd=os.path.dirname(os.path.abspath(__file__)))
 else:
     subprocess.check_output(["make.bat", "generate-api"], cwd=os.path.dirname(os.path.abspath(__file__)))
+    # Remove the api/modules.rst file which is intermediate file from template api
+    subprocess.run(['del', 'api\modules.rst'], check=True, shell=True)
 
 # -- General configuration ------------------------------------------------
 
-# This is the equivalent of -t in SPHINXOPTS for the RTD build
-tags.add('idmtools')
+# # This is the equivalent of -t in SPHINXOPTS for the RTD build
+# tags.add('idmtools')
 
 # If your docs needs a minimal Sphinx version, state it here.
 #
@@ -80,7 +83,7 @@ plantuml = 'plantweb'
 autodoc_default_options = {
     'member-order': 'bysource',
     'members': None,
-    'special-members': '__init__',
+    'special-members': '__new__,__init__',
     'exclude-members': '__all__'
 }
 
@@ -210,7 +213,7 @@ html_theme_options = {
     ],
     "navbar_end": ["theme-switcher", "navbar-icon-links"],
     "secondary_sidebar_items": ["navbar-side"],
-    "header_links_before_dropdown": 5,
+    "header_links_before_dropdown": 6,
     "footer_start": ["copyright", "footer_start"],
     "footer_end": ["theme-version", "footer_end"],
 }
@@ -233,6 +236,9 @@ html_context = {
 # Add customizations
 def setup(app):
     app.add_css_file("theme_overrides.css")
+    if os.environ.get('READTHEDOCS') == 'True':
+        # Set a tag for Read the Docs environment
+        app.tags.add('idmtools')
 
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]

@@ -15,14 +15,14 @@ class JSONMetadataOperationsTest(unittest.TestCase):
     @staticmethod
     def _initialize_data(self):
         # create 1 suite, 2 experiments, 3 simulations for general usage. Meta is default one for each item
-        suite = Suite()
-        exp1 = Experiment()
+        suite = Suite(name="Suite1")
+        exp1 = Experiment(name="Exp1")
         exp1.suite = suite
-        exp2 = Experiment()
+        exp2 = Experiment(name="Exp2")
         exp2.suite = suite
-        simulation1 = Simulation()
-        simulation2 = Simulation()
-        simulation3 = Simulation()
+        simulation1 = Simulation(name="Sim1")
+        simulation2 = Simulation(name="Sim2")
+        simulation3 = Simulation(name="Sim3")
         simulation1.experiment = exp1
         simulation2.experiment = exp1
         simulation3.experiment = exp2
@@ -53,9 +53,12 @@ class JSONMetadataOperationsTest(unittest.TestCase):
         expected_meta = {'platform_id': None, 'status': 'CREATED', 'tags': {}, 'item_type': 'Simulation', 'name': None,
                          'assets': [], 'task': None}
         expected_meta.update({"parent_id": experiments[1].id})
+        expected_meta.update({"experiment_id": experiments[1].id})
         expected_meta.update({"_uid": sim.id})
         expected_meta.update({"uid": sim.id})
         expected_meta.update({"id": sim.id})
+        expected_meta.update({"name": sim.name})
+        expected_meta.update({"dir": str(Path(f"{self.metadata_root}/{_[0].name}_{_[0].id}/{experiments[1].name}_{sim.parent_id}/{sim.id}"))})
         self.assertDictEqual(expected_meta, metadata)
 
     # test get meta for experiment
@@ -64,13 +67,14 @@ class JSONMetadataOperationsTest(unittest.TestCase):
         exp = experiments[1]
         metadata = self.op.get(item=exp)
         expected_meta = {'platform_id': None, 'status': 'CREATED', 'tags': {}, 'item_type': 'Experiment', 'name': None,
-                         'assets': [], 'suite_id': None, 'task_type': 'idmtools.entities.command_task.CommandTask',
+                         'assets': [], 'suite_id': suites[0].id, 'task_type': 'idmtools.entities.command_task.CommandTask',
                          'platform_requirements': None, 'frozen': False, 'gather_common_assets_from_task': True,
                          'parent_id': suites[0].id, 'disable_default_pre_create': False}
-        expected_meta.update({"parent_id": suites[0].id})
         expected_meta.update({"_uid": exp.id})
         expected_meta.update({"uid": exp.id})
         expected_meta.update({"id": exp.id})
+        expected_meta.update({"name": exp.name})
+        expected_meta.update({"dir": str(Path(f"{self.metadata_root}/{suites[0].name}_{suites[0].id}/{exp.name}_{exp.id}"))})
         self.assertDictEqual(expected_meta, metadata)
 
     # test get meta for suite
@@ -80,27 +84,29 @@ class JSONMetadataOperationsTest(unittest.TestCase):
         metadata = self.op.get(item=suite)
         expected_suite_meta = {'platform_id': None, 'parent_id': None, 'status': 'CREATED', 'tags': {}, 'item_type': 'Suite',
                                'name': None, 'description': None}
-        exp_meta_dict1 = {'platform_id': None, 'status': None, 'tags': {}, 'item_type': 'Experiment', 'name': None,
-                          'assets': [], 'suite_id': None, 'task_type': 'idmtools.entities.command_task.CommandTask',
-                          'platform_requirements': None, 'frozen': False, 'gather_common_assets_from_task': True}
-        exp_meta_dict2 = exp_meta_dict1.copy()
-        exp_meta_dict1.update({"parent_id": suites[0].id})
-        exp_meta_dict2.update({"parent_id": suites[0].id})
-        exp_meta_dict2.update({"_uid": experiments[1].id})
+        # exp_meta_dict1 = {'platform_id': None, 'status': None, 'tags': {}, 'item_type': 'Experiment', 'name': None,
+        #                   'assets': [], 'suite_id': None, 'task_type': 'idmtools.entities.command_task.CommandTask',
+        #                   'platform_requirements': None, 'frozen': False, 'gather_common_assets_from_task': True}
+        # exp_meta_dict2 = exp_meta_dict1.copy()
+        # exp_meta_dict1.update({"parent_id": suites[0].id})
+        # exp_meta_dict2.update({"parent_id": suites[0].id})
+        # exp_meta_dict2.update({"_uid": experiments[1].id})
         expected_suite_meta.update({"parent_id": None})
         expected_suite_meta.update({"_uid": suite.id})
         expected_suite_meta.update({"uid": suite.id})
         expected_suite_meta.update({"id": suite.id})
+        expected_suite_meta.update({"name": suite.name})
+        expected_suite_meta.update({"dir": str(Path(f"{self.metadata_root}/{suites[0].name}_{suites[0].id}"))})
         self.assertDictEqual(expected_suite_meta, metadata)
 
     # test load with no meta_data file
     def test_errors_for_no_existent_metadata_file(self):
-        sim = Simulation()
+        sim = Simulation(name="sim")
         sim.uid = 'totally-brand-new'
-        exp = Experiment()
+        exp = Experiment(name="exp")
         exp.uid = 'very-shiny-new'
         sim.experiment = exp
-        suite = Suite()
+        suite = Suite(name="suite")
         suite.uid = 'is-it-new-or-knew'
         exp.suite = suite
 

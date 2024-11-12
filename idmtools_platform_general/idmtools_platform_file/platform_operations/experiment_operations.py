@@ -91,7 +91,7 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
             List of file simulations
         """
         sim_list = []
-        sim_meta_list = self.platform._metas.get_children(parent)
+        sim_meta_list = self.platform._metas.get_children(experiment)
         for meta in sim_meta_list:
             file_sim = FileSimulation(meta)
             file_sim.status = self.platform.get_simulation_status(file_sim.id)
@@ -135,6 +135,7 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         user_logger.info(f'job_directory: {Path(self.platform.job_directory).resolve()}')
         user_logger.info(f'suite: {str(suite_id)}')
         user_logger.info(f'experiment: {experiment.id}')
+        user_logger.info(f"\nExperiment Directory: \n{self.platform.get_directory(experiment)}")
 
     def send_assets(self, experiment: Experiment, **kwargs):
         """
@@ -170,9 +171,10 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         """
         assets = AssetCollection()
         assets_dir = Path(self.platform.get_directory_by_id(experiment.id, ItemType.EXPERIMENT), 'Assets')
-        assets_list = AssetCollection.assets_from_directory(assets_dir, recursive=True)
-        for a in assets_list:
-            assets.add_asset(a)
+        if assets_dir.exists():
+            assets_list = AssetCollection.assets_from_directory(assets_dir, recursive=True)
+            for a in assets_list:
+                assets.add_asset(a)
         return assets
 
     def to_entity(self, file_exp: FileExperiment, parent: Optional[Suite] = None, children: bool = True,

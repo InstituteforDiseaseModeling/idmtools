@@ -1,5 +1,5 @@
 =====================
-ID Generation Plugins
+ID generation plugins
 =====================
 
 **1. Create a file to host the plugin callback for generator (under idmtools_core/idmtools/plugins). The plugin must have the following format**::

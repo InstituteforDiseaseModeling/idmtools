@@ -40,6 +40,8 @@ def generate_script(platform: 'FilePlatform', experiment: Experiment, max_job: i
             )
             if platform.modules:
                 tvars['modules'] = platform.modules
+            if platform.extra_packages:
+                tvars['packages'] = platform.extra_packages
             tout.write(t.render(tvars))
 
     # Make executable
@@ -54,6 +56,7 @@ def generate_simulation_script(platform: 'FilePlatform', simulation: Simulation,
         platform: File Platform
         simulation: idmtools Simulation
         retries: int
+        extra_packages: List of extra packages to install
         kwargs: keyword arguments used to expand functionality
     Returns:
         None
@@ -65,7 +68,8 @@ def generate_simulation_script(platform: 'FilePlatform', simulation: Simulation,
             tvars = dict(
                 platform=platform,
                 simulation=simulation,
-                retries=retries if retries else platform.retries
+                retries=retries if retries else platform.retries,
+                ntasks=platform.ntasks
             )
             tout.write(t.render(tvars))
 

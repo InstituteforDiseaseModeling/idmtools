@@ -32,15 +32,20 @@ setup(
     author=[author[0] for author in authors],
     author_email=[author[1] for author in authors],
     classifiers=[
-        'Framework:: IDM-Tools :: Test'
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12'
     ],
     description="Test and demo data for IDM-Tools",
     install_requires=requirements,
     long_description=readme,
+    long_description_content_type="text/markdown",
     include_package_data=True,
     keywords='modeling, IDM, test, testdata, demodata',
     name='idmtools_test',
-    packages=find_packages(),
+    packages=find_packages(exclude=["tests"]),
     setup_requires=setup_requirements,
     entry_points=dict(
         idmtools_platform=["idmtools_platform_test = idmtools_test.utils.test_platform:TestPlatformSpecification", "idmtools_platform_testex = idmtools_test.utils.test_execute_platform:TestExecutePlatformSpecification"],
@@ -49,6 +54,6 @@ setup(
     ),
     test_suite='tests',
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='1.7.10',
+    version='2.0.1+nightly',
     zip_safe=False
 )

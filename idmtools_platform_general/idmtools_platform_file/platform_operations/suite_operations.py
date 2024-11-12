@@ -94,7 +94,7 @@ class FilePlatformSuiteOperations(IPlatformSuiteOperations):
             List of File experiments
         """
         exp_list = []
-        exp_meta_list = self.platform._metas.get_children(parent)
+        exp_meta_list = self.platform._metas.get_children(suite)
         for meta in exp_meta_list:
             file_exp = FileExperiment(meta)
             if raw:
@@ -165,7 +165,7 @@ class FilePlatformSuiteOperations(IPlatformSuiteOperations):
         Returns:
             None
         """
-        suite = self.platform.get_item(suite_id, ItemType.SUITE, raw=False)
+        suite = self.platform.get_item(suite_id, ItemType.SUITE, force=True, raw=False)
         exps = suite.experiments
         for exp in exps:
             try:

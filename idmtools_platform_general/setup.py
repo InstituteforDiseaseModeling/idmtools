@@ -35,21 +35,20 @@ setup(
     author=", ".join([author[0] for author in authors]),
     author_email=", ".join([author[1] for author in authors]),
     classifiers=[
-        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
         'Programming Language :: Python :: 3.12',
-        'Framework:: IDM-Tools :: Platform'
     ],
     description="General platform for IDM-Tools",
     install_requires=requirements,
     long_description=readme,
+    long_description_content_type="text/markdown",
     include_package_data=True,
     keywords='modeling, IDM',
     name='idmtools_platform_general',
-    packages=find_packages(),
+    packages=find_packages(exclude=["tests"]),
     test_suite='tests',
     entry_points={"idmtools_platform": [
         "idmtools_platform_file = idmtools_platform_file.plugin_info:FilePlatformSpecification",
@@ -58,5 +57,5 @@ setup(
     },
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='1.7.10'
+    version='2.0.1+nightly'
 )

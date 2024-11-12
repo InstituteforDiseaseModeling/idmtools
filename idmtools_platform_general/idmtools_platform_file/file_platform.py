@@ -10,14 +10,16 @@ from pathlib import Path
 from logging import getLogger
 from typing import Union, List
 from dataclasses import dataclass, field
-from idmtools.core import ItemType, EntityStatus
+from idmtools import IdmConfigParser
+from idmtools.core import ItemType, EntityStatus, TRUTHY_VALUES
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.iplatform import IPlatform, ITEM_TYPE_TO_OBJECT_INTERFACE
 from idmtools.utils.decorators import check_symlink_capabilities
-from idmtools_platform_file.platform_operations.utils import FILE_MAPS
+from idmtools_platform_file.platform_operations.utils import FILE_MAPS, clean_experiment_name, \
+    validate_file_path_length, validate_folder_files_path_length
 from idmtools_platform_file.assets import generate_script, generate_simulation_script
 from idmtools_platform_file.platform_operations.asset_collection_operations import FilePlatformAssetCollectionOperations
 from idmtools_platform_file.platform_operations.experiment_operations import FilePlatformExperimentOperations
@@ -36,15 +38,19 @@ class FilePlatform(IPlatform):
     """
     File Platform definition.
     """
-    job_directory: str = field(default=None)
-    max_job: int = field(default=4)
-    run_sequence: bool = field(default=True)
+    job_directory: str = field(default=None, metadata=dict(help="Job Directory"))
+    max_job: int = field(default=4, metadata=dict(help="Maximum number of jobs to run concurrently"))
+    run_sequence: bool = field(default=True, metadata=dict(help="Run jobs in sequence"))
+    sym_link: bool = field(default=True, metadata=dict(help="Use symbolic links"))
 
     # Default retries for jobs
-    retries: int = field(default=1)
-
+    retries: int = field(default=1, metadata=dict(help="Number of retries for failed jobs"))
+    # number of MPI processes
+    ntasks: int = field(default=1, metadata=dict(help="Number of MPI processes. If greater than 1, it triggers mpirun."))
     # modules to be load
-    modules: list = field(default_factory=list, metadata=dict(sbatch=True))
+    modules: list = field(default_factory=list, metadata=dict(help="Modules to load"))
+    # extra packages to install
+    extra_packages: list = field(default_factory=list, metadata=dict(help="Extra packages to install"))
 
     _suites: FilePlatformSuiteOperations = field(**op_defaults, repr=False, init=False)
     _experiments: FilePlatformExperimentOperations = field(**op_defaults, repr=False, init=False)
@@ -57,7 +63,12 @@ class FilePlatform(IPlatform):
         self.supported_types = {ItemType.SUITE, ItemType.EXPERIMENT, ItemType.SIMULATION}
         if self.job_directory is None:
             raise ValueError("Job Directory is required.")
+        self.job_directory = os.path.abspath(self.job_directory)
+        self.name_directory = IdmConfigParser.get_option(None, "name_directory", 'True').lower() in TRUTHY_VALUES
+        self.sim_name_directory = IdmConfigParser.get_option(None, "sim_name_directory",
+                                                             'False').lower() in TRUTHY_VALUES
         super().__post_init__()
+        self._object_cache_expiration = 600
 
     def __init_interfaces(self):
         self._suites = FilePlatformSuiteOperations(platform=self)
@@ -82,19 +93,19 @@ class FilePlatform(IPlatform):
             item file directory
         """
         if isinstance(item, Suite):
-            item_dir = Path(self.job_directory, item.id)
+            item_dir = Path(self.job_directory, self.entity_display_name(item))
         elif isinstance(item, Experiment):
             suite_id = item.parent_id or item.suite_id
             if suite_id is None:
                 raise RuntimeError("Experiment missing parent!")
-            suite_dir = Path(self.job_directory, str(suite_id))
-            item_dir = Path(suite_dir, item.id)
+            suite_dir = Path(self.job_directory, self.entity_display_name(item.parent))
+            item_dir = Path(suite_dir, self.entity_display_name(item))
         elif isinstance(item, Simulation):
             exp = item.parent
             if exp is None:
                 raise RuntimeError("Simulation missing parent!")
             exp_dir = self.get_directory(exp)
-            item_dir = Path(exp_dir, item.id)
+            item_dir = Path(exp_dir, self.entity_display_name(item))
         else:
             raise RuntimeError(f"Get directory is not supported for {type(item)} object on FilePlatform")
 
@@ -109,19 +120,11 @@ class FilePlatform(IPlatform):
         Returns:
             item file directory
         """
-        if item_type is ItemType.SIMULATION:
-            pattern = f"*/*/{item_id}"
-        elif item_type is ItemType.EXPERIMENT:
-            pattern = f"*/{item_id}"
-        elif item_type is ItemType.SUITE:
-            pattern = f"{item_id}"
+        metas = self._metas.filter(item_type=item_type, property_filter={'id': str(item_id)})
+        if len(metas) > 0:
+            return Path(metas[0]['dir'])
         else:
-            raise RuntimeError(f"Unknown item type: {item_type}")
-
-        root = Path(self.job_directory)
-        for item_path in root.glob(pattern=pattern):
-            return item_path
-        raise RuntimeError(f"Not found path for item_id: {item_id} with type: {item_type}.")
+            raise RuntimeError(f"Not found path for item_id: {item_id} with type: {item_type}.")
 
     def mk_directory(self, item: Union[Suite, Experiment, Simulation] = None, dest: Union[Path, str] = None,
                      exist_ok: bool = True) -> None:
@@ -140,11 +143,13 @@ class FilePlatform(IPlatform):
             target = self.get_directory(item)
         else:
             raise RuntimeError('Only support Suite/Experiment/Simulation or not None dest.')
+
+        # Validate target path length
+        validate_file_path_length(target)
         target.mkdir(parents=True, exist_ok=exist_ok)
 
-    @staticmethod
     @check_symlink_capabilities
-    def link_file(target: Union[Path, str], link: Union[Path, str]) -> None:
+    def link_file(self, target: Union[Path, str], link: Union[Path, str]) -> None:
         """
         Link files.
         Args:
@@ -155,11 +160,13 @@ class FilePlatform(IPlatform):
         """
         target = Path(target).absolute()
         link = Path(link).absolute()
-        link.symlink_to(target)
+        if self.sym_link:
+            link.symlink_to(target)
+        else:
+            shutil.copyfile(target, link)
 
-    @staticmethod
     @check_symlink_capabilities
-    def link_dir(target: Union[Path, str], link: Union[Path, str]) -> None:
+    def link_dir(self, target: Union[Path, str], link: Union[Path, str]) -> None:
         """
         Link directory/files.
         Args:
@@ -170,7 +177,14 @@ class FilePlatform(IPlatform):
         """
         target = Path(target).absolute()
         link = Path(link).absolute()
-        link.symlink_to(target)
+
+        # Validate file path length
+        validate_folder_files_path_length(target, link)
+
+        if self.sym_link:
+            link.symlink_to(target)
+        else:
+            shutil.copytree(target, link)
 
     def create_batch_file(self, item: Union[Experiment, Simulation], **kwargs) -> None:
         """
@@ -256,6 +270,32 @@ class FilePlatform(IPlatform):
             status = FILE_MAPS['None']
 
         return status
+
+    def entity_display_name(self, item: Union[Suite, Experiment, Simulation]) -> str:
+        """
+        Get display name for entity.
+        Args:
+            item: Suite, Experiment or Simulation
+        Returns:
+            str
+        """
+        if self.name_directory:
+            if isinstance(item, Simulation):
+                if self.sim_name_directory:
+                    if item.name:
+                        title = f"{clean_experiment_name(item.name)}_{item.id}"
+                    else:
+                        title = item.id
+                else:
+                    title = item.id
+            else:
+                if item.name:
+                    title = f"{clean_experiment_name(item.name)}_{item.id}"
+                else:
+                    title = item.id
+        else:
+            title = item.id
+        return title
 
     def flatten_item(self, item: IEntity, raw=False, **kwargs) -> List[object]:
         """

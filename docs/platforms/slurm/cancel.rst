@@ -9,7 +9,7 @@ cluster. |IT_s| submits jobs as job arrays. The job id of the job array is used 
 https://slurm.schedmd.com/scancel.html. 
 
 View jobs in queue
-````````````````````
+``````````````````
 To view the job id associated with the job array use the ``squeue`` command::
 
     squeue
@@ -17,7 +17,7 @@ To view the job id associated with the job array use the ``squeue`` command::
 For more information about squeue, see https://slurm.schedmd.com/squeue.html.
 
 Cancel a specific job
-````````````````````````
+`````````````````````
 To cancel a specific job from the job array specify the job id of the job array and index number::
 
     scancel job-id-number-and-index-number-here

@@ -59,10 +59,7 @@ shows some of the options available to include in a workorder.json file.
       }
     }
 
-In addition to including a workorder.json file you must also set and pass
-**scheduling=True** parameter when running simulations, for example::
 
-    experiment.run(scheduling=True)
 
 Add workorder.json as a transient asset
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -78,12 +75,17 @@ create one using the ``add_schedule_config`` method, both methods included in th
 
 **Dynamically create workorder.json**::
 
-    add_schedule_config(ts, command="python -c \"print('hello test')\"", node_group_name='idm_abcd', num_cores=2,
+    add_schedule_config(ts, command="python -c \"print('hello test')\"", NodeGroupName='idm_abcd', NumCores=2,
                             NumProcesses=1, NumNodes=1,
                             Environment={"key1": "value1", "key2:": "value2"})
 
 
 .. _Examples:
+
+When dynamically creating workorder by ``add_schedule_config`` method you must also set and pass
+**scheduling=True** parameter when running simulations, for example::
+
+    experiment.run(scheduling=True)
 
 Scheduling example
 ------------------
@@ -94,7 +96,7 @@ you can begin with the following:
 .. literalinclude:: ../../../examples/python_model/python_sim_scheduling_hpc.py
     :language: python
 
-To see the list of platform alias', such as BELEGOST and CALCULON, use the following
+To see the list of platform alias', such as IDMCloud and CALCULON, use the following
 CLI command: ``idmtools info plugins platform-aliases``.
 
 Scheduling schemas
@@ -189,3 +191,4 @@ options you are able to include within the workorder.json file.
       },
       "additionalProperties": false
     }
+

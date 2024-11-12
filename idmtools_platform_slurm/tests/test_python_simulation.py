@@ -45,7 +45,7 @@ class TestPythonSimulation(ITestWithPersistence):
         ts.add_builder(builder)
 
         # Now we can create our Experiment using our template builder
-        experiment = Experiment.from_template(ts, name=self.case_name)
+        experiment = Experiment.from_template(ts, name="test")
         # Add our own custom tag to simulation
         experiment.tags["tag1"] = 1
         # And add common assets from local dir
@@ -90,7 +90,7 @@ class TestPythonSimulation(ITestWithPersistence):
                     # verify Assets folder under simulation is symlink and it link to experiment's Assets
                     self.assertTrue(os.path.islink(asserts_dir))
                     target_link = os.readlink(asserts_dir)
-                    self.assertEqual(os.path.basename(pathlib.Path(target_link).parent), experiment.id)
+                    self.assertEqual(os.path.basename(pathlib.Path(target_link).parent), f"{experiment.name}_{experiment.id}")
                     count = count + 1
                 files.extend(filenames)
             self.assertSetEqual(set(files), set(["metadata.json", "_run.sh", "config.json"]))
@@ -104,7 +104,7 @@ class TestPythonSimulation(ITestWithPersistence):
         with open(os.path.join(experiment_dir, 'sbatch.sh'), 'r') as fpr:
             contents = fpr.read()
         self.assertIn("#SBATCH --open-mode=append", contents)
-        self.assertIn("srun run_simulation.sh $1", contents)
+        self.assertIn("bash run_simulation.sh", contents)
 
         # verify run_simulation.sh script content in experiment level
         with open(os.path.join(experiment_dir, 'run_simulation.sh'), 'r') as fpr:
@@ -113,7 +113,7 @@ class TestPythonSimulation(ITestWithPersistence):
             "JOB_DIRECTORY=$(find . -type d -maxdepth 1 -mindepth 1  | grep -v Assets | head -$SIMULATION_INDEX | tail -1)",
             contents)
         self.assertIn("JOB_DIRECTORY", contents)
-        self.assertIn("bash _run.sh 1> stdout.txt 2> stderr.txt", contents)
+        self.assertIn("srun _run.sh 1> stdout.txt 2> stderr.txt", contents)
 
         # verify _run.sh script content under simulation level
         simulation_ids = []
@@ -210,9 +210,11 @@ class TestPythonSimulation(ITestWithPersistence):
         experiment = self.create_experiment(self.platform, a=3, b=3, wait_until_done=False, dry_run=True)
         self.platform._experiments.platform_delete(experiment.id)
         # make sure we don't delete suite in this case
-        self.assertTrue(os.path.exists(os.path.join(self.job_directory, experiment.parent_id)))
+        suite_dir = self.platform.get_directory(experiment.parent)
+        experiment_dir = self.platform.get_directory(experiment)
+        self.assertTrue(os.path.exists(suite_dir))
         # make sure we only delete experiment folder under suite
-        self.assertFalse(os.path.exists(os.path.join(self.job_directory, experiment.parent_id, experiment.id)))
+        self.assertFalse(os.path.exists(experiment_dir))
         with self.assertRaises(RuntimeError) as context:
             self.platform.get_item(experiment.id, item_type=ItemType.EXPERIMENT, raw=True)
         self.assertTrue(f"Not found Experiment with id '{experiment.id}'" in str(context.exception.args[0]))

@@ -70,7 +70,7 @@ try:
     from idmtools_platform_comps.utils.file_filter_workitem import DEFAULT_EXCLUDES
     from idmtools_platform_comps.comps_platform import COMPSPlatform
 
-    @click.group(short_help="COMPS Related Commands")
+    @click.group(short_help="COMPS platform related commands.")
     @click.argument('config-block')
     @click.pass_context
     def comps(ctx: click.Context, config_block):
