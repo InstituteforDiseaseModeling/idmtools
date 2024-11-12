@@ -155,6 +155,7 @@ class SlurmPlatform(IPlatform):
             raise ValueError(f"Invalid mpi_type '{self.mpi_type}'. Allowed values are 'pmi2', 'pmix', or 'mpirun'.")
 
         super().__post_init__()
+        self._object_cache_expiration = 600
 
         # check if run script as a slurm job
         r = run_script_on_slurm(self, run_on_slurm=self.run_on_slurm)

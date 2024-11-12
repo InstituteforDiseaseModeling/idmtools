@@ -68,6 +68,7 @@ class FilePlatform(IPlatform):
         self.sim_name_directory = IdmConfigParser.get_option(None, "sim_name_directory",
                                                              'False').lower() in TRUTHY_VALUES
         super().__post_init__()
+        self._object_cache_expiration = 600
 
     def __init_interfaces(self):
         self._suites = FilePlatformSuiteOperations(platform=self)
