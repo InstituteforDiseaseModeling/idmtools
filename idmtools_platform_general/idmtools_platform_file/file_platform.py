@@ -46,7 +46,8 @@ class FilePlatform(IPlatform):
     # Default retries for jobs
     retries: int = field(default=1, metadata=dict(help="Number of retries for failed jobs"))
     # number of MPI processes
-    ntasks: int = field(default=1, metadata=dict(help="Number of MPI processes. If greater than 1, it triggers mpirun."))
+    ntasks: int = field(default=1,
+                        metadata=dict(help="Number of MPI processes. If greater than 1, it triggers mpirun."))
     # modules to be load
     modules: list = field(default_factory=list, metadata=dict(help="Modules to load"))
     # extra packages to install
@@ -98,7 +99,14 @@ class FilePlatform(IPlatform):
             suite_id = item.parent_id or item.suite_id
             if suite_id is None:
                 raise RuntimeError("Experiment missing parent!")
-            suite_dir = Path(self.job_directory, self.entity_display_name(item.parent))
+            suite = None
+            try:
+                suite = self.get_item(suite_id, ItemType.SUITE)
+            except RuntimeError:
+                pass
+            if suite is None:
+                suite = item.parent
+            suite_dir = Path(self.job_directory, self.entity_display_name(suite))
             item_dir = Path(suite_dir, self.entity_display_name(item))
         elif isinstance(item, Simulation):
             exp = item.parent
