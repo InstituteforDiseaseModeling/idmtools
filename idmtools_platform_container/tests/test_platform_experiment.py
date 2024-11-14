@@ -421,7 +421,7 @@ class TestPlatformExperiment(unittest.TestCase):
             sim_dir1 = platform1.get_directory_by_id(experiment.simulations[0].id, ItemType.SIMULATION)
             with open(os.path.join(str(sim_dir1), "_run.sh"), "r") as file:
                 content = file.read()
-                self.assertIn(f'exec -a "SIMULATION:{experiment.simulations[0].id}" {command} &', content)
+                self.assertIn(f'exec -a "SIMULATION:{experiment.simulations[0].id}"  {command} &', content)
 
             # clean up
             stop_container(platform.container_id, remove=True)
