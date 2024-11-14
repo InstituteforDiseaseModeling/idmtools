@@ -60,7 +60,7 @@ class SlurmPlatformSimulationOperations(IPlatformSimulationOperations):
         # Generate Simulation folder structure
         self.platform._op_client.mk_directory(simulation, exist_ok=False)
         meta = self.platform._metas.dump(simulation)
-        self.platform._assets.link_common_assets(simulation)
+        # self.platform._assets.link_common_assets(simulation)
         self.platform._assets.dump_assets(simulation)
         self.platform._op_client.create_batch_file(simulation, **kwargs)
 

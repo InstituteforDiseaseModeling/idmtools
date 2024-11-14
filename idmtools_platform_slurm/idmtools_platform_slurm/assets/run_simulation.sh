@@ -4,6 +4,10 @@ mpi_type="$2"
 
 SIMULATION_INDEX=$((${SLURM_ARRAY_TASK_ID} + $1))
 JOB_DIRECTORY=$(find . -type d -maxdepth 1 -mindepth 1  | grep -v Assets | head -$SIMULATION_INDEX | tail -1)
+
+# Create the symbolic link
+ln -s "$(dirname "${BASH_SOURCE[0]}")/Assets" "${JOB_DIRECTORY}/Assets"
+
 cd $JOB_DIRECTORY
 current_dir=$(pwd)
 echo "The script is running from: $current_dir"
