@@ -172,7 +172,11 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
         Returns:
             None
         """
-        comps_suite = self.platform.get_item(suite_id, ItemType.SUITE, raw=True)
+        try:
+            comps_suite = self.platform.get_item(suite_id, ItemType.SUITE, raw=True)
+        except ValueError:
+            return
+
         comps_exps = comps_suite.get_experiments()
         for comps_exp in comps_exps:
             try:
