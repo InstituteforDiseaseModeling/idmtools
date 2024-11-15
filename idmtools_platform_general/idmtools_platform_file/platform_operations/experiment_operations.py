@@ -73,6 +73,11 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         dest_script = Path(self.platform.get_directory(experiment)).joinpath('run_simulation.sh')
         shutil.copy(str(run_simulation_script), str(dest_script))
 
+        # Copy file link_mode.py
+        link_mode_script = Path(__file__).parent.parent.joinpath('assets/link_mode.py')
+        dest_script = Path(self.platform.get_directory(experiment)).joinpath('Assets/link_assets.py')
+        shutil.copy(str(link_mode_script), str(dest_script))
+
         # Make executable
         self.platform.update_script_mode(dest_script)
 
