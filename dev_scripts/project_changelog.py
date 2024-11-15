@@ -138,7 +138,8 @@ def update_changelog(release, docs_dir):
     toctree_index = lines.index('.. toctree::\n') + 2
 
     # Insert the new entry after the toctree line
-    lines.insert(toctree_index, new_entry)
+    if new_entry not in lines:
+        lines.insert(toctree_index, new_entry)
 
     # Write the updated content back to the file
     with open(changelog_file, 'w') as file:
