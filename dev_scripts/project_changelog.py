@@ -126,7 +126,7 @@ def update_changelog(release, docs_dir):
     Returns:
         None
     """
-    changelog_file = os.path.join("..", docs_dir, 'changelog', f'changelog.rst')
+    changelog_file = os.path.join("..", docs_dir, 'changelog', 'changelog.rst')
     new_entry = f'    changelog_{release}\n'
     # Read the existing content
     with open(changelog_file, 'r') as file:
@@ -167,7 +167,7 @@ def generate_changelog_for_releasenote(df, docs_dir):
         os.remove(release_file)
 
     issue_types = df['issue_type'].unique()
-    section_out = f'## Change log:'
+    section_out = '## Change log:'
     for issue in sorted(issue_types):
         section_out += section_template.format(section='### ' + issue)
         section_data = df[df['issue_type'] == issue]
@@ -175,6 +175,7 @@ def generate_changelog_for_releasenote(df, docs_dir):
             section_out += f"* #{issue['issue_number']} - {issue['title']}\n"
     with open(release_file, 'w') as out:
         out.write(section_out)
+
 
 # Define your GraphQL query
 query = """
@@ -263,7 +264,7 @@ if __name__ == '__main__':
         docs_dir = 'docs'
         release = args.version
         df['release'] = release
-        df.rename(columns={'content.title': 'title', 'content.url': 'url', 'content.state': 'status', 'content.author.login': 'author', 'content.labels.nodes':'label'}, inplace=True)
+        df.rename(columns={'content.title': 'title', 'content.url': 'url', 'content.state': 'status', 'content.author.login': 'author', 'content.labels.nodes': 'label'}, inplace=True)
         df['issue_number'] = df['url'].str.extract(r'(\d+)')
         df['issue_type'] = df.apply(lambda x: get_issue_type(x['label']), axis=1)
         generate_release_change_log(df, docs_dir)
