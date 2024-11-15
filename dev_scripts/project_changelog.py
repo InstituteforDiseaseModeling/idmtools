@@ -73,6 +73,8 @@ def get_issue_type(labels):
         return 'Developer/Test'
     elif any(label['name'] == 'Dependencies' for label in labels):
         return 'Dependencies'
+    elif any(label['name'] == 'Release/Packaging' for label in labels):
+        return 'Release/Packaging'
     else:
         return 'Other'
 
