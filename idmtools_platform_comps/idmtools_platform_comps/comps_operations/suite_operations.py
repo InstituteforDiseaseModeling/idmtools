@@ -174,7 +174,7 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
         """
         try:
             comps_suite = self.platform.get_item(suite_id, ItemType.SUITE, raw=True)
-        except ValueError:
+        except RuntimeError:
             return
 
         comps_exps = comps_suite.get_experiments()
