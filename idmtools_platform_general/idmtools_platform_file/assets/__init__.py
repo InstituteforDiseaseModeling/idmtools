@@ -69,7 +69,8 @@ def generate_simulation_script(platform: 'FilePlatform', simulation: Simulation,
                 platform=platform,
                 simulation=simulation,
                 retries=retries if retries else platform.retries,
-                ntasks=platform.ntasks
+                ntasks=platform.ntasks,
+                cmd=simulation.task.command.cmd
             )
             tout.write(t.render(tvars))
 
