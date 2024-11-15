@@ -16,27 +16,6 @@ import json
 import pandas as pd
 
 
-def generate_changelog_index_from_df(df, docs_dir):
-    """
-    Generate changelog index from DataFrame.
-    Args:
-        df: DataFrame containing changelog data
-        docs_dir: doc directory
-
-    Returns:
-        None
-    """
-    cl_name = os.path.join("..", docs_dir, 'changelog', 'changelog.rst')
-    with open(cl_name, 'w') as out:
-        out.write("=========\n")
-        out.write("Changelog\n")
-        out.write("=========\n")
-        out.write("\n.. toctree::\n\n")
-        releases = df['release'].unique()
-        for release in sorted(releases, reverse=True):
-            out.write(f'    changelog_{release}\n')
-
-
 def get_issue_type(labels):
     """
     Returns the issue type based on the labels and assigns that to the issue_types map.
@@ -79,12 +58,12 @@ def get_issue_type(labels):
         return 'Other'
 
 
-def generate_release_change_log(df, docs_dir):
+def generate_release_change_log(project_df: pd.DataFrame, docs_path: str):
     """
-    Generate release note files from DataFrame.
+    Generate changelog_x.x.x.rst.
     Args:
-        df: DataFrame containing changelog data
-        docs_dir: doc directory
+        project_df: DataFrame containing changelog data from specific GitHub project
+        docs_path: docs directory
 
     Returns:
         None
@@ -100,36 +79,36 @@ def generate_release_change_log(df, docs_dir):
 {section_under}
 '''
 
-    releases = df['release'].unique()
+    releases = project_df['release'].unique()
     final_out = f'.. _changelog-{releases[0]}:\n'
-    release_file = os.path.join("..", docs_dir, 'changelog', f'changelog_{releases[0]}.rst')
+    release_file = os.path.join("..", docs_path, 'changelog', f'changelog_{releases[0]}.rst')
     if os.path.exists(release_file):
         os.remove(release_file)
     final_out += release_templates.format(release=releases[0], release_under='=' * len(releases[0]))
-    issue_types = df['issue_type'].unique()
+    issue_types = project_df['issue_type'].unique()
     section_out = final_out
     for issue in sorted(issue_types):
 
         section_out += section_template.format(section=issue, section_under='-' * len(issue))
-        section_data = df[df['issue_type'] == issue]
+        section_data = project_df[project_df['issue_type'] == issue]
         for _, issue in section_data.iterrows():
             section_out += f"* `#{issue['issue_number']} <{issue['url']}>`_ - {issue['title']}\n"
     with open(release_file, 'w') as out:
         out.write(section_out)
 
 
-def update_changelog(release, docs_dir):
+def update_changelog(version: str, docs_path: str):
     """
-    Update changelog index file with the new release.
+    Update changelog.rst.
     Args:
-        release: Release number
-        docs_dir: doc directory
+        version: Release number
+        docs_path: docs directory
 
     Returns:
         None
     """
-    changelog_file = os.path.join("..", docs_dir, 'changelog', 'changelog.rst')
-    new_entry = f'    changelog_{release}\n'
+    changelog_file = os.path.join("..", docs_path, 'changelog', 'changelog.rst')
+    new_entry = f'    changelog_{version}\n'
     # Read the existing content
     with open(changelog_file, 'r') as file:
         lines = file.readlines()
@@ -146,12 +125,11 @@ def update_changelog(release, docs_dir):
         file.writelines(lines)
 
 
-def generate_changelog_for_releasenote(df, docs_dir):
+def generate_changelog_for_releasenote(project_df: pd.DataFrame):
     """
     Generate release note files from DataFrame.
     Args:
-        df: DataFrame containing changelog data
-        docs_dir: doc directory
+        project_df: DataFrame containing changelog data from specific GitHub project
 
     Returns:
         None
@@ -163,17 +141,17 @@ def generate_changelog_for_releasenote(df, docs_dir):
     dir_path = "release_notes"
     os.makedirs(dir_path, exist_ok=True)
 
-    releases = df['release'].unique()
+    releases = project_df['release'].unique()
     release_file = os.path.join(dir_path, f'changelog_release_{releases[0]}.rst')
 
     if os.path.exists(release_file):
         os.remove(release_file)
 
-    issue_types = df['issue_type'].unique()
+    issue_types = project_df['issue_type'].unique()
     section_out = '## Change log:'
-    for issue in sorted(issue_types):
-        section_out += section_template.format(section='### ' + issue)
-        section_data = df[df['issue_type'] == issue]
+    for issue_type in sorted(issue_types):
+        section_out += section_template.format(section='### ' + issue_type)
+        section_data = project_df[project_df['issue_type'] == issue_type]
         for _, issue in section_data.iterrows():
             section_out += f"* #{issue['issue_number']} - {issue['title']}\n"
     with open(release_file, 'w') as out:
@@ -271,5 +249,5 @@ if __name__ == '__main__':
         df['issue_number'] = df['url'].str.extract(r'(\d+)')
         df['issue_type'] = df.apply(lambda x: get_issue_type(x['label']), axis=1)
         generate_release_change_log(df, docs_dir)
-        generate_changelog_for_releasenote(df, docs_dir)
+        generate_changelog_for_releasenote(df)
         update_changelog(release, docs_dir)
