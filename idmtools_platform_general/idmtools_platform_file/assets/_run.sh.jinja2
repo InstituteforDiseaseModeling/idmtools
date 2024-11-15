@@ -11,9 +11,20 @@ term_handler()
 # Register cleanup function to handle SIGINT and SIGTERM signals
 trap 'term_handler' SIGINT SIGTERM
 
-n=0
+# Get the path to the parent directory of the script
+PARENT_DIR=$(dirname "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)")
+
+# Create the symbolic link
+ln -s "${PARENT_DIR}/Assets" "$(dirname "${BASH_SOURCE[0]}")/Assets"
+
+# Make executable runnable
+python3 Assets/link_assets.py "{{ cmd }}"
+
+
+# Set variable
 {% set mpi_command = "mpirun -n " + ntasks|string if ntasks > 1 else "" %}
 
+n=0
 until [ "$n" -ge {{retries}} ]
 do
     echo "100" > job_status.txt
