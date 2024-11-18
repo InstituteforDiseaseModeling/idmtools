@@ -177,7 +177,7 @@ class FilePlatform(IPlatform):
 
             # Compute the relative path from the destination to the source
             relative_source = os.path.relpath(target, link.parent)
-            print(f"Relative source path: {relative_source}")
+            # print(f"Relative source path: {relative_source}")
 
             # Remove existing symbolic link or folder at destination if it exists
             if link.exists() or link.is_symlink():
@@ -185,7 +185,7 @@ class FilePlatform(IPlatform):
 
             # Create the symbolic link
             link.symlink_to(relative_source, target_is_directory=False)
-            print(f"Symbolic link created: {link} -> {relative_source}")
+            # print(f"Symbolic link created: {link} -> {relative_source}")
         else:
             shutil.copyfile(target, link)
 
@@ -214,15 +214,15 @@ class FilePlatform(IPlatform):
 
             # Compute the relative path from the destination to the source
             relative_source = os.path.relpath(target, link.parent)
-            print(f"Relative source path: {relative_source}")
+            # print(f"Relative source path: {relative_source}")
 
             # Remove existing symbolic link or folder at destination if it exists
             if link.exists() or link.is_symlink():
-                link.unlink()
+                shutil.rmtree(link)
 
             # Create the symbolic link
             link.symlink_to(relative_source, target_is_directory=True)
-            print(f"Symbolic link created: {link} -> {relative_source}")
+            # print(f"Symbolic link created: {link} -> {relative_source}")
         else:
             shutil.copytree(target, link)
 
