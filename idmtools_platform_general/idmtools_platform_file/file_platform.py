@@ -218,7 +218,10 @@ class FilePlatform(IPlatform):
 
             # Remove existing symbolic link or folder at destination if it exists
             if link.exists() or link.is_symlink():
-                link.unlink()
+                if link.is_symlink():
+                    link.unlink()
+                else:
+                    shutil.rmtree(link)
 
             # Create the symbolic link
             link.symlink_to(relative_source, target_is_directory=True)
