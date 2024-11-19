@@ -169,23 +169,19 @@ class FilePlatform(IPlatform):
         target = Path(target).absolute()
         link = Path(link).absolute()
         if self.sym_link:
-            # link.symlink_to(target)
-
             # Ensure the source folder exists
             if not target.exists():
                 raise FileNotFoundError(f"Source folder does not exist: {target}")
 
             # Compute the relative path from the destination to the source
             relative_source = os.path.relpath(target, link.parent)
-            # print(f"Relative source path: {relative_source}")
 
-            # Remove existing symbolic link or folder at destination if it exists
+            # Remove existing symbolic link or file at destination if it exists
             if link.exists() or link.is_symlink():
                 link.unlink()
 
             # Create the symbolic link
             link.symlink_to(relative_source, target_is_directory=False)
-            # print(f"Symbolic link created: {link} -> {relative_source}")
         else:
             shutil.copyfile(target, link)
 
@@ -206,15 +202,12 @@ class FilePlatform(IPlatform):
         validate_folder_files_path_length(target, link)
 
         if self.sym_link:
-            # link.symlink_to(target)
-
             # Ensure the source folder exists
             if not target.exists():
                 raise FileNotFoundError(f"Source folder does not exist: {target}")
 
             # Compute the relative path from the destination to the source
             relative_source = os.path.relpath(target, link.parent)
-            # print(f"Relative source path: {relative_source}")
 
             # Remove existing symbolic link or folder at destination if it exists
             if link.exists() or link.is_symlink():
@@ -225,7 +218,6 @@ class FilePlatform(IPlatform):
 
             # Create the symbolic link
             link.symlink_to(relative_source, target_is_directory=True)
-            # print(f"Symbolic link created: {link} -> {relative_source}")
         else:
             shutil.copytree(target, link)
 
