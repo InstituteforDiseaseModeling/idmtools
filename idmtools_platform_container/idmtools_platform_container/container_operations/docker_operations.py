@@ -82,7 +82,7 @@ def validate_container_running(platform, **kwargs) -> str:
                     stop_container(container_id, remove=True)
                     container_id = None
                     if logger.isEnabledFor(DEBUG):
-                        logger.debug(f"Existing container is not usable")
+                        logger.debug(f"Existing container {container_id} is not usable")
 
             if container_id is not None:
                 if logger.isEnabledFor(DEBUG):
