@@ -51,7 +51,6 @@ class ContainerPlatform(FilePlatform):
         self._experiments = ContainerPlatformExperimentOperations(platform=self)
         self._simulations = ContainerPlatformSimulationOperations(platform=self)
         self.job_directory = os.path.abspath(self.job_directory)
-        self.sym_link = False
         self.run_sequence = False
         if self.docker_image is None:
             self.docker_image = self.__CONTAINER_IMAGE
