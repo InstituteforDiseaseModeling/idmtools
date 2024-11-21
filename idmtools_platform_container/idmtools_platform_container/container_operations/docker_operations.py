@@ -3,6 +3,7 @@ Here we implement the ContainerPlatform docker operations.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+#import os
 import docker
 import subprocess
 from dataclasses import dataclass
@@ -14,6 +15,7 @@ from docker.models.containers import Container
 from docker.errors import NotFound as ErrorNotFound
 from docker.errors import APIError as DockerAPIError
 from logging import getLogger, DEBUG
+#from pathlib import Path
 
 logger = getLogger(__name__)
 user_logger = getLogger('user')
@@ -72,8 +74,21 @@ def validate_container_running(platform, **kwargs) -> str:
             # Pick up the first running container
             container_running = sort_containers_by_start(container_running)
             container_id = container_running[0].short_id
-            if logger.isEnabledFor(DEBUG):
-                logger.debug(f"Pick running container {container_id}.")
+            container = get_container(container_id)
+            command = f"bash -c '[ \"$(ls -lart {platform.data_mount} | wc -l)\" -ge 3 ] && echo exists || echo not_exists'"
+            #print(f"Executing command: {command}")
+            result = container.exec_run(command)
+            output = result.output.decode().strip()
+            if output == "not_exists":
+                #print("Data mount is empty, restarting the container.")
+                stop_container(container_id, remove=True)
+                container_id = None
+                if logger.isEnabledFor(DEBUG):
+                    logger.debug(f"Existing container is not usable")
+            else:
+                #print("Data mount is not empty.")
+                if logger.isEnabledFor(DEBUG):
+                    logger.debug(f"Pick running container {container_id}.")
         elif len(container_stopped) > 0:
             # Pick up the first stopped container and then restart it
             container_stopped = sort_containers_by_start(container_stopped)
