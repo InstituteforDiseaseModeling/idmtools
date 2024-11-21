@@ -67,7 +67,7 @@ class TestPlatformExperiment(unittest.TestCase):
                 with self.subTest(file=file):
                     self.assertTrue(Path(file).is_file(), f"The file {file} should exist.")
             sim_assets_dir = Path(f"{sim_dir}/Assets")
-            self.assertTrue(sim_assets_dir.is_dir() and not os.path.islink(sim_assets_dir))
+            self.assertTrue(sim_assets_dir.is_dir() and os.path.islink(sim_assets_dir)) # check if the path is a symlink
             # Check if the stdout.txt file contains pip list results
             with open(f"{sim_dir}/stdout.txt", "r") as file:
                 content = file.read()
@@ -202,7 +202,7 @@ class TestPlatformExperiment(unittest.TestCase):
             sim_assets_path = Path(platform.get_directory(experiment.simulations[0]), 'Assets')
             # Make sure experiment and simulations Assets dirs are not symlink
             self.assertEqual(os.path.islink(exp_assets_path), False)
-            self.assertEqual(os.path.islink(sim_assets_path), False)
+            self.assertEqual(os.path.islink(sim_assets_path), True)
             # clean up
             stop_container(platform.container_id, remove=True)
 
