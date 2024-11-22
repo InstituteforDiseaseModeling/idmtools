@@ -95,6 +95,7 @@ def generate_release_change_log(project_df: pd.DataFrame, docs_path: str):
             section_out += f"* `#{issue['issue_number']} <{issue['url']}>`_ - {issue['title']}\n"
     with open(release_file, 'w') as out:
         out.write(section_out)
+    print(f"Changelog_version.rst generated: {release_file}")
 
 
 def update_changelog(version: str, docs_path: str):
@@ -123,6 +124,7 @@ def update_changelog(version: str, docs_path: str):
     # Write the updated content back to the file
     with open(changelog_file, 'w') as file:
         file.writelines(lines)
+    print(f"Changelog.rst generated: {changelog_file}")
 
 
 def generate_changelog_for_releasenote(project_df: pd.DataFrame):
@@ -156,6 +158,7 @@ def generate_changelog_for_releasenote(project_df: pd.DataFrame):
             section_out += f"* #{issue['issue_number']} - {issue['title']}\n"
     with open(release_file, 'w') as out:
         out.write(section_out)
+    print(f"Release note file generated: {release_file}")
 
 
 # Define your GraphQL query
