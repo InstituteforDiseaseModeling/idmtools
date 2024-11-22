@@ -61,7 +61,7 @@ class COMPSPriority(Enum):
 op_defaults = dict(default=None, compare=False, metadata=dict(pickle_ignore=True))
 
 # We use this to track os. It would be nice to do that in server
-SLURM_ENVS = ['calculon', 'slurmstage', "slurmdev"]
+SLURM_ENVS = ['calculon', 'slurmstage', "slurmdev", "nibbler"]
 supported_types = [PlatformRequirements.PYTHON, PlatformRequirements.SHELL, PlatformRequirements.NativeBinary]
 PLATFORM_DEFAULTS = [AnalyzerManagerPlatformDefault(max_workers=24)]
 
