@@ -165,7 +165,11 @@ class FilePlatformSuiteOperations(IPlatformSuiteOperations):
         Returns:
             None
         """
-        suite = self.platform.get_item(suite_id, ItemType.SUITE, force=True, raw=False)
+        try:
+            suite = self.platform.get_item(suite_id, ItemType.SUITE, force=True, raw=False)
+        except RuntimeError:
+            return
+
         exps = suite.experiments
         for exp in exps:
             try:
