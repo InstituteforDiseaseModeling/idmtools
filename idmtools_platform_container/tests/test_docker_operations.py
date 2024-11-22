@@ -45,7 +45,7 @@ class TestDockerOperations(unittest.TestCase):
         mock_check_local_image.return_value = True
         mock_pull_docker_image.return_value = True
         mock_sys_platform.return_value = "Linux"
-        with self.subTest("test_with_running_container"):
+        with self.subTest("test_with_running_container_exists_dir"):
             mock_container1 = MagicMock(short_id='test_container_id1')
             mock_container2 = MagicMock(short_id='test_container_id2')
             mock_container3 = MagicMock(short_id='test_container_id3')
@@ -58,12 +58,32 @@ class TestDockerOperations(unittest.TestCase):
                                                           mock_container1]  # assume container2 is the latest
             platform.retrieve_match_containers.return_value = mock_retrieve_match_containers.return_value
             platform.start_container.return_value = 'new_container_id'
-            container_id = validate_container_running(platform)
+            container_id = validate_container_running(platform)  # return latest running container which is mock_container2
 
             # Assert
             mock_container1.exec_run.assert_called_once_with(
                 "bash -c \'[ \"$(ls -lart /home/container_data | wc -l)\" -ge 3 ] && echo exists || echo not_exists\'")
             self.assertEqual(container_id, mock_container2.short_id)
+
+        with self.subTest("test_with_running_container_not_exists_dir"):
+            mock_container1 = MagicMock(short_id='test_container_id1')
+            mock_container2 = MagicMock(short_id='test_container_id2')
+            mock_container3 = MagicMock(short_id='test_container_id3')
+            mock_container1.exec_run = MagicMock(return_value=MagicMock(output=b'not_exists\n'))
+            mock_get_container.return_value = mock_container1
+            mock_retrieve_match_containers.return_value = [('running', mock_container1),
+                                                           ('running', mock_container2),
+                                                           ('stopped', mock_container3)]
+            mock_sort_containers_by_start.return_value = [mock_container2,
+                                                          mock_container1]  # assume container2 is the latest
+            platform.retrieve_match_containers.return_value = mock_retrieve_match_containers.return_value
+            platform.start_container.return_value = 'new_container_id'
+            container_id = validate_container_running(platform)  # return new container id
+
+            # Assert
+            mock_container1.exec_run.assert_called_once_with(
+                "bash -c \'[ \"$(ls -lart /home/container_data | wc -l)\" -ge 3 ] && echo exists || echo not_exists\'")
+            self.assertEqual(container_id, "new_container_id")
 
         with self.subTest("test_with_stopped_container"):
             mock_container1 = MagicMock(short_id='test_container_id1')
