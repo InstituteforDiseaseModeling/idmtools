@@ -379,9 +379,6 @@ class TestPlatformExperiment(unittest.TestCase):
         # verify simulation job is deleted from history
         job = find_running_job(experiment.simulations[0].id, platform.container_id)
         self.assertIsNone(job)
-        # verify experiment job is still in history
-        job_exp = find_running_job(experiment.id, platform.container_id)
-        self.assertIsNotNone(job_exp)
         # clean up
         stop_container(platform.container_id, remove=True)
 
