@@ -4,6 +4,7 @@ Here we implement the ContainerPlatform docker operations.
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import docker
+import platform as sys_platform
 import subprocess
 from dataclasses import dataclass
 from typing import List, Dict, NoReturn, Any, Union
@@ -72,8 +73,20 @@ def validate_container_running(platform, **kwargs) -> str:
             # Pick up the first running container
             container_running = sort_containers_by_start(container_running)
             container_id = container_running[0].short_id
-            if logger.isEnabledFor(DEBUG):
-                logger.debug(f"Pick running container {container_id}.")
+            container = get_container(container_id)
+            if sys_platform.system() not in ["Windows"]:
+                command = f"bash -c '[ \"$(ls -lart {platform.data_mount} | wc -l)\" -ge 3 ] && echo exists || echo not_exists'"
+                result = container.exec_run(command)
+                output = result.output.decode().strip()
+                if output == "not_exists":
+                    stop_container(container_id, remove=True)
+                    if logger.isEnabledFor(DEBUG):
+                        logger.debug(f"Existing container {container_id} is not usable")
+                    container_id = None
+
+            if container_id is not None:
+                if logger.isEnabledFor(DEBUG):
+                    logger.debug(f"Pick running container {container_id}.")
         elif len(container_stopped) > 0:
             # Pick up the first stopped container and then restart it
             container_stopped = sort_containers_by_start(container_stopped)

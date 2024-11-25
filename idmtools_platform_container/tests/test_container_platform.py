@@ -105,7 +105,7 @@ class TestContainerPlatform(unittest.TestCase):
             self.assertEqual(platform.data_mount, '/home/container_data')
             self.assertEqual(platform.force_start, False)
             self.assertEqual(platform.user_mounts, None)
-            self.assertEqual(platform.sym_link, False)
+            self.assertEqual(platform.sym_link, True)
 
     @patch('docker.from_env')
     def test_start_container_custom_data_mount(self, mock_docker):
