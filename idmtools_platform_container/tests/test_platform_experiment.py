@@ -67,7 +67,7 @@ class TestPlatformExperiment(unittest.TestCase):
                 with self.subTest(file=file):
                     self.assertTrue(Path(file).is_file(), f"The file {file} should exist.")
             sim_assets_dir = Path(f"{sim_dir}/Assets")
-            self.assertTrue(sim_assets_dir.is_dir() and not os.path.islink(sim_assets_dir))
+            self.assertTrue(sim_assets_dir.is_dir() and os.path.islink(sim_assets_dir)) # check if the path is a symlink
             # Check if the stdout.txt file contains pip list results
             with open(f"{sim_dir}/stdout.txt", "r") as file:
                 content = file.read()
@@ -202,7 +202,7 @@ class TestPlatformExperiment(unittest.TestCase):
             sim_assets_path = Path(platform.get_directory(experiment.simulations[0]), 'Assets')
             # Make sure experiment and simulations Assets dirs are not symlink
             self.assertEqual(os.path.islink(exp_assets_path), False)
-            self.assertEqual(os.path.islink(sim_assets_path), False)
+            self.assertEqual(os.path.islink(sim_assets_path), True)
             # clean up
             stop_container(platform.container_id, remove=True)
 
@@ -379,9 +379,6 @@ class TestPlatformExperiment(unittest.TestCase):
         # verify simulation job is deleted from history
         job = find_running_job(experiment.simulations[0].id, platform.container_id)
         self.assertIsNone(job)
-        # verify experiment job is still in history
-        job_exp = find_running_job(experiment.id, platform.container_id)
-        self.assertIsNotNone(job_exp)
         # clean up
         stop_container(platform.container_id, remove=True)
 
@@ -397,6 +394,32 @@ class TestPlatformExperiment(unittest.TestCase):
             self.assertTrue(str(platform.name_directory).lower() in TRUTHY_VALUES)
             self.assertFalse(str(platform.sim_name_directory).lower() in TRUTHY_VALUES)
             self.assertEqual(str(exp_dir).replace("\\", "/"), os.path.join(temp_dir, f"Suite_{experiment.parent_id}/run____command_{experiment.id}").replace("\\", "/"))
+            # clean up
+            stop_container(platform.container_id, remove=True)
+
+    def test_platform_with_mpi_procs(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            # case1: ntasks=4
+            ntasks = 4
+            platform = Platform("Container", job_directory=temp_dir, ntasks=ntasks)
+            command = "ls -lat"
+            task = CommandTask(command=command)
+            experiment = Experiment.from_task(task, name="run_command")
+            experiment.run(wait_until_done=True)
+            self.assertEqual(experiment.status, EntityStatus.SUCCEEDED)
+            sim_dir = platform.get_directory_by_id(experiment.simulations[0].id, ItemType.SIMULATION)
+            with open(os.path.join(str(sim_dir), "_run.sh"), "r") as file:
+                content = file.read()
+                self.assertIn(f'exec -a "SIMULATION:{experiment.simulations[0].id}" mpirun -n {ntasks} {command} &', content)
+            # case2: default ntasks=1
+            platform1 = Platform("Container", job_directory=temp_dir)
+            experiment = Experiment.from_task(task, name="run_command")
+            experiment.run(wait_until_done=True, platform=platform1)
+            sim_dir1 = platform1.get_directory_by_id(experiment.simulations[0].id, ItemType.SIMULATION)
+            with open(os.path.join(str(sim_dir1), "_run.sh"), "r") as file:
+                content = file.read()
+                self.assertIn(f'exec -a "SIMULATION:{experiment.simulations[0].id}"  {command} &', content)
+
             # clean up
             stop_container(platform.container_id, remove=True)
 

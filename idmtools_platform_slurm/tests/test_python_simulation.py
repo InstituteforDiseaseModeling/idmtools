@@ -104,7 +104,7 @@ class TestPythonSimulation(ITestWithPersistence):
         with open(os.path.join(experiment_dir, 'sbatch.sh'), 'r') as fpr:
             contents = fpr.read()
         self.assertIn("#SBATCH --open-mode=append", contents)
-        self.assertIn("srun run_simulation.sh $1", contents)
+        self.assertIn("bash run_simulation.sh", contents)
 
         # verify run_simulation.sh script content in experiment level
         with open(os.path.join(experiment_dir, 'run_simulation.sh'), 'r') as fpr:
@@ -113,7 +113,7 @@ class TestPythonSimulation(ITestWithPersistence):
             "JOB_DIRECTORY=$(find . -type d -maxdepth 1 -mindepth 1  | grep -v Assets | head -$SIMULATION_INDEX | tail -1)",
             contents)
         self.assertIn("JOB_DIRECTORY", contents)
-        self.assertIn("bash _run.sh 1> stdout.txt 2> stderr.txt", contents)
+        self.assertIn("srun _run.sh 1> stdout.txt 2> stderr.txt", contents)
 
         # verify _run.sh script content under simulation level
         simulation_ids = []

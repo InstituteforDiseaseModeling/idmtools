@@ -83,6 +83,7 @@ ContainerPlatform attributes
 - **container\_id**: The ID of the container being used.
 - **max\_job**: The maximum number of jobs to run in parallel.
 - **retries**: The number of retries to attempt for a job.
+- **ntasks**: Number of MPI processes. If greater than 1, it triggers mpirun.
 
 Usage
 -----

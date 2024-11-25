@@ -45,6 +45,9 @@ class FilePlatform(IPlatform):
 
     # Default retries for jobs
     retries: int = field(default=1, metadata=dict(help="Number of retries for failed jobs"))
+    # number of MPI processes
+    ntasks: int = field(default=1,
+                        metadata=dict(help="Number of MPI processes. If greater than 1, it triggers mpirun."))
     # modules to be load
     modules: list = field(default_factory=list, metadata=dict(help="Modules to load"))
     # extra packages to install
@@ -66,6 +69,7 @@ class FilePlatform(IPlatform):
         self.sim_name_directory = IdmConfigParser.get_option(None, "sim_name_directory",
                                                              'False').lower() in TRUTHY_VALUES
         super().__post_init__()
+        self._object_cache_expiration = 600
 
     def __init_interfaces(self):
         self._suites = FilePlatformSuiteOperations(platform=self)
@@ -95,7 +99,14 @@ class FilePlatform(IPlatform):
             suite_id = item.parent_id or item.suite_id
             if suite_id is None:
                 raise RuntimeError("Experiment missing parent!")
-            suite_dir = Path(self.job_directory, self.entity_display_name(item.parent))
+            suite = None
+            try:
+                suite = self.get_item(suite_id, ItemType.SUITE)
+            except RuntimeError:
+                pass
+            if suite is None:
+                suite = item.parent
+            suite_dir = Path(self.job_directory, self.entity_display_name(suite))
             item_dir = Path(suite_dir, self.entity_display_name(item))
         elif isinstance(item, Simulation):
             exp = item.parent
@@ -158,7 +169,19 @@ class FilePlatform(IPlatform):
         target = Path(target).absolute()
         link = Path(link).absolute()
         if self.sym_link:
-            link.symlink_to(target)
+            # Ensure the source folder exists
+            if not target.exists():
+                raise FileNotFoundError(f"Source folder does not exist: {target}")
+
+            # Compute the relative path from the destination to the source
+            relative_source = os.path.relpath(target, link.parent)
+
+            # Remove existing symbolic link or file at destination if it exists
+            if link.exists() or link.is_symlink():
+                link.unlink()
+
+            # Create the symbolic link
+            link.symlink_to(relative_source, target_is_directory=False)
         else:
             shutil.copyfile(target, link)
 
@@ -179,7 +202,22 @@ class FilePlatform(IPlatform):
         validate_folder_files_path_length(target, link)
 
         if self.sym_link:
-            link.symlink_to(target)
+            # Ensure the source folder exists
+            if not target.exists():
+                raise FileNotFoundError(f"Source folder does not exist: {target}")
+
+            # Compute the relative path from the destination to the source
+            relative_source = os.path.relpath(target, link.parent)
+
+            # Remove existing symbolic link or folder at destination if it exists
+            if link.exists() or link.is_symlink():
+                if link.is_symlink():
+                    link.unlink()
+                else:
+                    shutil.rmtree(link)
+
+            # Create the symbolic link
+            link.symlink_to(relative_source, target_is_directory=True)
         else:
             shutil.copytree(target, link)
 
