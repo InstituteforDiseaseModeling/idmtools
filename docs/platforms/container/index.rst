@@ -46,6 +46,18 @@ Prerequisites
 
      pip install idmtools[container] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
 
+* Enable Developer Mode on Windows
+
+  - Open Settings
+  - Click on Update & Security
+  - Click on For developers
+  - Select Developer mode
+
+* Enable long file path support on Windows if needed
+
+  - Windows file paths have a 255-character length limitation. To enable long path support, configure the "Enable Long Path Support" setting in the Windows Group Policy Editor. For more details, refer to `Autodesk Support Article <https://www.autodesk.com/support/technical/article/caas/sfdcarticles/sfdcarticles/The-Windows-10-default-path-length-limitation-MAX-PATH-is-256-characters.html>`_
+
+
 ContainerPlatform
 -----------------
 
