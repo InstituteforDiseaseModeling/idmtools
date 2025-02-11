@@ -4,6 +4,7 @@ Here we implement the FilePlatform object.
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import os
+import platform
 import shlex
 import shutil
 from pathlib import Path
@@ -29,6 +30,7 @@ from idmtools_platform_file.platform_operations.suite_operations import FilePlat
 from idmtools_platform_file.platform_operations.utils import FileExperiment, FileSimulation, FileSuite
 
 logger = getLogger(__name__)
+user_logger = getLogger('user')
 
 op_defaults = dict(default=None, compare=False, metadata={"pickle_ignore": True})
 
@@ -181,7 +183,15 @@ class FilePlatform(IPlatform):
                 link.unlink()
 
             # Create the symbolic link
-            link.symlink_to(relative_source, target_is_directory=False)
+            try:
+                link.symlink_to(relative_source, target_is_directory=False)
+            except OSError as e:
+                logger.error(f"Failed to create symbolic link: {e}")
+                user_logger.error(f"\n Failed to create symbolic link: {e}")
+                if platform.system() == 'Windows':
+                    user_logger.warning("\n/!\\ WARNING:  Please follow the instructions to enable Developer Mode for Windows: ")
+                    user_logger.warning("https://learn.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development. \n")
+                exit(-1)
         else:
             shutil.copyfile(target, link)
 
@@ -217,7 +227,15 @@ class FilePlatform(IPlatform):
                     shutil.rmtree(link)
 
             # Create the symbolic link
-            link.symlink_to(relative_source, target_is_directory=True)
+            try:
+                link.symlink_to(relative_source, target_is_directory=True)
+            except OSError as e:
+                logger.error(f"Failed to create symbolic link: {e}")
+                user_logger.error(f"\n Failed to create symbolic link: {e}")
+                if platform.system() == 'Windows':
+                    user_logger.warning("\n/!\\ WARNING:  Please follow the instructions to enable Developer Mode for Windows: ")
+                    user_logger.warning("https://learn.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development. \n")
+                exit(-1)
         else:
             shutil.copytree(target, link)
 
