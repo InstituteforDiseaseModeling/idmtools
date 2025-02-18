@@ -134,3 +134,24 @@ def convert_byte_size(size_bytes: int) -> str:
     p = math.pow(1024, i)
     s = round(size_bytes / p, 2)
     return "%s %s" % (s, size_name[i])
+
+
+def find_text_index(main_string: str, first_text: str, second_text: str) -> str:
+    """
+    Finds the index of the first occurrence of `first_text` in `main_string`.
+    If `first_text` is not found, it searches for `second_text`.
+
+    Args:
+        main_string (str): The string to search within.
+        first_text (str): The first text to search for.
+        second_text (str): The second text to search for if the first is not found.
+
+    Returns:
+        The index of the first occurrence of `first_text` or `second_text`.
+    """
+    index = main_string.find(first_text)
+    if index != -1:
+        return index
+    else:
+        index = main_string.find(second_text)
+        return index

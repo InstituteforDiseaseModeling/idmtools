@@ -9,7 +9,7 @@ import subprocess
 from dataclasses import dataclass
 from typing import List, Dict, NoReturn, Any, Union
 from idmtools.core import ItemType
-from idmtools_platform_container.utils.general import normalize_path, parse_iso8601
+from idmtools_platform_container.utils.general import normalize_path, parse_iso8601, find_text_index
 from idmtools_platform_container.utils.job_history import JobHistory
 from docker.models.containers import Container
 from docker.errors import NotFound as ErrorNotFound
@@ -487,10 +487,12 @@ class Job:
         parts = process[4].split(':')
         self.item_id = parts[1]
         self.group_pid = int(process[2])
-        self.item_type = ItemType.EXPERIMENT if parts[0] == 'EXPERIMENT' else ItemType.SIMULATION
-        if parts[0] == 'EXPERIMENT':
+        index = find_text_index(process_line, 'EXPERIMENT', 'SIMULATION')
+        cmd_parts = process_line[index:].split(':')
+        self.item_type = ItemType.EXPERIMENT if cmd_parts[0] == 'EXPERIMENT' else ItemType.SIMULATION
+        if cmd_parts[0] == 'EXPERIMENT':
             self.job_id = int(process[2])
-        elif parts[0] == 'SIMULATION':
+        elif cmd_parts[0] == 'SIMULATION':
             self.job_id = int(process[0])
         self.container_id = container_id
         self.elapsed = process[3]
