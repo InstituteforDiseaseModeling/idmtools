@@ -9,7 +9,7 @@ import subprocess
 from dataclasses import dataclass
 from typing import List, Dict, NoReturn, Any, Union
 from idmtools.core import ItemType
-from idmtools_platform_container.utils.general import normalize_path, parse_iso8601, find_text_index
+from idmtools_platform_container.utils.general import normalize_path, parse_iso8601
 from idmtools_platform_container.utils.job_history import JobHistory
 from docker.models.containers import Container
 from docker.errors import NotFound as ErrorNotFound
@@ -476,26 +476,23 @@ class Job:
     container_id: str = None
     elapsed: str = None
 
-    def __init__(self, container_id: str, process_line: str):
+    def __init__(self, container_id: str, typed_job: Dict):
         """
         Initialize Job.
         Args:
             container_id: Container ID
-            process_line: Process Input Line
+            typed_job: Process Dict
         """
-        process = process_line.split()
-        parts = process[4].split(':')
-        self.item_id = parts[1]
-        self.group_pid = int(process[2])
-        index = find_text_index(process_line, 'EXPERIMENT', 'SIMULATION')
-        cmd_parts = process_line[index:].split(':')
-        self.item_type = ItemType.EXPERIMENT if cmd_parts[0] == 'EXPERIMENT' else ItemType.SIMULATION
-        if cmd_parts[0] == 'EXPERIMENT':
-            self.job_id = int(process[2])
-        elif cmd_parts[0] == 'SIMULATION':
-            self.job_id = int(process[0])
+        self.item_id = typed_job['pid']
+        self.group_pid = typed_job['pgid']
+        cmd = typed_job['cmd']
+        self.item_type = ItemType.EXPERIMENT if 'EXPERIMENT' in cmd else ItemType.SIMULATION
+        if 'EXPERIMENT' in cmd:
+            self.job_id = typed_job['pgid']
+        elif 'SIMULATION' in cmd:
+            self.job_id = typed_job['pid']
         self.container_id = container_id
-        self.elapsed = process[3]
+        self.elapsed = typed_job['etime']
 
     def display(self):
         """Display Job for debugging usage."""
@@ -521,11 +518,28 @@ def list_running_jobs(container_id: str, limit: int = None) -> List[Job]:
 
     running_jobs = []
     if result.returncode == 0:
-        processes = result.stdout
-        for line in processes.splitlines()[1:]:  # Skip the first header line
+        processes = result.stdout.splitlines()
+        header = processes[0].split()  # Extract the header (column names)
+        for line in processes[1:]:  # Skip the first header line
             if 'EXPERIMENT' in line or 'SIMULATION' in line:
+                # Split the line into columns
+                columns = line.split(maxsplit=len(header) - 1)
+                # Convert columns to their respective types
+                pid = int(columns[0])  # pid is an integer
+                ppid = int(columns[1])  # ppid is an integer
+                pgid = int(columns[2])  # pgid is an integer
+                etime = columns[3]  # etime is a string
+                cmd = columns[4]  # cmd is a string
+                # Create a dictionary with column names and typed values
+                typed_job = {
+                    'pid': pid,
+                    'ppid': ppid,
+                    'pgid': pgid,
+                    'etime': etime,
+                    'cmd': cmd
+                }
                 # Create a new job
-                job = Job(container_id, line)
+                job = Job(container_id, typed_job)
                 running_jobs.append(job)
     elif result.returncode == 1:
         pass
