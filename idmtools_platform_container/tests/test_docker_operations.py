@@ -704,7 +704,7 @@ class TestDockerOperations(unittest.TestCase):
         mock_container = MagicMock(spec=Container, short_id="container_id")
         with self.subTest("test_list_running_jobs_success"):
             # Mock subprocess.run to simulate docker command output
-            mock_output = "PID  PPID  PGID CMD\n1234 5678 1234 01:23 EXPERIMENT:exp_id batch.sh\n2345 6789 2345 01:24 SIMULATION:sim_id"
+            mock_output = "PID  PPID  PGID ETIME CMD\n1234 5678 1234 01:23 EXPERIMENT:exp_id batch.sh\n2345 6789 2345 01:24 SIMULATION:sim_id"
             mock_run.return_value = MagicMock(returncode=0, stdout=mock_output)
             result = list_running_jobs("123")
             self.assertEqual(len(result), 2)
@@ -713,7 +713,7 @@ class TestDockerOperations(unittest.TestCase):
             self.assertEqual(result[1].item_id, "sim_id")
         with self.subTest("test_list_running_jobs_no_jobs"):
             # Mock subprocess.run to simulate no jobs running
-            mock_run.return_value = MagicMock(returncode=0, stdout="")
+            mock_run.return_value = MagicMock(returncode=1, stdout="")
             result = list_running_jobs(mock_container.short_id)
             self.assertEqual(len(result), 0)    # No jobs running
         with self.subTest("test_list_running_jobs_failure"):

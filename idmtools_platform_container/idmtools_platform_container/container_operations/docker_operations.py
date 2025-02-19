@@ -470,7 +470,7 @@ PS_QUERY = 'ps xao pid,ppid,pgid,etime,cmd | head -n 1 && ps xao pid,ppid,pgid,e
 class Job:
     """Running Job."""
     item_id: str = field(init=True)
-    item_type: str = field(init=True)
+    item_type: ItemType = field(init=True)
     job_id: int = field(init=True)
     group_pid: int = field(init=True)
     container_id: str = field(init=True)
@@ -498,6 +498,8 @@ def list_running_jobs(container_id: str, limit: int = None) -> List[Job]:
     """
     command = f'docker exec {container_id} bash -c "({PS_QUERY})"'
     result = subprocess.run(command, shell=True, check=False, capture_output=True, text=True)
+    print(result.returncode)
+    print(result.stdout)
 
     running_jobs = []
     if result.returncode == 0:
