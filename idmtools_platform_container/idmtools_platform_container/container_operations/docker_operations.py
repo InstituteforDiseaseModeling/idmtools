@@ -6,7 +6,7 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 import docker
 import platform as sys_platform
 import subprocess
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List, Dict, NoReturn, Any, Union
 from idmtools.core import ItemType
 from idmtools_platform_container.utils.general import normalize_path, parse_iso8601
@@ -469,30 +469,13 @@ PS_QUERY = 'ps xao pid,ppid,pgid,etime,cmd | head -n 1 && ps xao pid,ppid,pgid,e
 @dataclass(repr=False)
 class Job:
     """Running Job."""
-    item_id: str = None
-    item_type: ItemType = None
-    job_id: int = None
-    group_pid: int = None
-    container_id: str = None
-    elapsed: str = None
-
-    def __init__(self, container_id: str, typed_job: Dict):
-        """
-        Initialize Job.
-        Args:
-            container_id: Container ID
-            typed_job: Process Dict
-        """
-        self.item_id = typed_job['pid']
-        self.group_pid = typed_job['pgid']
-        cmd = typed_job['cmd']
-        self.item_type = ItemType.EXPERIMENT if 'EXPERIMENT' in cmd else ItemType.SIMULATION
-        if 'EXPERIMENT' in cmd:
-            self.job_id = typed_job['pgid']
-        elif 'SIMULATION' in cmd:
-            self.job_id = typed_job['pid']
-        self.container_id = container_id
-        self.elapsed = typed_job['etime']
+    item_id: str = field(init=True)
+    item_type: str = field(init=True)
+    job_id: int = field(init=True)
+    group_pid: int = field(init=True)
+    container_id: str = field(init=True)
+    elapsed: str = field(init=True)
+    parent_pid: int = field(default=None, init=True)
 
     def display(self):
         """Display Job for debugging usage."""
@@ -530,16 +513,19 @@ def list_running_jobs(container_id: str, limit: int = None) -> List[Job]:
                 pgid = int(columns[2])  # pgid is an integer
                 etime = columns[3]  # etime is a string
                 cmd = columns[4]  # cmd is a string
-                # Create a dictionary with column names and typed values
-                typed_job = {
-                    'pid': pid,
-                    'ppid': ppid,
-                    'pgid': pgid,
-                    'etime': etime,
-                    'cmd': cmd
-                }
+
+                # Determine the item type and job ID
+                item_type = ItemType.EXPERIMENT if 'EXPERIMENT' in cmd else ItemType.SIMULATION
+                job_id = pgid if 'EXPERIMENT' in cmd else pid
+
+                # Find the item that starts with 'EXPERIMENT' or 'SIMULATION'
+                columns = cmd.split()
+                result = [item for item in columns if item.startswith('EXPERIMENT') or item.startswith('SIMULATION')]
+                item_id = result[0].split(':')[1]
+
                 # Create a new job
-                job = Job(container_id, typed_job)
+                job = Job(item_id=item_id, item_type=item_type, job_id=job_id, group_pid=pgid, parent_pid=ppid,
+                          container_id=container_id, elapsed=etime)
                 running_jobs.append(job)
     elif result.returncode == 1:
         pass
