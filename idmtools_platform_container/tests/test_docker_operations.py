@@ -745,7 +745,7 @@ class TestDockerOperations(unittest.TestCase):
     def test_find_running_job(self, mock_user_logger, mock_list_running_jobs, mock_get_working_containers,
                                                 mock_get_job):
         with self.subTest("test_find_running_job_with_container_id"):
-            mock_job = Job(item_id='exp_id', item_type='ItemType.EXPERIMENT', job_id=1234, group_pid=5678, parent_pid=6666,
+            mock_job = Job(item_id='exp_id', item_type=ItemType.EXPERIMENT, job_id=1234, group_pid=5678, parent_pid=6666,
                 container_id="container1", elapsed="00:55")
             mock_list_running_jobs.return_value = [mock_job]
             result = find_running_job(item_id='exp_id', container_id='container1')
@@ -753,7 +753,7 @@ class TestDockerOperations(unittest.TestCase):
             self.assertEqual(result.item_id, 'exp_id')
         with self.subTest("test_find_running_job_without_container_id"):
             mock_get_job.return_value = {'CONTAINER': 'container1'}
-            mock_job = Job(item_id='exp_id1', item_type='ItemType.EXPERIMENT', job_id=1234, group_pid=5678, parent_pid=6666,
+            mock_job = Job(item_id='exp_id1', item_type=ItemType.EXPERIMENT, job_id=1234, group_pid=5678, parent_pid=6666,
                 container_id="container1", elapsed="00:55")
             mock_list_running_jobs.return_value = [mock_job]
             result = find_running_job(item_id='exp_id1')
@@ -761,7 +761,7 @@ class TestDockerOperations(unittest.TestCase):
             self.assertEqual(result.item_id, 'exp_id1')
         with self.subTest("test_find_running_job_with_job_id"):
             mock_container1 = MagicMock(spec=Container, short_id="container_id1")
-            mock_job = Job(item_id='exp_id2', item_type='ItemType.EXPERIMENT', job_id=1234, group_pid=5678,
+            mock_job = Job(item_id='exp_id2', item_type=ItemType.EXPERIMENT, job_id=1234, group_pid=5678,
                            parent_pid=6666, container_id=mock_container1.short_id, elapsed="00:55")
             mock_job.job_id = "123"
 
@@ -780,7 +780,7 @@ class TestDockerOperations(unittest.TestCase):
         with self.subTest("test_find_running_job_with_job_id_match_multiple_containers"):
             mock_container1 = MagicMock(spec=Container, short_id="container_id1")
             mock_container2 = MagicMock(spec=Container, short_id="container_id2")
-            mock_job = Job(item_id='exp_id2', item_type='ItemType.EXPERIMENT', job_id=1234, group_pid=5678,
+            mock_job = Job(item_id='exp_id2', item_type=ItemType.EXPERIMENT, job_id=1234, group_pid=5678,
                            parent_pid=6666, container_id=mock_container1.short_id, elapsed="00:55")
             mock_job.job_id = "123"
             def side_effect(item_id):
@@ -798,7 +798,7 @@ class TestDockerOperations(unittest.TestCase):
             mock_container1 = MagicMock(spec=Container, short_id="container_id1")
             mock_container2 = MagicMock(spec=Container, short_id="container_id2")
             mock_get_job.return_value = None
-            mock_job = Job(item_id='sim_id', item_type='ItemType.SIMULATION', job_id=1234, group_pid=5678,
+            mock_job = Job(item_id='sim_id', item_type=ItemType.SIMULATION, job_id=1234, group_pid=5678,
                            parent_pid=6666, container_id='container_id1', elapsed="00:55")
             mock_get_working_containers.return_value = [mock_container1]
             mock_list_running_jobs.return_value = [mock_job]
