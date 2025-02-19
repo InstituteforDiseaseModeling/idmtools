@@ -186,7 +186,6 @@ class FilePlatform(IPlatform):
             try:
                 link.symlink_to(relative_source, target_is_directory=False)
             except OSError as e:
-                logger.error(f"Failed to create symbolic link: {e}")
                 user_logger.error(f"\n Failed to create symbolic link: {e}")
                 if platform.system() == 'Windows':
                     user_logger.warning("\n/!\\ WARNING:  Please follow the instructions to enable Developer Mode for Windows: ")
@@ -230,7 +229,6 @@ class FilePlatform(IPlatform):
             try:
                 link.symlink_to(relative_source, target_is_directory=True)
             except OSError as e:
-                logger.error(f"Failed to create symbolic link: {e}")
                 user_logger.error(f"\n Failed to create symbolic link: {e}")
                 if platform.system() == 'Windows':
                     user_logger.warning("\n/!\\ WARNING:  Please follow the instructions to enable Developer Mode for Windows: ")
