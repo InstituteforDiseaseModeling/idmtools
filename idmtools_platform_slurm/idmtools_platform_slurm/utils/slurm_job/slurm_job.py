@@ -5,6 +5,7 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import os
 import subprocess
+import time
 from os import PathLike
 from pathlib import Path
 from dataclasses import dataclass, field
@@ -13,7 +14,8 @@ from idmtools.core import NoPlatformException
 from jinja2 import Template
 from logging import getLogger
 from idmtools_platform_slurm.utils.slurm_job import create_slurm_indicator, slurm_installed
-import time
+from typing import Tuple
+
 
 user_logger = getLogger('user')
 
@@ -69,7 +71,7 @@ def generate_script(platform: 'SlurmPlatform', command: str,
     platform._op_client.update_script_mode(output_target)
 
 
-def check_file_and_job_id(file_path, timeout=300, interval=10) -> bool, str:
+def check_file_and_job_id(file_path, timeout=300, interval=10) -> Tuple[bool, str]:
     """
     Wait for a file to be created and check if slurm job id exists in the file.
 
@@ -79,7 +81,9 @@ def check_file_and_job_id(file_path, timeout=300, interval=10) -> bool, str:
         interval (int): Time interval (in seconds) between checks.
 
     Returns:
-        bool: True if the file exists and the line is found, False otherwise.
+        Tuple[bool, str]: A tuple containing:
+            - bool: True if the file exists and contains a valid job ID, False otherwise.
+            - str: The job ID if found, otherwise an empty string.
     """
     start_time = time.time()
 
@@ -162,7 +166,7 @@ class SlurmJob:
                 with open(stdout_file, "r") as f:
                     read_data = f.read()
                     user_logger.info(read_data)
-                user_loggger.info("To check job status, run command:")
+                user_logger.info("To check job status, run command:")
                 user_logger.info(f"scontrol show job {slurm_job_id}")
                 user_logger.info(f"sacct -j {slurm_job_id} --format=JobID,State,Start,End")
             else:
