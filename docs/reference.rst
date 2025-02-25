@@ -53,7 +53,7 @@ API class specifications
 
 .. uml:: /diagrams/apis.puml
 
-|EMOD_s|
+|EMOD_s|:
 ^^^^^^^^
 
 .. uml:: /diagrams/apis-emod.puml
