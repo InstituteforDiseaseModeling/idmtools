@@ -30,7 +30,7 @@ jobs:
           sudo apt-get update
           python -m pip install --upgrade pip
           pip install --upgrade setuptools
-          python -m pip install --upgrade pip idm-buildtools --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+          pip install idm-buildtools --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
           sudo apt-get install make
           pip install -r requirements.txt
       - name: Install tools in dev mode
