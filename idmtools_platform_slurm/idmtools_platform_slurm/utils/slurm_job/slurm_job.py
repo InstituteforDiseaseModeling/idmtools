@@ -93,9 +93,9 @@ def check_file_and_job_id(file_path, timeout=300, interval=10) -> Tuple[bool, st
             with open(file_path, 'r') as file:
                 for line in file:
                     if 'Slurm Job Ids (' in line:
-                        job_id = file.readline().strip()
-                        if job_id.isdigit():
-                            return True, job_id
+                        slurm_job_id = file.readline().strip()
+                        if slurm_job_id.isdigit():
+                            return True, slurm_job_id
             user_logger.warning(f"Not found slurm job id in {file_path}.")
         else:
             user_logger.info(f"File {file_path} not found yet. Waiting...")
