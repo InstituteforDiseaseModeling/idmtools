@@ -122,7 +122,8 @@ class CommandLine:
         options = []
         for k, v in self._options.items():
             # Handles spaces
-            value = '"%s"' % v if ' ' in str(v) else str(v)
+            # value = '"%s"' % v if ' ' in str(v) else str(v)   # Wrong: result in option value with both single and double quotes!
+            value = str(v)
             if k[-1] == ':':
                 options.append(k + value)  # if the option ends in ':', don't insert a space
             else:
