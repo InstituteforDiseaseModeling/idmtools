@@ -64,10 +64,21 @@ To set up a virtual environment for **ContainerPlatform**, follow these steps:
     ```bash
     pip install -r requirements.txt
     ```
-6. **Optional(no need step #4 and #5), install all container platform related packages**
+   
+6. **Optional install all container platform related packages (skip step #4 and #5)**
     ```bash
     pip install idmtools[container] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
     ```
+7. **Enable Developer Mode on Windows**
+
+    If you are running the script on Windows, you need to enable Developer Mode. To enable Developer Mode, go to `Settings -> Update & Security -> For developers` and select `Developer Mode` on.
+
+
+8. **Enable long file path on Windows**
+
+    If running the script on Windows, be aware of the file path length limitation (less than 255 characters).
+    If you really need to run the script with long file paths, you can set the Enable Long Path Support in Windows Group Policy Editor. refer to https://www.autodesk.com/support/technical/article/caas/sfdcarticles/sfdcarticles/The-Windows-10-default-path-length-limitation-MAX-PATH-is-256-characters.html.
+
 ## Running a simple example with ContainerPlatform
 
 To run a simple example using **ContainerPlatform**, please pay attention to the **Note** at the end of the README. Other than that, for a general existing COMPS example, user just needs to change one line code to replace COMPS Platform with Container Platform. Below are the steps:
