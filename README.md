@@ -16,12 +16,17 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
+- [Introduction](#introduction)
+- [Documentation](#documentation)
 - [User Installation](#user-installation)
-  - [Recommended install](#recommended-install)
+  - [Pre-requisites](#pre-requisites)
+  - [Installation](#installation)
   - [Advanced install](#advanced-install)
   - [Installing development/early release versions](#installing-developmentearly-release-versions)
-    - [IDMOD's PyPI staging registry](#idmods-pypi-staging-registry)
-  - [Pre-requisites](#pre-requisites)
+    - [Installing from idmod's pypi staging registry](#installing-from-idmods-pypi-staging-registry)
+    - [Developer Installation from source code](#developer-installation-from-source-code)
+  - [More instructions for MAC users](#more-instructions-for-mac-users)
+  - [Build the documentation locally](#build-the-documentation-locally)
 - [Reporting issues](#reporting-issues)
 - [Requesting a feature](#requesting-a-feature)
 - [Development documentation](#development-documentation)
