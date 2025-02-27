@@ -2,15 +2,10 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [User Installation](#user-installation)
-  - [Recommended install](#recommended-install)
-  - [Advanced install](#advanced-install)
-  - [Installing development/early release versions](#installing-developmentearly-release-versions)
-    - [IDMOD's PyPI staging registry](#idmods-pypi-staging-registry)
+- [Instruction for running idmtools on macOS](#instruction-for-running-idmtools-on-macos)
   - [Pre-requisites](#pre-requisites)
-- [Reporting issues](#reporting-issues)
-- [Requesting a feature](#requesting-a-feature)
-- [Development documentation](#development-documentation)
+  - [Installation](#installation)
+  - [Run examples](#run-examples)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 # Instruction for running idmtools on macOS

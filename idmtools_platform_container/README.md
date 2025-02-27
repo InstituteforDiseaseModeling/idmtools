@@ -7,15 +7,20 @@
 **Table of Contents**
 
 - [Introduction](#introduction)
-- [Pre-requisites](#pre-requisites)
-- [Setting up virtual environment](#setting-up-virtual-environment)
-- [Running a simple example with ContainerPlatform](#running-a-simple-example-with-containerplatform)
-- [Basic CLI commands](#basic-cli-commands)
-  - [List running jobs](#list-running-jobs)
-  - [Check status](#check-status)
-  - [Cancel job](#cancel-job)
-  - [View Experiments history](#view-experiments-history)
-- [Note](#note)
+  - [Pre-requisites](#pre-requisites)
+  - [Installation](#installation)
+  - [Examples for container platform](#examples-for-container-platform)
+    - [Initialize platform](#initialize-platform)
+    - [Container Examples](#container-examples)
+    - [Check result with CLI commands](#check-result-with-cli-commands)
+    - [Check result files](#check-result-files)
+    - [Folder structure](#folder-structure)
+  - [Basic CLI commands](#basic-cli-commands)
+    - [List running jobs](#list-running-jobs)
+    - [Check status](#check-status)
+    - [Cancel job](#cancel-job)
+    - [View Experiments history](#view-experiments-history)
+  - [Note](#note)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
