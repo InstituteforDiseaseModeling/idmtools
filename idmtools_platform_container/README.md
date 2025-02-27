@@ -94,9 +94,9 @@
 
 
 ### Check result with CLI commands
-    ```bash
-    idmtools container status <experiment id>
-    ```
+  ```bash
+  idmtools container status <experiment id>
+  ```
 ### Check result files
     - on host: `<job_directory>/<suite_path>/<experiment_path>/<simulation_path>/`
     - in container: `/home/container-data/<suite_path>/<experiment_path>/<simulation_path>/`
@@ -123,9 +123,9 @@ The user can customize the folder structure by setting the following parameters 
 ### List running jobs
 
 To list running experiment or simulation jobs:
-```bash
-idmtools container jobs [<container-id>] [-l <limit>] [-n <next>]
-```
+  ```bash
+  idmtools container jobs [<container-id>] [-l <limit>] [-n <next>]
+  ```
 
 ### Check status
 
@@ -153,4 +153,4 @@ idmtools container history [<container-id>] [-l <limit>] [-n <next>]
 
 - **WorkItem** is not supported on the Container Platform as it is not needed in most cases since the code already runs on user's local computer.
 - **AssetCollection** creation or referencing to an existing AssetCollection are not supported on the Container Platform with current release. If you've used the COMPS Platform, you may have scripts using these objects. You would need to update these scripts without using these objects in order to run them on the Container Platform.
-- Run with Singularity is not needed with Container Platform. If you take existing COMPS example and try to run it with Container Platform, you may need to remove the code that setups the singularity image.
+- Run with **Singularity** is not needed with Container Platform. If you take existing COMPS example and try to run it with Container Platform, you may need to remove the code that setups the singularity image.
