@@ -8,6 +8,7 @@ import uuid
 from dataclasses import field, dataclass
 from functools import partial
 from logging import getLogger, DEBUG
+from pathlib import Path
 from typing import Type, Union, List, TYPE_CHECKING, Optional, Dict
 from uuid import UUID
 import humanfriendly
@@ -248,13 +249,13 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         normalized_files = [ntpath.normpath(file) for file in files]
         ret = {}
         if ac is not None:
-            for asset_file in ac.assets:
-                # Get asset file path which combined the relative path and filename if relative path is set
-                asset_file_path = os.path.join(asset_file.relative_path,
-                                               asset_file.file_name) if asset_file.relative_path else asset_file.file_name
-                normalized_asset_file_path = ntpath.normpath(asset_file_path)
-                for file in normalized_files:
-                    if file in normalized_asset_file_path:
+            for file in normalized_files:
+                for asset_file in ac.assets:
+                    # Get asset file path which combined the relative path and filename if relative path is set
+                    asset_file_path = os.path.join(asset_file.relative_path,
+                                                   asset_file.file_name) if asset_file.relative_path else asset_file.file_name
+                    normalized_asset_file_path = ntpath.normpath(asset_file_path)
+                    if Path(file).name == Path(normalized_asset_file_path).name:
                         # if matches, get the file from COMPS
                         ret[file] = asset_file.retrieve()
                         break
