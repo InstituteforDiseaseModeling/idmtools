@@ -52,7 +52,8 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         if asset_collection_id is None and query_criteria is None:
             raise ValueError("You cannot query for all asset collections. Please specify a query criteria or an id")
         query_criteria = query_criteria or QueryCriteria().select_children(children)
-
+        if asset_collection_id is None or asset_collection_id == "":
+            raise ValueError("AssetCollection does not have an id")
         return COMPSAssetCollection.get(id=asset_collection_id, query_criteria=query_criteria)
 
     def platform_create(self, asset_collection: AssetCollection, **kwargs) -> COMPSAssetCollection:
@@ -250,13 +251,15 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         ret = {}
         if ac is not None:
             for file in normalized_files:
+                if file.startswith("Assets"):
+                    # remove the Assets prefix
+                    file = str(Path(file).relative_to("Assets"))
                 for asset_file in ac.assets:
                     # Get asset file path which combined the relative path and filename if relative path is set
                     asset_file_path = os.path.join(asset_file.relative_path,
                                                    asset_file.file_name) if asset_file.relative_path else asset_file.file_name
                     normalized_asset_file_path = ntpath.normpath(asset_file_path)
-                    if Path(file).name == Path(normalized_asset_file_path).name:
-                        # if matches, get the file from COMPS
-                        ret[file] = asset_file.retrieve()
+                    if normalized_asset_file_path.endswith(file):
+                        ret[asset_file_path] = asset_file.retrieve()
                         break
         return ret
