@@ -259,7 +259,7 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
                     asset_file_path = os.path.join(asset_file.relative_path,
                                                    asset_file.file_name) if asset_file.relative_path else asset_file.file_name
                     normalized_asset_file_path = ntpath.normpath(asset_file_path)
-                    if normalized_asset_file_path.endswith(file):
+                    if normalized_asset_file_path == file:
                         ret[asset_file_path] = asset_file.retrieve()
                         break
         return ret
