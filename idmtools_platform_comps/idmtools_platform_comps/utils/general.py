@@ -132,7 +132,7 @@ def get_file_from_collection(platform: IPlatform, collection_id: UUID, file_path
     Returns:
         Object Byte Array
     """
-    print(f"Cache miss for {collection_id} {file_path}")
+    logger.debug(f"Cache miss for {collection_id} {file_path}")
 
     # retrieve the collection
     ac = platform.get_item(collection_id, ItemType.ASSETCOLLECTION, raw=True)

@@ -2,18 +2,20 @@
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+import ntpath
 import os
 import uuid
 from dataclasses import field, dataclass
 from functools import partial
 from logging import getLogger, DEBUG
-from typing import Type, Union, List, TYPE_CHECKING, Optional
+from typing import Type, Union, List, TYPE_CHECKING, Optional, Dict
 from uuid import UUID
 import humanfriendly
 from COMPS.Data import AssetCollection as COMPSAssetCollection, QueryCriteria, AssetCollectionFile, SimulationFile, OutputFileMetadata, WorkItemFile
 from tqdm import tqdm
 from idmtools import IdmConfigParser
 from idmtools.assets import AssetCollection, Asset
+from idmtools.core import ItemType
 from idmtools.entities.iplatform_ops.iplatform_asset_collection_operations import IPlatformAssetCollectionOperations
 from idmtools_platform_comps.utils.general import get_file_as_generator
 
@@ -49,7 +51,8 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         if asset_collection_id is None and query_criteria is None:
             raise ValueError("You cannot query for all asset collections. Please specify a query criteria or an id")
         query_criteria = query_criteria or QueryCriteria().select_children(children)
-
+        if asset_collection_id is None or asset_collection_id == "":
+            raise ValueError("AssetCollection does not have an id")
         return COMPSAssetCollection.get(id=asset_collection_id, query_criteria=query_criteria)
 
     def platform_create(self, asset_collection: AssetCollection, **kwargs) -> COMPSAssetCollection:
@@ -227,3 +230,36 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         if asset.uri:
             asset.download_generator_hook = partial(get_file_as_generator, asset_collection)
         return asset
+
+    def get_assets(self, asset_collection: AssetCollection, files: List[str], **kwargs) -> Dict[str, bytearray]:
+        """
+        Fetch the files associated with an AssetCollection.
+
+        Args:
+            asset_collection: AssetCollection to fetch files from
+            files: List of files to download. For example ['config.json', 'stdout.txt', 'python/dtk_post_process.py']
+            **kwargs: Additional arguments
+
+        Returns:
+            Dictionary of filename -> ByteArray
+        """
+        # get the asset collection from COMPS
+        ac = self.platform.get_item(asset_collection.id, ItemType.ASSETCOLLECTION, raw=True)
+
+        normalized_files = [ntpath.normpath(file) for file in files]
+        ret = {}
+        if ac is not None:
+            for file in normalized_files:
+                match_found = False  # Track if the file matches any asset in `ac.assets`
+                for asset_file in ac.assets:
+                    # Get asset file path which combined the relative path and filename if relative path is set
+                    asset_file_path = os.path.join(asset_file.relative_path,
+                                                   asset_file.file_name) if asset_file.relative_path else asset_file.file_name
+                    normalized_asset_file_path = ntpath.normpath(asset_file_path)
+                    if normalized_asset_file_path == file:
+                        ret[asset_file_path] = asset_file.retrieve()
+                        match_found = True
+                        break
+                if not match_found:
+                    user_logger.warning(f"\nFile '{file}' not found in asset collection {ac.id}")
+        return ret
