@@ -8,7 +8,6 @@ import uuid
 from dataclasses import field, dataclass
 from functools import partial
 from logging import getLogger, DEBUG
-from pathlib import Path
 from typing import Type, Union, List, TYPE_CHECKING, Optional, Dict
 from uuid import UUID
 import humanfriendly
