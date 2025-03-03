@@ -238,7 +238,7 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
 
         Args:
             asset_collection: AssetCollection to fetch files from
-            files: List of files to download
+            files: List of files to download. For example ['config.json', 'stdout.txt', 'python/dtk_post_process.py']
             **kwargs: Additional arguments
 
         Returns:
@@ -251,9 +251,7 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         ret = {}
         if ac is not None:
             for file in normalized_files:
-                if file.startswith("Assets"):
-                    # remove the Assets prefix
-                    file = str(Path(file).relative_to("Assets"))
+                match_found = False  # Track if the file matches any asset in `ac.assets`
                 for asset_file in ac.assets:
                     # Get asset file path which combined the relative path and filename if relative path is set
                     asset_file_path = os.path.join(asset_file.relative_path,
@@ -261,5 +259,8 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
                     normalized_asset_file_path = ntpath.normpath(asset_file_path)
                     if normalized_asset_file_path == file:
                         ret[asset_file_path] = asset_file.retrieve()
+                        match_found = True
                         break
+                if not match_found:
+                    user_logger.warning(f"\nFile '{file}' not found in asset collection {ac.id}")
         return ret

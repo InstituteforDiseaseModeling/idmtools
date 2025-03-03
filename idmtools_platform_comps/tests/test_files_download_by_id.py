@@ -23,13 +23,14 @@ class TestPlatformFileDownload(unittest.TestCase):
         Test downloading files from the platform.
         For this testcase, we will download all files from out_filenames list except the last one "b.txt" because it does not exist in assetcollection.
         """
-        out_filenames = ['a_test.txt', "data/a_test", 'data/a_test.txt', "B.txt", "b.txt"]
+        out_filenames = ["a_test.txt", "data/a_test", "data/a_test.txt", "B.txt", "b.txt", "Assets/a_test.txt"]
         d = self.platform.get_files_by_id(
             self.ac_id,
             ItemType.ASSETCOLLECTION,
             out_filenames,
             self.output_path
         )
+        # Expect only first 4 files to be downloaded
         expected_files = [str(Path(os.path.join(self.output_path, self.ac_id, f))) for f in out_filenames[:4]]
 
         # Get all files in the output_path directory
@@ -41,8 +42,9 @@ class TestPlatformFileDownload(unittest.TestCase):
                 full_path = os.path.join(root, file)
                 downloaded_files.append(full_path)
 
-        self.assertTrue(all([f in downloaded_files for f in expected_files]))  # check all_files and expected_files are the same
-        self.assertFalse(out_filenames[1] in downloaded_files)  # b.txt is not in the all_files list
+        self.assertTrue(all([f in downloaded_files for f in expected_files]))
+        self.assertFalse([s for s in downloaded_files if out_filenames[4] in s])  # b.txt is not in the downloaded_files list
+        self.assertFalse([s for s in downloaded_files if out_filenames[5] in s])  # Assets/a_test.txt is not in the downloaded_files list
 
     def test_simulation_files_download(self):
         out_filenames = ['stdout.txt', 'stderr.txt', 'Assets/a_test.txt']
