@@ -16,70 +16,80 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
+- [Introduction](#introduction)
+- [Documentation](#documentation)
 - [User Installation](#user-installation)
-  - [Recommended install](#recommended-install)
+  - [Pre-requisites](#pre-requisites)
+  - [Installation](#installation)
   - [Advanced install](#advanced-install)
   - [Installing development/early release versions](#installing-developmentearly-release-versions)
-    - [IDMOD's PyPI staging registry](#idmods-pypi-staging-registry)
-  - [Pre-requisites](#pre-requisites)
+    - [Installing from idmod's pypi staging registry](#installing-from-idmods-pypi-staging-registry)
+    - [Developer Installation from source code](#developer-installation-from-source-code)
+  - [More instructions for MAC users](#more-instructions-for-mac-users)
+  - [Build the documentation locally](#build-the-documentation-locally)
 - [Reporting issues](#reporting-issues)
 - [Requesting a feature](#requesting-a-feature)
 - [Development documentation](#development-documentation)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# User Installation
+# Introduction
+**idmtools** is a collection of Python scripts and utilities designed to streamline interactions with disease modeling workflows. It can be used to run simulations on various platforms, including COMPS, Slurm, and Docker containers.
 
+# Documentation
 Documentation is located at https://docs.idmod.org/projects/idmtools/en/latest/. 
 
-To build the documentation locally, do the following:
+# User Installation
+## Pre-requisites
+- Python 3.8/3.9/3.10/3.11/3.12 x64-bit
+- OS: 
+  - Windows 10 Pro or Enterprise
+  - Linux
+  - macOS (10.15 Catalina or later) 
+- Docker or Docker Desktop(required for the container platform)
+  On Windows, please use Docker Desktop 4.0.0 or later
+- **Mac user**: Only support Intel based **x86_64** architecture if you want to run emodpy related disease models on **Docker** container platform. Apple based ARM architecture currently is not supported. 
 
-1. Create and activate a venv.
-2. Navigate to the root directory of the repo and enter the following:
+## Installation
 
+- Create and activate a virtual environment:
     ```
-    pip install -r dev_scripts/package_requirements.txt
-    pip install -r docs/requirements.txt
-    python dev_scripts/bootstrap.py
-    cd docs
-    make html
+    python -m venv venv
+    source venv/bin/activate  # On macOS/Linux
+    venv\Scripts\activate     # On Windows
     ```
-3. (Optional) To automatically serve the built docs locally in your browser, enter the following from
-   the root directory:
-
+- Full installation:
+    ```bash
+    pip install idmtools[full] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
     ```
-    python dev_scripts/serve_docs.py
+    This will install all idmtools packages, except the idmtools-test package. The installation includes core, CLI, models, COMPS, General, Container, and Slurm platforms.
+
+- Only install packages for running simulations in COMPS:
+    ```bash
+    pip install idmtools[idm] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
     ```
+    This will install the idmtools core, CLI, models, and COMPS platform.
 
-## Recommended install
+- Only install packages for running simulations in Slurm cluster:
+    ```bash
+    pip install idmtools[slurm] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+    ```
+    This will install the idmtools core, CLI, models, slurm_utils, and Slurm platform.
 
-- The recommended installation is to use:
-```bash
-pip install idmtools[full] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
-```
-This will install all idmtools packages, except the idmtools-test package. The installation includes core, CLI, models, COMPS, General, Container, and Slurm platforms.
-- For only run simulations on COMPS:
-```bash
-pip install idmtools[idm] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
-```
-This will install the idmtools core, CLI, models, and COMPS platform.
-
-- For only run simulations in Slurm cluster:
-```bash
-pip install idmtools[slurm] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
-```
-This will install the idmtools core, CLI, models, slurm_utils, and Slurm platform.
-
-- For only run simulations in Docker container locally:
-```bash
-pip install idmtools[container] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
-```
-This will install the idmtools core, CLI, models, General, and Container platforms.
+- Only install packages for running simulations in Docker container locally:
+    ```bash
+    pip install idmtools[container] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+    ```
+    This will install the idmtools core, CLI, models, General, and Container platforms.
 
 - For run unittests, you may need to install the idmtools-test package:
-```bash
-pip install idmtools-test --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
-```
+    ```bash
+    pip install idmtools-test --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+    ```
+- **Note**: If running above command on **macOS**, you may need to escape the square brackets with a backslash. for example:
+    ```bash
+    pip install idmtools\[full\] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+    ```
 
 ## Advanced install
 You can also install just the individual packages to create minimal environments:
@@ -97,7 +107,7 @@ You can also install just the individual packages to create minimal environments
 
 Development versions are available through both IDM's pypi registry and through Github.
 
-### IDMOD's PyPI staging registry
+### Installing from idmod's pypi staging registry
 
 If you have your authentication defined in your pip.conf or pip.ini file, you can use the following commands to install from staging:
 - `pip install idmtools --index-url=https://<USERNAME>:<PASSWORD>@packages.idmod.org/api/pypi/pypi-staging/simple` - Core package
@@ -109,12 +119,30 @@ If you have your authentication defined in your pip.conf or pip.ini file, you ca
 - `pip install idmtools-platform-container --index-url=https://<USERNAME>:<PASSWORD>@packages.idmod.org/api/pypi/pypi-staging/simple` - Support for Container Platform
 - `pip install idmtools-test --index-url=https://<USERNAME>:<PASSWORD>@packages.idmod.org/api/pypi/pypi-staging/simple` - Test package
 
-## Pre-requisites
-- Python 3.8/3.9/3.10/3.11/3.12 x64-bit
-- Windows 10 Pro or Enterprise, or a Linux operating system
-- Docker(required for the container platform)
-  On Windows, please use Docker Desktop 4.0.0 or later
+### Developer Installation from source code
+  ```
+  python dev_scripts/bootstrap.py
+  ```
+## More instructions for [MAC users](MAC_README.md)
 
+## Build the documentation locally
+
+- Create and activate a virtual environment
+- Navigate to the root directory of the repo and enter the following:
+
+  ```
+  pip install -r dev_scripts/package_requirements.txt
+  pip install -r docs/requirements.txt
+  python dev_scripts/bootstrap.py
+  cd docs
+  make html
+  ```
+- (Optional) To automatically serve the built docs locally in your browser, enter the following from
+   the root directory:
+
+    ```
+    python dev_scripts/serve_docs.py
+    ```
 # Reporting issues
 
 Include the following information in your post:
