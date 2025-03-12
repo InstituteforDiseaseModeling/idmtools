@@ -607,8 +607,8 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         ret = getattr(self, interface).get_assets(item, files, **kwargs)
 
         if output:
-            if item.item_type not in (ItemType.SIMULATION, ItemType.WORKFLOW_ITEM):
-                user_logger.info("Currently 'output' only supports Simulation and WorkItem!")
+            if item.item_type not in (ItemType.SIMULATION, ItemType.WORKFLOW_ITEM, ItemType.ASSETCOLLECTION):
+                user_logger.info("Currently 'output' only supports Simulation, WorkItem and AssetCollection!")
             else:
                 for ofi, ofc in ret.items():
                     file_path = os.path.join(output, str(item.uid), ofi)
