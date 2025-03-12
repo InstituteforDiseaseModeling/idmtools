@@ -157,7 +157,7 @@ class SlurmJob:
 
             user_logger.info(f"{'job_id: '.ljust(20)} {self.slurm_job_id}")
             user_logger.info(f"{'job_directory: '.ljust(20)} {self.platform.job_directory}\n")
-            user_logger.warning(MSG)
+
             # Check if stdout.txt is created and job id exists in there
             stdout_file = os.path.join(self.working_directory, 'stdout.txt')
             is_exists, slurm_job_id = check_file_and_job_id(stdout_file)
@@ -171,6 +171,7 @@ class SlurmJob:
                 user_logger.info(f"sacct -j {slurm_job_id} --format=JobID,State,Start,End")
             else:
                 user_logger.warning("Check status.txt for job details.")
+                user_logger.warning(MSG)
         else:
             user_logger.warning('Script is runing with dry_run = True')
 
