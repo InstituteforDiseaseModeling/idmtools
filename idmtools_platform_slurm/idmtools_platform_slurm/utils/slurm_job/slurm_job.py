@@ -173,7 +173,7 @@ class SlurmJob:
                 user_logger.warning("Check status.txt for job details.")
                 user_logger.warning(MSG)
         else:
-            user_logger.warning('Script is runing with dry_run = True')
+            user_logger.warning('Script is running with dry_run = True')
 
     def __check_for_platform_from_context(self, platform) -> 'IPlatform':  # noqa: F821
         """
