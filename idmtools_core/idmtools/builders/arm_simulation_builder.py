@@ -3,6 +3,8 @@ idmtools arm builder definition.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+from idmtools.builders import SweepArm
+from itertools import tee
 
 
 class ArmSimulationBuilder:
@@ -110,8 +112,27 @@ class ArmSimulationBuilder:
         Returns:
             None
         """
-        self.arms.append(arm)
-        arm._update_sweep_functions()
+        # create a new arm
+        arm_new = SweepArm(type=arm.type)
+        old_sweeps = []
+        new_sweeps = []
+        # make two copies of each sweep
+        for sweep in arm.sweeps:
+            old_sw, new_sw = tee(sweep, 2)
+            old_sweeps.append(old_sw)
+            new_sweeps.append(new_sw)
+
+        # keep original sweeps
+        arm.sweeps = old_sweeps
+        # copy sweeps to new arm
+        arm_new.sweeps = new_sweeps
+        # update count for new arm
+        arm_new.count = arm.count
+
+        # add new arm to arms
+        self.arms.append(arm_new)
+        # update sweep functions for new arm
+        arm_new._update_sweep_functions()
 
     def __iter__(self):
         """
