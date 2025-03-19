@@ -103,7 +103,7 @@ class TemplatedSimulations:
             self.base_simulation.tags.update(tags)
 
     @property
-    def builder(self) -> Union[SimulationBuilder,ArmSimulationBuilder]:
+    def builder(self) -> Union[SimulationBuilder, ArmSimulationBuilder]:
         """
         For backward-compatibility purposes.
 
@@ -113,7 +113,7 @@ class TemplatedSimulations:
         return list(self.builders)[-1] if self.builders and len(self.builders) > 0 else None
 
     @builder.setter
-    def builder(self, builder: Union[SimulationBuilder,ArmSimulationBuilder]) -> None:
+    def builder(self, builder: Union[SimulationBuilder, ArmSimulationBuilder]) -> None:
         """
         For backward-compatibility purposes.
 
@@ -129,7 +129,7 @@ class TemplatedSimulations:
 
         self.add_builder(builder)
 
-    def add_builder(self, builder: Union[SimulationBuilder,ArmSimulationBuilder]) -> None:
+    def add_builder(self, builder: Union[SimulationBuilder, ArmSimulationBuilder]) -> None:
         """
         Add builder to builder collection.
 
