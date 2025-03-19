@@ -3,7 +3,6 @@ import os
 from functools import partial
 import pytest
 from COMPS.Data import QueryCriteria
-
 from idmtools.builders import SimulationBuilder, SweepArm, ArmType, ArmSimulationBuilder
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
@@ -52,7 +51,7 @@ class TestSimulationBuilder(ITestWithPersistence):
                 sim6: {a:1, b:2, c:4, d:7, e:2}
                 sim7: {a:1, b:2, c:5, d:6, e:2}
                 sim8: {a:1, b:2, c:5, d:7, e:2}
-                sim9: {a:1, b:3, c:4, d:6, be:2}
+                sim9: {a:1, b:3, c:4, d:6, e:2}
                 sim10: {a:1, b:3, c:4, d:7, e:2}
                 sim11: {a:1, b:3, c:5, d:6, e:2}
                 sim12: {a:1, b:3, c:5, d:7, e:2}
