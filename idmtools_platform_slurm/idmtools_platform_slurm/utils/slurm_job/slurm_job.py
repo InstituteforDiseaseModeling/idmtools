@@ -71,7 +71,7 @@ def generate_script(platform: 'SlurmPlatform', command: str,
     platform._op_client.update_script_mode(output_target)
 
 
-def check_file_and_job_id(file_path, timeout: int = 300, interval: int = 5) -> Tuple[bool, str]:
+def check_file_and_job_id(file_path, timeout: int = 3600, interval: int = 10) -> Tuple[bool, str]:
     """
     Wait for a file to be created and check if slurm job id exists in the file.
 
