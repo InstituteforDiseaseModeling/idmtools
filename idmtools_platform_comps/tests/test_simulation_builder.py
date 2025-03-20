@@ -13,7 +13,7 @@ from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.utils import get_case_name
 
-# define specific callbacks for a, b, and c
+# define specific callbacks for a, b, c, d, e
 setA = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="a")
 setB = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="b")
 setC = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="c")
