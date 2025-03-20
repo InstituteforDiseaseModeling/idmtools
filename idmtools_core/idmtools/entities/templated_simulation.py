@@ -9,13 +9,13 @@ import copy
 from dataclasses import dataclass, field, fields, InitVar
 from functools import partial
 from itertools import chain
-from typing import Set, Generator, Dict, Any, List, TYPE_CHECKING
+from typing import Set, Generator, Dict, Any, List, TYPE_CHECKING, Union
 from more_itertools import grouper
-from idmtools.builders.simulation_builder import SimulationBuilder
 from idmtools.entities.itask import ITask
 from idmtools.entities.simulation import Simulation
 from idmtools.utils.collections import ResetGenerator
 from idmtools.utils.hashing import ignore_fields_in_dataclass_on_pickle
+from idmtools.builders import SimulationBuilder, ArmSimulationBuilder
 
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.experiment import Experiment
@@ -71,7 +71,7 @@ class TemplatedSimulations:
             experiment.simulations = list(experiment.simulations)
             experiment.simulations[2].tags['test']=123
     """
-    builders: Set[SimulationBuilder] = field(default_factory=set, compare=False)
+    builders: Set[Union[SimulationBuilder, ArmSimulationBuilder]] = field(default_factory=set, compare=False)
     base_simulation: Simulation = field(default=None, compare=False, metadata={"pickle_ignore": True})
     base_task: ITask = field(default=None)
     parent: 'Experiment' = field(default=None)
@@ -103,7 +103,7 @@ class TemplatedSimulations:
             self.base_simulation.tags.update(tags)
 
     @property
-    def builder(self) -> SimulationBuilder:
+    def builder(self) -> Union[SimulationBuilder, ArmSimulationBuilder]:
         """
         For backward-compatibility purposes.
 
@@ -113,7 +113,7 @@ class TemplatedSimulations:
         return list(self.builders)[-1] if self.builders and len(self.builders) > 0 else None
 
     @builder.setter
-    def builder(self, builder: SimulationBuilder) -> None:
+    def builder(self, builder: Union[SimulationBuilder, ArmSimulationBuilder]) -> None:
         """
         For backward-compatibility purposes.
 
@@ -129,7 +129,7 @@ class TemplatedSimulations:
 
         self.add_builder(builder)
 
-    def add_builder(self, builder: SimulationBuilder) -> None:
+    def add_builder(self, builder: Union[SimulationBuilder, ArmSimulationBuilder]) -> None:
         """
         Add builder to builder collection.
 
@@ -142,8 +142,6 @@ class TemplatedSimulations:
         Raises:
             ValueError - Builder must be type of SimulationBuilder
         """
-        from idmtools.builders import SimulationBuilder, ArmSimulationBuilder
-
         # Add builder validation
         if not isinstance(builder, (SimulationBuilder, ArmSimulationBuilder)):
             raise ValueError("Builder ({}) must have type of ExperimentBuilder!".format(builder))
