@@ -19,7 +19,6 @@ RUN yum -y install rpm dnf-plugins-core \
     wget \
     nano
 
-
 # Update the system
 RUN yum clean all
 
