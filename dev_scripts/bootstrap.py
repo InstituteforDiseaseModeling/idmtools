@@ -163,7 +163,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Bootstrap the development environment")
     parser.add_argument("--index-url", default='https://packages.idmod.org/api/pypi/pypi-production/simple',
                         help="Pip url to install dependencies from")
-    parser.add_argument("--extra-index-url", default='https://example.com/pypi/simple',
+    parser.add_argument("--extra-index-url", default='https://pypi.org/simple',
                         help="Pip url to install dependencies from pypi")
     parser.add_argument("--verbose", default=False, action='store_true')
 
