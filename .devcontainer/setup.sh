@@ -15,7 +15,7 @@ sudo usermod -aG docker $USER
 sudo chown root:docker /var/run/docker.sock
 sudo chmod 666 /var/run/docker.sock
 docker --version
-sudo chown -R codespace:codespace /workspaces/idmtools
+sudo chown -R $USER:$USER /workspaces
 
 # install idmtools
 pip install idmtools[full] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
