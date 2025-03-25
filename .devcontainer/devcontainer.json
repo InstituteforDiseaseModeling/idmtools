@@ -1,0 +1,36 @@
+{
+    "name": "idmtools",
+    "image": "mcr.microsoft.com/devcontainers/universal:2",
+    "features": {
+      "ghcr.io/devcontainers/features/docker-in-docker:2": {
+        "mounts": [
+          "source=${localWorkspaceFolder},target=/workspace,type=bind"
+        ]
+    },
+      "ghcr.io/devcontainers/features/python:1": {
+        "version": "3.12",
+        "installJupyterlab": true
+      },
+     "ghcr.io/devcontainers/features/node:1": {
+        "version": "20"
+      },
+      "ghcr.io/rocker-org/devcontainer-features/quarto-cli:1": {},
+      "ghcr.io/rocker-org/devcontainer-features/pandoc:1": {},
+      "ghcr.io/devcontainers/features/ruby:1": {
+        "version": "3.3"
+      }
+    },
+    "customizations": {
+      "vscode": {
+        "extensions": [
+          "ms-python.python",
+          "ms-python.debugpy",
+          "ms-toolsai.jupyter",
+          "ritwickdey.LiveServer",
+          "esbenp.prettier-vscode",
+          "redhat.vscode-yaml"
+        ]
+      }
+    },
+    "postCreateCommand": "bash ./.devcontainer/setup.sh"
+  }
