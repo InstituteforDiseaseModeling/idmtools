@@ -2,7 +2,7 @@ click~=8.1.7
 click-plugins
 colorama~=0.4.6
 cookiecutter~=2.6.0
-idmtools~=2.0.2
+idmtools~=2.1.0
 tabulate>=0.8.9,<0.10
 pyperclip~=1.8
 tqdm>=4.52.0,<5
