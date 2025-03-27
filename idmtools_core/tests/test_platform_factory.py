@@ -98,8 +98,6 @@ class TestPlatformFactory(ITestWithPersistence):
         mock_config_user_logger.log.call_args_list[0].assert_called_with('INI File Found: ')
         self.assertIn('\nInitializing FilePlatform with:', mock_user_logger.log.call_args_list[0].args[1])
         self.assertIn('"job_directory": "MY_JOB_DIRECTORY"', mock_user_logger.log.call_args_list[1].args[1])
-        # verify there is no warning printed
-        mock_logger.warning.not_called()
 
     @patch("idmtools.core.platform_factory.user_logger")
     @patch('idmtools.core.platform_factory.logger')
@@ -113,8 +111,6 @@ class TestPlatformFactory(ITestWithPersistence):
         self.assertIn('my_directory', platform.job_directory)
         self.assertIn('\nInitializing FilePlatform with:', mock_user_logger.log.call_args_list[0].args[1])
         self.assertIn('"job_directory": "my_directory"', mock_user_logger.log.call_args_list[1].args[1])
-        # verify there is no warning printed
-        mock_logger.warning.not_called()
 
     @patch("idmtools.core.platform_factory.user_logger")
     def test_create_platform_with_valid_block_other_kwargs(self, mock_user_logger):
@@ -168,7 +164,6 @@ class TestPlatformFactory(ITestWithPersistence):
         self.assertIn('destination_directory', platform.job_directory)
         self.assertIn('\nInitializing FilePlatform with:', mock_user_logger.log.call_args_list[0].args[1])
         self.assertIn('"job_directory": "destination_directory"', mock_user_logger.log.call_args_list[1].args[1])
-        mock_logger.warning.not_called()
 
     @patch('idmtools.core.platform_factory.user_logger')
     @patch('idmtools.core.platform_factory.logger')
@@ -182,7 +177,6 @@ class TestPlatformFactory(ITestWithPersistence):
         # verify there is no user_logger printed from either platform_factory or idm_config_parser
         self.assertIn('\nInitializing FilePlatform with:', mock_user_logger.log.call_args_list[0].args[1])
         self.assertIn('"job_directory": "destination_directory"', mock_user_logger.log.call_args_list[1].args[1])
-        mock_logger.warning.not_called()
 
     def test_create_platform_with_no_block_and_invalid_type(self):
         with self.assertRaises(Exception) as context:

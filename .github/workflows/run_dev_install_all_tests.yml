@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest ]
-        python-version: ['3.9']
+        python-version: ['3.12']
     env:
       PYPI_STAGING_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
       PYPI_STAGING_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
