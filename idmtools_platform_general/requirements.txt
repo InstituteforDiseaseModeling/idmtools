@@ -1,3 +1,3 @@
-idmtools~=2.0.2
+idmtools~=2.1.0
 jinja2~=3.1.3
 tqdm>=4.52.0,<5
