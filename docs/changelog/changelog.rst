@@ -4,6 +4,7 @@ Changelog
 
 .. toctree::
 
+    changelog_2.1.0
     changelog_2.0.2
     changelog_2.0.1
     changelog_2.0.0
