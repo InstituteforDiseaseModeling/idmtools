@@ -98,6 +98,7 @@ class TestPlatformFactory(ITestWithPersistence):
         self.assertEqual(platform.environment, 'Calculon')
 
     @pytest.mark.comps
+    @pytest.mark.skipif(os.environ.get("GITHUB_ACTIONS") == "true", reason="Skip on GitHub Actions")
     @unittest.mock.patch('idmtools.core.platform_factory.user_logger')
     @unittest.mock.patch('idmtools.core.platform_factory.logger')
     @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
@@ -115,6 +116,7 @@ class TestPlatformFactory(ITestWithPersistence):
 
 
     @pytest.mark.comps
+    @pytest.mark.skipif(os.environ.get("GITHUB_ACTIONS") == "true", reason="Skip on GitHub Actions")
     @unittest.mock.patch('idmtools.core.platform_factory.user_logger')
     @unittest.mock.patch('idmtools.core.platform_factory.logger')
     @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
