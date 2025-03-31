@@ -475,7 +475,6 @@ class TestPythonExperiment(ITestWithPersistence):
         e.add_assets(copy.deepcopy(new_ac.assets))
         for asset in new_ac:
             self.assertIn(asset, e.assets)
-        e.assets.add_assets(AssetCollection.from_id(self.ac_id, platform=self.platform, as_copy=True))
         wait_on_experiment_and_check_all_sim_status(self, e, self.platform)
         exp_id = e.uid
         # don't validate stdout since we it isn't the typical out since we use different parameters
