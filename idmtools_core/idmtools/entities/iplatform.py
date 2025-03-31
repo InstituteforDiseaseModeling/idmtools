@@ -635,6 +635,8 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         Returns: dict with key/value: file_name/file_content
         """
+        if item_id is None or item_id == "":
+            raise ValueError("item_id cannot be None or empty")
         idm_item = self.get_item(item_id, item_type, raw=False)
         return self.get_files(idm_item, files, output)
 

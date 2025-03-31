@@ -261,7 +261,7 @@ class TestAssetizeOutput(unittest.TestCase):
         def rename_func(filename):
             return filename.replace("Assets/", "")
 
-        ao = AssetizeOutput(name=self.case_name, related_experiments=['79c8b289-8c48-ee11-92fb-f0921c167864'], file_patterns=["**/*.py"], verbose=True, include_assets=True, filename_format_function=rename_func)
+        ao = AssetizeOutput(name=self.case_name, related_experiments=['4935a424-500e-f011-930e-f0921c167864'], file_patterns=["**/*.py"], verbose=True, include_assets=True, filename_format_function=rename_func)
         ac = ao.run(wait_until_done=True, platform=self.platform)
 
         self.assertTrue(ao.succeeded)
