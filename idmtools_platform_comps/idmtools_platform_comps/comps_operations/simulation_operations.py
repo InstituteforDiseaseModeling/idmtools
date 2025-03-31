@@ -59,7 +59,7 @@ def comps_batch_worker(simulations: List[Simulation], interface: 'CompsPlatformS
     Returns:
         List of Comps Simulations
     """
-    global COMPS_EXPERIMENT_BATCH_COMMISSION_LOCK, COMPS_EXPERIMENT_BATCH_COMMISSION_TIMESTAMP
+    global COMPS_EXPERIMENT_BATCH_COMMISSION_LOCK, COMPS_EXPERIMENT_BATCH_COMMISSION_TIMESTAMP  # noqa: F824
     if logger.isEnabledFor(DEBUG):
         logger.debug(f'Converting {len(simulations)} to COMPS')
     created_simulations = []
