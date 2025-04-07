@@ -60,5 +60,5 @@ setup(
             'idmtools-slurm-bridge = idmtools_slurm_utils.singularity_bridge:main',
         ],
     },
-    version='2.1.0'
+    version='2.1.0+nightly'
 )
