@@ -19,7 +19,7 @@ for file_prefix in ['', 'dev_', 'build_']:
 # Conditional dependency based on Python version
 conditional_requirements = ['importlib_metadata; python_version < "3.8"']
 
-version = '2.1.0'
+version = '2.1.0+nightly'
 
 extras = {
     'test': extra_require_files['build'] + extra_require_files['dev'],
