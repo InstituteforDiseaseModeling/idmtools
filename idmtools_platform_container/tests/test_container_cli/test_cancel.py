@@ -1,5 +1,6 @@
 import os
 import sys
+from time import sleep
 import unittest
 from unittest.mock import patch
 import pytest
@@ -21,6 +22,7 @@ class TestContainerPlatformCancelCli(TestContainerPlatformCliBase):
         task = CommandTask(command=command)
         experiment = Experiment.from_task(task, name="run_command")
         experiment.run(wait_until_done=False)
+        sleep(1)
         # test cancel with experiment id
         result = self.runner.invoke(container_cli.container, ['cancel', experiment.id])
         self.assertEqual(result.exit_code, 0)
@@ -33,6 +35,7 @@ class TestContainerPlatformCancelCli(TestContainerPlatformCliBase):
         task.common_assets.add_asset(os.path.join(script_dir, "..", "inputs", "sleep.py"))
         experiment = Experiment.from_task(task, name="run_command")
         experiment.run(wait_until_done=False)
+        sleep(1)
         # test cancel with simulation id
         result = self.runner.invoke(container_cli.container, ['cancel', experiment.simulations[0].id])
         self.assertEqual(result.exit_code, 0)
@@ -44,6 +47,7 @@ class TestContainerPlatformCancelCli(TestContainerPlatformCliBase):
         task = CommandTask(command=command)
         experiment = Experiment.from_task(task, name="run_command")
         experiment.run(wait_until_done=False)
+        sleep(1)
         result = self.runner.invoke(container_cli.container, ['jobs'])
         self.assertEqual(result.exit_code, 0)
         actual_table = get_actual_rich_table_values(mock_console)
@@ -59,6 +63,7 @@ class TestContainerPlatformCancelCli(TestContainerPlatformCliBase):
         task = CommandTask(command=command)
         experiment = Experiment.from_task(task, name="run_command")
         experiment.run(wait_until_done=False)
+        sleep(1)
         result = self.runner.invoke(container_cli.container, ['jobs'])
         self.assertEqual(result.exit_code, 0)
         actual_table = get_actual_rich_table_values(mock_console)

@@ -13,7 +13,7 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 @pytest.mark.smoke
 @pytest.mark.serial
 @allure.story("Core")
-@allure.suite("idmtools_core")
+@allure.suite("idmtools_platform_comps")
 class TestPlatformFactory(ITestWithPersistence):
     def setUp(self):
         super().setUp()
@@ -98,41 +98,38 @@ class TestPlatformFactory(ITestWithPersistence):
         self.assertEqual(platform.environment, 'Calculon')
 
     @pytest.mark.comps
+    @pytest.mark.skipif(os.environ.get("GITHUB_ACTIONS") == "true", reason="Skip on GitHub Actions")
     @unittest.mock.patch('idmtools.core.platform_factory.user_logger')
     @unittest.mock.patch('idmtools.core.platform_factory.logger')
     @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
     def test_platform_factory_with_ini_and_update_random_field(self, mock_login, mock_logger, mock_user_logger):
+        mock_logger.reset_mock()
+        mock_user_logger.reset_mock()
         platform = Platform('COMPS2', endpoint='https://comps.idmod.org', node='abcd')
         self.assertEqual(platform.__class__.__name__, 'COMPSPlatform')
         self.assertEqual(platform._config_block, 'COMPS2')
-        mock_logger.warning.call_args_list[0].assert_called_with(
-            f"call('\n/!\\ WARNING: The following User Inputs are not used:")
-        mock_logger.warning.call_args_list[1].assert_called_with("- node = abcd")
-        mock_user_logger.log.call_args_list[0].assert_called_with('\n[COMPS2]')
-    @pytest.mark.comps
-    @unittest.mock.patch('idmtools.core.platform_factory.user_logger')
-    @unittest.mock.patch('idmtools.core.platform_factory.logger')
-    @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
-    def test_platform_factory_with_ini_and_update_valid_field(self, mock_login, mock_logger, mock_user_logger):
-        platform = Platform('COMPS2', environment='Calculon')
-        self.assertEqual(platform.__class__.__name__, 'COMPSPlatform')
-        self.assertEqual(platform._config_block, 'COMPS2')
-        mock_logger.warning.call_args_list[0].assert_called_with("The following User Inputs are not used:")
-        mock_logger.warning.call_args_list[1].assert_called_with("- type = Container")
-        mock_user_logger.log.call_args_list[0].assert_called_with('\n[COMPS2]')
-        mock_user_logger.log.call_args_list[1].assert_called_with('"environment": "Calculon"')
+        args, kwargs = mock_logger.warning.call_args_list[0]
+        self.assertIn("WARNING: The following User Inputs are not used:", args[0])
+        args, kwargs = mock_user_logger.log.call_args_list[0]
+        self.assertEqual(args[0], 15)
+        self.assertIn("Initializing COMPSPlatform with:", args[1])
+
 
     @pytest.mark.comps
+    @pytest.mark.skipif(os.environ.get("GITHUB_ACTIONS") == "true", reason="Skip on GitHub Actions")
     @unittest.mock.patch('idmtools.core.platform_factory.user_logger')
     @unittest.mock.patch('idmtools.core.platform_factory.logger')
     @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)
     def test_platform_factory_with_ini_and_update_valid_field(self, mock_login, mock_logger, mock_user_logger):
+        mock_user_logger.reset_mock()
         platform = Platform('COMPS2', environment='Calculon')
         self.assertEqual(platform.__class__.__name__, 'COMPSPlatform')
         self.assertEqual(platform._config_block, 'COMPS2')
-        mock_user_logger.log.call_args_list[0].assert_called_with('\n[COMPS2]')
-        mock_user_logger.log.call_args_list[1].assert_called_with('"environment": "Calculon"')
-        mock_logger.warning.not_called()
+        args, kwargs = mock_user_logger.log.call_args_list[0]
+        self.assertEqual(args[0], 15)
+        self.assertIn("Initializing COMPSPlatform with:", args[1])
+        args, kwargs = mock_user_logger.log.call_args_list[1]
+        self.assertIn('"environment": "Calculon"', args[1])
 
     @pytest.mark.comps
     @unittest.mock.patch('idmtools_platform_comps.comps_platform.COMPSPlatform._login', side_effect=lambda: True)

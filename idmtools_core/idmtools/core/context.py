@@ -27,7 +27,7 @@ def set_current_platform(platform: 'IPlatform'):
     Returns:
         None
     """
-    global CURRENT_PLATFORM, current_platform_stack
+    global CURRENT_PLATFORM, current_platform_stack  # noqa: F824
     if CURRENT_PLATFORM and CURRENT_PLATFORM != platform and platform not in current_platform_stack:
         current_platform_stack.append(CURRENT_PLATFORM)
     CURRENT_PLATFORM = platform
@@ -40,7 +40,7 @@ def remove_current_platform():
     Returns:
         None
     """
-    global CURRENT_PLATFORM, current_platform_stack
+    global CURRENT_PLATFORM, current_platform_stack  # noqa: F824
     old_current_platform = CURRENT_PLATFORM
     if len(current_platform_stack):
         new_platform = current_platform_stack.pop()
@@ -54,7 +54,7 @@ def clear_context():
     """
     Clear all platforms from context.
     """
-    global CURRENT_PLATFORM, current_platform_stack
+    global CURRENT_PLATFORM, current_platform_stack  # noqa: F824
     old_current_platform = CURRENT_PLATFORM
     CURRENT_PLATFORM = None
     current_platform_stack.clear()

@@ -7,6 +7,8 @@ from docker.models.containers import Container
 from unittest.mock import patch, MagicMock
 import docker
 from docker.errors import NotFound, APIError
+
+from idmtools.core import ItemType
 from idmtools_platform_container.container_operations.docker_operations import stop_container, stop_all_containers, \
     validate_container_running, \
     get_container, pull_docker_image, is_docker_daemon_running, check_local_image, find_container_by_image, \
@@ -702,7 +704,7 @@ class TestDockerOperations(unittest.TestCase):
         mock_container = MagicMock(spec=Container, short_id="container_id")
         with self.subTest("test_list_running_jobs_success"):
             # Mock subprocess.run to simulate docker command output
-            mock_output = "PID  PPID  PGID CMD\n1234 5678 1234 01:23 EXPERIMENT:exp_id batch.sh\n2345 6789 2345 01:24 SIMULATION:sim_id"
+            mock_output = "PID  PPID  PGID ETIME CMD\n1234 5678 1234 01:23 EXPERIMENT:exp_id batch.sh\n2345 6789 2345 01:24 SIMULATION:sim_id"
             mock_run.return_value = MagicMock(returncode=0, stdout=mock_output)
             result = list_running_jobs("123")
             self.assertEqual(len(result), 2)
@@ -711,7 +713,7 @@ class TestDockerOperations(unittest.TestCase):
             self.assertEqual(result[1].item_id, "sim_id")
         with self.subTest("test_list_running_jobs_no_jobs"):
             # Mock subprocess.run to simulate no jobs running
-            mock_run.return_value = MagicMock(returncode=0, stdout="")
+            mock_run.return_value = MagicMock(returncode=1, stdout="")
             result = list_running_jobs(mock_container.short_id)
             self.assertEqual(len(result), 0)    # No jobs running
         with self.subTest("test_list_running_jobs_failure"):
@@ -743,21 +745,24 @@ class TestDockerOperations(unittest.TestCase):
     def test_find_running_job(self, mock_user_logger, mock_list_running_jobs, mock_get_working_containers,
                                                 mock_get_job):
         with self.subTest("test_find_running_job_with_container_id"):
-            mock_job = Job(container_id='container1', process_line='1234 5678 1234 00:55 EXPERIMENT:exp_id')
+            mock_job = Job(item_id='exp_id', item_type=ItemType.EXPERIMENT, job_id=1234, group_pid=5678, parent_pid=6666,
+                container_id="container1", elapsed="00:55")
             mock_list_running_jobs.return_value = [mock_job]
             result = find_running_job(item_id='exp_id', container_id='container1')
             self.assertIsNotNone(result)
             self.assertEqual(result.item_id, 'exp_id')
         with self.subTest("test_find_running_job_without_container_id"):
             mock_get_job.return_value = {'CONTAINER': 'container1'}
-            mock_job = Job(container_id='container1', process_line='1234 5678 1234 00:55 EXPERIMENT:exp_id')
+            mock_job = Job(item_id='exp_id1', item_type=ItemType.EXPERIMENT, job_id=1234, group_pid=5678, parent_pid=6666,
+                container_id="container1", elapsed="00:55")
             mock_list_running_jobs.return_value = [mock_job]
-            result = find_running_job(item_id='exp_id')
+            result = find_running_job(item_id='exp_id1')
             self.assertIsNotNone(result)
-            self.assertEqual(result.item_id, 'exp_id')
+            self.assertEqual(result.item_id, 'exp_id1')
         with self.subTest("test_find_running_job_with_job_id"):
             mock_container1 = MagicMock(spec=Container, short_id="container_id1")
-            mock_job = Job(container_id=mock_container1.short_id, process_line='1234 5678 1234 00:55 EXPERIMENT:exp_id')
+            mock_job = Job(item_id='exp_id2', item_type=ItemType.EXPERIMENT, job_id=1234, group_pid=5678,
+                           parent_pid=6666, container_id=mock_container1.short_id, elapsed="00:55")
             mock_job.job_id = "123"
 
             def side_effect(item_id):
@@ -770,12 +775,13 @@ class TestDockerOperations(unittest.TestCase):
             mock_get_working_containers.return_value = [mock_container1]
             result = find_running_job(item_id="123")
             self.assertIsNotNone(result)
-            self.assertEqual(result.item_id, 'exp_id')
+            self.assertEqual(result.item_id, 'exp_id2')
             self.assertEqual(result.job_id, '123')
         with self.subTest("test_find_running_job_with_job_id_match_multiple_containers"):
             mock_container1 = MagicMock(spec=Container, short_id="container_id1")
             mock_container2 = MagicMock(spec=Container, short_id="container_id2")
-            mock_job = Job(container_id=mock_container1.short_id, process_line='1234 5678 1234 00:55 EXPERIMENT:exp_id')
+            mock_job = Job(item_id='exp_id2', item_type=ItemType.EXPERIMENT, job_id=1234, group_pid=5678,
+                           parent_pid=6666, container_id=mock_container1.short_id, elapsed="00:55")
             mock_job.job_id = "123"
             def side_effect(item_id):
                 if not is_valid_uuid(item_id):
@@ -792,7 +798,8 @@ class TestDockerOperations(unittest.TestCase):
             mock_container1 = MagicMock(spec=Container, short_id="container_id1")
             mock_container2 = MagicMock(spec=Container, short_id="container_id2")
             mock_get_job.return_value = None
-            mock_job = Job(container_id='container_id1', process_line='1234 5678 1234 00:55 SIMULATION:sim_id')
+            mock_job = Job(item_id='sim_id', item_type=ItemType.SIMULATION, job_id=1234, group_pid=5678,
+                           parent_pid=6666, container_id='container_id1', elapsed="00:55")
             mock_get_working_containers.return_value = [mock_container1]
             mock_list_running_jobs.return_value = [mock_job]
             result = find_running_job(item_id='sim_id')

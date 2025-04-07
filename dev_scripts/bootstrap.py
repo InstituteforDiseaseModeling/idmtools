@@ -100,7 +100,7 @@ def process_output(output_line: str):
         logger.debug("".join(ch for ch in output_line if unicodedata.category(ch)[0] != "C"))
 
 
-def install_dev_packages(pip_url):
+def install_dev_packages(pip_url, extra_index_url):
     """
     Install the development packages.
 
@@ -118,19 +118,21 @@ def install_dev_packages(pip_url):
         extras_str = f"[{','.join(extras)}]" if extras else ''
         logger.info(f'Installing {package} with extras: {extras_str if extras_str else "None"} from {base_directory}')
         try:
-            for line in execute(["pip3", "install", "-e", f".{extras_str}", f"--extra-index-url={pip_url}"],
+            for line in execute(["pip3", "install", "-e", f".{extras_str}", f"--index-url={pip_url}",
+                                 f"--extra-index-url={extra_index_url}"],
                                 cwd=join(base_directory, package)):
                 process_output(line)
         except subprocess.CalledProcessError as e:
             logger.critical(f'{package} installed failed using {e.cmd} did not succeed')
             result = e.returncode
             logger.debug(f'Return Code: {result}')
-    for line in execute(["pip3", "install", "-r", "requirements.txt", f"--extra-index-url={pip_url}"],
+    for line in execute(["pip3", "install", "-r", "requirements.txt", f"--index-url={pip_url}",
+                         f"--extra-index-url={extra_index_url}"],
                         cwd=join(base_directory, 'docs')):
         process_output(line)
 
 
-def install_base_environment(pip_url):
+def install_base_environment(pip_url, extra_index_url):
     """
     Installs the base packages needed for development environments.
 
@@ -141,13 +143,14 @@ def install_base_environment(pip_url):
     Lastly, we create an idmtools ini in example for developers
     """
     # install wheel first to benefit from binaries
-    for line in execute(["pip3", "install", "wheel", f"--extra-index-url={pip_url}"]):
+    for line in execute(["pip3", "install", "wheel", f"--index-url={pip_url}", f"--extra-index-url={extra_index_url}"]):
         process_output(line)
 
     for line in execute(["pip3", "uninstall", "-y", "py-make"], ignore_error=True):
         process_output(line)
 
-    for line in execute(["pip3", "install", "idm-buildtools~=1.0.1", f"--index-url={pip_url}"]):
+    for line in execute(["pip3", "install", "idm-buildtools~=1.0.1", f"--index-url={pip_url}",
+                         f"--extra-index-url={extra_index_url}"]):
         process_output(line)
 
     dev_idmtools_ini = join(base_directory, "examples", "idmtools.ini")
@@ -160,6 +163,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Bootstrap the development environment")
     parser.add_argument("--index-url", default='https://packages.idmod.org/api/pypi/pypi-production/simple',
                         help="Pip url to install dependencies from")
+    parser.add_argument("--extra-index-url", default='https://pypi.org/simple',
+                        help="Pip url to install dependencies from pypi")
     parser.add_argument("--verbose", default=False, action='store_true')
 
     args = parser.parse_args()
@@ -185,5 +190,5 @@ if __name__ == "__main__":
         console_handler.setLevel(console_log_level)
         logger.addHandler(console_handler)
 
-    install_base_environment(args.index_url)
-    sys.exit(install_dev_packages(args.index_url))
+    install_base_environment(args.index_url, args.extra_index_url)
+    sys.exit(install_dev_packages(args.index_url, args.extra_index_url))
