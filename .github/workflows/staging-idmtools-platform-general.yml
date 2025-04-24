@@ -8,6 +8,7 @@ on:
       # only run this on
       - dev
       - 'release**'
+      - 'fix_2457**'
     paths:
       - 'idmtools_platform_general/**'
 
