@@ -285,4 +285,3 @@ class FilePlatform(IPlatform):
             str
         """
         return self._file_op.entity_display_name(item)
-
