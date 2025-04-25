@@ -126,6 +126,7 @@ class SlurmPlatform(FilePlatform):
     _slurm_op: SlurmOperations = field(**op_defaults, repr=False, init=False)
 
     def __post_init__(self):
+        super().__post_init__()
         if isinstance(self.mode, str):
             if self.mode.upper() not in [mode.value.upper() for mode in SlurmOperationalMode]:
                 raise ValueError(
@@ -152,7 +153,6 @@ class SlurmPlatform(FilePlatform):
         if self.mpi_type.lower() not in {'pmi2', 'pmix', 'mpirun'}:
             raise ValueError(f"Invalid mpi_type '{self.mpi_type}'. Allowed values are 'pmi2', 'pmix', or 'mpirun'.")
 
-        super().__post_init__()
         self._object_cache_expiration = 600
 
         # check if run script as a slurm job

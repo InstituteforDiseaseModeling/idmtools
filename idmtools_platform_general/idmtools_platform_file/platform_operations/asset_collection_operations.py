@@ -101,7 +101,6 @@ class FilePlatformAssetCollectionOperations(IPlatformAssetCollectionOperations):
             raise NotImplementedError(
                 f"get_assets() for items of type {type(simulation)} is not supported on FilePlatform.")
 
-
     def list_assets(self, item: Union[Experiment, Simulation], exclude: List[str] = None, **kwargs) -> List[Asset]:
         """
         List assets for Experiment/Simulation.

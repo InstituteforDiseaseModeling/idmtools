@@ -22,6 +22,7 @@ class SlurmPlatformSuiteOperations(FilePlatformSuiteOperations):
     Provides Suite operation to the SlurmPlatform.
     """
     platform: 'SlurmPlatform'  # noqa F821
+    #platform_type: Type = field(default=SlurmSuite)
 
     def platform_cancel(self, suite_id: str, force: bool = False) -> None:
         """
