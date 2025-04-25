@@ -11,12 +11,12 @@ from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
+from idmtools_platform_file.platform_operations.utils import FileExperiment, FileSimulation, add_dummy_suite
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.decorators import linux_only
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 from idmtools.entities.templated_simulation import TemplatedSimulations
-from idmtools_platform_slurm.platform_operations.utils import add_dummy_suite, SlurmExperiment, SlurmSimulation
 from idmtools.assets.asset import Asset
 
 setA = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="a")
@@ -56,7 +56,7 @@ class TestSlurmOperations(ITestWithPersistence):
 
         # Test the raw retrieval
         slurm_experiment = self.platform.get_item(self.exp.uid, ItemType.EXPERIMENT, raw=True)
-        self.assertIsInstance(slurm_experiment, SlurmExperiment)
+        self.assertIsInstance(slurm_experiment, FileExperiment)
         self.assertEqual(str(self.exp.uid), slurm_experiment.uid)
         self.assertEqual(self.exp.name, slurm_experiment.name)
         self.assertEqual({k: (v or None) for k, v in self.exp.tags.items()}, slurm_experiment.tags)
@@ -76,8 +76,8 @@ class TestSlurmOperations(ITestWithPersistence):
         self.assertEqual({k: v for k, v in base.tags.items()}, sim.tags)
 
         # Test the raw retrieval
-        slurm_simulation: SlurmSimulation = self.platform.get_item(base.uid, ItemType.SIMULATION, raw=True)
-        self.assertIsInstance(slurm_simulation, SlurmSimulation)
+        slurm_simulation = self.platform.get_item(base.uid, ItemType.SIMULATION, raw=True)
+        self.assertIsInstance(slurm_simulation, FileSimulation)
         self.assertEqual(str(base.uid), slurm_simulation.uid)
         self.assertEqual(self.case_name, slurm_simulation.name)
         self.assertEqual({k: v for k, v in base.tags.items()}, slurm_simulation.tags)
@@ -117,13 +117,13 @@ class TestSlurmOperations(ITestWithPersistence):
             children = self.platform.get_children(self.exp.uid, ItemType.EXPERIMENT, raw=True)
             self.assertEqual(len(self.exp.simulations), len(children))
             for child in children:
-                self.assertTrue(isinstance(child, SlurmSimulation))
+                self.assertTrue(isinstance(child, FileSimulation))
                 self.assertTrue(isinstance(child.uid, str))
         with self.subTest('test_get_children_for_suite_raw_true'):
             children = self.platform.get_children(self.suite.uid, ItemType.SUITE, raw=True)
             self.assertEqual(len(children), 1)
             for child in children:
-                self.assertTrue(isinstance(child, SlurmExperiment))
+                self.assertTrue(isinstance(child, FileExperiment))
                 self.assertTrue(isinstance(child.uid, str))
 
     def test_experiment_list_assets(self):

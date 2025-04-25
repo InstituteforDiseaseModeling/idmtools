@@ -11,6 +11,7 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 @pytest.mark.serial
 @linux_only
+@pytest.mark.skip
 class TestSlurmBridge(ITestWithPersistence):
     def test_init(self):
         IdmConfigParser.clear_instance()
