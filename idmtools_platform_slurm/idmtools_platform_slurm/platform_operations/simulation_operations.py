@@ -39,7 +39,7 @@ class SlurmPlatformSimulationOperations(FilePlatformSimulationOperations):
                 logger.debug(f"Slurm job for simulation: {sim_id} is not available!")
                 return
             else:
-                result = self.platform._slurm_op.cancel_job(job_id)
+                result = self.platform._op_client.cancel_job(job_id)
                 user_logger.info(f"Cancel Simulation: {sim_id}: {result}")
                 return result
         else:

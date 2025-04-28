@@ -44,7 +44,7 @@ class SlurmPlatformExperimentOperations(FilePlatformExperimentOperations):
         self.platform._metas.dump(experiment)
         # Commission
         if not dry_run:
-            self.platform._slurm_op.submit_job(experiment, **kwargs)
+            self.platform._op_client.submit_job(experiment, **kwargs)
 
         suite_id = experiment.parent_id or experiment.suite_id
 
@@ -76,7 +76,7 @@ class SlurmPlatformExperimentOperations(FilePlatformExperimentOperations):
         self.platform.mk_directory(experiment, exist_ok=False)
         meta = self.platform._metas.dump(experiment)
         self.platform._assets.dump_assets(experiment)
-        self.platform._slurm_op.create_batch_file(experiment, **kwargs)
+        self.platform._op_client.create_batch_file(experiment, **kwargs)
 
         # Copy file run_simulation.sh
         run_simulation_script = Path(__file__).parent.parent.joinpath('assets/run_simulation.sh')
@@ -124,7 +124,7 @@ class SlurmPlatformExperimentOperations(FilePlatformExperimentOperations):
             if job_id is None:
                 logger.debug(f"Slurm job for experiment: {experiment_id} is not available!")
             else:
-                result = self.platform._slurm_op.cancel_job(job_id)
+                result = self.platform._op_client.cancel_job(job_id)
                 user_logger.info(f"Cancel Experiment {experiment_id}: {result}")
         else:
             user_logger.info(f"Experiment {experiment_id} is not running, no cancel needed...")

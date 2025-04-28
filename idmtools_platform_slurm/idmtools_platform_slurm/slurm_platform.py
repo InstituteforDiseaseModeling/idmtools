@@ -123,7 +123,7 @@ class SlurmPlatform(FilePlatform):
     _simulations: SlurmPlatformSimulationOperations = field(**op_defaults, repr=False, init=False)
     _assets: SlurmPlatformAssetCollectionOperations = field(**op_defaults, repr=False, init=False)
     _metas: JSONMetadataOperations = field(**op_defaults, repr=False, init=False)
-    _slurm_op: SlurmOperations = field(**op_defaults, repr=False, init=False)
+    _op_client: SlurmOperations = field(**op_defaults, repr=False, init=False)
 
     def __post_init__(self):
         super().__post_init__()
@@ -165,9 +165,9 @@ class SlurmPlatform(FilePlatform):
             raise NotImplementedError("SSH mode has not been implemented on the Slurm Platform")
         elif self.mode == SlurmOperationalMode.BRIDGED:
             from idmtools_platform_slurm.slurm_operations.bridged_operations import BridgedLocalSlurmOperations
-            self._slurm_op = BridgedLocalSlurmOperations(platform=self)
+            self._op_client = BridgedLocalSlurmOperations(platform=self)
         else:
-            self._slurm_op = SlurmOperations(platform=self)
+            self._op_client = SlurmOperations(platform=self)
 
         self._suites = SlurmPlatformSuiteOperations(platform=self)
         self._experiments = SlurmPlatformExperimentOperations(platform=self)
@@ -207,7 +207,7 @@ class SlurmPlatform(FilePlatform):
         Returns:
             None
         """
-        self._slurm_op.create_batch_file(item, **kwargs)
+        self._op_client.create_batch_file(item, **kwargs)
 
     def get_job_id(self, item_id: str, item_type: ItemType) -> List:
         """
