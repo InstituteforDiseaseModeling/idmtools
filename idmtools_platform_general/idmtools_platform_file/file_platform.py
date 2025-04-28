@@ -35,8 +35,6 @@ class FilePlatform(IPlatform):
     """
     File Platform definition.
     """
-    platform: 'FilePlatform' = field(default=None, repr=False)
-
     job_directory: str = field(default=None, metadata=dict(help="Job Directory"))
     max_job: int = field(default=4, metadata=dict(help="Maximum number of jobs to run concurrently"))
     run_sequence: bool = field(default=True, metadata=dict(help="Run jobs in sequence"))
@@ -57,7 +55,7 @@ class FilePlatform(IPlatform):
     _simulations: FilePlatformSimulationOperations = field(**op_defaults, repr=False, init=False)
     _assets: FilePlatformAssetCollectionOperations = field(**op_defaults, repr=False, init=False)
     _metas: JSONMetadataOperations = field(**op_defaults, repr=False, init=False)
-    _file_op: FileOperations = field(**op_defaults, repr=False, init=False)
+    _op_client: FileOperations = field(**op_defaults, repr=False, init=False)
 
     def __post_init__(self):
         self.__init_interfaces()
@@ -77,7 +75,7 @@ class FilePlatform(IPlatform):
         self._simulations = FilePlatformSimulationOperations(platform=self)
         self._assets = FilePlatformAssetCollectionOperations(platform=self)
         self._metas = JSONMetadataOperations(platform=self)
-        self._file_op = FileOperations(platform=self)
+        self._op_client = FileOperations(platform=self)
 
     def post_setstate(self):
         """
@@ -98,7 +96,7 @@ class FilePlatform(IPlatform):
         Returns:
             None
         """
-        self._file_op.mk_directory(item, dest, exist_ok)
+        self._op_client.mk_directory(item, dest, exist_ok)
 
     def get_directory(self, item: Union[Suite, Experiment, Simulation]) -> Path:
         """
@@ -108,7 +106,7 @@ class FilePlatform(IPlatform):
         Returns:
             item file directory
         """
-        return self._file_op.get_directory(item)
+        return self._op_client.get_directory(item)
 
     def get_directory_by_id(self, item_id: str, item_type: ItemType) -> Path:
         """
@@ -119,7 +117,7 @@ class FilePlatform(IPlatform):
         Returns:
             item file directory
         """
-        return self._file_op.get_directory_by_id(item_id, item_type)
+        return self._op_client.get_directory_by_id(item_id, item_type)
 
     def create_batch_file(self, item: Union[Experiment, Simulation], **kwargs) -> None:
         """
@@ -130,7 +128,7 @@ class FilePlatform(IPlatform):
         Returns:
             None
         """
-        self._file_op.create_batch_file(item, **kwargs)
+        self._op_client.create_batch_file(item, **kwargs)
 
     @staticmethod
     def update_script_mode(script_path: Union[Path, str], mode: int = 0o777) -> None:
@@ -242,7 +240,7 @@ class FilePlatform(IPlatform):
         Returns:
             None
         """
-        self._file_op.link_file(target, link)
+        self._op_client.link_file(target, link)
 
     def link_dir(self, target: Union[Path, str], link: Union[Path, str]) -> None:
         """
@@ -253,7 +251,7 @@ class FilePlatform(IPlatform):
         Returns:
             None
         """
-        self._file_op.link_dir(target, link)
+        self._op_client.link_dir(target, link)
 
     def make_command_executable(self, simulation: Simulation) -> None:
         """
@@ -263,7 +261,7 @@ class FilePlatform(IPlatform):
         Returns:
             None
         """
-        self._file_op.make_command_executable(simulation)
+        self._op_client.make_command_executable(simulation)
 
     def get_simulation_status(self, sim_id: str, **kwargs) -> EntityStatus:
         """
@@ -274,7 +272,7 @@ class FilePlatform(IPlatform):
         Returns:
             EntityStatus
         """
-        return self._file_op.get_simulation_status(sim_id, **kwargs)
+        return self._op_client.get_simulation_status(sim_id, **kwargs)
 
     def entity_display_name(self, item: Union[Suite, Experiment, Simulation]) -> str:
         """
@@ -284,4 +282,4 @@ class FilePlatform(IPlatform):
         Returns:
             str
         """
-        return self._file_op.entity_display_name(item)
+        return self._op_client.entity_display_name(item)
