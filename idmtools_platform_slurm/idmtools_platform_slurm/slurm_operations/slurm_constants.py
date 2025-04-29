@@ -34,4 +34,3 @@ SLURM_MAPS = {
 class SlurmOperationalMode(Enum):
     SSH = 'ssh'
     LOCAL = 'local'
-    BRIDGED = 'bridged'
