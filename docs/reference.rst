@@ -71,5 +71,4 @@ API Documentation
    api/idmtools_models_index
    api/idmtools_platform_comps_index
    api/idmtools_platform_slurm_index
-   api/idmtools_slurm_utils_index
    api/idmtools_platform_container_index

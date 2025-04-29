@@ -164,7 +164,6 @@
 'idmtools_platform_slurm.platform_operations.utils.rst' './api/idmtools_platform_slurm.platform_operations.utils.rst'
 'idmtools_platform_slurm.plugin_info.rst' './api/idmtools_platform_slurm.plugin_info.rst'
 'idmtools_platform_slurm.rst' './api/idmtools_platform_slurm.rst'
-'idmtools_platform_slurm.slurm_operations.bridged_operations.rst' './api/idmtools_platform_slurm.slurm_operations.bridged_operations.rst'
 'idmtools_platform_slurm.slurm_operations.local_operations.rst' './api/idmtools_platform_slurm.slurm_operations.local_operations.rst'
 'idmtools_platform_slurm.slurm_operations.operations_interface.rst' './api/idmtools_platform_slurm.slurm_operations.operations_interface.rst'
 'idmtools_platform_slurm.slurm_operations.remote_operations.rst' './api/idmtools_platform_slurm.slurm_operations.remote_operations.rst'
