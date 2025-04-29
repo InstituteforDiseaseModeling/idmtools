@@ -72,6 +72,18 @@ class FilePlatformAssetCollectionOperations(IPlatformAssetCollectionOperations):
         # Copy common assets to simulation directory
         self.platform.link_dir(common_asset_dir, link_dir)
 
+    @staticmethod
+    def _get_assets_from_dir(sim_dir: Path, files: List[str]) -> Dict[str, bytearray]:
+        ret = {}
+        for file in files:
+            asset_file = sim_dir / file
+            if asset_file.exists():
+                asset = Asset(absolute_path=asset_file.absolute())
+                ret[file] = bytearray(asset.bytes)
+            else:
+                raise RuntimeError(f"Couldn't find asset for path '{file}'.")
+        return ret
+
     def get_assets(self, simulation: Union[Simulation, FileSimulation], files: List[str], **kwargs) -> Dict[str, bytearray]:
         """
         Get assets for simulation.
@@ -82,20 +94,12 @@ class FilePlatformAssetCollectionOperations(IPlatformAssetCollectionOperations):
         Returns:
             Dict[str, bytearray]
         """
-        ret = dict()
         if isinstance(simulation, (Simulation, FileSimulation)):
             sim_dir = self.platform.get_directory_by_id(simulation.id, ItemType.SIMULATION)
-            for file in files:
-                asset_file = Path(sim_dir, file)
-                if asset_file.exists():
-                    asset = Asset(absolute_path=asset_file.absolute())
-                    ret[file] = bytearray(asset.bytes)
-                else:
-                    raise RuntimeError(f"Couldn't find asset for path '{file}'.")
+            return self._get_assets_from_dir(sim_dir, files)
         else:
             raise NotImplementedError(
                 f"get_assets() for items of type {type(simulation)} is not supported on FilePlatform.")
-        return ret
 
     def list_assets(self, item: Union[Experiment, Simulation], exclude: List[str] = None, **kwargs) -> List[Asset]:
         """
