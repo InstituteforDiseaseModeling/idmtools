@@ -56,8 +56,8 @@ Include the following in your patch:
    `python -m venv idmtools`
    On Unix(Mac/Linux) you can use venv or virtualenv
 3) Activate the virtualenv
-4) Run `docker login docker-staging.packages.idmod.org`
-5) Then run `python dev_scripts/bootstrap.py`. This will install all the tools. A note about bootstrap.py. It adds a configuration to the examples folder which points all examples to staging environments. This is so when in dev/test mode, examples can be ran in a non-production environments.
+4) Run `docker login docker-staging.packages.idmod.org -u yourusername -p yourpassword`  # you need to have an idm jfrog account. This step is only needed if you are using docker image from/to staging artifactory.
+5) Then run `python dev_scripts/bootstrap.py`. This will install all the tools. A note about bootstrap.py. It adds a configuration to the examples folder which points all examples to staging environments. This is so when in dev/test mode, examples can be run in a non-production environments.
 
 ## Start coding
 
@@ -65,7 +65,7 @@ Include the following in your patch:
 
     ```bash
     $ git fetch origin
-    $ git checkout -b your-branch-name origin/1.1.x
+    $ git checkout -b your-branch-name origin/main
     ```
     If you're submitting a feature addition or change, branch off of the "dev" branch.
 
@@ -92,7 +92,7 @@ After the first install almost everything you need as a developer is part of the
 
 To use the makefiles you can explore the available commands by running `make help`. On Windows, use `pymake help`
 
-Here are a list of common commands
+Here are a list of common commands, (type `pymake help` or `make help` to see the full list)
 
 ```bash
 setup-dev   -   Setup dev environment(assumes you already have a virtualenv)
@@ -105,12 +105,12 @@ test-all    -   Run Tests that require docker and external systems
 coverage    -   Run tests and generate coverage report that is shown in browser
 ```
 
-Some packages have unique build related commands, specifically the local platform. Use `make help` to identify specific commands
+Some packages have unique build related commands, Use `make help` to identify specific commands
 
 ## Run test/linting on code change
 
 There is a utility command to run linting and tests on code changes. It runs within each package directory. For example, changes to
-files in `idmtools_core` will run the `make lint` and `make test-smoke` tests within the idmtools_core directory. The jobs run at most once every 10 seconds. This limits how often the jobs will be executed.
+files in `idmtools_core` will run the `make lint` and `make test-smoke` tests within the idmtools_core directory. 
 
 ## IDE/Runtime Setup
 
@@ -119,32 +119,40 @@ For source completion and indexing, set the package paths in your IDE. In PyChar
 ![Mark Directory as Sources Root](docs/images/mark_directory_as_source.png)
 
 The directories that should be added as source roots are
-- `idmtools/idmtools_core`
 - `idmtools/idmtools_cli`
-- `idmtools/idmtools_platform_local`
-- `idmtools/idmtools_platform_comps`
+- `idmtools/idmtools_core`
 - `idmtools/idmtools_models`
+- `idmtools/idmtools_platform_comps`
+- `idmtools/idmtools_platform_container`
+- `idmtools/idmtools_platform_general`
+- `idmtools/idmtools_platform_slurm`
 - `idmtools/idmtools_test`
 
-## WSL2 on Windows Setup(Experimental)
+## Setting Up WSL2 on Windows for Container platform/Development (Most Windows users should have WSL2 installed already)
 
-1. Enable Windows Features by running the following in a Windows Powershell
+1. Enable WSL (Windows Subsystem for Linux)
    ```powershell
-   dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
-   dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
+   wsl --install
     ```
-2. Restart
-3.
-   a. If you do a Linux Distro installed already through WSL run the following command in a powershell windows
-       ```powershell
-       wsl --set-version <Distro> 2
-       ```
-       You most likely want to run the following command as well to ensure wsl2 is default going forward
-       ```powershell
-       wsl --set-default-version 2
-       ```
-   b. If you do not yet have a copy of linux installed through WSL, see https://docs.microsoft.com/en-us/windows/wsl/install-win10#install-your-linux-distribution-of-choice
-
+2. Set WSL2 as default:
+   ```powershell
+   wsl --set-default-version 2
+   ```
+   This will set WSL2 as the default for all new Linux distributions. If you have an existing distribution, you can convert it to WSL2 by running the following command in a powershell window:
+   ```powershell
+   wsl --set-version <Distro> 2
+   ```
+## Development installation
+1. Install the required packages
+   ```bash
+   make setup-dev
+   Or python dev_scripts/bootstrap.py
+   ```
+   or on Windows
+   ```powershell
+   pymake setup-dev
+   Or python dev_scripts\bootstrap.py
+   ```
 
 ## Troubleshooting the Development Environment
 
@@ -154,7 +162,7 @@ The directories that should be added as source roots are
    beforehand using `docker login docker-staging.packages.idmod.org`
 2. Docker image not found issue
    
-   Rerun `pymake setup-dev` or `make setup-dev` command on unix systems
+   Rerun `pymake setup-dev` on Windows or `make setup-dev` command on unix systems
 3. Dev install get stuck with cmd: `pymake setup-dev` or `python dev_scripts\bootstrap.py`
    
    Sometimes dev install command can get stuck on some packages. This most likely due to users company credential changed
@@ -187,7 +195,7 @@ See the next section for details on `build-docs-server`
 
 ## Reload Documentation on change
 
-You can use the `make build-docs-server` feature to automatically. This runs a local python documentation server running at
+You can use the `make build-docs-server` feature to build doc automatically. This runs a local python documentation server running at
 http://localhost:8000. Any changes you make to the python files or rst files, the documentation will be reloaded in the browser.
 
 ```bash
@@ -197,7 +205,7 @@ make build-docs-server
 # Test
 
 The following section is an overview of test for idmtools. All tests are located under the `tests` folder in each package folder. 
-Test are written to be ran my `py.test`. The test are partially configured through the pytest.ini. Additional test configuration happens
+Test are written to be run my `py.test`. The test are partially configured through the pytest.ini. Additional test configuration happens
 dynamically through the `make test` commands. 
 
 Here are a list of jobs related to test from the makefile.
@@ -219,7 +227,7 @@ test-report         :Launch test report in browser
 test-smoke          :Run our smoke tests
 ```
 
-The jobs can be ran at the root of the project or the within each package.
+The jobs can be run at the root of the project or the within each package.
 
 The root also has additional jobs at the root. Those jobs are
 ```
@@ -236,21 +244,19 @@ test-smoke-allure   :Run smoke tests and enable allure
 
 Allure is a test visualization utility. It can be accessed after running `make test-all-allure` or `make test-smoke-allure` at http://localhost:5050/allure-docker-service/latest-report in the root of the repo.
 
-There is also an html report available after running any tests http://localhost:8001. To view this report, run `make aggregate-html-reports` from the root. There will be multiple html files. Each file represents a specific run of tests for a package. 
+There is also a html report available after running any tests http://localhost:8001. To view this report, run `make aggregate-html-reports` from the root. There will be multiple html files. Each file represents a specific run of tests for a package. 
 Some packages, the ones that have both serial and parallel tests, will have two files. The file generated by serial tests will have the prefix `serial.`. 
 
 There is also a coverage report available. It can only be viewed after running `coverage-smoke` or `coverage` rules. It can then be viewed with `coverage-report`
 
-## Running smoke tests or all tests from Github Actions
+## Running all tests from Github Actions
 
-To run smoke tests from Github Actions when push or pull request, put "Run smoke test!" in your commit message
+To run all tests from Github Actions, go to Actions tab in Github repo and select one of the workflows:
+* run_dev_install_all_tests.yml <-- This will run all tests with dev install on idm staging COMPS environment
+* run_pip_prod_all_tests.yml  <-- This will run all tests with pip install production packages on idm staging COMPS environment
+* run_pip_stage_all_tests.yml  <-- This will run all tests with pip install staging packages on idm staging COMPS environment
 
-To run all tests from Github Actions when push or pull request, put "Run all test!" in your commit message
-
-```bash
-$ git commit -m 'fix bug xxx, ran smoke test, linted'
-$ git push
-```
+Then select Run Workflows dropdown and select the branch you want to run the tests on. This will run all tests in the repo.
 
 ## Running specific tests from the command line
 
@@ -281,10 +287,7 @@ To install idmtools from a specific PR you can use the following script replacin
 ```
 pip install git+https://github.com/InstituteforDiseaseModeling/idmtools.git@refs/pull/123/head#egg="idmtools&subdirectory=idmtools_core"
 pip install git+https://github.com/InstituteforDiseaseModeling/idmtools.git@refs/pull/123/head#egg="idmtools_platform_comps&subdirectory=idmtools_platform_comps"
-pip install git+https://github.com/InstituteforDiseaseModeling/idmtools.git@refs/pull/123/head#egg="idmtools_cli&subdirectory=idmtools_cli"
-pip install git+https://github.com/InstituteforDiseaseModeling/idmtools.git@refs/pull/123/head#egg="idmtools_models&subdirectory=idmtools_models"
-pip install git+https://github.com/InstituteforDiseaseModeling/idmtools.git@refs/pull/123/head#egg="idmtools_platform_local&subdirectory=idmtools_platform_local"
-pip install git+https://github.com/InstituteforDiseaseModeling/idmtools.git@refs/pull/123/head#egg="idmtools_test&subdirectory=idmtools_test"
+... pip install other packages
 ```
 
 To install from a specific branch, see [Installing From Development Branch(or other specific branch)](#installing-from-development-branchor-other-specific-branch)
@@ -298,10 +301,7 @@ To install from the development branch, use the following commands
 ```
 pip install git+https://github.com/InstituteforDiseaseModeling/idmtools.git@dev#egg="idmtools&subdirectory=idmtools_core"
 pip install git+https://github.com/InstituteforDiseaseModeling/idmtools.git@dev#egg="idmtools_platform_comps&subdirectory=idmtools_platform_comps"
-pip install git+https://github.com/InstituteforDiseaseModeling/idmtools.git@dev#egg="idmtools_cli&subdirectory=idmtools_cli"
-pip install git+https://github.com/InstituteforDiseaseModeling/idmtools.git@dev#egg="idmtools_models&subdirectory=idmtools_models"
-pip install git+https://github.com/InstituteforDiseaseModeling/idmtools.git@dev#egg="idmtools_platform_local&subdirectory=idmtools_platform_local"
-pip install git+https://github.com/InstituteforDiseaseModeling/idmtools.git@dev#egg="idmtools_test&subdirectory=idmtools_test"
+... pip install other packages
 ```
 
 To install a different github branch, change the *@dev* in each command to *@<branch name>* where *branch_name* is the name of branch you would like to install from. To install from a PR, see [Installing from a Pull Request](#installing-from-a-pull-request)
