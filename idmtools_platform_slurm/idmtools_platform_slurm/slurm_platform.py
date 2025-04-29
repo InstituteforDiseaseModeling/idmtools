@@ -37,13 +37,6 @@ CONFIG_PARAMETERS = ['ntasks', 'partition', 'nodes', 'mail_type', 'mail_user', '
 @dataclass(repr=False)
 class SlurmPlatform(FilePlatform):
 
-    #: Needed for bridge mode
-    bridged_jobs_directory: str = field(default=Path.home().joinpath(".idmtools").joinpath("singularity-bridge"),
-                                        metadata=dict(help="Bridged Jobs Directory"))
-    bridged_results_directory: str = field(
-        default=Path.home().joinpath(".idmtools").joinpath("singularity-bridge").joinpath("results"),
-        metadata=dict(help="Bridged Results Directory"))
-
     mode: SlurmOperationalMode = field(default=SlurmOperationalMode.LOCAL, metadata=dict(help="Slurm Operational Mode"))
 
     # region: Resources request
