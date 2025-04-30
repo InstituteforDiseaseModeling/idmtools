@@ -129,10 +129,11 @@ class FileOperations(IOperations):
         target.mkdir(parents=True, exist_ok=exist_ok)
 
     @check_symlink_capabilities
-    def link_file(self, target: Union[Path, str], link: Union[Path, str]) -> None:
+    def link_file(self, target: Union[Path, str], link: Union[Path, str], sym_link: bool = True) -> None:
         """
         Link files.
         Args:
+            sym_link: is sym_link? True/False
             target: the source file path
             link: the file path
         Returns:
@@ -140,7 +141,7 @@ class FileOperations(IOperations):
         """
         target = Path(target).absolute()
         link = Path(link).absolute()
-        if self.platform.sym_link:
+        if sym_link:
             # Ensure the source folder exists
             if not target.exists():
                 raise FileNotFoundError(f"Source folder does not exist: {target}")
@@ -165,11 +166,12 @@ class FileOperations(IOperations):
             shutil.copyfile(target, link)
 
     @check_symlink_capabilities
-    def link_dir(self, target: Union[Path, str], link: Union[Path, str]) -> None:
+    def link_dir(self, target: Union[Path, str], link: Union[Path, str], sym_link: bool = True) -> None:
         """
         Link directory/files.
         Args:
-            target: the source folder path.
+            sym_link: is sym_link? True/False
+            target: the source folder path
             link: the folder path
         Returns:
             None
@@ -180,7 +182,7 @@ class FileOperations(IOperations):
         # Validate file path length
         validate_folder_files_path_length(target, link)
 
-        if self.platform.sym_link:
+        if sym_link:
             # Ensure the source folder exists
             if not target.exists():
                 raise FileNotFoundError(f"Source folder does not exist: {target}")

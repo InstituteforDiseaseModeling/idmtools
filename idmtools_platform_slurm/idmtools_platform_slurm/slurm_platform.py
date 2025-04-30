@@ -4,7 +4,7 @@ Here we implement the SlurmPlatform object.
 Copyright 2025, Gates Foundation. All rights reserved.
 """
 import os
-from pathlib import Path
+import subprocess
 from typing import Optional, Any, Dict, List, Union, Literal
 from dataclasses import dataclass, field, fields
 from logging import getLogger
@@ -13,13 +13,11 @@ from idmtools.core import ItemType, TRUTHY_VALUES
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools_platform_file.file_platform import FilePlatform
-from idmtools_platform_file.platform_operations.json_metadata_operations import JSONMetadataOperations
-
+from idmtools_platform_slurm.platform_operations.json_metadata_operations import SlurmJSONMetadataOperations
 from idmtools_platform_slurm.platform_operations.asset_collection_operations import \
     SlurmPlatformAssetCollectionOperations
 from idmtools_platform_slurm.platform_operations.experiment_operations import SlurmPlatformExperimentOperations
 from idmtools_platform_slurm.platform_operations.simulation_operations import SlurmPlatformSimulationOperations
-from idmtools_platform_slurm.slurm_operations.slurm_constants import SlurmOperationalMode
 from idmtools_platform_slurm.platform_operations.suite_operations import SlurmPlatformSuiteOperations
 from idmtools_platform_slurm.platform_operations.utils import get_max_array_size
 from idmtools_platform_slurm.slurm_operations.slurm_operations import SlurmOperations
@@ -36,9 +34,6 @@ CONFIG_PARAMETERS = ['ntasks', 'partition', 'nodes', 'mail_type', 'mail_user', '
 
 @dataclass(repr=False)
 class SlurmPlatform(FilePlatform):
-
-    mode: SlurmOperationalMode = field(default=SlurmOperationalMode.LOCAL, metadata=dict(help="Slurm Operational Mode"))
-
     # region: Resources request
 
     # choose e-mail type
@@ -115,20 +110,11 @@ class SlurmPlatform(FilePlatform):
     _experiments: SlurmPlatformExperimentOperations = field(**op_defaults, repr=False, init=False)
     _simulations: SlurmPlatformSimulationOperations = field(**op_defaults, repr=False, init=False)
     _assets: SlurmPlatformAssetCollectionOperations = field(**op_defaults, repr=False, init=False)
-    _metas: JSONMetadataOperations = field(**op_defaults, repr=False, init=False)
+    _metas: SlurmJSONMetadataOperations = field(**op_defaults, repr=False, init=False)
     _op_client: SlurmOperations = field(**op_defaults, repr=False, init=False)
 
     def __post_init__(self):
         super().__post_init__()
-        if isinstance(self.mode, str):
-            if self.mode.upper() not in [mode.value.upper() for mode in SlurmOperationalMode]:
-                raise ValueError(
-                    f"{self.mode} is not a value mode. Please select one of the following {', '.join([mode.value for mode in SlurmOperationalMode])}")
-            self.mode = SlurmOperationalMode[self.mode.upper()]
-
-        if not isinstance(self.mode, SlurmOperationalMode):
-            raise ValueError(f"{self.mode} is not a valid mode. Please use enum {SlurmOperationalMode}")
-
         self.__init_interfaces()
         self.supported_types = {ItemType.SUITE, ItemType.EXPERIMENT, ItemType.SIMULATION}
         if self.job_directory is None:
@@ -154,17 +140,12 @@ class SlurmPlatform(FilePlatform):
             exit(0)  # finish the current workflow
 
     def __init_interfaces(self):
-        if self.mode == SlurmOperationalMode.SSH:
-            raise NotImplementedError("SSH mode has not been implemented on the Slurm Platform")
-        else:
-            self._op_client = SlurmOperations(platform=self)
-
+        self._op_client = SlurmOperations(platform=self)
         self._suites = SlurmPlatformSuiteOperations(platform=self)
         self._experiments = SlurmPlatformExperimentOperations(platform=self)
         self._simulations = SlurmPlatformSimulationOperations(platform=self)
         self._assets = SlurmPlatformAssetCollectionOperations(platform=self)
-        self._metas = JSONMetadataOperations(platform=self)
-
+        self._metas = SlurmJSONMetadataOperations(platform=self)
 
     @property
     def slurm_fields(self):
@@ -186,7 +167,6 @@ class SlurmPlatform(FilePlatform):
         config_dict = {k: getattr(self, k) for k in self.slurm_fields}
         config_dict.update(kwargs)
         return config_dict
-
 
     def create_batch_file(self, item: Union[Experiment, Simulation], **kwargs) -> None:
         """
@@ -220,3 +200,19 @@ class SlurmPlatform(FilePlatform):
         job_id = open(job_id_file).read().strip()
         return job_id.split('\n')
 
+    def submit_job(self, item: Union[Experiment, Simulation], **kwargs) -> None:
+        """
+        Submit a Slurm job.
+        Args:
+            item: idmtools Experiment or Simulation
+            kwargs: keyword arguments used to expand functionality
+        Returns:
+            None
+        """
+        if isinstance(item, Experiment):
+            working_directory = self.get_directory(item)
+            subprocess.run(['bash', 'batch.sh'], stdout=subprocess.PIPE, cwd=str(working_directory))
+        elif isinstance(item, Simulation):
+            pass
+        else:
+            raise NotImplementedError(f"Submit job is not implemented on SlurmPlatform.")

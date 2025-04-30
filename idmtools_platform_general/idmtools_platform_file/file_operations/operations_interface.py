@@ -45,12 +45,12 @@ class IOperations(ABC):
         pass
 
     @abstractmethod
-    def link_file(self, target: Union[Path, str], link: Union[Path, str]) -> None:
+    def link_file(self, target: Union[Path, str], link: Union[Path, str], sym_link: bool = True) -> None:
         """Link files with symlink."""
         pass
 
     @abstractmethod
-    def link_dir(self, target: Union[Path, str], link: Union[Path, str]) -> None:
+    def link_dir(self, target: Union[Path, str], link: Union[Path, str], sym_link: bool = True) -> None:
         """Link directory with symlink."""
         pass
 

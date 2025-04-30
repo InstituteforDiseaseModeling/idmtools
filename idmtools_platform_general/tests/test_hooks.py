@@ -26,7 +26,7 @@ class TestFilePlatform(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         self.job_directory = "DEST"
-        self.platform = Platform('FILE', job_directory=self.job_directory, sym_link=False)
+        self.platform = Platform('FILE', job_directory=self.job_directory)
 
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
     def test_assetcollection_hook(self, mock_stdout):
