@@ -3,8 +3,6 @@ Here we implement the SlurmPlatform operations constants.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
-from enum import Enum
-
 from idmtools.core import EntityStatus
 
 SLURM_STATES = dict(
@@ -30,7 +28,3 @@ SLURM_MAPS = {
     "None": EntityStatus.CREATED
 }
 
-
-class SlurmOperationalMode(Enum):
-    SSH = 'ssh'
-    LOCAL = 'local'
