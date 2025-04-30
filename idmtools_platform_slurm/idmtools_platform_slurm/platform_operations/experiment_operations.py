@@ -38,21 +38,10 @@ class SlurmPlatformExperimentOperations(FilePlatformExperimentOperations):
             None
         """
         # Ensure parent
-        experiment.parent.add_experiment(experiment)
-        self.platform._metas.dump(experiment.parent)
-        # Generate/update metadata
-        self.platform._metas.dump(experiment)
+        super().platform_run_item(experiment, **kwargs)
         # Commission
         if not dry_run:
-            self.platform._op_client.submit_job(experiment, **kwargs)
-
-        suite_id = experiment.parent_id or experiment.suite_id
-
-        # user_logger.info(f'job_id: {slurm_job_id}')
-        user_logger.info(f'job_directory: {Path(self.platform.job_directory).resolve()}')
-        user_logger.info(f'suite: {str(suite_id)}')
-        user_logger.info(f'experiment: {experiment.id}')
-        user_logger.info(f"\nExperiment Directory: \n{self.platform.get_directory(experiment)}")
+            self.platform.submit_job(experiment, **kwargs)
 
     def platform_create(self, experiment: Experiment, **kwargs) -> FileExperiment:
         """
@@ -73,10 +62,10 @@ class SlurmPlatformExperimentOperations(FilePlatformExperimentOperations):
             experiment.parent = suite
 
         # Generate Suite/Experiment/Simulation folder structure
-        self.platform.mk_directory(experiment, exist_ok=False)
+        self.platform.mk_directory(experiment, exist_ok=True)
         meta = self.platform._metas.dump(experiment)
         self.platform._assets.dump_assets(experiment)
-        self.platform._op_client.create_batch_file(experiment, **kwargs)
+        self.platform.create_batch_file(experiment, **kwargs)
 
         # Copy file run_simulation.sh
         run_simulation_script = Path(__file__).parent.parent.joinpath('assets/run_simulation.sh')
@@ -88,6 +77,7 @@ class SlurmPlatformExperimentOperations(FilePlatformExperimentOperations):
 
         # Return Slurm Experiment
         return FileExperiment(meta)
+
     def refresh_status(self, experiment: Experiment, **kwargs):
         """
         Refresh status of experiment.
@@ -106,7 +96,6 @@ class SlurmPlatformExperimentOperations(FilePlatformExperimentOperations):
         # Refresh status for each simulation
         for sim in experiment.simulations:
             sim.status = self.platform.get_simulation_status(sim.id, **kwargs)
-
 
     def platform_cancel(self, experiment_id: str, force: bool = True) -> None:
         """
