@@ -63,7 +63,7 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
             experiment.parent = suite
 
         # Generate Suite/Experiment/Simulation folder structure
-        self.platform.mk_directory(experiment)
+        self.platform.mk_directory(experiment, exist_ok=True)
         meta = self.platform._metas.dump(experiment)
         self.platform._assets.dump_assets(experiment)
         self.platform.create_batch_file(experiment, **kwargs)
