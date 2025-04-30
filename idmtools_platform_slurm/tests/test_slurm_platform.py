@@ -24,7 +24,7 @@ setA = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="a")
 
 @pytest.mark.serial
 @linux_only
-class TestSlurmOperations(ITestWithPersistence):
+class TestSlurmPlatform(ITestWithPersistence):
 
     def create_experiment(self, platform=None):
         task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, 'python', 'model1.py'),
