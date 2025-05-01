@@ -29,17 +29,7 @@ class ProcessPlatformExperimentOperations(FilePlatformExperimentOperations):
             None
         """
         # Ensure parent
-        experiment.parent.add_experiment(experiment)
-        self.platform._metas.dump(experiment.parent)
-        # Generate/update metadata
-        self.platform._metas.dump(experiment)
-        # Commission
-        self.platform.submit_job(experiment, **kwargs)
-
-        suite_id = experiment.parent_id or experiment.suite_id
-        user_logger.info(f'job_directory: {Path(self.platform.job_directory).resolve()}')
-        user_logger.info(f'suite: {str(suite_id)}')
-        user_logger.info(f'experiment: {experiment.id}')
+        super().platform_run_item(experiment, **kwargs)
 
     def post_run_item(self, experiment: Experiment, **kwargs):
         """
