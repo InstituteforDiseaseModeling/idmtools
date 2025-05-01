@@ -116,13 +116,6 @@ class SlurmPlatform(FilePlatform):
     def __post_init__(self):
         super().__post_init__()
         self.__init_interfaces()
-        self.supported_types = {ItemType.SUITE, ItemType.EXPERIMENT, ItemType.SIMULATION}
-        if self.job_directory is None:
-            raise ValueError("Job Directory is required.")
-        self.job_directory = os.path.abspath(self.job_directory)
-        self.name_directory = IdmConfigParser.get_option(None, "name_directory", 'True').lower() in TRUTHY_VALUES
-        self.sim_name_directory = IdmConfigParser.get_option(None, "sim_name_directory",
-                                                             'False').lower() in TRUTHY_VALUES
 
         # check max_array_size from slurm configuration
         self._max_array_size = None
@@ -131,8 +124,6 @@ class SlurmPlatform(FilePlatform):
 
         if self.mpi_type.lower() not in {'pmi2', 'pmix', 'mpirun'}:
             raise ValueError(f"Invalid mpi_type '{self.mpi_type}'. Allowed values are 'pmi2', 'pmix', or 'mpirun'.")
-
-        self._object_cache_expiration = 600
 
         # check if run script as a slurm job
         r = run_script_on_slurm(self, run_on_slurm=self.run_on_slurm)
