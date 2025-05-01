@@ -14,10 +14,6 @@ from idmtools.registry.plugin_specification import get_description_impl
 
 SLURM_EXAMPLE_CONFIG = """
 [Slurm]
-# mode of operation. Options are ssh or local
-# SSH would mean you remotely connect to the head node to submit jobs to slurm(and use that to transfer files as well)
-# Local is when you install idmtools on the head node and run from there
-mode = ssh
 job_directory = /data
 # values on ALL or END. 
 # All will email you as the job changes states
@@ -31,7 +27,7 @@ class SlurmPlatformSpecification(PlatformSpecification):
 
     @get_description_impl
     def get_description(self) -> str:
-        return "Provides access to the Local Platform to IDM Tools"
+        return "Provides access to the Slurm Platform to IDM Tools"
 
     @get_platform_impl
     def get(self, **configuration) -> IPlatform:
