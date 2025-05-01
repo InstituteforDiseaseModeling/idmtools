@@ -31,7 +31,7 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
     platform_type: Type = field(default=FileExperiment)
     RUN_SIMULATION_SCRIPT_PATH = Path(__file__).parent.parent.joinpath('assets/run_simulation.sh')
 
-    def get(self, experiment_id: str, **kwargs) -> Dict:
+    def get(self, experiment_id: str, **kwargs) -> FileExperiment:
         """
         Gets an experiment from the File platform.
         Args:
@@ -102,7 +102,7 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
                 sim_list.append(sim)
         return sim_list
 
-    def get_parent(self, experiment: FileExperiment, **kwargs) -> FileSuite:
+    def get_parent(self, experiment: FileExperiment, **kwargs) -> FileSuite | None:
         """
         Fetches the parent of an experiment.
         Args:

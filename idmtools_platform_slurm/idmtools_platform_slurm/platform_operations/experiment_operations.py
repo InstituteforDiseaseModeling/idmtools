@@ -4,7 +4,6 @@ Here we implement the SlurmPlatform experiment operations.
 Copyright 2025, Gates Foundation. All rights reserved.
 """
 import os
-import shutil
 from pathlib import Path
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
@@ -14,7 +13,6 @@ from idmtools.entities.experiment import Experiment
 from idmtools_platform_file.platform_operations.experiment_operations import FilePlatformExperimentOperations
 from logging import getLogger
 
-from idmtools_platform_file.platform_operations.utils import FileExperiment, add_dummy_suite
 
 logger = getLogger(__name__)
 user_logger = getLogger('user')

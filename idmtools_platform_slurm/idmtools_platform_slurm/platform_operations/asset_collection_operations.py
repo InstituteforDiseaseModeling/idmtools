@@ -8,7 +8,6 @@ from logging import getLogger
 from typing import TYPE_CHECKING
 from idmtools_platform_file.platform_operations.asset_collection_operations import FilePlatformAssetCollectionOperations
 
-
 if TYPE_CHECKING:
     from idmtools_platform_slurm.slurm_platform import SlurmPlatform
 
