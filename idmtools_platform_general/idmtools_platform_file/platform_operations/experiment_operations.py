@@ -102,7 +102,7 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
                 sim_list.append(sim)
         return sim_list
 
-    def get_parent(self, experiment: FileExperiment, **kwargs) -> FileSuite | None:
+    def get_parent(self, experiment: FileExperiment, **kwargs) -> FileSuite:
         """
         Fetches the parent of an experiment.
         Args:
