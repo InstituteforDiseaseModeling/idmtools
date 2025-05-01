@@ -129,11 +129,10 @@ class FileOperations(IOperations):
         target.mkdir(parents=True, exist_ok=exist_ok)
 
     @check_symlink_capabilities
-    def link_file(self, target: Union[Path, str], link: Union[Path, str], sym_link: bool = True) -> None:
+    def link_file(self, target: Union[Path, str], link: Union[Path, str]) -> None:
         """
         Link files.
         Args:
-            sym_link: is sym_link? True/False
             target: the source file path
             link: the file path
         Returns:
@@ -141,7 +140,7 @@ class FileOperations(IOperations):
         """
         target = Path(target).absolute()
         link = Path(link).absolute()
-        if sym_link:
+        if self.platform.sym_link:
             # Ensure the source folder exists
             if not target.exists():
                 raise FileNotFoundError(f"Source folder does not exist: {target}")
@@ -166,11 +165,10 @@ class FileOperations(IOperations):
             shutil.copyfile(target, link)
 
     @check_symlink_capabilities
-    def link_dir(self, target: Union[Path, str], link: Union[Path, str], sym_link: bool = True) -> None:
+    def link_dir(self, target: Union[Path, str], link: Union[Path, str]) -> None:
         """
         Link directory/files.
         Args:
-            sym_link: is sym_link? True/False
             target: the source folder path
             link: the folder path
         Returns:
@@ -182,7 +180,7 @@ class FileOperations(IOperations):
         # Validate file path length
         validate_folder_files_path_length(target, link)
 
-        if sym_link:
+        if self.platform.sym_link:
             # Ensure the source folder exists
             if not target.exists():
                 raise FileNotFoundError(f"Source folder does not exist: {target}")
@@ -207,7 +205,7 @@ class FileOperations(IOperations):
                     user_logger.warning("https://learn.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development. \n")
                 exit(-1)
         else:
-            shutil.copytree(target, link)
+            shutil.copytree(target, link, dirs_exist_ok=True)
 
     @staticmethod
     def update_script_mode(script_path: Union[Path, str], mode: int = 0o777) -> None:

@@ -230,29 +230,27 @@ class FilePlatform(IPlatform):
                     result = True
         return result
 
-    def link_file(self, target: Union[Path, str], link: Union[Path, str], sym_link: bool = True) -> None:
+    def link_file(self, target: Union[Path, str], link: Union[Path, str]) -> None:
         """
         Link files.
         Args:
-            sym_link: is sym_link? True/False
             target: the source file path
             link: the file path
         Returns:
             None
         """
-        self._op_client.link_file(target, link, sym_link)
+        self._op_client.link_file(target, link)
 
-    def link_dir(self, target: Union[Path, str], link: Union[Path, str], sym_link: bool = True) -> None:
+    def link_dir(self, target: Union[Path, str], link: Union[Path, str]) -> None:
         """
         Link directory/files.
         Args:
-            sym_link: is sym_link? True/False
             target: the source folder path.
             link: the folder path
         Returns:
             None
         """
-        self._op_client.link_dir(target, link, sym_link)
+        self._op_client.link_dir(target, link)
 
     def make_command_executable(self, simulation: Simulation) -> None:
         """
