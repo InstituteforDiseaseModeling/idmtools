@@ -38,7 +38,7 @@ class FilePlatform(IPlatform):
     job_directory: str = field(default=None, metadata=dict(help="Job Directory"))
     max_job: int = field(default=4, metadata=dict(help="Maximum number of jobs to run concurrently"))
     run_sequence: bool = field(default=True, metadata=dict(help="Run jobs in sequence"))
-
+    sym_link: bool = field(default=True, metadata=dict(help="Use symbolic links"))
     # Default retries for jobs
     retries: int = field(default=1, metadata=dict(help="Number of retries for failed jobs"))
     # number of MPI processes

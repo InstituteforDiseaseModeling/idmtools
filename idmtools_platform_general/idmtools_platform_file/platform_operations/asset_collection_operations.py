@@ -56,10 +56,11 @@ class FilePlatformAssetCollectionOperations(IPlatformAssetCollectionOperations):
         """
         raise NotImplementedError("platform_create is not supported on FilePlatform.")
 
-    def link_common_assets(self, simulation: Simulation, common_asset_dir: Union[Path, str] = None) -> None:
+    def link_common_assets(self, simulation: Simulation, common_asset_dir: Union[Path, str] = None, sym_link: bool = True) -> None:
         """
         Link directory/files.
         Args:
+            sym_link: is sym_link? True/False
             simulation: Simulation
             common_asset_dir: the common asset folder path
         Returns:
@@ -70,7 +71,7 @@ class FilePlatformAssetCollectionOperations(IPlatformAssetCollectionOperations):
         link_dir = Path(self.platform.get_directory(simulation), 'Assets')
 
         # Copy common assets to simulation directory
-        self.platform.link_dir(common_asset_dir, link_dir)
+        self.platform.link_dir(common_asset_dir, link_dir, sym_link)
 
     @staticmethod
     def _get_assets_from_dir(sim_dir: Path, files: List[str]) -> Dict[str, bytearray]:
