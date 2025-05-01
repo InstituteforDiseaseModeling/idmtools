@@ -4,7 +4,6 @@ Here we implement the ProcessPlatform experiment operations.
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import os
-from pathlib import Path
 from dataclasses import dataclass
 from idmtools.entities.experiment import Experiment
 from idmtools_platform_file.platform_operations.experiment_operations import FilePlatformExperimentOperations
