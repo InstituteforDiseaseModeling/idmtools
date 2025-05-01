@@ -63,7 +63,7 @@ class FilePlatformSimulationOperations(IPlatformSimulationOperations):
         # Generate Simulation folder structure
         self.platform.mk_directory(simulation)
         meta = self.platform._metas.dump(simulation)
-        self.platform._assets.link_common_assets(simulation, sym_link=self.platform.sym_link)
+        self.platform._assets.link_common_assets(simulation)
         self.platform._assets.dump_assets(simulation)
         self.platform.create_batch_file(simulation, **kwargs)
 
