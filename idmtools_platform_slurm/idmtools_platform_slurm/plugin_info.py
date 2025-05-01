@@ -72,6 +72,9 @@ class SlurmPlatformSpecification(PlatformSpecification):
         config_aliases = dict(
             SLURM_LOCAL=dict(
                 job_directory=str(Path.home())
+            ),
+            SLURM_CLUSTER=dict(
+                job_directory=str(Path.home())
             )
         )
         return config_aliases
