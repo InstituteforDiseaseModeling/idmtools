@@ -3,7 +3,6 @@ import tempfile
 import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
-
 from idmtools.core.platform_factory import Platform
 
 

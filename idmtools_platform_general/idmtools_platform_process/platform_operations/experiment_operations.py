@@ -6,7 +6,6 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 import os
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
-
 from idmtools.entities.experiment import Experiment
 from idmtools_platform_file.platform_operations.experiment_operations import FilePlatformExperimentOperations
 from logging import getLogger
