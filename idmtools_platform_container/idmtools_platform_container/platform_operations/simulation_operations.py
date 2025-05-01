@@ -30,7 +30,7 @@ class ContainerPlatformSimulationOperations(FilePlatformSimulationOperations):
         Returns:
             NoReturn
         """
-        job = find_running_job(self.platform, sim_id)
+        job = find_running_job(sim_id)
         if job:
             if job.item_type != ItemType.SIMULATION:
                 pass
