@@ -29,6 +29,7 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
     """
     platform: 'FilePlatform'  # noqa: F821
     platform_type: Type = field(default=FileExperiment)
+    RUN_SIMULATION_SCRIPT_PATH = Path(__file__).parent.parent.joinpath('assets/run_simulation.sh')
 
     def get(self, experiment_id: str, **kwargs) -> Dict:
         """
@@ -69,9 +70,8 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         self.platform.create_batch_file(experiment, **kwargs)
 
         # Copy file run_simulation.sh
-        run_simulation_script = Path(__file__).parent.parent.joinpath('assets/run_simulation.sh')
         dest_script = Path(self.platform.get_directory(experiment)).joinpath('run_simulation.sh')
-        shutil.copy(str(run_simulation_script), str(dest_script))
+        shutil.copy(str(self.RUN_SIMULATION_SCRIPT_PATH), str(dest_script))
 
         # Make executable
         self.platform.update_script_mode(dest_script)

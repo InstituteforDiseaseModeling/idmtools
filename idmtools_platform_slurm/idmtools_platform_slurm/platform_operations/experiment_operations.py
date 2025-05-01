@@ -26,6 +26,7 @@ if TYPE_CHECKING:
 @dataclass
 class SlurmPlatformExperimentOperations(FilePlatformExperimentOperations):
     platform: 'SlurmPlatform'  # noqa: F821
+    RUN_SIMULATION_SCRIPT_PATH = Path(__file__).parent.parent.joinpath('assets/run_simulation.sh')
 
     def platform_run_item(self, experiment: Experiment, dry_run: bool = False, **kwargs):
         """
@@ -42,41 +43,6 @@ class SlurmPlatformExperimentOperations(FilePlatformExperimentOperations):
         # Commission
         if not dry_run:
             self.platform.submit_job(experiment, **kwargs)
-
-    def platform_create(self, experiment: Experiment, **kwargs) -> FileExperiment:
-        """
-        Creates an experiment on Slurm Platform.
-        Args:
-            experiment: idmtools experiment
-            kwargs: keyword arguments used to expand functionality
-        Returns:
-            Slurm Experiment object created
-        """
-
-        # ensure experiment's parent
-        experiment.parent_id = experiment.parent_id or experiment.suite_id
-        if experiment.parent_id is None:
-            suite = add_dummy_suite(experiment)
-            self.platform._suites.platform_create(suite)
-            # update parent
-            experiment.parent = suite
-
-        # Generate Suite/Experiment/Simulation folder structure
-        self.platform.mk_directory(experiment, exist_ok=True)
-        meta = self.platform._metas.dump(experiment)
-        self.platform._assets.dump_assets(experiment)
-        self.platform.create_batch_file(experiment, **kwargs)
-
-        # Copy file run_simulation.sh
-        run_simulation_script = Path(__file__).parent.parent.joinpath('assets/run_simulation.sh')
-        dest_script = Path(self.platform.get_directory(experiment)).joinpath('run_simulation.sh')
-        shutil.copy(str(run_simulation_script), str(dest_script))
-
-        # Make executable
-        self.platform.update_script_mode(dest_script)
-
-        # Return Slurm Experiment
-        return FileExperiment(meta)
 
     def refresh_status(self, experiment: Experiment, **kwargs):
         """
