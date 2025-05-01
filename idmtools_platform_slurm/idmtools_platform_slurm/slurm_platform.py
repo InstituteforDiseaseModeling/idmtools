@@ -3,13 +3,11 @@ Here we implement the SlurmPlatform object.
 
 Copyright 2025, Gates Foundation. All rights reserved.
 """
-import os
 import subprocess
 from typing import Optional, Any, Dict, List, Union, Literal
 from dataclasses import dataclass, field, fields
 from logging import getLogger
-from idmtools import IdmConfigParser
-from idmtools.core import ItemType, TRUTHY_VALUES
+from idmtools.core import ItemType
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools_platform_file.file_platform import FilePlatform
