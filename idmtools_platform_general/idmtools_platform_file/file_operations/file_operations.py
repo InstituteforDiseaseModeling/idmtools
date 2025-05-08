@@ -9,7 +9,6 @@ import shutil
 from dataclasses import dataclass
 from logging import getLogger
 from pathlib import Path
-
 from typing import Union
 from idmtools.core import ItemType, EntityStatus
 from idmtools.entities import Suite
@@ -169,7 +168,7 @@ class FileOperations(IOperations):
         """
         Link directory/files.
         Args:
-            target: the source folder path.
+            target: the source folder path
             link: the folder path
         Returns:
             None
@@ -205,7 +204,7 @@ class FileOperations(IOperations):
                     user_logger.warning("https://learn.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development. \n")
                 exit(-1)
         else:
-            shutil.copytree(target, link)
+            shutil.copytree(target, link, dirs_exist_ok=True)
 
     @staticmethod
     def update_script_mode(script_path: Union[Path, str], mode: int = 0o777) -> None:

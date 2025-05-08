@@ -7,7 +7,6 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Type, Union, Any
-
 from idmtools.core import ItemType
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities.simulation import Simulation

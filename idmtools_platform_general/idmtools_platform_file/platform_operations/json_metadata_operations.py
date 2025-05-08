@@ -98,13 +98,13 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
 
         return meta
 
-    def dump(self, item: Union[Suite, Experiment, Simulation]) -> None:
+    def dump(self, item: Union[Suite, Experiment, Simulation]) -> Dict:
         """
         Save item's metadata to a file.
         Args:
             item: idmtools entity (Suite, Experiment and Simulation)
         Returns:
-            None
+            key/value dict of metadata from the given item
         """
         if not isinstance(item, (Suite, Experiment, Simulation)):
             raise RuntimeError("Dump method supports Suite/Experiment/Simulation only.")

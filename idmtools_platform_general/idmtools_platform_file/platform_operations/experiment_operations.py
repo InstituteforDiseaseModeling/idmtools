@@ -29,8 +29,9 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
     """
     platform: 'FilePlatform'  # noqa: F821
     platform_type: Type = field(default=FileExperiment)
+    RUN_SIMULATION_SCRIPT_PATH = Path(__file__).parent.parent.joinpath('assets/run_simulation.sh')
 
-    def get(self, experiment_id: str, **kwargs) -> Dict:
+    def get(self, experiment_id: str, **kwargs) -> FileExperiment:
         """
         Gets an experiment from the File platform.
         Args:
@@ -63,15 +64,14 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
             experiment.parent = suite
 
         # Generate Suite/Experiment/Simulation folder structure
-        self.platform.mk_directory(experiment)
+        self.platform.mk_directory(experiment, exist_ok=True)
         meta = self.platform._metas.dump(experiment)
         self.platform._assets.dump_assets(experiment)
         self.platform.create_batch_file(experiment, **kwargs)
 
         # Copy file run_simulation.sh
-        run_simulation_script = Path(__file__).parent.parent.joinpath('assets/run_simulation.sh')
         dest_script = Path(self.platform.get_directory(experiment)).joinpath('run_simulation.sh')
-        shutil.copy(str(run_simulation_script), str(dest_script))
+        shutil.copy(str(self.RUN_SIMULATION_SCRIPT_PATH), str(dest_script))
 
         # Make executable
         self.platform.update_script_mode(dest_script)
