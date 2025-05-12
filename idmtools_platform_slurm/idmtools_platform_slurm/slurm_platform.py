@@ -1,30 +1,25 @@
 """
 Here we implement the SlurmPlatform object.
 
-Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+Copyright 2025, Gates Foundation. All rights reserved.
 """
-import os
-from pathlib import Path
+import subprocess
 from typing import Optional, Any, Dict, List, Union, Literal
 from dataclasses import dataclass, field, fields
 from logging import getLogger
-from idmtools import IdmConfigParser
-from idmtools.core import ItemType, EntityStatus, TRUTHY_VALUES
-from idmtools.core.interfaces.ientity import IEntity
-from idmtools.entities.suite import Suite
+from idmtools.core import ItemType
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
-from idmtools.entities.iplatform import IPlatform, ITEM_TYPE_TO_OBJECT_INTERFACE
-from idmtools_platform_slurm.platform_operations.json_metadata_operations import JSONMetadataOperations
+from idmtools_platform_file.file_platform import FilePlatform
+from idmtools_platform_slurm.platform_operations.json_metadata_operations import SlurmJSONMetadataOperations
 from idmtools_platform_slurm.platform_operations.asset_collection_operations import \
     SlurmPlatformAssetCollectionOperations
 from idmtools_platform_slurm.platform_operations.experiment_operations import SlurmPlatformExperimentOperations
 from idmtools_platform_slurm.platform_operations.simulation_operations import SlurmPlatformSimulationOperations
-from idmtools_platform_slurm.slurm_operations.operations_interface import SlurmOperations
-from idmtools_platform_slurm.slurm_operations.slurm_constants import SlurmOperationalMode
 from idmtools_platform_slurm.platform_operations.suite_operations import SlurmPlatformSuiteOperations
-from idmtools_platform_slurm.platform_operations.utils import SlurmSuite, SlurmExperiment, SlurmSimulation, \
-    get_max_array_size
+from idmtools_platform_slurm.platform_operations.utils import get_max_array_size
+from idmtools_platform_slurm.slurm_operations.slurm_operations import SlurmOperations
+
 from idmtools_platform_slurm.utils.slurm_job import run_script_on_slurm, slurm_installed
 
 logger = getLogger(__name__)
@@ -36,18 +31,7 @@ CONFIG_PARAMETERS = ['ntasks', 'partition', 'nodes', 'mail_type', 'mail_user', '
 
 
 @dataclass(repr=False)
-class SlurmPlatform(IPlatform):
-    job_directory: str = field(default=None, metadata=dict(help="Job Directory"))
-
-    #: Needed for bridge mode
-    bridged_jobs_directory: str = field(default=Path.home().joinpath(".idmtools").joinpath("singularity-bridge"),
-                                        metadata=dict(help="Bridged Jobs Directory"))
-    bridged_results_directory: str = field(
-        default=Path.home().joinpath(".idmtools").joinpath("singularity-bridge").joinpath("results"),
-        metadata=dict(help="Bridged Results Directory"))
-
-    mode: SlurmOperationalMode = field(default=SlurmOperationalMode.LOCAL, metadata=dict(help="Slurm Operational Mode"))
-
+class SlurmPlatform(FilePlatform):
     # region: Resources request
 
     # choose e-mail type
@@ -124,27 +108,12 @@ class SlurmPlatform(IPlatform):
     _experiments: SlurmPlatformExperimentOperations = field(**op_defaults, repr=False, init=False)
     _simulations: SlurmPlatformSimulationOperations = field(**op_defaults, repr=False, init=False)
     _assets: SlurmPlatformAssetCollectionOperations = field(**op_defaults, repr=False, init=False)
-    _metas: JSONMetadataOperations = field(**op_defaults, repr=False, init=False)
+    _metas: SlurmJSONMetadataOperations = field(**op_defaults, repr=False, init=False)
     _op_client: SlurmOperations = field(**op_defaults, repr=False, init=False)
 
     def __post_init__(self):
-        if isinstance(self.mode, str):
-            if self.mode.upper() not in [mode.value.upper() for mode in SlurmOperationalMode]:
-                raise ValueError(
-                    f"{self.mode} is not a value mode. Please select one of the following {', '.join([mode.value for mode in SlurmOperationalMode])}")
-            self.mode = SlurmOperationalMode[self.mode.upper()]
-
-        if not isinstance(self.mode, SlurmOperationalMode):
-            raise ValueError(f"{self.mode} is not a valid mode. Please use enum {SlurmOperationalMode}")
-
+        super().__post_init__()
         self.__init_interfaces()
-        self.supported_types = {ItemType.SUITE, ItemType.EXPERIMENT, ItemType.SIMULATION}
-        if self.job_directory is None:
-            raise ValueError("Job Directory is required.")
-        self.job_directory = os.path.abspath(self.job_directory)
-        self.name_directory = IdmConfigParser.get_option(None, "name_directory", 'True').lower() in TRUTHY_VALUES
-        self.sim_name_directory = IdmConfigParser.get_option(None, "sim_name_directory",
-                                                             'False').lower() in TRUTHY_VALUES
 
         # check max_array_size from slurm configuration
         self._max_array_size = None
@@ -154,29 +123,18 @@ class SlurmPlatform(IPlatform):
         if self.mpi_type.lower() not in {'pmi2', 'pmix', 'mpirun'}:
             raise ValueError(f"Invalid mpi_type '{self.mpi_type}'. Allowed values are 'pmi2', 'pmix', or 'mpirun'.")
 
-        super().__post_init__()
-        self._object_cache_expiration = 600
-
         # check if run script as a slurm job
         r = run_script_on_slurm(self, run_on_slurm=self.run_on_slurm)
         if r:
             exit(0)  # finish the current workflow
 
     def __init_interfaces(self):
-        if self.mode == SlurmOperationalMode.SSH:
-            raise NotImplementedError("SSH mode has not been implemented on the Slurm Platform")
-        else:
-            from idmtools_platform_slurm.slurm_operations.local_operations import LocalSlurmOperations
-            self._op_client = LocalSlurmOperations(platform=self)
-
+        self._op_client = SlurmOperations(platform=self)
         self._suites = SlurmPlatformSuiteOperations(platform=self)
         self._experiments = SlurmPlatformExperimentOperations(platform=self)
         self._simulations = SlurmPlatformSimulationOperations(platform=self)
         self._assets = SlurmPlatformAssetCollectionOperations(platform=self)
-        self._metas = JSONMetadataOperations(platform=self)
-
-    def post_setstate(self):
-        self.__init_interfaces()
+        self._metas = SlurmJSONMetadataOperations(platform=self)
 
     @property
     def slurm_fields(self):
@@ -199,111 +157,51 @@ class SlurmPlatform(IPlatform):
         config_dict.update(kwargs)
         return config_dict
 
-    def flatten_item(self, item: IEntity, raw=False, **kwargs) -> List[object]:
+    def create_batch_file(self, item: Union[Experiment, Simulation], **kwargs) -> None:
         """
-        Flatten an item: resolve the children until getting to the leaves.
-
-        For example, for an experiment, will return all the simulations.
-        For a suite, will return all the simulations contained in the suites experiments.
-
+        Create batch file.
         Args:
-            item: Which item to flatten
-            raw: bool
-            kwargs: extra parameters
-
+            item: the item to build batch file for
+            kwargs: keyword arguments used to expand functionality.
         Returns:
-            List of leaves
+            None
         """
-        if not raw:
-            interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
-            idm_item = getattr(self, interface).to_entity(item)
-            return super().flatten_item(idm_item)
+        self._op_client.create_batch_file(item, **kwargs)
 
-        if isinstance(item, SlurmSuite):
-            experiments = self._suites.get_children(item, parent=item, raw=True)
-            children = list()
-            for slurm_exp in experiments:
-                children += self.flatten_item(item=slurm_exp, raw=raw)
-        elif isinstance(item, SlurmExperiment):
-            children = self._experiments.get_children(item, parent=item, raw=True)
-            exp = Experiment()
-            exp.uid = item.id
-            exp.platform = self
-            exp._platform_object = item
-            exp.tags = item.tags
+    def get_job_id(self, item_id: str, item_type: ItemType) -> List:
+        """
+        Retrieve the job id for item that had been run.
+        Args:
+            item_id: id of experiment/simulation
+            item_type: ItemType (Experiment or Simulation)
+        Returns:
+            List of slurm job ids
+        """
+        if item_type not in (ItemType.EXPERIMENT, ItemType.SIMULATION):
+            raise RuntimeError(f"Not support item type: {item_type}")
 
-            for slurm_sim in children:
-                slurm_sim.experiment = exp
-                slurm_sim.platform = self
-        elif isinstance(item, SlurmSimulation):
-            if raw:
-                children = [item]
-            else:
-                exp = Experiment()
-                exp.uid = item.id
-                exp.platform = self
-                exp._platform_object = item
-                exp.tags = item.tags
-                sim = self._simulations.to_entity(item, parent=exp)
-                sim.experiment = exp
-                children = [sim]
-        elif isinstance(item, Suite):
-            slurm_suite = item.get_platform_object()
-            slurm_suite.platform = self
-            children = self.flatten_item(item=slurm_suite)
-        elif isinstance(item, Experiment):
-            children = item.simulations.items
+        item_dir = self.get_directory_by_id(item_id, item_type)
+        job_id_file = item_dir.joinpath('job_id.txt')
+        if not job_id_file.exists():
+            logger.debug(f"{job_id_file} not found.")
+            return None
+
+        job_id = open(job_id_file).read().strip()
+        return job_id.split('\n')
+
+    def submit_job(self, item: Union[Experiment, Simulation], **kwargs) -> None:
+        """
+        Submit a Slurm job.
+        Args:
+            item: idmtools Experiment or Simulation
+            kwargs: keyword arguments used to expand functionality
+        Returns:
+            None
+        """
+        if isinstance(item, Experiment):
+            working_directory = self.get_directory(item)
+            subprocess.run(['bash', 'batch.sh'], stdout=subprocess.PIPE, cwd=str(working_directory))
         elif isinstance(item, Simulation):
-            children = [item]
+            pass
         else:
-            raise Exception(f'Item Type: {type(item)} is not supported!')
-
-        return children
-
-    def validate_item_for_analysis(self, item: Union[Simulation, SlurmSimulation], analyze_failed_items=False):
-        """
-        Check if item is valid for analysis.
-
-        Args:
-            item: which item to verify status
-            analyze_failed_items: bool
-
-        Returns: bool
-        """
-        result = False
-
-        # TODO: we may consolidate two cases into one
-        if isinstance(item, SlurmSimulation):
-            if item.status == EntityStatus.SUCCEEDED:
-                result = True
-            else:
-                if analyze_failed_items and item.status == EntityStatus.FAILED:
-                    result = True
-        elif isinstance(item, Simulation):
-            if item.succeeded:
-                result = True
-            else:
-                if analyze_failed_items and item.status == EntityStatus.FAILED:
-                    result = True
-        return result
-
-    def get_directory(self, item: Union[Suite, Experiment, Simulation]) -> Path:
-        """
-        Get item's path.
-        Args:
-            item: Suite, Experiment, Simulation
-        Returns:
-            item file directory
-        """
-        return self._op_client.get_directory(item)
-
-    def get_directory_by_id(self, item_id: str, item_type: ItemType) -> Path:
-        """
-        Get item's path.
-        Args:
-            item_id: entity id (Suite, Experiment, Simulation)
-            item_type: the type of items (Suite, Experiment, Simulation)
-        Returns:
-            item file directory
-        """
-        return self._op_client.get_directory_by_id(item_id, item_type)
+            raise NotImplementedError(f"Submit job is not implemented on SlurmPlatform.")

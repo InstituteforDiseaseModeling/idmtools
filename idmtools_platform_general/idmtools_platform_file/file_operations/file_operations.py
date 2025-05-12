@@ -1,33 +1,34 @@
 """
-Here we implement the SlurmPlatform local operations.
+Here we implement the operations_interface.
 
-Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+Copyright 2025, Gates Foundation. All rights reserved.
 """
 import os
 import shlex
 import shutil
-import subprocess
 from dataclasses import dataclass
 from logging import getLogger
 from pathlib import Path
-from idmtools import IdmConfigParser
-from typing import Union, Any, List
-from idmtools.core import ItemType, EntityStatus, TRUTHY_VALUES
+from typing import Union
+from idmtools.core import ItemType, EntityStatus
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
-from idmtools_platform_slurm.assets import generate_batch, generate_script, generate_simulation_script
-from idmtools_platform_slurm.platform_operations.utils import clean_experiment_name
-from idmtools_platform_slurm.slurm_operations.operations_interface import SlurmOperations
-from idmtools_platform_slurm.slurm_operations.slurm_constants import SLURM_MAPS
-
+from idmtools_platform_file.assets import generate_script, generate_simulation_script
+from idmtools_platform_file.file_operations.operations_interface import IOperations
+from idmtools_platform_file.platform_operations.utils import FILE_MAPS, validate_file_path_length, \
+    clean_experiment_name, validate_folder_files_path_length
 from idmtools.utils.decorators import check_symlink_capabilities
 
 logger = getLogger(__name__)
+user_logger = getLogger('user')
 
 
 @dataclass
-class LocalSlurmOperations(SlurmOperations):
+class FileOperations(IOperations):
+    """
+    Implement operations_interface.
+    """
 
     def entity_display_name(self, item: Union[Suite, Experiment, Simulation]) -> str:
         """
@@ -85,13 +86,13 @@ class LocalSlurmOperations(SlurmOperations):
             exp_dir = self.get_directory(exp)
             item_dir = Path(exp_dir, self.entity_display_name(item))
         else:
-            raise RuntimeError(f"Get directory is not supported for {type(item)} object on SlurmPlatform")
+            raise RuntimeError(f"Get directory is not supported for {type(item)} object on FilePlatform")
 
         return item_dir
 
     def get_directory_by_id(self, item_id: str, item_type: ItemType) -> Path:
         """
-        Get item's path.
+        Get item's path by id.
         Args:
             item_id: entity id (Suite, Experiment, Simulation)
             item_type: the type of items (Suite, Experiment, Simulation)
@@ -105,7 +106,7 @@ class LocalSlurmOperations(SlurmOperations):
             raise RuntimeError(f"Not found path for item_id: {item_id} with type: {item_type}.")
 
     def mk_directory(self, item: Union[Suite, Experiment, Simulation] = None, dest: Union[Path, str] = None,
-                     exist_ok: bool = None) -> None:
+                     exist_ok: bool = True) -> None:
         """
         Make a new directory.
         Args:
@@ -122,13 +123,9 @@ class LocalSlurmOperations(SlurmOperations):
         else:
             raise RuntimeError('Only support Suite/Experiment/Simulation or not None dest.')
 
-        exist_ok = exist_ok if exist_ok is not None else IdmConfigParser.get_option(option="EXIST_ITEM_DIR",
-                                                                                    fallback=self.platform.dir_exist_ok)
-        if not exist_ok and os.path.exists(target):
-            raise RuntimeError(
-                f'Item directory {target} already exists. Exist_ok flag set to false to avoid data being overwritten.')
-        else:
-            target.mkdir(parents=True, exist_ok=exist_ok)
+        # Validate target path length
+        validate_file_path_length(self.platform.job_directory)
+        target.mkdir(parents=True, exist_ok=exist_ok)
 
     @check_symlink_capabilities
     def link_file(self, target: Union[Path, str], link: Union[Path, str]) -> None:
@@ -142,21 +139,72 @@ class LocalSlurmOperations(SlurmOperations):
         """
         target = Path(target).absolute()
         link = Path(link).absolute()
-        link.symlink_to(target)
+        if self.platform.sym_link:
+            # Ensure the source folder exists
+            if not target.exists():
+                raise FileNotFoundError(f"Source folder does not exist: {target}")
+
+            # Compute the relative path from the destination to the source
+            relative_source = os.path.relpath(target, link.parent)
+
+            # Remove existing symbolic link or file at destination if it exists
+            if link.exists() or link.is_symlink():
+                link.unlink()
+
+            # Create the symbolic link
+            try:
+                link.symlink_to(relative_source, target_is_directory=False)
+            except OSError as e:
+                user_logger.error(f"\n Failed to create symbolic link: {e}")
+                if self.platform.system() == 'Windows':
+                    user_logger.warning("\n/!\\ WARNING:  Please follow the instructions to enable Developer Mode for Windows: ")
+                    user_logger.warning("https://learn.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development. \n")
+                exit(-1)
+        else:
+            shutil.copyfile(target, link)
 
     @check_symlink_capabilities
     def link_dir(self, target: Union[Path, str], link: Union[Path, str]) -> None:
         """
         Link directory/files.
         Args:
-            target: the source folder path.
+            target: the source folder path
             link: the folder path
         Returns:
             None
         """
         target = Path(target).absolute()
         link = Path(link).absolute()
-        link.symlink_to(target)
+
+        # Validate file path length
+        validate_folder_files_path_length(target, link)
+
+        if self.platform.sym_link:
+            # Ensure the source folder exists
+            if not target.exists():
+                raise FileNotFoundError(f"Source folder does not exist: {target}")
+
+            # Compute the relative path from the destination to the source
+            relative_source = os.path.relpath(target, link.parent)
+
+            # Remove existing symbolic link or folder at destination if it exists
+            if link.exists() or link.is_symlink():
+                if link.is_symlink():
+                    link.unlink()
+                else:
+                    shutil.rmtree(link)
+
+            # Create the symbolic link
+            try:
+                link.symlink_to(relative_source, target_is_directory=True)
+            except OSError as e:
+                user_logger.error(f"\n Failed to create symbolic link: {e}")
+                if self.platform.system() == 'Windows':
+                    user_logger.warning("\n/!\\ WARNING:  Please follow the instructions to enable Developer Mode for Windows: ")
+                    user_logger.warning("https://learn.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development. \n")
+                exit(-1)
+        else:
+            shutil.copytree(target, link, dirs_exist_ok=True)
 
     @staticmethod
     def update_script_mode(script_path: Union[Path, str], mode: int = 0o777) -> None:
@@ -173,7 +221,7 @@ class LocalSlurmOperations(SlurmOperations):
 
     def make_command_executable(self, simulation: Simulation) -> None:
         """
-        Make simulation command executable
+        Make simulation command executable.
         Args:
             simulation: idmtools Simulation
         Returns:
@@ -203,41 +251,6 @@ class LocalSlurmOperations(SlurmOperations):
         except:
             logger.debug(f"Failed to change file mode for executable: {exe}")
 
-    def create_batch_file(self, item: Union[Experiment, Simulation], max_running_jobs: int = None, retries: int = None,
-                          array_batch_size: int = None, dependency: bool = True, **kwargs) -> None:
-        """
-        Create batch file.
-        Args:
-            item: the item to build batch file for
-            kwargs: keyword arguments used to expand functionality.
-        Returns:
-            None
-        """
-        if isinstance(item, Experiment):
-            generate_batch(self.platform, item, max_running_jobs, array_batch_size, dependency)
-            generate_script(self.platform, item, max_running_jobs)
-        elif isinstance(item, Simulation):
-            generate_simulation_script(self.platform, item, retries)
-        else:
-            raise NotImplementedError(f"{item.__class__.__name__} is not supported for batch creation.")
-
-    def submit_job(self, item: Union[Experiment, Simulation], **kwargs) -> None:
-        """
-        Submit a Slurm job.
-        Args:
-            item: idmtools Experiment or Simulation
-            kwargs: keyword arguments used to expand functionality
-        Returns:
-            None
-        """
-        if isinstance(item, Experiment):
-            working_directory = self.get_directory(item)
-            subprocess.run(['bash', 'batch.sh'], stdout=subprocess.PIPE, cwd=str(working_directory))
-        elif isinstance(item, Simulation):
-            pass
-        else:
-            raise NotImplementedError(f"Submit job is not implemented on SlurmPlatform.")
-
     def get_simulation_status(self, sim_id: str, **kwargs) -> EntityStatus:
         """
         Retrieve simulation status.
@@ -247,7 +260,6 @@ class LocalSlurmOperations(SlurmOperations):
         Returns:
             EntityStatus
         """
-        # Workaround (cancelling job not output -1): check if slurm job finished
         sim_dir = self.get_directory_by_id(sim_id, ItemType.SIMULATION)
 
         # Check process status
@@ -255,11 +267,11 @@ class LocalSlurmOperations(SlurmOperations):
         if job_status_path.exists():
             status = open(job_status_path).read().strip()
             if status in ['100', '0', '-1']:
-                status = SLURM_MAPS[status]
+                status = FILE_MAPS[status]
             else:
-                status = SLURM_MAPS['100']  # To be safe
+                status = FILE_MAPS['100']  # To be safe
         else:
-            status = SLURM_MAPS['None']
+            status = FILE_MAPS['None']
 
         return status
 
@@ -276,41 +288,18 @@ class LocalSlurmOperations(SlurmOperations):
         with open(file_path, 'w') as f:
             f.write(content)
 
-    # region: Cancel Slurm Job
-    @staticmethod
-    def cancel_job(job_ids: Union[str, List[str]]) -> Any:
+    def create_batch_file(self, item: Union[Experiment, Simulation], **kwargs) -> None:
         """
-        Cancel Slurm job for given job ids.
+        Create batch file.
         Args:
-            job_ids: slurm jobs id
+            item: the item to build batch file for
+            kwargs: keyword arguments used to expand functionality.
         Returns:
-            Any
+            None
         """
-        if isinstance(job_ids, str):
-            job_ids = [job_ids]
-        logger.debug(f"Submit slurm cancel job: {job_ids}")
-        result = subprocess.run(['scancel', *job_ids], stdout=subprocess.PIPE)
-        stdout = "Success" if result.returncode == 0 else 'Error'
-        return stdout
-
-    def get_job_id(self, item_id: str, item_type: ItemType) -> List:
-        """
-        Retrieve the job id for item that had been run.
-        Args:
-            item_id: id of experiment/simulation
-            item_type: ItemType (Experiment or Simulation)
-        Returns:
-            List of slurm job ids
-        """
-        if item_type not in (ItemType.EXPERIMENT, ItemType.SIMULATION):
-            raise RuntimeError(f"Not support item type: {item_type}")
-
-        item_dir = self.get_directory_by_id(item_id, item_type)
-        job_id_file = item_dir.joinpath('job_id.txt')
-        if not job_id_file.exists():
-            logger.debug(f"{job_id_file} not found.")
-            return None
-
-        job_id = open(job_id_file).read().strip()
-        return job_id.split('\n')
-    # endregion
+        if isinstance(item, Experiment):
+            generate_script(self.platform, item, **kwargs)
+        elif isinstance(item, Simulation):
+            generate_simulation_script(self.platform, item, **kwargs)
+        else:
+            raise NotImplementedError(f"{item.__class__.__name__} is not supported for batch creation.")

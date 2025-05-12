@@ -27,7 +27,7 @@ class FilePlatformSuiteOperations(IPlatformSuiteOperations):
     platform: 'FilePlatform'  # noqa F821
     platform_type: Type = field(default=FileSuite)
 
-    def get(self, suite_id: str, **kwargs) -> Dict:
+    def get(self, suite_id: str, **kwargs) -> FileSuite:
         """
         Get a suite from the File platform.
         Args:
@@ -42,7 +42,7 @@ class FilePlatformSuiteOperations(IPlatformSuiteOperations):
         else:
             raise RuntimeError(f"Not found Suite with id '{suite_id}'")
 
-    def platform_create(self, suite: Suite, **kwargs) -> Tuple:
+    def platform_create(self, suite: Suite, **kwargs) -> Tuple[FileSuite, str]:
         """
         Create suite on File Platform.
         Args:

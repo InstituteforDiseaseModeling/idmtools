@@ -1,12 +1,9 @@
 import os
-
 import pytest
-
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import Suite
 from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
-
 from idmtools_test.utils.decorators import linux_only
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
