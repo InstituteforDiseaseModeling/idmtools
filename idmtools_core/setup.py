@@ -72,8 +72,7 @@ setup(
         idmtools_experiment=["idmtools_experiment = idmtools.entities.experiment:ExperimentSpecification"],
         idmtools_task=["idmtools_task_command = idmtools.entities.command_task:CommandTaskSpecification", "idmtools_task_docker = idmtools.core.docker_task:DockerTaskSpecification"],
         idmtools_hooks=[
-            "idmtools_add_git_tag = idmtools.plugins.git_commit",
-            "idmtools_id_generate_uuid = idmtools.plugins.uuid_generator"
+            "idmtools_add_git_tag = idmtools.plugins.git_commit"
         ]
     ),
     python_requires='>=3.8.0',
