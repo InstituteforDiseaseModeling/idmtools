@@ -86,7 +86,7 @@ class ContainerPlatformExperimentOperations(FilePlatformExperimentOperations):
         Returns:
             No Return
         """
-        from idmtools_platform_container.utils.job_history import JobHistory
+        from idmtools_platform_file.tools.job_history import JobHistory
         job = JobHistory.get_job(experiment_id)
         exp_dir = job['EXPERIMENT_DIR']
         try:
