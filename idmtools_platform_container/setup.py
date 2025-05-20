@@ -56,5 +56,5 @@ setup(
     },
     extras_require=extras,
     url='https://github.com/InstituteforDiseaseModeling/idmtools',
-    version='2.1.0'
+    version='2.1.0+nightly'
 )

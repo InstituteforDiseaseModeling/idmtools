@@ -19,7 +19,7 @@ for file_prefix in ['', 'dev_', 'build_']:
 # Conditional dependency based on Python version
 conditional_requirements = ['importlib_metadata; python_version < "3.8"']
 
-version = '2.1.0'
+version = '2.1.0+nightly'
 
 extras = {
     'test': extra_require_files['build'] + extra_require_files['dev'],
@@ -27,12 +27,12 @@ extras = {
     'notebooks': ['docker==4.0.1'],
     'packaging': extra_require_files['build'],
     'idm': ['idmtools_platform_comps', 'idmtools_cli', 'idmtools_models'],
-    # our full install include all common plugins
-    'full': ['idmtools_platform_comps', 'idmtools_cli', 'idmtools_models', 'idmtools_platform_slurm', 'idmtools_slurm_utils', 'idmtools_platform_general', 'idmtools_platform_container'],
+    # our full installation includes all common plugins
+    'full': ['idmtools_platform_comps', 'idmtools_cli', 'idmtools_models', 'idmtools_platform_general', 'idmtools_platform_slurm', 'idmtools_platform_container'],
     # container install include all container plugins
     'container': ['idmtools_cli', 'idmtools_models', 'idmtools_platform_general', 'idmtools_platform_container'],
     # slurm install include all slurm plugins
-    'slurm': ['idmtools_cli', 'idmtools_models', 'idmtools_platform_slurm', 'idmtools_slurm_utils']
+    'slurm': ['idmtools_cli', 'idmtools_models', 'idmtools_platform_general', 'idmtools_platform_slurm']
 
 }
 
@@ -72,9 +72,7 @@ setup(
         idmtools_experiment=["idmtools_experiment = idmtools.entities.experiment:ExperimentSpecification"],
         idmtools_task=["idmtools_task_command = idmtools.entities.command_task:CommandTaskSpecification", "idmtools_task_docker = idmtools.core.docker_task:DockerTaskSpecification"],
         idmtools_hooks=[
-            "idmtools_add_git_tag = idmtools.plugins.git_commit",
-            "idmtools_id_generate_uuid = idmtools.plugins.uuid_generator",
-            "idmtools_id_generate_item_sequence = idmtools.plugins.item_sequence"
+            "idmtools_add_git_tag = idmtools.plugins.git_commit"
         ]
     ),
     python_requires='>=3.8.0',

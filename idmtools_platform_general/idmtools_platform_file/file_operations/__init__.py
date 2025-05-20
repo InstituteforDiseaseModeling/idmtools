@@ -1,5 +1,5 @@
 """
-idmtools process platform.
+idmtools file platform.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """

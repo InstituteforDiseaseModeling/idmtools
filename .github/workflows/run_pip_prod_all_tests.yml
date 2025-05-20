@@ -69,26 +69,6 @@ jobs:
         with:
           name: idmtools_models_test_results
           path: idmtools_models/tests/reports/
-      - name: run idmtools_platform_slurm tests
-        run: |
-          cd idmtools_platform_slurm
-          make test-all
-      - name: Upload idmtools_platform_slurm all test results
-        uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: idmtools_platform_slurm_test_results
-          path: idmtools_platform_slurm/tests/reports/
-      - name: run idmtools_slurm_utils tests
-        run: |
-          cd idmtools_slurm_utils
-          make test-all
-      - name: Upload idmtools_slurm_utils all test results
-        uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: idmtools_slurm_utils_test_results
-          path: idmtools_slurm_utils/tests/reports/
       - name: run idmtools_platform_general tests
         run: |
           cd idmtools_platform_general
@@ -99,6 +79,16 @@ jobs:
         with:
           name: idmtools_platform_general_test_results
           path: idmtools_platform_general/tests/reports/
+      - name: run idmtools_platform_slurm tests
+        run: |
+          cd idmtools_platform_slurm
+          make test-all
+      - name: Upload idmtools_platform_slurm all test results
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: idmtools_platform_slurm_test_results
+          path: idmtools_platform_slurm/tests/reports/
       - name: run idmtools_platform_container tests
         run: |
             cd idmtools_platform_container

@@ -1,7 +1,7 @@
 """
 Fast hash of Python objects.
 
-Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+Copyright 2025, Gates Foundation. All rights reserved.
 """
 from typing import Union, BinaryIO
 
@@ -10,7 +10,7 @@ import hashlib
 import io
 import pickle
 import types
-from dataclasses import fields, _MISSING_TYPE
+from dataclasses import fields, MISSING
 from logging import getLogger, Logger
 
 logger = getLogger(__name__)
@@ -189,7 +189,7 @@ def ignore_fields_in_dataclass_on_pickle(item):
     # Don't pickle ignore_pickle fields: set values to default
     for field_name in attrs.intersection(item.pickle_ignore_fields):
         if field_name in state:
-            if isinstance(field_default[field_name], _MISSING_TYPE):
+            if field_default[field_name] is MISSING:
                 state[field_name] = None
             else:
                 state[field_name] = field_default[field_name]

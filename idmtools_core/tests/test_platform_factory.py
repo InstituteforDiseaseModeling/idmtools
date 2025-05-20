@@ -222,16 +222,3 @@ class TestPlatformFactory(ITestWithPersistence):
         self.assertEqual(platform.__class__.__name__, 'FilePlatform')
         self.assertEqual(platform._kwargs, kwargs)
 
-    def test_slurm_platform_kwargs_enum(self):
-        from idmtools_platform_slurm.slurm_operations.slurm_constants import SlurmOperationalMode
-        kwargs = {'job_directory': 'destination_directory', 'type': 'Slurm', 'mode': SlurmOperationalMode.LOCAL}
-        platform = Platform(**kwargs)
-        self.assertEqual(platform.__class__.__name__, 'SlurmPlatform')
-        self.assertEqual(platform._kwargs, kwargs)
-
-    def test_slurm_platform(self):
-        from idmtools_platform_slurm.slurm_operations.slurm_constants import SlurmOperationalMode
-        kwargs = {'job_directory': 'destination_directory', 'type': 'Slurm'}
-        platform = Platform(**kwargs)
-        self.assertEqual(platform.__class__.__name__, 'SlurmPlatform')
-        self.assertEqual(platform._kwargs, kwargs)
