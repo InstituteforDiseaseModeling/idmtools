@@ -5,7 +5,7 @@ import pytest
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
-from idmtools_platform_slurm.platform_operations.utils import add_dummy_suite
+from idmtools_platform_file.platform_operations.utils import add_dummy_suite
 from idmtools_test.utils.decorators import linux_only
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools.entities.command_task import CommandTask

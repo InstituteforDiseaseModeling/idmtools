@@ -75,12 +75,12 @@ def generate_batch(platform: 'SlurmPlatform', experiment: Experiment,
         t = Template(file_.read())
 
     # Write out file
-    output_target = platform._op_client.get_directory(experiment).joinpath("batch.sh")
+    output_target = platform.get_directory(experiment).joinpath("batch.sh")
     with open(output_target, "w") as tout:
         tout.write(t.render(template_vars))
 
     # Make executable
-    platform._op_client.update_script_mode(output_target)
+    platform.update_script_mode(output_target)
 
 
 def generate_script(platform: 'SlurmPlatform', experiment: Experiment, max_running_jobs: Optional[int] = None,
@@ -124,7 +124,7 @@ def generate_script(platform: 'SlurmPlatform', experiment: Experiment, max_runni
     with open(output_target, "w") as tout:
         tout.write(t.render(template_vars))
     # Make executable
-    platform._op_client.update_script_mode(output_target)
+    platform.update_script_mode(output_target)
 
 
 def generate_simulation_script(platform: 'SlurmPlatform', simulation, retries: Optional[int] = None) -> None:
@@ -154,4 +154,4 @@ def generate_simulation_script(platform: 'SlurmPlatform', simulation, retries: O
             t = Template(tin.read())
             tout.write(t.render(tvars))
     # Make executable
-    platform._op_client.update_script_mode(sim_script)
+    platform.update_script_mode(sim_script)

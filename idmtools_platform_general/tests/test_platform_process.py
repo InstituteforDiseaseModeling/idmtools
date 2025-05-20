@@ -3,12 +3,9 @@ import os
 import pathlib
 from functools import partial
 from typing import Any, Dict
-
 import numpy as np
 import pandas as pd
 import pytest
-from pathlib import Path
-
 from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform

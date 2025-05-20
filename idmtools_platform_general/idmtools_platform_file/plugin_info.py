@@ -5,7 +5,6 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 from pathlib import Path
 from typing import Type, Dict
-
 from idmtools.entities.iplatform import IPlatform
 from idmtools.registry.platform_specification import example_configuration_impl, get_platform_impl, \
     get_platform_type_impl, PlatformSpecification

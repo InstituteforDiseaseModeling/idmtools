@@ -1,16 +1,14 @@
 """
 IItem is the base of all items that have ids such as AssetCollections, Experiments, etc.
 
-Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+Copyright 2025, Bill Foundation. All rights reserved.
 """
 from dataclasses import dataclass, field, fields
-from functools import lru_cache
 from inspect import signature
 from logging import getLogger, DEBUG
 from typing import List, Callable, TYPE_CHECKING, Any, Dict
+from uuid import uuid4
 
-from idmtools import IdmConfigParser
-from idmtools.registry.functions import FunctionPluginManager
 from idmtools.utils.hashing import ignore_fields_in_dataclass_on_pickle
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -19,21 +17,6 @@ if TYPE_CHECKING:  # pragma: no cover
 logger = getLogger(__name__)
 
 PRE_POST_CREATION_HOOK = Callable[['IItem', 'IPlatform'], None]
-
-
-@lru_cache(maxsize=None)
-def get_id_generator():
-    """
-    Retrieves the type of id generator specified in .ini config as well as corresponding plugin.
-
-    Returns:
-        id_gen: specified id generation plugin in .ini config (uuid, item_sequence, etc)
-        plugin: id generation plugin that is used to determine ids for items. See setup.py > entry_points > idmtools_hooks for full names of plugin options
-    """
-    fpm = FunctionPluginManager.instance()
-    id_gen = IdmConfigParser.get_option(None, "id_generator", "uuid")
-    plugin = fpm.get_plugin(f"idmtools_id_generate_{id_gen}")
-    return id_gen, plugin
 
 
 @dataclass(repr=False)
@@ -52,21 +35,11 @@ class IItem:
     def uid(self):
         """
         UID Of the object.
-
-        If not id is set, uses the hash of the object.
-
         Returns:
             ID
         """
         if self._uid is None:
-            id_gen, plugin = get_id_generator()
-            if plugin:
-                self._uid = plugin.idmtools_generate_id(self)
-            else:
-                fpm = FunctionPluginManager.instance()
-                id_plugins = sorted([x[0] for x in fpm.list_name_plugin() if x[0].startswith("idmtools_id_generate_")])
-                raise RuntimeError(f"Could not find the id plugin idmtools_id_generate_{id_gen} defined by id_generator in your idmtools.ini."
-                                   f"Please use one of the following plugins: {', '.join(id_plugins)}")
+            self._uid = str(uuid4())
         return self._uid
 
     @uid.setter

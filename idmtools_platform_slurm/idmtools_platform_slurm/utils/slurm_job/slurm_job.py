@@ -68,7 +68,7 @@ def generate_script(platform: 'SlurmPlatform', command: str,
         tout.write(t.render(template_vars))
 
     # Make executable
-    platform._op_client.update_script_mode(output_target)
+    platform.update_script_mode(output_target)
 
 
 def check_file_and_job_id(file_path, timeout: int = 3600, interval: int = 10) -> Tuple[bool, str]:

@@ -191,8 +191,7 @@ class TestPlatformExperiment(unittest.TestCase):
 
     def test_platform_with_symlink_true(self):
         with tempfile.TemporaryDirectory() as temp_dir:
-            # first create experiment with sym_link=True
-            platform = Platform("Container", job_directory=temp_dir, sym_link=True)
+            platform = Platform("Container", job_directory=temp_dir)
             command = "ls -lat"
             task = CommandTask(command=command)
             experiment = Experiment.from_task(task, name="run_command")

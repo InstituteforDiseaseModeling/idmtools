@@ -24,7 +24,6 @@ logger = getLogger(__name__)
 current_directory = os.path.dirname(os.path.realpath(__file__))
 data_path = os.path.abspath(os.path.join(current_directory, "..", "..", "data"))
 EXPERIMENTS_LOCK = Lock()
-SEQUENCE_FILE_DEFAULT_PATH = IDMTOOLS_USER_HOME.joinpath("itemsequence", "index.json")
 
 
 class ExperimentDict(dict):

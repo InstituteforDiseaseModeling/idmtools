@@ -46,7 +46,6 @@ packages = dict(
     idmtools_platform_slurm=data_class_default,
     idmtools_platform_general=data_class_default,
     idmtools_platform_container=data_class_default,
-    idmtools_slurm_utils=[],
     idmtools_test=[]
 )
 logger = getLogger("bootstrap")

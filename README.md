@@ -1,16 +1,4 @@
-# Packages Status
-![Staging: idmtools-core](https://github.com/InstituteforDiseaseModeling/idmtools/workflows/Staging:%20idmtools-core/badge.svg?branch=dev)
-![Staging: idmtools-cli](https://github.com/InstituteforDiseaseModeling/idmtools/workflows/Staging:%20idmtools-cli/badge.svg?branch=dev)
-![Staging: idmtools-models](https://github.com/InstituteforDiseaseModeling/idmtools/workflows/Staging:%20idmtools-models/badge.svg?branch=dev)
-![Staging: idmtools-platform-comps](https://github.com/InstituteforDiseaseModeling/idmtools/workflows/Staging:%20idmtools-platform-comps/badge.svg?branch=dev)
-![Staging: idmtools-platform-slurm](https://github.com/InstituteforDiseaseModeling/idmtools/workflows/Staging:%20idmtools-platform-slurm/badge.svg?branch=dev)
-![Staging: idmtools-test](https://github.com/InstituteforDiseaseModeling/idmtools/workflows/Staging:%20idmtools-test/badge.svg?branch=dev)
-
-# Other status
-![Dev: Rebuild documentation](https://github.com/InstituteforDiseaseModeling/idmtools/workflows/Rebuild%20documentation/badge.svg?branch=dev)
-![Lint](https://github.com/InstituteforDiseaseModeling/idmtools/workflows/Lint/badge.svg?branch=dev)
-
-# IDM Modeling Tools
+# idmtools
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -54,9 +42,9 @@ Documentation is located at https://docs.idmod.org/projects/idmtools/en/latest/.
 
 - Create and activate a virtual environment:
     ```
-    python -m venv venv
-    source venv/bin/activate  # On macOS/Linux
-    venv\Scripts\activate     # On Windows
+    python -m venv idmtools
+    source idmtools/bin/activate  # On macOS/Linux
+    idmtools\Scripts\activate     # On Windows
     ```
 - Full installation:
     ```bash
@@ -74,7 +62,7 @@ Documentation is located at https://docs.idmod.org/projects/idmtools/en/latest/.
     ```bash
     pip install idmtools[slurm] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
     ```
-    This will install the idmtools core, CLI, models, slurm_utils, and Slurm platform.
+    This will install the idmtools core, CLI, models and Slurm platform.
 
 - Only install packages for running simulations in Docker container locally:
     ```bash

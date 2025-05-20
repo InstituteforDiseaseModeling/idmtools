@@ -1,11 +1,8 @@
-import csv
 import json
 import os
 import pathlib
-import shutil
 from functools import partial
 from typing import Any, Dict
-
 import numpy as np
 import pandas as pd
 import pytest
@@ -18,7 +15,6 @@ from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
-
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.decorators import linux_only
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
@@ -89,8 +85,8 @@ class TestPythonSimulation(ITestWithPersistence):
                 if dirnames == ["Assets"]:
                     # verify Assets folder under simulation is symlink and it link to experiment's Assets
                     self.assertTrue(os.path.islink(asserts_dir))
-                    target_link = os.readlink(asserts_dir)
-                    self.assertEqual(os.path.basename(pathlib.Path(target_link).parent), f"{experiment.name}_{experiment.id}")
+                    target_link = pathlib.Path(asserts_dir).resolve()
+                    self.assertEqual(os.path.basename(target_link.parent), f"{experiment.name}_{experiment.id}")
                     count = count + 1
                 files.extend(filenames)
             self.assertSetEqual(set(files), set(["metadata.json", "_run.sh", "config.json"]))

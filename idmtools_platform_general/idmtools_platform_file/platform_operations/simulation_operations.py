@@ -31,7 +31,7 @@ class FilePlatformSimulationOperations(IPlatformSimulationOperations):
     platform: 'FilePlatform'  # noqa: F821
     platform_type: Type = field(default=FileSimulation)
 
-    def get(self, simulation_id: str, **kwargs) -> Dict:
+    def get(self, simulation_id: str, **kwargs) -> FileSimulation:
         """
         Gets a simulation from the File platform.
         Args:

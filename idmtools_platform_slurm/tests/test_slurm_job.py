@@ -1,6 +1,5 @@
 import os
 import unittest
-
 import pytest
 from idmtools.core.platform_factory import Platform
 from idmtools_platform_slurm.utils.slurm_job.slurm_job import SlurmJob
@@ -9,7 +8,7 @@ from idmtools_test.utils.decorators import linux_only
 
 @pytest.mark.serial
 @linux_only
-class SlurmJobDryrRunTest(unittest.TestCase):
+class SlurmJobDryRunTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:

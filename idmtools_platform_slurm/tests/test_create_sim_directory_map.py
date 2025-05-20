@@ -4,12 +4,12 @@ import allure
 import os
 
 from idmtools.builders import SimulationBuilder
-from idmtools.core import ItemType
+from idmtools.core import ItemType, EntityStatus
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
-from idmtools_platform_slurm.platform_operations.utils import add_dummy_suite
+from idmtools_platform_file.platform_operations.utils import add_dummy_suite
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.utils import get_case_name
@@ -63,5 +63,12 @@ class TestCreateSimDirectoryMap(ITestWithPersistence):
         sims = experiment.simulations
         for sim in sims:
             self.assertEqual(workdir_dict[sim.id], str(self.platform.get_directory_by_id(sim.id, ItemType.SIMULATION)))
+
+    def test_aliases(self):
+        platform = Platform("SLURM_CLUSTER", job_directory=self.job_directory)
+        suite, exp = self.create_experiment(platform)
+        self.assertTrue(suite.platform._config_block == "SLURM_CLUSTER")
+
+
 
 
