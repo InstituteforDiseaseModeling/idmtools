@@ -23,7 +23,34 @@ FILE_MAPS = {
 }
 
 
-class FileSuite(Suite):
+class FileItem:
+    """
+    Represent File Object.
+    """
+
+    _metas: Dict
+    _platform_directory: str
+
+    def __init__(self, metas: Dict):
+        """
+        Constructor.
+        Args:
+            metas: metadata
+        """
+        self._metas = metas
+        self._platform_directory = metas["dir"]
+
+    def get_platform_object(self):
+        """
+        Get platform.
+
+        Returns:
+            Platform
+        """
+        return self
+
+
+class FileSuite(Suite, FileItem):
     """
     Represent File Suite.
     """
@@ -34,15 +61,22 @@ class FileSuite(Suite):
         Args:
             metas: metadata
         """
-        self.platform_id = metas['platform_id']
+        super().__init__()
         self.uid = metas['id']
         self.parent_id = metas['parent_id']
         self.name = metas['name']
         self.status = metas['status']
+        self.experiments = metas['experiments']
         self.tags = metas['tags']
 
+    def __repr__(self):
+        """
+        String representation of suite.
+        """
+        return f"<{self.__class__.__name__} {self.uid} - {len(self.experiments)} experiments>"
 
-class FileExperiment(Experiment):
+
+class FileExperiment(Experiment, FileItem):
     """
     Represent File Experiment.
     """
@@ -53,15 +87,22 @@ class FileExperiment(Experiment):
         Args:
             metas: metadata
         """
-        self.platform_id = metas['platform_id']
+        super().__init__()
         self.suite_id = self.parent_id = metas['suite_id']
+        self.simulations = metas['simulations']
         self.uid = metas['id']
         self.name = metas['name']
         self.status = metas['status']
         self.tags = metas['tags']
 
+    def __repr__(self):
+        """
+        String representation of experiment.
+        """
+        return f"<{self.__class__.__name__} {self.uid} - {len(self.simulations)} simulations>"
 
-class FileSimulation(Simulation):
+
+class FileSimulation(Simulation, FileItem):
     """
     Represent File Simulation.
     """
@@ -72,7 +113,7 @@ class FileSimulation(Simulation):
         Args:
             metas: metadata
         """
-        self.platform_id = metas['platform_id']
+        super().__init__()
         self.parent_id = metas['parent_id']
         self.uid = metas['id']
         self.name = metas['name']

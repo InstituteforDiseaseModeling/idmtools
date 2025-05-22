@@ -91,11 +91,13 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         meta['status'] = 'CREATED'
         meta['dir'] = os.path.abspath(self.platform.get_directory(item))
 
-        if isinstance(item, Experiment):
+        if isinstance(item, Suite):
+            meta['experiments'] = [experiment.id for experiment in item.experiments]
+        elif isinstance(item, Experiment):
             meta['suite_id'] = meta["parent_id"]
+            meta['simulations'] = [simulation.id for simulation in item.simulations]
         elif isinstance(item, Simulation):
             meta['experiment_id'] = meta["parent_id"]
-
         return meta
 
     def dump(self, item: Union[Suite, Experiment, Simulation]) -> Dict:
