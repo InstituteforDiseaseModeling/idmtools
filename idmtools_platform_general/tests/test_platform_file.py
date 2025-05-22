@@ -17,6 +17,7 @@ from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
+from idmtools_platform_file.platform_operations.utils import FileSimulation, FileExperiment, FileSuite
 
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.decorators import linux_only
@@ -24,7 +25,7 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 
 @pytest.mark.serial
-@linux_only
+#@linux_only
 class TestFilePlatform(ITestWithPersistence):
 
     def create_experiment(self, platform=None, a=1, b=1, retries=None, wait_until_done=False):
@@ -235,3 +236,31 @@ class TestFilePlatform(ITestWithPersistence):
         with self.assertRaises(RuntimeError) as context:
             self.platform.get_item(experiment.parent_id, item_type=ItemType.SUITE, raw=True)
         self.assertTrue(f"Not found Suite with id '{experiment.parent_id}'" in str(context.exception.args[0]))
+
+    def test_file_suite_experiment_simulation(self):
+        experiment = self.create_experiment(self.platform, a=3, b=3)
+        # Test FileSuite
+        file_suite = self.platform.get_item(experiment.parent.id, item_type=ItemType.SUITE, raw=True)
+        self.assertTrue(isinstance(file_suite, FileSuite))
+        self.assertEqual(repr(file_suite), f"<FileSuite {file_suite.id} - {len(file_suite.experiments)} experiments>")
+        self.assertEqual(file_suite.id, experiment.parent.id)
+        self.assertEqual(file_suite.uid, experiment.suite.id)
+        self.assertEqual(file_suite.status, "CREATED")
+        self.assertEqual(file_suite.parent, None)
+        self.assertDictEqual(file_suite.tags, experiment.parent.tags)
+        self.assertEqual(len(file_suite.experiments), 1)
+
+        # Test FileExperiment
+        file_experiment = self.platform.get_item(experiment.id, item_type=ItemType.EXPERIMENT, raw=True)
+        self.assertTrue(isinstance(file_experiment, FileExperiment))
+        self.assertEqual(file_experiment.id, experiment.id)
+        self.assertEqual(file_experiment.parent_id, experiment.parent_id)
+        self.assertEqual(len(file_experiment.simulations), 9)
+        self.assertEqual(repr(file_experiment), f"<FileExperiment {file_experiment.id} - {len(file_experiment.simulations)} simulations>")
+
+        # Test FileSimulation
+        file_simulations = self.platform.get_children(experiment.id, item_type=ItemType.EXPERIMENT, raw=True)
+        self.assertEqual(len(file_simulations), 9)
+        for file_simulation in file_simulations:
+            self.assertTrue(isinstance(file_simulation, FileSimulation))
+
