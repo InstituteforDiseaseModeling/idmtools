@@ -346,7 +346,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
             None
 
         Raises:
-            ValueError - If simulations is a list has items that are not simulations or tasks or string (id)
+            ValueError - If simulations is a list has items that are not simulations or tasks
                          If simulations is not a list, set, TemplatedSimulations or EntityContainer
         """
         if isinstance(simulations, (GeneratorType, TemplatedSimulations, EntityContainer)):
@@ -360,8 +360,6 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
                 if isinstance(sim, ITask):
                     self.__simulations.append(sim.to_simulation())
                 elif isinstance(sim, Simulation):
-                    self.__simulations.append(sim)
-                elif isinstance(sim, str):
                     self.__simulations.append(sim)
                 else:
                     raise ValueError("Only list of tasks/simulations can be passed to experiment simulations")

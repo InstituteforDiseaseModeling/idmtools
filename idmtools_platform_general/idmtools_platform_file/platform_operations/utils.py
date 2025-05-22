@@ -6,7 +6,7 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 import os
 from pathlib import Path
 from logging import getLogger
-from typing import Dict, Union
+from typing import Dict, Union, List
 from idmtools.entities import Suite
 from idmtools.core import EntityStatus
 from idmtools.entities.experiment import Experiment
@@ -31,7 +31,7 @@ class FileItem:
     _metas: Dict
     _platform_directory: str
 
-    def __init__(self, metas: Dict):
+    def initialize(self, metas: Dict):
         """
         Constructor.
         Args:
@@ -61,9 +61,9 @@ class FileSuite(Suite, FileItem):
         Args:
             metas: metadata
         """
-        super().__init__()
+        self.initialize(metas)
+        self._id = metas['id']
         self.uid = metas['id']
-        self.parent_id = metas['parent_id']
         self.name = metas['name']
         self.status = metas['status']
         self.experiments = metas['experiments']
@@ -80,6 +80,28 @@ class FileExperiment(Experiment, FileItem):
     """
     Represent File Experiment.
     """
+    _simulations = List[str]
+
+    @property
+    def simulations(self) -> List:
+        """
+        Get Simulations.
+        Returns:
+            Simulations
+        """
+        return self._simulations
+
+    @simulations.setter
+    def simulations(self, simulations: List):
+        """
+        Set Simulations.
+        Args:
+            simulations:
+
+        Returns:
+            None
+        """
+        self._simulations = simulations
 
     def __init__(self, metas: Dict):
         """
@@ -87,7 +109,8 @@ class FileExperiment(Experiment, FileItem):
         Args:
             metas: metadata
         """
-        super().__init__()
+        self.initialize(metas)
+        self._id = metas['id']
         self.suite_id = self.parent_id = metas['suite_id']
         self.simulations = metas['simulations']
         self.uid = metas['id']
@@ -111,11 +134,13 @@ class FileSimulation(Simulation, FileItem):
         """
         Constructor.
         Args:
-            metas: metadata
+            metas: Metas dict
         """
-        super().__init__()
-        self.parent_id = metas['parent_id']
+        self.initialize(metas)
+        self._id = metas['id']
         self.uid = metas['id']
+        self.parent_id = metas['parent_id']
+        self.experiment_id = metas['parent_id']
         self.name = metas['name']
         self.status = metas['status']
         self.tags = metas['tags']
