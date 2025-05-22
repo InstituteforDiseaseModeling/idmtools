@@ -16,7 +16,7 @@ import tempfile
 from idmtools_platform_container.container_operations.docker_operations import stop_container, find_running_job
 from idmtools_platform_container.container_platform import ContainerPlatform
 import idmtools_platform_container.cli.container as container_cli
-from idmtools_platform_container.utils.job_history import JobHistory
+from idmtools_platform_file.tools.job_history import JobHistory
 parent = Path(__file__).resolve().parent
 sys.path.append(str(parent))
 from utils import find_containers_by_prefix, is_valid_container_name_with_prefix, get_container_name_by_id, \

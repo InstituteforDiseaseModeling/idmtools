@@ -1,5 +1,5 @@
 """
-idmtools ContainerPlatform JobHistory Utility.
+idmtools JobHistory Utility.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
@@ -15,7 +15,7 @@ from logging import getLogger
 logger = getLogger(__name__)
 user_logger = getLogger('user')
 
-JOB_HISTORY_DIR = "idmtools_container_history"
+JOB_HISTORY_DIR = "idmtools_experiment_history"
 
 
 def initialize():
