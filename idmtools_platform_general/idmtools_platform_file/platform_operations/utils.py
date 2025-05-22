@@ -8,8 +8,9 @@ from pathlib import Path
 from logging import getLogger
 from typing import Dict, Union
 from idmtools.entities import Suite
-from idmtools.core import ItemType, EntityStatus
+from idmtools.core import EntityStatus
 from idmtools.entities.experiment import Experiment
+from idmtools.entities.simulation import Simulation
 
 logger = getLogger(__name__)
 user_logger = getLogger("user")
@@ -22,31 +23,7 @@ FILE_MAPS = {
 }
 
 
-class FileItem:
-    """
-    Represent File Object.
-    """
-
-    def __init__(self, metas: Dict):
-        """
-        Constructor.
-        Args:
-            metas: metadata
-        """
-        for key, value in metas.items():
-            setattr(self, key, value)
-
-    def get_platform_object(self):
-        """
-        Get platform.
-
-        Returns:
-            Platform
-        """
-        return self
-
-
-class FileSuite(FileItem):
+class FileSuite(Suite):
     """
     Represent File Suite.
     """
@@ -57,11 +34,15 @@ class FileSuite(FileItem):
         Args:
             metas: metadata
         """
-        super().__init__(metas)
-        self.item_type = ItemType.SUITE
+        self.platform_id = metas['platform_id']
+        self.uid = metas['id']
+        self.parent_id = metas['parent_id']
+        self.name = metas['name']
+        self.status = metas['status']
+        self.tags = metas['tags']
 
 
-class FileExperiment(FileItem):
+class FileExperiment(Experiment):
     """
     Represent File Experiment.
     """
@@ -72,11 +53,15 @@ class FileExperiment(FileItem):
         Args:
             metas: metadata
         """
-        super().__init__(metas)
-        self.item_type = ItemType.EXPERIMENT
+        self.platform_id = metas['platform_id']
+        self.suite_id = self.parent_id = metas['suite_id']
+        self.uid = metas['id']
+        self.name = metas['name']
+        self.status = metas['status']
+        self.tags = metas['tags']
 
 
-class FileSimulation(FileItem):
+class FileSimulation(Simulation):
     """
     Represent File Simulation.
     """
@@ -87,8 +72,13 @@ class FileSimulation(FileItem):
         Args:
             metas: metadata
         """
-        super().__init__(metas)
-        self.item_type = ItemType.SIMULATION
+        self.platform_id = metas['platform_id']
+        self.parent_id = metas['parent_id']
+        self.uid = metas['id']
+        self.name = metas['name']
+        self.status = metas['status']
+        self.tags = metas['tags']
+        self.task = metas['task']
 
 
 def clean_experiment_name(experiment_name: str) -> str:
