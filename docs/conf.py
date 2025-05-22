@@ -78,7 +78,12 @@ myst_enable_extensions = [
     "tasklist",
 ]
 
-plantuml = 'plantweb'
+plantweb_defaults = {
+    'server': 'http://localhost:8080',  # Local server we'll run in CI
+    'format': 'svg',
+    'cache': True,
+    'cache_dir': '_plantweb_cache'
+}
 
 autodoc_default_options = {
     'member-order': 'bysource',

@@ -19,7 +19,17 @@ jobs:
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, 'Bump version: ')"
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+      - name: Setup Java (for PlantUML)
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Start PlantUML server
+        run: |
+            wget -q -O plantuml.jar https://sourceforge.net/projects/plantuml/files/latest/download
+            java -jar plantuml.jar -picoweb &
+            sleep 3  # Wait for server to start
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
