@@ -81,6 +81,7 @@ class FileExperiment(Experiment, FileItem):
     Represent File Experiment.
     """
     _simulations = List[str]
+    _status = None
 
     @property
     def simulations(self) -> List:
@@ -103,6 +104,27 @@ class FileExperiment(Experiment, FileItem):
         """
         self._simulations = simulations
 
+    @property
+    def status(self):
+        """
+        Get status.
+        Returns:
+            Status
+        """
+        return self._status
+
+    @status.setter
+    def status(self, status):
+        """
+        Set Status.
+        Args:
+            status: status
+
+        Returns:
+            None
+        """
+        self._status = status
+
     def __init__(self, metas: Dict):
         """
         Constructor.
@@ -117,6 +139,7 @@ class FileExperiment(Experiment, FileItem):
         self.name = metas['name']
         self.status = metas['status']
         self.tags = metas['tags']
+        self.assets = metas['assets']
 
     def __repr__(self):
         """
@@ -145,6 +168,7 @@ class FileSimulation(Simulation, FileItem):
         self.status = metas['status']
         self.tags = metas['tags']
         self.task = metas['task']
+        self.assets = metas['assets']
 
 
 def clean_experiment_name(experiment_name: str) -> str:

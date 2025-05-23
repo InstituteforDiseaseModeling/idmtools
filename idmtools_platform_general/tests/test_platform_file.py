@@ -10,7 +10,7 @@ import pytest
 from pathlib import Path
 
 from idmtools.builders import SimulationBuilder
-from idmtools.core import ItemType
+from idmtools.core import ItemType, EntityStatus
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
@@ -254,13 +254,25 @@ class TestFilePlatform(ITestWithPersistence):
         file_experiment = self.platform.get_item(experiment.id, item_type=ItemType.EXPERIMENT, raw=True)
         self.assertTrue(isinstance(file_experiment, FileExperiment))
         self.assertEqual(file_experiment.id, experiment.id)
+        self.assertEqual(file_experiment.status, "CREATED")
         self.assertEqual(file_experiment.parent_id, experiment.parent_id)
         self.assertEqual(len(file_experiment.simulations), 9)
         self.assertEqual(repr(file_experiment), f"<FileExperiment {file_experiment.id} - {len(file_experiment.simulations)} simulations>")
+        self.assertEqual(file_experiment.parent_id, experiment.parent_id)
+        # validate file_experiment assets
+        file_experiment_assets = [asset['filename'] for asset in file_experiment.assets]
+        experiment_assets = [asset.filename for asset in experiment.assets]
+        self.assertEqual(set(file_experiment_assets), set(experiment_assets))
 
         # Test FileSimulation
         file_simulations = self.platform.get_children(experiment.id, item_type=ItemType.EXPERIMENT, raw=True)
         self.assertEqual(len(file_simulations), 9)
         for file_simulation in file_simulations:
             self.assertTrue(isinstance(file_simulation, FileSimulation))
+            self.assertEqual(file_simulation.status.name, "CREATED")
+            self.assertEqual(file_simulation.parent_id, file_experiment.id)
+
+        file_simulation_assets = [asset['filename'] for asset in file_simulations[0].assets]
+        simulation_assets = [asset.filename for asset in experiment.simulations[0].assets]
+        self.assertEqual(set(file_simulation_assets), set(simulation_assets))
 
