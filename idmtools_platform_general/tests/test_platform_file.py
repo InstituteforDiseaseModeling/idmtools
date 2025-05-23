@@ -10,7 +10,7 @@ import pytest
 from pathlib import Path
 
 from idmtools.builders import SimulationBuilder
-from idmtools.core import ItemType, EntityStatus
+from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
