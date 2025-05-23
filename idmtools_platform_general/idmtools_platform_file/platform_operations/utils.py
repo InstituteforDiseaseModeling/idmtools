@@ -1,15 +1,16 @@
 """
 This is FilePlatform operations utils.
 
-Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+Copyright 2025, Gates Foundation. All rights reserved.
 """
 import os
 from pathlib import Path
 from logging import getLogger
-from typing import Dict, Union
+from typing import Dict, Union, List
 from idmtools.entities import Suite
-from idmtools.core import ItemType, EntityStatus
+from idmtools.core import EntityStatus
 from idmtools.entities.experiment import Experiment
+from idmtools.entities.simulation import Simulation
 
 logger = getLogger(__name__)
 user_logger = getLogger("user")
@@ -27,14 +28,17 @@ class FileItem:
     Represent File Object.
     """
 
+    _metas: Dict
+    _platform_directory: str
+
     def __init__(self, metas: Dict):
         """
         Constructor.
         Args:
             metas: metadata
         """
-        for key, value in metas.items():
-            setattr(self, key, value)
+        self._metas = metas
+        self._platform_directory = metas["dir"]
 
     def get_platform_object(self):
         """
@@ -46,7 +50,7 @@ class FileItem:
         return self
 
 
-class FileSuite(FileItem):
+class FileSuite(FileItem, Suite):
     """
     Represent File Suite.
     """
@@ -57,14 +61,68 @@ class FileSuite(FileItem):
         Args:
             metas: metadata
         """
-        super().__init__(metas)
-        self.item_type = ItemType.SUITE
+        FileItem.__init__(self, metas)
+        self.uid = metas['id']
+        self.name = metas['name']
+        self.status = metas['status']
+        self.experiments = metas['experiments']
+        self.tags = metas['tags']
+
+    def __repr__(self):
+        """
+        String representation of suite.
+        """
+        return f"<{self.__class__.__name__} {self.uid} - {len(self.experiments)} experiments>"
 
 
-class FileExperiment(FileItem):
+class FileExperiment(FileItem, Experiment):
     """
     Represent File Experiment.
     """
+    _simulations = List[str]
+    _status = None
+
+    @property
+    def simulations(self) -> List:
+        """
+        Get Simulations.
+        Returns:
+            Simulations
+        """
+        return self._simulations
+
+    @simulations.setter
+    def simulations(self, simulations: List):
+        """
+        Set Simulations.
+        Args:
+            simulations:
+
+        Returns:
+            None
+        """
+        self._simulations = simulations
+
+    @property
+    def status(self):
+        """
+        Get status.
+        Returns:
+            Status
+        """
+        return self._status
+
+    @status.setter
+    def status(self, status):
+        """
+        Set Status.
+        Args:
+            status: status
+
+        Returns:
+            None
+        """
+        self._status = status
 
     def __init__(self, metas: Dict):
         """
@@ -72,11 +130,23 @@ class FileExperiment(FileItem):
         Args:
             metas: metadata
         """
-        super().__init__(metas)
-        self.item_type = ItemType.EXPERIMENT
+        FileItem.__init__(self, metas)
+        self.suite_id = self.parent_id = metas['suite_id']
+        self.simulations = metas['simulations']
+        self.uid = metas['id']
+        self.name = metas['name']
+        self.status = metas['status']
+        self.tags = metas['tags']
+        self.assets = metas['assets']
+
+    def __repr__(self):
+        """
+        String representation of experiment.
+        """
+        return f"<{self.__class__.__name__} {self.uid} - {len(self.simulations)} simulations>"
 
 
-class FileSimulation(FileItem):
+class FileSimulation(FileItem, Simulation):
     """
     Represent File Simulation.
     """
@@ -85,10 +155,17 @@ class FileSimulation(FileItem):
         """
         Constructor.
         Args:
-            metas: metadata
+            metas: Metas dict
         """
-        super().__init__(metas)
-        self.item_type = ItemType.SIMULATION
+        FileItem.__init__(self, metas)
+        self.uid = metas['id']
+        self.parent_id = metas['parent_id']
+        self.experiment_id = metas['parent_id']
+        self.name = metas['name']
+        self.status = metas['status']
+        self.tags = metas['tags']
+        self.task = metas['task']
+        self.assets = metas['assets']
 
 
 def clean_experiment_name(experiment_name: str) -> str:
