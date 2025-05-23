@@ -27,7 +27,7 @@ class TestContainerPlatform(unittest.TestCase):
     #     except FileNotFoundError:
     #         pass
 
-    @patch('idmtools_platform_container.utils.job_history.JobHistory.save_job')
+    @patch('idmtools_platform_file.tools.job_history.JobHistory.save_job')
     @patch('idmtools_platform_container.container_platform.find_running_job', return_value=None)
     @patch.object(ContainerPlatform, 'check_container')
     @patch.object(ContainerPlatform, 'convert_scripts_to_linux')
