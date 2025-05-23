@@ -31,7 +31,7 @@ class FileItem:
     _metas: Dict
     _platform_directory: str
 
-    def initialize(self, metas: Dict):
+    def __init__(self, metas: Dict):
         """
         Constructor.
         Args:
@@ -50,7 +50,7 @@ class FileItem:
         return self
 
 
-class FileSuite(Suite, FileItem):
+class FileSuite(FileItem, Suite):
     """
     Represent File Suite.
     """
@@ -61,8 +61,7 @@ class FileSuite(Suite, FileItem):
         Args:
             metas: metadata
         """
-        self.initialize(metas)
-        self._id = metas['id']
+        FileItem.__init__(self, metas)
         self.uid = metas['id']
         self.name = metas['name']
         self.status = metas['status']
@@ -76,7 +75,7 @@ class FileSuite(Suite, FileItem):
         return f"<{self.__class__.__name__} {self.uid} - {len(self.experiments)} experiments>"
 
 
-class FileExperiment(Experiment, FileItem):
+class FileExperiment(FileItem, Experiment):
     """
     Represent File Experiment.
     """
@@ -131,8 +130,7 @@ class FileExperiment(Experiment, FileItem):
         Args:
             metas: metadata
         """
-        self.initialize(metas)
-        self._id = metas['id']
+        FileItem.__init__(self, metas)
         self.suite_id = self.parent_id = metas['suite_id']
         self.simulations = metas['simulations']
         self.uid = metas['id']
@@ -148,7 +146,7 @@ class FileExperiment(Experiment, FileItem):
         return f"<{self.__class__.__name__} {self.uid} - {len(self.simulations)} simulations>"
 
 
-class FileSimulation(Simulation, FileItem):
+class FileSimulation(FileItem, Simulation):
     """
     Represent File Simulation.
     """
@@ -159,8 +157,7 @@ class FileSimulation(Simulation, FileItem):
         Args:
             metas: Metas dict
         """
-        self.initialize(metas)
-        self._id = metas['id']
+        FileItem.__init__(self, metas)
         self.uid = metas['id']
         self.parent_id = metas['parent_id']
         self.experiment_id = metas['parent_id']

@@ -249,7 +249,10 @@ class TestFilePlatform(ITestWithPersistence):
         self.assertEqual(file_suite.parent, None)
         self.assertDictEqual(file_suite.tags, experiment.parent.tags)
         self.assertEqual(len(file_suite.experiments), 1)
-
+        # validate get_platform_object() method
+        file_suite1 = file_suite.get_platform_object()
+        self.assertTrue(isinstance(file_suite1, FileSuite))
+        self.assertEqual(id(file_suite), id(file_suite1))
         # Test FileExperiment
         file_experiment = self.platform.get_item(experiment.id, item_type=ItemType.EXPERIMENT, raw=True)
         self.assertTrue(isinstance(file_experiment, FileExperiment))
@@ -275,4 +278,5 @@ class TestFilePlatform(ITestWithPersistence):
         file_simulation_assets = [asset['filename'] for asset in file_simulations[0].assets]
         simulation_assets = [asset.filename for asset in experiment.simulations[0].assets]
         self.assertEqual(set(file_simulation_assets), set(simulation_assets))
+
 
