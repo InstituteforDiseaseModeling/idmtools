@@ -3,6 +3,9 @@ from pathlib import Path
 import shutil
 import tempfile
 import unittest
+
+import pytest
+
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
@@ -11,6 +14,7 @@ from idmtools.entities.suite import Suite
 from idmtools_platform_file.platform_operations.json_metadata_operations import JSONMetadataOperations
 
 
+@pytest.mark.serial
 class JSONMetadataOperationsTest(unittest.TestCase):
 
     @staticmethod
