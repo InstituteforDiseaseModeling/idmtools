@@ -1,7 +1,7 @@
 """
 This is FilePlatform operations utils.
 
-Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+Copyright 2025, Gates Foundation. All rights reserved.
 """
 import os
 from pathlib import Path
