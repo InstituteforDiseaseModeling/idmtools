@@ -38,7 +38,7 @@ from functools import partial
 from typing import List
 from enum import Enum
 from idmtools.core import CacheEnabled, ItemType, EntityStatus
-from idmtools.entities.iplatform import IPlatform, ITEM_TYPE_TO_OBJECT_INTERFACE
+from idmtools.entities.iplatform import IPlatform
 from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools_platform_comps.comps_operations.asset_collection_operations import CompsPlatformAssetCollectionOperations
 from idmtools_platform_comps.comps_operations.experiment_operations import CompsPlatformExperimentOperations
