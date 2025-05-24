@@ -233,7 +233,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         if isinstance(item, COMPSSuite):
             children = self._suites.get_children(item)
             for child in children:
-                flattened .extend(self.flatten_item(item=child, raw=raw, **kwargs))
+                flattened.extend(self.flatten_item(item=child, raw=raw, **kwargs))
         elif isinstance(item, COMPSExperiment):
             columns = ["id", "name", "state"]
             comps_children = ["tags", "configuration", "hpc_jobs"]
