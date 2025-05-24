@@ -5,7 +5,6 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 # flake8: noqa E402
 import copy
 import logging
-from uuid import UUID
 
 # fix for comps weird import
 from idmtools.entities import Suite
