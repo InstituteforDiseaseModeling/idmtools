@@ -329,10 +329,8 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             for src_type, dest_type in self.platform_type_map.items():
                 if isinstance(ce, src_type):  # no need to convert to native platform object
                     children = self._get_children_for_platform_item(ce, raw=raw, **kwargs)
-                    break
                 else:
                     children = self.get_children_by_object(ce)
-                    break
             self.cache.set(cache_key, children, expire=self._object_cache_expiration)
             return children
 
