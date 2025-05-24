@@ -63,16 +63,6 @@ jobs:
         with:
           name: idmtools_core_test_results
           path: idmtools_core/tests/reports/
-      - name: run idmtools_models tests
-        run: |
-          cd idmtools_models
-          PARALLEL_TEST_COUNT=2 make test-all
-      - name: Upload idmtools_models all test results
-        uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: idmtools_models_test_results
-          path: idmtools_models/tests/reports/
       - name: run idmtools_platform_general tests
         run: |
             cd idmtools_platform_general
@@ -103,6 +93,16 @@ jobs:
         with:
           name: idmtools_platform_container_test_results
           path: idmtools_platform_container/tests/reports/
+      - name: run idmtools_models tests
+        run: |
+          cd idmtools_models
+          PARALLEL_TEST_COUNT=2 make test-all
+      - name: Upload idmtools_models all test results
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: idmtools_models_test_results
+          path: idmtools_models/tests/reports/
       - name: run idmtools_platform_comps tests
         run: |
           cd idmtools_platform_comps
