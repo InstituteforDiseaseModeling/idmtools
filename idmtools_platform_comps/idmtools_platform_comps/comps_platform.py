@@ -10,7 +10,7 @@ import logging
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
-from idmtools_platform_comps.utils.general import convert_to_uuid
+from idmtools.utils.general import convert_to_uuid
 
 HANDLERS = copy.copy(logging.getLogger().handlers)
 LEVEL = logging.getLogger().level
