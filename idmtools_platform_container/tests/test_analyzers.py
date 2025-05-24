@@ -66,11 +66,30 @@ class TestContainerPlatformAnalyzer(unittest.TestCase):
         experiment.run(True, platform=cls.platform)
         cls.exp_id = experiment.uid
 
-    def test_AddAnalyzer(self):
+    def test_analyzer_experiment(self):
         self.case_name = os.path.basename(__file__)
         analyzers = [AddAnalyzer(filenames=['config.json'])]
-
         am = AnalyzeManager(platform=self.platform, ids=[(self.exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
         am.analyze()
-        print(analyzers[0].results)
+        self.assertEqual(analyzers[0].results, 45)
+
+    def test_analyzer_simulations(self):
+        self.case_name = os.path.basename(__file__)
+        analyzers = [AddAnalyzer(filenames=['config.json'])]
+        simulation_tuple = []
+        exp = self.platform.get_item(self.exp_id, item_type=ItemType.EXPERIMENT)
+        for sim in exp.simulations:
+            simulation_tuple.append((sim.id, ItemType.SIMULATION))
+        am = AnalyzeManager(ids=simulation_tuple, analyzers=analyzers)
+        am.analyze()
+        self.assertEqual(analyzers[0].results, 45)
+
+    def test_analyzer_suite(self):
+        self.case_name = os.path.basename(__file__)
+        analyzers = [AddAnalyzer(filenames=['config.json'])]
+        exp = self.platform.get_item(self.exp_id, item_type=ItemType.EXPERIMENT)
+        suite = exp.suite
+        suite_tuple = [(suite.id, ItemType.SUITE)]
+        am = AnalyzeManager(ids=suite_tuple, analyzers=analyzers)
+        am.analyze()
         self.assertEqual(analyzers[0].results, 45)
