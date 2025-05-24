@@ -352,3 +352,7 @@ def save_sif_asset_md5_from_ac_id(ac_id: str):
     asset = Asset(filename=ac.assets[0].file_name, checksum=ac.assets[0].md5_checksum)
     # Save the asset filename and md5 checksum to local file
     asset.save_md5_checksum()
+
+
+def convert_to_uuid(item_id):
+    return item_id if isinstance(item_id, UUID) else UUID(item_id)

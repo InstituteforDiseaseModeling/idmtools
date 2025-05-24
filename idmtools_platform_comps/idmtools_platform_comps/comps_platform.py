@@ -11,6 +11,7 @@ from uuid import UUID
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
+from idmtools_platform_comps.utils.general import convert_to_uuid
 
 HANDLERS = copy.copy(logging.getLogger().handlers)
 LEVEL = logging.getLogger().level
@@ -248,12 +249,10 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                 exp.platform = self
                 item.experiment = exp
                 exp._platform_object = item
-                item.uid = item.id if isinstance(item.id, UUID) else UUID(item.id)
+                item.uid = convert_to_uuid(item.id)
                 item.platform = self
             flattened.append(item)
         else:
             return super().flatten_item(item)
 
         return flattened
-
-
