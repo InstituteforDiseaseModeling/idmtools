@@ -10,7 +10,7 @@ from dataclasses import dataclass, field
 from typing import List, Dict, NoReturn, Any, Union
 from idmtools.core import ItemType
 from idmtools_platform_container.utils.general import normalize_path, parse_iso8601
-from idmtools_platform_container.utils.job_history import JobHistory
+from idmtools_platform_file.tools.job_history import JobHistory
 from docker.models.containers import Container
 from docker.errors import NotFound as ErrorNotFound
 from docker.errors import APIError as DockerAPIError

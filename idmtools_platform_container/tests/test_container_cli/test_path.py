@@ -42,7 +42,7 @@ class TestContainerPlatformPathCli(TestContainerPlatformCliBase):
             self.assertIn(normalize_path(normalize_path(suite_dir)),
                           normalize_path(mock_console.call_args.args[0].split(' ')[1]))
         # Test invalid path
-        with patch("idmtools_platform_container.utils.job_history.logger") as mock_logger:
+        with patch("idmtools_platform_file.tools.job_history.logger") as mock_logger:
             result = self.runner.invoke(container_cli.container, ['path', "abc"])
             mock_logger.debug.assert_called_with("Invalid item id: abc")
         # clean up container

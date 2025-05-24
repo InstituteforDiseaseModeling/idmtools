@@ -156,21 +156,32 @@ class TestSlurmPlatform(ITestWithPersistence):
             count += 1
         self.assertEqual(count, 2)
 
-    def test_to_entity(self):
+    def test_get_server_item(self):
         slurm_experiment = self.platform.get_item(self.exp.id, item_type=ItemType.EXPERIMENT, raw=True)
         idm_experiment = self.platform._experiments.to_entity(slurm_experiment)
         self.assertEqual(slurm_experiment.id, idm_experiment.id)
         self.assertEqual(slurm_experiment.uid, idm_experiment.id)
         self.assertEqual(slurm_experiment.name, idm_experiment.name)
         self.assertEqual(slurm_experiment.tags, idm_experiment.tags)
-        self.assertFalse(hasattr(slurm_experiment, 'simulations'))
+        self.assertEqual(len(slurm_experiment.simulations), 2)
 
         # we only compare asset filenames
         slurm_experiment_assets = [asset['filename'] for asset in slurm_experiment.assets]
-        idm_experiment_assets = [asset.filename for asset in idm_experiment.assets]
-        self.assertEqual(set(slurm_experiment_assets), set(idm_experiment_assets))
+        experiment_assets = [asset.filename for asset in idm_experiment.assets]
+        self.assertEqual(set(slurm_experiment_assets), set(experiment_assets))
         self.assertEqual(slurm_experiment.status, 'CREATED')
         self.assertEqual(idm_experiment.status, EntityStatus.CREATED)
+        self.assertEqual(slurm_experiment.parent_id, self.exp.parent_id)
+
+        slurm_simulations = self.platform.get_children(self.exp.id, item_type=ItemType.EXPERIMENT, raw=True)
+        for slurm_sim in slurm_simulations:
+            self.assertTrue(isinstance(slurm_sim, FileSimulation))
+            self.assertEqual(slurm_sim.status.name, "CREATED")
+            self.assertEqual(slurm_sim.parent_id, slurm_experiment.id)
+
+        file_simulation_assets = [asset['filename'] for asset in slurm_simulations[0].assets]
+        simulation_assets = [asset.filename for asset in self.exp.simulations[0].assets]
+        self.assertEqual(set(file_simulation_assets), set(simulation_assets))
 
     def test_get_files(self):
         with self.subTest('test_get_files_for_experiment'):

@@ -20,7 +20,7 @@ from idmtools_platform_container.container_operations.docker_operations import v
     is_docker_installed, is_docker_daemon_running
 from idmtools_platform_container.platform_operations.simulation_operations import ContainerPlatformSimulationOperations
 from idmtools_platform_container.utils.general import map_container_path
-from idmtools_platform_container.utils.job_history import JobHistory
+from idmtools_platform_file.tools.job_history import JobHistory
 from idmtools_platform_file.file_platform import FilePlatform
 from idmtools_platform_container.platform_operations.experiment_operations import ContainerPlatformExperimentOperations
 from logging import getLogger, DEBUG

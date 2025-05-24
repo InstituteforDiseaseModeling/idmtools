@@ -14,9 +14,9 @@ from rich.table import Table
 from idmtools.core import ItemType
 from idmtools_platform_container.container_operations.docker_operations import list_running_jobs, find_running_job, \
     is_docker_installed, is_docker_daemon_running, get_working_containers, get_containers, get_container
-from idmtools_platform_container.utils.job_history import JobHistory
 from idmtools_platform_container.utils.status import summarize_status_files, get_simulation_status
 from idmtools_platform_container.utils.general import convert_byte_size, format_timestamp
+from idmtools_platform_file.tools.job_history import JobHistory
 from logging import getLogger
 
 logger = getLogger(__name__)

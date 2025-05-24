@@ -42,7 +42,7 @@ class TestContainerPlatformHistoryCli(TestContainerPlatformCliBase):
                                       cleaned_str(mock_console.call_args_list[6][0][0]))
         self.assertTrue(match_created_time)
         # Verify history path:
-        JOB_HISTORY_DIR = "idmtools_container_history"
+        JOB_HISTORY_DIR = "idmtools_experiment_history"
         history_path = Path.home().joinpath(".idmtools").joinpath(JOB_HISTORY_DIR)
         self.assertTrue(history_path.is_dir())
         self.assertTrue(any(history_path.iterdir()))  # verify history path has some files
