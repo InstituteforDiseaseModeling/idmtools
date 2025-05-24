@@ -321,12 +321,18 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         if force:
             self.cache.delete(cache_key)
-
+        children=[]
         if cache_key not in self.cache:
             ce = item or self.get_item(item_id, raw=raw, item_type=item_type)
             ce.platform = self
             kwargs['parent'] = ce
-            children = self._get_children_for_platform_item(ce.get_platform_object(), raw=raw, **kwargs)
+            for src_type, dest_type in self.platform_type_map.items():
+                if isinstance(ce, src_type):  # no need to convert to native platform object
+                    children = self._get_children_for_platform_item(ce, raw=raw, **kwargs)
+                    break
+                else:
+                    children = self._get_children_for_platform_item(ce.get_platform_object(), raw=raw, **kwargs)
+                    break
             self.cache.set(cache_key, children, expire=self._object_cache_expiration)
             return children
 
@@ -562,14 +568,22 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             List of leaves
 
         """
-        children = self.get_children(item.uid, item.item_type, force=True)
-        if children is None or (isinstance(children, list) and len(children) == 0):
-            items = [item]
-        else:
-            items = list()
-            for child in children:
-                items += self.flatten_item(item=child)
-        return items
+        flattened = []
+        if isinstance(item, Suite):
+            experiments = item.experiments
+            if experiments is None:
+                experiments = self.get_children(item.uid, item.item_type, force=True)
+            for child in experiments:
+                flattened.extend(self.flatten_item(item=child))
+        elif isinstance(item, Experiment):
+            simulations = item.simulations
+            if simulations is None:
+                simulations = self.get_children(item.uid, item.item_type, force=True)
+            for simulation in simulations:
+                flattened.extend(self.flatten_item(item=simulation))
+        elif isinstance(item, Simulation):
+            flattened.append(item)
+        return flattened
 
     def refresh_status(self, item: IEntity) -> NoReturn:
         """
