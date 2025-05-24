@@ -167,7 +167,7 @@ class FilePlatform(IPlatform):
             children = self._experiments.get_children(item, parent=item, raw=raw, **kwargs)
             for child in children:
                 flattened.extend(self.flatten_item(item=child, raw=raw, **kwargs))
-        elif isinstance(item, (FileSimulation)):
+        elif isinstance(item, FileSimulation):
             exp = Experiment()
             exp.uid = item.experiment_id
             exp.platform = self
