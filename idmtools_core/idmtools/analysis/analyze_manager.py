@@ -13,11 +13,16 @@ from typing import NoReturn, List, Dict, Tuple, Optional, TYPE_CHECKING
 from tqdm import tqdm
 from idmtools import IdmConfigParser
 from idmtools.analysis.map_worker_entry import map_item
+from idmtools.assets import AssetCollection
 from idmtools.core import NoPlatformException
 from idmtools.core.enums import ItemType
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.core.logging import VERBOSE, SUCCESS
+from idmtools.entities import Suite
+from idmtools.entities.experiment import Experiment
 from idmtools.entities.ianalyzer import IAnalyzer
+from idmtools.entities.iworkflow_item import IWorkflowItem
+from idmtools.entities.simulation import Simulation
 from idmtools.utils.language import on_off, verbose_timedelta
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -201,7 +206,10 @@ class AnalyzeManager:
         Returns:
             None
         """
-        self.potential_items.extend(self.platform.flatten_item(item=item, raw=True))
+        if isinstance(item, (Suite, Experiment, Simulation, IWorkflowItem, AssetCollection)):
+            item = self.platform.get_item(item.id, item_type=item.item_type, raw=True)
+
+        self.potential_items.extend(self.platform.flatten_item(item=item))
 
     def _get_items_to_analyze(self) -> Dict[str, IEntity]:
         """
