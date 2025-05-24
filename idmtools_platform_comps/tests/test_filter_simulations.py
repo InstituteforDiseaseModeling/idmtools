@@ -7,9 +7,10 @@ from idmtools.core import ItemType, EntityStatus
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
+from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools.utils.filter_simulations import FilterItem
-
+from COMPS.Data import Simulation as COMPSSimulation
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
@@ -48,6 +49,8 @@ class TestSimulations(ITestWithPersistence):
         self.platform.create_items([suite])
         suite.add_experiment(experiment)
         experiment.run(wait_until_done=True)
+        # suite_id = 'd35b322e-4238-f011-930f-f0921c167860'
+        # suite = self.platform.get_item(suite_id, item_type=ItemType.SUITE)
         return suite
 
     @classmethod
@@ -109,6 +112,45 @@ class TestSimulations(ITestWithPersistence):
         sims = FilterItem.filter_item_by_id(self.platform, self.experiment.uid, ItemType.EXPERIMENT,
                                             skip_sims=[skip_sim], max_simulations=5)
         self.assertEqual(len(sims), 1)
+
+    def test_flatten_item_idm_suite(self):
+        flatten_items = self.platform.flatten_item(self.suite)
+        self.assertEqual(len(flatten_items), 5)
+        for item in flatten_items:
+            self.assertTrue(isinstance(item, Simulation))
+
+    def test_flatten_item_comps_suite(self):
+        comps_suite = self.platform.get_item(self.suite.id, item_type=ItemType.SUITE, raw=True)
+        flatten_items = self.platform.flatten_item(comps_suite)
+        self.assertEqual(len(flatten_items), 5)
+        for item in flatten_items:
+            self.assertTrue(isinstance(item, COMPSSimulation))
+
+    def test_flatten_item_idm_experiment(self):
+        flatten_items = self.platform.flatten_item(self.experiment)
+        self.assertEqual(len(flatten_items), 5)
+        for item in flatten_items:
+            self.assertTrue(isinstance(item, Simulation))
+
+    def test_flatten_item_comps_experiment(self):
+        comps_exp = self.platform.get_item(self.experiment.id, item_type=ItemType.EXPERIMENT, raw=True)
+        flatten_items = self.platform.flatten_item(comps_exp)
+        self.assertEqual(len(flatten_items), 5)
+        for item in flatten_items:
+            self.assertTrue(isinstance(item, COMPSSimulation))
+
+    def test_flatten_item_idm_simulation(self):
+        flatten_items = self.platform.flatten_item(self.experiment.simulations[0])
+        self.assertEqual(len(flatten_items), 1)
+        for item in flatten_items:
+            self.assertTrue(isinstance(item, Simulation))
+
+    def test_flatten_item_comps_simulation(self):
+        comps_sim = self.platform.get_item(self.experiment.simulations[0].id, item_type=ItemType.SIMULATION, raw=True)
+        flatten_items = self.platform.flatten_item(comps_sim)
+        self.assertEqual(len(flatten_items), 1)
+        for item in flatten_items:
+            self.assertTrue(isinstance(item, COMPSSimulation))
 
 
 if __name__ == '__main__':
