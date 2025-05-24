@@ -8,13 +8,15 @@ from pathlib import Path
 from logging import getLogger
 from typing import Union, List
 from dataclasses import dataclass, field
+from uuid import UUID
+
 from idmtools import IdmConfigParser
 from idmtools.core import ItemType, EntityStatus, TRUTHY_VALUES
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
-from idmtools.entities.iplatform import IPlatform, ITEM_TYPE_TO_OBJECT_INTERFACE
+from idmtools.entities.iplatform import IPlatform
 from idmtools_platform_file.file_operations.file_operations import FileOperations
 from idmtools_platform_file.platform_operations.asset_collection_operations import FilePlatformAssetCollectionOperations
 from idmtools_platform_file.platform_operations.experiment_operations import FilePlatformExperimentOperations
@@ -156,51 +158,28 @@ class FilePlatform(IPlatform):
         Returns:
             List of leaves
         """
-        if not raw:
-            interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
-            idm_item = getattr(self, interface).to_entity(item)
-            return super().flatten_item(idm_item)
-
+        flattened = []
         if isinstance(item, FileSuite):
-            experiments = self._suites.get_children(item, parent=item, raw=True)
-            children = list()
-            for file_exp in experiments:
-                children += self.flatten_item(item=file_exp, raw=raw)
+            children = self._suites.get_children(item, parent=item, raw=raw, **kwargs)
+            for child in children:
+                flattened.extend(self.flatten_item(item=child, raw=raw, **kwargs))
         elif isinstance(item, FileExperiment):
-            children = self._experiments.get_children(item, parent=item, raw=True)
+            children = self._experiments.get_children(item, parent=item, raw=raw)
+            for child in children:
+                flattened.extend(self.flatten_item(item=child, raw=raw, **kwargs))
+        elif isinstance(item, (FileSimulation)):
             exp = Experiment()
-            exp.uid = item.id
+            exp.uid = item.experiment_id
             exp.platform = self
+            item.experiment = exp
             exp._platform_object = item
-            exp.tags = item.tags
-
-            for file_sim in children:
-                file_sim.experiment = exp
-                file_sim.platform = self
-        elif isinstance(item, FileSimulation):
-            if raw:
-                children = [item]
-            else:
-                exp = Experiment()
-                exp.uid = item.id
-                exp.platform = self
-                exp._platform_object = item
-                exp.tags = item.tags
-                sim = self._simulations.to_entity(item, parent=exp)
-                sim.experiment = exp
-                children = [sim]
-        elif isinstance(item, Suite):
-            file_suite = item.get_platform_object()
-            file_suite.platform = self
-            children = self.flatten_item(item=file_suite)
-        elif isinstance(item, Experiment):
-            children = item.simulations.items
-        elif isinstance(item, Simulation):
-            children = [item]
+            item.uid = item.id if isinstance(item.id, UUID) else UUID(item.id)
+            item.platform = self
+            flattened.append(item)
         else:
-            raise Exception(f'Item Type: {type(item)} is not supported!')
+            return super().flatten_item(item)
 
-        return children
+        return flattened
 
     def validate_item_for_analysis(self, item: Union[Simulation, FileSimulation], analyze_failed_items=False):
         """
