@@ -321,20 +321,12 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         if force:
             self.cache.delete(cache_key)
-        children = []
+
         if cache_key not in self.cache:
             ce = item or self.get_item(item_id, raw=raw, item_type=item_type)
             ce.platform = self
             kwargs['parent'] = ce
-            found_match = False
-            for src_type, dest_type in self.platform_type_map.items():
-                if isinstance(ce, src_type):  # no need to convert to native platform object
-                    children = self._get_children_for_platform_item(ce, raw=raw, **kwargs)
-                    found_match = True
-                    break
-
-            if not found_match:
-                children = self.get_children_by_object(ce)
+            children = self._get_children_for_platform_item(ce.get_platform_object(), raw=raw, **kwargs)
             self.cache.set(cache_key, children, expire=self._object_cache_expiration)
             return children
 
