@@ -566,7 +566,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         Returns:
             List of leaves
         """
-        if isinstance(item, Simulation):
+        if isinstance(item, (Simulation, IWorkflowItem, AssetCollection)):
             children = []
         else:
             children = self.get_children(item.uid, item.item_type, force=True)
