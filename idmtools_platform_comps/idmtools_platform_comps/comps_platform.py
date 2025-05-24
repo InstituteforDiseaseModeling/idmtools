@@ -38,7 +38,7 @@ from functools import partial
 from typing import List
 from enum import Enum
 from idmtools.core import CacheEnabled, ItemType, EntityStatus
-from idmtools.entities.iplatform import IPlatform
+from idmtools.entities.iplatform import IPlatform, ITEM_TYPE_TO_OBJECT_INTERFACE
 from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools_platform_comps.comps_operations.asset_collection_operations import CompsPlatformAssetCollectionOperations
 from idmtools_platform_comps.comps_operations.experiment_operations import CompsPlatformExperimentOperations
@@ -229,50 +229,31 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         Returns:
             List of leaves
         """
-        if not raw:
-            return super().flatten_item(item)
-
+        flattened = []
         if isinstance(item, COMPSSuite):
-            experiments = item.get_experiments()
-            children = list()
-            for child in experiments:
-                children += self.flatten_item(item=child)
+            children = self._suites.get_children(item)
+            for child in children:
+                flattened .extend(self.flatten_item(item=child, raw=raw, **kwargs))
         elif isinstance(item, COMPSExperiment):
             columns = ["id", "name", "state"]
             comps_children = ["tags", "configuration", "hpc_jobs"]
-            query_criteria = QueryCriteria().select(columns).select_children(comps_children)
-            children = item.get_simulations(query_criteria=query_criteria)
-            item.uid = item.id
-
-            exp = Experiment()
-            exp.uid = item.id
-            exp.platform = self
-            exp._platform_object = item
-            exp.tags = item.tags
-
-            for comps_item in children:
-                comps_item.uid = comps_item.id if isinstance(comps_item.id, UUID) else UUID(comps_item.id)
-                comps_item.experiment = exp
-                comps_item.platform = self
+            children = self._experiments.get_children(item, columns=columns, children=comps_children)
+            for child in children:
+                child.experiment_id = item.id
+                flattened.extend(self.flatten_item(item=child, raw=raw, **kwargs))
         elif isinstance(item, (COMPSSimulation, COMPSWorkItem, COMPSAssetCollection)):
-            children = [item]
-
             if isinstance(item, COMPSSimulation):
                 exp = Experiment()
                 exp.uid = item.experiment_id
                 exp.platform = self
                 item.experiment = exp
-        elif isinstance(item, Suite):
-            comps_item = item.get_platform_object()
-            comps_item.platform = self
-            children = self.flatten_item(item=comps_item)
-        elif isinstance(item, Experiment):
-            children = item.simulations.items
-        elif isinstance(item, (Simulation, IWorkflowItem, AssetCollection)):
-            children = [item]
+                exp._platform_object = item
+                item.uid = item.id if isinstance(item.id, UUID) else UUID(item.id)
+                item.platform = self
+            flattened.append(item)
         else:
-            raise Exception(f'Item Type: {type(item)} is not supported!')
+            return super().flatten_item(item)
 
-        return children
+        return flattened
 
 
