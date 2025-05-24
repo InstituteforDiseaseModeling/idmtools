@@ -321,7 +321,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         if force:
             self.cache.delete(cache_key)
-        children=[]
+        children = []
         if cache_key not in self.cache:
             ce = item or self.get_item(item_id, raw=raw, item_type=item_type)
             ce.platform = self
