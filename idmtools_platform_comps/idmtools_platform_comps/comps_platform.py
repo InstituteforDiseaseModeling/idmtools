@@ -21,7 +21,7 @@ logging.root.handlers = HANDLERS
 logging.getLogger().setLevel(LEVEL)
 comps_logger.propagate = False
 comps_logger.handlers = [h for h in comps_logger.handlers if isinstance(h, logging.FileHandler)]
-from COMPS.Data import Simulation as COMPSSimulation, QueryCriteria
+from COMPS.Data import Simulation as COMPSSimulation
 from COMPS.Data import WorkItem as COMPSWorkItem
 from COMPS.Data import AssetCollection as COMPSAssetCollection
 from COMPS.Data import Experiment as COMPSExperiment

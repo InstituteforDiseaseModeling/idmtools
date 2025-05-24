@@ -331,7 +331,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
                     children = self._get_children_for_platform_item(ce, raw=raw, **kwargs)
                     break
                 else:
-                    children = self._get_children_for_platform_item(ce.get_platform_object(), raw=raw, **kwargs)
+                    children = self.get_children_by_object(ce)
                     break
             self.cache.set(cache_key, children, expire=self._object_cache_expiration)
             return children
@@ -566,24 +566,18 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         Returns:
             List of leaves
-
         """
-        flattened = []
-        if isinstance(item, Suite):
-            experiments = item.experiments
-            if experiments is None:
-                experiments = self.get_children(item.uid, item.item_type, force=True)
-            for child in experiments:
-                flattened.extend(self.flatten_item(item=child))
-        elif isinstance(item, Experiment):
-            simulations = item.simulations
-            if simulations is None:
-                simulations = self.get_children(item.uid, item.item_type, force=True)
-            for simulation in simulations:
-                flattened.extend(self.flatten_item(item=simulation))
-        elif isinstance(item, Simulation):
-            flattened.append(item)
-        return flattened
+        if isinstance(item, Simulation):
+            children = []
+        else:
+            children = self.get_children(item.uid, item.item_type, force=True)
+        if children is None or (isinstance(children, list) and len(children) == 0):
+            items = [item]
+        else:
+            items = list()
+            for child in children:
+                items += self.flatten_item(item=child)
+        return items
 
     def refresh_status(self, item: IEntity) -> NoReturn:
         """
