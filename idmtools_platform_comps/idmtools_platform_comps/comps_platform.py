@@ -7,10 +7,8 @@ import copy
 import logging
 
 # fix for comps weird import
-from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
-from idmtools.utils.general import convert_to_uuid
 
 HANDLERS = copy.copy(logging.getLogger().handlers)
 LEVEL = logging.getLogger().level
@@ -241,7 +239,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                 item.item_type = ItemType.SIMULATION
                 item._platform_object = item
                 item.experiment = exp
-                item.uid = convert_to_uuid(item.id)
+                item.uid = item.id
                 item.platform = self
             flattened.append(item)
         else:
