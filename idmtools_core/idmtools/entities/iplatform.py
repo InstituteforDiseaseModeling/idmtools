@@ -326,7 +326,10 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             ce = item or self.get_item(item_id, raw=raw, item_type=item_type)
             ce.platform = self
             kwargs['parent'] = ce
-            children = self._get_children_for_platform_item(ce.get_platform_object(), raw=raw, **kwargs)
+            if raw:
+                children = self._get_children_for_platform_item(ce, raw=raw, **kwargs)
+            else:
+                children = self._get_children_for_platform_item(ce.get_platform_object(), raw=raw, **kwargs)
             self.cache.set(cache_key, children, expire=self._object_cache_expiration)
             return children
 
@@ -547,7 +550,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         return result
 
-    def flatten_item(self, item: object, **kwargs) -> List[object]:
+    def flatten_item(self, item: object, raw: bool =False, **kwargs) -> List[object]:
         """
         Flatten an item: resolve the children until getting to the leaves.
 
@@ -564,13 +567,17 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         if isinstance(item, (Simulation, IWorkflowItem, AssetCollection)):
             children = []
         else:
-            children = self.get_children(item.uid, item.item_type, force=True)
+            children = self.get_children(item.uid, item.item_type, force=True, raw=raw)
+
         if children is None or (isinstance(children, list) and len(children) == 0):
             items = [item]
         else:
             items = list()
             for child in children:
-                items += self.flatten_item(item=child)
+                n = self._convert_platform_item_to_entity(child, **kwargs)
+                if n._platform_object is None:
+                    n._platform_object = child
+                items.append(n) #self.flatten_item(item=n, raw=raw, **kwargs)
         return items
 
     def refresh_status(self, item: IEntity) -> NoReturn:

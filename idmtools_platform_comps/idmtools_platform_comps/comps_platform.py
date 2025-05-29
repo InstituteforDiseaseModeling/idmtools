@@ -200,15 +200,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             For experiments, this returns a dictionary with key as sim id and then the values as a dict of the
             simulations described above
         """
-        if isinstance(item, COMPSSimulation):
-            item = self._simulations.to_entity(item, parent=item.experiment)
-        elif isinstance(item, COMPSWorkItem):
-            item = self._workflow_items.to_entity(item)
-        elif isinstance(item, COMPSAssetCollection):
-            item = self._assets.to_entity(item)
-        elif isinstance(item, (Simulation, IWorkflowItem, AssetCollection)):
-            item = item
-        else:
+        if not isinstance(item, (COMPSSimulation, COMPSWorkItem, COMPSAssetCollection)):
             raise Exception(f'Item Type: {type(item)} is not supported!')
 
         file_data = super().get_files(item, files, output, **kwargs)
@@ -236,7 +228,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                 flattened.extend(self.flatten_item(item=child, raw=raw, **kwargs))
         elif isinstance(item, COMPSExperiment):
             columns = ["id", "name", "state"]
-            comps_children = ["tags", "configuration", "hpc_jobs"]
+            comps_children = ["tags", "configuration"]
             children = self._experiments.get_children(item, columns=columns, children=comps_children, **kwargs)
             for child in children:
                 child.experiment_id = item.id
@@ -246,12 +238,13 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                 exp = Experiment()
                 exp.uid = item.experiment_id
                 exp.platform = self
+                item.item_type = ItemType.SIMULATION
+                item._platform_object = item
                 item.experiment = exp
-                exp._platform_object = item
                 item.uid = convert_to_uuid(item.id)
                 item.platform = self
             flattened.append(item)
         else:
-            return super().flatten_item(item)
+            return super().flatten_item(item, raw=raw)
 
         return flattened

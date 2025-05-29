@@ -551,7 +551,10 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         """
         # since assets could be in the common assets, we should check that firs
         # load comps config first
-        comps_sim: COMPSSimulation = simulation.get_platform_object(load_children=["files", "configuration"])
+        if isinstance(simulation, COMPSSimulation):
+            comps_sim: COMPSSimulation = simulation
+        else:
+            comps_sim: COMPSSimulation = simulation.get_platform_object(load_children=["files", "configuration"])
         if include_experiment_assets and (
                 comps_sim.configuration is None or comps_sim.configuration.asset_collection_id is None):
             if logger.isEnabledFor(DEBUG):
