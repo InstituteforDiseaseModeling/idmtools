@@ -49,7 +49,6 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
     'sphinx.ext.todo',
-    'plantweb.directive',
     'sphinxcontrib.programoutput',
     'sphinxcontrib.plantuml',
     'sphinx_copybutton',
