@@ -8,7 +8,7 @@ version: 2
 build:
   os: "ubuntu-22.04"
   tools:
-    python: "mambaforge-latest"
+    python: "3.11"
   jobs:
     pre_build:
       - pip install -e "idmtools_core[test]"
