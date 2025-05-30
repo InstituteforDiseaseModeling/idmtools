@@ -11,4 +11,3 @@ myst-parser~=2.0
 sphinx-copybutton~=0.5
 pygithub~=2.3
 sphinxcontrib-plantuml~=0.2
-plantuml~=1.2024
