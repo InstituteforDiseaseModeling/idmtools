@@ -198,13 +198,9 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             For experiments, this returns a dictionary with key as sim id and then the values as a dict of the
             simulations described above
         """
-        if isinstance(item, COMPSSimulation):
-            item = self._simulations.to_entity(item, parent=item.experiment)
-        elif isinstance(item, COMPSWorkItem):
-            item = self._workflow_items.to_entity(item)
-        elif isinstance(item, COMPSAssetCollection):
-            item = self._assets.to_entity(item)
-        elif isinstance(item, (Simulation, IWorkflowItem, AssetCollection)):
+        if isinstance(item, (COMPSWorkItem, COMPSAssetCollection)):
+            item.uid = item.id
+        elif isinstance(item, (Simulation, IWorkflowItem, AssetCollection, COMPSSimulation)):
             item = item
         else:
             raise Exception(f'Item Type: {type(item)} is not supported!')
@@ -234,26 +230,35 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             for child in children:
                 flattened.extend(self.flatten_item(item=child, raw=raw, **kwargs))
         elif isinstance(item, COMPSExperiment):
+            item._platform_object = item  # Set internal platform object reference to CompsExperiment
+            item.platform = self
+            item._id = str(item.id)
+            item.item_type = ItemType.EXPERIMENT
             columns = ["id", "name", "state"]
             comps_children = ["tags", "configuration"]
             children = self._experiments.get_children(item, columns=columns, children=comps_children, **kwargs)
             for child in children:
-                child.experiment_id = item.id
+                child.experiment_id = str(item.id)
+                child.experiment = item  # Assign experiment to it's child
                 flattened.extend(self.flatten_item(item=child, raw=raw, **kwargs))
         elif isinstance(item, (COMPSSimulation, COMPSWorkItem, COMPSAssetCollection)):
             if isinstance(item, COMPSSimulation):
-                exp = Experiment()
-                exp.uid = item.experiment_id
-                exp.platform = self
+                # Check if experiment is missing or raw mode. Otherwise, item.experiment is set from CompsExperiment block
+                if raw is False or getattr(item, "experiment", None) is None:
+                    experiment = self.get_item(item.experiment_id, item_type=ItemType.EXPERIMENT, raw=True)
+                    experiment._platform_object = experiment
+                    experiment.platform = self
+                    experiment._id = str(experiment.id)
+                    item.experiment = experiment  # Assign a new Experiment to the item
                 item.item_type = ItemType.SIMULATION
-                item._platform_object = item
-                item.experiment = exp
-                item.uid = item.id
+                item._platform_object = item  # Set internal platform object reference to CompsSimulation
+                item.uid = str(item.id)
+                item._id = item.uid
                 item.platform = self
-            if raw is False:
-                flattened.append(self._simulations.to_entity(item, parent=item.experiment, **kwargs))
-            else:
+            if raw:
                 flattened.append(item)
+            else:
+                flattened.append(self._simulations.to_entity(item, parent=item.experiment, **kwargs))
         else:
             return super().flatten_item(item, raw=raw)
         return flattened

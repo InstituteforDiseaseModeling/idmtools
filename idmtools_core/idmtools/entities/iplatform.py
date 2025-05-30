@@ -572,10 +572,10 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
                 flattened.extend(self.flatten_item(child, raw=raw, **kwargs))
         elif isinstance(item, (Simulation, IWorkflowItem, AssetCollection)):
             if raw:
-                if item._platform_object:
-                    item = item._platform_object
-            flattened.append(item)
-
+                item = self.get_item(item.id, item_type=ItemType.SIMULATION, raw=raw)
+                return self.flatten_item(item, raw=raw)
+            else:
+                flattened.append(item)
         return flattened
 
     def refresh_status(self, item: IEntity) -> NoReturn:

@@ -8,7 +8,6 @@ from pathlib import Path
 from logging import getLogger
 from typing import Union, List
 from dataclasses import dataclass, field
-from uuid import UUID
 
 from idmtools import IdmConfigParser
 from idmtools.core import ItemType, EntityStatus, TRUTHY_VALUES
