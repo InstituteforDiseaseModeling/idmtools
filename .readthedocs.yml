@@ -5,6 +5,9 @@
 # Required
 version: 2
 
+conda:
+  environment: environment.yml
+
 build:
   os: "ubuntu-22.04"
   tools:
@@ -14,10 +17,6 @@ build:
       - pip install -e "idmtools_core[test]"
       - mkdir -p docs/tools
       - wget -O docs/tools/plantuml.jar https://downloads.sourceforge.net/project/plantuml/plantuml.jar
-
-conda:
-  environment: environment.yml
-
 
 
 # Build documentation in the docs/ directory with Sphinx
