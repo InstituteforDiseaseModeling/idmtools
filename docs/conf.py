@@ -78,6 +78,10 @@ myst_enable_extensions = [
     "tasklist",
 ]
 
+import subprocess
+print("JAVA:", subprocess.getoutput("java -version"))
+print("DOT:", subprocess.getoutput("dot -V"))
+
 CURRENT_DIRECTORY = os.path.dirname(__file__)
 jar_file = os.path.join(CURRENT_DIRECTORY, "tools/plantuml.jar")
 plantuml = f"java -jar {jar_file}"
