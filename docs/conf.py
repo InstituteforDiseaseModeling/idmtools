@@ -79,6 +79,11 @@ myst_enable_extensions = [
 ]
 
 plantuml = 'plantweb'
+plantweb_defaults = {
+    'engine': 'plantuml',
+    'format': 'svg',
+    'server': None  # disables remote calls; renders locally
+}
 
 autodoc_default_options = {
     'member-order': 'bysource',
