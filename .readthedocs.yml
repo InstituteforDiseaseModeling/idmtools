@@ -65,7 +65,6 @@ python:
         - test
 
 
-
 # Optionally rank topics in search results, between -10 (lower) and 10 (higher).
 # 0 is normal rank, not no rank
 

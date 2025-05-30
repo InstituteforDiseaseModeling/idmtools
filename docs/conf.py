@@ -78,8 +78,8 @@ myst_enable_extensions = [
     "tasklist",
 ]
 
-plantuml = 'plantuml'
-
+#plantuml = 'plantuml'
+plantuml = 'java -jar docs/tools/plantuml.jar'
 autodoc_default_options = {
     'member-order': 'bysource',
     'members': None,
