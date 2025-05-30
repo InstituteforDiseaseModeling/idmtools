@@ -68,7 +68,7 @@ class TestSimulations(ITestWithPersistence):
         sims = FilterItem.filter_item_by_id(self.platform, self.experiment.uid, ItemType.EXPERIMENT, max_simulations=5)
         self.assertEqual(len(sims), 2)
 
-    # Filer from Suite
+    # Filter from Suite
     # Test default filter with suite uuid and type which only returns succeed sims (2 in this case)
     def test_filter_suite(self):
         sims = FilterItem.filter_item_by_id(self.platform, self.suite.uid, ItemType.SUITE)
