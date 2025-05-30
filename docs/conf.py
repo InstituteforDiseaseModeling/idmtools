@@ -78,7 +78,6 @@ myst_enable_extensions = [
     "tasklist",
 ]
 
-plantuml = 'plantweb'
 plantweb_defaults = {
     'engine': 'plantuml',
     'format': 'svg',
