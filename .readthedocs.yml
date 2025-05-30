@@ -12,8 +12,8 @@ build:
   jobs:
     pre_build:
       - pip install -e "idmtools_core[test]"
-      - mkdir -p docs/tools
-      - wget -O docs/tools/plantuml.jar https://downloads.sourceforge.net/project/plantuml/plantuml.jar
+#      - mkdir -p docs/tools
+#      - wget -O docs/tools/plantuml.jar https://downloads.sourceforge.net/project/plantuml/plantuml.jar
 
 
 # Build documentation in the docs/ directory with Sphinx
