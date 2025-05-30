@@ -125,7 +125,7 @@ class TestSimulations(ITestWithPersistence):
         for item in flatten_items:
             self.assertTrue(isinstance(item, FileSimulation))
 
-    def test_flatten_item_file_suite1(self):
+    def test_flatten_item_file_suite_raw_false(self):
         file_suite = self.platform.get_item(self.suite.id, item_type=ItemType.SUITE, raw=True)
         flatten_items = self.platform.flatten_item(file_suite, raw=False)
         self.assertEqual(len(flatten_items), 5)

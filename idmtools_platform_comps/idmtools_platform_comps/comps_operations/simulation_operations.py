@@ -549,7 +549,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         Returns:
             Dictionary of filename -> ByteArray
         """
-        # since assets could be in the common assets, we should check that firs
+        # since assets could be in the common assets, we should check that first
         # load comps config first
         if isinstance(simulation, COMPSSimulation):
             comps_sim: COMPSSimulation = simulation
