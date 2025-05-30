@@ -93,3 +93,13 @@ class TestContainerPlatformAnalyzer(unittest.TestCase):
         am = AnalyzeManager(ids=suite_tuple, analyzers=analyzers)
         am.analyze()
         self.assertEqual(analyzers[0].results, 45)
+
+    def test_analyzer_suite_add_item(self):
+        self.case_name = os.path.basename(__file__)
+        analyzers = [AddAnalyzer(filenames=['config.json'])]
+        manager = AnalyzeManager(analyzers=analyzers)
+        exp = self.platform.get_item(self.exp_id, item_type=ItemType.EXPERIMENT)
+        suite = exp.suite
+        manager.add_item(suite)
+        manager.analyze()
+        self.assertEqual(analyzers[0].results, 45)

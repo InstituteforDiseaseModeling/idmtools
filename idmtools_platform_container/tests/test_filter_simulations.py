@@ -125,6 +125,13 @@ class TestSimulations(ITestWithPersistence):
         for item in flatten_items:
             self.assertTrue(isinstance(item, FileSimulation))
 
+    def test_flatten_item_file_suite1(self):
+        file_suite = self.platform.get_item(self.suite.id, item_type=ItemType.SUITE, raw=True)
+        flatten_items = self.platform.flatten_item(file_suite, raw=False)
+        self.assertEqual(len(flatten_items), 5)
+        for item in flatten_items:
+            self.assertTrue(isinstance(item, Simulation))
+
     def test_flatten_item_idm_experiment(self):
         flatten_items = self.platform.flatten_item(self.experiment)
         self.assertEqual(len(flatten_items), 5)
@@ -146,7 +153,7 @@ class TestSimulations(ITestWithPersistence):
 
     def test_flatten_item_file_simulation(self):
         file_sim = self.platform.get_item(self.experiment.simulations[0].id, item_type=ItemType.SIMULATION, raw=True)
-        flatten_items = self.platform.flatten_item(file_sim)
+        flatten_items = self.platform.flatten_item(file_sim, raw=True)
         self.assertEqual(len(flatten_items), 1)
         for item in flatten_items:
             self.assertTrue(isinstance(item, FileSimulation))

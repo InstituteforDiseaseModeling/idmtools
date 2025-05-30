@@ -124,7 +124,7 @@ class TestSimulations(ITestWithPersistence):
         flatten_items = self.platform.flatten_item(comps_suite)
         self.assertEqual(len(flatten_items), 5)
         for item in flatten_items:
-            self.assertTrue(isinstance(item, COMPSSimulation))
+            self.assertTrue(isinstance(item, Simulation))
 
     def test_flatten_item_idm_experiment(self):
         flatten_items = self.platform.flatten_item(self.experiment)
@@ -134,7 +134,7 @@ class TestSimulations(ITestWithPersistence):
 
     def test_flatten_item_comps_experiment(self):
         comps_exp = self.platform.get_item(self.experiment.id, item_type=ItemType.EXPERIMENT, raw=True)
-        flatten_items = self.platform.flatten_item(comps_exp)
+        flatten_items = self.platform.flatten_item(comps_exp, raw=True)
         self.assertEqual(len(flatten_items), 5)
         for item in flatten_items:
             self.assertTrue(isinstance(item, COMPSSimulation))
@@ -147,7 +147,7 @@ class TestSimulations(ITestWithPersistence):
 
     def test_flatten_item_comps_simulation(self):
         comps_sim = self.platform.get_item(self.experiment.simulations[0].id, item_type=ItemType.SIMULATION, raw=True)
-        flatten_items = self.platform.flatten_item(comps_sim)
+        flatten_items = self.platform.flatten_item(comps_sim, raw=True)
         self.assertEqual(len(flatten_items), 1)
         for item in flatten_items:
             self.assertTrue(isinstance(item, COMPSSimulation))
