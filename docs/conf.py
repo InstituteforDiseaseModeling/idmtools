@@ -78,8 +78,9 @@ myst_enable_extensions = [
     "tasklist",
 ]
 
-#plantuml = 'plantuml'
-plantuml = 'java -jar docs/tools/plantuml.jar'
+CURRENT_DIRECTORY = os.path.dirname(__file__)
+jar_file = os.path.join(CURRENT_DIRECTORY, "tools/plantuml.jar")
+plantuml = f"java -jar {jar_file}"
 autodoc_default_options = {
     'member-order': 'bysource',
     'members': None,
