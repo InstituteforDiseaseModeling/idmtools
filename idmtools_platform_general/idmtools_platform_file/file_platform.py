@@ -8,6 +8,7 @@ from pathlib import Path
 from logging import getLogger
 from typing import Union, List
 from dataclasses import dataclass, field
+from uuid import UUID
 
 from idmtools import IdmConfigParser
 from idmtools.core import ItemType, EntityStatus, TRUTHY_VALUES
@@ -16,7 +17,6 @@ from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.iplatform import IPlatform
-from idmtools.utils.general import convert_to_uuid
 from idmtools_platform_file.file_operations.file_operations import FileOperations
 from idmtools_platform_file.platform_operations.asset_collection_operations import FilePlatformAssetCollectionOperations
 from idmtools_platform_file.platform_operations.experiment_operations import FilePlatformExperimentOperations
@@ -173,11 +173,13 @@ class FilePlatform(IPlatform):
             exp.platform = self
             item.experiment = exp
             exp._platform_object = item
-            item.uid = convert_to_uuid(item.id)
+            item.uid = UUID(item.id)
             item.platform = self
+            if raw is False:
+                item = self._simulations.to_entity(item, parent=item.experiment)
             flattened.append(item)
         else:
-            return super().flatten_item(item)
+            return super().flatten_item(item, raw=raw)
 
         return flattened
 

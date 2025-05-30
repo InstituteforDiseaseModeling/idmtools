@@ -221,7 +221,8 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         """
         flattened = []
         if isinstance(item, COMPSSuite):
-            children = self._suites.get_children(item, **kwargs)
+            comps_children = ["tags", "configuration"]
+            children = self._suites.get_children(item, children=comps_children, **kwargs)
             for child in children:
                 flattened.extend(self.flatten_item(item=child, raw=raw, **kwargs))
         elif isinstance(item, COMPSExperiment):
@@ -241,8 +242,10 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                 item.experiment = exp
                 item.uid = item.id
                 item.platform = self
-            flattened.append(item)
+            if raw is False:
+                flattened.append(self._simulations.to_entity(item, parent=item.experiment, **kwargs))
+            else:
+                flattened.append(item)
         else:
             return super().flatten_item(item, raw=raw)
-
         return flattened
