@@ -5,13 +5,10 @@
 # Required
 version: 2
 
-conda:
-  environment: environment.yml
-
 build:
   os: "ubuntu-22.04"
   tools:
-    python: "3.11"
+    python: "mambaforge-latest"
   jobs:
     pre_build:
       - pip install -e "idmtools_core[test]"
