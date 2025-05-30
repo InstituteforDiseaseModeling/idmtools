@@ -198,7 +198,8 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             For experiments, this returns a dictionary with key as sim id and then the values as a dict of the
             simulations described above
         """
-        if not isinstance(item, (COMPSSimulation, COMPSWorkItem, COMPSAssetCollection)):
+        if not isinstance(item, (COMPSSimulation, COMPSWorkItem, COMPSAssetCollection,
+                                 Simulation, IWorkflowItem, AssetCollection)):
             raise Exception(f'Item Type: {type(item)} is not supported!')
 
         file_data = super().get_files(item, files, output, **kwargs)
