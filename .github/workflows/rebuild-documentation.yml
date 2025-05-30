@@ -28,6 +28,10 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y plantuml graphviz
+      - name: Check plantuml and graphviz installation
+        run: |
+          plantuml -version
+          dot -V
       - name: Install dependencies
         working-directory: 'docs'
         run: |
