@@ -51,6 +51,7 @@ extensions = [
     'sphinx.ext.todo',
     'plantweb.directive',
     'sphinxcontrib.programoutput',
+    'sphinxcontrib.plantuml',
     'sphinx_copybutton',
     # intersphinx to allow cross-reference
     'sphinx.ext.intersphinx',
@@ -78,11 +79,7 @@ myst_enable_extensions = [
     "tasklist",
 ]
 
-plantweb_defaults = {
-    'engine': 'plantuml',
-    'format': 'svg',
-    'server': None  # disables remote calls; renders locally
-}
+plantuml = 'plantuml'
 
 autodoc_default_options = {
     'member-order': 'bysource',

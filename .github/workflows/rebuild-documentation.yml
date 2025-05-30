@@ -38,7 +38,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install make
           python -m pip install --upgrade pip
-          pip install --upgrade setuptools
+          pip install --upgrade setuptools sphinxcontrib-plantuml
           pip install -r requirements.txt
       - name: Install tools in dev mode
         run: |
