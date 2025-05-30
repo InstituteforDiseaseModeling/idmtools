@@ -572,7 +572,8 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
                 flattened.extend(self.flatten_item(child, raw=raw, **kwargs))
         elif isinstance(item, (Simulation, IWorkflowItem, AssetCollection)):
             if raw:
-                item = item._platform_object
+                if item._platform_object:
+                    item = item._platform_object
             flattened.append(item)
 
         return flattened
