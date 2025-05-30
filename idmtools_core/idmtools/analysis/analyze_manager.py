@@ -206,9 +206,6 @@ class AnalyzeManager:
         Returns:
             None
         """
-        if isinstance(item, (Suite, Experiment, Simulation, IWorkflowItem, AssetCollection)):
-            item = self.platform.get_item(item.id, item_type=item.item_type, raw=True)
-
         self.potential_items.extend(self.platform.flatten_item(item=item, raw=True))
 
     def _get_items_to_analyze(self) -> Dict[str, IEntity]:
