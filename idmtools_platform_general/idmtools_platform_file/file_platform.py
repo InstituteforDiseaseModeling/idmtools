@@ -173,7 +173,7 @@ class FilePlatform(IPlatform):
             exp.platform = self
             item.experiment = exp
             exp._platform_object = item
-            item.uid = UUID(item.id)
+            item.uid = item.id
             item.platform = self
             if raw is False:
                 item = self._simulations.to_entity(item, parent=item.experiment)
