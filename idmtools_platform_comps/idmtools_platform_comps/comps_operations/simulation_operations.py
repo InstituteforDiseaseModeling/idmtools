@@ -500,7 +500,10 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         """
         cli = None
         # do we have a configuration?
-        po: COMPSExperiment = experiment.get_platform_object()
+        if isinstance(experiment, COMPSExperiment):
+            po = experiment
+        else:
+            po: COMPSExperiment = experiment.get_platform_object()
         if po.configuration is None:
             po.refresh(QueryCriteria().select_children('configuration'))
         # simulation configuration for executable?

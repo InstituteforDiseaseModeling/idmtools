@@ -7,7 +7,6 @@ import copy
 import logging
 
 # fix for comps weird import
-from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 
 HANDLERS = copy.copy(logging.getLogger().handlers)
@@ -249,16 +248,23 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                     experiment._platform_object = experiment
                     experiment.platform = self
                     experiment._id = str(experiment.id)
+                    experiment.uid = str(experiment.id)
                     item.experiment = experiment  # Assign a new Experiment to the item
                 item.item_type = ItemType.SIMULATION
                 item._platform_object = item  # Set internal platform object reference to CompsSimulation
                 item.uid = str(item.id)
                 item._id = item.uid
                 item.platform = self
+                if not raw:
+                    flattened.append(self._simulations.to_entity(item, parent=item.experiment, **kwargs))
+            elif isinstance(item, COMPSWorkItem):
+                if not raw:
+                    flattened.append(self._workflow_items.to_entity(item, **kwargs))
+            elif isinstance(item, COMPSAssetCollection):
+                if not raw:
+                    flattened.append(self._assets.to_entity(item, **kwargs))
             if raw:
                 flattened.append(item)
-            else:
-                flattened.append(self._simulations.to_entity(item, parent=item.experiment, **kwargs))
         else:
             return super().flatten_item(item, raw=raw)
         return flattened
