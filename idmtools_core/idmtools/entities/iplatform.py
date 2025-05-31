@@ -571,9 +571,9 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             for child in children:
                 flattened.extend(self.flatten_item(child, raw=raw, **kwargs))
         elif isinstance(item, (Simulation, IWorkflowItem, AssetCollection)):
-            if raw and not kwargs.get("_internal_refetched"):
+            if raw and not kwargs.get("flag"):
                 item = self.get_item(item.id, item_type=ItemType.SIMULATION, raw=raw)
-                kwargs["_internal_refetched"] = True  # prevent infinite recursion
+                kwargs["flag"] = True  # prevent infinite recursion
                 return self.flatten_item(item, raw=raw, **kwargs)
             else:
                 flattened.append(item)
