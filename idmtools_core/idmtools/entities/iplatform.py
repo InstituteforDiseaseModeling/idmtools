@@ -572,7 +572,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
                 flattened.extend(self.flatten_item(child, raw=raw, **kwargs))
         elif isinstance(item, (Simulation, IWorkflowItem, AssetCollection)):
             if raw and not kwargs.get("flag"):
-                item = self.get_item(item.id, item_type=item.item_type, raw=raw)
+                item = self.get_item(item.id, item_type=item.item_type, force=True, raw=raw)
                 kwargs["flag"] = True  # prevent infinite recursion
                 return self.flatten_item(item, raw=raw, **kwargs)
             else:
