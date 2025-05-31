@@ -197,8 +197,14 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             For experiments, this returns a dictionary with key as sim id and then the values as a dict of the
             simulations described above
         """
-        if isinstance(item, (COMPSWorkItem, COMPSAssetCollection)):
+        if isinstance(item, COMPSWorkItem):
             item.uid = item.id
+            item.item_type = ItemType.WORKFLOW_ITEM
+            item._platform_object = item
+        elif isinstance(item, COMPSAssetCollection):
+            item.uid = item.id
+            item.item_type = ItemType.ASSETCOLLECTION
+            item._platform_object = item
         elif isinstance(item, (Simulation, IWorkflowItem, AssetCollection, COMPSSimulation)):
             item = item
         else:
