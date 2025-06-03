@@ -312,6 +312,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             child.uid = str(child.id)
             child._id = str(child.id)
             child.platform = self.platform
+            child.experiment = experiment
             child.item_type = ItemType.SIMULATION
             child._platform_object = child
         return children

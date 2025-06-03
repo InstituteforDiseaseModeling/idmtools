@@ -109,6 +109,7 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
             child.uid = str(child.id)
             child._id = str(child.id)
             child.platform = self.platform
+            child.suite = suite
             child.item_type = ItemType.EXPERIMENT
             child._platform_object = child
         return children
