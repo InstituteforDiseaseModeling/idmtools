@@ -178,7 +178,8 @@ class FilePlatform(IPlatform):
                 item = self._simulations.to_entity(item, parent=item.experiment)
             flattened.append(item)
         else:
-            return super().flatten_item(item, raw=raw)
+            platform_object = item.get_platform_object()
+            return self.flatten_item(platform_object, raw=raw)
 
         return flattened
 
