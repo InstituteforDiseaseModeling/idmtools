@@ -50,7 +50,7 @@ class SimFilterAnalyzer(IAnalyzer):
 
     def reduce(self, all_data):
         first_sim = list(all_data.keys())[0]  # get first Simulation
-        exp_id = first_sim.experiment.id  # Set the exp id from the first sim data
+        exp_id = str(first_sim.experiment.id)  # Set the exp id from the first sim data
         output_folder = os.path.join(self.output_path, exp_id)
         os.makedirs(output_folder, exist_ok=True)
 
