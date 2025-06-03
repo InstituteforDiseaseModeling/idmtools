@@ -313,7 +313,6 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             child.platform = self.platform
             child.experiment = experiment
             child.item_type = ItemType.SIMULATION
-            #child._platform_object = child
         return children
 
     def get_parent(self, experiment: COMPSExperiment, **kwargs) -> COMPSSuite:
