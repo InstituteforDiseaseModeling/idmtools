@@ -550,7 +550,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         return result
 
-    def flatten_item(self, item: object, raw: bool = False, **kwargs) -> List[object]:
+    def flatten_item(self, item: object, **kwargs) -> List[object]:
         """
         Flatten an item: resolve the children until getting to the leaves.
 
@@ -559,25 +559,20 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         Args:
             item: Which item to flatten
-            raw: True/False. True is sever object, False is idmtools object
             kwargs: extra parameters
 
         Returns:
             List of leaves
+
         """
-        flattened = []
-        if isinstance(item, (Suite, Experiment)):
-            children = self.get_children(item.uid, item.item_type, force=True, raw=raw)
+        children = self.get_children(item.uid, item.item_type, force=True)
+        if children is None or (isinstance(children, list) and len(children) == 0):
+            items = [item]
+        else:
+            items = list()
             for child in children:
-                flattened.extend(self.flatten_item(child, raw=raw, **kwargs))
-        elif isinstance(item, (Simulation, IWorkflowItem, AssetCollection)):
-            if raw and not kwargs.get("flag"):
-                item = self.get_item(item.id, item_type=item.item_type, force=True, raw=raw)
-                kwargs["flag"] = True  # prevent infinite recursion
-                return self.flatten_item(item, raw=raw, **kwargs)
-            else:
-                flattened.append(item)
-        return flattened
+                items += self.flatten_item(item=child)
+        return items
 
     def refresh_status(self, item: IEntity) -> NoReturn:
         """
