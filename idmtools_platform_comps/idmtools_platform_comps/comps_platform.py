@@ -197,19 +197,37 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             For experiments, this returns a dictionary with key as sim id and then the values as a dict of the
             simulations described above
         """
-        if isinstance(item, COMPSWorkItem):
-            item.uid = item.id
-            item.item_type = ItemType.WORKFLOW_ITEM
-            item._platform_object = item
-        elif isinstance(item, COMPSAssetCollection):
-            item.uid = item.id
-            item.item_type = ItemType.ASSETCOLLECTION
-            item._platform_object = item
-        elif isinstance(item, (Simulation, IWorkflowItem, AssetCollection, COMPSSimulation)):
-            item = item
-        else:
-            raise Exception(f'Item Type: {type(item)} is not supported!')
 
+        if isinstance(item, COMPSSimulation):
+            item.item_type = ItemType.SIMULATION
+            if getattr(item, "experiment", None) is None:
+                # Only add experiment when there is no simulation.experiment
+                experiment = self.get_item(item.experiment_id, item_type=ItemType.EXPERIMENT, raw=True)
+                experiment._platform_object = experiment
+                experiment.platform = self
+                item.experiment = experiment
+        elif isinstance(item, COMPSWorkItem):
+            item.item_type = ItemType.WORKFLOW_ITEM
+        elif isinstance(item, COMPSAssetCollection):
+            item.item_type = ItemType.ASSETCOLLECTION
+        elif isinstance(item, (Simulation, IWorkflowItem, AssetCollection)):
+            # Convert to platform object first
+            po_sim = item.get_platform_object(force=True)
+            po_sim.uid = str(item.id)
+            po_sim.item_type = item.item_type
+            po_sim.platform = self
+            if isinstance(item, Simulation):
+                po_experiment = item.experiment.get_platform_object(force=True)
+                po_experiment.platform = self
+                po_sim.experiment = po_experiment
+                po_sim.experiment._platform_object = po_experiment
+            item = po_sim
+        else:
+            raise TypeError(f'Item Type: {type(item).__name__} is not supported!')
+
+        item.uid = str(item.id)
+        item._platform_object = item
+        item.platform = self
         file_data = super().get_files(item, files, output, **kwargs)
         return file_data
 
@@ -261,16 +279,11 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                 item.uid = str(item.id)
                 item._id = item.uid
                 item.platform = self
-                if not raw:
-                    flattened.append(self._simulations.to_entity(item, parent=item.experiment, **kwargs))
-            elif isinstance(item, COMPSWorkItem):
-                if not raw:
-                    flattened.append(self._workflow_items.to_entity(item, **kwargs))
-            elif isinstance(item, COMPSAssetCollection):
-                if not raw:
-                    flattened.append(self._assets.to_entity(item, **kwargs))
             if raw:
                 flattened.append(item)
+            else:
+                flattened.append(self._convert_platform_item_to_entity(item, **kwargs))
         else:
-            return super().flatten_item(item, raw=raw)
+            platform_object = item.get_platform_object()
+            return self.flatten_item(platform_object, raw=raw)
         return flattened
