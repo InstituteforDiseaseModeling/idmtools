@@ -60,19 +60,19 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         comps_children = load_children if load_children is not None else ["tags", "configuration"]
         query_criteria = query_criteria or QueryCriteria().select(columns).select_children(comps_children)
         try:
-            result = COMPSExperiment.get(
+            comps_experiment = COMPSExperiment.get(
                 id=experiment_id,
                 query_criteria=query_criteria
             )
         except AttributeError as e:
             user_logger.error(f"The id {experiment_id} could not be converted to an UUID. Please verify your id")
             raise e
-        result.uid = str(result.id)
-        result._id = str(result.id)
-        result.platform = self.platform
-        result.item_type = ItemType.EXPERIMENT
-        result._platform_object = result
-        return result
+        comps_experiment.uid = comps_experiment.id
+        comps_experiment._id = str(comps_experiment.id)
+        comps_experiment.platform = self.platform
+        comps_experiment.item_type = ItemType.EXPERIMENT
+        comps_experiment._platform_object = comps_experiment
+        return comps_experiment
 
     def pre_create(self, experiment: Experiment, **kwargs) -> NoReturn:
         """
@@ -309,7 +309,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
 
         children = experiment.get_simulations(query_criteria=QueryCriteria().select(columns).select_children(children))
         for child in children:
-            child.uid = str(child.id)
+            child.uid = child.id
             child._id = str(child.id)
             child.platform = self.platform
             child.experiment = experiment

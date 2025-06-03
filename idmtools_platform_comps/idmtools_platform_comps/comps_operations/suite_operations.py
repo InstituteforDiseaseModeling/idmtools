@@ -45,13 +45,13 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
         children = load_children if load_children is not None else ["tags", "configuration"]
         # Comps doesn't like getting uuids for some reason
         query_criteria = query_criteria or QueryCriteria().select(columns).select_children(children)
-        s = COMPSSuite.get(id=str(suite_id), query_criteria=query_criteria)
-        s.uid = str(s.id)
-        s._id = str(s.id)
-        s.platform = self.platform
-        s.item_type = ItemType.SUITE
-        s._platform_object = s
-        return s
+        comps_suite = COMPSSuite.get(id=str(suite_id), query_criteria=query_criteria)
+        comps_suite.uid = comps_suite.id
+        comps_suite._id = str(comps_suite.id)
+        comps_suite.platform = self.platform
+        comps_suite.item_type = ItemType.SUITE
+        comps_suite._platform_object = comps_suite
+        return comps_suite
 
     def platform_create(self, suite: Suite, **kwargs) -> Tuple[COMPSSuite, UUID]:
         """
@@ -106,7 +106,7 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
 
         children = suite.get_experiments(query_criteria=QueryCriteria().select(cols).select_children(children))
         for child in children:
-            child.uid = str(child.id)
+            child.uid = child.id
             child._id = str(child.id)
             child.platform = self.platform
             child.suite = suite

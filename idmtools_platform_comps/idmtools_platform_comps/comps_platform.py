@@ -222,20 +222,17 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         """
         flattened = []
         if isinstance(item, COMPSSuite):
-            children = self._get_children_for_platform_item(item, raw=raw, children = ["tags", "configuration"])
+            children = self._get_children_for_platform_item(item, children = ["tags", "configuration"])
             for child in children:
                 flattened.extend(self.flatten_item(item=child, raw=raw, **kwargs))
         elif isinstance(item, COMPSExperiment):
-            children = self._get_children_for_platform_item(item, raw=raw, children = ["tags", "configuration"])
+            children = self._get_children_for_platform_item(item, children = ["tags", "configuration"])
             for child in children:
                 flattened.extend(self.flatten_item(item=child, raw=raw, **kwargs))
         elif isinstance(item, (COMPSSimulation, COMPSWorkItem, COMPSAssetCollection)):
             if isinstance(item, COMPSSimulation):
-                # Check if experiment is missing. Otherwise, item.experiment is set from CompsExperiment block
-                if getattr(item, "experiment", None) is None or (
-                        getattr(item, "experiment", None) is not None and
-                        getattr(item.experiment.configuration, "configuration", None)
-                ):
+                # Check if experiment is missing, or if simulation.experiment.configuration is None
+                if not hasattr(item, "experiment") or item.experiment.configuration is None:
                     experiment = self.get_item(item.experiment_id, item_type=ItemType.EXPERIMENT, raw=True)
                     item.experiment = experiment
             if raw:
