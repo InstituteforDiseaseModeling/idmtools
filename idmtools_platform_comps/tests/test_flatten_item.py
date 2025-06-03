@@ -41,14 +41,14 @@ class TestFlattenItem(unittest.TestCase):
         self.assertEqual(len(sims), 5)
         self.assertTrue(all(isinstance(item, COMPSSimulation) for item in sims))
 
-    def test_flatten_item_exp_true_true(self):
+    def test_flatten_item_exp_true_false(self):
         exp_id = "69cab2fe-a252-ea11-a2bf-f0921c167862"
         exp = self.platform.get_item(exp_id, ItemType.EXPERIMENT, raw=True)
         sims = self.platform.flatten_item(exp, raw=False)
         self.assertEqual(len(sims), 6)
         self.assertTrue(all(isinstance(item, Simulation) for item in sims))
 
-    def test_flatten_item_exp_true_false(self):
+    def test_flatten_item_exp_true_true(self):
         exp_id = "69cab2fe-a252-ea11-a2bf-f0921c167862"
         exp = self.platform.get_item(exp_id, ItemType.EXPERIMENT, raw=True)
         sims = self.platform.flatten_item(exp, raw=True)
