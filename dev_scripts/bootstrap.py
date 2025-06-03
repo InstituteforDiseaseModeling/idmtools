@@ -178,6 +178,11 @@ if __name__ == "__main__":
     logger.addHandler(file_handler)
     # use colorful logs except the first time
     console_log_level = logging.DEBUG if 'BUILD_DEBUG' in os.environ or args.verbose else logging.INFO
+
+    logging.addLevelName(15, 'VERBOSE')
+    logging.addLevelName(35, 'SUCCESS')
+    logging.addLevelName(50, 'CRITICAL')
+
     try:
         import coloredlogs  # noqa: I900
 
