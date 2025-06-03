@@ -137,7 +137,6 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         comps_simulation._id = str(comps_simulation.id)
         comps_simulation.platform = self.platform
         comps_simulation.item_type = ItemType.SIMULATION
-        comps_simulation._platform_object = comps_simulation
         return comps_simulation
 
     def platform_create(self, simulation: Simulation, num_cores: int = None, priority: str = None,

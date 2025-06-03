@@ -71,7 +71,6 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         comps_experiment._id = str(comps_experiment.id)
         comps_experiment.platform = self.platform
         comps_experiment.item_type = ItemType.EXPERIMENT
-        comps_experiment._platform_object = comps_experiment
         return comps_experiment
 
     def pre_create(self, experiment: Experiment, **kwargs) -> NoReturn:
@@ -314,7 +313,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             child.platform = self.platform
             child.experiment = experiment
             child.item_type = ItemType.SIMULATION
-            child._platform_object = child
+            #child._platform_object = child
         return children
 
     def get_parent(self, experiment: COMPSExperiment, **kwargs) -> COMPSSuite:

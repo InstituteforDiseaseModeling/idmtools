@@ -50,7 +50,6 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
         comps_suite._id = str(comps_suite.id)
         comps_suite.platform = self.platform
         comps_suite.item_type = ItemType.SUITE
-        comps_suite._platform_object = comps_suite
         return comps_suite
 
     def platform_create(self, suite: Suite, **kwargs) -> Tuple[COMPSSuite, UUID]:
@@ -111,7 +110,6 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
             child.platform = self.platform
             child.suite = suite
             child.item_type = ItemType.EXPERIMENT
-            child._platform_object = child
         return children
 
     def refresh_status(self, suite: Suite, **kwargs):
