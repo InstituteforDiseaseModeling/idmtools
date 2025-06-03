@@ -134,7 +134,6 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             query_criteria=query_criteria
         )
         comps_simulation.uid = comps_simulation.id
-        comps_simulation._id = str(comps_simulation.id)
         comps_simulation.platform = self.platform
         comps_simulation.item_type = ItemType.SIMULATION
         return comps_simulation

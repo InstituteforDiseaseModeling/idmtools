@@ -68,7 +68,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             user_logger.error(f"The id {experiment_id} could not be converted to an UUID. Please verify your id")
             raise e
         comps_experiment.uid = comps_experiment.id
-        comps_experiment._id = str(comps_experiment.id)
+        #comps_experiment._id = str(comps_experiment.id)
         comps_experiment.platform = self.platform
         comps_experiment.item_type = ItemType.EXPERIMENT
         return comps_experiment
@@ -309,7 +309,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         children = experiment.get_simulations(query_criteria=QueryCriteria().select(columns).select_children(children))
         for child in children:
             child.uid = child.id
-            child._id = str(child.id)
+            #child._id = str(child.id)
             child.platform = self.platform
             child.experiment = experiment
             child.item_type = ItemType.SIMULATION
