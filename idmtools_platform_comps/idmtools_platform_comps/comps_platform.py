@@ -223,7 +223,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                 po_sim.experiment._platform_object = po_experiment
             item = po_sim
         else:
-            raise TypeError(f'Item Type: {type(item).__name__} is not supported!')
+            raise TypeError(f'Item Type: {type(item)} is not supported!')
 
         item.uid = str(item.id)
         item._platform_object = item

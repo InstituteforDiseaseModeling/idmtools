@@ -84,7 +84,7 @@ class TestGetFiles(unittest.TestCase):
         files = ["output/result.json", "StdOut.txt"]
         with self.assertRaises(TypeError) as a:
             ret_files = self.platform.get_files(simulation, files=files, output=self.case_name)
-        self.assertIn('Item Type: Experiment is not supported!', a.exception.args[0])
+        self.assertIn("Item Type: <class 'idmtools.entities.experiment.Experiment'> is not supported!", a.exception.args[0])
 
     def _verify_files(self, actual_files, expected_files):
         convert_file_path = []
