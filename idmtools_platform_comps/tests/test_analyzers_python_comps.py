@@ -69,7 +69,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
     @run_in_temp_dir
     def test_download_analyzer(self):
         # step1: test with 1 experiment
-        output_folder = "output_test_download_analyzer"
+        output_folder = f"output/{self._testMethodName}"
         exp_id1 = self.create_experiment()
         filenames = ['output/result.json', 'config.json']
         analyzers = [DownloadAnalyzer(filenames=filenames, output_path=output_folder)]
@@ -100,7 +100,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         exp_id = '69cab2fe-a252-ea11-a2bf-f0921c167862'  # comps2
         # then run SimFilterAnalyzer to analyze the sims tags
         filenames = ['output/result.json']
-        output_folder = "output_test_analyzer_filter_sims"
+        output_folder = f"output/{self._testMethodName}"
         analyzers = [SimFilterAnalyzer(filenames=filenames, output_path=output_folder)]
 
         am = AnalyzeManager(ids=[(exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
@@ -119,7 +119,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
     @run_in_temp_dir
     def test_analyzer_filter_sims_by_id(self):
         exp_id = '69cab2fe-a252-ea11-a2bf-f0921c167862'  # comps2
-        output_folder = "output_test_analyzer_filter_sims_by_id"
+        output_folder = f"output/{self._testMethodName}"
         # then run SimFilterAnalyzer to analyze the sims tags
         filenames = ['output/result.json']
         from sim_filter_analyzer_by_id import SimFilterAnalyzerById  # noqa
@@ -145,7 +145,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
     def test_analyzer_with_failed_sims(self):
         experiment_id = 'c3e4ef50-ee63-ea11-a2bf-f0921c167862'  # staging experiment includes 5 sims with 3 failed sims
         filenames = ["stdErr.txt"]
-        output_folder = "output_test_analyzer_with_failed_sims"
+        output_folder = f"output/{self._testMethodName}"
         analyzers = [DownloadAnalyzer(filenames=filenames, output_path=output_folder)]
         manager = AnalyzeManager(ids=[(experiment_id, ItemType.EXPERIMENT)],
                                  analyzers=analyzers, analyze_failed_items=True)
@@ -178,7 +178,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
     @run_in_temp_dir
     def test_analyzer_with_succeeded_sims(self):
         experiment_id = 'c3e4ef50-ee63-ea11-a2bf-f0921c167862'  # staging experiment includes 5 sims with 3 failed sims
-        output_folder = "output_test_analyzer_with_succeeded_sims"
+        output_folder = f"output/{self._testMethodName}"
 
         filenames = ["stdOut.txt"]
         analyzers = [DownloadAnalyzer(filenames=filenames, output_path=output_folder)]
@@ -211,7 +211,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
     def test_analyzer_with_scheduling_experiment(self):
         # files to download
         filenames = ['outputs/results.xlsx', 'outputs/results.json', 'WorkOrder.json']
-        output_folder = "output_test_analyzer_with_scheduling_experiment"
+        output_folder = f"output/{self._testMethodName}"
         # Initialize the analyser class with the path of the output files to download
         analyzers = [DownloadAnalyzer(filenames=filenames, output_path=output_folder)]
 
@@ -230,7 +230,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
     def test_analyzer_manager_add_item_exp(self):
         exp_id = '69cab2fe-a252-ea11-a2bf-f0921c167862'  # comps2
         filenames = ['output/result.json']
-        output_folder = self._testMethodName
+        output_folder = f"output/{self._testMethodName}"
         analyzers = [SimFilterAnalyzer(filenames=filenames, output_path=output_folder, result_file_name="match.csv")]
         exp = self.platform.get_item(item_id=exp_id, item_type=ItemType.EXPERIMENT)
         manager = AnalyzeManager(analyzers=analyzers)
@@ -246,7 +246,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
     def test_analyzer_manager_add_item_exp_raw_true(self):
         exp_id = '69cab2fe-a252-ea11-a2bf-f0921c167862'  # comps2
         filenames = ['output/result.json']
-        output_folder = self._testMethodName
+        output_folder = f"output/{self._testMethodName}"
         analyzers = [SimFilterAnalyzer(filenames=filenames, output_path=output_folder, result_file_name="match_true.csv")]
         exp = self.platform.get_item(item_id=exp_id, item_type=ItemType.EXPERIMENT, raw=True)
         manager = AnalyzeManager(analyzers=analyzers)
@@ -262,31 +262,33 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
     def test_analyzer_manager_suite(self):
         suite_id = 'c47cbc8c-e43c-f011-9310-f0921c167864'  # comps2
         filenames = ['config.json']
-        analyzers = [DownloadAnalyzer(filenames=filenames, output_path=self._testMethodName)]
+        output_folder = f"output/{self._testMethodName}"
+        analyzers = [DownloadAnalyzer(filenames=filenames, output_path=output_folder)]
         manager = AnalyzeManager(analyzers=analyzers, ids=[(suite_id, ItemType.SUITE)], partial_analyze_ok=True)
         manager.analyze()
         expected_sims = ['c97cbc8c-e43c-f011-9310-f0921c167864', 'c77cbc8c-e43c-f011-9310-f0921c167864']
         for sim_id in expected_sims:
-            path, dirs, files = next(os.walk(os.path.join(self._testMethodName, sim_id)))
+            path, dirs, files = next(os.walk(os.path.join(output_folder, sim_id)))
             self.assertEqual(set(files), {"config.json"})
 
     def test_analyzer_manager_add_item_suite(self):
         suite_id = 'c47cbc8c-e43c-f011-9310-f0921c167864'
         suite = self.platform.get_item(item_id=suite_id, item_type=ItemType.SUITE, raw=True)
         filenames = ['config.json']
-        analyzers = [DownloadAnalyzer(filenames=filenames, output_path=self._testMethodName)]
+        output_folder = f"output/{self._testMethodName}"
+        analyzers = [DownloadAnalyzer(filenames=filenames, output_path=output_folder)]
         manager = AnalyzeManager(analyzers=analyzers, partial_analyze_ok=True)
         manager.add_item(suite)
         manager.analyze()
         expected_sims = ['c97cbc8c-e43c-f011-9310-f0921c167864', 'c77cbc8c-e43c-f011-9310-f0921c167864']
         for sim_id in expected_sims:
-            path, dirs, files = next(os.walk(os.path.join(self._testMethodName, sim_id)))
+            path, dirs, files = next(os.walk(os.path.join(output_folder, sim_id)))
             self.assertEqual(set(files), {"config.json"})
 
     def test_analyzer_manager_exp(self):
         exp_id = '69cab2fe-a252-ea11-a2bf-f0921c167862'  # comps2
         filenames = ['output/result.json']
-        output_folder = self._testMethodName
+        output_folder = f"output/{self._testMethodName}"
         analyzers = [SimFilterAnalyzer(filenames=filenames, output_path=output_folder, result_file_name="match_exp.csv")]
         manager = AnalyzeManager(analyzers=analyzers, ids=[(exp_id, ItemType.EXPERIMENT)])
         manager.analyze()
@@ -303,7 +305,7 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         sim_id3 = '6dcab2fe-a252-ea11-a2bf-f0921c167862'
         sim_id4 = '6ccab2fe-a252-ea11-a2bf-f0921c167862'
         filenames = ['output/result.json']
-        output_folder = self._testMethodName
+        output_folder = f"output/{self._testMethodName}"
         analyzers = [SimFilterAnalyzer(filenames=filenames, output_path=output_folder, result_file_name="match_sims.csv")]
         sim1 = self.platform.get_item(item_id=sim_id1, item_type=ItemType.SIMULATION)
         sim2 = self.platform.get_item(item_id=sim_id2, item_type=ItemType.SIMULATION)

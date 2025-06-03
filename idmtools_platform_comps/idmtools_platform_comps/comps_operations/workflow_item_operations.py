@@ -51,7 +51,12 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         columns = columns or ["id", "name", "state", "environment_name"]
         load_children = load_children if load_children is not None else ["tags"]
         query_criteria = query_criteria or QueryCriteria().select(columns).select_children(load_children)
-        return COMPSWorkItem.get(workflow_item_id, query_criteria=query_criteria)
+        comps_workitem = COMPSWorkItem.get(workflow_item_id, query_criteria=query_criteria)
+        comps_workitem.uid = str(comps_workitem.id)
+        comps_workitem._id = str(comps_workitem.id)
+        comps_workitem.platform = self.platform
+        comps_workitem.item_type = ItemType.WORKFLOW_ITEM
+        return comps_workitem
 
     def platform_create(self, work_item: IWorkflowItem, **kwargs) -> Tuple[Any]:
         """

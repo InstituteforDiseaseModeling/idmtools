@@ -13,31 +13,31 @@ class TestFlattenItem(unittest.TestCase):
     def setUp(self):
         self.platform = Platform('SlurmStage')
 
-    def test_flatten_item_suite_true_true(self):
+    def test_flatten_item_suite_true_false(self):
         suite_id = "c47cbc8c-e43c-f011-9310-f0921c167864"
-        exp = self.platform.get_item(suite_id, ItemType.SUITE, raw=True)
-        sims = self.platform.flatten_item(exp, raw=False)
+        suite = self.platform.get_item(suite_id, ItemType.SUITE, raw=True)
+        sims = self.platform.flatten_item(suite, raw=False)
         self.assertEqual(len(sims), 5)
         self.assertTrue(all(isinstance(item, Simulation) for item in sims))
 
-    def test_flatten_item_suite_true_false(self):
+    def test_flatten_item_suite_true_true(self):
         suite_id = "c47cbc8c-e43c-f011-9310-f0921c167864"
-        exp = self.platform.get_item(suite_id, ItemType.SUITE, raw=True)
-        sims = self.platform.flatten_item(exp, raw=True)
+        suite = self.platform.get_item(suite_id, ItemType.SUITE, raw=True)
+        sims = self.platform.flatten_item(suite, raw=True)
         self.assertEqual(len(sims), 5)
         self.assertTrue(all(isinstance(item, COMPSSimulation) for item in sims))
 
     def test_flatten_item_suite_false_false(self):
         suite_id = "c47cbc8c-e43c-f011-9310-f0921c167864"
-        exp = self.platform.get_item(suite_id, ItemType.SUITE)
-        sims = self.platform.flatten_item(exp, raw=False)
+        suite = self.platform.get_item(suite_id, ItemType.SUITE)
+        sims = self.platform.flatten_item(suite, raw=False)
         self.assertEqual(len(sims), 5)
         self.assertTrue(all(isinstance(item, Simulation) for item in sims))
 
     def test_flatten_item_suite_false_true(self):
         suite_id = "c47cbc8c-e43c-f011-9310-f0921c167864"
-        exp = self.platform.get_item(suite_id, ItemType.SUITE)
-        sims = self.platform.flatten_item(exp, raw=True)
+        suite = self.platform.get_item(suite_id, ItemType.SUITE)
+        sims = self.platform.flatten_item(suite, raw=True)
         self.assertEqual(len(sims), 5)
         self.assertTrue(all(isinstance(item, COMPSSimulation) for item in sims))
 

@@ -67,7 +67,11 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         except AttributeError as e:
             user_logger.error(f"The id {experiment_id} could not be converted to an UUID. Please verify your id")
             raise e
-
+        result.uid = str(result.id)
+        result._id = str(result.id)
+        result.platform = self.platform
+        result.item_type = ItemType.EXPERIMENT
+        result._platform_object = result
         return result
 
     def pre_create(self, experiment: Experiment, **kwargs) -> NoReturn:
@@ -304,6 +308,12 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         children = children if children is not None else ["tags", "configuration", "files"]
 
         children = experiment.get_simulations(query_criteria=QueryCriteria().select(columns).select_children(children))
+        for child in children:
+            child.uid = str(child.id)
+            child._id = str(child.id)
+            child.platform = self.platform
+            child.item_type = ItemType.SIMULATION
+            child._platform_object = child
         return children
 
     def get_parent(self, experiment: COMPSExperiment, **kwargs) -> COMPSSuite:

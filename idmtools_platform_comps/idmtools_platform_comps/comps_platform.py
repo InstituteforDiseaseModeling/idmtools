@@ -222,41 +222,29 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         """
         flattened = []
         if isinstance(item, COMPSSuite):
-            comps_children = ["tags", "configuration"]
-            children = self._suites.get_children(item, children=comps_children, **kwargs)
+            children = self._get_children_for_platform_item(item, raw=raw, children = ["tags", "configuration"])
             for child in children:
                 flattened.extend(self.flatten_item(item=child, raw=raw, **kwargs))
         elif isinstance(item, COMPSExperiment):
-            item._platform_object = item  # Set internal platform object reference to CompsExperiment
-            item.platform = self
-            item._id = str(item.id)
-            item.item_type = ItemType.EXPERIMENT
-            columns = ["id", "name", "state"]
-            comps_children = ["tags", "configuration"]
-            children = self._experiments.get_children(item, columns=columns, children=comps_children, **kwargs)
+            children = self._get_children_for_platform_item(item, raw=raw, children = ["tags", "configuration"])
             for child in children:
-                child.experiment_id = str(item.id)
-                child.experiment = item  # Assign experiment to it's child
                 flattened.extend(self.flatten_item(item=child, raw=raw, **kwargs))
         elif isinstance(item, (COMPSSimulation, COMPSWorkItem, COMPSAssetCollection)):
             if isinstance(item, COMPSSimulation):
-                # Check if experiment is missing or raw mode. Otherwise, item.experiment is set from CompsExperiment block
-                if raw is False or getattr(item, "experiment", None) is None:
+                # Check if experiment is missing. Otherwise, item.experiment is set from CompsExperiment block
+                if getattr(item, "experiment", None) is None or (
+                        getattr(item, "experiment", None) is not None and
+                        getattr(item.experiment.configuration, "configuration", None)
+                ):
                     experiment = self.get_item(item.experiment_id, item_type=ItemType.EXPERIMENT, raw=True)
-                    experiment._platform_object = experiment
-                    experiment.platform = self
-                    experiment._id = str(experiment.id)
-                    experiment.uid = str(experiment.id)
-                    item.experiment = experiment  # Assign a new Experiment to the item
-                item.item_type = ItemType.SIMULATION
-                item._platform_object = item  # Set internal platform object reference to CompsSimulation
-                item.uid = str(item.id)
-                item._id = item.uid
-                item.platform = self
+                    item.experiment = experiment
             if raw:
                 flattened.append(item)
             else:
-                flattened.append(self._convert_platform_item_to_entity(item, **kwargs))
+                if isinstance(item, COMPSSimulation):
+                    flattened.append(self._convert_platform_item_to_entity(item, parent=item.experiment, **kwargs))
+                else:
+                    flattened.append(self._convert_platform_item_to_entity(item, **kwargs))
         else:
             platform_object = item.get_platform_object()
             return self.flatten_item(platform_object, raw=raw)

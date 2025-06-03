@@ -6,7 +6,7 @@ from idmtools.core.platform_factory import Platform
 class TestGetFiles(unittest.TestCase):
     def setUp(self):
         self.platform = Platform('SlurmStage')
-        self.case_name = self._testMethodName
+        self.case_name = f"output/{self._testMethodName}"
 
     def test_get_files_simulation(self):
         sim_id = "24061284-d33d-f011-9310-f0921c167864"
@@ -63,7 +63,7 @@ class TestGetFiles(unittest.TestCase):
         self.assertEqual(len(ret_files), 2)
         self._verify_files(ret_files, files)
 
-    def test_getfiles_comps_asset_collection(self):
+    def test_get_files_comps_asset_collection(self):
         ac_id = "475445f2-9359-ef11-9306-f0921c167864"
         ac = self.platform.get_item(ac_id, ItemType.ASSETCOLLECTION, raw=True)
         files = ["model.py", "MyExternalLibrary/functions.py"]
@@ -91,4 +91,5 @@ class TestGetFiles(unittest.TestCase):
         for key, value in actual_files.items():
             convert_file_path.append(key.replace("\\", "/"))
             self.assertIsNotNone(value)
+            self.assertTrue(len(value) > 0)
         assert set(convert_file_path) == set(expected_files)

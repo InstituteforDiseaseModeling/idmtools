@@ -129,10 +129,16 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         columns = columns or ["id", "name", "experiment_id", "state"]
         children = load_children if load_children is not None else ["tags", "configuration", "files"]
         query_criteria = query_criteria or QueryCriteria().select(columns).select_children(children)
-        return COMPSSimulation.get(
+        comps_simulation = COMPSSimulation.get(
             id=simulation_id,
             query_criteria=query_criteria
         )
+        comps_simulation.uid = str(comps_simulation.id)
+        comps_simulation._id = str(comps_simulation.id)
+        comps_simulation.platform = self.platform
+        comps_simulation.item_type = ItemType.SIMULATION
+        comps_simulation._platform_object = comps_simulation
+        return comps_simulation
 
     def platform_create(self, simulation: Simulation, num_cores: int = None, priority: str = None,
                         enable_platform_task_hooks: bool = True, asset_collection_id: str = None, **kwargs) -> COMPSSimulation:
@@ -563,7 +569,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             if logger.isEnabledFor(DEBUG):
                 logger.debug("Gathering assets from experiment first")
             exp_assets = get_asset_for_comps_item(self.platform, simulation.experiment, files, self.cache,
-                                                  load_children=["configuration"], comps_item=simulation.experiment._platform_object)
+                                                  load_children=["configuration"], comps_item=simulation.experiment)
             if exp_assets is None:
                 exp_assets = dict()
         else:
