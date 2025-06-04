@@ -49,9 +49,8 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
     'sphinx.ext.todo',
-    'sphinxcontrib.programoutput',
     'plantweb.directive',
-    #'sphinxcontrib.plantuml',
+    'sphinxcontrib.programoutput',
     'sphinx_copybutton',
     # intersphinx to allow cross-reference
     'sphinx.ext.intersphinx',
@@ -79,14 +78,8 @@ myst_enable_extensions = [
     "tasklist",
 ]
 
-# import subprocess
-# print("JAVA:", subprocess.getoutput("java -version"))
-# print("DOT:", subprocess.getoutput("dot -V"))
-#
-# CURRENT_DIRECTORY = os.path.dirname(__file__)
-# jar_file = os.path.join(CURRENT_DIRECTORY, "tools/plantuml.jar")
-# plantuml = f"java -jar {jar_file}"
 plantuml = 'plantweb'
+
 autodoc_default_options = {
     'member-order': 'bysource',
     'members': None,

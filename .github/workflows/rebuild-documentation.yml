@@ -24,21 +24,13 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-      - name: Install PlantUML and Graphviz
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y plantuml graphviz
-      - name: Check plantuml and graphviz installation
-        run: |
-          plantuml -version
-          dot -V
       - name: Install dependencies
         working-directory: 'docs'
         run: |
           sudo apt-get update
           sudo apt-get install make
           python -m pip install --upgrade pip
-          pip install --upgrade setuptools sphinxcontrib-plantuml
+          pip install --upgrade setuptools
           pip install -r requirements.txt
       - name: Install tools in dev mode
         run: |
