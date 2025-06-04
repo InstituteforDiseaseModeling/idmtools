@@ -191,7 +191,7 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         # we support comps simulations files and experiments as asset collections
         # only true asset collections have ids
         if isinstance(asset_collection, COMPSAssetCollection):
-            ac.uid = asset_collection.id
+            ac.uid = asset_collection.uid
             ac.tags = asset_collection.tags
         elif isinstance(asset_collection, list) and len(asset_collection):
             if not isinstance(asset_collection[0], (SimulationFile, WorkItemFile)):

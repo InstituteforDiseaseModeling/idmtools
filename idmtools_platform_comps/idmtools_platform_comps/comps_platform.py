@@ -244,5 +244,8 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                     flattened.append(self._convert_platform_item_to_entity(item, **kwargs))
         else:
             platform_object = item.get_platform_object()
+            if not hasattr(platform_object, "uid"):
+                platform_object.uid = platform_object.id
+                platform_object._id = str(platform_object.id)
             return self.flatten_item(platform_object, raw=raw)
         return flattened
