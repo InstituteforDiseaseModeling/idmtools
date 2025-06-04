@@ -129,15 +129,10 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         columns = columns or ["id", "name", "experiment_id", "state"]
         children = load_children if load_children is not None else ["tags", "configuration", "files"]
         query_criteria = query_criteria or QueryCriteria().select(columns).select_children(children)
-        comps_simulation = COMPSSimulation.get(
+        return COMPSSimulation.get(
             id=simulation_id,
             query_criteria=query_criteria
         )
-        comps_simulation.uid = comps_simulation.id
-        comps_simulation._id = str(comps_simulation.id)
-        comps_simulation.platform = self.platform
-        comps_simulation.item_type = ItemType.SIMULATION
-        return comps_simulation
 
     def platform_create(self, simulation: Simulation, num_cores: int = None, priority: str = None,
                         enable_platform_task_hooks: bool = True, asset_collection_id: str = None, **kwargs) -> COMPSSimulation:
@@ -256,7 +251,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
 
         return Configuration(**comps_configuration)
 
-    def batch_create(self, simulations: List[Simulation], num_cores: int = None, priority: str = None, 
+    def batch_create(self, simulations: List[Simulation], num_cores: int = None, priority: str = None,
                      asset_collection_id: str = None, **kwargs) -> List[COMPSSimulation]:
         """
         Perform batch creation of Simulations.
@@ -395,7 +390,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         obj.parent = parent
         obj.experiment = parent
         # Set its correct attributes
-        obj.uid = simulation.uid
+        obj.uid = simulation.id
         obj.tags = simulation.tags
         obj.status = convert_comps_status(simulation.state)
         if simulation.files:
@@ -504,10 +499,10 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             ValueError when command cannot be detected
         """
         cli = None
-        # do we have a configuration?
         if isinstance(experiment, COMPSExperiment):
             po = experiment
         else:
+            # do we have a configuration?
             po: COMPSExperiment = experiment.get_platform_object()
         if po.configuration is None:
             po.refresh(QueryCriteria().select_children('configuration'))
@@ -557,7 +552,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         Returns:
             Dictionary of filename -> ByteArray
         """
-        # since assets could be in the common assets, we should check that first
+        # since assets could be in the common assets, we should check that firs
         # load comps config first
         if isinstance(simulation, COMPSSimulation):
             comps_sim: COMPSSimulation = simulation

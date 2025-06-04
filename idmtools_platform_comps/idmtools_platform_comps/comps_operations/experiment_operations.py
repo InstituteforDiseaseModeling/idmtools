@@ -60,18 +60,15 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         comps_children = load_children if load_children is not None else ["tags", "configuration"]
         query_criteria = query_criteria or QueryCriteria().select(columns).select_children(comps_children)
         try:
-            comps_experiment = COMPSExperiment.get(
+            result = COMPSExperiment.get(
                 id=experiment_id,
                 query_criteria=query_criteria
             )
         except AttributeError as e:
             user_logger.error(f"The id {experiment_id} could not be converted to an UUID. Please verify your id")
             raise e
-        comps_experiment.uid = comps_experiment.id
-        comps_experiment._id = str(comps_experiment.id)
-        comps_experiment.platform = self.platform
-        comps_experiment.item_type = ItemType.EXPERIMENT
-        return comps_experiment
+
+        return result
 
     def pre_create(self, experiment: Experiment, **kwargs) -> NoReturn:
         """
@@ -307,12 +304,6 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         children = children if children is not None else ["tags", "configuration", "files"]
 
         children = experiment.get_simulations(query_criteria=QueryCriteria().select(columns).select_children(children))
-        for child in children:
-            child.uid = child.id
-            child._id = str(child.id)
-            child.platform = self.platform
-            child.experiment = experiment
-            child.item_type = ItemType.SIMULATION
         return children
 
     def get_parent(self, experiment: COMPSExperiment, **kwargs) -> COMPSSuite:
@@ -427,7 +418,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         # Set parent
         obj.parent = suite
         # Set the correct attributes
-        obj.uid = experiment.uid
+        obj.uid = experiment.id
         obj.comps_experiment = experiment
         # load assets first so children can access during their load
         obj.assets = self.get_assets_from_comps_experiment(experiment)
@@ -446,8 +437,6 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             )
             obj.simulations = []
             for s in comps_sims:
-                s.uid = s.id
-                s._id = str(s.id)
                 obj.simulations.append(
                     self.platform._simulations.to_entity(s, parent=obj, **kwargs)
                 )

@@ -224,28 +224,44 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         if isinstance(item, COMPSSuite):
             children = self._get_children_for_platform_item(item, children = ["tags", "configuration"])
             for child in children:
+                child = self._normalized_item_fields(child)
                 flattened.extend(self.flatten_item(item=child, raw=raw, **kwargs))
         elif isinstance(item, COMPSExperiment):
             children = self._get_children_for_platform_item(item, children = ["tags", "configuration"])
             for child in children:
+                child = self._normalized_item_fields(child)
                 flattened.extend(self.flatten_item(item=child, raw=raw, **kwargs))
         elif isinstance(item, (COMPSSimulation, COMPSWorkItem, COMPSAssetCollection)):
             if isinstance(item, COMPSSimulation):
                 # Check if experiment is missing, or if simulation.experiment.configuration is None
                 if not hasattr(item, "experiment") or item.experiment.configuration is None:
                     experiment = self.get_item(item.experiment_id, item_type=ItemType.EXPERIMENT, raw=True)
+                    experiment = self._normalized_item_fields(experiment)
                     item.experiment = experiment
+                item = self._normalized_item_fields(item)
             if raw:
                 flattened.append(item)
             else:
                 if isinstance(item, COMPSSimulation):
-                    flattened.append(self._convert_platform_item_to_entity(item, parent=item.experiment, **kwargs))
+                    entity_item = self._convert_platform_item_to_entity(item, parent=item.experiment, **kwargs)
                 else:
-                    flattened.append(self._convert_platform_item_to_entity(item, **kwargs))
+                    entity_item = self._convert_platform_item_to_entity(item, **kwargs)
+                flattened.append(entity_item)
         else:
             platform_object = item.get_platform_object()
-            if not hasattr(platform_object, "uid"):
-                platform_object.uid = platform_object.id
-                platform_object._id = str(platform_object.id)
             return self.flatten_item(platform_object, raw=raw)
         return flattened
+
+    def _normalized_item_fields(self, item):
+        item.uid = item.id
+        item._id = str(item.id)
+        if type(item).__name__ == "GenericWorkItem":
+            item.item_type = ItemType.WORKFLOW_ITEM
+        elif type(item).__name__ == "AssetCollection":
+            item.item_type = ItemType.ASSETCOLLECTION
+        else:
+            item.item_type = ItemType(type(item).__name__)
+        item.platform = self
+        return item
+
+

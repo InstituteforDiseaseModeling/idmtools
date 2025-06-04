@@ -45,12 +45,8 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
         children = load_children if load_children is not None else ["tags", "configuration"]
         # Comps doesn't like getting uuids for some reason
         query_criteria = query_criteria or QueryCriteria().select(columns).select_children(children)
-        comps_suite = COMPSSuite.get(id=str(suite_id), query_criteria=query_criteria)
-        comps_suite.uid = comps_suite.id
-        comps_suite._id = str(comps_suite.id)
-        comps_suite.platform = self.platform
-        comps_suite.item_type = ItemType.SUITE
-        return comps_suite
+        s = COMPSSuite.get(id=str(suite_id), query_criteria=query_criteria)
+        return s
 
     def platform_create(self, suite: Suite, **kwargs) -> Tuple[COMPSSuite, UUID]:
         """
@@ -104,12 +100,6 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
         children = children if children is not None else ["tags"]
 
         children = suite.get_experiments(query_criteria=QueryCriteria().select(cols).select_children(children))
-        for child in children:
-            child.uid = child.id
-            child._id = str(child.id)
-            child.platform = self.platform
-            child.suite = suite
-            child.item_type = ItemType.EXPERIMENT
         return children
 
     def refresh_status(self, suite: Suite, **kwargs):
@@ -153,8 +143,6 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
             comps_exps = suite.get_experiments()
             obj.experiments = []
             for exp in comps_exps:
-                exp.uid = exp.id
-                exp._id = str(exp.id)
                 self.platform._experiments.to_entity(exp, parent=obj, **kwargs)
         return obj
 
