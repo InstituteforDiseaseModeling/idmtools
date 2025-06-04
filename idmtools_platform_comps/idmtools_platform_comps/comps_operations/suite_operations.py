@@ -47,6 +47,7 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
         query_criteria = query_criteria or QueryCriteria().select(columns).select_children(children)
         comps_suite = COMPSSuite.get(id=str(suite_id), query_criteria=query_criteria)
         comps_suite.uid = comps_suite.id
+        comps_suite._id = str(comps_suite.id)
         comps_suite.platform = self.platform
         comps_suite.item_type = ItemType.SUITE
         return comps_suite
@@ -105,6 +106,7 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
         children = suite.get_experiments(query_criteria=QueryCriteria().select(cols).select_children(children))
         for child in children:
             child.uid = child.id
+            child._id = str(child.id)
             child.platform = self.platform
             child.suite = suite
             child.item_type = ItemType.EXPERIMENT
@@ -151,6 +153,8 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
             comps_exps = suite.get_experiments()
             obj.experiments = []
             for exp in comps_exps:
+                exp.uid = exp.id
+                exp._id = str(exp.id)
                 self.platform._experiments.to_entity(exp, parent=obj, **kwargs)
         return obj
 

@@ -53,6 +53,7 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         query_criteria = query_criteria or QueryCriteria().select(columns).select_children(load_children)
         comps_workitem = COMPSWorkItem.get(workflow_item_id, query_criteria=query_criteria)
         comps_workitem.uid = comps_workitem.id
+        comps_workitem._id = str(comps_workitem.id)
         comps_workitem.platform = self.platform
         comps_workitem.item_type = ItemType.WORKFLOW_ITEM
         return comps_workitem

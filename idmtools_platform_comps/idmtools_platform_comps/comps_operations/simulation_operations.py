@@ -134,6 +134,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             query_criteria=query_criteria
         )
         comps_simulation.uid = comps_simulation.id
+        comps_simulation._id = str(comps_simulation.id)
         comps_simulation.platform = self.platform
         comps_simulation.item_type = ItemType.SIMULATION
         return comps_simulation
@@ -394,7 +395,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         obj.parent = parent
         obj.experiment = parent
         # Set its correct attributes
-        obj.uid = simulation.id
+        obj.uid = simulation.uid
         obj.tags = simulation.tags
         obj.status = convert_comps_status(simulation.state)
         if simulation.files:

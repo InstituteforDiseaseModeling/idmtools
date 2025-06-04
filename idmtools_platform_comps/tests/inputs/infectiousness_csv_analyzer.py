@@ -36,7 +36,7 @@ class InfectiousnessCSVAnalyzer(BaseAnalyzer):
     def reduce(self, all_data):
         # Let's hope the first simulation is representative
         first_sim = list(all_data.keys())[0]  # get first Simulation
-        exp_id = str(first_sim.experiment.id)  # Set the exp id from the first sim data
+        exp_id = first_sim.experiment.id  # Set the exp id from the first sim data
         keys = []
         for k in all_data.keys():
             if 'simulation_name_tag' in k.tags:
