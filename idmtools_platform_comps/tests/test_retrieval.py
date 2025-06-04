@@ -57,7 +57,7 @@ class TestRetrieval(ITestWithPersistence):
         # Test the raw retrieval
         comps_experiment = self.platform.get_item(self.exp.uid, ItemType.EXPERIMENT, raw=True)
         self.assertIsInstance(comps_experiment, COMPSExperiment)
-        self.assertEqual(self.exp.uid, comps_experiment.uid)
+        self.assertEqual(self.exp.uid, comps_experiment.id)
         self.assertEqual(self.exp.name, comps_experiment.name)
         self.assertEqual({k: str(v or '') for k, v in self.exp.tags.items()}, comps_experiment.tags)
 
@@ -66,7 +66,7 @@ class TestRetrieval(ITestWithPersistence):
                                                   columns=["id"])
         self.assertIsNone(comps_experiment.name)
         self.assertIsNone(comps_experiment.tags)
-        self.assertEqual(self.exp.uid, comps_experiment.uid)
+        self.assertEqual(self.exp.uid, comps_experiment.id)
 
         # Test retrieving with wrong type
         with self.assertRaises(UnsupportedPlatformType) as e:
@@ -85,7 +85,7 @@ class TestRetrieval(ITestWithPersistence):
         # Test the raw retrieval
         comps_simulation: COMPSSimulation = self.platform.get_item(base.uid, ItemType.SIMULATION, raw=True)
         self.assertIsInstance(comps_simulation, COMPSSimulation)
-        self.assertEqual(base.uid, comps_simulation.uid)
+        self.assertEqual(base.uid, comps_simulation.id)
         self.assertEqual(self.case_name, comps_simulation.name)
         self.assertEqual({k: str(v) for k, v in sorted(base.tags.items())},
                          {k: str(v) for k, v in sorted(comps_simulation.tags.items())})

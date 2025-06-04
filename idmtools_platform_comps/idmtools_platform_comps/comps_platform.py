@@ -224,12 +224,10 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         if isinstance(item, COMPSSuite):
             children = self._get_children_for_platform_item(item, children = ["tags", "configuration"])
             for child in children:
-                child = self._normalized_item_fields(child)
                 flattened.extend(self.flatten_item(item=child, raw=raw, **kwargs))
         elif isinstance(item, COMPSExperiment):
             children = self._get_children_for_platform_item(item, children = ["tags", "configuration"])
             for child in children:
-                child = self._normalized_item_fields(child)
                 flattened.extend(self.flatten_item(item=child, raw=raw, **kwargs))
         elif isinstance(item, (COMPSSimulation, COMPSWorkItem, COMPSAssetCollection)):
             if isinstance(item, COMPSSimulation):
