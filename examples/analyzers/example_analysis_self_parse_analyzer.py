@@ -37,7 +37,7 @@ class MyCSVAnalyzer(IAnalyzer):
 
         # Make a directory labeled the exp id to write the csv results to
         first_sim = list(all_data.keys())[0]  # get first Simulation
-        exp_id = str(first_sim.experiment.id)  # get experiment id from all_data
+        exp_id = first_sim.experiment.id  # get experiment id from all_data
         output_folder = os.path.join(self.output_path, exp_id)
         os.makedirs(output_folder, exist_ok=True)
         results.to_csv(os.path.join(output_folder, self.__class__.__name__ + '.csv'))
