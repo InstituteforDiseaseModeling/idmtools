@@ -51,12 +51,7 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         columns = columns or ["id", "name", "state", "environment_name"]
         load_children = load_children if load_children is not None else ["tags"]
         query_criteria = query_criteria or QueryCriteria().select(columns).select_children(load_children)
-        comps_workitem = COMPSWorkItem.get(workflow_item_id, query_criteria=query_criteria)
-        comps_workitem.uid = comps_workitem.id
-        comps_workitem._id = str(comps_workitem.id)
-        comps_workitem.platform = self.platform
-        comps_workitem.item_type = ItemType.WORKFLOW_ITEM
-        return comps_workitem
+        return COMPSWorkItem.get(workflow_item_id, query_criteria=query_criteria)
 
     def platform_create(self, work_item: IWorkflowItem, **kwargs) -> Tuple[Any]:
         """
@@ -241,7 +236,7 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
         # Set its correct attributes
         obj.platform = self.platform
         obj._platform_object = work_item
-        obj.uid = work_item.uid
+        obj.uid = work_item.id
         if work_item.asset_collection_id:
             obj.assets = AssetCollection.from_id(work_item.asset_collection_id, platform=self.platform)
         if work_item.files:

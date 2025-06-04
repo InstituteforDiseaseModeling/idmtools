@@ -51,19 +51,7 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         if asset_collection_id is None and query_criteria is None:
             raise ValueError("You cannot query for all asset collections. Please specify a query criteria or an id")
         query_criteria = query_criteria or QueryCriteria().select_children(children)
-        comps_ac = COMPSAssetCollection.get(id=asset_collection_id, query_criteria=query_criteria)
-        if asset_collection_id is None or asset_collection_id == "":
-            for ac in comps_ac:
-                ac.uid = ac.id
-                ac._id = str(ac.id)
-                ac.platform = self.platform
-                ac.item_type = ItemType.ASSETCOLLECTION
-        else:
-            comps_ac.uid = comps_ac.id
-            comps_ac._id = str(comps_ac.id)
-            comps_ac.platform = self.platform
-            comps_ac.item_type = ItemType.ASSETCOLLECTION
-        return comps_ac
+        return COMPSAssetCollection.get(id=asset_collection_id, query_criteria=query_criteria)
 
     def platform_create(self, asset_collection: AssetCollection, **kwargs) -> COMPSAssetCollection:
         """
@@ -191,7 +179,7 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
         # we support comps simulations files and experiments as asset collections
         # only true asset collections have ids
         if isinstance(asset_collection, COMPSAssetCollection):
-            ac.uid = asset_collection.uid
+            ac.uid = asset_collection.id
             ac.tags = asset_collection.tags
         elif isinstance(asset_collection, list) and len(asset_collection):
             if not isinstance(asset_collection[0], (SimulationFile, WorkItemFile)):
