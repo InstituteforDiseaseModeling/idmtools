@@ -52,9 +52,10 @@ class CompsPlatformAssetCollectionOperations(IPlatformAssetCollectionOperations)
             raise ValueError("You cannot query for all asset collections. Please specify a query criteria or an id")
         query_criteria = query_criteria or QueryCriteria().select_children(children)
         comps_ac = COMPSAssetCollection.get(id=asset_collection_id, query_criteria=query_criteria)
-        comps_ac.uid = comps_ac.id
-        comps_ac.platform = self.platform
-        comps_ac.item_type = ItemType.ASSETCOLLECTION
+        for ac in comps_ac:
+            ac.uid = ac.id
+            ac.platform = self.platform
+            ac.item_type = ItemType.ASSETCOLLECTION
         return comps_ac
 
     def platform_create(self, asset_collection: AssetCollection, **kwargs) -> COMPSAssetCollection:
