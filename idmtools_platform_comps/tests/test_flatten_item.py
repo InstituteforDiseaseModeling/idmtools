@@ -1,4 +1,6 @@
 import unittest
+import uuid
+from typing import Iterable
 from uuid import UUID
 
 from idmtools.assets import AssetCollection
@@ -103,7 +105,7 @@ class TestFlattenItem(unittest.TestCase):
         sims = self.platform.flatten_item(sim, raw=False)
         self.assertEqual(len(sims), 1)
         self.assertTrue(all(isinstance(item, Simulation) for item in sims))
-        self._verify_idm_extra_fields(sims)
+        self.assertEqual(sims[0], sim)
 
     def test_flatten_item_sim_false_true(self):
         sim_id = "c97cbc8c-e43c-f011-9310-f0921c167864"
@@ -133,9 +135,9 @@ class TestFlattenItem(unittest.TestCase):
         workitem_id = "7ad3f7b8-063d-f011-9310-f0921c167864"
         workitem = self.platform.get_item(workitem_id, ItemType.WORKFLOW_ITEM)
         workitems = self.platform.flatten_item(workitem, raw=False)
-        self.assertEqual(len(workitems), 1)
         self.assertTrue(isinstance(workitems[0], GenericWorkItem))
-        self._verify_idm_extra_fields(workitems)
+        self.assertEqual(len(workitems), 1)
+        self.assertEqual(workitems[0], workitem)
 
     def test_flatten_item_workitem_false_true(self):
         workitem_id = "7ad3f7b8-063d-f011-9310-f0921c167864"
@@ -167,7 +169,7 @@ class TestFlattenItem(unittest.TestCase):
         asset_collections = self.platform.flatten_item(asset_collection, raw=False)
         self.assertEqual(len(asset_collections), 1)
         self.assertTrue(isinstance(asset_collections[0], AssetCollection))
-        self._verify_idm_extra_fields(asset_collections)
+        self.assertEqual(asset_collections[0], asset_collection)
 
     def test_flatten_item_ac_false_true(self):
         ac_id = "ca2c7680-5a5f-eb11-a2c2-f0921c167862"
@@ -182,3 +184,8 @@ class TestFlattenItem(unittest.TestCase):
             self.assertTrue(isinstance(item.id, str))
             self.assertEqual(str(item.uid), item.id)
             self.assertTrue(isinstance(item.platform, COMPSPlatform))
+            if isinstance(item, (COMPSSimulation, COMPSWorkItem, COMPSAssetCollection)):
+                self.assertTrue(isinstance(item.uid, uuid.UUID))  # uid is UUID when item is server item
+            else:
+                self.assertTrue(isinstance(item.uid, str))  # uid is string type when item is not server item
+

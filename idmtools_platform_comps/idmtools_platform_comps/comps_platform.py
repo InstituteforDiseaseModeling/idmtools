@@ -214,12 +214,18 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
         Args:
             item: Which item to flatten
-            raw: If True, returns raw platform objects
+            raw: If True, returns raw platform objects, False, return local objects
             kwargs: Extra parameters for conversion
 
         Returns:
-            List of leaf items (simulations, workitems, or asset collections)
+            List of leaf items, which can be from either the local platform or a COMPS server:
+            - Simulations (either local Simulation or COMPSSimulation),
+            - WorkItems (local or COMPSWorkItem),
+            - or AssetCollections (local or COMPSAssetCollection).
         """
+        # Return directly if item is already in leaf and raw = False
+        if not raw and isinstance(item, (Simulation, IWorkflowItem, AssetCollection)):
+            return [item]
         # Handle platform object conversion if needed
         if not isinstance(item, (COMPSSuite, COMPSExperiment, COMPSSimulation,
                                  COMPSWorkItem, COMPSAssetCollection)):
@@ -233,15 +239,16 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                     for leaf in self.flatten_item(child, raw=raw, **kwargs)]
 
         # Handle leaf types
-        if isinstance(item, COMPSSimulation):
-            self._ensure_simulation_experiment(item)
+        if isinstance(item, (COMPSSimulation, COMPSWorkItem, COMPSAssetCollection)):
+            if isinstance(item, COMPSSimulation):
+                self._ensure_simulation_experiment(item)
             item = self._normalized_item_fields(item)
 
         if not raw:
             parent = item.experiment if isinstance(item, COMPSSimulation) else None
             item = self._convert_platform_item_to_entity(item, parent=parent, **kwargs)
 
-        return [self._normalized_item_fields(item)]
+        return [item]
 
     def _ensure_simulation_experiment(self, simulation):
         """Ensure simulation has a valid experiment attached."""
@@ -254,7 +261,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
     def _normalized_item_fields(self, item):
         item.uid = item.id
         item._id = str(item.id)
-        if type(item).__name__ == "GenericWorkItem":
+        if type(item).__name__ == "WorkItem":
             item.item_type = ItemType.WORKFLOW_ITEM
         elif type(item).__name__ == "AssetCollection":
             item.item_type = ItemType.ASSETCOLLECTION
