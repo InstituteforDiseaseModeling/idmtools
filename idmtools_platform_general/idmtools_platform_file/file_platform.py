@@ -141,31 +141,6 @@ class FilePlatform(IPlatform):
         script_path = Path(script_path)
         script_path.chmod(mode)
 
-    def get_files(self, item: FileSimulation, files: Union[Set[str], List[str]], output: str = None, **kwargs) -> \
-            Union[Dict[str, Dict[str, bytearray]], Dict[str, bytearray]]:
-        """
-        Get files for a platform entity.
-
-        Args:
-            item: Item to fetch files for
-            files: List of file names to get
-            output: save files to
-            kwargs: Platform arguments
-
-        Returns:
-            For simulations, this returns a dictionary with filename as key and values being binary data from file or a
-            dict.
-
-            For experiments, this returns a dictionary with key as sim id and then the values as a dict of the
-            simulations described above
-        """
-        if not isinstance(item, (FileSimulation, Simulation)):
-            raise TypeError(f'Item Type: {type(item)} is not supported!')
-
-        item = self.flatten_item(item, **kwargs)[0]
-        file_data = super().get_files(item, files, output, **kwargs)
-        return file_data
-
     def flatten_item(self, item: object, raw: bool = False, **kwargs) -> List[object]:
         """
         Flatten an item: resolve the children until getting to the leaves.

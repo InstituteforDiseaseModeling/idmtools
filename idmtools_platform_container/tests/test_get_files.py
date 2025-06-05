@@ -68,9 +68,18 @@ class TestGetFiles(unittest.TestCase):
     def test_get_files_experiment(self):
         experiment = self.platform.get_item(self.experiment.id, ItemType.EXPERIMENT, raw=False)
         files = ["config.json", "metadata.json", "output/result.txt"]
-        with self.assertRaises(TypeError) as a:
-            ret_files = self.platform.get_files(experiment, files=files, output=self.case_name)
-        self.assertIn("Item Type: <class 'idmtools.entities.experiment.Experiment'> is not supported!", a.exception.args[0])
+        ret_files = self.platform.get_files(experiment, files=files, output=self.case_name)
+        # ret_files is a dictionary with key as sim id and the values as a dict of filename as key and values
+        # being binary data from file or a dict.
+        # Verify each entry for each entry(sim), make sure every sim returns 3 files
+        for sim in experiment.simulations:
+            convert_file_path = []
+            for key, value in ret_files[sim.id].items():
+                convert_file_path.append(key.replace("\\", "/"))
+                self.assertIsNotNone(value)
+                self.assertTrue(len(value) > 0)
+            assert set(convert_file_path) == set(files)
+
 
     def _verify_files(self, actual_files, expected_files):
         convert_file_path = []
