@@ -205,7 +205,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         file_data = super().get_files(item, files, output, **kwargs)
         return file_data
 
-    def flatten_item(self, item: object, raw=False, **kwargs) -> List[object]:
+    def flatten_item(self, item: object, raw: bool = False, **kwargs) -> List[object]:
         """
         Flatten an item: resolve the children until getting to the leaves.
 
@@ -214,41 +214,42 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
         Args:
             item: Which item to flatten
-            raw: bool
-            kwargs: extra parameters
+            raw: If True, returns raw platform objects
+            kwargs: Extra parameters for conversion
 
         Returns:
-            List of leaves
+            List of leaf items (simulations, workitems, or asset collections)
         """
-        flattened = []
-        if isinstance(item, COMPSSuite):
-            children = self._get_children_for_platform_item(item, children = ["tags", "configuration"])
-            for child in children:
-                flattened.extend(self.flatten_item(item=child, raw=raw, **kwargs))
-        elif isinstance(item, COMPSExperiment):
-            children = self._get_children_for_platform_item(item, children = ["tags", "configuration"])
-            for child in children:
-                flattened.extend(self.flatten_item(item=child, raw=raw, **kwargs))
-        elif isinstance(item, (COMPSSimulation, COMPSWorkItem, COMPSAssetCollection)):
-            if isinstance(item, COMPSSimulation):
-                # Check if experiment is missing, or if simulation.experiment.configuration is None
-                if not hasattr(item, "experiment") or item.experiment.configuration is None:
-                    experiment = self.get_item(item.experiment_id, item_type=ItemType.EXPERIMENT, raw=True)
-                    experiment = self._normalized_item_fields(experiment)
-                    item.experiment = experiment
-                item = self._normalized_item_fields(item)
-            if raw:
-                flattened.append(item)
-            else:
-                if isinstance(item, COMPSSimulation):
-                    entity_item = self._convert_platform_item_to_entity(item, parent=item.experiment, **kwargs)
-                else:
-                    entity_item = self._convert_platform_item_to_entity(item, **kwargs)
-                flattened.append(entity_item)
-        else:
-            platform_object = item.get_platform_object()
-            return self.flatten_item(platform_object, raw=raw)
-        return flattened
+        # Handle platform object conversion if needed
+        if not isinstance(item, (COMPSSuite, COMPSExperiment, COMPSSimulation,
+                                 COMPSWorkItem, COMPSAssetCollection)):
+            return self.flatten_item(item.get_platform_object(), raw=raw, **kwargs)
+
+        # Process types (suites and experiments)
+        if isinstance(item, (COMPSSuite, COMPSExperiment)):
+            children = self._get_children_for_platform_item(item, children=["tags", "configuration"])
+            return [leaf
+                    for child in children
+                    for leaf in self.flatten_item(child, raw=raw, **kwargs)]
+
+        # Handle leaf types
+        if isinstance(item, COMPSSimulation):
+            self._ensure_simulation_experiment(item)
+            item = self._normalized_item_fields(item)
+
+        if not raw:
+            parent = item.experiment if isinstance(item, COMPSSimulation) else None
+            item = self._convert_platform_item_to_entity(item, parent=parent, **kwargs)
+
+        return [self._normalized_item_fields(item)]
+
+    def _ensure_simulation_experiment(self, simulation):
+        """Ensure simulation has a valid experiment attached."""
+        if not hasattr(simulation, "experiment") or simulation.experiment.configuration is None:
+            experiment = self.get_item(simulation.experiment_id,
+                                       item_type=ItemType.EXPERIMENT,
+                                       raw=True)
+            simulation.experiment = self._normalized_item_fields(experiment)
 
     def _normalized_item_fields(self, item):
         item.uid = item.id
@@ -261,5 +262,3 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             item.item_type = ItemType(type(item).__name__)
         item.platform = self
         return item
-
-
