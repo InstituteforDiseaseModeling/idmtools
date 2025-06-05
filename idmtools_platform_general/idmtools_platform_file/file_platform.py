@@ -10,12 +10,9 @@ from typing import Union, List, Set, Dict
 from dataclasses import dataclass, field
 
 from idmtools import IdmConfigParser
-from idmtools.assets import AssetCollection
 from idmtools.core import ItemType, EntityStatus, TRUTHY_VALUES
-from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
-from idmtools.entities.iworkflow_item import IWorkflowItem
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.iplatform import IPlatform
 from idmtools_platform_file.file_operations.file_operations import FileOperations
@@ -195,6 +192,11 @@ class FilePlatform(IPlatform):
         # Process types (suites and experiments)
         if isinstance(item, (FileSuite, FileExperiment)):
             children = self._get_children_for_platform_item(item)
+            # Assign server experiment to child.experiment to avoid recreating child's parent
+            if isinstance(item, FileExperiment):
+                item = self._normalized_item_fields(item)
+                for child in children:
+                    child.experiment = item
             return [leaf
                     for child in children
                     for leaf in self.flatten_item(child, raw=raw, **kwargs)]
@@ -202,6 +204,7 @@ class FilePlatform(IPlatform):
         # Handle leaf types
         if isinstance(item, FileSimulation):
             self._ensure_simulation_experiment(item)
+            item = self._normalized_item_fields(item)
 
         if not raw:
             parent = item.experiment if isinstance(item, FileSimulation) else None
@@ -211,11 +214,21 @@ class FilePlatform(IPlatform):
 
     def _ensure_simulation_experiment(self, simulation):
         """Ensure simulation has a valid experiment attached."""
-        experiment = self.get_item(simulation.experiment_id,
-                                   item_type=ItemType.EXPERIMENT,
-                                   raw=True)
-        simulation.experiment = experiment
+        try:
+            experiment = simulation.experiment if hasattr(simulation, 'experiment') else None
+        except Exception:
+            experiment = None
 
+        if experiment is None:
+            experiment = self.get_item(simulation.experiment_id,
+                              item_type=ItemType.EXPERIMENT,
+                              raw=True)
+            simulation.experiment = self._normalized_item_fields(experiment)
+
+    def _normalized_item_fields(self, item):
+        item.platform = self
+        item._platform_object = item
+        return item
 
     def validate_item_for_analysis(self, item: Union[Simulation, FileSimulation], analyze_failed_items=False):
         """
