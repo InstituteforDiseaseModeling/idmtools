@@ -234,9 +234,15 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         # Process types (suites and experiments)
         if isinstance(item, (COMPSSuite, COMPSExperiment)):
             children = self._get_children_for_platform_item(item, children=["tags", "configuration"])
+            # Assign server experiment to child.experiment to avoid recreating child's parent
+            if isinstance(item, COMPSExperiment):
+                item = self._normalized_item_fields(item)
+                for child in children:
+                    child.experiment = item
+
             return [leaf
-                    for child in children
-                    for leaf in self.flatten_item(child, raw=raw, **kwargs)]
+                for child in children
+                for leaf in self.flatten_item(child, raw=raw, **kwargs)]
 
         # Handle leaf types
         if isinstance(item, (COMPSSimulation, COMPSWorkItem, COMPSAssetCollection)):
@@ -268,4 +274,5 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         else:
             item.item_type = ItemType(type(item).__name__)
         item.platform = self
+        item._platform_object = item
         return item
