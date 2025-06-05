@@ -109,6 +109,7 @@ class TestFlattenItem(unittest.TestCase):
         sims = self.platform.flatten_item(sim, raw=False)
         self.assertEqual(len(sims), 1)
         self.assertTrue(all(isinstance(item, Simulation) for item in sims))
+        self.assertEqual(sims[0], sim)
 
     def test_flatten_item_sim_false_true(self):
         sim = self.platform.get_item(self.experiment.simulations[0].id, item_type=ItemType.SIMULATION, raw=False)

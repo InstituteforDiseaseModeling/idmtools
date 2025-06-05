@@ -6,14 +6,16 @@ Copyright 2025, Gates Foundation. All rights reserved.
 import os
 from pathlib import Path
 from logging import getLogger
-from typing import Union, List
+from typing import Union, List, Set, Dict
 from dataclasses import dataclass, field
 
 from idmtools import IdmConfigParser
+from idmtools.assets import AssetCollection
 from idmtools.core import ItemType, EntityStatus, TRUTHY_VALUES
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
+from idmtools.entities.iworkflow_item import IWorkflowItem
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.iplatform import IPlatform
 from idmtools_platform_file.file_operations.file_operations import FileOperations
@@ -142,7 +144,32 @@ class FilePlatform(IPlatform):
         script_path = Path(script_path)
         script_path.chmod(mode)
 
-    def flatten_item(self, item: IEntity, raw=False, **kwargs) -> List[object]:
+    def get_files(self, item: FileSimulation, files: Union[Set[str], List[str]], output: str = None, **kwargs) -> \
+            Union[Dict[str, Dict[str, bytearray]], Dict[str, bytearray]]:
+        """
+        Get files for a platform entity.
+
+        Args:
+            item: Item to fetch files for
+            files: List of file names to get
+            output: save files to
+            kwargs: Platform arguments
+
+        Returns:
+            For simulations, this returns a dictionary with filename as key and values being binary data from file or a
+            dict.
+
+            For experiments, this returns a dictionary with key as sim id and then the values as a dict of the
+            simulations described above
+        """
+        if not isinstance(item, (FileSimulation, Simulation)):
+            raise TypeError(f'Item Type: {type(item)} is not supported!')
+
+        item = self.flatten_item(item, **kwargs)[0]
+        file_data = super().get_files(item, files, output, **kwargs)
+        return file_data
+
+    def flatten_item(self, item: object, raw: bool = False, **kwargs) -> List[object]:
         """
         Flatten an item: resolve the children until getting to the leaves.
 
@@ -151,38 +178,44 @@ class FilePlatform(IPlatform):
 
         Args:
             item: Which item to flatten
-            raw: bool
-            kwargs: extra parameters
+            raw: If True, returns raw platform objects, False, return local objects
+            kwargs: Extra parameters for conversion
 
         Returns:
-            List of leaves
+            List of leaf items, which can be from either the local platform or a File platform:
+            - Simulations (either local Simulation or FileSimulation),
         """
-        flattened = []
-        if isinstance(item, FileSuite):
-            children = self._suites.get_children(item, parent=item, raw=raw, **kwargs)
-            for child in children:
-                flattened.extend(self.flatten_item(item=child, raw=raw, **kwargs))
-        elif isinstance(item, FileExperiment):
-            children = self._experiments.get_children(item, parent=item, raw=raw, **kwargs)
-            for child in children:
-                flattened.extend(self.flatten_item(item=child, raw=raw, **kwargs))
-        elif isinstance(item, FileSimulation):
-            exp = Experiment()
-            exp.uid = item.experiment_id
-            exp.platform = self
-            item.experiment = exp
-            exp._platform_object = item
-            item.uid = item.id
-            item.platform = self
-            if raw is False:
-                item = self._simulations.to_entity(item, parent=item.experiment)
-            flattened.append(item)
-        else:
-            item.platform = self
-            platform_object = item.get_platform_object()
-            return self.flatten_item(platform_object, raw=raw)
+        # Return directly if item is already in leaf and raw = False
+        if not raw and isinstance(item, Simulation):
+            return [item]
+        # Handle platform object conversion if needed
+        if not isinstance(item, (FileSuite, FileExperiment, FileSimulation)):
+            return self.flatten_item(item.get_platform_object(), raw=raw, **kwargs)
 
-        return flattened
+        # Process types (suites and experiments)
+        if isinstance(item, (FileSuite, FileExperiment)):
+            children = self._get_children_for_platform_item(item)
+            return [leaf
+                    for child in children
+                    for leaf in self.flatten_item(child, raw=raw, **kwargs)]
+
+        # Handle leaf types
+        if isinstance(item, FileSimulation):
+            self._ensure_simulation_experiment(item)
+
+        if not raw:
+            parent = item.experiment if isinstance(item, FileSimulation) else None
+            item = self._convert_platform_item_to_entity(item, parent=parent, **kwargs)
+
+        return [item]
+
+    def _ensure_simulation_experiment(self, simulation):
+        """Ensure simulation has a valid experiment attached."""
+        experiment = self.get_item(simulation.experiment_id,
+                                   item_type=ItemType.EXPERIMENT,
+                                   raw=True)
+        simulation.experiment = experiment
+
 
     def validate_item_for_analysis(self, item: Union[Simulation, FileSimulation], analyze_failed_items=False):
         """
