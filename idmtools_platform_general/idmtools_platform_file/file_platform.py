@@ -220,9 +220,7 @@ class FilePlatform(IPlatform):
             experiment = None
 
         if experiment is None:
-            experiment = self.get_item(simulation.experiment_id,
-                              item_type=ItemType.EXPERIMENT,
-                              raw=True)
+            experiment = self.get_item(simulation.experiment_id, item_type=ItemType.EXPERIMENT, raw=True)
             simulation.experiment = self._normalized_item_fields(experiment)
 
     def _normalized_item_fields(self, item):
