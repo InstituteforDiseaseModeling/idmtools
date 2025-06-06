@@ -5,7 +5,10 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 # flake8: noqa E402
 import copy
 import logging
+import uuid
 
+from idmtools.entities import Suite
+from idmtools.entities.experiment import Experiment
 # fix for comps weird import
 from idmtools.entities.simulation import Simulation
 
@@ -179,14 +182,14 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
         return result
 
-    def get_files(self, item: Union[COMPSSimulation, COMPSWorkItem, COMPSAssetCollection], files: Union[Set[str], List[str]], output: str = None, **kwargs) -> \
+    def get_files(self, item: IEntity, files: Union[Set[str], List[str]], output: str = None, **kwargs) -> \
             Union[Dict[str, Dict[str, bytearray]], Dict[str, bytearray]]:
         """
         Get files for a platform entity.
 
         Args:
             item: Item to fetch files for
-            files: List of file names to get
+            files: List of asset filenames to retrieve from each simulation
             output: save files to
             kwargs: Platform arguments
 
@@ -197,13 +200,18 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             For experiments, this returns a dictionary with key as sim id and then the values as a dict of the
             simulations described above
         """
-        if not isinstance(item, (COMPSSimulation, COMPSWorkItem, COMPSAssetCollection, Simulation, IWorkflowItem,
+        if isinstance(item, (COMPSSimulation, COMPSWorkItem, COMPSAssetCollection, Simulation, IWorkflowItem,
                                  AssetCollection)):
-            raise TypeError(f'Item Type: {type(item)} is not supported!')
-
-        item = self.flatten_item(item, **kwargs)[0]
-        file_data = super().get_files(item, files, output, **kwargs)
-        return file_data
+            item = self.flatten_item(item, raw=True, **kwargs)[0]
+            file_data = super().get_files(item, files, output, **kwargs)
+            return file_data
+        elif isinstance(item, (COMPSExperiment, Experiment)):
+            file_data = super().get_files(self._normalized_item_fields(item), files, output, **kwargs)
+            return file_data
+        elif isinstance(item, (COMPSSuite, Suite)):
+            file_data = super().get_files(self._normalized_item_fields(item), files, output, **kwargs)
+            return file_data
+        return []
 
     def flatten_item(self, item: object, raw: bool = False, **kwargs) -> List[object]:
         """
@@ -265,14 +273,14 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             simulation.experiment = self._normalized_item_fields(experiment)
 
     def _normalized_item_fields(self, item):
-        item.uid = item.id
-        item._id = str(item.id)
-        if type(item).__name__ == "WorkItem":
-            item.item_type = ItemType.WORKFLOW_ITEM
-        elif type(item).__name__ == "AssetCollection":
-            item.item_type = ItemType.ASSETCOLLECTION
-        else:
-            item.item_type = ItemType(type(item).__name__)
-        item.platform = self
-        item._platform_object = item
+        if not hasattr(item,'uid') and isinstance(item.id, uuid.UUID):
+            item.uid = item.id
+            item._id = str(item.id)
+            if type(item).__name__ == "WorkItem":
+                item.item_type = ItemType.WORKFLOW_ITEM
+            elif type(item).__name__ == "AssetCollection":
+                item.item_type = ItemType.ASSETCOLLECTION
+            else:
+                item.item_type = ItemType(type(item).__name__)
+            item.platform = self
         return item
