@@ -190,8 +190,7 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
             logger.info(f"Could not delete suite ({suite_id})...")
             return
 
-    def get_assets(self, suite: Suite, files: List[str], **kwargs) -> \
-                Dict[str, bytearray]:
+    def get_assets(self, suite: Suite, files: List[str], **kwargs) -> Dict[str, bytearray]:
             """
             Fetch the files associated with a suite.
 

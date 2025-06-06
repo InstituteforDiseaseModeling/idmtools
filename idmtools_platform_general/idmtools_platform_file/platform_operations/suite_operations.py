@@ -193,3 +193,38 @@ class FilePlatformSuiteOperations(IPlatformSuiteOperations):
             None
         """
         pass
+
+    def get_assets(self, suite: Suite, files: List[str], **kwargs) -> \
+                Dict[str, bytearray]:
+            """
+            Fetch the files associated with a suite.
+
+            Args:
+                suite: Suite (idmtools Suite or FileSuite)
+                files: List of files to download
+                **kwargs:
+
+            Returns:
+                Dict[str, Dict[Dict[str, Dict[str, str]]]]:
+                    A nested dictionary structured as:
+                    {
+                       suite.id{
+                            experiment.id: {
+                                simulation.id {
+                                    filename: file content as string,
+                                    ...
+                                },
+                                ...
+                            },
+                        }
+                    }
+            """
+            ret = dict()
+            if isinstance(suite, FileSuite):
+                file_suite = suite
+            else:
+                file_suite = suite.get_platform_object()
+            children = self.platform._get_children_for_platform_item(file_suite)
+            for child in children:
+                ret[child.id] = self.platform._experiments.get_assets(child, files, **kwargs)
+            return ret
