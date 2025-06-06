@@ -5,11 +5,8 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 # flake8: noqa E402
 import copy
 import logging
-import uuid
-
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
-# fix for comps weird import
 from idmtools.entities.simulation import Simulation
 
 HANDLERS = copy.copy(logging.getLogger().handlers)
@@ -200,18 +197,8 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             For experiments, this returns a dictionary with key as sim id and then the values as a dict of the
             simulations described above
         """
-        if isinstance(item, (COMPSSimulation, COMPSWorkItem, COMPSAssetCollection, Simulation, IWorkflowItem,
-                                 AssetCollection)):
-            item = self.flatten_item(item, raw=True, **kwargs)[0]
-            file_data = super().get_files(item, files, output, **kwargs)
-            return file_data
-        elif isinstance(item, (COMPSExperiment, Experiment)):
-            file_data = super().get_files(self._normalized_item_fields(item), files, output, **kwargs)
-            return file_data
-        elif isinstance(item, (COMPSSuite, Suite)):
-            file_data = super().get_files(self._normalized_item_fields(item), files, output, **kwargs)
-            return file_data
-        return []
+        file_data = super().get_files(self._normalized_item_fields(item), files, output, **kwargs)
+        return file_data
 
     def flatten_item(self, item: object, raw: bool = False, **kwargs) -> List[object]:
         """
@@ -231,6 +218,10 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             - WorkItems (local or COMPSWorkItem),
             - or AssetCollections (local or COMPSAssetCollection).
         """
+        if not isinstance(item, (Simulation, IWorkflowItem, AssetCollection, COMPSSuite, COMPSExperiment,
+                                 COMPSSimulation, COMPSWorkItem, COMPSAssetCollection, Suite, Experiment)):
+            raise Exception(f'Item Type: {type(item)} is not supported!')
+
         # Return directly if item is already in leaf and raw = False
         if not raw and isinstance(item, (Simulation, IWorkflowItem, AssetCollection)):
             return [item]
@@ -254,8 +245,6 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
         # Handle leaf types
         if isinstance(item, (COMPSSimulation, COMPSWorkItem, COMPSAssetCollection)):
-            if isinstance(item, COMPSSimulation):
-                self._ensure_simulation_experiment(item)
             item = self._normalized_item_fields(item)
 
         if not raw:
@@ -264,15 +253,40 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
         return [item]
 
-    def _ensure_simulation_experiment(self, simulation):
-        """Ensure simulation has a valid experiment attached."""
-        if not hasattr(simulation, "experiment") or simulation.experiment.configuration is None:
+    def _ensure_simulation_experiment(self, simulation: COMPSSimulation) -> None:
+        """
+        Ensure the given simulation has a valid experiment attached.
+
+        If the simulation's 'experiment' attribute is missing or uninitialized,
+        fetch the experiment from the server using its ID and normalize it.
+
+        Args:
+            simulation (COMPSSimulation): The simulation object to validate.
+        Raises:
+            ValueError: If 'experiment_id' is missing or invalid.
+        """
+        experiment = getattr(simulation, "experiment", None)
+
+        if experiment is None or getattr(experiment, "configuration", None) is None:
+            if not hasattr(simulation, "experiment_id") or simulation.experiment_id is None:
+                raise ValueError("simulation.experiment_id is missing or None; cannot retrieve experiment.")
+
             experiment = self.get_item(simulation.experiment_id,
                                        item_type=ItemType.EXPERIMENT,
                                        raw=True)
             simulation.experiment = self._normalized_item_fields(experiment)
 
     def _normalized_item_fields(self, item):
+        """
+        Add extra fields to item.
+        Args:
+            item: Item (COMPS item)
+        """
+        if not isinstance(item, (COMPSSuite, COMPSExperiment, COMPSSimulation,
+                                 COMPSWorkItem, COMPSAssetCollection)):
+            item = item.get_platform_object()
+        if isinstance(item, COMPSSimulation):
+            self._ensure_simulation_experiment(item)
         item.uid = item.id
         item._id = str(item.id)
         if type(item).__name__ == "WorkItem":

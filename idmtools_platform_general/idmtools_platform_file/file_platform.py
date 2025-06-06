@@ -187,8 +187,24 @@ class FilePlatform(IPlatform):
 
         return [item]
 
-    def _ensure_simulation_experiment(self, simulation):
-        """Ensure simulation has a valid experiment attached."""
+    def _ensure_simulation_experiment(self, simulation: FileSimulation) -> None:
+        """
+        Ensure the given simulation has a valid experiment attached.
+
+        If the simulation's 'experiment' attribute is missing or uninitialized,
+        fetch the experiment from the server using its ID and normalize it.
+
+        Args:
+            simulation (FileSimulation): The simulation object to validate.
+        Raises:
+            ValueError: If 'experiment_id' is missing or invalid.
+        """
+        experiment = getattr(simulation, "experiment", None)
+
+        if experiment is None or getattr(experiment, "configuration", None) is None:
+            if not hasattr(simulation, "experiment_id") or simulation.experiment_id is None:
+                raise ValueError("simulation.experiment_id is missing or None; cannot retrieve experiment.")
+
         try:
             experiment = simulation.experiment if hasattr(simulation, 'experiment') else None
         except Exception:
