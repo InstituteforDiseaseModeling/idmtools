@@ -273,14 +273,13 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             simulation.experiment = self._normalized_item_fields(experiment)
 
     def _normalized_item_fields(self, item):
-        if not hasattr(item,'uid') and isinstance(item.id, uuid.UUID):
-            item.uid = item.id
-            item._id = str(item.id)
-            if type(item).__name__ == "WorkItem":
-                item.item_type = ItemType.WORKFLOW_ITEM
-            elif type(item).__name__ == "AssetCollection":
-                item.item_type = ItemType.ASSETCOLLECTION
-            else:
-                item.item_type = ItemType(type(item).__name__)
-            item.platform = self
+        item.uid = item.id
+        item._id = str(item.id)
+        if type(item).__name__ == "WorkItem":
+            item.item_type = ItemType.WORKFLOW_ITEM
+        elif type(item).__name__ == "AssetCollection":
+            item.item_type = ItemType.ASSETCOLLECTION
+        else:
+            item.item_type = ItemType(type(item).__name__)
+        item.platform = self
         return item
