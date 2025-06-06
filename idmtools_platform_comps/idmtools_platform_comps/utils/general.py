@@ -206,7 +206,7 @@ def get_asset_for_comps_item(platform: IPlatform, item: IEntity, files: List[str
         load_children = ["configuration"]
     if logger.isEnabledFor(DEBUG):
         logger.debug(f"Loading the files {files} from {item}")
-    if item.platform is None:
+    if not hasattr(item, "platform"):
         item.platform = platform
     if comps_item is None:
         comps_item = item.get_platform_object(True, load_children=load_children)
