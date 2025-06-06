@@ -169,7 +169,6 @@ class FilePlatform(IPlatform):
             children = self._get_children_for_platform_item(item)
             # Assign server experiment to child.experiment to avoid recreating child's parent
             if isinstance(item, FileExperiment):
-                item = self._normalized_item_fields(item)
                 for child in children:
                     child.experiment = item
             return [leaf
@@ -179,7 +178,6 @@ class FilePlatform(IPlatform):
         # Handle leaf types
         if isinstance(item, FileSimulation):
             self._ensure_simulation_experiment(item)
-            item = self._normalized_item_fields(item)
 
         if not raw:
             parent = item.experiment if isinstance(item, FileSimulation) else None
@@ -212,11 +210,7 @@ class FilePlatform(IPlatform):
 
         if experiment is None:
             experiment = self.get_item(simulation.experiment_id, item_type=ItemType.EXPERIMENT, raw=True)
-            simulation.experiment = self._normalized_item_fields(experiment)
-
-    def _normalized_item_fields(self, item):
-        item.platform = self
-        return item
+            simulation.experiment = experiment
 
     def validate_item_for_analysis(self, item: Union[Simulation, FileSimulation], analyze_failed_items=False):
         """
