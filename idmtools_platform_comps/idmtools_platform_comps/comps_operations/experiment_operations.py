@@ -534,7 +534,7 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
     def get_assets(self, experiment: Experiment, files: List[str], include_experiment_assets: bool = True, **kwargs) -> \
                 Dict[str, bytearray]:
             """
-            Fetch the files associated with a experiment.
+            Fetch the files associated with an experiment.
 
             Args:
                 experiment: Experiment (idmools Experiment or COMPSExperiment)

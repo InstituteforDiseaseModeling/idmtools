@@ -1,8 +1,5 @@
 import unittest
 import uuid
-from typing import Iterable
-from uuid import UUID
-
 from idmtools.assets import AssetCollection
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
@@ -11,7 +8,6 @@ from idmtools.entities.simulation import Simulation
 from COMPS.Data import Simulation as COMPSSimulation
 from COMPS.Data import WorkItem as COMPSWorkItem
 from COMPS.Data import AssetCollection as COMPSAssetCollection
-
 from idmtools_platform_comps.comps_platform import COMPSPlatform
 
 

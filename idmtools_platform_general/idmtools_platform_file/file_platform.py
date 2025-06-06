@@ -200,7 +200,6 @@ class FilePlatform(IPlatform):
 
     def _normalized_item_fields(self, item):
         item.platform = self
-        item._platform_object = item
         return item
 
     def validate_item_for_analysis(self, item: Union[Simulation, FileSimulation], analyze_failed_items=False):
