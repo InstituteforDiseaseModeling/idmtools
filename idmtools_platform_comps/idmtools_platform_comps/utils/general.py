@@ -203,7 +203,7 @@ def get_asset_for_comps_item(platform: IPlatform, item: IEntity, files: List[str
     """
     # Retrieve comps item
     if load_children is None:
-        load_children = ["files", "configuration"]
+        load_children = ["configuration"]
     if logger.isEnabledFor(DEBUG):
         logger.debug(f"Loading the files {files} from {item}")
     if item.platform is None:

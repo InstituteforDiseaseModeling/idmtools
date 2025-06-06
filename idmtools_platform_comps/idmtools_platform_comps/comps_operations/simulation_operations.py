@@ -557,7 +557,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         if isinstance(simulation, COMPSSimulation):
             comps_sim: COMPSSimulation = simulation
         else:
-            comps_sim: COMPSSimulation = simulation.get_platform_object(load_children=["files", "configuration"])
+            comps_sim: COMPSSimulation = simulation.get_platform_object(load_children=["configuration"])
         if include_experiment_assets and (
                 comps_sim.configuration is None or comps_sim.configuration.asset_collection_id is None):
             if logger.isEnabledFor(DEBUG):
