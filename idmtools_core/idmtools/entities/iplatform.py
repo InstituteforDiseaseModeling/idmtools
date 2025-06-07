@@ -244,7 +244,6 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             return_object = self.cache.get(cache_key)
             return_object.platform = self
 
-        return_object.platform = self
         return return_object
 
     def _get_children_for_platform_item(self, item: Any, raw: bool = True, **kwargs) -> List[Any]:

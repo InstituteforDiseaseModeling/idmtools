@@ -197,16 +197,15 @@ class FilePlatform(IPlatform):
         Raises:
             ValueError: If 'experiment_id' is missing or invalid.
         """
-        experiment = getattr(simulation, "experiment", None)
-
-        if experiment is None or getattr(experiment, "configuration", None) is None:
-            if not hasattr(simulation, "experiment_id") or simulation.experiment_id is None:
-                raise ValueError("simulation.experiment_id is missing or None; cannot retrieve experiment.")
-
         try:
-            experiment = simulation.experiment if hasattr(simulation, 'experiment') else None
+            experiment = getattr(simulation, "experiment", None)
         except Exception:
             experiment = None
+
+        # Check fallback if experiment is missing or misconfigured
+        if experiment is None or getattr(experiment, "configuration", None) is None:
+            if not getattr(simulation, "experiment_id", None):
+                raise ValueError("simulation.experiment_id is missing or None; cannot retrieve experiment.")
 
         if experiment is None:
             experiment = self.get_item(simulation.experiment_id, item_type=ItemType.EXPERIMENT, raw=True)
