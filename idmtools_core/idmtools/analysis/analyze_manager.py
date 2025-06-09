@@ -301,7 +301,7 @@ class AnalyzeManager:
                                      f'cache: {on_off(hasattr(analyzer, "cache"))}')
             if hasattr(analyzer, 'need_dir_map'):
                 user_logger.log(VERBOSE, f' | (Directory map: {on_off(analyzer.need_dir_map)}')
-        user_logger.log(VERBOSE, f' | Pool of {n_processes} analyzing process(es)')
+        user_logger.log(VERBOSE, f' | Pool of {n_processes} analyzing {self.executor_type}(es)')
 
     def _run_and_wait_for_mapping(self, executor) -> Tuple[Dict, bool]:
         """
