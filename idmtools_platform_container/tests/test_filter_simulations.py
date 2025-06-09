@@ -10,17 +10,16 @@ from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools.utils.filter_simulations import FilterItem
-from COMPS.Data import Simulation as COMPSSimulation
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
+from idmtools_platform_file.platform_operations.utils import FileSimulation
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.utils import get_case_name
 
 
-@allure.story("COMPS")
 @allure.story("Python")
 @allure.story("Filtering")
-@allure.suite("idmtools_platform_comps")
+@allure.suite("idmtools_platform_container")
 class TestSimulations(ITestWithPersistence):
 
     def _run_create_test_experiments(self):
@@ -55,7 +54,7 @@ class TestSimulations(ITestWithPersistence):
 
     @classmethod
     def setUpClass(cls):
-        cls.platform = Platform('SlurmStage')
+        cls.platform = Platform('Container', job_directory="DEST")
         cls.suite = cls._run_create_test_experiments(cls)
         cls.experiment = cls.suite.experiments[0]
 
@@ -69,7 +68,7 @@ class TestSimulations(ITestWithPersistence):
         sims = FilterItem.filter_item_by_id(self.platform, self.experiment.uid, ItemType.EXPERIMENT, max_simulations=5)
         self.assertEqual(len(sims), 2)
 
-    # Filer from Suite
+    # Filter from Suite
     # Test default filter with suite uuid and type which only returns succeed sims (2 in this case)
     def test_filter_suite(self):
         sims = FilterItem.filter_item_by_id(self.platform, self.suite.uid, ItemType.SUITE)
@@ -78,7 +77,7 @@ class TestSimulations(ITestWithPersistence):
     # Test default filter plus tags which only returns 1 matched succeed sims
     def test_filter_item_experiment(self):
         exp = self.platform.get_item(self.experiment.uid, ItemType.EXPERIMENT, raw=False)
-        sims = FilterItem.filter_item(self.platform, exp, max_simulations=5, tags={'Run_Number': '1'})
+        sims = FilterItem.filter_item(self.platform, exp, max_simulations=5, tags={'Run_Number': 1})
         self.assertEqual(len(sims), 1)
 
     # test filter with suite which only return succeed sims by default
@@ -96,7 +95,7 @@ class TestSimulations(ITestWithPersistence):
     # test filter with experiment and tags which only return 1 matched succeed sim
     def test_filter_item_experiment_tags(self):
         exp = self.platform.get_item(self.experiment.uid, ItemType.EXPERIMENT, raw=False)
-        sims = FilterItem.filter_item(self.platform, exp, max_simulations=5, tags={'Run_Number': '1'})
+        sims = FilterItem.filter_item(self.platform, exp, max_simulations=5, tags={'Run_Number': 1})
         self.assertEqual(len(sims), 1)
 
     # test filter with experiment and max_simulations filter which only return 1 matched succeed sim
@@ -119,9 +118,16 @@ class TestSimulations(ITestWithPersistence):
         for item in flatten_items:
             self.assertTrue(isinstance(item, Simulation))
 
-    def test_flatten_item_comps_suite(self):
-        comps_suite = self.platform.get_item(self.suite.id, item_type=ItemType.SUITE, raw=True)
-        flatten_items = self.platform.flatten_item(comps_suite)
+    def test_flatten_item_file_suite(self):
+        file_suite = self.platform.get_item(self.suite.id, item_type=ItemType.SUITE, raw=True)
+        flatten_items = self.platform.flatten_item(file_suite, raw=True)
+        self.assertEqual(len(flatten_items), 5)
+        for item in flatten_items:
+            self.assertTrue(isinstance(item, FileSimulation))
+
+    def test_flatten_item_file_suite_raw_false(self):
+        file_suite = self.platform.get_item(self.suite.id, item_type=ItemType.SUITE, raw=True)
+        flatten_items = self.platform.flatten_item(file_suite, raw=False)
         self.assertEqual(len(flatten_items), 5)
         for item in flatten_items:
             self.assertTrue(isinstance(item, Simulation))
@@ -132,12 +138,12 @@ class TestSimulations(ITestWithPersistence):
         for item in flatten_items:
             self.assertTrue(isinstance(item, Simulation))
 
-    def test_flatten_item_comps_experiment(self):
-        comps_exp = self.platform.get_item(self.experiment.id, item_type=ItemType.EXPERIMENT, raw=True)
-        flatten_items = self.platform.flatten_item(comps_exp, raw=True)
+    def test_flatten_item_file_experiment(self):
+        file_exp = self.platform.get_item(self.experiment.id, item_type=ItemType.EXPERIMENT, raw=True)
+        flatten_items = self.platform.flatten_item(file_exp, raw=True)
         self.assertEqual(len(flatten_items), 5)
         for item in flatten_items:
-            self.assertTrue(isinstance(item, COMPSSimulation))
+            self.assertTrue(isinstance(item, FileSimulation))
 
     def test_flatten_item_idm_simulation(self):
         flatten_items = self.platform.flatten_item(self.experiment.simulations[0])
@@ -145,12 +151,12 @@ class TestSimulations(ITestWithPersistence):
         for item in flatten_items:
             self.assertTrue(isinstance(item, Simulation))
 
-    def test_flatten_item_comps_simulation(self):
-        comps_sim = self.platform.get_item(self.experiment.simulations[0].id, item_type=ItemType.SIMULATION, raw=True)
-        flatten_items = self.platform.flatten_item(comps_sim, raw=True)
+    def test_flatten_item_file_simulation(self):
+        file_sim = self.platform.get_item(self.experiment.simulations[0].id, item_type=ItemType.SIMULATION, raw=True)
+        flatten_items = self.platform.flatten_item(file_sim, raw=True)
         self.assertEqual(len(flatten_items), 1)
         for item in flatten_items:
-            self.assertTrue(isinstance(item, COMPSSimulation))
+            self.assertTrue(isinstance(item, FileSimulation))
 
 
 if __name__ == '__main__':

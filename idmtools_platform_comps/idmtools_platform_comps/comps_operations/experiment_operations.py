@@ -530,3 +530,38 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         comps_experiment = self.platform.get_item(experiment_id, ItemType.EXPERIMENT, raw=True)
         if comps_experiment and experiment_is_running(comps_experiment):
             comps_experiment.cancel()
+
+    def get_assets(self, experiment: Experiment, files: List[str], include_experiment_assets: bool = True, **kwargs) -> Dict[str, bytearray]:
+        """
+        Fetch the files associated with an experiment.
+
+        Args:
+            experiment: Experiment (idmools Experiment or COMPSExperiment)
+            files: List of files to download
+            include_experiment_assets: Should we also load experiment assets?
+            **kwargs:
+
+        Returns:
+            Dict[str, Dict[str, Dict[str, str]]]:
+                A nested dictionary structured as:
+                {
+                    experiment.id: {
+                        simulation.id {
+                            filename: file content as string,
+                            ...
+                        },
+                        ...
+                    }
+                }
+        """
+        ret = dict()
+        if isinstance(experiment, COMPSExperiment):
+            comps_exp = experiment
+        else:
+            comps_exp = experiment.get_platform_object()
+        simulations = self.platform.flatten_item(comps_exp, raw=True)
+        for sim in simulations:
+            ret[sim.id] = self.platform._simulations.get_assets(sim, files,
+                                                                include_experiment_assets=include_experiment_assets,
+                                                                **kwargs)
+        return ret

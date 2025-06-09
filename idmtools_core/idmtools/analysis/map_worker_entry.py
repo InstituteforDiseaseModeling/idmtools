@@ -35,9 +35,6 @@ def map_item(item: IItem) -> Dict[str, Dict]:
         logger.debug(f"Init item {item.uid} in worker")
     analyzers = map_item.analyzers
     platform = map_item.platform
-
-    if item.platform is None:
-        item.platform = platform
     return _get_mapped_data_for_item(item, analyzers, platform)
 
 

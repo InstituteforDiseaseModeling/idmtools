@@ -251,7 +251,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
 
         return Configuration(**comps_configuration)
 
-    def batch_create(self, simulations: List[Simulation], num_cores: int = None, priority: str = None, 
+    def batch_create(self, simulations: List[Simulation], num_cores: int = None, priority: str = None,
                      asset_collection_id: str = None, **kwargs) -> List[COMPSSimulation]:
         """
         Perform batch creation of Simulations.
@@ -499,8 +499,11 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             ValueError when command cannot be detected
         """
         cli = None
-        # do we have a configuration?
-        po: COMPSExperiment = experiment.get_platform_object()
+        if isinstance(experiment, COMPSExperiment):
+            po = experiment
+        else:
+            # do we have a configuration?
+            po: COMPSExperiment = experiment.get_platform_object()
         if po.configuration is None:
             po.refresh(QueryCriteria().select_children('configuration'))
         # simulation configuration for executable?
@@ -551,13 +554,16 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         """
         # since assets could be in the common assets, we should check that firs
         # load comps config first
-        comps_sim: COMPSSimulation = simulation.get_platform_object(load_children=["files", "configuration"])
+        if isinstance(simulation, COMPSSimulation):
+            comps_sim: COMPSSimulation = simulation
+        else:
+            comps_sim: COMPSSimulation = simulation.get_platform_object(load_children=["configuration"])
         if include_experiment_assets and (
                 comps_sim.configuration is None or comps_sim.configuration.asset_collection_id is None):
             if logger.isEnabledFor(DEBUG):
                 logger.debug("Gathering assets from experiment first")
             exp_assets = get_asset_for_comps_item(self.platform, simulation.experiment, files, self.cache,
-                                                  load_children=["configuration"])
+                                                  comps_item=simulation.experiment)
             if exp_assets is None:
                 exp_assets = dict()
         else:

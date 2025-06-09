@@ -60,6 +60,7 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         if experiment.parent_id is None:
             suite = add_dummy_suite(experiment)
             self.platform._suites.platform_create(suite)
+            suite.platform = self.platform
             # update parent
             experiment.parent = suite
 
@@ -261,3 +262,35 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
             Any
         """
         pass
+
+    def get_assets(self, experiment: Experiment, files: List[str], **kwargs) -> Dict[str, bytearray]:
+        """
+        Fetch the files associated with an experiment.
+
+        Args:
+            experiment: Experiment (idmools Experiment or COMPSExperiment)
+            files: List of files to download
+            **kwargs:
+
+        Returns:
+            Dict[str, Dict[str, Dict[str, str]]]:
+                A nested dictionary structured as:
+                {
+                    experiment.id: {
+                        simulation.id {
+                            filename: file content as string,
+                            ...
+                        },
+                        ...
+                    }
+                }
+        """
+        ret = dict()
+        if isinstance(experiment, FileExperiment):
+            file_exp = experiment
+        else:
+            file_exp = experiment.get_platform_object()
+        simulations = self.platform.flatten_item(file_exp, raw=True)
+        for sim in simulations:
+            ret[sim.id] = self.platform._simulations.get_assets(sim, files, **kwargs)
+        return ret

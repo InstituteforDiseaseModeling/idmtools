@@ -326,7 +326,10 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             ce = item or self.get_item(item_id, raw=raw, item_type=item_type)
             ce.platform = self
             kwargs['parent'] = ce
-            children = self._get_children_for_platform_item(ce.get_platform_object(), raw=raw, **kwargs)
+            if raw:
+                children = self._get_children_for_platform_item(ce, raw=raw, **kwargs)
+            else:
+                children = self._get_children_for_platform_item(ce.get_platform_object(), raw=raw, **kwargs)
             self.cache.set(cache_key, children, expire=self._object_cache_expiration)
             return children
 
@@ -637,7 +640,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         """
         if item_id is None or item_id == "":
             raise ValueError("item_id cannot be None or empty")
-        idm_item = self.get_item(item_id, item_type, raw=False)
+        idm_item = self.get_item(item_id, item_type, raw=True)
         return self.get_files(idm_item, files, output)
 
     def are_requirements_met(self, requirements: Union[PlatformRequirements, Set[PlatformRequirements]]) -> bool:

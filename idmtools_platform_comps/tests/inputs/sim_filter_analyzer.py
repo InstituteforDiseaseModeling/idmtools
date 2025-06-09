@@ -11,9 +11,10 @@ logger = getLogger(__name__)
 
 class SimFilterAnalyzer(IAnalyzer):
 
-    def __init__(self, filenames=None, output_path="output", **kwargs):
+    def __init__(self, filenames=None, output_path="output", result_file_name="b_match.csv", **kwargs):
         super().__init__(filenames=filenames, parse=False, **kwargs)
         self.output_path = output_path
+        self.result_file_name = result_file_name
 
     def initialize(self):
         self.output_path = os.path.join(self.working_dir, self.output_path)
@@ -52,13 +53,11 @@ class SimFilterAnalyzer(IAnalyzer):
         exp_id = first_sim.experiment.id  # Set the exp id from the first sim data
         output_folder = os.path.join(self.output_path, exp_id)
         os.makedirs(output_folder, exist_ok=True)
-        match_tuple = ("b", 2)
-        b_result_list = []
+
+        b_result_dict = {}
 
         for sim, sim_data in all_data.items():
-            # TODO: Add sim uid data
-            if sim_data == match_tuple:
-                b_result_list.append(sim_data)
+            b_result_dict[sim.id] = sim_data
 
-        b_results_df = pd.DataFrame.from_records(b_result_list, columns=['key', 'value'])
-        b_results_df.to_csv(os.path.join(output_folder, 'b_match.csv'), index_label='index')  # Write the matched sim results to a csv
+        df = pd.DataFrame.from_dict(b_result_dict,orient='index', columns=['tags', 'value'])
+        df.to_csv(os.path.join(output_folder, self.result_file_name), index_label="sim_id")  # Write the matched sim results to a csv

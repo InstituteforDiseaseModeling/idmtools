@@ -98,14 +98,12 @@ class TestPlatformFileDownload(unittest.TestCase):
             self.assertEqual(str(e), f"Couldn't find file for path 'random.txt'")
 
     def test_experiment_file_download_not_support(self):
-        out_filenames = ['anything']
+        out_filenames = ['stdout.txt']
         exp_id = "074eb953-3af6-ef11-930d-f0921c167864"
-        try:
-            d = self.platform.get_files_by_id(
-                exp_id,
-                ItemType.EXPERIMENT,
-                out_filenames,
-                self.output_path
-            )
-        except Exception as e:
-            self.assertEqual(e.args[0], "Item Type: <class 'idmtools.entities.experiment.Experiment'> is not supported!")
+        d = self.platform.get_files_by_id(
+            exp_id,
+            ItemType.EXPERIMENT,
+            out_filenames,
+            self.output_path
+        )
+        self.assertIn(b"Python 3.6.8", d['084eb953-3af6-ef11-930d-f0921c167864']['stdout.txt'])
