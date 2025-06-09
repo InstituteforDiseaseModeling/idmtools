@@ -186,7 +186,7 @@ class Workitem(object):
     pass
 
 
-def get_asset_for_comps_item(platform: IPlatform, item: IEntity, files: List[str], cache=None, load_children: List[str] = None, comps_item: Union[Experiment, Workitem, Simulation] = None) -> Dict[str, bytearray]:
+def get_asset_for_comps_item(platform: IPlatform, item: IEntity, files: List[str], cache=None, comps_item: Union[Experiment, Workitem, Simulation] = None) -> Dict[str, bytearray]:
     """
     Retrieve assets from an Entity(Simulation, Experiment, WorkItem).
 
@@ -195,19 +195,13 @@ def get_asset_for_comps_item(platform: IPlatform, item: IEntity, files: List[str
         item: Item to fetch assets from
         files: List of file names to retrieve
         cache: Cache object to use
-        load_children: Optional Load children fields
         comps_item: Optional comps item
 
     Returns:
         Dictionary in structure of filename -> bytearray
     """
-    # Retrieve comps item
-    if load_children is None:
-        load_children = ["configuration"]
     if logger.isEnabledFor(DEBUG):
         logger.debug(f"Loading the files {files} from {item}")
-    if comps_item is None:
-        comps_item = item.get_platform_object(True, load_children=load_children)
 
     if len(files) == 0:
         transients = []

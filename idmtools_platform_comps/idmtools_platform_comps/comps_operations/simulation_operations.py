@@ -563,7 +563,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             if logger.isEnabledFor(DEBUG):
                 logger.debug("Gathering assets from experiment first")
             exp_assets = get_asset_for_comps_item(self.platform, simulation.experiment, files, self.cache,
-                                                  load_children=["configuration"], comps_item=simulation.experiment)
+                                                  comps_item=simulation.experiment)
             if exp_assets is None:
                 exp_assets = dict()
         else:

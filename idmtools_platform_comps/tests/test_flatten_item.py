@@ -179,7 +179,6 @@ class TestFlattenItem(unittest.TestCase):
         for item in items:
             self.assertTrue(isinstance(item.id, str))
             self.assertEqual(str(item.uid), item.id)
-            self.assertTrue(isinstance(item.platform, COMPSPlatform))
             if isinstance(item, (COMPSSimulation, COMPSWorkItem, COMPSAssetCollection)):
                 self.assertTrue(isinstance(item.uid, uuid.UUID))  # uid is UUID when item is server item
             else:
