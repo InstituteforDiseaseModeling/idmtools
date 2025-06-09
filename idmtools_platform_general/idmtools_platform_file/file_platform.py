@@ -158,7 +158,7 @@ class FilePlatform(IPlatform):
             - Simulations (either local Simulation or FileSimulation),
         """
         # Return directly if item is already in leaf and raw = False
-        if not raw and isinstance(item, Simulation):
+        if not raw and (isinstance(item, Simulation) and not isinstance(item, FileSimulation)):
             return [item]
         # Handle platform object conversion if needed
         if not isinstance(item, (FileSuite, FileExperiment, FileSimulation)):
@@ -198,14 +198,9 @@ class FilePlatform(IPlatform):
             ValueError: If 'experiment_id' is missing or invalid.
         """
         try:
-            experiment = getattr(simulation, "experiment", None)
+            experiment = hasattr(simulation, "experiment")
         except Exception:
             experiment = None
-
-        # Check fallback if experiment is missing or misconfigured
-        if experiment is None or getattr(experiment, "configuration", None) is None:
-            if not getattr(simulation, "experiment_id", None):
-                raise ValueError("simulation.experiment_id is missing or None; cannot retrieve experiment.")
 
         if experiment is None:
             experiment = self.get_item(simulation.experiment_id, item_type=ItemType.EXPERIMENT, raw=True)

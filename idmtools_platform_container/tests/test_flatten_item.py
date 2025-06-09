@@ -40,14 +40,14 @@ class TestFlattenItem(unittest.TestCase):
         cls.exp_id = experiment.uid
         cls.experiment = experiment
 
-    def test_flatten_item_suite_true_true(self):
+    def test_flatten_item_suite_true_false(self):
         suite_id = self.experiment.suite.id
         exp = self.platform.get_item(suite_id, ItemType.SUITE, raw=True)
         sims = self.platform.flatten_item(exp, raw=False)
         self.assertEqual(len(sims), 15)
         self.assertTrue(all(isinstance(item, Simulation) for item in sims))
 
-    def test_flatten_item_suite_true_false(self):
+    def test_flatten_item_suite_true_true(self):
         suite_id = self.experiment.suite.id
         exp = self.platform.get_item(suite_id, ItemType.SUITE, raw=True)
         sims = self.platform.flatten_item(exp, raw=True)

@@ -295,4 +295,5 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             item.item_type = ItemType.ASSETCOLLECTION
         else:
             item.item_type = ItemType(type(item).__name__)
+        item.platform = self
         return item

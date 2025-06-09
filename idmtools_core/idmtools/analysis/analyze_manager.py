@@ -146,7 +146,6 @@ class AnalyzeManager:
             logger.debug(f'Getting metadata for {oid} and {otype}')
             item = self.platform.get_item(oid, otype, force=True, raw=True)
             item.uid = str(item.id)
-            item.platform = self.platform
             items.append(item)
         self.potential_items: List[IEntity] = []
 
