@@ -43,9 +43,9 @@ packages = dict(
     idmtools_cli=default_install,
     idmtools_platform_comps=data_class_default,
     idmtools_models=data_class_default,
-    idmtools_platform_slurm=data_class_default,
     idmtools_platform_general=data_class_default,
     idmtools_platform_container=data_class_default,
+    idmtools_platform_slurm=data_class_default,
     idmtools_test=[]
 )
 logger = getLogger("bootstrap")
@@ -117,15 +117,16 @@ def install_dev_packages(pip_url, extra_index_url):
         extras_str = f"[{','.join(extras)}]" if extras else ''
         logger.info(f'Installing {package} with extras: {extras_str if extras_str else "None"} from {base_directory}')
         try:
-            for line in execute(["pip3", "install", "-e", f".{extras_str}", f"--index-url={pip_url}",
-                                 f"--extra-index-url={extra_index_url}"],
-                                cwd=join(base_directory, package)):
+            for line in execute(
+                    [sys.executable, "-m", "pip", "install", "-e", f".{extras_str}", f"--index-url={pip_url}",
+                     f"--extra-index-url={extra_index_url}"],
+                    cwd=join(base_directory, package)):
                 process_output(line)
         except subprocess.CalledProcessError as e:
             logger.critical(f'{package} installed failed using {e.cmd} did not succeed')
             result = e.returncode
             logger.debug(f'Return Code: {result}')
-    for line in execute(["pip3", "install", "-r", "requirements.txt", f"--index-url={pip_url}",
+    for line in execute([sys.executable, "-m", "pip", "install", "-r", "requirements.txt", f"--index-url={pip_url}",
                          f"--extra-index-url={extra_index_url}"],
                         cwd=join(base_directory, 'docs')):
         process_output(line)
@@ -142,13 +143,14 @@ def install_base_environment(pip_url, extra_index_url):
     Lastly, we create an idmtools ini in example for developers
     """
     # install wheel first to benefit from binaries
-    for line in execute(["pip3", "install", "wheel", f"--index-url={pip_url}", f"--extra-index-url={extra_index_url}"]):
+    for line in execute([sys.executable, "-m", "pip", "install", "wheel", f"--index-url={pip_url}",
+                         f"--extra-index-url={extra_index_url}"]):
         process_output(line)
 
-    for line in execute(["pip3", "uninstall", "-y", "py-make"], ignore_error=True):
+    for line in execute([sys.executable, "-m", "pip", "uninstall", "-y", "py-make"], ignore_error=True):
         process_output(line)
 
-    for line in execute(["pip3", "install", "idm-buildtools~=1.0.1", f"--index-url={pip_url}",
+    for line in execute([sys.executable, "-m", "pip", "install", "idm-buildtools~=1.0.1", f"--index-url={pip_url}",
                          f"--extra-index-url={extra_index_url}"]):
         process_output(line)
 
@@ -176,13 +178,15 @@ if __name__ == "__main__":
     logger.addHandler(file_handler)
     # use colorful logs except the first time
     console_log_level = logging.DEBUG if 'BUILD_DEBUG' in os.environ or args.verbose else logging.INFO
+
+    logging.addLevelName(15, 'VERBOSE')
+    logging.addLevelName(35, 'SUCCESS')
+    logging.addLevelName(50, 'CRITICAL')
+
     try:
         import coloredlogs  # noqa: I900
 
         coloredlogs.install(logger=logger, level=console_log_level, fmt="%(asctime)s [%(levelname)-8.8s]  %(message)s")
-        logging.addLevelName(15, 'VERBOSE')
-        logging.addLevelName(35, 'SUCCESS')
-        logging.addLevelName(50, 'CRITICAL')
     except ImportError:
         console_handler = logging.StreamHandler(stream=sys.stdout)
         console_handler.setFormatter(log_formatter)
