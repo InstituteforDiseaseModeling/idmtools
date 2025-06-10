@@ -240,7 +240,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                 for leaf in self.flatten_item(child, raw=raw, **kwargs)]
         # Process type COMPSExperiment
         elif isinstance(item, COMPSExperiment):
-            if isinstance(self, COMPSPlatform):
+            if type(self) is COMPSPlatform:
                 children = self._get_children_for_platform_item(item, children=["tags", "configuration"])
             else:
                 children = self._get_children_for_platform_item(item,
