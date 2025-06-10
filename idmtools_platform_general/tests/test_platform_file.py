@@ -27,7 +27,7 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 
 @pytest.mark.serial
-# @linux_only
+@linux_only
 class TestFilePlatform(ITestWithPersistence):
 
     def create_experiment(self, platform=None, a=1, b=1, retries=None, wait_until_done=False):
@@ -284,8 +284,8 @@ class TestFilePlatform(ITestWithPersistence):
 
     def test_get_directory_with_suite(self):
         experiment = self.create_experiment(self.platform, a=3, b=3)
-        suite = experiment.parent
-        file_suite = suite.get_platform_object()
+        suite: Suite = experiment.parent
+        file_suite: FileSuite = suite.get_platform_object()
         # verify get_directory for server suite (file_suite)
         self.assertEqual(self.platform.get_directory(file_suite), file_suite.get_directory())
         self.assertEqual(self.platform.directory(file_suite), self.platform.get_directory(file_suite))
@@ -314,7 +314,7 @@ class TestFilePlatform(ITestWithPersistence):
         # verify get_directory for server sim (file_sim)
         self.assertEqual(self.platform.directory(file_sim), self.platform.get_directory(file_sim))
         self.assertEqual(self.platform.directory(file_sim), file_sim.get_directory())
-        idmtools_sim: FileSimulation = self.platform.get_item(experiment.simulations[0].id,
+        idmtools_sim: Simulation = self.platform.get_item(experiment.simulations[0].id,
                                                               item_type=ItemType.SIMULATION,
                                                               raw=FALSE)
         # verify get_directory for local sim (idmtools sim)
