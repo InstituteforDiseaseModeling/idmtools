@@ -293,4 +293,5 @@ class IEntity(IItem, metaclass=ABCMeta):
     def directory(self):
         return self.get_directory()
 
+
 IEntityList = List[IEntity]
