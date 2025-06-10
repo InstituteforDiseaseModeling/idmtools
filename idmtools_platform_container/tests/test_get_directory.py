@@ -3,13 +3,11 @@ import os
 import unittest
 from functools import partial
 from idmtools.builders import SimulationBuilder
-from idmtools.core import ItemType, EntityStatus
+from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
-from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
-from idmtools.utils.filter_simulations import FilterItem
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_platform_file.platform_operations.utils import FileSimulation, FileSuite
 from idmtools_test import COMMON_INPUT_PATH
