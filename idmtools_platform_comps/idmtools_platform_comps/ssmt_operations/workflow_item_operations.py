@@ -57,10 +57,7 @@ class SSMTPlatformWorkflowItemOperations(CompsPlatformWorkflowItemOperations):
             Files requested
         """
         files = [f.replace("\\", '/') for f in files]
-        if isinstance(workflow_item, COMPSWorkItem):
-            comps_workitem: COMPSWorkItem = workflow_item
-        else:
-            comps_workitem: COMPSWorkItem = workflow_item.get_platform_object(load_children=["configuration"])
+        comps_workitem: COMPSWorkItem = workflow_item
         working_directory = comps_workitem.working_directory
         results = dict()
         for file in files:
