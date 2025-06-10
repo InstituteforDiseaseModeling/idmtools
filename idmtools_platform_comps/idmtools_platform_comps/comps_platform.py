@@ -232,7 +232,7 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
         # Process types (suites and experiments)
         if isinstance(item, (COMPSSuite, COMPSExperiment)):
-            children = self._get_children_for_platform_item(item, children=["tags", "configuration"])
+            children = self._get_children_for_platform_item(item, children=["tags", "configuration", "hpc_jobs"])
             # Assign server experiment to child.experiment to avoid recreating child's parent
             if isinstance(item, COMPSExperiment):
                 item = self._normalized_item_fields(item)

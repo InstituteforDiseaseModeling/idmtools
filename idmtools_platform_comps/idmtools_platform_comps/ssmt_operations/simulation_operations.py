@@ -61,8 +61,11 @@ class SSMTPlatformSimulationOperations(CompsPlatformSimulationOperations):
             Files fetched
         """
         files = [f.replace("\\", '/') for f in files]
-        po: COMPSSimulation = simulation.get_platform_object(load_children=["files", "configuration", "hpc_jobs"])
-        working_directory = po.hpc_jobs[0].working_directory
+        if isinstance(simulation, COMPSSimulation):
+            comps_sim: COMPSSimulation = simulation
+        else:
+            comps_sim: COMPSSimulation = simulation.get_platform_object(load_children=["configuration"])
+        working_directory = comps_sim.hpc_jobs[0].working_directory
         results = dict()
         for file in files:
             full_path = os.path.join(working_directory, file)
