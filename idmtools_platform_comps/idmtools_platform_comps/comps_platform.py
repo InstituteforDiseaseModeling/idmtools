@@ -240,7 +240,11 @@ class COMPSPlatform(IPlatform, CacheEnabled):
                 for leaf in self.flatten_item(child, raw=raw, **kwargs)]
         # Process type COMPSExperiment
         elif isinstance(item, COMPSExperiment):
-            children = self._get_children_for_platform_item(item, children=["tags", "configuration", "hpc_jobs"])
+            if isinstance(self, COMPSPlatform):
+                children = self._get_children_for_platform_item(item, children=["tags", "configuration"])
+            else:
+                children = self._get_children_for_platform_item(item,
+                                                                    children=["tags", "configuration", "hpc_jobs"])
             # Assign server experiment to child.experiment to avoid recreating child's parent
             item = self._normalized_item_fields(item)
             for child in children:
