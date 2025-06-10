@@ -319,7 +319,7 @@ class TestFilePlatform(ITestWithPersistence):
         self.assertEqual(self.platform.directory(file_sim), file_sim.get_directory())
         idmtools_sim: Simulation = self.platform.get_item(experiment.simulations[0].id,
                                                               item_type=ItemType.SIMULATION,
-                                                              raw=FALSE)
+                                                              raw=False)
         # verify get_directory for local sim (idmtools sim)
         print(idmtools_sim.get_directory())
         self.assertEqual(self.platform.directory(idmtools_sim), self.platform.get_directory(idmtools_sim))
