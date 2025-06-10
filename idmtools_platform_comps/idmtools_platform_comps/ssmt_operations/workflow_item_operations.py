@@ -57,8 +57,7 @@ class SSMTPlatformWorkflowItemOperations(CompsPlatformWorkflowItemOperations):
             Files requested
         """
         files = [f.replace("\\", '/') for f in files]
-        comps_workitem: COMPSWorkItem = workflow_item
-        working_directory = comps_workitem.working_directory
+        working_directory = workflow_item.working_directory
         results = dict()
         for file in files:
             full_path = os.path.join(working_directory, file)
