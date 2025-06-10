@@ -225,26 +225,33 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         # Return directly if item is already in leaf and raw = False
         if not raw and isinstance(item, (Simulation, IWorkflowItem, AssetCollection)):
             return [item]
+
         # Handle platform object conversion if needed
         if not isinstance(item, (COMPSSuite, COMPSExperiment, COMPSSimulation,
                                  COMPSWorkItem, COMPSAssetCollection)):
             return self.flatten_item(item.get_platform_object(), raw=raw, **kwargs)
 
-        # Process types (suites and experiments)
-        if isinstance(item, (COMPSSuite, COMPSExperiment)):
+        # Process type COMPSSuite
+        if isinstance(item, COMPSSuite):
+            children = self._get_children_for_platform_item(item, children=["tags", "configuration"])
+            # Handle leaf types
+            return [leaf
+                for child in children
+                for leaf in self.flatten_item(child, raw=raw, **kwargs)]
+        # Process type COMPSExperiment
+        elif isinstance(item, COMPSExperiment):
             children = self._get_children_for_platform_item(item, children=["tags", "configuration", "hpc_jobs"])
             # Assign server experiment to child.experiment to avoid recreating child's parent
-            if isinstance(item, COMPSExperiment):
-                item = self._normalized_item_fields(item)
-                for child in children:
-                    child.experiment = item
-
+            item = self._normalized_item_fields(item)
+            for child in children:
+                child.experiment = item
+            # Handle leaf types
             return [leaf
                 for child in children
                 for leaf in self.flatten_item(child, raw=raw, **kwargs)]
 
         # Handle leaf types
-        if isinstance(item, (COMPSSimulation, COMPSWorkItem, COMPSAssetCollection)):
+        elif isinstance(item, (COMPSSimulation, COMPSWorkItem, COMPSAssetCollection)):
             item = self._normalized_item_fields(item)
 
         if not raw:
