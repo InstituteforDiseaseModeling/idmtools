@@ -9,7 +9,10 @@ import pandas as pd
 import pytest
 from pathlib import Path
 
-from win32con import FALSE
+import sys
+
+if sys.platform == "win32":
+    from win32con import FALSE
 
 from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType
