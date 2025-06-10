@@ -9,6 +9,8 @@ import pandas as pd
 import pytest
 from pathlib import Path
 
+from win32con import FALSE
+
 from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
@@ -25,7 +27,7 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 
 @pytest.mark.serial
-@linux_only
+# @linux_only
 class TestFilePlatform(ITestWithPersistence):
 
     def create_experiment(self, platform=None, a=1, b=1, retries=None, wait_until_done=False):
@@ -260,7 +262,8 @@ class TestFilePlatform(ITestWithPersistence):
         self.assertEqual(file_experiment.status, "CREATED")
         self.assertEqual(file_experiment.parent_id, experiment.parent_id)
         self.assertEqual(len(file_experiment.simulations), 9)
-        self.assertEqual(repr(file_experiment), f"<FileExperiment {file_experiment.id} - {len(file_experiment.simulations)} simulations>")
+        self.assertEqual(repr(file_experiment),
+                         f"<FileExperiment {file_experiment.id} - {len(file_experiment.simulations)} simulations>")
         self.assertEqual(file_experiment.parent_id, experiment.parent_id)
         # validate file_experiment assets
         file_experiment_assets = [asset['filename'] for asset in file_experiment.assets]
@@ -279,4 +282,45 @@ class TestFilePlatform(ITestWithPersistence):
         simulation_assets = [asset.filename for asset in experiment.simulations[0].assets]
         self.assertEqual(set(file_simulation_assets), set(simulation_assets))
 
+    def test_get_directory_with_suite(self):
+        experiment = self.create_experiment(self.platform, a=3, b=3)
+        suite = experiment.parent
+        file_suite = suite.get_platform_object()
+        # verify get_directory for server suite (file_suite)
+        self.assertEqual(self.platform.get_directory(file_suite), file_suite.get_directory())
+        self.assertEqual(self.platform.directory(file_suite), self.platform.get_directory(file_suite))
+        # verify get_directory for local suite (idmtools suite)
+        self.assertEqual(self.platform.directory(suite), suite.get_directory())
+        self.assertEqual(self.platform.directory(suite), self.platform.get_directory(suite))
+
+        self.assertEqual(self.platform.directory(suite), self.platform.get_directory(file_suite))
+
+    def test_get_directory_with_exp(self):
+        experiment = self.create_experiment(self.platform, a=3, b=3)
+        file_experiment = experiment.get_platform_object()
+        # verify get_directory for server experiment (file_experiment)
+        self.assertEqual(self.platform.get_directory(file_experiment), file_experiment.get_directory())
+        self.assertEqual(self.platform.directory(file_experiment), self.platform.get_directory(file_experiment))
+        # verify get_directory for local experiment (idmtools experiment)
+        self.assertEqual(self.platform.directory(experiment), experiment.get_directory())
+        self.assertEqual(self.platform.directory(experiment), self.platform.get_directory(experiment))
+
+        self.assertEqual(self.platform.directory(experiment), self.platform.get_directory(file_experiment))
+
+    def test_get_directory_with_sim(self):
+        experiment = self.create_experiment(self.platform, a=3, b=3)
+        file_sim: FileSimulation = self.platform.get_item(experiment.simulations[0].id, item_type=ItemType.SIMULATION,
+                                                          raw=True)
+        # verify get_directory for server sim (file_sim)
+        self.assertEqual(self.platform.directory(file_sim), self.platform.get_directory(file_sim))
+        self.assertEqual(self.platform.directory(file_sim), file_sim.get_directory())
+        idmtools_sim: FileSimulation = self.platform.get_item(experiment.simulations[0].id,
+                                                              item_type=ItemType.SIMULATION,
+                                                              raw=FALSE)
+        # verify get_directory for local sim (idmtools sim)
+        print(idmtools_sim.get_directory())
+        self.assertEqual(self.platform.directory(idmtools_sim), self.platform.get_directory(idmtools_sim))
+        self.assertEqual(self.platform.directory(idmtools_sim), idmtools_sim.get_directory())
+
+        self.assertEqual(self.platform.directory(file_sim), self.platform.get_directory(idmtools_sim))
 

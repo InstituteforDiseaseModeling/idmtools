@@ -296,3 +296,6 @@ class COMPSPlatform(IPlatform, CacheEnabled):
         else:
             item.item_type = ItemType(type(item).__name__)
         return item
+
+    def get_directory(self, item: IEntity):
+        pass

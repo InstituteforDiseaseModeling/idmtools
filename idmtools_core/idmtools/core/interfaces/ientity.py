@@ -279,5 +279,18 @@ class IEntity(IItem, metaclass=ABCMeta):
         """
         write_id_file(filename, self, save_platform, platform_args)
 
+    def get_directory(self, platform: 'IPlatform' = None):
+        """
+        Get the directory of the item.
+        Args:
+            platform: Platform object to use. If not specified, we first check object for platform object then the current context
+        """
+
+        platform = self.get_current_platform_or_error()
+        return platform.get_directory(self)
+
+    @property
+    def directory(self):
+        return self.get_directory()
 
 IEntityList = List[IEntity]
