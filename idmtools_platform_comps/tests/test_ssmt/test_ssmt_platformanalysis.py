@@ -1,5 +1,6 @@
 import functools
 import tempfile
+from pathlib import PurePath
 
 import allure
 import json
@@ -24,7 +25,8 @@ sys.path.insert(0, analyzer_path)
 from simple_analyzer import SimpleAnalyzer  # noqa
 from csv_analyzer import CSVAnalyzer  # noqa
 from infectiousness_csv_analyzer import InfectiousnessCSVAnalyzer  # noqa
-from node_csv_analyzer import NodeCSVAnalyzer  # noqa
+from node_csv_analyzer import NodeCSVAnalyzer # noqa
+from workitem_analyzer import WorkItemAnalyzer # noqa
 
 # When enabled, ssmt tests will attempt to upload packages from local environment and install before run.
 # You need to rebuild the the packages when code changes using
@@ -228,7 +230,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
         filenames_2 = {'filenames': ['output/node.csv']}
 
         # Initialize two analyser classes with the path of the output csv file
-        from custom_csv_analyzer import InfectiousnessCSVAnalyzer, NodeCSVAnalyzer
+        from custom_csv_analyzer import InfectiousnessCSVAnalyzer, NodeCSVAnalyzer # noqa
         analyzers = [InfectiousnessCSVAnalyzer, NodeCSVAnalyzer]
         extra_args = dict()
         wrapper = None
@@ -321,3 +323,19 @@ class TestPlatformAnalysis(ITestWithPersistence):
         self.assertIn("!!!!!!!!!!!!!Preload executed!!!!!!!!!!!!!!!!!!", stdout_contents)
         self.assertIn(f"Idmtools Core Version: {core_version}", stdout_contents)
         self.assertIn(f"Idmtools COMPS Version: {platform_comps_version}", stdout_contents)
+
+
+    def test_analyzer_workitem(self):
+        # This test will run ssmt analyzer in comps and analyzer is workitem analyzer which read another workitem and
+        # do analysis.
+        workitem_id = "75dba2d2-0c43-f011-9310-f0921c167864"
+        analyzers = [WorkItemAnalyzer]
+        analysis = PlatformAnalysis(platform=self.platform, work_item_ids=[workitem_id], analyzers=analyzers,
+                                    analyzers_args=[{'name': "hello"}], analysis_name=self.case_name)
+        analysis.analyze(check_status=True)
+        wi = analysis.get_work_item()
+        local_output_path = "output"
+        # download analyzer result and verify
+        self.platform.get_files_by_id(wi.uid, ItemType.WORKFLOW_ITEM, ["output/std.txt"], local_output_path)
+        file_path = os.path.join(local_output_path, wi.id)
+        self.assertTrue(os.path.exists(os.path.join(file_path, "output", "std.txt")))
