@@ -6,7 +6,6 @@ import json
 import typing
 from dataclasses import dataclass, field
 from logging import getLogger, DEBUG
-from pathlib import Path
 from typing import Any, Dict, List, Tuple, Type, Optional
 from uuid import UUID
 from COMPS.Data import QueryCriteria, WorkItem as COMPSWorkItem, WorkItemFile
