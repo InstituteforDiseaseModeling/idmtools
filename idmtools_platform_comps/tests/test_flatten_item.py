@@ -8,7 +8,6 @@ from idmtools.entities.simulation import Simulation
 from COMPS.Data import Simulation as COMPSSimulation
 from COMPS.Data import WorkItem as COMPSWorkItem
 from COMPS.Data import AssetCollection as COMPSAssetCollection
-from idmtools_platform_comps.comps_platform import COMPSPlatform
 
 
 class TestFlattenItem(unittest.TestCase):
@@ -184,3 +183,18 @@ class TestFlattenItem(unittest.TestCase):
             else:
                 self.assertTrue(isinstance(item.uid, str))  # uid is string type when item is not server item
 
+    def test_get_directory(self):
+        suite_id = "c47cbc8c-e43c-f011-9310-f0921c167864"
+        suite = self.platform.get_item(suite_id, ItemType.SUITE, raw=True)
+        sims = self.platform.flatten_item(suite, raw=True)
+        # Test get_directory for comps object
+        # First test simulation.get_directory()
+        try:
+            sims[0].get_directory()
+        except Exception as e:
+            self.assertTrue("'Simulation' object has no attribute 'get_directory'" in str(e))
+        # test platform.get_directory(simulation)
+        try:
+            self.platform.get_directory(sims[0])
+        except Exception as e:
+            self.assertTrue("'COMPSPlatform' object has no attribute 'get_directory'" in str(e))

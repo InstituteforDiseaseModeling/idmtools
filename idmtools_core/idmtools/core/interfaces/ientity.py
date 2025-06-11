@@ -6,6 +6,7 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 from abc import ABCMeta
 from dataclasses import dataclass, field
 from os import PathLike
+from pathlib import Path
 from typing import NoReturn, List, Any, Dict, Union, TYPE_CHECKING
 from idmtools.core import EntityStatus, ItemType, NoPlatformException
 from idmtools.core.interfaces.iitem import IItem
@@ -285,9 +286,10 @@ class IEntity(IItem, metaclass=ABCMeta):
         Args:
             platform: Platform object to use. If not specified, we first check object for platform object then the current context
         """
-
-        platform = self.get_current_platform_or_error()
-        return platform.get_directory(self)
+        if type(self).__name__ not in ("Suite", "Experiment", "Simulation", "FileSuite", "FileExperiment", "FileSimulation"):
+            raise RuntimeError('Only support Suite/Experiment/Simulation for get_directory() for now.')
+        item = self.get_platform_object()
+        return Path(item._platform_directory)
 
     @property
     def directory(self):

@@ -11,6 +11,10 @@ from pathlib import Path
 
 import sys
 
+from COMPS.Data import WorkItem
+
+from idmtools.entities.generic_workitem import GenericWorkItem
+
 if sys.platform == "win32":
     from win32con import FALSE
 
@@ -30,7 +34,7 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 
 @pytest.mark.serial
-@linux_only
+#@linux_only
 class TestFilePlatform(ITestWithPersistence):
 
     def create_experiment(self, platform=None, a=1, b=1, retries=None, wait_until_done=False):
@@ -297,6 +301,12 @@ class TestFilePlatform(ITestWithPersistence):
         self.assertEqual(self.platform.directory(suite), self.platform.get_directory(suite))
 
         self.assertEqual(self.platform.directory(suite), self.platform.get_directory(file_suite))
+        # create a random suite object:
+        suite = Suite(name = "my_suite")
+        try:
+            suite.get_directory()
+        except Exception as e:
+            self.assertTrue("The object has no platform set..." in str(e))
 
     def test_get_directory_with_exp(self):
         experiment = self.create_experiment(self.platform, a=3, b=3)
@@ -309,6 +319,12 @@ class TestFilePlatform(ITestWithPersistence):
         self.assertEqual(self.platform.directory(experiment), self.platform.get_directory(experiment))
 
         self.assertEqual(self.platform.directory(experiment), self.platform.get_directory(file_experiment))
+        # create a random experiment object:
+        exp = Experiment(name = "my_exp")
+        try:
+            exp.get_directory()
+        except Exception as e:
+            self.assertTrue("The object has no platform set..." in str(e))
 
     def test_get_directory_with_sim(self):
         experiment = self.create_experiment(self.platform, a=3, b=3)
@@ -321,9 +337,21 @@ class TestFilePlatform(ITestWithPersistence):
                                                               item_type=ItemType.SIMULATION,
                                                               raw=False)
         # verify get_directory for local sim (idmtools sim)
-        print(idmtools_sim.get_directory())
         self.assertEqual(self.platform.directory(idmtools_sim), self.platform.get_directory(idmtools_sim))
         self.assertEqual(self.platform.directory(idmtools_sim), idmtools_sim.get_directory())
-
         self.assertEqual(self.platform.directory(file_sim), self.platform.get_directory(idmtools_sim))
+
+        # create a random simulation object:
+        sim = Simulation(name = "my_sim")
+        try:
+            sim.get_directory()
+        except Exception as e:
+            self.assertTrue("The object has no platform set..." in str(e))
+
+    def test_get_directory_workitem(self):
+        workitem = GenericWorkItem(name="test_workitem")
+        try:
+            workitem.get_directory()
+        except Exception as e:
+            self.assertTrue("Only support Suite/Experiment/Simulation for get_directory() for now." in str(e))
 

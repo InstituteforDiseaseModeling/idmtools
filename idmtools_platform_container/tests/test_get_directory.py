@@ -88,9 +88,8 @@ class TestGetDirectory(ITestWithPersistence):
         # verify get_directory for server sim (file_sim)
         self.assertEqual(self.platform.directory(file_sim), self.platform.get_directory(file_sim))
         self.assertEqual(self.platform.directory(file_sim), file_sim.get_directory())
-        idmtools_sim: FileSimulation = self.experiment.simulations[0]
+        idmtools_sim: FileSimulation = self.platform.get_item(self.experiment.simulations[0].id, item_type=ItemType.SIMULATION)
         # verify get_directory for local sim (idmtools sim)
-        print(idmtools_sim.get_directory())
         self.assertEqual(self.platform.directory(idmtools_sim), self.platform.get_directory(idmtools_sim))
         self.assertEqual(self.platform.directory(idmtools_sim), idmtools_sim.get_directory())
 
