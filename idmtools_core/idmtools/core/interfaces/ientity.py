@@ -303,12 +303,17 @@ class IEntity(IItem, metaclass=ABCMeta):
             raise RuntimeError('Only support Suite/Experiment/Simulation for get_directory() for now.')
         try:
             item = self.get_platform_object()
-        except NoPlatformException:
+        except (NoPlatformException, RuntimeError):
             raise AttributeError(f"{type(self).__name__} id: {self.id} not found in {platform.__class__.__name__}.")
         return Path(item._platform_directory)
 
     @property
-    def directory(self):
+    def directory(self) -> Path:
+        """
+        The get directory for the current item. This is a convenience alias for `get_directory()`.
+        Returns:
+            pathlib.Path: The path to the item's working directory on the current platform.
+        """
         return self.get_directory()
 
 
