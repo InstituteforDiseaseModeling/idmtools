@@ -1,23 +1,16 @@
 import json
 import os
+import sys
 import pathlib
-from functools import partial
-from typing import Any, Dict
-
 import numpy as np
 import pandas as pd
 import pytest
+from functools import partial
+from typing import Any, Dict
 from pathlib import Path
-
-import sys
-
-from COMPS.Data import WorkItem
-
 from idmtools.entities.generic_workitem import GenericWorkItem
-
 if sys.platform == "win32":
     from win32con import FALSE
-
 from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
@@ -27,14 +20,13 @@ from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_platform_file.platform_operations.utils import FileSimulation, FileExperiment, FileSuite
-
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.decorators import linux_only
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 
 @pytest.mark.serial
-#@linux_only
+@linux_only
 class TestFilePlatform(ITestWithPersistence):
 
     def create_experiment(self, platform=None, a=1, b=1, retries=None, wait_until_done=False):
