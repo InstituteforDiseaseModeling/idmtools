@@ -293,7 +293,7 @@ class IEntity(IItem, metaclass=ABCMeta):
             raise RuntimeError('Only support Suite/Experiment/Simulation for get_directory() for now.')
         try:
             item = self.get_platform_object()
-        except NoPlatformException as ex:
+        except NoPlatformException:
             raise AttributeError(f"{self.__class__.__name__} object has no attribute 'get_directory'.")
         return Path(item._platform_directory)
 
