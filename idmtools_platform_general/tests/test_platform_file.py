@@ -296,7 +296,7 @@ class TestFilePlatform(ITestWithPersistence):
         try:
             suite.get_directory()
         except AttributeError as e:
-            self.assertTrue("Suite object has no attribute 'get_directory'." in str(e))
+            self.assertTrue(f"Suite id: {suite.id} not found in FilePlatform." in str(e))
 
     def test_get_directory_with_exp(self):
         experiment = self.create_experiment(self.platform, a=3, b=3)
@@ -311,7 +311,7 @@ class TestFilePlatform(ITestWithPersistence):
         try:
             exp.get_directory()
         except AttributeError as e:
-            self.assertTrue("Experiment object has no attribute 'get_directory'." in str(e))
+            self.assertTrue(f"Experiment id: {exp.id} not found in FilePlatform." in str(e))
 
     def test_get_directory_with_sim(self):
         experiment = self.create_experiment(self.platform, a=3, b=3)
@@ -332,7 +332,7 @@ class TestFilePlatform(ITestWithPersistence):
         try:
             sim.get_directory()
         except AttributeError as e:
-            self.assertTrue("Simulation object has no attribute 'get_directory'." in str(e))
+            self.assertTrue(f"Simulation id: {sim.id} not found in FilePlatform." in str(e))
 
     def test_get_directory_workitem(self):
         workitem = GenericWorkItem(name="test_workitem")

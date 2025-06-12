@@ -86,6 +86,11 @@ class TestGetDirectory(ITestWithPersistence):
         self.assertEqual(idmtools_sim.get_directory(), self.platform.get_directory(idmtools_sim))
         self.assertEqual(self.platform.get_directory(file_sim), self.platform.get_directory(idmtools_sim))
 
+    def test_get_simulations(self):
+        simulations = self.experiment.get_simulations()
+        sims = self.experiment.simulations.items
+        self.assertEqual(sims, simulations)
+
 
 if __name__ == '__main__':
     unittest.main()

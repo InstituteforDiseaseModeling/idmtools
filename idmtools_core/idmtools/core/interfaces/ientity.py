@@ -297,14 +297,14 @@ class IEntity(IItem, metaclass=ABCMeta):
             pathlib.Path: The path to the item's working directory on the current platform.
         """
         platform = self.get_current_platform_or_error()
-        if platform.__class__.__name__ == 'COMPSPlatform':
-            raise RuntimeError('Not support get_directory for COMPSPlatform.')
+        if not hasattr(platform, 'job_directory'):
+            raise RuntimeError(f'Not support get_directory for {platform.__class__.__name__}')
         if self.item_type not in (ItemType.SIMULATION, ItemType.EXPERIMENT, ItemType.SUITE):
             raise RuntimeError('Only support Suite/Experiment/Simulation for get_directory() for now.')
         try:
             item = self.get_platform_object()
         except NoPlatformException:
-            raise AttributeError(f"{self.__class__.__name__} object has no attribute 'get_directory'.")
+            raise AttributeError(f"{type(self).__name__} id: {self.id} not found in {platform.__class__.__name__}.")
         return Path(item._platform_directory)
 
     @property
