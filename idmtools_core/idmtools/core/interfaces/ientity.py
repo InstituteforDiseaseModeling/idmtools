@@ -280,11 +280,21 @@ class IEntity(IItem, metaclass=ABCMeta):
         """
         write_id_file(filename, self, save_platform, platform_args)
 
-    def get_directory(self):
+    def get_directory(self) -> Path:
         """
-        Get the directory of the item.
-        Args:
-            platform: Platform object to use. If not specified, we first check object for platform object then the current context
+        Retrieve the directory path associated with the current item.
+
+        This method returns the local platform-specific directory for the item,
+        such as a simulation, experiment, or suite. It is only supported for
+        non-COMPS platforms and for items of type SIMULATION, EXPERIMENT, or SUITE.
+
+        Raises:
+            RuntimeError: If the current platform is COMPSPlatform, or if the item
+                          type is not one of SIMULATION, EXPERIMENT, or SUITE.
+            AttributeError: If the item does not have an associated platform object.
+
+        Returns:
+            pathlib.Path: The path to the item's working directory on the current platform.
         """
         platform = self.get_current_platform_or_error()
         if platform.__class__.__name__ == 'COMPSPlatform':
