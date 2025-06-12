@@ -1,14 +1,16 @@
 import json
 import os
+import sys
 import pathlib
-from functools import partial
-from typing import Any, Dict
-
 import numpy as np
 import pandas as pd
 import pytest
+from functools import partial
+from typing import Any, Dict
 from pathlib import Path
-
+from idmtools.entities.generic_workitem import GenericWorkItem
+if sys.platform == "win32":
+    from win32con import FALSE
 from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
@@ -18,7 +20,6 @@ from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_platform_file.platform_operations.utils import FileSimulation, FileExperiment, FileSuite
-
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.decorators import linux_only
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
@@ -260,7 +261,8 @@ class TestFilePlatform(ITestWithPersistence):
         self.assertEqual(file_experiment.status, "CREATED")
         self.assertEqual(file_experiment.parent_id, experiment.parent_id)
         self.assertEqual(len(file_experiment.simulations), 9)
-        self.assertEqual(repr(file_experiment), f"<FileExperiment {file_experiment.id} - {len(file_experiment.simulations)} simulations>")
+        self.assertEqual(repr(file_experiment),
+                         f"<FileExperiment {file_experiment.id} - {len(file_experiment.simulations)} simulations>")
         self.assertEqual(file_experiment.parent_id, experiment.parent_id)
         # validate file_experiment assets
         file_experiment_assets = [asset['filename'] for asset in file_experiment.assets]
@@ -279,4 +281,63 @@ class TestFilePlatform(ITestWithPersistence):
         simulation_assets = [asset.filename for asset in experiment.simulations[0].assets]
         self.assertEqual(set(file_simulation_assets), set(simulation_assets))
 
+    def test_get_directory_with_suite(self):
+        experiment = self.create_experiment(self.platform, a=3, b=3)
+        suite: Suite = experiment.parent
+        file_suite: FileSuite = suite.get_platform_object()
+        # verify get_directory for server suite (file_suite)
+        self.assertEqual(self.platform.get_directory(file_suite), file_suite.get_directory())
+        # verify get_directory for local suite (idmtools suite)
+        self.assertEqual(self.platform.get_directory(suite), suite.get_directory())
+
+        self.assertEqual(self.platform.get_directory(suite), self.platform.get_directory(file_suite))
+        # create a random suite object:
+        suite = Suite(name="my_suite")
+        try:
+            suite.get_directory()
+        except AttributeError as e:
+            self.assertTrue(f"Suite id: {suite.id} not found in FilePlatform." in str(e))
+
+    def test_get_directory_with_exp(self):
+        experiment = self.create_experiment(self.platform, a=3, b=3)
+        file_experiment = experiment.get_platform_object()
+        # verify get_directory for server experiment (file_experiment)
+        self.assertEqual(self.platform.get_directory(file_experiment), file_experiment.get_directory())
+        # verify get_directory for local experiment (idmtools experiment)
+        self.assertEqual(self.platform.get_directory(experiment), experiment.get_directory())
+        self.assertEqual(experiment.directory, experiment.get_directory())
+        # create a random experiment object:
+        exp = Experiment(name="my_exp")
+        try:
+            exp.get_directory()
+        except AttributeError as e:
+            self.assertTrue(f"Experiment id: {exp.id} not found in FilePlatform." in str(e))
+
+    def test_get_directory_with_sim(self):
+        experiment = self.create_experiment(self.platform, a=3, b=3)
+        file_sim: FileSimulation = self.platform.get_item(experiment.simulations[0].id, item_type=ItemType.SIMULATION,
+                                                          raw=True)
+        # verify get_directory for server sim (file_sim)
+        self.assertEqual(file_sim.get_directory(), self.platform.get_directory(file_sim))
+        self.assertEqual(file_sim.get_directory(), file_sim.directory)
+        idmtools_sim: Simulation = self.platform.get_item(experiment.simulations[0].id,
+                                                              item_type=ItemType.SIMULATION,
+                                                              raw=False)
+        # verify get_directory for local sim (idmtools sim)
+        self.assertEqual(idmtools_sim.get_directory(), self.platform.get_directory(idmtools_sim))
+        self.assertEqual(idmtools_sim.directory, idmtools_sim.get_directory())
+
+        # create a random simulation object:
+        sim = Simulation(name="my_sim")
+        try:
+            sim.get_directory()
+        except AttributeError as e:
+            self.assertTrue(f"Simulation id: {sim.id} not found in FilePlatform." in str(e))
+
+    def test_get_directory_workitem(self):
+        workitem = GenericWorkItem(name="test_workitem")
+        try:
+            workitem.get_directory()
+        except Exception as e:
+            self.assertTrue("Only support Suite/Experiment/Simulation for get_directory() for now." in str(e))
 

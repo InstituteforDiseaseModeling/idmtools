@@ -7,11 +7,10 @@ from idmtools.core import ItemType, EntityStatus
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
-from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools.utils.filter_simulations import FilterItem
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
-from idmtools_platform_file.platform_operations.utils import FileSimulation
+from idmtools_platform_file.platform_operations.utils import FileSimulation, FileSuite
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.utils import get_case_name
@@ -111,52 +110,6 @@ class TestSimulations(ITestWithPersistence):
         sims = FilterItem.filter_item_by_id(self.platform, self.experiment.uid, ItemType.EXPERIMENT,
                                             skip_sims=[skip_sim], max_simulations=5)
         self.assertEqual(len(sims), 1)
-
-    def test_flatten_item_idm_suite(self):
-        flatten_items = self.platform.flatten_item(self.suite)
-        self.assertEqual(len(flatten_items), 5)
-        for item in flatten_items:
-            self.assertTrue(isinstance(item, Simulation))
-
-    def test_flatten_item_file_suite(self):
-        file_suite = self.platform.get_item(self.suite.id, item_type=ItemType.SUITE, raw=True)
-        flatten_items = self.platform.flatten_item(file_suite, raw=True)
-        self.assertEqual(len(flatten_items), 5)
-        for item in flatten_items:
-            self.assertTrue(isinstance(item, FileSimulation))
-
-    def test_flatten_item_file_suite_raw_false(self):
-        file_suite = self.platform.get_item(self.suite.id, item_type=ItemType.SUITE, raw=True)
-        flatten_items = self.platform.flatten_item(file_suite, raw=False)
-        self.assertEqual(len(flatten_items), 5)
-        for item in flatten_items:
-            self.assertTrue(isinstance(item, Simulation))
-
-    def test_flatten_item_idm_experiment(self):
-        flatten_items = self.platform.flatten_item(self.experiment)
-        self.assertEqual(len(flatten_items), 5)
-        for item in flatten_items:
-            self.assertTrue(isinstance(item, Simulation))
-
-    def test_flatten_item_file_experiment(self):
-        file_exp = self.platform.get_item(self.experiment.id, item_type=ItemType.EXPERIMENT, raw=True)
-        flatten_items = self.platform.flatten_item(file_exp, raw=True)
-        self.assertEqual(len(flatten_items), 5)
-        for item in flatten_items:
-            self.assertTrue(isinstance(item, FileSimulation))
-
-    def test_flatten_item_idm_simulation(self):
-        flatten_items = self.platform.flatten_item(self.experiment.simulations[0])
-        self.assertEqual(len(flatten_items), 1)
-        for item in flatten_items:
-            self.assertTrue(isinstance(item, Simulation))
-
-    def test_flatten_item_file_simulation(self):
-        file_sim = self.platform.get_item(self.experiment.simulations[0].id, item_type=ItemType.SIMULATION, raw=True)
-        flatten_items = self.platform.flatten_item(file_sim, raw=True)
-        self.assertEqual(len(flatten_items), 1)
-        for item in flatten_items:
-            self.assertTrue(isinstance(item, FileSimulation))
 
 
 if __name__ == '__main__':

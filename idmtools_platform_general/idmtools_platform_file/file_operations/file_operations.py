@@ -17,7 +17,7 @@ from idmtools.entities.simulation import Simulation
 from idmtools_platform_file.assets import generate_script, generate_simulation_script
 from idmtools_platform_file.file_operations.operations_interface import IOperations
 from idmtools_platform_file.platform_operations.utils import FILE_MAPS, validate_file_path_length, \
-    clean_experiment_name, validate_folder_files_path_length
+    clean_experiment_name, validate_folder_files_path_length, FileExperiment, FileSimulation, FileSuite
 from idmtools.utils.decorators import check_symlink_capabilities
 
 logger = getLogger(__name__)
@@ -64,7 +64,9 @@ class FileOperations(IOperations):
         Returns:
             item file directory
         """
-        if isinstance(item, Suite):
+        if isinstance(item, (FileSimulation, FileExperiment, FileSuite)):
+            item_dir = item.get_directory()
+        elif isinstance(item, Suite):
             item_dir = Path(self.platform.job_directory, self.entity_display_name(item))
         elif isinstance(item, Experiment):
             suite_id = item.parent_id or item.suite_id
