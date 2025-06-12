@@ -295,58 +295,52 @@ class TestFilePlatform(ITestWithPersistence):
         file_suite: FileSuite = suite.get_platform_object()
         # verify get_directory for server suite (file_suite)
         self.assertEqual(self.platform.get_directory(file_suite), file_suite.get_directory())
-        self.assertEqual(self.platform.directory(file_suite), self.platform.get_directory(file_suite))
         # verify get_directory for local suite (idmtools suite)
-        self.assertEqual(self.platform.directory(suite), suite.get_directory())
-        self.assertEqual(self.platform.directory(suite), self.platform.get_directory(suite))
+        self.assertEqual(self.platform.get_directory(suite), suite.get_directory())
 
-        self.assertEqual(self.platform.directory(suite), self.platform.get_directory(file_suite))
+        self.assertEqual(self.platform.get_directory(suite), self.platform.get_directory(file_suite))
         # create a random suite object:
-        suite = Suite(name = "my_suite")
+        suite = Suite(name="my_suite")
         try:
             suite.get_directory()
-        except Exception as e:
-            self.assertTrue("The object has no platform set..." in str(e))
+        except AttributeError as e:
+            self.assertTrue("Suite object has no attribute 'get_directory'." in str(e))
 
     def test_get_directory_with_exp(self):
         experiment = self.create_experiment(self.platform, a=3, b=3)
         file_experiment = experiment.get_platform_object()
         # verify get_directory for server experiment (file_experiment)
         self.assertEqual(self.platform.get_directory(file_experiment), file_experiment.get_directory())
-        self.assertEqual(self.platform.directory(file_experiment), self.platform.get_directory(file_experiment))
         # verify get_directory for local experiment (idmtools experiment)
-        self.assertEqual(self.platform.directory(experiment), experiment.get_directory())
-        self.assertEqual(self.platform.directory(experiment), self.platform.get_directory(experiment))
-
-        self.assertEqual(self.platform.directory(experiment), self.platform.get_directory(file_experiment))
+        self.assertEqual(self.platform.get_directory(experiment), experiment.get_directory())
+        self.assertEqual(experiment.directory, experiment.get_directory())
         # create a random experiment object:
-        exp = Experiment(name = "my_exp")
+        exp = Experiment(name="my_exp")
         try:
             exp.get_directory()
-        except Exception as e:
-            self.assertTrue("The object has no platform set..." in str(e))
+        except AttributeError as e:
+            self.assertTrue("Experiment object has no attribute 'get_directory'." in str(e))
 
     def test_get_directory_with_sim(self):
         experiment = self.create_experiment(self.platform, a=3, b=3)
         file_sim: FileSimulation = self.platform.get_item(experiment.simulations[0].id, item_type=ItemType.SIMULATION,
                                                           raw=True)
         # verify get_directory for server sim (file_sim)
-        self.assertEqual(self.platform.directory(file_sim), self.platform.get_directory(file_sim))
-        self.assertEqual(self.platform.directory(file_sim), file_sim.get_directory())
+        self.assertEqual(file_sim.get_directory(), self.platform.get_directory(file_sim))
+        self.assertEqual(file_sim.get_directory(), file_sim.directory)
         idmtools_sim: Simulation = self.platform.get_item(experiment.simulations[0].id,
                                                               item_type=ItemType.SIMULATION,
                                                               raw=False)
         # verify get_directory for local sim (idmtools sim)
-        self.assertEqual(self.platform.directory(idmtools_sim), self.platform.get_directory(idmtools_sim))
-        self.assertEqual(self.platform.directory(idmtools_sim), idmtools_sim.get_directory())
-        self.assertEqual(self.platform.directory(file_sim), self.platform.get_directory(idmtools_sim))
+        self.assertEqual(idmtools_sim.get_directory(), self.platform.get_directory(idmtools_sim))
+        self.assertEqual(idmtools_sim.directory, idmtools_sim.get_directory())
 
         # create a random simulation object:
-        sim = Simulation(name = "my_sim")
+        sim = Simulation(name="my_sim")
         try:
             sim.get_directory()
-        except Exception as e:
-            self.assertTrue("The object has no platform set..." in str(e))
+        except AttributeError as e:
+            self.assertTrue("Simulation object has no attribute 'get_directory'." in str(e))
 
     def test_get_directory_workitem(self):
         workitem = GenericWorkItem(name="test_workitem")

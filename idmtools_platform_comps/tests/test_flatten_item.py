@@ -191,10 +191,10 @@ class TestFlattenItem(unittest.TestCase):
         # First test simulation.get_directory()
         try:
             sims[0].get_directory()
-        except Exception as e:
+        except AttributeError as e:
             self.assertTrue("'Simulation' object has no attribute 'get_directory'" in str(e))
         # test platform.get_directory(simulation)
         try:
             self.platform.get_directory(sims[0])
-        except Exception as e:
+        except AttributeError as e:
             self.assertTrue("'COMPSPlatform' object has no attribute 'get_directory'" in str(e))

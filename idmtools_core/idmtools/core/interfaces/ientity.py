@@ -280,15 +280,21 @@ class IEntity(IItem, metaclass=ABCMeta):
         """
         write_id_file(filename, self, save_platform, platform_args)
 
-    def get_directory(self, platform: 'IPlatform' = None):
+    def get_directory(self):
         """
         Get the directory of the item.
         Args:
             platform: Platform object to use. If not specified, we first check object for platform object then the current context
         """
-        if type(self).__name__ not in ("Suite", "Experiment", "Simulation", "FileSuite", "FileExperiment", "FileSimulation"):
+        platform = self.get_current_platform_or_error()
+        if platform.__class__.__name__ == 'COMPSPlatform':
+            raise NotImplementedError('Only support get_directory for COMPSPlatform.')
+        if self.item_type not in (ItemType.SIMULATION, ItemType.EXPERIMENT, ItemType.SUITE):
             raise RuntimeError('Only support Suite/Experiment/Simulation for get_directory() for now.')
-        item = self.get_platform_object()
+        try:
+            item = self.get_platform_object()
+        except NoPlatformException as ex:
+            raise AttributeError(f"{self.__class__.__name__} object has no attribute 'get_directory'.")
         return Path(item._platform_directory)
 
     @property

@@ -285,7 +285,3 @@ class FilePlatform(IPlatform):
             str
         """
         return self._op_client.entity_display_name(item)
-
-    @property
-    def directory(self):
-        return self.get_directory

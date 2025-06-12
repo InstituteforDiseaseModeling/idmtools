@@ -65,35 +65,27 @@ class TestGetDirectory(ITestWithPersistence):
         file_suite: FileSuite = suite.get_platform_object()
         # verify get_directory for server suite (file_suite)
         self.assertEqual(self.platform.get_directory(file_suite), file_suite.get_directory())
-        self.assertEqual(self.platform.directory(file_suite), self.platform.get_directory(file_suite))
         # verify get_directory for local suite (idmtools suite)
-        self.assertEqual(self.platform.directory(suite), suite.get_directory())
-        self.assertEqual(self.platform.directory(suite), self.platform.get_directory(suite))
+        self.assertEqual(self.platform.get_directory(suite), suite.get_directory())
 
-        self.assertEqual(self.platform.directory(suite), self.platform.get_directory(file_suite))
+        self.assertEqual(self.platform.get_directory(suite), self.platform.get_directory(file_suite))
 
     def test_get_directory_with_exp(self):
         file_experiment = self.platform.get_item(self.experiment.id, item_type=ItemType.EXPERIMENT, raw=True)
         # verify get_directory for server experiment (file_experiment)
         self.assertEqual(self.platform.get_directory(file_experiment), file_experiment.get_directory())
-        self.assertEqual(self.platform.directory(file_experiment), self.platform.get_directory(file_experiment))
         # verify get_directory for local experiment (idmtools experiment)
-        self.assertEqual(self.platform.directory(self.experiment), self.experiment.get_directory())
-        self.assertEqual(self.platform.directory(self.experiment), self.platform.get_directory(self.experiment))
-
-        self.assertEqual(self.platform.directory(self.experiment), self.platform.get_directory(file_experiment))
+        self.assertEqual(self.platform.get_directory(self.experiment), self.experiment.get_directory())
+        self.assertEqual(self.platform.get_directory(self.experiment), self.platform.get_directory(file_experiment))
 
     def test_get_directory_with_sim(self):
         file_sim: FileSimulation = self.platform.get_item(self.experiment.simulations[0].id, item_type=ItemType.SIMULATION, raw=True)
         # verify get_directory for server sim (file_sim)
-        self.assertEqual(self.platform.directory(file_sim), self.platform.get_directory(file_sim))
-        self.assertEqual(self.platform.directory(file_sim), file_sim.get_directory())
+        self.assertEqual(file_sim.get_directory(), self.platform.get_directory(file_sim))
         idmtools_sim: FileSimulation = self.platform.get_item(self.experiment.simulations[0].id, item_type=ItemType.SIMULATION)
         # verify get_directory for local sim (idmtools sim)
-        self.assertEqual(self.platform.directory(idmtools_sim), self.platform.get_directory(idmtools_sim))
-        self.assertEqual(self.platform.directory(idmtools_sim), idmtools_sim.get_directory())
-
-        self.assertEqual(self.platform.directory(file_sim), self.platform.get_directory(idmtools_sim))
+        self.assertEqual(idmtools_sim.get_directory(), self.platform.get_directory(idmtools_sim))
+        self.assertEqual(self.platform.get_directory(file_sim), self.platform.get_directory(idmtools_sim))
 
 
 if __name__ == '__main__':
