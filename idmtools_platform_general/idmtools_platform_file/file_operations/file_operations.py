@@ -65,7 +65,7 @@ class FileOperations(IOperations):
             item file directory
         """
         if isinstance(item, (FileSimulation, FileExperiment, FileSuite)):
-            item_dir = Path(item._platform_directory)
+            item_dir = item.get_directory()
         elif isinstance(item, Suite):
             item_dir = Path(self.platform.job_directory, self.entity_display_name(item))
         elif isinstance(item, Experiment):
