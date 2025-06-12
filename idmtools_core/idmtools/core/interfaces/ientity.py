@@ -288,7 +288,7 @@ class IEntity(IItem, metaclass=ABCMeta):
         """
         platform = self.get_current_platform_or_error()
         if platform.__class__.__name__ == 'COMPSPlatform':
-            raise NotImplementedError('Only support get_directory for COMPSPlatform.')
+            raise NotImplementedError('Not support get_directory for COMPSPlatform.')
         if self.item_type not in (ItemType.SIMULATION, ItemType.EXPERIMENT, ItemType.SUITE):
             raise RuntimeError('Only support Suite/Experiment/Simulation for get_directory() for now.')
         try:
