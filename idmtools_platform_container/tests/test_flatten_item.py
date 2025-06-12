@@ -2,7 +2,6 @@ import os
 import unittest
 from functools import partial
 from typing import Any, Dict
-
 from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform

@@ -16,7 +16,6 @@ from idmtools_test.utils.utils import get_case_name
 
 
 @allure.story("Python")
-@allure.story("Filtering")
 @allure.suite("idmtools_platform_container")
 class TestGetDirectory(ITestWithPersistence):
 
