@@ -8,7 +8,7 @@ from pathlib import Path
 from logging import getLogger
 from typing import Dict, Union, List
 from idmtools.entities import Suite
-from idmtools.core import EntityStatus
+from idmtools.core import EntityStatus, ItemType
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 
@@ -54,6 +54,7 @@ class FileSuite(FileItem, Suite):
     """
     Represent File Suite.
     """
+    _experiments = List[str]
 
     def __init__(self, metas: Dict):
         """
@@ -67,6 +68,41 @@ class FileSuite(FileItem, Suite):
         self.status = metas['status']
         self.experiments = metas['experiments']
         self.tags = metas['tags']
+
+    @property
+    def experiments(self) -> List:
+        """
+        Get Experiments
+        Returns:
+            Experiments
+        """
+        if self._experiments is None:
+            self._experiments = self.get_experiments()
+        return self._experiments
+
+    def get_experiments(self) -> List:
+        """
+        Get Experiments.
+        Returns:
+            Experiments
+        """
+        experiments = []
+        platform = self.get_current_platform_or_error()
+        for exp_id in self._experiments:
+            experiments.append(platform.get_item(exp_id, item_type=ItemType.EXPERIMENT, force=True, raw=True))
+        return experiments
+
+    @experiments.setter
+    def experiments(self, experiments: List):
+        """
+        Set Experiments.
+        Args:
+            experiments: experiments
+
+        Returns:
+            None
+        """
+        self._experiments = experiments
 
     def __repr__(self):
         """
@@ -90,6 +126,18 @@ class FileExperiment(FileItem, Experiment):
             Simulations
         """
         return self._simulations
+
+    def get_simulations(self) -> List:
+        """
+        Get Simulations.
+        Returns:
+            Simulations
+        """
+        simulations = []
+        platform = self.get_current_platform_or_error()
+        for sim_id in self._simulations:
+            simulations.append(platform.get_item(sim_id, item_type=ItemType.SIMULATION, raw=True))
+        return simulations
 
     @simulations.setter
     def simulations(self, simulations: List):
