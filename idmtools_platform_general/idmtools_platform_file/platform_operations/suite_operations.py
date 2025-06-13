@@ -71,6 +71,20 @@ class FilePlatformSuiteOperations(IPlatformSuiteOperations):
         # Refresh with entity ids
         self.platform._metas.dump(suite)
 
+    def post_run_item(self, suite: Suite, **kwargs) -> None:
+        """
+        Perform post-processing steps after a suite run.
+        Args:
+            suite: The suite object that has just finished running
+            **kwargs: Additional keyword arguments
+
+        Returns:
+            None
+        """
+        super().post_run_item(suite, **kwargs)
+        # Refresh platform object
+        suite._platform_object = self.get(suite.id, **kwargs)
+
     def get_parent(self, suite: FileSuite, **kwargs) -> Any:
         """
         Fetches the parent of a suite.
@@ -102,6 +116,7 @@ class FilePlatformSuiteOperations(IPlatformSuiteOperations):
             else:
                 exp = self.platform._experiments.to_entity(file_exp, parent=parent)
                 exp_list.append(exp)
+                #self.platform._experiments.to_entity(file_exp, parent=parent, **kwargs)
         return exp_list
 
     def to_entity(self, file_suite: FileSuite, children: bool = True, **kwargs) -> Suite:
@@ -227,3 +242,11 @@ class FilePlatformSuiteOperations(IPlatformSuiteOperations):
         for child in children:
             ret[child.id] = self.platform._experiments.get_assets(child, files, **kwargs)
         return ret
+
+    def get_experiments(self, suite: Suite):
+        """
+        Get experiments.
+        Returns:
+            List of experiments
+        """
+        return suite.experiments

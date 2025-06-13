@@ -138,6 +138,20 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         user_logger.info(f'experiment: {experiment.id}')
         user_logger.info(f"\nExperiment Directory: \n{self.platform.get_directory(experiment)}")
 
+    def post_run_item(self, experiment: Experiment, **kwargs):
+        """
+        Perform post-processing steps after an experiment run.
+        Args:
+            experiment: The experiment object that has just finished running
+            **kwargs: Additional keyword arguments
+
+        Returns:
+            None
+        """
+        super().post_run_item(experiment, **kwargs)
+        # Refresh platform object
+        experiment._platform_object = self.get(experiment.id, **kwargs)
+
     def send_assets(self, experiment: Experiment, **kwargs):
         """
         Copy our experiment assets.
@@ -294,3 +308,11 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         for sim in simulations:
             ret[sim.id] = self.platform._simulations.get_assets(sim, files, **kwargs)
         return ret
+
+    def get_simulations(self, experiment: Experiment):
+        """
+        Get simulations
+        Returns:
+              List of simulations
+        """
+        return experiment.simulations
