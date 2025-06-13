@@ -216,11 +216,16 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         Returns:
             None
         """
-        if parent:
-            if parent.experiments is None:
-                parent.experiments = [self]
+        if parent is not None:
+            try:
+                experiments = getattr(parent, "_experiments", None)
+            except AttributeError:
+                experiments = None
+
+            if experiments is None:
+                parent._experiments = [self]
             else:
-                parent.experiments.append(self)
+                experiments.append(self)
         IEntity.parent.__set__(self, parent)
 
     def display(self):
@@ -333,6 +338,15 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
             Simulations
         """
         return ExperimentParentIterator(self.__simulations, parent=self)
+
+    def get_simulations(self) -> ExperimentParentIterator:  # noqa: F811:
+        """
+        Returns the Simulations.
+
+        Returns:
+            List of simulations
+        """
+        return self.simulations
 
     @simulations.setter
     def simulations(self, simulations: Union[SUPPORTED_SIM_TYPE]):
