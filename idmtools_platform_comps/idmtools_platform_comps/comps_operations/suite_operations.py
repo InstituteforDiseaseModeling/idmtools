@@ -223,3 +223,11 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
         for child in children:
             ret[child.id] = self.platform._experiments.get_assets(child, files, **kwargs)
         return ret
+
+    def get_experiments(self, suite: Suite):
+        """
+        Get experiments.
+        Returns:
+            List of experiments
+        """
+        return self.platform.get_children_by_object(suite)
