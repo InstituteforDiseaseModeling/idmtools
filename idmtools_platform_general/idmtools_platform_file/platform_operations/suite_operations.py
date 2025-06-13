@@ -116,7 +116,7 @@ class FilePlatformSuiteOperations(IPlatformSuiteOperations):
             else:
                 exp = self.platform._experiments.to_entity(file_exp, parent=parent)
                 exp_list.append(exp)
-                #self.platform._experiments.to_entity(file_exp, parent=parent, **kwargs)
+                # self.platform._experiments.to_entity(file_exp, parent=parent, **kwargs)
         return exp_list
 
     def to_entity(self, file_suite: FileSuite, children: bool = True, **kwargs) -> Suite:
