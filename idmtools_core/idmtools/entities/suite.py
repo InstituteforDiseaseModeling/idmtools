@@ -26,7 +26,7 @@ class Suite(INamedEntity, ABC, IRunnableEntity):
     Args:
         experiments: The child items of this suite.
     """
-    experiments: EntityContainer = field(
+    _experiments: EntityContainer = field(
         default_factory=lambda: EntityContainer(),
         compare=False,
         metadata={"pickle_ignore": True}
@@ -42,7 +42,7 @@ class Suite(INamedEntity, ABC, IRunnableEntity):
         Args:
             experiment: the experiment to be linked to suite
         """
-        ids = [exp.uid for exp in self.experiments]
+        ids = [exp.uid for exp in self._experiments or []]
         if experiment.uid in ids:
             return
 
@@ -87,12 +87,13 @@ class Suite(INamedEntity, ABC, IRunnableEntity):
         """
         String representation of suite.
         """
-        return f"<Suite {self.uid} - {len(self.experiments)} experiments>"
+        num_experiments = len(self._experiments or [])
+        return f"<Suite {self.uid} - {num_experiments} experiments>"
 
     @property
     def done(self):
         """
-        Return if an suite has finished executing.
+        Return if a suite has finished executing.
 
         Returns:
             True if all experiments have ran, False otherwise
@@ -102,7 +103,7 @@ class Suite(INamedEntity, ABC, IRunnableEntity):
     @property
     def succeeded(self) -> bool:
         """
-        Return if an suite has succeeded. An suite is succeeded when all experiments have succeeded.
+        Return if a suite has succeeded. A suite is succeeded when all experiments have succeeded.
 
         Returns:
             True if all experiments have succeeded, False otherwise
@@ -122,6 +123,37 @@ class Suite(INamedEntity, ABC, IRunnableEntity):
                 result[f.name] = getattr(self, f.name)
         result['_uid'] = self.uid
         return result
+
+    @property
+    def experiments(self) -> EntityContainer:
+        """
+        Access the list of experiments in this suite.
+
+        If experiments are not yet loaded, it will fetch them from the platform.
+
+        Returns:
+            EntityContainer: A container of Experiment objects.
+        """
+        if self._experiments is None:
+            self._experiments = self.get_experiments()
+        return self._experiments
+
+    @experiments.setter
+    def experiments(self, value):
+        """
+        Set the list of experiments for the suite.
+        Args:
+            value (EntityContainer): The list of experiments to assign.
+        """
+        self._experiments = value
+
+    def get_experiments(self):
+        """
+        Retrieve the experiments associated with this suite from the platform.
+        Returns:
+            EntityContainer: A container of Experiment objects belonging to this suite.
+        """
+        return self.platform.get_children(self.uid, ItemType.SUITE)
 
 
 ISuiteClass = Type[Suite]
