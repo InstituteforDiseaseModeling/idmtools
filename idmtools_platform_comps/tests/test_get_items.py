@@ -1,11 +1,9 @@
-import os
 import allure
 import unittest
 import pytest
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.simulation import Simulation
-from idmtools_test.utils.utils import get_case_name
 
 
 @pytest.mark.comps
@@ -15,8 +13,6 @@ from idmtools_test.utils.utils import get_case_name
 @allure.suite("idmtools_platform_comps")
 class TestGetItems(unittest.TestCase):
     def setUp(self) -> None:
-        self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
-        print(self.case_name)
         self.platform = Platform('SlurmStage')
 
     def test_get_experiments_and_get_simulations(self):
