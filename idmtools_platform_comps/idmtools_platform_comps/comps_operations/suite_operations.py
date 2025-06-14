@@ -136,7 +136,7 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
         obj.name = suite.name
         obj.description = suite.description
         obj.tags = suite.tags
-        obj.comps_suite = suite
+        obj._platform_object = suite
 
         # Convert all experiments
         if children:
