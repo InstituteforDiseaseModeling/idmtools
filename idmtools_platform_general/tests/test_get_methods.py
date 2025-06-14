@@ -49,7 +49,6 @@ class TestFilePlatform(unittest.TestCase):
 
         # Create suite
         suite = Suite(name='Idm Suite')
-        self.platform.create_items(suite)
         suite.update_tags({'name': 'suite_tag', 'idmtools': '123'})
         # Add experiment to the suite
         suite.add_experiment(experiment)
