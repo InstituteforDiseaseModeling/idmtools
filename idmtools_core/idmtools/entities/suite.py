@@ -10,7 +10,7 @@ from abc import ABC
 from dataclasses import dataclass, field, fields
 from idmtools.core.interfaces.iitem import IItem
 from idmtools.core.interfaces.inamed_entity import INamedEntity
-from idmtools.core import ItemType, EntityContainer
+from idmtools.core import ItemType, EntityContainer, UnknownItemException
 from idmtools.core.interfaces.irunnable_entity import IRunnableEntity
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -153,7 +153,10 @@ class Suite(INamedEntity, ABC, IRunnableEntity):
         Returns:
             EntityContainer: A container of Experiment objects belonging to this suite.
         """
-        return self.platform.get_children(self.uid, ItemType.SUITE)
+        if self.platform:
+            return self.platform.get_children(self.uid, ItemType.SUITE)
+        else:
+            raise UnknownItemException(f"Suite {self.id} cannot retrieve experiments because it was not found on the platform.")
 
 
 ISuiteClass = Type[Suite]
