@@ -4,12 +4,14 @@ import unittest
 
 import pytest
 from functools import partial
-from typing import Any, Dict
+from typing import Any, Dict, List
 from idmtools.entities.generic_workitem import GenericWorkItem
+from idmtools.utils.collections import ExperimentParentIterator
+
 if sys.platform == "win32":
     from win32con import FALSE
 from idmtools.builders import SimulationBuilder
-from idmtools.core import ItemType
+from idmtools.core import ItemType, EntityContainer, UnknownItemException
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
@@ -168,21 +170,58 @@ class TestFilePlatform(unittest.TestCase):
         converted_exp_ids = [exp.id for exp in suite.experiments]
         self.assertSetEqual(set(file_exp_ids), set(converted_exp_ids))
 
-    def test_get_experiments_platform(self):
+    def test_get_experiments_by_platform_get_items(self):
         experiment = self.experiment
         suite = experiment.suite
-        # Test platform get_experiments(suite), expect result is list of Experiments
-        experiments = self.platform._suites.get_experiments(suite)
-        self.assertTrue(all(isinstance(exp, Experiment) for exp in experiments))
-        self.assertFalse(all(isinstance(exp, FileExperiment) for exp in experiments))
-        self.assertEqual(experiments, suite.experiments)
+        suite = self.platform.get_item(suite.id, item_type=ItemType.SUITE)
+        exps = suite.get_experiments()
+        exps_property = suite.experiments
+        self.assertEqual(exps, exps_property)
+        self.assertTrue(isinstance(exps, EntityContainer))
+        self.assertTrue(len(exps) == 1)
+        self.assertTrue(all(isinstance(exp, Experiment) for exp in exps))
 
-    def test_get_simulations_platform(self):
+        file_suite = self.platform.get_item(suite.id, item_type=ItemType.SUITE, raw=True)
+        file_exps = file_suite.get_experiments()
+        self.assertTrue(len(file_exps) == 1)
+        self.assertTrue(all(isinstance(exp, FileExperiment) for exp in file_exps))
+        self.assertTrue(isinstance(file_exps, List))
+
+    def test_get_simulations_by_platform_get_item(self):
         experiment = self.experiment
-        # Test platform get_simulations(experiments), expect result is list of Experiments
-        simulations = self.platform._experiments.get_simulations(experiment)
-        self.assertTrue(all(isinstance(sim, Simulation) for sim in simulations.items))
-        self.assertFalse(all(isinstance(sim, FileSimulation) for sim in simulations.items))
-        sim_ids = [sim.id for sim in simulations.items]
-        converted_sim_ids = [sim.id for sim in experiment.simulations.items]
-        self.assertSetEqual(set(sim_ids), set(converted_sim_ids))
+        experiment = self.platform.get_item(experiment.id, item_type=ItemType.EXPERIMENT, raw=False)
+        sims = experiment.get_simulations()
+        sims_property = experiment.simulations
+        # verify experiment.get_simulations and experiment.simulations are the same
+        self.assertEqual(sims.items, sims_property.items)
+        self.assertTrue(isinstance(sims, ExperimentParentIterator))
+        self.assertTrue(len(sims) == 9)
+        self.assertTrue(all(isinstance(sim, Simulation) for sim in sims.items))
+        file_experiment = self.platform.get_item(experiment.id, item_type=ItemType.EXPERIMENT, raw=True)
+        file_sims = file_experiment.get_simulations()
+        self.assertTrue(isinstance(file_sims, List))
+        self.assertTrue(len(file_sims) == 9)
+        self.assertTrue(all(isinstance(sim, FileSimulation) for sim in file_sims))
+
+        # set simulations = []
+        experiment.simulations = []
+        sims = experiment.get_simulations()
+        self.assertTrue(len(sims) == 0)
+
+    def test_get_experiments_with_no_platform(self):
+        suite = Suite("my suite")
+        experiment = Experiment("my experiment")
+        suite.add_experiment(experiment)
+        with self.assertRaises(UnknownItemException) as context:
+            experiments = suite.get_experiments()
+        self.assertTrue(f"Suite my suite cannot retrieve experiments because it was not found on the platform." in str(context.exception.args[0]))
+
+    def test_get_simulations_with_no_platform(self):
+        experiment = Experiment("my experiment")
+        simulation1 = Simulation("my sim1")
+        simulation2 = Simulation("my sim2")
+        experiment.add_simulation(simulation1)
+        experiment.add_simulation(simulation2)
+        with self.assertRaises(UnknownItemException) as context:
+            simulations = experiment.get_simulations()
+        self.assertTrue(f"Experiment my experiment cannot retrieve simulations because it was not found on the platform." in str(context.exception.args[0]))

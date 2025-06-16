@@ -257,7 +257,7 @@ class TestFilePlatform(unittest.TestCase):
         self.assertTrue(isinstance(file_suite1, FileSuite))
         self.assertEqual(id(file_suite), id(file_suite1))
         # Test FileExperiment
-        file_experiment = self.platform.get_item(experiment.id, item_type=ItemType.EXPERIMENT, raw=True)
+        file_experiment = self.platform.get_item(experiment.id, item_type=ItemType.EXPERIMENT, force=True, raw=True)
         self.assertTrue(isinstance(file_experiment, FileExperiment))
         self.assertEqual(file_experiment.id, experiment.id)
         self.assertEqual(file_experiment.status, "CREATED")
@@ -272,7 +272,7 @@ class TestFilePlatform(unittest.TestCase):
         self.assertEqual(set(file_experiment_assets), set(experiment_assets))
 
         # Test FileSimulation
-        file_simulations = self.platform.get_children(experiment.id, item_type=ItemType.EXPERIMENT, raw=True)
+        file_simulations = self.platform.get_children(experiment.id, item_type=ItemType.EXPERIMENT, force=True, raw=True)
         self.assertEqual(len(file_simulations), 9)
         for file_simulation in file_simulations:
             self.assertTrue(isinstance(file_simulation, FileSimulation))
