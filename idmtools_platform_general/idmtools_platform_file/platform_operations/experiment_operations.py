@@ -61,8 +61,6 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
             suite = add_dummy_suite(experiment)
             self.platform._suites.platform_create(suite)
             suite.platform = self.platform
-            # update parent
-            experiment.parent = suite
 
         # Generate Suite/Experiment/Simulation folder structure
         self.platform.mk_directory(experiment, exist_ok=True)
