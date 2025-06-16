@@ -6,7 +6,7 @@ Copyright 2025, Gates Foundation. All rights reserved.
 import os
 from pathlib import Path
 from logging import getLogger
-from typing import Dict, Union, List
+from typing import Dict, Union, List, Optional
 from idmtools.entities import Suite
 from idmtools.core import EntityStatus, ItemType
 from idmtools.entities.experiment import Experiment
@@ -54,8 +54,6 @@ class FileSuite(FileItem, Suite):
     """
     Represent File Suite.
     """
-    _experiments = List[str]
-
     def __init__(self, metas: Dict):
         """
         Constructor.
@@ -66,7 +64,8 @@ class FileSuite(FileItem, Suite):
         self.uid = metas['id']
         self.name = metas['name']
         self.status = metas['status']
-        self.experiments = metas['experiments']
+        self._experiment_ids: List[str] = metas['experiments']
+        self._experiments: Optional[List] = None
         self.tags = metas['tags']
 
     @property
@@ -86,11 +85,11 @@ class FileSuite(FileItem, Suite):
         Returns:
             Experiments
         """
-        experiments = []
         platform = self.get_current_platform_or_error()
-        for exp_id in self._experiments:
-            experiments.append(platform.get_item(exp_id, item_type=ItemType.EXPERIMENT, force=True, raw=True))
-        return experiments
+        return [
+            platform.get_item(exp_id, item_type=ItemType.EXPERIMENT, force=True, raw=True)
+            for exp_id in self._experiment_ids
+        ]
 
     @experiments.setter
     def experiments(self, experiments: List):
@@ -102,7 +101,9 @@ class FileSuite(FileItem, Suite):
         Returns:
             None
         """
+        # Set both the raw and resolved values
         self._experiments = experiments
+        self._experiment_ids = [exp.id if hasattr(exp, 'id') else exp for exp in experiments]
 
     def __repr__(self):
         """
@@ -115,8 +116,21 @@ class FileExperiment(FileItem, Experiment):
     """
     Represent File Experiment.
     """
-    _simulations = List[str]
-    _status = None
+    def __init__(self, metas: Dict):
+        """
+        Constructor.
+        Args:
+            metas: metadata
+        """
+        FileItem.__init__(self, metas)
+        self.suite_id = self.parent_id = metas['suite_id']
+        self._simulations_ids: List[str] = metas['simulations']
+        self._simulations: Optional[List] = None
+        self.uid = metas['id']
+        self.name = metas['name']
+        self._status = metas['status']
+        self.tags = metas['tags']
+        self.assets = metas['assets']
 
     @property
     def simulations(self) -> List:
@@ -125,6 +139,8 @@ class FileExperiment(FileItem, Experiment):
         Returns:
             Simulations
         """
+        if self._simulations is None:
+            self._simulations = self.get_simulations()
         return self._simulations
 
     def get_simulations(self) -> List:
@@ -133,11 +149,11 @@ class FileExperiment(FileItem, Experiment):
         Returns:
             Simulations
         """
-        simulations = []
         platform = self.get_current_platform_or_error()
-        for sim_id in self._simulations:
-            simulations.append(platform.get_item(sim_id, item_type=ItemType.SIMULATION, raw=True))
-        return simulations
+        return [
+            platform.get_item(sim_id, item_type=ItemType.SIMULATION, force=True, raw=True)
+            for sim_id in self._simulations_ids
+        ]
 
     @simulations.setter
     def simulations(self, simulations: List):
@@ -150,6 +166,7 @@ class FileExperiment(FileItem, Experiment):
             None
         """
         self._simulations = simulations
+        self._simulations_ids = [sim.id if hasattr(sim, 'id') else sim for sim in simulations]
 
     @property
     def status(self):
@@ -171,21 +188,6 @@ class FileExperiment(FileItem, Experiment):
             None
         """
         self._status = status
-
-    def __init__(self, metas: Dict):
-        """
-        Constructor.
-        Args:
-            metas: metadata
-        """
-        FileItem.__init__(self, metas)
-        self.suite_id = self.parent_id = metas['suite_id']
-        self.simulations = metas['simulations']
-        self.uid = metas['id']
-        self.name = metas['name']
-        self.status = metas['status']
-        self.tags = metas['tags']
-        self.assets = metas['assets']
 
     def __repr__(self):
         """
