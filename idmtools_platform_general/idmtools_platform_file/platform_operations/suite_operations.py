@@ -242,11 +242,3 @@ class FilePlatformSuiteOperations(IPlatformSuiteOperations):
         for child in children:
             ret[child.id] = self.platform._experiments.get_assets(child, files, **kwargs)
         return ret
-
-    def get_experiments(self, suite: Suite):
-        """
-        Get experiments.
-        Returns:
-            List of experiments
-        """
-        return suite.experiments

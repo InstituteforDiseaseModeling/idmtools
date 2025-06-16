@@ -308,11 +308,3 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         for sim in simulations:
             ret[sim.id] = self.platform._simulations.get_assets(sim, files, **kwargs)
         return ret
-
-    def get_simulations(self, experiment: Experiment):
-        """
-        Get simulations
-        Returns:
-              List of simulations
-        """
-        return experiment.simulations
