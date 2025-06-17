@@ -71,7 +71,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
     #: Simulation in this experiment
     simulations: InitVar[SUPPORTED_SIM_TYPE] = None
     #: Internal storage of simulation
-    __simulations: SUPPORTED_SIM_TYPE = field(default_factory=lambda: EntityContainer(), compare=False)
+    _simulations: SUPPORTED_SIM_TYPE = field(default_factory=lambda: EntityContainer(), compare=False)
 
     #: Determines if we should gather assets from the first task. Only use when not using TemplatedSimulations
     gather_common_assets_from_task: bool = field(default=None, compare=False)
@@ -99,7 +99,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
 
         if self.gather_common_assets_from_task is None:
             self.gather_common_assets_from_task = isinstance(self.simulations.items, EntityContainer)
-        self.__simulations.parent = self
+        self._simulations.parent = self
 
     def post_creation(self, platform: 'IPlatform') -> None:
         """
@@ -281,12 +281,12 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
                         raise ValueError("You cannot run an empty experiment")
                     if logger.isEnabledFor(DEBUG):
                         logger.debug("Using all tasks to gather assets")
-                    task_class = self.__simulations[0].task.__class__
+                    task_class = self._simulations[0].task.__class__
                     self.tags["task_type"] = f'{task_class.__module__}.{task_class.__name__}'
-                    pbar = self.__simulations
+                    pbar = self._simulations
                     if not IdmConfigParser.is_progress_bar_disabled():
                         from tqdm import tqdm
-                        pbar = tqdm(self.__simulations, desc="Discovering experiment assets from tasks",
+                        pbar = tqdm(self._simulations, desc="Discovering experiment assets from tasks",
                                     unit="simulation")
                     for sim in pbar:
                         # don't gather assets from simulations that have been provisioned
@@ -337,9 +337,9 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         Returns:
             Simulations
         """
-        if self.__simulations is None:
+        if self._simulations is None:
             return self.get_simulations()
-        return ExperimentParentIterator(self.__simulations, parent=self)
+        return ExperimentParentIterator(self._simulations, parent=self)
 
     def get_simulations(self) -> ExperimentParentIterator:  # noqa: F811:
         """
@@ -349,7 +349,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
             List of simulations
         """
         if self.platform:
-            return ExperimentParentIterator(self.__simulations, parent=self)
+            return ExperimentParentIterator(self._simulations, parent=self)
         else:
             raise UnknownItemException(
                 f"Experiment {self.id} cannot retrieve simulations because it was not found on the platform.")
@@ -371,7 +371,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         """
         if isinstance(simulations, (GeneratorType, TemplatedSimulations, EntityContainer)):
             self.gather_common_assets_from_task = isinstance(simulations, (GeneratorType, EntityContainer))
-            self.__simulations = simulations
+            self._simulations = simulations
         elif isinstance(simulations, (list, set)):
             from idmtools.entities.simulation import Simulation  # noqa: F811
             self.gather_common_assets_from_task = True
@@ -383,7 +383,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
                     container.append(sim)
                 else:
                     raise ValueError("Only list of tasks/simulations can be passed to experiment simulations")
-            self.__simulations = container
+            self._simulations = container
         else:
             raise ValueError("You can only set simulations to an EntityContainer, a Generator, a TemplatedSimulations "
                              "or a List/Set of Simulations")
@@ -525,7 +525,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         result = cls.__new__(cls)
         memo[id(self)] = result
         for k, v in self.__dict__.items():
-            if k in ['_Experiment__simulations'] and isinstance(v, (GeneratorType, TemplatedSimulations)):
+            if k in ['_simulations'] and isinstance(v, (GeneratorType, TemplatedSimulations)):
                 v = list(v)
             setattr(result, k, copy.deepcopy(v, memo))
         result._task_log = getLogger(__name__)
@@ -643,7 +643,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
                 user_logger.critical("Experiment failed. Please check output")
 
         if verbose:
-            user_logger.info(f"Simulation Type: {type(self.__simulations)}")
+            user_logger.info(f"Simulation Type: {type(self._simulations)}")
             user_logger.info(f"Assets: {self.assets}")
 
     def add_simulation(self, item: 'Simulation'):  # noqa F821
