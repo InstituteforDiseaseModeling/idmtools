@@ -565,10 +565,3 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
                                                                 **kwargs)
         return ret
 
-    def get_simulations(self, experiment: Experiment):
-        """
-        Get simulations
-        Returns:
-              List of simulations
-        """
-        return self.platform.get_children_by_object(experiment)
