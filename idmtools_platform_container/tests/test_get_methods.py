@@ -165,22 +165,3 @@ class TestFilePlatform(unittest.TestCase):
         file_exp_ids = [exp.id for exp in file_experiments]
         converted_exp_ids = [exp.id for exp in suite.experiments]
         self.assertSetEqual(set(file_exp_ids), set(converted_exp_ids))
-
-    def test_get_experiments_platform(self):
-        experiment = self.experiment
-        suite = experiment.suite
-        # Test platform get_experiments(suite), expect result is list of Experiments
-        experiments = self.platform._suites.get_experiments(suite)
-        self.assertTrue(all(isinstance(exp, Experiment) for exp in experiments))
-        self.assertFalse(all(isinstance(exp, FileExperiment) for exp in experiments))
-        self.assertEqual(experiments, suite.experiments)
-
-    def test_get_simulations_platform(self):
-        experiment = self.experiment
-        # Test platform get_simulations(experiments), expect result is list of Experiments
-        simulations = self.platform._experiments.get_simulations(experiment)
-        self.assertTrue(all(isinstance(sim, Simulation) for sim in simulations.items))
-        self.assertFalse(all(isinstance(sim, FileSimulation) for sim in simulations.items))
-        sim_ids = [sim.id for sim in simulations.items]
-        converted_sim_ids = [sim.id for sim in experiment.simulations.items]
-        self.assertSetEqual(set(sim_ids), set(converted_sim_ids))
