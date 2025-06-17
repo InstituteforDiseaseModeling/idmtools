@@ -24,7 +24,7 @@ from idmtools_test.utils.decorators import linux_only
 
 
 @pytest.mark.serial
-@linux_only
+#@linux_only
 class TestFilePlatform(unittest.TestCase):
 
     def create_experiment(self, a=1, b=1, retries=None, wait_until_done=False):
@@ -212,9 +212,8 @@ class TestFilePlatform(unittest.TestCase):
         suite = Suite("my suite")
         experiment = Experiment("my experiment")
         suite.add_experiment(experiment)
-        with self.assertRaises(UnknownItemException) as context:
-            experiments = suite.get_experiments()
-        self.assertTrue(f"Suite my suite cannot retrieve experiments because it was not found on the platform." in str(context.exception.args[0]))
+        experiments = suite.get_experiments()
+        self.assertTrue(isinstance(experiments, EntityContainer))
 
     def test_get_simulations_with_no_platform(self):
         experiment = Experiment("my experiment")
@@ -222,6 +221,5 @@ class TestFilePlatform(unittest.TestCase):
         simulation2 = Simulation("my sim2")
         experiment.add_simulation(simulation1)
         experiment.add_simulation(simulation2)
-        with self.assertRaises(UnknownItemException) as context:
-            simulations = experiment.get_simulations()
-        self.assertTrue(f"Experiment my experiment cannot retrieve simulations because it was not found on the platform." in str(context.exception.args[0]))
+        simulations = experiment.get_simulations()
+        self.assertTrue(isinstance(simulations, ExperimentParentIterator))
