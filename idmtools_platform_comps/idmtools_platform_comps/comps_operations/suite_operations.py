@@ -223,4 +223,3 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
         for child in children:
             ret[child.id] = self.platform._experiments.get_assets(child, files, **kwargs)
         return ret
-
