@@ -375,11 +375,6 @@ class IEntity(IItem, metaclass=ABCMeta):
         """
         if not isinstance(value, (dict, property)) and value is not None:
             raise ValueError("Tags must be a dictionary.")
-
-        # Normalize sets to lists
-        if isinstance(value, dict):
-            value = {k: list(v) if isinstance(v, set) else v for k, v in value.items()}
-
         self._tags = value
 
     def _load_tags(self) -> Dict[str, Any]:

@@ -20,13 +20,22 @@ def parse_item_tags(item):
 
 
 def parse_value_tags(tags):
-    tags_json = json.dumps(tags)
+    # convert tags value as set to list first
+    tags = {k: list(v) if isinstance(v, set) else v for k, v in tags.items()}
+    tags_json = json.dumps(tags, cls=SetEncoder)
     # Then: parse back into a dict with properly typed values
     converted_tags = json.loads(tags_json, cls=CustomDecoder)
     # Update result.tags in-place
     for k, v in converted_tags.items():
         tags[k] = v
     return tags
+
+
+class SetEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, set):
+            return list(obj)
+        return super().default(obj)
 
 
 class CustomDecoder(json.JSONDecoder):
