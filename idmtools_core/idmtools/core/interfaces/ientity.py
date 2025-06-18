@@ -365,7 +365,7 @@ class IEntity(IItem, metaclass=ABCMeta):
     @tags.setter
     def tags(self, value: Dict[str, Any]):
         """
-        Set the tags for the entity.
+        Set the tags for the entity, converting any set values to lists for JSON compatibility.
 
         Args:
             value (Dict[str, Any]): A dictionary of key-value tags. Can be None if clearing.
@@ -375,6 +375,11 @@ class IEntity(IItem, metaclass=ABCMeta):
         """
         if not isinstance(value, (dict, property)) and value is not None:
             raise ValueError("Tags must be a dictionary.")
+
+        # Normalize sets to lists
+        if isinstance(value, dict):
+            value = {k: list(v) if isinstance(v, set) else v for k, v in value.items()}
+
         self._tags = value
 
     def _load_tags(self) -> Dict[str, Any]:
