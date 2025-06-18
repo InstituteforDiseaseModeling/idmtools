@@ -110,8 +110,6 @@ class FilePlatformSimulationOperations(IPlatformSimulationOperations):
             None
         """
         super().post_run_item(simulation, **kwargs)
-        # Refresh platform object
-        simulation._platform_object = self.get(simulation.id, **kwargs)
 
     def send_assets(self, simulation: Simulation, **kwargs):
         """
