@@ -61,8 +61,6 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
             suite = add_dummy_suite(experiment)
             self.platform._suites.platform_create(suite)
             suite.platform = self.platform
-            # update parent
-            experiment.parent = suite
 
         # Generate Suite/Experiment/Simulation folder structure
         self.platform.mk_directory(experiment, exist_ok=True)
@@ -137,6 +135,20 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         user_logger.info(f'suite: {str(suite_id)}')
         user_logger.info(f'experiment: {experiment.id}')
         user_logger.info(f"\nExperiment Directory: \n{self.platform.get_directory(experiment)}")
+
+    def post_run_item(self, experiment: Experiment, **kwargs):
+        """
+        Perform post-processing steps after an experiment run.
+        Args:
+            experiment: The experiment object that has just finished running
+            **kwargs: Additional keyword arguments
+
+        Returns:
+            None
+        """
+        super().post_run_item(experiment, **kwargs)
+        # Refresh platform object
+        experiment._platform_object = self.get(experiment.id, **kwargs)
 
     def send_assets(self, experiment: Experiment, **kwargs):
         """

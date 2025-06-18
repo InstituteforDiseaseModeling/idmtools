@@ -199,8 +199,8 @@ class TestFlattenItem(unittest.TestCase):
         except AttributeError as e:
             self.assertTrue("'COMPSPlatform' object has no attribute 'get_directory'" in str(e))
 
-        idm_sim = self.platform._simulations.to_entity(sims[0])
+        idm_sim = self.platform._convert_platform_item_to_entity(sims[0])
         try:
             idm_sim.get_directory()
-        except:
-            self.assertTrue(f"Simulation id: {idm_sim.id} not found in COMPSPlatform.")
+        except RuntimeError:
+            self.assertTrue("Not support get_directory for COMPSPlatform")
