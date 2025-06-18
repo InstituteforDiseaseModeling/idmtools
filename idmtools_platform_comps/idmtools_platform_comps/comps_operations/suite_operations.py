@@ -136,7 +136,7 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
         obj.name = suite.name
         obj.description = suite.description
         obj.tags = suite.tags
-        obj.comps_suite = suite
+        obj._platform_object = suite
 
         # Convert all experiments
         if children:
@@ -195,24 +195,27 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
         Fetch the files associated with a suite.
 
         Args:
-            suite: Suite (idmtools Suite or COMPSSuite)
-            files: List of files to download
-            **kwargs:
+            suite (Suite): The suite object.
+            files (List[str]): List of filenames to download.
+            **kwargs: Additional keyword arguments for platform-specific options.
 
         Returns:
-            Dict[str, Dict[Dict[str, Dict[str, str]]]]:
-                A nested dictionary structured as:
+            Dict[str, Dict[str, Dict[str, Dict[str, Union[str, bytearray]]]]]: A nested dictionary structured as::
+
                 {
-                   suite.id{
-                        experiment.id: {
-                            simulation.id {
-                                filename: file content as string,
+                    "suite_id": {
+                        "experiment_id": {
+                            "simulation_id": {
+                                "filename": file_content,
                                 ...
                             },
                             ...
                         },
+                        ...
                     }
                 }
+
+            File content may be returned as either a decoded string or a bytearray.
         """
         ret = dict()
         if isinstance(suite, COMPSSuite):

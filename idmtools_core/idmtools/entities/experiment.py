@@ -71,7 +71,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
     #: Simulation in this experiment
     simulations: InitVar[SUPPORTED_SIM_TYPE] = None
     #: Internal storage of simulation
-    __simulations: Union[SUPPORTED_SIM_TYPE] = field(default_factory=lambda: EntityContainer(), compare=False)
+    __simulations: SUPPORTED_SIM_TYPE = field(default_factory=lambda: EntityContainer(), compare=False)
 
     #: Determines if we should gather assets from the first task. Only use when not using TemplatedSimulations
     gather_common_assets_from_task: bool = field(default=None, compare=False)
@@ -216,11 +216,16 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         Returns:
             None
         """
-        if parent:
-            if parent.experiments is None:
-                parent.experiments = [self]
-            else:
-                parent.experiments.append(self)
+        if parent is not None:
+            try:
+                experiments = getattr(parent, "_experiments", None)
+            except AttributeError:
+                experiments = None
+
+            if experiments is None:
+                parent._experiments = [self]
+            elif self not in experiments:  # Avoid duplicate
+                experiments.append(self)
         IEntity.parent.__set__(self, parent)
 
     def display(self):
@@ -327,45 +332,57 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
     @property
     def simulations(self) -> ExperimentParentIterator:  # noqa: F811
         """
-        Returns the Simulations.
+        Get the experiment's simulations.
 
         Returns:
-            Simulations
+            ExperimentParentIterator: Iterator wrapping internal simulation container.
         """
+        if self.__simulations is None:
+            return ExperimentParentIterator([], parent=self)
         return ExperimentParentIterator(self.__simulations, parent=self)
 
-    @simulations.setter
-    def simulations(self, simulations: Union[SUPPORTED_SIM_TYPE]):
+    def get_simulations(self) -> ExperimentParentIterator:  # noqa: F811:
         """
-        Set the simulations object.
-
-        Args:
-            simulations:
+        Resolve and return simulations from internal container.
 
         Returns:
-            None
+            ExperimentParentIterator
+        """
+        return self.simulations
+
+    @simulations.setter
+    def simulations(self, simulations: SUPPORTED_SIM_TYPE):
+        """
+        Set and normalize the simulations input.
+
+        Args:
+            simulations (SUPPORTED_SIM_TYPE): Simulations, task list, or generator.
 
         Raises:
-            ValueError - If simulations is a list has items that are not simulations or tasks
-                         If simulations is not a list, set, TemplatedSimulations or EntityContainer
+            ValueError: If unsupported input type or invalid simulation list item.
         """
-        if isinstance(simulations, (GeneratorType, TemplatedSimulations, EntityContainer)):
-            self.gather_common_assets_from_task = isinstance(simulations, (GeneratorType, EntityContainer))
+        from idmtools.entities.simulation import Simulation
+        if isinstance(simulations, GeneratorType):
+            simulations = list(simulations)
+
+        if isinstance(simulations, (EntityContainer, TemplatedSimulations)):
             self.__simulations = simulations
+            self.gather_common_assets_from_task = isinstance(simulations, EntityContainer)
         elif isinstance(simulations, (list, set)):
-            from idmtools.entities.simulation import Simulation  # noqa: F811
             self.gather_common_assets_from_task = True
-            self.__simulations = EntityContainer()
+            container = EntityContainer()
             for sim in simulations:
                 if isinstance(sim, ITask):
-                    self.__simulations.append(sim.to_simulation())
+                    container.append(sim.to_simulation())
                 elif isinstance(sim, Simulation):
-                    self.__simulations.append(sim)
+                    container.append(sim)
                 else:
-                    raise ValueError("Only list of tasks/simulations can be passed to experiment simulations")
+                    raise ValueError("Only Simulation or Task objects are allowed in simulation list.")
+            self.__simulations = container
         else:
-            raise ValueError("You can only set simulations to an EntityContainer, a Generator, a TemplatedSimulations "
-                             "or a List/Set of Simulations")
+            raise ValueError(
+                "Simulations must be an EntityContainer, Generator, TemplatedSimulations, or a List/Set of Simulations."
+            )
 
     @property
     def simulation_count(self) -> int:

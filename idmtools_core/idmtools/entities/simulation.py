@@ -143,6 +143,7 @@ class Simulation(IAssetsEnabled, INamedEntity):
             self.task = TaskProxy.from_task(self.task)
         if self.status is None:
             self.status = EntityStatus.CREATED
+        self.platform = platform
 
     def pre_getstate(self):
         """
