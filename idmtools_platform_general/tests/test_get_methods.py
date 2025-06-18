@@ -1,3 +1,4 @@
+import copy
 import os
 import sys
 import unittest
@@ -5,6 +6,8 @@ import unittest
 import pytest
 from functools import partial
 from typing import Any, Dict, List
+
+from idmtools.entities.command_task import CommandTask
 from idmtools.entities.generic_workitem import GenericWorkItem
 from idmtools.utils.collections import ExperimentParentIterator
 
@@ -24,7 +27,7 @@ from idmtools_test.utils.decorators import linux_only
 
 
 @pytest.mark.serial
-#@linux_only
+@linux_only
 class TestFilePlatform(unittest.TestCase):
 
     def create_experiment(self, a=1, b=1, retries=None, wait_until_done=False):
@@ -139,6 +142,9 @@ class TestFilePlatform(unittest.TestCase):
 
     def test_get_simulations_file(self):
         file_experiment = self.experiment.get_platform_object()
+        print("test_get_simulations_file")
+        print(repr(self.experiment))
+        print(repr(file_experiment))
         self.assertTrue(isinstance(file_experiment, FileExperiment))
         # Test FileExperiment's get_simulations(), expect result is list of FileSimulations
         file_simulations = file_experiment.get_simulations()
@@ -161,6 +167,9 @@ class TestFilePlatform(unittest.TestCase):
     def test_get_experiments_file(self):
         experiment = self.experiment
         suite = experiment.suite
+        print("test_get_experiments_file")
+        print(repr(suite))
+        print(repr(experiment))
         file_suite = suite.get_platform_object()
         self.assertTrue(isinstance(file_suite, FileSuite))
         # Test FileSuite's get_experiments(), expect result is list of FileExperiments
@@ -173,17 +182,16 @@ class TestFilePlatform(unittest.TestCase):
     def test_get_experiments_by_platform_get_items(self):
         experiment = self.experiment
         suite = experiment.suite
-        suite = self.platform.get_item(suite.id, item_type=ItemType.SUITE)
+        suite = self.platform.get_item(suite.id, item_type=ItemType.SUITE, force=True)
         exps = suite.get_experiments()
         exps_property = suite.experiments
         self.assertEqual(exps, exps_property)
-        self.assertTrue(isinstance(exps, EntityContainer))
-        self.assertTrue(len(exps) == 1)
+        self.assertEqual(len(exps), 1)
         self.assertTrue(all(isinstance(exp, Experiment) for exp in exps))
 
         file_suite = self.platform.get_item(suite.id, item_type=ItemType.SUITE, raw=True)
         file_exps = file_suite.get_experiments()
-        self.assertTrue(len(file_exps) == 1)
+        self.assertEqual(len(file_exps), 1)
         self.assertTrue(all(isinstance(exp, FileExperiment) for exp in file_exps))
         self.assertTrue(isinstance(file_exps, List))
 
@@ -195,12 +203,12 @@ class TestFilePlatform(unittest.TestCase):
         # verify experiment.get_simulations and experiment.simulations are the same
         self.assertEqual(sims.items, sims_property.items)
         self.assertTrue(isinstance(sims, ExperimentParentIterator))
-        self.assertTrue(len(sims) == 9)
+        self.assertEqual(len(sims), 9)
         self.assertTrue(all(isinstance(sim, Simulation) for sim in sims.items))
         file_experiment = self.platform.get_item(experiment.id, item_type=ItemType.EXPERIMENT, raw=True)
         file_sims = file_experiment.get_simulations()
         self.assertTrue(isinstance(file_sims, List))
-        self.assertTrue(len(file_sims) == 9)
+        self.assertEqual(len(file_sims), 9)
         self.assertTrue(all(isinstance(sim, FileSimulation) for sim in file_sims))
 
         # set simulations = []
@@ -223,3 +231,52 @@ class TestFilePlatform(unittest.TestCase):
         experiment.add_simulation(simulation2)
         simulations = experiment.get_simulations()
         self.assertTrue(isinstance(simulations, ExperimentParentIterator))
+
+    def test_add_experiment(self):
+        experiment = self.create_experiment(a=2, b=2)
+        suite: Suite = experiment.parent
+        task = CommandTask(command='python --version')
+        new_experiment1 = Experiment.from_task(task=task, name='new experiment1')
+        new_experiment2 = Experiment.from_task(task=task, name='new experiment2')
+        suite.add_experiment(experiment)
+        suite.add_experiment(new_experiment1)
+        suite.add_experiment(new_experiment2)
+        exps = suite.get_experiments()
+        self.assertEqual(len(exps), 3)
+        self.assertTrue(all(isinstance(exp, Experiment) for exp in exps))
+        self.assertEqual(repr(suite), f"<Suite {suite.id} - 3 experiments>")
+
+    @pytest.mark.skip("Only run this in local with valid experiment id")
+    def test_add_experiment_file(self):
+        experiment = self.create_experiment(a=2, b=2)
+        suite: Suite = experiment.parent
+        file_suite = suite.get_platform_object()
+        new_experiment_file = self.platform.get_item("e8161f68-7fcc-4bd5-992d-247f842da2a0", item_type=ItemType.EXPERIMENT, raw=True, force=True)
+        file_suite.add_experiment(new_experiment_file)
+        file_exps = file_suite.get_experiments()
+        self.assertEqual(len(file_exps), 2)
+        self.assertTrue(all(isinstance(exp, FileExperiment) for exp in file_exps))
+        self.assertEqual(repr(file_suite), f"<FileSuite {file_suite.id} - 2 experiments>")
+
+    def test_add_simulation(self):
+        experiment = self.create_experiment(a=2, b=2)
+        new_simulation1 = Simulation("my sim1")
+        new_simulation2 = Simulation("my sim2")
+        experiment.add_simulation(new_simulation1)
+        experiment.add_simulation(new_simulation2)
+        sims = experiment.get_simulations()
+        self.assertEqual(len(sims), 6)
+        self.assertTrue(all(isinstance(sim, Simulation) for sim in sims))
+        self.assertEqual(repr(experiment), f'<Experiment: {experiment.id} - test_experiment / Sim count 6>')
+
+    @pytest.mark.skip("Only run this in local with valid experiment id")
+    def test_add_simulation_file(self):
+        experiment = self.create_experiment(a=2, b=2)
+        file_experiment = experiment.get_platform_object()
+        new_simulation_file = self.platform.get_item("2c7dea18-5a70-4e2e-95fc-f1e09f214423", item_type=ItemType.SIMULATION, raw=True, force=True)
+        file_experiment.add_simulation(new_simulation_file)
+        file_experiment.add_simulation("4baf88f9-d655-4583-8979-76f4b4c00c73")
+        file_sims = file_experiment.get_simulations()
+        self.assertEqual(len(file_sims), 6)
+        self.assertTrue(all(isinstance(sim, FileSimulation) for sim in file_sims))
+        self.assertEqual(repr(file_experiment), f'<FileExperiment {file_experiment.id} - 6 simulations>')

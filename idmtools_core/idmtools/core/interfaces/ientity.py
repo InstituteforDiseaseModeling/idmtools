@@ -310,7 +310,7 @@ class IEntity(IItem, metaclass=ABCMeta):
     @property
     def directory(self) -> Path:
         """
-        The get directory for the current item. This is a convenience alias for `get_directory()`.
+        The get directory for the current item. This is a convenience alias for get_directory.
         Returns:
             pathlib.Path: The path to the item's working directory on the current platform.
         """
