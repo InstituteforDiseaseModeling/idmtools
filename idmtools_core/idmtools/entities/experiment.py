@@ -224,7 +224,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
 
             if experiments is None:
                 parent._experiments = [self]
-            else:
+            elif self not in experiments:  # Avoid duplicate
                 experiments.append(self)
         IEntity.parent.__set__(self, parent)
 
