@@ -99,18 +99,6 @@ class FilePlatformSimulationOperations(IPlatformSimulationOperations):
         """
         pass
 
-    def post_run_item(self, simulation: Simulation, **kwargs) -> None:
-        """
-        Perform post-processing steps after a simulation run.
-        Args:
-            simulation: The simulation object that has just finished running
-            **kwargs: Additional keyword arguments
-
-        Returns:
-            None
-        """
-        super().post_run_item(simulation, **kwargs)
-
     def send_assets(self, simulation: Simulation, **kwargs):
         """
         Send assets.
