@@ -24,7 +24,7 @@ if __name__ == "__main__":
     # create experiment  object and define some extra assets
     assets_path = os.path.join(COMMON_INPUT_PATH, "python", "Assets")
     e = Experiment(name=os.path.split(sys.argv[0])[1],
-                   _tags={"string_tag": "test", "number_tag": 123},
+                   tags={"string_tag": "test", "number_tag": 123},
                    assets=AssetCollection.from_directory(assets_path))
 
     # define paths to model and extra assets folder container more common assets
@@ -32,7 +32,7 @@ if __name__ == "__main__":
 
     # define our base task including the common assets. We could also add these assets to the experiment above
     base_task = JSONConfiguredPythonTask(script_path=model_path, envelope='parameters')
-    base_task.tags.update({"a"})
+
     base_simulation = Simulation.from_task(base_task)
 
     # now build our simulations

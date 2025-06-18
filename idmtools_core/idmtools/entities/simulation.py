@@ -176,7 +176,7 @@ class Simulation(IAssetsEnabled, INamedEntity):
         Returns:
             Simulation using the  parameters provided
         """
-        return Simulation(task=task, _tags=dict() if tags is None else tags,
+        return Simulation(task=task, tags=dict() if tags is None else tags,
                           assets=asset_collection if asset_collection else AssetCollection())
 
     def list_static_assets(self, platform: 'IPlatform' = None, **kwargs) -> List[Asset]:

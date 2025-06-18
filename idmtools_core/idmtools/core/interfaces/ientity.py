@@ -37,11 +37,27 @@ class IEntity(IItem, metaclass=ABCMeta):
     #: Status of item
     status: EntityStatus = field(default=None, compare=False, metadata={"pickle_ignore": True})
     #: Tags for item
+    # First tags is for constructor
+    tags: Dict[str, Any] = field(default_factory=lambda: {}, metadata={"md": True})
+    # Search tags for internal variable
     _tags: Dict[str, Any] = field(default_factory=lambda: {}, metadata={"md": True})
     #: Item Type(Experiment, Suite, Asset, etc)
     item_type: ItemType = field(default=None, compare=False)
     #: Platform Representation of Entity
     _platform_object: Any = field(default=None, compare=False, metadata={"pickle_ignore": True})
+
+    def __post_init__(self):
+        """
+         Post-initialization hook for IEntity.
+
+        Synchronizes the public `tags` field with the internal `_tags` variable
+        to allow for internal manipulation or lazy-loading without affecting
+        the external data model.
+
+         Returns:
+             None
+         """
+        self._tags = self.tags
 
     def update_tags(self, tags: dict = None) -> NoReturn:
         """
