@@ -4,7 +4,7 @@ from functools import partial
 from unittest.mock import MagicMock
 import allure
 import unittest
-from dataclasses import dataclass, field, fields
+from dataclasses import dataclass, field, fields, asdict
 import pytest
 from idmtools.builders import SimulationBuilder
 from idmtools.core.interfaces.ientity import IEntity
@@ -52,8 +52,7 @@ class TestEntity(ITestWithPersistence):
 
         c = IEntity()
         c.tags = {"a": 2}
-        self.assertNotEqual(a, c)
-
+        self.assertNotEqual(asdict(a), asdict(c))
         b = IEntity()
         b.tags = {"a": 1}
 

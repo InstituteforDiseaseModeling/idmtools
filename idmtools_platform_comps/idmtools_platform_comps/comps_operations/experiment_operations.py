@@ -411,8 +411,9 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
 
         # Create an experiment
         experiment_type = experiment.tags.get("type") if experiment.tags is not None else ""
-        obj = experiment_factory.create(experiment_type, tags=experiment.tags, name=experiment.name,
+        obj = experiment_factory.create(experiment_type, name=experiment.name,
                                         fallback=Experiment)
+        obj.tags = experiment.tags
         obj.platform = self.platform
         obj._platform_object = experiment
         # Set parent

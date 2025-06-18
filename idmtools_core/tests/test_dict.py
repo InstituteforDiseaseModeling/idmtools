@@ -1,3 +1,5 @@
+from dataclasses import asdict
+
 import allure
 import unittest
 
@@ -53,15 +55,15 @@ class TestDictionary(ITestWithPersistence):
 
         sim3 = ts.new_simulation()
         sim3.tags = {"a": 2, "b": 2}
-        self.assertNotEqual(sim1, sim3)
+        self.assertNotEqual(asdict(sim1), asdict(sim3))
 
         sim4 = ts.new_simulation()
         sim4.tags = {"a": 1, "b": 2, "c": 3}
-        self.assertNotEqual(sim1, sim4)
+        self.assertNotEqual(asdict(sim1), asdict(sim4))
 
         sim5 = ts.new_simulation()
         sim5.tags = {"a": 1, "c": 3, "b": 2}
-        self.assertEqual(sim4, sim5)
+        self.assertEqual(asdict(sim4), asdict(sim5))
 
         sim6 = ts.new_simulation()
         sim7 = ts.new_simulation()

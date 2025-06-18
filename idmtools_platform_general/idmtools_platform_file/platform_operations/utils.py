@@ -75,7 +75,7 @@ class FileSuite(FileItem, Suite):
         self.name = metas['name']
         self.status = metas['status']
         self.__experiments: Optional[List[str, IEntity]] = metas['experiments']
-        self.tags = metas['tags']
+        self._tags = metas['tags']
 
     @property
     def experiments(self) -> List:
@@ -275,7 +275,7 @@ class FileSimulation(FileItem, Simulation):
         self.experiment_id = metas['parent_id']
         self.name = metas['name']
         self.status = metas['status']
-        self.tags = metas['tags']
+        self._tags = metas['tags']
         self.task = metas['task']
         self.assets = metas['assets']
 
@@ -307,6 +307,8 @@ def add_dummy_suite(experiment: Experiment, suite_name: str = None, tags: Dict =
     Returns:
         Suite
     """
+    if tags is None:
+        tags = {}
     if suite_name is None:
         suite_name = 'Suite'
     suite = Suite(name=suite_name)

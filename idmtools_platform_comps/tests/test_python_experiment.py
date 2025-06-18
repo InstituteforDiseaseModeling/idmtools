@@ -408,7 +408,8 @@ class TestPythonExperiment(ITestWithPersistence):
         script_path = os.path.join(COMMON_INPUT_PATH, "python", "model1.py")
         experiment = Experiment(name=self.case_name,
                                 simulations=[JSONConfiguredPythonTask(script_path=script_path)],
-                                tags={"string_tag": "test", "number_tag": 123}, gather_common_assets_from_task=True)
+                                gather_common_assets_from_task=True)
+        experiment.tags = {"string_tag": "test", "number_tag": 123}
         # add another file with different content at same path
         experiment.assets.add_asset(Asset(filename="model1.py", content="yay"))
         with self.assertRaises(DuplicatedAssetError) as context:

@@ -277,7 +277,8 @@ class TestAssetizeOutput(unittest.TestCase):
     def test_benchmark(self):
         ranges_to_test = [10, 100, 250]
 
-        experiment = Experiment(name=self.case_name, tags=dict(benchmark='assetize'))
+        experiment = Experiment(name=self.case_name)
+        experiment.tags = dict(benchmark='assetize')
         experiment.assets.add_directory(PurePath(COMMON_INPUT_PATH).joinpath('python', 'output_generator'))
         for i in ranges_to_test:
             task = CommandTask(f"python Assets/generate.py --chunks {i}")
