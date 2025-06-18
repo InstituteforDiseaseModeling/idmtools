@@ -361,6 +361,10 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         Raises:
             ValueError: If unsupported input type or invalid simulation list item.
         """
+        from idmtools.entities.simulation import Simulation
+        if isinstance(simulations, GeneratorType):
+            simulations = list(simulations)
+
         if isinstance(simulations, (EntityContainer, TemplatedSimulations)):
             self.__simulations = simulations
             self.gather_common_assets_from_task = isinstance(simulations, EntityContainer)
