@@ -373,7 +373,7 @@ class IEntity(IItem, metaclass=ABCMeta):
         Raises:
             ValueError: If the provided value is not a dictionary or None.
         """
-        if not isinstance(value, dict) and value is not None:
+        if not isinstance(value, (dict, property)) and value is not None:
             raise ValueError("Tags must be a dictionary.")
         self._tags = value
 
