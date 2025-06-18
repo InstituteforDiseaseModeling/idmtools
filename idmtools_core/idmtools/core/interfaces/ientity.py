@@ -343,7 +343,7 @@ class IEntity(IItem, metaclass=ABCMeta):
         return self.get_directory()
 
     @property
-    def tags(self) -> Dict[str, Any]:
+    def tags(self) -> Dict[str, Any]:  # noqa: F811
         """
         Get the tags associated with the entity.
         Returns:

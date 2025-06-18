@@ -27,7 +27,7 @@ from idmtools_test.utils.decorators import linux_only
 
 
 @pytest.mark.serial
-@linux_only
+#@linux_only
 class TestFilePlatform(unittest.TestCase):
 
     def create_experiment(self, a=1, b=1, retries=None, wait_until_done=False):
