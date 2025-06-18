@@ -5,7 +5,7 @@ The Suite object can be thought as a metadata object. It represents a container 
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
-from typing import NoReturn, Type, TYPE_CHECKING, Dict
+from typing import NoReturn, Type, TYPE_CHECKING, Dict, List
 from abc import ABC
 from dataclasses import dataclass, field, fields
 from idmtools.core.interfaces.iitem import IItem
@@ -152,6 +152,32 @@ class Suite(INamedEntity, ABC, IRunnableEntity):
             EntityContainer: A container of Experiment objects belonging to this suite.
         """
         return self._experiments
+
+    def simulations_with_tags(self, tags=None, skip_sims=None, max_simulations=None, entity_type=False, **kwargs) -> \
+            Dict[str, List[str]]:
+        """
+        Retrieve simulation ids or simulation objects with matching tags across all experiments in the suite.
+        This method filters simulations based on the provided tags, skipping specified simulations,
+        and limiting the number of results if `max_simulations` is set. The return type can be
+        either a dictionary of simulation IDs or simulation objects, depending on the `entity_type` flag.
+        Args:
+            tags (dict, optional): A simulation's tags to filter by.
+            skip_sims (List[str], optional): A list of simulation IDs to exclude from the results.
+            max_simulations (int, optional): The maximum number of simulations to return per experiment.
+            entity_type (bool, optional): If True, return simulation objects; otherwise, return simulation IDs. Defaults to False.
+            **kwargs: Additional filter parameters.
+        Returns:
+            Dict[str, List[str]]: A dictionary where the keys are experiment IDs and the values are lists of
+                                  simulation IDs or simulation objects, depending on the `entity_type` flag.
+        """
+        experiments = self.experiments
+        sims = {}
+        for experiment in experiments:
+            sims[experiment.id] = experiment.simulations_with_tags(tags=tags, skip_sims=skip_sims,
+                                                                   max_simulations=max_simulations,
+                                                                   entity_type=entity_type, **kwargs)
+
+        return sims
 
 
 ISuiteClass = Type[Suite]
