@@ -84,9 +84,7 @@ class FileSuite(FileItem, Suite):
         Returns:
             List: A list of resolved `Experiment` objects.
         """
-        if self.__experiments is None:
-            self.__experiments = self.get_experiments()
-        return self.__experiments
+        return self.get_experiments()
 
     def get_experiments(self) -> List:
         """
@@ -176,7 +174,7 @@ class FileExperiment(FileItem, Experiment):
         Returns:
             List: A list containing either simulation IDs or resolved `Simulation` objects.
         """
-        return self.__simulations
+        return self.get_simulations()
 
     def get_simulations(self) -> List:
         """
