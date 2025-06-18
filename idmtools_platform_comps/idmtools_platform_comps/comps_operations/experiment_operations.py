@@ -532,26 +532,29 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
 
     def get_assets(self, experiment: Experiment, files: List[str], include_experiment_assets: bool = True, **kwargs) -> Dict[str, bytearray]:
         """
-        Fetch the files associated with an experiment.
+        Fetch the files associated with an experiment and its simulations.
 
         Args:
-            experiment: Experiment (idmools Experiment or COMPSExperiment)
-            files: List of files to download
-            include_experiment_assets: Should we also load experiment assets?
-            **kwargs:
+            experiment (Experiment): The experiment object.
+            files (List[str]): A list of filenames to retrieve.
+            include_experiment_assets (bool): Whether to include experiment-level assets. Defaults to True.
+            **kwargs: Additional platform-specific options.
 
         Returns:
-            Dict[str, Dict[str, Dict[str, str]]]:
-                A nested dictionary structured as:
+            Dict[str, Dict[str, Dict[str, Union[str, bytearray]]]]: A nested dictionary in the format::
+
                 {
-                    experiment.id: {
-                        simulation.id {
-                            filename: file content as string,
+                    "experiment_id": {
+                        "simulation_id": {
+                            "filename1": file_content,
+                            "filename2": file_content,
                             ...
                         },
                         ...
                     }
                 }
+
+            File content may be either a decoded string or a bytearray.
         """
         ret = dict()
         if isinstance(experiment, COMPSExperiment):

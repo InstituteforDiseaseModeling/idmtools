@@ -31,15 +31,17 @@ class AddAnalyzer(IAnalyzer):
         # We only want the raw files -> disable parsing
         self.parse = True
 
-    def filter(self, item: ANALYZABLE_ITEM):
+    def filter(self, item: ANALYZABLE_ITEM) -> bool:
         """
-        Filter analyzers. Here we want all the items so just return true.
+        Determine whether the given item should be included by this analyzer.
+
+        This implementation accepts all items unconditionally.
 
         Args:
-            item: Item to filter
+            item (ANALYZABLE_ITEM): The item to be evaluated.
 
         Returns:
-            True
+            bool: Always returns True, meaning all items are accepted.
         """
         return True  # download them all!
 
