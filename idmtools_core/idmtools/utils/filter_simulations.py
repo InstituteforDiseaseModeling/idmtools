@@ -15,7 +15,7 @@ class FilterItem:
     """
 
     @staticmethod
-    def filter_item(platform: IPlatform, item: IEntity, skip_sims=None, max_simulations: int = None, **kwargs):
+    def filter_item(platform: IPlatform, item: IEntity, skip_sims=None, max_simulations: int = None, entity_type: bool = False, **kwargs):
         """
         Filter simulations from Experiment or Suite, by default it filter status with Succeeded.
 
@@ -81,23 +81,33 @@ class FilterItem:
         # consider max_simulations for return
         sims_final = sims_id_filtered[0:max_simulations if max_simulations else len(sims_id_filtered)]
 
-        # only return uid
-        return [s.uid for s in sims_final]
+        if entity_type:
+            return sims_final
+        else:
+            return [s.id for s in sims_final]
 
     @classmethod
-    def filter_item_by_id(cls, platform: IPlatform, item_id: UUID, item_type: ItemType = ItemType.EXPERIMENT, skip_sims=None, max_simulations: int = None, **kwargs):
+    def filter_item_by_id(cls, platform: IPlatform, item_id: UUID, item_type: ItemType = ItemType.EXPERIMENT,
+                          skip_sims=None, max_simulations: int = None, **kwargs):
         """
-        Filter simulations from Experiment or Suite.
+        Retrieve and filter simulations from an Experiment or Suite by item ID.
+
+        This method looks up the specified item (Experiment or Suite) by ID on the given platform,
+        then filters its simulations using the class's `filter_item()` method.
 
         Args:
-            platform: COMPSPlatform
-            item_id: Experiment/Suite id
-            item_type:  Experiment or Suite
-            skip_sims: list of sim ids
-            max_simulations: #sims to be returned
-            kwargs: extra filters
+            platform (IPlatform): The platform instance used to fetch the item.
+            item_id (UUID): The unique identifier of the Experiment or Suite.
+            item_type (ItemType, optional): The type of item (Experiment or Suite). Defaults to Experiment.
+            skip_sims (List[str], optional): List of simulation IDs to skip during filtering. Defaults to an empty list.
+            max_simulations (int, optional): Maximum number of simulations to return. Defaults to None (no limit).
+            **kwargs: Additional keyword arguments passed to `filter_item()`.
 
-        Returns: list of simulation ids
+        Returns:
+            List[str]: A list of filtered simulation IDs.
+
+        Raises:
+            ValueError: If the provided `item_type` is not Experiment or Suite.
         """
         if skip_sims is None:
             skip_sims = []

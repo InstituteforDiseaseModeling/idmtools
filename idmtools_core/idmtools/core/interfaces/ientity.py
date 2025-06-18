@@ -8,11 +8,12 @@ from dataclasses import dataclass, field
 from logging import getLogger
 from os import PathLike
 from pathlib import Path
-from typing import NoReturn, List, Any, Dict, Union, TYPE_CHECKING, Optional
+from typing import NoReturn, List, Any, Dict, Union, TYPE_CHECKING
 from idmtools.core import EntityStatus, ItemType, NoPlatformException
 from idmtools.core.interfaces.iitem import IItem
 from idmtools.core.id_file import read_id_file, write_id_file
 from idmtools.services.platforms import PlatformPersistService
+from idmtools.utils.general import parse_value_tags
 
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
@@ -334,7 +335,7 @@ class IEntity(IItem, metaclass=ABCMeta):
         """
         if self._tags is None:
             self._tags = self._load_tags()
-        return self._tags
+        return parse_value_tags(self._tags)
 
     def get_tags(self) -> Dict[str, Any]:
         """
@@ -379,7 +380,8 @@ class IEntity(IItem, metaclass=ABCMeta):
                 return {}
 
             # Safely retrieve tags
-            return getattr(platform_obj, 'tags', {}) or {}
+            tags = getattr(platform_obj, 'tags', {}) or {}
+            return parse_value_tags(tags)
 
         except Exception as e:
             # Optional: log or debug
