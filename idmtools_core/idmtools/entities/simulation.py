@@ -176,8 +176,7 @@ class Simulation(IAssetsEnabled, INamedEntity):
         Returns:
             Simulation using the  parameters provided
         """
-        simulation = Simulation(task=task,
-                          assets=asset_collection if asset_collection else AssetCollection())
+        simulation = Simulation(task=task, assets=asset_collection if asset_collection else AssetCollection())
         simulation.tags = dict() if tags is None else tags
         return simulation
 

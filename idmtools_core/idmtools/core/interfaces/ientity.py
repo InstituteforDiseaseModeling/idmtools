@@ -18,6 +18,8 @@ if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
 
 logger = getLogger(__name__)
+
+
 @dataclass
 class IEntity(IItem, metaclass=ABCMeta):
     """
