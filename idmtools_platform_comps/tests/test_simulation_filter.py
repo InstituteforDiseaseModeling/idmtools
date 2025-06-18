@@ -49,8 +49,8 @@ class TestSimulationsWithTags(unittest.TestCase):
         self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
         print(self.case_name)
         self.platform = Platform('SlurmStage')
-        #self.exp = self.create_experiment()
-        self.exp = self.platform.get_item("a40d096f-874c-f011-9311-f0921c167864", item_type=ItemType.EXPERIMENT)
+        self.exp = self.create_experiment()
+        #self.exp = self.platform.get_item("a40d096f-874c-f011-9311-f0921c167864", item_type=ItemType.EXPERIMENT)
 
     def test_suite_sim_tags_by_id(self):
         experiment = self.exp
