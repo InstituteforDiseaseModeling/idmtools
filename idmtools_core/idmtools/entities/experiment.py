@@ -451,10 +451,9 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
             tags = dict()
         if name is None:
             name = task.__class__.__name__
-        e = Experiment(name=name, assets=AssetCollection() if assets is None else assets,
+        e = Experiment(name=name, _tags=tags, assets=AssetCollection() if assets is None else assets,
                        gather_common_assets_from_task=gather_common_assets_from_task)
         e.simulations = [task]
-        e.tags = tags
         return e
 
     @classmethod
@@ -504,9 +503,8 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
             tags = dict()
         if name is None:
             name = template.base_task.__class__.__name__
-        e = Experiment(name=name, assets=AssetCollection() if assets is None else assets)
+        e = Experiment(name=name, _tags=tags, assets=AssetCollection() if assets is None else assets)
         e.simulations = template
-        e.tags = tags
         return e
 
     def __deepcopy__(self, memo):

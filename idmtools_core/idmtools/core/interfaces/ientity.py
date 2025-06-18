@@ -36,7 +36,6 @@ class IEntity(IItem, metaclass=ABCMeta):
     #: Status of item
     status: EntityStatus = field(default=None, compare=False, metadata={"pickle_ignore": True})
     #: Tags for item
-    # _tags: Optional[Dict[str, Any]] = field(default=None, metadata={"pickle_ignore": True}, compare=False)
     _tags: Dict[str, Any] = field(default_factory=lambda: {}, metadata={"md": True})
     #: Item Type(Experiment, Suite, Asset, etc)
     item_type: ItemType = field(default=None, compare=False)

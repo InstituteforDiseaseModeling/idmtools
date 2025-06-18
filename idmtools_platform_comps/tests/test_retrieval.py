@@ -41,10 +41,8 @@ class TestRetrieval(ITestWithPersistence):
         builder = SimulationBuilder()
         builder.add_sweep_definition(setA, range(0, 2))
         ts.add_builder(builder)
-        exp = Experiment(name=cls.case_name, simulations=ts)
-        exp.tags = dict(string_tag="test", number_tag=123, KeyOnly=None)
-        exp.run(wait_until_done=True)
-        cls.exp = exp
+        cls.exp = Experiment(name=cls.case_name, simulations=ts, _tags=dict(string_tag="test", number_tag=123, KeyOnly=None))
+        cls.exp.run(wait_until_done=True)
 
     def test_retrieve_experiment(self):
         exp = self.platform.get_item(self.exp.uid, ItemType.EXPERIMENT)

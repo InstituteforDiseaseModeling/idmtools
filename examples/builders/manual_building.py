@@ -19,13 +19,14 @@ from idmtools_test import COMMON_INPUT_PATH
 if __name__ == "__main__":
 
     # define our platform
-    platform = Platform('SlurmStage')
+    platform = Platform('Calculon')
 
     # create experiment  object and define some extra assets
     assets_path = os.path.join(COMMON_INPUT_PATH, "python", "Assets")
     e = Experiment(name=os.path.split(sys.argv[0])[1],
+                   _tags={"string_tag": "test", "number_tag": 123},
                    assets=AssetCollection.from_directory(assets_path))
-    e.tags = {"string_tag": "test", "number_tag": 123}
+
     # define paths to model and extra assets folder container more common assets
     model_path = os.path.join(COMMON_INPUT_PATH, "python", "model.py")
 

@@ -53,6 +53,7 @@ class TestEntity(ITestWithPersistence):
         c = IEntity()
         c.tags = {"a": 2}
         self.assertNotEqual(a, c)
+
         b = IEntity()
         b.tags = {"a": 1}
 
