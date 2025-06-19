@@ -22,7 +22,6 @@ from idmtools.builders import ArmSimulationBuilder, ArmType, SimulationBuilder, 
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.command_task import CommandTask
-from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools.utils.entities import save_id_as_file_as_hook

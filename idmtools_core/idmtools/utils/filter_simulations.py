@@ -1,13 +1,13 @@
 """
 Filtering utility.
 
-Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+Copyright 2025, Gates Foundation. All rights reserved.
 """
 from uuid import UUID
 from idmtools.core import ItemType, EntityStatus
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities.iplatform import IPlatform
-from idmtools.utils.general import parse_value_tags
+from idmtools.utils.general import parse_value_tags, TagValue
 
 
 class FilterItem:
@@ -18,28 +18,37 @@ class FilterItem:
     @staticmethod
     def filter_item(platform: IPlatform, item: IEntity, skip_sims=None, max_simulations: int = None, entity_type: bool = False, **kwargs):
         """
-        Filter simulations from Experiment or Suite, by default it filter status with Succeeded.
+        Filter simulations from an Experiment or Suite using tag and status criteria.
 
-        If user wants to filter by other status, it also can be done, for example:
+        By default, this filters simulations that have a status of `EntityStatus.SUCCEEDED`.
+        Additional filtering can be applied by specifying tag values or tag-based conditions.
 
-        .. code-block:: python
+        This method supports:
+            - Skipping specific simulations by ID
+            - Filtering based on simulation status (e.g., FAILED, SUCCEEDED)
+            - Tag-based filtering (both exact match and conditional/lambda-based)
 
-                filter_item(platform, exp, status=EntityStatus.FAILED
-
-        If user wants to filter by tags, it also can be done, for example:
-
-        .. code-block:: python
-
-                filter_item(platform, exp, tags={'Run_Number': '2'})
+        Examples:
+            >>> filter_item(platform, experiment, status=EntityStatus.FAILED)
+            >>> filter_item(platform, experiment, tags={"Run_Number": "2"})
+            >>> filter_item(platform, experiment, tags={"Run_Number": lambda v: 2 <= v <= 10})
+            >>> filter_item(platform, experiment, tags={"Coverage": 0.8}, max_simulations=10)
 
         Args:
-            platform: Platform item
-            item: Item to filter
-            skip_sims: list of sim ids
-            max_simulations: Total simulations
-            kwargs: extra filters
+            platform (IPlatform): The platform instance to query simulations from.
+            item (IEntity): An Experiment or Suite to filter simulations from.
+            skip_sims (list, optional): A list of simulation IDs (as strings) to exclude from the results.
+            max_simulations (int, optional): Maximum number of simulations to return. Returns all if not set.
+            entity_type (bool, optional): If True, return simulation entities instead of just their IDs.
+            **kwargs:
+                - status (EntityStatus): The status to filter by (default is SUCCEEDED).
+                - tags (dict): A dictionary of tag key-value pairs to filter by. Values may be:
+                    * A fixed value (e.g., {"Run_Number": 2})
+                    * A lambda or callable function for conditional logic
+                      (e.g., {"Run_Number": lambda v: 2 <= v <= 10})
 
-        Returns: list of simulation ids
+        Returns:
+            list: A list of simulation IDs or simulation entities (if entity_type=True).
         """
         if skip_sims is None:
             skip_sims = []
@@ -57,14 +66,24 @@ class FilterItem:
             # If no tags are provided, treat it as an empty filter (match all)
             if tags is None:
                 tags = {}
-            # Iterate over each expected tag key-value pair
-            sim_tags = parse_value_tags(sim.tags)
-            for k, v in tags.items():
-                # If the simulation does not have the key or the value does not match, it's not a match
-                if k not in sim_tags or sim_tags[k] != v:
-                    return False  # One mismatch is enough to reject the simulation
+            # Normalize simulation tag values and wrap them with TagValue for safe comparisons
+            # (e.g., allows "5" == 5 and supports operators like >, <, == in tag filters)
+            sim_tags = {k: TagValue(v) for k, v in parse_value_tags(sim.tags).items()}
 
-            # All provided tags matched successfully
+            # Iterate over each tag filter condition
+            for k, v in tags.items():
+                sim_val = sim_tags.get(k)
+                # If the simulation does not have the tag, skip it
+                if sim_val is None:
+                    return False
+                # If the filter value is a callable (e.g., lambda), evaluate the condition
+                if callable(v):
+                    if not v(sim_val):
+                        return False
+                # Otherwise, do a direct comparison between the simulation tag and expected value
+                elif sim_val != v:
+                    return False
+
             return True
 
         if item.item_type not in [ItemType.EXPERIMENT, ItemType.SUITE]:
@@ -78,7 +97,7 @@ class FilterItem:
         sims_status_filtered = [sim for sim in potential_sims if sim.status == status]
 
         # filter tags
-        tags = parse_value_tags(kwargs.get("tags", {}))
+        tags = kwargs.get("tags", {})
         sims_tags_filtered = [sim for sim in sims_status_filtered if match_tags(sim, tags)]
 
         # filter sims

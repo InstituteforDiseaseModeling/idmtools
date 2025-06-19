@@ -12,7 +12,6 @@ from idmtools.entities import Suite
 from idmtools.entities.simulation import Simulation
 from idmtools_test.utils.common_experiments import \
     wait_on_experiment_and_check_all_sim_status, get_model1_templated_experiment
-from idmtools_test.utils.utils import get_case_name
 
 sys.path.insert(0, os.path.dirname(__file__))
 
@@ -27,7 +26,7 @@ class TestSimulationsWithTags(unittest.TestCase):
 
     def create_experiment(self):
         with tempfile.TemporaryDirectory() as temp_dir:
-            exp = get_model1_templated_experiment(self.case_name)
+            exp = get_model1_templated_experiment("test_filter_by_tags")
 
             def param_update_ab(simulation, param, value):
                 # Set B within
@@ -45,12 +44,33 @@ class TestSimulationsWithTags(unittest.TestCase):
             wait_on_experiment_and_check_all_sim_status(self, exp)
             return exp
 
-    def setUp(self) -> None:
-        self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
-        print(self.case_name)
-        self.platform = Platform('SlurmStage')
-        self.exp = self.create_experiment()
-        # self.exp = self.platform.get_item("ee06d44f-d24c-f011-9311-f0921c167864", item_type=ItemType.EXPERIMENT)
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.platform = Platform('SlurmStage')
+        cls.exp = cls.create_experiment(cls)
+
+    def test_tag_filter_with_range(self):
+        experiment = self.platform.get_item("d9cb76d9-e9e6-ee11-9301-f0921c167864", ItemType.EXPERIMENT)
+        filter_simulation_ids = experiment.simulations_with_tags(
+            tags={"__sample_index__": lambda v: 4 <= v <= 10, "Reporting_Rate": 0.4})
+        filter_simulation_ids1 = experiment.simulations_with_tags(
+            tags={"__sample_index__": lambda v: 4 <= v <= 10, "Reporting_Rate": 0.4})
+        self.assertEqual(len(filter_simulation_ids), 7)
+        self.assertEqual(len(filter_simulation_ids1), 7)
+
+        filter_simulation_ids2 = experiment.simulations_with_tags(
+            tags={"__sample_index__": lambda v: 1 <= v <= "10", "Typhoid_Environmental_Exposure_Rate": lambda v: v >= 0.4})
+        self.assertEqual(len(filter_simulation_ids2), 2)
+
+        # Below call with entity_type=True will return matched simulation objects. Total count should be the same as above cases
+        filter_simulations = experiment.simulations_with_tags(
+            tags={"__sample_index__": lambda v: 4 <= v <= "10", "Reporting_Rate": "0.4"}, entity_type=True)
+        count = 0
+        for sim in filter_simulations:
+            self.assertTrue(isinstance(sim, Simulation))
+            count += 1
+            print(sim.tags)
+        self.assertEqual(len(filter_simulations), 7)
 
     def test_suite_sim_tags_by_id(self):
         experiment = self.exp
