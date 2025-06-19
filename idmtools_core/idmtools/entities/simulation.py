@@ -120,7 +120,6 @@ class Simulation(IAssetsEnabled, INamedEntity):
             if logger.isEnabledFor(DEBUG):
                 logger.debug(f'Setting Simulation Tag "task_type" to "{tn}"')
             self.tags["task_type"] = tn
-            print("something")
 
     def post_creation(self, platform: 'IPlatform') -> None:
         """
