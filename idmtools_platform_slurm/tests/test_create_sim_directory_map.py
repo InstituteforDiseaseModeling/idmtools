@@ -37,7 +37,7 @@ class TestCreateSimDirectoryMap(ITestWithPersistence):
         builder = SimulationBuilder()
         builder.add_sweep_definition(setA, range(0, 2))
         ts.add_builder(builder)
-        exp = Experiment(name=self.case_name, simulations=ts, tags=dict(number_tag=123, KeyOnly=None))
+        exp = Experiment(name=self.case_name, simulations=ts, _tags=dict(number_tag=123, KeyOnly=None))
         suite = add_dummy_suite(exp)
         suite.run(platform=platform, wait_until_done=False, dry_run=True)
         return suite, exp
