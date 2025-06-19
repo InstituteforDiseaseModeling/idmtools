@@ -13,7 +13,6 @@ from idmtools.core import EntityStatus, ItemType, NoPlatformException
 from idmtools.core.interfaces.iitem import IItem
 from idmtools.core.id_file import read_id_file, write_id_file
 from idmtools.services.platforms import PlatformPersistService
-from idmtools.utils.general import parse_value_tags
 
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
@@ -381,7 +380,7 @@ class IEntity(IItem, metaclass=ABCMeta):
 
             # Safely retrieve tags
             tags = getattr(platform_obj, 'tags', {}) or {}
-            return parse_value_tags(tags)
+            return tags
 
         except Exception as e:
             # Optional: log or debug

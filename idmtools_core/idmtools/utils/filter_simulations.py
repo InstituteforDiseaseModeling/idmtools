@@ -7,6 +7,7 @@ from uuid import UUID
 from idmtools.core import ItemType, EntityStatus
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities.iplatform import IPlatform
+from idmtools.utils.general import parse_value_tags
 
 
 class FilterItem:
@@ -49,16 +50,21 @@ class FilterItem:
 
             Args:
                 sim: simulation
-                tags: tags
+                tags: search tags
 
             Returns: bool True/False
             """
+            # If no tags are provided, treat it as an empty filter (match all)
             if tags is None:
                 tags = {}
+            # Iterate over each expected tag key-value pair
+            sim_tags = parse_value_tags(sim.tags)
             for k, v in tags.items():
-                if k not in sim.tags or sim.tags[k] != v:
-                    return False
+                # If the simulation does not have the key or the value does not match, it's not a match
+                if k not in sim_tags or sim_tags[k] != v:
+                    return False  # One mismatch is enough to reject the simulation
 
+            # All provided tags matched successfully
             return True
 
         if item.item_type not in [ItemType.EXPERIMENT, ItemType.SUITE]:
@@ -72,7 +78,7 @@ class FilterItem:
         sims_status_filtered = [sim for sim in potential_sims if sim.status == status]
 
         # filter tags
-        tags = kwargs.get("tags", {})
+        tags = parse_value_tags(kwargs.get("tags", {}))
         sims_tags_filtered = [sim for sim in sims_status_filtered if match_tags(sim, tags)]
 
         # filter sims

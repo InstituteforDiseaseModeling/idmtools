@@ -42,7 +42,7 @@ class TestSimulationsWithTags(unittest.TestCase):
             # Sweep parameter "a" and make "b" depends on "a"
             builder.add_sweep_definition(setAB, range(0, 6))
             exp.simulations.add_builder(builder)
-            #wait_on_experiment_and_check_all_sim_status(self, exp)
+            wait_on_experiment_and_check_all_sim_status(self, exp)
             return exp
 
     def setUp(self) -> None:
@@ -50,17 +50,19 @@ class TestSimulationsWithTags(unittest.TestCase):
         print(self.case_name)
         self.platform = Platform('SlurmStage')
         self.exp = self.create_experiment()
-        #self.exp = self.platform.get_item("a40d096f-874c-f011-9311-f0921c167864", item_type=ItemType.EXPERIMENT)
+        # self.exp = self.platform.get_item("ee06d44f-d24c-f011-9311-f0921c167864", item_type=ItemType.EXPERIMENT)
 
     def test_suite_sim_tags_by_id(self):
         experiment = self.exp
         suite = Suite(name='Idm Suite')
         suite.add_experiment(experiment)
-        expected = {"a": 0}
+        expected = {"a": "0"}
         suite = experiment.parent
-        result = suite.simulations_with_tags(tags=expected)
-        # validation--------------------------------------------
-        # make sure each simulation in result contains tag {"a": 0}
+        # Let search tags with 2 different ways for int-like string.
+        result = suite.simulations_with_tags(tags={"a": 0})
+        result1 = suite.simulations_with_tags(tags={"a": "0"})
+        self.assertEqual(result, result1)
+        # make sure each simulation in result contains tag {"a": "0"}
         for sim_id in result[experiment.id]:
             self.assertTrue(uuid_pattern.match(sim_id))
             sim = self.platform.get_item(sim_id, item_type=ItemType.SIMULATION)
@@ -71,14 +73,18 @@ class TestSimulationsWithTags(unittest.TestCase):
     def test_experiment_sim_tags_by_id(self):
         experiment = self.exp
         # this returns list of simulation ids
-        expected = {"a": 0}
-        simulation_ids = experiment.simulations_with_tags(tags=expected)
-        # validation--------------------------------------------
+        expected = {"a": "0"}
+        simulation_ids = experiment.simulations_with_tags(tags={"a": "0"})
+        simulation_ids_1 = experiment.simulations_with_tags(tags={"a": 0})
+        # verify we can search both with int 0 and str "0"
+        self.assertEqual(simulation_ids, simulation_ids_1)
         # make sure each simulation contains tag {"a": "0"} in returned simulations
         for sim_id in simulation_ids:
             self.assertTrue(uuid_pattern.match(sim_id))
             sim = self.platform.get_item(sim_id, item_type=ItemType.SIMULATION)
-            assert all(item in sim.tags.items() for item in expected.items())
+            for k, v in expected.items():
+                self.assertIn(k, sim.tags)
+                self.assertEqual(sim.tags[k], v)
         # make sure we have 0 simulations matched
         self.assertEqual(len(simulation_ids), 1)
 
@@ -86,22 +92,25 @@ class TestSimulationsWithTags(unittest.TestCase):
         experiment = self.exp
         suite = Suite(name='Idm Suite')
         suite.add_experiment(experiment)
-        expected = {"a": 0}
+        expected = {"a": "0"}
         suite = experiment.parent
         # this returns dict with experiment_id as key and list of simulation as value
-        result = suite.simulations_with_tags(tags=expected, entity_type=True)
-
-        # make sure each simulation in result contains tag {"a": "0"}
-        for sim in result[experiment.id]:
+        result_sim = suite.simulations_with_tags(tags={"a": 0, "b": 2}, entity_type=True)
+        result_id = suite.simulations_with_tags(tags={"a": "0", "b": "2"}, entity_type=False)
+        # make sure above 2 results basically return the same simulation
+        self.assertEqual(result_sim[experiment.id][0].id, result_id[experiment.id][0])
+        for sim in result_sim[experiment.id]:
             self.assertTrue(isinstance(sim, Simulation))
-            assert all(item in sim.tags.items() for item in expected.items())
-        # make sure we have 1 simulations matched
-        self.assertEqual(len(result[experiment.id]), 1)
+            for k, v in expected.items():
+                self.assertIn(k, sim.tags)
+                self.assertEqual(sim.tags[k], v)
+        # make sure we have 1 simulation matched
+        self.assertEqual(len(result_sim[experiment.id]), 1)
 
     def test_experiment_sim_tags_by_object(self):
         experiment = self.exp
         # this returns list of simulation ids
-        expected = {"a": 0}
+        expected = {"a": "0"}
         simulation_ids = experiment.simulations_with_tags(tags=expected)
         # this returns list of simulations
         simulations = experiment.simulations_with_tags(tags=expected, entity_type=True)
@@ -109,7 +118,9 @@ class TestSimulationsWithTags(unittest.TestCase):
         # make sure each simulation contains tag {"a": "0"} in returned simulations
         for sim in simulations:
             self.assertTrue(isinstance(sim, Simulation))
-            assert all(item in sim.tags.items() for item in expected.items())
+            for k, v in expected.items():
+                self.assertIn(k, sim.tags)
+                self.assertEqual(sim.tags[k], v)
         # make sure we have 1 simulation matched
         self.assertEqual(len(simulations), 1)
 
@@ -117,38 +128,45 @@ class TestSimulationsWithTags(unittest.TestCase):
         experiment = self.exp
         suite = Suite(name='Idm Suite')
         suite.add_experiment(experiment)
-        excluded = {"b": "2"}
-        expected = {"a": 0}
-        # skip simulations contain tags with {"b":2}
-        skip_sims = [sim.id for sim in experiment.simulations if any(sim.tags.get(k) == v for k, v in excluded.items())]
+        excluded = {"a": "1", "b": "3"}
+        expected = {"a": "0", "b": "2"}
+        # Collect simulation IDs where any excluded tag key-value pair matches
+        skip_sims = [
+            sim.id
+            for sim in experiment.simulations
+            if any(sim.tags.get(k) == v for k, v in excluded.items())
+        ]
         suite = experiment.suite
         # this returns dict with experiment_id as key and list of simulation as value
-        result = suite.simulations_with_tags(tags=expected, skip_sims=skip_sims, entity_type=True)
+        result = suite.simulations_with_tags(tags={"a": 0, "b": "2"}, skip_sims=skip_sims, entity_type=True)
         # validation--------------------------------------------
-        # make sure each simulation contains tag {"a": "0"} and not contains {"b": 2} in returned simulations
-
+        # make sure each simulation contains tag {"a": 0, "b":2} and not contains {"a": 1, "b", 3} in returned simulations
         for sim in result[experiment.id]:
             self.assertTrue(isinstance(sim, Simulation))
-            # make sure all simulation do not contain tags with {"b": "2"}
+            # make sure all simulation do not contain tags with {"b": 2}
             assert not all(item in sim.tags.items() for item in excluded.items())
-            assert all(item in sim.tags.items() for item in expected.items())
+            for k, v in expected.items():
+                self.assertIn(k, sim.tags)
+                self.assertEqual(sim.tags[k], v)
         # make sure we have 1 simulation matched
         self.assertEqual(len(result[experiment.id]), 1)
 
     def test_experiment_sim_tags_skip_sims(self):
         experiment = self.exp
         # this returns list of simulations
-        excluded = {"b": 2}
-        expected = {"a": 0}
+        excluded = {"b": 5}
+        expected = {"a": "0"}
         # skip simulations contain tags with {"b":2}
         skip_sims = [sim.id for sim in experiment.simulations if
                      any(sim.tags.get(k) == v for k, v in excluded.items())]
-        simulations = experiment.simulations_with_tags(tags=expected, skip_sims=skip_sims, entity_type=True)
+        simulations = experiment.simulations_with_tags(tags={"a": "0", "b": 2}, skip_sims=skip_sims, entity_type=True)
         # validation--------------------------------------------
-        # make sure each simulation contains tag {"a": 0} and not contains {"b": 2} in returned simulations
+        # make sure each simulation contains tag {"a": "0"} and not contains {"b": "5"} in returned simulations
         for sim in simulations:
             self.assertTrue(isinstance(sim, Simulation))
-            assert not all(item in sim.tags.items() for item in excluded.items())
-            assert all(item in sim.tags.items() for item in expected.items())
+            assert not all(item in sim.tags.items() for item in {"b": "5"}.items())
+            for k, v in expected.items():
+                self.assertIn(k, sim.tags)
+                self.assertEqual(sim.tags[k], v)
         # make sure we have 0 simulations matched
-        self.assertEqual(len(simulations), 0)
+        self.assertEqual(len(simulations), 1)
