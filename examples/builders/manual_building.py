@@ -24,7 +24,7 @@ if __name__ == "__main__":
     # create experiment  object and define some extra assets
     assets_path = os.path.join(COMMON_INPUT_PATH, "python", "Assets")
     e = Experiment(name=os.path.split(sys.argv[0])[1],
-                   tags={"string_tag": "test", "number_tag": 123},
+                   _tags={"string_tag": "test", "number_tag": 123},
                    assets=AssetCollection.from_directory(assets_path))
 
     # define paths to model and extra assets folder container more common assets

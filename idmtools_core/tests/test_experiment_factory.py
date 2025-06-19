@@ -21,7 +21,7 @@ class TestExperimentFactory(ITestWithPersistence):
 
     def test_build_python_experiment_from_factory(self):
         test_platform: TestPlatform = Platform('Test')
-        experiment = experiment_factory.create("Experiment", tags={"a": "1", "b": 2})
+        experiment = experiment_factory.create("Experiment", _tags={"a": "1", "b": 2})
         script_path = os.path.join(COMMON_INPUT_PATH, "compsplatform", "working_model.py")
         from idmtools_test.utils.test_task import TestTask
         ts = TemplatedSimulations(base_task=TestTask())
@@ -42,7 +42,7 @@ class TestExperimentFactory(ITestWithPersistence):
 
     def test_add_asset_collection_to_experiment(self):
         base_path = os.path.abspath(os.path.join(COMMON_INPUT_PATH, "assets", "collections"))
-        experiment = experiment_factory.create("Experiment", tags={"a": "1", "b": 2})
+        experiment = experiment_factory.create("Experiment", _tags={"a": "1", "b": 2})
         ac = AssetCollection.from_directory(assets_directory=base_path)
         experiment.add_assets(ac)
         for asset in ac:

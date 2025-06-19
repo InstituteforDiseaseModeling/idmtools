@@ -337,9 +337,9 @@ class TestExecutePlatformSimulationOperation(IPlatformSimulationOperations):
             sim.assets = ac
         # should we fully load the task?
         if load_task:
-            if dict_sim['tags'] and 'task_type' in dict_sim['tags']:
+            if dict_sim['_tags'] and 'task_type' in dict_sim['_tags']:
                 try:
-                    sim.task = TaskFactory().create(dict_sim['tags']['task_type'], **dict_sim['task'])
+                    sim.task = TaskFactory().create(dict_sim['_tags']['task_type'], **dict_sim['task'])
                 except Exception as e:
                     logger.exception(e)
 

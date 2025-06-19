@@ -120,6 +120,7 @@ class Simulation(IAssetsEnabled, INamedEntity):
             if logger.isEnabledFor(DEBUG):
                 logger.debug(f'Setting Simulation Tag "task_type" to "{tn}"')
             self.tags["task_type"] = tn
+            print("something")
 
     def post_creation(self, platform: 'IPlatform') -> None:
         """
@@ -176,7 +177,7 @@ class Simulation(IAssetsEnabled, INamedEntity):
         Returns:
             Simulation using the  parameters provided
         """
-        return Simulation(task=task, tags=dict() if tags is None else tags,
+        return Simulation(task=task, _tags=dict() if tags is None else tags,
                           assets=asset_collection if asset_collection else AssetCollection())
 
     def list_static_assets(self, platform: 'IPlatform' = None, **kwargs) -> List[Asset]:
@@ -207,7 +208,7 @@ class Simulation(IAssetsEnabled, INamedEntity):
         """
         result = dict()
         for f in fields(self):
-            if not f.name.startswith("_") and f.name not in ['parent']:
+            if (not f.name.startswith("_") or f.name == "_tags") and f.name not in ['parent']:
                 result[f.name] = getattr(self, f.name)
         result['_uid'] = self.uid
         result['task'] = self.task.to_dict() if self.task else None

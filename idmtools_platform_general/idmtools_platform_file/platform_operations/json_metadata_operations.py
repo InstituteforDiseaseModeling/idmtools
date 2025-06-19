@@ -90,7 +90,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         meta['uid'] = meta['_uid']
         meta['status'] = 'CREATED'
         meta['dir'] = os.path.abspath(self.platform.get_directory(item))
-        meta['tags'] = item.tags
+        meta['_tags'] = meta['_tags']
 
         if isinstance(item, Suite):
             meta['experiments'] = [experiment.id for experiment in item.experiments]

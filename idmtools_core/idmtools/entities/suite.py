@@ -119,7 +119,7 @@ class Suite(INamedEntity, ABC, IRunnableEntity):
         """
         result = dict()
         for f in fields(self):
-            if not f.name.startswith("_") and f.name not in ['parent']:
+            if (not f.name.startswith("_") or f.name == "_tags") and f.name not in ['parent']:
                 result[f.name] = getattr(self, f.name)
         result['_uid'] = self.uid
         return result
