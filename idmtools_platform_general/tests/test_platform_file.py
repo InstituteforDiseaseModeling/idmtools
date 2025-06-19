@@ -147,7 +147,7 @@ class TestFilePlatform(unittest.TestCase):
             self.assertEqual(contents['uid'], suite.id)
             self.assertEqual(contents['id'], suite.id)
             self.assertEqual(contents['parent_id'], None)
-            self.assertEqual(contents['_tags'], {'name': 'suite_tag', 'idmtools': '123'})
+            self.assertEqual(contents['tags'], {'name': 'suite_tag', 'idmtools': '123'})
             self.assertEqual(contents['item_type'], 'Suite')
 
         # verify ids in metadata.json for experiment

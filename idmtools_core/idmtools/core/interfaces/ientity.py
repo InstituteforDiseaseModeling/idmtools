@@ -36,7 +36,7 @@ class IEntity(IItem, metaclass=ABCMeta):
     #: Status of item
     status: EntityStatus = field(default=None, compare=False, metadata={"pickle_ignore": True})
     #: Tags for item
-    _tags: Dict[str, Any] = field(default_factory=lambda: {}, metadata={"md": True})
+    tags: Dict[str, Any] = field(default_factory=lambda: {}, metadata={"md": True})
     #: Item Type(Experiment, Suite, Asset, etc)
     item_type: ItemType = field(default=None, compare=False)
     #: Platform Representation of Entity
@@ -49,13 +49,7 @@ class IEntity(IItem, metaclass=ABCMeta):
         Args:
             tags: New tags
         """
-        if tags is None:
-            return
-
-        if self._tags is None:
-            self._tags = {}
-
-        self._tags.update(tags)
+        self.tags.update(tags)
 
     def post_creation(self, platform: 'IPlatform') -> None:
         """
@@ -325,17 +319,6 @@ class IEntity(IItem, metaclass=ABCMeta):
         """
         return self.get_directory()
 
-    @property
-    def tags(self) -> Dict[str, Any]:  # noqa: F811
-        """
-        Get the tags associated with the entity.
-        Returns:
-            Dict[str, Any]: The dictionary of key-value tags associated with this entity.
-        """
-        if self._tags is None:
-            self._tags = self._load_tags()
-        return self._tags
-
     def get_tags(self) -> Dict[str, Any]:
         """
         Get the tags associated with the entity (alias for the `tags` property).
@@ -344,48 +327,6 @@ class IEntity(IItem, metaclass=ABCMeta):
             Dict[str, Any]: The dictionary of tags.
         """
         return self.tags
-
-    @tags.setter
-    def tags(self, value: Dict[str, Any]):
-        """
-        Set the tags for the entity, converting any set values to lists for JSON compatibility.
-
-        Args:
-            value (Dict[str, Any]): A dictionary of key-value tags. Can be None if clearing.
-
-        Raises:
-            ValueError: If the provided value is not a dictionary or None.
-        """
-        if not isinstance(value, (dict, property)) and value is not None:
-            raise ValueError("Tags must be a dictionary.")
-        self._tags = value
-
-    def _load_tags(self) -> Dict[str, Any]:
-        """
-        Load tags from the platform representation of the object, if available.
-
-        Returns:
-            dict: Tags dictionary, or an empty dict if not found.
-        """
-        if not self.platform:
-            return {}
-
-        try:
-            # Load raw platform-side object
-            platform_obj = self.get_platform_object()
-
-            # Avoid recursive loading if platform_obj is self
-            if platform_obj is self:
-                return {}
-
-            # Safely retrieve tags
-            tags = getattr(platform_obj, 'tags', {}) or {}
-            return tags
-
-        except Exception as e:
-            # Optional: log or debug
-            logger.debug(f"Failed to load tags for {self.uid}: {e}")
-            return {}
 
 
 IEntityList = List[IEntity]

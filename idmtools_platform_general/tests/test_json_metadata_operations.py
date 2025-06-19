@@ -275,8 +275,8 @@ class JSONMetadataOperationsTest(unittest.TestCase):
     def test_filter_with_tags(self):
         _, _, simulations = self._initialize_data(self)
         # let's add tag to simulations[0] first
-        self.op.update(simulations[0], metadata={'_tags': {'mytag': 123, "test_tag": "abc"}}, replace=False)
-        self.op.update(simulations[1], metadata={'_tags': {'mytag': 345, "test_tag": "abc"}}, replace=False)
+        self.op.update(simulations[0], metadata={'tags': {'mytag': 123, "test_tag": "abc"}}, replace=False)
+        self.op.update(simulations[1], metadata={'tags': {'mytag': 345, "test_tag": "abc"}}, replace=False)
 
         properties = {'_uid': simulations[0].id}
         tags = {'mytag': 123}  # only filter one of tags
@@ -288,7 +288,7 @@ class JSONMetadataOperationsTest(unittest.TestCase):
         # make sure matched meta_data is the one with simulations[0].id
         self.assertEqual(filtered_meta_list[0]['_uid'], simulations[0].id)
         # make sure matched meta_data contains tags we added
-        self.assertEqual(filtered_meta_list[0]['_tags'], {'mytag': 123, "test_tag": "abc"})
+        self.assertEqual(filtered_meta_list[0]['tags'], {'mytag': 123, "test_tag": "abc"})
         # make sure only one matched meta_data
         self.assertEqual(len(filtered_meta_list), 1)
 
@@ -306,8 +306,8 @@ class JSONMetadataOperationsTest(unittest.TestCase):
     def test_filter_by_tags_key_only(self):
         _, _, simulations = self._initialize_data(self)
         # let's add tag to simulations[0] first
-        self.op.update(simulations[0], metadata={'_tags': {'mytag': 123}}, replace=False)
-        self.op.update(simulations[1], metadata={'_tags': {'mytag1': 123}}, replace=False)
+        self.op.update(simulations[0], metadata={'tags': {'mytag': 123}}, replace=False)
+        self.op.update(simulations[1], metadata={'tags': {'mytag1': 123}}, replace=False)
         tags = {'mytag': None}
         meta_list = []
         for exp in simulations:
@@ -316,7 +316,7 @@ class JSONMetadataOperationsTest(unittest.TestCase):
         # make sure matched meta_data is the one with simulations[0].id
         self.assertEqual(filtered_meta_list[0]['_uid'], simulations[0].id)
         # make sure matched meta_data contains tag key "mytag"
-        self.assertEqual(filtered_meta_list[0]['_tags'], {'mytag': 123})
+        self.assertEqual(filtered_meta_list[0]['tags'], {'mytag': 123})
         # make sure only one matched meta_data
         self.assertEqual(len(filtered_meta_list), 1)
 
@@ -362,9 +362,9 @@ class JSONMetadataOperationsTest(unittest.TestCase):
     def test_filter_by_key_with_none_value(self):
         _, _, simulations = self._initialize_data(self)
         # let's add tags to simulations
-        self.op.update(simulations[0], metadata={'_tags': {'mytag': None}}, replace=False)
-        self.op.update(simulations[1], metadata={'_tags': {'mytag': None}}, replace=False)
-        self.op.update(simulations[2], metadata={'_tags': {'mytag': 123}}, replace=False)
+        self.op.update(simulations[0], metadata={'tags': {'mytag': None}}, replace=False)
+        self.op.update(simulations[1], metadata={'tags': {'mytag': None}}, replace=False)
+        self.op.update(simulations[2], metadata={'tags': {'mytag': 123}}, replace=False)
         tags = {'mytag': None}
         meta_list = []
         for exp in simulations:
@@ -376,8 +376,8 @@ class JSONMetadataOperationsTest(unittest.TestCase):
         # make sure second matched meta_data is the one with simulations[1].id
         self.assertEqual(filtered_meta_list[1]['_uid'], simulations[1].id)
         # make sure matched meta_data's tags contain 'mytag' key and 'None' value
-        self.assertEqual(filtered_meta_list[0]['_tags'], {'mytag': None})
-        self.assertEqual(filtered_meta_list[1]['_tags'], {'mytag': None})
+        self.assertEqual(filtered_meta_list[0]['tags'], {'mytag': None})
+        self.assertEqual(filtered_meta_list[1]['tags'], {'mytag': None})
         # make sure only 2 matched meta_data
         self.assertEqual(len(filtered_meta_list), 2)
 

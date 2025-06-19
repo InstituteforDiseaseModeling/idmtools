@@ -451,7 +451,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
             tags = dict()
         if name is None:
             name = task.__class__.__name__
-        e = Experiment(name=name, _tags=tags, assets=AssetCollection() if assets is None else assets,
+        e = Experiment(name=name, tags=tags, assets=AssetCollection() if assets is None else assets,
                        gather_common_assets_from_task=gather_common_assets_from_task)
         e.simulations = [task]
         return e
@@ -503,7 +503,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
             tags = dict()
         if name is None:
             name = template.base_task.__class__.__name__
-        e = Experiment(name=name, _tags=tags, assets=AssetCollection() if assets is None else assets)
+        e = Experiment(name=name, tags=tags, assets=AssetCollection() if assets is None else assets)
         e.simulations = template
         return e
 
@@ -589,10 +589,9 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         for f in fields(self):
             # Include:
             # - public fields (not starting with '_')
-            # - OR specifically allow '_tags'
             # Exclude:
             # - fields named 'parent'
-            if (not f.name.startswith("_") or f.name == "_tags") and f.name != 'parent':
+            if not f.name.startswith("_") and f.name != 'parent':
                 result[f.name] = getattr(self, f.name)
 
         result['_uid'] = self.uid

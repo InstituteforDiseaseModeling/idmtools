@@ -39,7 +39,7 @@ class SimFilterAnalyzer(IAnalyzer):
         return k
 
     def filter(self, simulation):
-        return int(simulation.tags.get("b")) == 2
+        return simulation.tags.get("b") == 2
 
     def map(self, data, simulation):
         results = data[self.filenames[0]]

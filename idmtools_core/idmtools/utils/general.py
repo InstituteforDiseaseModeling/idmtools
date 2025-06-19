@@ -252,6 +252,18 @@ class FilterSafeItem:
             state.pop(key, None)
         return state
 
+    def __getattr__(self, attr):
+        """
+        Delegate access to attributes not defined on the wrapper to the wrapped item.
+
+        This makes FilterSafeItem behave like the original simulation object for all
+        standard attributes (e.g., `id`, `status`, `experiment_id`, etc.).
+
+        Returns:
+            The attribute value from the wrapped entity.
+        """
+        return getattr(self._item, attr)
+
     def __setstate__(self, state):
         """
         Restore object state after unpickling.

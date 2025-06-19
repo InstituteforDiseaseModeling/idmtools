@@ -75,7 +75,7 @@ class FileSuite(FileItem, Suite):
         self.name = metas['name']
         self.status = metas['status']
         self.__experiments: Optional[List[str, IEntity]] = metas['experiments']
-        self._tags = metas['_tags']
+        self.tags = metas['tags']
 
     @property
     def experiments(self) -> List:
@@ -163,7 +163,7 @@ class FileExperiment(FileItem, Experiment):
         self.uid = metas['id']
         self.name = metas['name']
         self._status = metas['status']
-        self._tags = metas['_tags']
+        self.tags = metas['tags']
         self.assets = metas['assets']
 
     @property
@@ -273,7 +273,7 @@ class FileSimulation(FileItem, Simulation):
         self.experiment_id = metas['parent_id']
         self.name = metas['name']
         self.status = metas['status']
-        self._tags = metas['_tags']
+        self.tags = metas['tags']
         self.task = metas['task']
         self.assets = metas['assets']
 
