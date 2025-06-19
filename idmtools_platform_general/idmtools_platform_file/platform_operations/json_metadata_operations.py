@@ -268,7 +268,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
             if property_filter:
                 is_match = self._match_filter(meta, property_filter, ignore_none=ignore_none)
             if tag_filter:
-                is_match = is_match and self._match_filter(meta['tags'], tag_filter, ignore_none=ignore_none)
+                is_match = is_match and self._match_filter(meta['_tags'], tag_filter, ignore_none=ignore_none)
             if is_match:
                 item_list.append(meta)
         return item_list
