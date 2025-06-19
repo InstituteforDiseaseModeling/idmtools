@@ -37,10 +37,6 @@ class IEntity(IItem, metaclass=ABCMeta):
     #: Status of item
     status: EntityStatus = field(default=None, compare=False, metadata={"pickle_ignore": True})
     #: Tags for item
-    # First tags is for constructor
-    #tags: Dict[str, Any] = field(default_factory=lambda: {}, metadata={"md": True})
-    #tags: InitVar[Optional[Dict[str, Any]]] = None
-    # Search tags for internal variable
     _tags: Dict[str, Any] = field(default_factory=lambda: {}, metadata={"md": True})
     #: Item Type(Experiment, Suite, Asset, etc)
     item_type: ItemType = field(default=None, compare=False)
