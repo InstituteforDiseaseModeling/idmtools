@@ -187,7 +187,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item_type]
         return getattr(self, interface).get(item_id, **kwargs)
 
-    def get_item(self, item_id: str, item_type: ItemType = None, force: bool = False, raw: bool = False,
+    def get_item(self, item_id: str, item_type: ItemType = None, force: bool = True, raw: bool = False,
                  **kwargs) -> Union[Experiment, Suite, Simulation, IWorkflowItem, AssetCollection, None]:
         """
         Retrieve an object from the platform.
@@ -303,7 +303,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         raise ValueError(f"{self.__class__.__name__} has no mapping for {item.__class__.__name__}")
 
     def get_children(self, item_id: str, item_type: ItemType,
-                     force: bool = False, raw: bool = False, item: Any = None, **kwargs) -> Any:
+                     force: bool = True, raw: bool = False, item: Any = None, **kwargs) -> Any:
         """
         Retrieve the children of a given object.
 
