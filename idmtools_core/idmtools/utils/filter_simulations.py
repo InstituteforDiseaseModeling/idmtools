@@ -3,12 +3,11 @@ Filtering utility.
 
 Copyright 2025, Gates Foundation. All rights reserved.
 """
-from uuid import UUID
 from idmtools.core import ItemType, EntityStatus
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform import IPlatform
-from idmtools.utils.general import parse_value_tags, TagValue
+from idmtools.utils.general import parse_value_tags
 
 
 class FilterItem:
@@ -119,7 +118,8 @@ class FilterItem:
 
     @classmethod
     def filter_item_by_id(cls, platform: IPlatform, item_id: str, item_type: ItemType = ItemType.EXPERIMENT,
-                          tags=None, skip_sims=None, max_simulations: int = None, entity_type = False, status=None, **kwargs):
+                          tags=None, skip_sims=None, max_simulations: int = None, entity_type=False, status=None,
+                          **kwargs):
         """
         Retrieve and filter simulations from an Experiment or Suite by item ID.
 
