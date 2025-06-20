@@ -1069,12 +1069,12 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         """
         Filter simulations associated with a given Experiment or Suite using tag-based conditions.
 
-        This method is a platform-level convenience wrapper that delegates filtering logic to
-        the `simulations_with_tags` method on the retrieved item. It supports:
-            - Exact tag value matching
-            - Callable filters for flexible conditions (e.g., lambda expressions)
-            - Optionally limiting the number of returned simulations
-            - Returning either simulation entities or just their IDs
+        This method is a platform-level convenience wrapper that delegates filtering logic to the
+        `simulations_with_tags` method on the retrieved item. It supports:
+        - Exact tag value matching
+        - Callable filters for flexible conditions (e.g., lambda expressions)
+        - Optionally limiting the number of returned simulations
+        - Returning either simulation entities or just their IDs
 
         Args:
             item_id (str): The unique ID of the Experiment or Suite.
