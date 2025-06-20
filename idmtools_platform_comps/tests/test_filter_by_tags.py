@@ -42,12 +42,16 @@ class TestSimulationsWithTags(unittest.TestCase):
             builder.add_sweep_definition(setAB, range(0, 6))
             exp.simulations.add_builder(builder)
             wait_on_experiment_and_check_all_sim_status(self, exp)
+            # exp = self.platform.get_item("0f8ccd95-104e-f011-9311-f0921c167864", item_type=ItemType.EXPERIMENT)
             return exp
 
     @classmethod
     def setUpClass(cls) -> None:
         cls.platform = Platform('SlurmStage')
         cls.exp = cls.create_experiment(cls)
+
+    def setUp(self):
+        self.experiment = self.platform.get_item(self.exp.id, item_type=ItemType.EXPERIMENT, force=True)
 
     def test_tag_filter_with_range(self):
         experiment = self.platform.get_item("d9cb76d9-e9e6-ee11-9301-f0921c167864", ItemType.EXPERIMENT)
@@ -73,7 +77,7 @@ class TestSimulationsWithTags(unittest.TestCase):
         self.assertEqual(len(filter_simulations), 7)
 
     def test_suite_sim_tags_by_id(self):
-        experiment = self.exp
+        experiment = self.experiment
         suite = Suite(name='Idm Suite')
         suite.add_experiment(experiment)
         expected = {"a": "0"}
@@ -91,7 +95,7 @@ class TestSimulationsWithTags(unittest.TestCase):
         self.assertEqual(len(result[experiment.id]), 1)
 
     def test_experiment_sim_tags_by_id(self):
-        experiment = self.exp
+        experiment = self.experiment
         # this returns list of simulation ids
         expected = {"a": "0"}
         simulation_ids = experiment.simulations_with_tags(tags={"a": "0"})
@@ -109,7 +113,7 @@ class TestSimulationsWithTags(unittest.TestCase):
         self.assertEqual(len(simulation_ids), 1)
 
     def test_suite_sim_tags_by_object(self):
-        experiment = self.exp
+        experiment = self.experiment
         suite = Suite(name='Idm Suite')
         suite.add_experiment(experiment)
         expected = {"a": "0"}
@@ -128,7 +132,7 @@ class TestSimulationsWithTags(unittest.TestCase):
         self.assertEqual(len(result_sim[experiment.id]), 1)
 
     def test_experiment_sim_tags_by_object(self):
-        experiment = self.exp
+        experiment = self.experiment
         # this returns list of simulation ids
         expected = {"a": "0"}
         simulation_ids = experiment.simulations_with_tags(tags=expected)
@@ -145,7 +149,7 @@ class TestSimulationsWithTags(unittest.TestCase):
         self.assertEqual(len(simulations), 1)
 
     def test_suite_sim_tags_skip_sims(self):
-        experiment = self.exp
+        experiment = self.experiment
         suite = Suite(name='Idm Suite')
         suite.add_experiment(experiment)
         excluded = {"a": "1", "b": "3"}
@@ -172,7 +176,7 @@ class TestSimulationsWithTags(unittest.TestCase):
         self.assertEqual(len(result[experiment.id]), 1)
 
     def test_experiment_sim_tags_skip_sims(self):
-        experiment = self.exp
+        experiment = self.experiment
         # this returns list of simulations
         excluded = {"b": 5}
         expected = {"a": "0"}
