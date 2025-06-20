@@ -26,7 +26,7 @@ class Suite(INamedEntity, ABC, IRunnableEntity):
     Args:
         experiments: The child items of this suite.
     """
-    _experiments: EntityContainer = field(
+    experiments: EntityContainer = field(
         default_factory=lambda: EntityContainer(),
         compare=False,
         metadata={"pickle_ignore": True}
@@ -42,7 +42,7 @@ class Suite(INamedEntity, ABC, IRunnableEntity):
         Args:
             experiment: the experiment to be linked to suite
         """
-        ids = [exp.uid for exp in self._experiments or []]
+        ids = [exp.uid for exp in self.experiments]
         if experiment.uid in ids:
             return
 
@@ -87,8 +87,7 @@ class Suite(INamedEntity, ABC, IRunnableEntity):
         """
         String representation of suite.
         """
-        num_experiments = len(self._experiments or [])
-        return f"<Suite {self.uid} - {num_experiments} experiments>"
+        return f"<Suite {self.uid} - {len(self.experiments)} experiments>"
 
     @property
     def done(self):
@@ -124,37 +123,13 @@ class Suite(INamedEntity, ABC, IRunnableEntity):
         result['_uid'] = self.uid
         return result
 
-    @property
-    def experiments(self) -> EntityContainer:
-        """
-        Access the list of experiments in this suite.
-
-        If experiments are not yet loaded, it will fetch them from the platform.
-
-        Returns:
-            EntityContainer: A container of Experiment objects.
-        """
-        return self.get_experiments()
-
-    @experiments.setter
-    def experiments(self, value):
-        """
-        Set the list of experiments for the suite.
-        Args:
-            value (EntityContainer): The list of experiments to assign.
-        """
-        self._experiments = value
-
     def get_experiments(self) -> EntityContainer:
         """
         Retrieve the experiments associated with this suite from the platform.
         Returns:
             EntityContainer: A container of Experiment objects belonging to this suite.
         """
-        if self._experiments:
-            return self._experiments
-        else:
-            return self.platform.get_children(self.id, item_type=ItemType.SUITE, force=True)
+        return self.experiments
 
     def simulations_with_tags(self, tags=None, skip_sims=None, max_simulations=None, entity_type=False, **kwargs) -> \
             Dict[str, List[str]]:

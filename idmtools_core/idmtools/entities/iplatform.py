@@ -1093,7 +1093,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
                 - A list of simulation IDs (default),
                 - Or a list/dictionary of Simulation objects if `entity_type=True`.
         """
-        item = self.get_item(item_id, item_type)
+        item = self.get_item(item_id, item_type, force=True)
         return item.simulations_with_tags(tags=tags, skip_sims=skip_sims, max_simulations=max_simulations,
                                           entity_type=entity_type, **kwargs)
 

@@ -63,7 +63,7 @@ Suite-level Filtering
 """
 
 # Load suite and filter simulations across its experiments
-suite = platform.get_item("5230d6ef-9144-ef11-aa15-9440c9be2c51", item_type=ItemType.SUITE)
+suite = platform.get_item("5230d6ef-9144-ef11-aa15-9440c9be2c51", item_type=ItemType.SUITE, force=True)
 filter_suite_simulations = suite.simulations_with_tags(
     tags={"__sample_index__": lambda v: "2" <= v <= 10, "Reporting_Rate": 0.01},
     entity_type=True)

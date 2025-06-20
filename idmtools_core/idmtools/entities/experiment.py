@@ -218,12 +218,12 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         """
         if parent is not None:
             try:
-                experiments = getattr(parent, "_experiments", None)
+                experiments = getattr(parent, "experiments", None)
             except AttributeError:
                 experiments = None
 
             if experiments is None:
-                parent._experiments = [self]
+                parent.experiments = [self]
             elif self not in experiments:  # Avoid duplicate
                 experiments.append(self)
         IEntity.parent.__set__(self, parent)
@@ -591,7 +591,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
             # - public fields (not starting with '_')
             # Exclude:
             # - fields named 'parent'
-            if not f.name.startswith("_") and f.name != 'parent':
+            if not f.name.startswith("_") and f.name not in ['parent']:
                 result[f.name] = getattr(self, f.name)
 
         result['_uid'] = self.uid
