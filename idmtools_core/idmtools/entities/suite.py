@@ -134,7 +134,7 @@ class Suite(INamedEntity, ABC, IRunnableEntity):
         Returns:
             EntityContainer: A container of Experiment objects.
         """
-        return self._experiments
+        return self.get_experiments()
 
     @experiments.setter
     def experiments(self, value):
@@ -145,13 +145,16 @@ class Suite(INamedEntity, ABC, IRunnableEntity):
         """
         self._experiments = value
 
-    def get_experiments(self):
+    def get_experiments(self) -> EntityContainer:
         """
         Retrieve the experiments associated with this suite from the platform.
         Returns:
             EntityContainer: A container of Experiment objects belonging to this suite.
         """
-        return self._experiments
+        if self._experiments:
+            return self._experiments
+        else:
+            return self.platform.get_children(self.id, item_type=ItemType.SUITE, force=True)
 
     def simulations_with_tags(self, tags=None, skip_sims=None, max_simulations=None, entity_type=False, **kwargs) -> \
             Dict[str, List[str]]:

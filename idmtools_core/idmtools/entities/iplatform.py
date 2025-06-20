@@ -1064,6 +1064,39 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             file_name = f'{exp_id}.csv'
         df.to_csv(os.path.join(output, file_name), header=save_header, index=False)
 
+    def filter_simulations_by_tags(self, item_id: str, item_type: ItemType, tags: Dict = None, skip_sims=None,
+                                   max_simulations=None, entity_type=False, **kwargs):
+        """
+        Filter simulations associated with a given Experiment or Suite using tag-based conditions.
+
+        This method is a platform-level convenience wrapper that delegates filtering logic to
+        the `simulations_with_tags` method on the retrieved item. It supports:
+            - Exact tag value matching
+            - Callable filters for flexible conditions (e.g., lambda expressions)
+            - Optionally limiting the number of returned simulations
+            - Returning either simulation entities or just their IDs
+
+        Args:
+            item_id (str): The unique ID of the Experiment or Suite.
+            item_type (ItemType): The type of the item (ItemType.EXPERIMENT or ItemType.SUITE).
+            tags (Dict, optional): Dictionary of tag filters to apply. Values can be:
+                - Exact values (e.g., {"Coverage": 0.8})
+                - Callable functions (e.g., {"Run_Number": lambda v: 0 <= v <= 10})
+                - Ellipsis (...) or None to match presence of key only.
+            skip_sims (list, optional): A list of simulation IDs to exclude from the results.
+            max_simulations (int, optional): Maximum number of simulations to return.
+            entity_type (bool, optional): If True, return full simulation entities; otherwise, return simulation IDs.
+            **kwargs: Additional keyword arguments passed to the item's `simulations_with_tags` method.
+
+        Returns:
+            Union[List[str], List[Simulation], Dict[str, List[Simulation]]]:
+                - A list of simulation IDs (default),
+                - Or a list/dictionary of Simulation objects if `entity_type=True`.
+        """
+        item = self.get_item(item_id, item_type)
+        return item.simulations_with_tags(tags=tags, skip_sims=skip_sims, max_simulations=max_simulations,
+                                          entity_type=entity_type, **kwargs)
+
 
 TPlatform = TypeVar("TPlatform", bound=IPlatform)
 TPlatformClass = Type[TPlatform]
