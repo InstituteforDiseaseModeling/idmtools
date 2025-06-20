@@ -258,6 +258,7 @@ class FilterSafeItem:
 
         This makes FilterSafeItem behave like the original simulation object for all
         standard attributes (e.g., `id`, `status`, `experiment_id`, etc.).
+        This function makes simulation._item.id = simulation.id the same in filter function.
 
         Returns:
             The attribute value from the wrapped entity.
@@ -282,4 +283,4 @@ class FilterSafeItem:
             Dict[str, TagValue]: Dictionary of tags wrapped with TagValue.
         """
         tag = parse_value_tags(self._item.tags)
-        return {k: TagValue(v) for k, v in tag.items()}
+        return {k: v for k, v in tag.items()}
