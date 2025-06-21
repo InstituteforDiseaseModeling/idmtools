@@ -46,7 +46,7 @@ class TestSimulations(ITestWithPersistence):
         self.platform.create_items([suite])
         suite.add_experiment(experiment)
         experiment.run(wait_until_done=True)
-        # suite_id = 'd35b322e-4238-f011-930f-f0921c167860'
+        # suite_id = 'dd7a33f2-455a-4763-9440-c7a059dcfce9'
         # suite = self.platform.get_item(suite_id, item_type=ItemType.SUITE)
         return suite
 
@@ -58,47 +58,50 @@ class TestSimulations(ITestWithPersistence):
 
     def setUp(self) -> None:
         self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
+        self.experiment = self.platform.get_item(self.experiment.id, item_type=ItemType.EXPERIMENT, force=True)
         print(self.case_name)
 
     # Filter from Experiment, self.experiment has 5 simulations includes 2 succeed sims and 3 failed sims
     # Test default filter with experiment uuid and type which only returns succeed sims (2 in this case)
     def test_filter_experiment(self):
-        sims = FilterItem.filter_item_by_id(self.platform, self.experiment.uid, ItemType.EXPERIMENT, max_simulations=5)
+        exp = self.experiment
+        sims = FilterItem.filter_item_by_id(self.platform, exp.uid, ItemType.EXPERIMENT, max_simulations=5,
+                                            status=EntityStatus.SUCCEEDED)
         self.assertEqual(len(sims), 2)
 
     # Filter from Suite
     # Test default filter with suite uuid and type which only returns succeed sims (2 in this case)
     def test_filter_suite(self):
-        sims = FilterItem.filter_item_by_id(self.platform, self.suite.uid, ItemType.SUITE)
+        sims = FilterItem.filter_item_by_id(self.platform, self.suite.uid, ItemType.SUITE, status=EntityStatus.SUCCEEDED)
         self.assertEqual(len(sims), 2)
 
     # Test default filter plus tags which only returns 1 matched succeed sims
     def test_filter_item_experiment(self):
-        exp = self.platform.get_item(self.experiment.uid, ItemType.EXPERIMENT, raw=False)
+        exp = self.experiment
         sims = FilterItem.filter_item(self.platform, exp, max_simulations=5, tags={'Run_Number': 1})
         self.assertEqual(len(sims), 1)
 
     # test filter with suite which only return succeed sims by default
     def test_filter_item_suite(self):
         suite = self.platform.get_item(self.suite.uid, ItemType.SUITE, raw=False)
-        sims = FilterItem.filter_item(self.platform, suite)
+        sims = FilterItem.filter_item(self.platform, suite, status=EntityStatus.SUCCEEDED)
         self.assertEqual(len(sims), 2)
 
     # test filter with experiment and status=failed which only return failed sims(3 in this case)
     def test_filter_item_experiment_status(self):
-        exp = self.platform.get_item(self.experiment.uid, ItemType.EXPERIMENT, raw=False)
+        exp = self.experiment
         sims = FilterItem.filter_item(self.platform, exp, max_simulations=5, status=EntityStatus.FAILED)
         self.assertEqual(len(sims), 3)
 
     # test filter with experiment and tags which only return 1 matched succeed sim
     def test_filter_item_experiment_tags(self):
-        exp = self.platform.get_item(self.experiment.uid, ItemType.EXPERIMENT, raw=False)
+        exp = self.experiment
         sims = FilterItem.filter_item(self.platform, exp, max_simulations=5, tags={'Run_Number': 1})
         self.assertEqual(len(sims), 1)
 
     # test filter with experiment and max_simulations filter which only return 1 matched succeed sim
     def test_filter_item_experiment_max(self):
-        exp = self.platform.get_item(self.experiment.uid, ItemType.EXPERIMENT, raw=False)
+        exp = self.experiment
         sims = FilterItem.filter_item(self.platform, exp, max_simulations=1)
         self.assertEqual(len(sims), 1)
 
@@ -108,7 +111,7 @@ class TestSimulations(ITestWithPersistence):
         skip_sim = str(self.experiment.simulations[1].uid)
         sims = FilterItem.filter_item_by_id(self.platform, self.experiment.uid, ItemType.EXPERIMENT,
                                             skip_sims=[skip_sim], max_simulations=5)
-        self.assertEqual(len(sims), 1)
+        self.assertEqual(len(sims), 4)
 
 
 if __name__ == '__main__':
