@@ -84,7 +84,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     """
     #: Maps the platform types to idmtools types
     platform_type_map: Dict[Type, ItemType] = field(default=None, repr=False, init=False)
-    _object_cache_expiration: 'int' = field(default=60, repr=False, init=False)
+    _object_cache_expiration: 'int' = field(default=10, repr=False, init=False)
 
     supported_types: Set[ItemType] = field(default_factory=lambda: set(), repr=False, init=False)
     _platform_supports: List[PlatformRequirements] = field(default_factory=list, repr=False, init=False)
