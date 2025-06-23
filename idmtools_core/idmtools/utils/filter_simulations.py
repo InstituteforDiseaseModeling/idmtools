@@ -40,9 +40,9 @@ class FilterItem:
             platform (IPlatform): The platform instance to query simulations from.
             item (IEntity): An Experiment or Suite to filter simulations from.
             tags (dict): A dictionary of tag key-value pairs to filter by for a simulation. Values may be:
-                    * A fixed value (e.g., {"Run_Number": 2})
-                    * A lambda or callable function for conditional logic
-                      (e.g., {"Run_Number": lambda v: 2 <= v <= 10})
+                * A fixed value (e.g., {"Run_Number": 2})
+                * A lambda or callable function for conditional logic
+                (e.g., {"Run_Number": lambda v: 2 <= v <= 10})
             status (EntityStatus, Optional): The experiment's status.
             entity_type (bool, optional): If True, return simulation entities instead of just their IDs.
             skip_sims (list, optional): A list of simulation IDs (as strings) to exclude from the results.
