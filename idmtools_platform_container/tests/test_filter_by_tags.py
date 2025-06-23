@@ -27,7 +27,7 @@ class TestSimulationsWithTags(unittest.TestCase):
         experiment = create_experiment()
         suite = experiment.suite
         # this returns dict with experiment_id as key and list of simulation ids as value
-        result = suite.simulations_with_tags(tags={"a": 0})
+        result = suite.get_simulations_by_tags(tags={"a": 0})
         # validation--------------------------------------------
         expected = {"a": 0}
         # make sure each simulation in result contains tag {"a": 0}
@@ -42,7 +42,7 @@ class TestSimulationsWithTags(unittest.TestCase):
         sys.path.insert(0, os.path.dirname(__file__))
         experiment = create_experiment()
         # this returns list of simulation ids
-        simulation_ids = experiment.simulations_with_tags(tags={"a": 0})
+        simulation_ids = experiment.get_simulations_by_tags(tags={"a": 0})
         # validation--------------------------------------------
         expected = {"a": 0}
         # make sure each simulation contains tag {"a": 0} in returned simulations
@@ -58,7 +58,7 @@ class TestSimulationsWithTags(unittest.TestCase):
         experiment = create_experiment()
         suite = experiment.suite
         # this returns dict with experiment_id as key and list of simulation as value
-        result = suite.simulations_with_tags(tags={"a": 0}, entity_type=True)
+        result = suite.get_simulations_by_tags(tags={"a": 0}, entity_type=True)
         expected = {"a": 0}
         # make sure each simulation in result contains tag {"a": 0}
         for sim in result[experiment.id]:
@@ -71,7 +71,7 @@ class TestSimulationsWithTags(unittest.TestCase):
         sys.path.insert(0, os.path.dirname(__file__))
         experiment = create_experiment()
         # this returns list of simulations
-        simulations = experiment.simulations_with_tags(tags={"a": 0}, entity_type=True)
+        simulations = experiment.get_simulations_by_tags(tags={"a": 0}, entity_type=True)
         # validation--------------------------------------------
         expected = {"a": 0}
         # make sure each simulation contains tag {"a": 0} in returned simulations
@@ -89,7 +89,7 @@ class TestSimulationsWithTags(unittest.TestCase):
         skip_sims = [sim.id for sim in experiment.simulations if any(sim.tags.get(k) == v for k, v in excluded.items())]
         suite = experiment.suite
         # this returns dict with experiment_id as key and list of simulation as value
-        result = suite.simulations_with_tags(tags={"a": 0}, skip_sims=skip_sims, entity_type=True)
+        result = suite.get_simulations_by_tags(tags={"a": 0}, skip_sims=skip_sims, entity_type=True)
         # validation--------------------------------------------
         # make sure each simulation contains tag {"a": 0} and not contains {"b": 0} in returned simulations
         expected = {"a": 0}
@@ -109,7 +109,7 @@ class TestSimulationsWithTags(unittest.TestCase):
         # skip simulations contain tags with {"b":0}
         skip_sims = [sim.id for sim in experiment.simulations if
                      any(sim.tags.get(k) == v for k, v in excluded.items())]
-        simulations = experiment.simulations_with_tags(tags={"a": 0}, skip_sims=skip_sims, entity_type=True)
+        simulations = experiment.get_simulations_by_tags(tags={"a": 0}, skip_sims=skip_sims, entity_type=True)
         # validation--------------------------------------------
         expected = {"a": 0}
         # make sure each simulation contains tag {"a": 0} and not contains {"b": 0} in returned simulations

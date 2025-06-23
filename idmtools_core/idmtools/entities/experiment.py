@@ -666,7 +666,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         """
         self.simulations.extend(item)
 
-    def simulations_with_tags(self, tags=None, status=None, skip_sims=None, max_simulations=None, entity_type=False,
+    def get_simulations_by_tags(self, tags=None, status=None, skip_sims=None,  entity_type=False, max_simulations=None,
                               **kwargs) -> List[str]:
         """
         Retrieve a list of simulation IDs or simulation objects with matching tags.
@@ -676,9 +676,9 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         Args:
             tags (dict, optional): A simulation's tags to filter by.
             status (EntityStatus, Optional): Simulation status.
+            entity_type (bool, optional): If True, return simulation objects; otherwise, return simulation IDs. Defaults to False.
             skip_sims (list, optional): A list of simulation IDs to exclude from the results.
             max_simulations (int, optional): The maximum number of simulations to return.
-            entity_type (bool, optional): If True, return simulation objects; otherwise, return simulation IDs. Defaults to False.
             **kwargs: Additional filter parameters.
         Returns:
             list: A list of simulation IDs or simulation objects, depending on the `entity_type` flag.
@@ -689,9 +689,9 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
             item=self,
             tags=tags,
             status=status,
+            entity_type=entity_type,
             skip_sims=skip_sims,
             max_simulations=max_simulations,
-            entity_type=entity_type,
             **kwargs
         )
 

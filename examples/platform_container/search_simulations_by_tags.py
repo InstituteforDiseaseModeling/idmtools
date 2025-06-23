@@ -34,11 +34,11 @@ Experiment-level Filtering
 """
 
 # Filter simulations using different representations of tag values
-filter_simulation_ids = experiment.simulations_with_tags(
+filter_simulation_ids = experiment.get_simulations_by_tags(
     tags={"a": lambda v: 1 <= v <= 2, "sim_tag": "test_tag"})
-filter_simulation_ids1 = experiment.simulations_with_tags(
+filter_simulation_ids1 = experiment.get_simulations_by_tags(
     tags={"a": lambda v: "1" <= v <= 2, "sim_tag": "test_tag"})
-filter_simulation_ids2 = experiment.simulations_with_tags(
+filter_simulation_ids2 = experiment.get_simulations_by_tags(
     tags={"a": lambda v: 1 <= v <= "2", "sim_tag": "test_tag"})
 
 # Alternative: Filter via platform method
@@ -52,7 +52,7 @@ assert len(filter_simulation_ids1) == 40
 assert len(filter_simulation_ids2) == 40
 
 # Get simulation entities (instead of IDs) using entity_type=True
-filter_simulations = experiment.simulations_with_tags(
+filter_simulations = experiment.get_simulations_by_tags(
     tags={"a": lambda v: 1 <= v <= "2", "sim_tag": "test_tag"},
     entity_type=True)
 
@@ -71,7 +71,7 @@ Suite-level Filtering
 
 # Load suite and filter simulations across its experiments
 suite = experiment.suite
-filter_suite_simulations = suite.simulations_with_tags(
+filter_suite_simulations = suite.get_simulations_by_tags(
     tags={"a": lambda v: 1 <= v <= 2, "sim_tag": "test_tag"}, entity_type=True)
 
 # Validate structure and results

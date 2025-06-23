@@ -129,10 +129,13 @@ class Suite(INamedEntity, ABC, IRunnableEntity):
         Returns:
             EntityContainer: A container of Experiment objects belonging to this suite.
         """
-        return self.experiments
+        experiments  = self.experiments
+        if experiments is None:
+            experiments = self.platform.get_children(self.id, ItemType.SUITE, force=True)
+        return experiments
 
-    def simulations_with_tags(self, tags=None, status=None, skip_sims=None, max_simulations=None, entity_type=False,
-                              **kwargs) -> Dict[str, List[str]]:
+    def get_simulations_by_tags(self, tags=None, status=None, entity_type=False, skip_sims=None, max_simulations=None,
+                                **kwargs) -> Dict[str, List[str]]:
         """
         Retrieve simulation ids or simulation objects with matching tags across all experiments in the suite.
         This method filters simulations based on the provided tags, skipping specified simulations,
@@ -142,9 +145,9 @@ class Suite(INamedEntity, ABC, IRunnableEntity):
             status:
             tags (dict, optional): A simulation's tags to filter by.
             status (EntityStatus, Optional): Simulation status.
+            entity_type (bool, optional): If True, return simulation objects; otherwise, return simulation IDs. Defaults to False.
             skip_sims (List[str], optional): A list of simulation IDs to exclude from the results.
             max_simulations (int, optional): The maximum number of simulations to return per experiment.
-            entity_type (bool, optional): If True, return simulation objects; otherwise, return simulation IDs. Defaults to False.
             **kwargs: Additional filter parameters.
         Returns:
             Dict[str, List[str]]: A dictionary where the keys are experiment IDs and the values are lists of
@@ -153,10 +156,9 @@ class Suite(INamedEntity, ABC, IRunnableEntity):
         experiments = self.experiments
         sims = {}
         for experiment in experiments:
-            sims[experiment.id] = experiment.simulations_with_tags(tags=tags, status=status, skip_sims=skip_sims,
-                                                                   max_simulations=max_simulations,
-                                                                   entity_type=entity_type, **kwargs)
-
+            sims[experiment.id] = experiment.get_simulations_by_tags(tags=tags, status=status, entity_type=entity_type,
+                                                                     skip_sims=skip_sims,
+                                                                     max_simulations=max_simulations, **kwargs)
         return sims
 
 

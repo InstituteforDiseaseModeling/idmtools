@@ -48,9 +48,8 @@ class TestSimulations(ITestWithPersistence):
         experiment = Experiment(name="test_filter_simulations.py--test_experiment", simulations=ts)
         suite = Suite(name='test_filter_simulations.py--test suite')
         suite.update_tags({'name': 'test', 'fetch': 123})
-        self.platform.create_items([suite])
         suite.add_experiment(experiment)
-        experiment.run(wait_until_done=True)
+        suite.run(wait_until_done=True)
         # suite_id = 'd35b322e-4238-f011-930f-f0921c167860'
         # suite = self.platform.get_item(suite_id, item_type=ItemType.SUITE)
         return suite
@@ -75,10 +74,10 @@ class TestSimulations(ITestWithPersistence):
 
     # Filer from Suite
     # Test default filter with suite uuid and type which only returns succeed sims (2 in this case)
-    def test_filter_suite(self):
-        sims = FilterItem.filter_item_by_id(self.platform, self.suite.uid, ItemType.SUITE,
-                                            status=EntityStatus.SUCCEEDED)
-        self.assertEqual(len(sims), 2)
+    def test_filter_item_by_id_suite_tag1(self):
+        exp_sims = FilterItem.filter_item_by_id(self.platform, self.suite.uid, ItemType.SUITE,
+                                            tags={'tag1': 1})
+        self.assertEqual(len(exp_sims[self.suite.experiments[0].id]), 5)
 
     # Test default filter plus tags which only returns 1 matched succeed sims
     def test_filter_item_experiment(self):
@@ -87,21 +86,21 @@ class TestSimulations(ITestWithPersistence):
         self.assertEqual(len(sims), 1)
 
     # test filter with suite which only return succeed sims by default
-    def test_filter_item_suite(self):
+    def test_filter_item_suite_status(self):
         suite = self.platform.get_item(self.suite.uid, ItemType.SUITE, force=True)
-        sims = FilterItem.filter_item(self.platform, suite, status=EntityStatus.SUCCEEDED)
-        self.assertEqual(len(sims), 2)
+        exp_sims = FilterItem.filter_item(self.platform, suite, status=EntityStatus.SUCCEEDED)
+        self.assertEqual(len(exp_sims[self.suite.experiments[0].id]), 2)
 
     # test filter with experiment and status=failed which only return failed sims(3 in this case)
     def test_filter_item_experiment_status(self):
         exp = self.experiment
-        sims = FilterItem.filter_item(self.platform, exp, max_simulations=5, status=EntityStatus.FAILED)
+        sims = FilterItem.filter_item(self.platform, exp, status=EntityStatus.FAILED, max_simulations=5)
         self.assertEqual(len(sims), 3)
 
     # test filter with experiment and tags which only return 1 matched succeed sim
     def test_filter_item_experiment_tags(self):
         exp = self.experiment
-        sims = FilterItem.filter_item(self.platform, exp, max_simulations=5, tags={'Run_Number': '1'})
+        sims = FilterItem.filter_item(self.platform, exp, tags={'Run_Number': '1'}, max_simulations=5)
         self.assertEqual(len(sims), 1)
 
     # test filter with experiment and max_simulations filter which only return 1 matched succeed sim

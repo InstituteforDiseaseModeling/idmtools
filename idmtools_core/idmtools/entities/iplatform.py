@@ -1064,13 +1064,13 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             file_name = f'{exp_id}.csv'
         df.to_csv(os.path.join(output, file_name), header=save_header, index=False)
 
-    def filter_simulations_by_tags(self, item_id: str, item_type: ItemType, tags: Dict = None, skip_sims=None,
-                                   max_simulations=None, entity_type=False, **kwargs):
+    def filter_simulations_by_tags(self, item_id: str, item_type: ItemType, tags: Dict = None, status=None,
+                                   entity_type=False, skip_sims=None, max_simulations=None, **kwargs):
         """
         Filter simulations associated with a given Experiment or Suite using tag-based conditions.
 
         This method is a platform-level convenience wrapper that delegates filtering logic to the
-        `simulations_with_tags` method on the retrieved item. It supports:
+        `get_simulations_by_tags` method on the retrieved item. It supports:
         - Exact tag value matching
         - Callable filters for flexible conditions (e.g., lambda expressions)
         - Optionally limiting the number of returned simulations
@@ -1083,10 +1083,11 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
                 - Exact values (e.g., {"Coverage": 0.8})
                 - Callable functions (e.g., {"Run_Number": lambda v: 0 <= v <= 10})
                 - Ellipsis (...) or None to match presence of key only.
+            status (EntityStatus, optional): Filter by status. If provided, only simulations with the specified status will be returned.
+            entity_type (bool, optional): If True, return full simulation entities; otherwise, return simulation IDs.
             skip_sims (list, optional): A list of simulation IDs to exclude from the results.
             max_simulations (int, optional): Maximum number of simulations to return.
-            entity_type (bool, optional): If True, return full simulation entities; otherwise, return simulation IDs.
-            **kwargs: Additional keyword arguments passed to the item's `simulations_with_tags` method.
+            **kwargs: Additional keyword arguments passed to the item's `get_simulations_by_tags` method.
 
         Returns:
             Union[List[str], List[Simulation], Dict[str, List[Simulation]]]:
@@ -1094,8 +1095,8 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
                 - Or a list/dictionary of Simulation objects if `entity_type=True`.
         """
         item = self.get_item(item_id, item_type, force=True)
-        return item.simulations_with_tags(tags=tags, skip_sims=skip_sims, max_simulations=max_simulations,
-                                          entity_type=entity_type, **kwargs)
+        return item.get_simulations_by_tags(tags=tags, status=status, entity_type=entity_type, skip_sims=skip_sims,
+                                            max_simulations=max_simulations, **kwargs)
 
 
 TPlatform = TypeVar("TPlatform", bound=IPlatform)

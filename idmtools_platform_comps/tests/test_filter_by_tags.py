@@ -55,19 +55,19 @@ class TestSimulationsWithTags(unittest.TestCase):
 
     def test_tag_filter_with_range(self):
         experiment = self.platform.get_item("d9cb76d9-e9e6-ee11-9301-f0921c167864", ItemType.EXPERIMENT)
-        filter_simulation_ids = experiment.simulations_with_tags(
+        filter_simulation_ids = experiment.get_simulations_by_tags(
             tags={"__sample_index__": lambda v: 4 <= v <= 10, "Reporting_Rate": 0.4})
-        filter_simulation_ids1 = experiment.simulations_with_tags(
+        filter_simulation_ids1 = experiment.get_simulations_by_tags(
             tags={"__sample_index__": lambda v: 4 <= v <= 10, "Reporting_Rate": 0.4})
         self.assertEqual(len(filter_simulation_ids), 7)
         self.assertEqual(len(filter_simulation_ids1), 7)
 
-        filter_simulation_ids2 = experiment.simulations_with_tags(
+        filter_simulation_ids2 = experiment.get_simulations_by_tags(
             tags={"__sample_index__": lambda v: 1 <= v <= "10", "Typhoid_Environmental_Exposure_Rate": lambda v: v >= 0.4})
         self.assertEqual(len(filter_simulation_ids2), 2)
 
         # Below call with entity_type=True will return matched simulation objects. Total count should be the same as above cases
-        filter_simulations = experiment.simulations_with_tags(
+        filter_simulations = experiment.get_simulations_by_tags(
             tags={"__sample_index__": lambda v: 4 <= v <= "10", "Reporting_Rate": "0.4"}, entity_type=True)
         count = 0
         for sim in filter_simulations:
@@ -83,8 +83,8 @@ class TestSimulationsWithTags(unittest.TestCase):
         expected = {"a": "0"}
         suite = experiment.parent
         # Let search tags with 2 different ways for int-like string.
-        result = suite.simulations_with_tags(tags={"a": 0})
-        result1 = suite.simulations_with_tags(tags={"a": "0"})
+        result = suite.get_simulations_by_tags(tags={"a": 0})
+        result1 = suite.get_simulations_by_tags(tags={"a": "0"})
         self.assertEqual(result, result1)
         # make sure each simulation in result contains tag {"a": "0"}
         for sim_id in result[experiment.id]:
@@ -98,8 +98,8 @@ class TestSimulationsWithTags(unittest.TestCase):
         experiment = self.experiment
         # this returns list of simulation ids
         expected = {"a": "0"}
-        simulation_ids = experiment.simulations_with_tags(tags={"a": "0"})
-        simulation_ids_1 = experiment.simulations_with_tags(tags={"a": 0})
+        simulation_ids = experiment.get_simulations_by_tags(tags={"a": "0"})
+        simulation_ids_1 = experiment.get_simulations_by_tags(tags={"a": 0})
         # verify we can search both with int 0 and str "0"
         self.assertEqual(simulation_ids, simulation_ids_1)
         # make sure each simulation contains tag {"a": "0"} in returned simulations
@@ -119,8 +119,8 @@ class TestSimulationsWithTags(unittest.TestCase):
         expected = {"a": "0"}
         suite = experiment.parent
         # this returns dict with experiment_id as key and list of simulation as value
-        result_sim = suite.simulations_with_tags(tags={"a": 0, "b": 2}, entity_type=True)
-        result_id = suite.simulations_with_tags(tags={"a": "0", "b": "2"}, entity_type=False)
+        result_sim = suite.get_simulations_by_tags(tags={"a": 0, "b": 2}, entity_type=True)
+        result_id = suite.get_simulations_by_tags(tags={"a": "0", "b": "2"}, entity_type=False)
         # make sure above 2 results basically return the same simulation
         self.assertEqual(result_sim[experiment.id][0].id, result_id[experiment.id][0])
         for sim in result_sim[experiment.id]:
@@ -135,9 +135,9 @@ class TestSimulationsWithTags(unittest.TestCase):
         experiment = self.experiment
         # this returns list of simulation ids
         expected = {"a": "0"}
-        simulation_ids = experiment.simulations_with_tags(tags=expected)
+        simulation_ids = experiment.get_simulations_by_tags(tags=expected)
         # this returns list of simulations
-        simulations = experiment.simulations_with_tags(tags=expected, entity_type=True)
+        simulations = experiment.get_simulations_by_tags(tags=expected, entity_type=True)
         # validation--------------------------------------------
         # make sure each simulation contains tag {"a": "0"} in returned simulations
         for sim in simulations:
@@ -162,7 +162,7 @@ class TestSimulationsWithTags(unittest.TestCase):
         ]
         suite = experiment.suite
         # this returns dict with experiment_id as key and list of simulation as value
-        result = suite.simulations_with_tags(tags={"a": 0, "b": "2"}, skip_sims=skip_sims, entity_type=True)
+        result = suite.get_simulations_by_tags(tags={"a": 0, "b": "2"}, entity_type=True, skip_sims=skip_sims)
         # validation--------------------------------------------
         # make sure each simulation contains tag {"a": 0, "b":2} and not contains {"a": 1, "b", 3} in returned simulations
         for sim in result[experiment.id]:
@@ -183,7 +183,7 @@ class TestSimulationsWithTags(unittest.TestCase):
         # skip simulations contain tags with {"b":2}
         skip_sims = [sim.id for sim in experiment.simulations if
                      any(sim.tags.get(k) == v for k, v in excluded.items())]
-        simulations = experiment.simulations_with_tags(tags={"a": "0", "b": 2}, skip_sims=skip_sims, entity_type=True)
+        simulations = experiment.get_simulations_by_tags(tags={"a": "0", "b": 2}, entity_type=True, skip_sims=skip_sims)
         # validation--------------------------------------------
         # make sure each simulation contains tag {"a": "0"} and not contains {"b": "5"} in returned simulations
         for sim in simulations:

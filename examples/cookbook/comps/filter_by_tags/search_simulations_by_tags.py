@@ -27,11 +27,11 @@ Experiment-level Filtering
 experiment = platform.get_item("4721ac6b-9344-ef11-aa15-9440c9be2c51", ItemType.EXPERIMENT)
 
 # Filter simulations using different representations of tag values
-filter_simulation_ids = experiment.simulations_with_tags(
+filter_simulation_ids = experiment.get_simulations_by_tags(
     tags={"__sample_index__": lambda v: 2 <= v <= 10, "Reporting_Rate": "0.01"})
-filter_simulation_ids1 = experiment.simulations_with_tags(
+filter_simulation_ids1 = experiment.get_simulations_by_tags(
     tags={"__sample_index__": lambda v: 2 <= v <= 10, "Reporting_Rate": 0.01})
-filter_simulation_ids2 = experiment.simulations_with_tags(
+filter_simulation_ids2 = experiment.get_simulations_by_tags(
     tags={"__sample_index__": lambda v: "2" <= v <= 10, "Reporting_Rate": 0.01})
 
 # Alternative: Filter via platform method
@@ -45,7 +45,7 @@ assert len(filter_simulation_ids1) == 3
 assert len(filter_simulation_ids2) == 3
 
 # Get simulation entities (instead of IDs) using entity_type=True
-filter_simulations = experiment.simulations_with_tags(
+filter_simulations = experiment.get_simulations_by_tags(
     tags={"__sample_index__": lambda v: 2 <= v <= 10, "Reporting_Rate": "0.01"},
     entity_type=True)
 
@@ -64,7 +64,7 @@ Suite-level Filtering
 
 # Load suite and filter simulations across its experiments
 suite = platform.get_item("5230d6ef-9144-ef11-aa15-9440c9be2c51", item_type=ItemType.SUITE, force=True)
-filter_suite_simulations = suite.simulations_with_tags(
+filter_suite_simulations = suite.get_simulations_by_tags(
     tags={"__sample_index__": lambda v: "2" <= v <= 10, "Reporting_Rate": 0.01},
     entity_type=True)
 

@@ -16,8 +16,8 @@ class FilterItem:
     """
 
     @staticmethod
-    def filter_item(platform: IPlatform, item: IEntity, tags=None, status: EntityStatus = None, skip_sims=None,
-                    max_simulations: int = None, entity_type: bool = False, **kwargs):
+    def filter_item(platform: IPlatform, item: IEntity, tags=None, status: EntityStatus = None,
+                    entity_type: bool = False, max_simulations: int = None, skip_sims=None, **kwargs):
         """
         Filter simulations from an Experiment or Suite using tag and status criteria.
 
@@ -44,9 +44,9 @@ class FilterItem:
                     * A lambda or callable function for conditional logic
                       (e.g., {"Run_Number": lambda v: 2 <= v <= 10})
             status (EntityStatus, Optional): The experiment's status.
+            entity_type (bool, optional): If True, return simulation entities instead of just their IDs.
             skip_sims (list, optional): A list of simulation IDs (as strings) to exclude from the results.
             max_simulations (int, optional): Maximum number of simulations to return. Returns all if not set.
-            entity_type (bool, optional): If True, return simulation entities instead of just their IDs.
             **kwargs: Extra args.
 
         Returns:
@@ -125,7 +125,7 @@ class FilterItem:
 
     @classmethod
     def filter_item_by_id(cls, platform: IPlatform, item_id: str, item_type: ItemType = ItemType.EXPERIMENT,
-                          tags=None, status=None, skip_sims=None, max_simulations: int = None, entity_type=False,
+                          tags=None, status=None, entity_type=False, skip_sims=None, max_simulations: int = None,
                           **kwargs):
         """
         Retrieve and filter simulations from an Experiment or Suite by item ID.
@@ -139,9 +139,9 @@ class FilterItem:
             item_type (ItemType, optional): The type of item (Experiment or Suite). Defaults to Experiment.
             tags (dict, optional): A simulation's tags to filter by.
             status (EntityStatus, Optional): The experiment's status.
+            entity_type (bool, optional): If True, return simulation entities instead of just their IDs.
             skip_sims (List[str], optional): List of simulation IDs to skip during filtering. Defaults to an empty list.
             max_simulations (int, optional): Maximum number of simulations to return. Defaults to None (no limit).
-            entity_type (bool, optional): If True, return simulation entities instead of just their IDs.
             **kwargs: Additional keyword arguments passed to `filter_item()`.
 
         Returns:
@@ -164,5 +164,5 @@ class FilterItem:
         item = platform.get_item(item_id, item_type, raw=False, force=True)
 
         # filter simulations
-        return cls.filter_item(platform, item=item, tags=tags, status=status, skip_sims=skip_sims,
-                               max_simulations=max_simulations, entity_type=entity_type, **kwargs)
+        return cls.filter_item(platform, item=item, tags=tags, status=status, entity_type=entity_type,
+                               skip_sims=skip_sims, max_simulations=max_simulations, **kwargs)
