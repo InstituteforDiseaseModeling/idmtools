@@ -2,13 +2,13 @@
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
-import ntpath
+import os
 import re
 import uuid
+import ntpath
 from logging import getLogger, DEBUG
 from typing import List, Dict, Union, Generator, Optional
 from uuid import UUID
-
 from COMPS import Client
 from COMPS.Data import Simulation, SimulationFile, AssetCollectionFile, WorkItemFile, OutputFileMetadata, Experiment
 from COMPS.Data import AssetCollection as COMPSAssetCollection
@@ -145,14 +145,14 @@ def get_file_from_collection(platform: IPlatform, collection_id: UUID, file_path
     if LocalOS.is_window():
         file_name = file_name.lower()
         path = path.lower()
-    path = path.lstrip(ASSETS_PATH)
+    path = os.path.normpath(path.lstrip(ASSETS_PATH).strip('/'))
 
     for asset_file in ac.assets:
         if LocalOS.is_window():
-            if asset_file.file_name.lower() == file_name and (asset_file.relative_path or '').lower() == path:
+            if asset_file.file_name.lower() == file_name and os.path.normpath(asset_file.relative_path or '').lower() == path:
                 return asset_file.retrieve()
         else:
-            if asset_file.file_name == file_name and (asset_file.relative_path or '') == path:
+            if asset_file.file_name == file_name and os.path.normpath(asset_file.relative_path or '') == path:
                 return asset_file.retrieve()
 
 
