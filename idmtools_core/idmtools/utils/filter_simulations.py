@@ -6,7 +6,6 @@ Copyright 2025, Gates Foundation. All rights reserved.
 from idmtools.core import ItemType, EntityStatus
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities import Suite
-from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform import IPlatform
 from idmtools.utils.general import parse_value_tags
 
@@ -101,8 +100,9 @@ class FilterItem:
         if isinstance(item, Suite):  # Suite case
             experiments = item.get_experiments()
             for experiment in experiments:
-                return {experiment.id: FilterItem.filter_item(platform, item=experiment, tags=tags, status=status, skip_sims=skip_sims,
-                    max_simulations=max_simulations, entity_type=entity_type, **kwargs)}
+                return {experiment.id: FilterItem.filter_item(platform, item=experiment, tags=tags, status=status,
+                                                              skip_sims=skip_sims, max_simulations=max_simulations,
+                                                              entity_type=entity_type, **kwargs)}
         else:
             potential_sims = item.get_simulations()
 
@@ -166,4 +166,3 @@ class FilterItem:
         # filter simulations
         return cls.filter_item(platform, item=item, tags=tags, status=status, skip_sims=skip_sims,
                                max_simulations=max_simulations, entity_type=entity_type, **kwargs)
-
