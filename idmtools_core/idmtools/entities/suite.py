@@ -129,7 +129,7 @@ class Suite(INamedEntity, ABC, IRunnableEntity):
         Returns:
             EntityContainer: A container of Experiment objects belonging to this suite.
         """
-        experiments  = self.experiments
+        experiments = self.experiments
         if experiments is None:
             experiments = self.platform.get_children(self.id, ItemType.SUITE, force=True)
         return experiments

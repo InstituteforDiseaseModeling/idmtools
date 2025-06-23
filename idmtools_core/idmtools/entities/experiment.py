@@ -666,8 +666,8 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         """
         self.simulations.extend(item)
 
-    def get_simulations_by_tags(self, tags=None, status=None, skip_sims=None,  entity_type=False, max_simulations=None,
-                              **kwargs) -> List[str]:
+    def get_simulations_by_tags(self, tags=None, status=None, skip_sims=None, entity_type=False, max_simulations=None,
+                                **kwargs) -> List[str]:
         """
         Retrieve a list of simulation IDs or simulation objects with matching tags.
         This method filters simulations based on the provided tags, skipping specified simulations,
