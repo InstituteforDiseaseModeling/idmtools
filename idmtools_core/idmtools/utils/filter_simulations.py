@@ -5,6 +5,7 @@ Copyright 2025, Gates Foundation. All rights reserved.
 """
 from idmtools.core import ItemType, EntityStatus
 from idmtools.core.interfaces.ientity import IEntity
+from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform import IPlatform
 from idmtools.utils.general import parse_value_tags
@@ -16,8 +17,8 @@ class FilterItem:
     """
 
     @staticmethod
-    def filter_item(platform: IPlatform, item: IEntity, tags=None, skip_sims=None, max_simulations: int = None,
-                    entity_type: bool = False, status: EntityStatus = None, **kwargs):
+    def filter_item(platform: IPlatform, item: IEntity, tags=None, status: EntityStatus = None, skip_sims=None,
+                    max_simulations: int = None, entity_type: bool = False, **kwargs):
         """
         Filter simulations from an Experiment or Suite using tag and status criteria.
 
@@ -33,25 +34,30 @@ class FilterItem:
             >>> filter_item(platform, experiment, status=EntityStatus.FAILED)
             >>> filter_item(platform, experiment, tags={"Run_Number": "2"})
             >>> filter_item(platform, experiment, tags={"Run_Number": lambda v: 2 <= v <= 10})
+            >>> filter_item(platform, experiment, tags={"Coverage": 0.8}, status=EntityStatus.SUCCEEDED)
             >>> filter_item(platform, experiment, tags={"Coverage": 0.8}, max_simulations=10)
 
         Args:
             platform (IPlatform): The platform instance to query simulations from.
             item (IEntity): An Experiment or Suite to filter simulations from.
-            tags (dict, optional): A simulation's tags to filter by.
-            skip_sims (list, optional): A list of simulation IDs (as strings) to exclude from the results.
-            max_simulations (int, optional): Maximum number of simulations to return. Returns all if not set.
-            entity_type (bool, optional): If True, return simulation entities instead of just their IDs.
-            status (EntityStatus, Optional): The experiment's status.
-            **kwargs:
-                - status (EntityStatus): The status to filter by (default is SUCCEEDED).
-                - tags (dict): A dictionary of tag key-value pairs to filter by. Values may be:
+            tags (dict): A dictionary of tag key-value pairs to filter by for a simulation. Values may be:
                     * A fixed value (e.g., {"Run_Number": 2})
                     * A lambda or callable function for conditional logic
                       (e.g., {"Run_Number": lambda v: 2 <= v <= 10})
+            status (EntityStatus, Optional): The experiment's status.
+            skip_sims (list, optional): A list of simulation IDs (as strings) to exclude from the results.
+            max_simulations (int, optional): Maximum number of simulations to return. Returns all if not set.
+            entity_type (bool, optional): If True, return simulation entities instead of just their IDs.
+            **kwargs: Extra args.
 
         Returns:
-            list: A list of simulation IDs or simulation entities (if entity_type=True).
+            Union[List[Union[str, Simulation]], Dict[str, List[Union[str, Simulation]]]]:
+            If the item is an `Experiment`, returns a list of simulation IDs or simulation entities
+            (if `entity_type=True`).
+
+            If the item is a `Suite`, returns a dictionary where each key is an experiment ID and
+            each value is a list of simulation IDs or simulation entities (depending on the `entity_type` flag).
+
         """
         if skip_sims is None:
             skip_sims = []
@@ -92,12 +98,13 @@ class FilterItem:
         if item.item_type not in [ItemType.EXPERIMENT, ItemType.SUITE]:
             raise ValueError("This method only supports Experiment and Suite types!")
 
-        # Experiment case
-        if isinstance(item, Experiment):
+        if isinstance(item, Suite):  # Suite case
+            experiments = item.get_experiments()
+            for experiment in experiments:
+                return {experiment.id: FilterItem.filter_item(platform, item=experiment, tags=tags, status=status, skip_sims=skip_sims,
+                    max_simulations=max_simulations, entity_type=entity_type, **kwargs)}
+        else:
             potential_sims = item.get_simulations()
-        else:  # Suite case
-            # get all possible simulations
-            potential_sims = platform.flatten_item(item=item)
 
         # filter by status
         sims_status_filtered = [sim for sim in potential_sims if sim.status == status] if status else potential_sims
@@ -118,7 +125,7 @@ class FilterItem:
 
     @classmethod
     def filter_item_by_id(cls, platform: IPlatform, item_id: str, item_type: ItemType = ItemType.EXPERIMENT,
-                          tags=None, skip_sims=None, max_simulations: int = None, entity_type=False, status=None,
+                          tags=None, status=None, skip_sims=None, max_simulations: int = None, entity_type=False,
                           **kwargs):
         """
         Retrieve and filter simulations from an Experiment or Suite by item ID.
@@ -131,14 +138,19 @@ class FilterItem:
             item_id (str): The unique identifier of the Experiment or Suite.
             item_type (ItemType, optional): The type of item (Experiment or Suite). Defaults to Experiment.
             tags (dict, optional): A simulation's tags to filter by.
+            status (EntityStatus, Optional): The experiment's status.
             skip_sims (List[str], optional): List of simulation IDs to skip during filtering. Defaults to an empty list.
             max_simulations (int, optional): Maximum number of simulations to return. Defaults to None (no limit).
             entity_type (bool, optional): If True, return simulation entities instead of just their IDs.
-            status (EntityStatus, Optional): The experiment's status.
             **kwargs: Additional keyword arguments passed to `filter_item()`.
 
         Returns:
-            List[str]: A list of filtered simulation IDs.
+            Union[List[Union[str, Simulation]], Dict[str, List[Union[str, Simulation]]]]:
+            If the item is an `Experiment`, returns a list of simulation IDs or simulation entities
+            (if `entity_type=True`).
+
+            If the item is a `Suite`, returns a dictionary where each key is an experiment ID and
+            each value is a list of simulation IDs or simulation entities (depending on the `entity_type` flag).
 
         Raises:
             ValueError: If the provided `item_type` is not Experiment or Suite.
@@ -152,5 +164,6 @@ class FilterItem:
         item = platform.get_item(item_id, item_type, raw=False, force=True)
 
         # filter simulations
-        return cls.filter_item(platform, item=item, tags=tags, skip_sims=skip_sims, max_simulations=max_simulations,
-                               entity_type=entity_type, status=status, **kwargs)
+        return cls.filter_item(platform, item=item, tags=tags, status=status, skip_sims=skip_sims,
+                               max_simulations=max_simulations, entity_type=entity_type, **kwargs)
+

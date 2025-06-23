@@ -151,7 +151,7 @@ class CustomDecoder(json.JSONDecoder):
         # Return as-is if it's not a simple number/bool/null
         return val
 
-    def custom_object_hook(self, obj):
+    def custom_object_hook(self, obj: Dict):
         """
         Apply normalization to each value in a decoded JSON object.
 

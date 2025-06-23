@@ -131,7 +131,7 @@ class Suite(INamedEntity, ABC, IRunnableEntity):
         """
         return self.experiments
 
-    def simulations_with_tags(self, tags=None, skip_sims=None, max_simulations=None, entity_type=False, status=None,
+    def simulations_with_tags(self, tags=None, status=None, skip_sims=None, max_simulations=None, entity_type=False,
                               **kwargs) -> Dict[str, List[str]]:
         """
         Retrieve simulation ids or simulation objects with matching tags across all experiments in the suite.
@@ -141,10 +141,10 @@ class Suite(INamedEntity, ABC, IRunnableEntity):
         Args:
             status:
             tags (dict, optional): A simulation's tags to filter by.
+            status (EntityStatus, Optional): Simulation status.
             skip_sims (List[str], optional): A list of simulation IDs to exclude from the results.
             max_simulations (int, optional): The maximum number of simulations to return per experiment.
             entity_type (bool, optional): If True, return simulation objects; otherwise, return simulation IDs. Defaults to False.
-            status (EntityStatus, Optional): Simulation status.
             **kwargs: Additional filter parameters.
         Returns:
             Dict[str, List[str]]: A dictionary where the keys are experiment IDs and the values are lists of
@@ -153,9 +153,9 @@ class Suite(INamedEntity, ABC, IRunnableEntity):
         experiments = self.experiments
         sims = {}
         for experiment in experiments:
-            sims[experiment.id] = experiment.simulations_with_tags(tags=tags, skip_sims=skip_sims,
+            sims[experiment.id] = experiment.simulations_with_tags(tags=tags, status=status, skip_sims=skip_sims,
                                                                    max_simulations=max_simulations,
-                                                                   entity_type=entity_type, status=status, **kwargs)
+                                                                   entity_type=entity_type, **kwargs)
 
         return sims
 

@@ -34,7 +34,7 @@ class IEntity(IItem, metaclass=ABCMeta):
     #: Parent object
     _parent: 'IEntity' = field(default=None, compare=False, metadata={"pickle_ignore": False})
     #: Status of item
-    status: EntityStatus = field(default=None, compare=False, metadata={"pickle_ignore": True})
+    status: EntityStatus = field(default=None, compare=False, metadata={"pickle_ignore": False})
     #: Tags for item
     tags: Dict[str, Any] = field(default_factory=lambda: {}, metadata={"md": True})
     #: Item Type(Experiment, Suite, Asset, etc)
