@@ -26,6 +26,7 @@ Example:
 Copyright 2025, Gates Foundation. All rights reserved.
 """
 import json
+from typing import Dict
 
 
 def parse_item_tags(item):
