@@ -58,6 +58,8 @@ class TestFilePlatform(unittest.TestCase):
         # Add experiment to the suite
         suite.add_experiment(experiment)
         # Commission
+        #suite = self.platform.get_item("3887be47-a464-4abe-a2c2-a726798e556d", item_type=ItemType.SUITE, force=True)
+        #experiment = suite.get_experiments()[0]
         suite.run(wait_until_done=wait_until_done, retries=retries)
         print("suite_id: " + suite.id)
         print("experiment_id: " + experiment.id)
@@ -157,6 +159,7 @@ class TestFilePlatform(unittest.TestCase):
     def test_get_experiments(self):
         experiment = self.experiment
         suite = experiment.suite
+        experiment.parent = suite
         self.assertTrue(isinstance(suite, Suite))
         # Test Suite's get_experiments(), expect result is list of Experiments
         experiments = suite.get_experiments()
@@ -280,3 +283,103 @@ class TestFilePlatform(unittest.TestCase):
         self.assertEqual(len(file_sims), 6)
         self.assertTrue(all(isinstance(sim, FileSimulation) for sim in file_sims))
         self.assertEqual(repr(file_experiment), f'<FileExperiment {file_experiment.id} - 6 simulations>')
+
+    def test_get_tags_experiments(self):
+        experiment = self.experiment
+        # Test get_tags for base experiment
+        tags = experiment.get_tags()
+        tags_p = experiment.tags
+        expected_subset_tags = {'tag1': 1}
+        self.assertTrue(all(tags.get(k) == v for k, v in expected_subset_tags.items()))
+        self.assertDictEqual(tags, tags_p)
+
+        # Test get_tags for file experiment
+        file_experiment = experiment.get_platform_object()
+        tags_f = file_experiment.get_tags()
+        tags_f_p = file_experiment.tags
+        self.assertTrue(all(tags_f.get(k) == v for k, v in expected_subset_tags.items()))
+        self.assertDictEqual(tags_f, tags_p)
+        self.assertDictEqual(tags_f_p, tags_p)
+
+        # Test update_tags for base experiment
+        experiment = self.experiment
+        experiment.update_tags({"a": 2})
+        tags1 = experiment.get_tags()
+        expected_subset_tags = {'tag1': 1, "a": 2}
+        self.assertTrue(all(tags1.get(k) == v for k, v in expected_subset_tags.items()))
+        # Test update_tags for file experiment
+        file_experiment = self.experiment.get_platform_object()
+        file_experiment.update_tags({"file_tags": "c"})
+        tags_f1 = file_experiment.get_tags()
+        expected_subset_tags = {'tag1': 1, "file_tags": "c"}
+        self.assertTrue(all(tags_f1.get(k) == v for k, v in expected_subset_tags.items()))
+
+    def test_get_tags_simulations(self):
+        experiment = self.experiment
+        simulations = experiment.get_simulations()
+        for sim in simulations:
+            tags = sim.get_tags()
+            self.assertIn('a', tags)
+            self.assertIn('b', tags)
+            # Check values are in desired range
+            self.assertIn(tags['a'], range(3))
+            self.assertIn(tags['b'], range(3))
+        file_simulations = experiment.get_platform_object().get_simulations()
+        for sim in file_simulations:
+            tags = sim.get_tags()
+            self.assertIn('a', tags)
+            self.assertIn('b', tags)
+            # Check values are in desired range
+            self.assertIn(tags['a'], range(3))
+            self.assertIn(tags['b'], range(3))
+
+        # Test update tags for base simulation
+        simulations = experiment.get_simulations()
+        for sim in simulations:
+            sim.update_tags({"c": 100})
+            tags = sim.get_tags()
+            self.assertIn("c", tags)
+            self.assertEqual(tags["c"], 100)
+            self.assertIn('a', tags)
+            self.assertIn('b', tags)
+            # Check values are in desired range
+            self.assertIn(tags['a'], range(3))
+            self.assertIn(tags['b'], range(3))
+
+        # Test update tags for file simulation
+        file_simulations = experiment.get_platform_object().get_simulations()
+        for sim in file_simulations:
+            sim.update_tags({"d": 200})
+            tags = sim.get_tags()
+            self.assertIn("d", tags)
+            self.assertEqual(tags["d"], 200)
+            self.assertIn('a', tags)
+            self.assertIn('b', tags)
+            # Check values are in desired range
+            self.assertIn(tags['a'], range(3))
+            self.assertIn(tags['b'], range(3))
+
+    def test_get_tags_suite(self):
+        suite: Suite = self.experiment.parent
+        # Test base suite's get_tags()
+        tags = suite.get_tags()
+        expected_suite_tags = {'name': 'suite_tag', 'idmtools': '123'}
+        self.assertTrue(all(tags.get(k) == v for k, v in expected_suite_tags.items()))
+        # Test file suite's get_tags
+        file_suite = suite.get_platform_object()
+        tags_f = file_suite.get_tags()
+        expected_suite_tags = {'name': 'suite_tag', 'idmtools': '123'}
+        self.assertTrue(all(tags_f.get(k) == v for k, v in expected_suite_tags.items()))
+        # Test update_tags
+        suite: Suite = self.experiment.parent
+        suite.update_tags({"new_suite_tag": 321})
+        tags = suite.get_tags()
+        expected_suite_tags = {'name': 'suite_tag', 'idmtools': '123', "new_suite_tag": 321}
+        self.assertTrue(all(tags.get(k) == v for k, v in expected_suite_tags.items()))
+
+        # Test update_tags for file_suite
+        file_suite = self.experiment.parent.get_platform_object()
+        file_suite.update_tags({"new_file_suite_tag": "abc"})
+        tags = file_suite.get_tags()
+        expected_suite_tags = {'name': 'suite_tag', 'idmtools': '123', "new_file_suite_tag": "abc"}
+        self.assertTrue(all(tags.get(k) == v for k, v in expected_suite_tags.items()))

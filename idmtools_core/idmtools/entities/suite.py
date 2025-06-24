@@ -5,7 +5,7 @@ The Suite object can be thought as a metadata object. It represents a container 
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
-from typing import NoReturn, Type, TYPE_CHECKING, Dict
+from typing import NoReturn, Type, TYPE_CHECKING, Dict, List
 from abc import ABC
 from dataclasses import dataclass, field, fields
 from idmtools.core.interfaces.iitem import IItem
@@ -26,7 +26,7 @@ class Suite(INamedEntity, ABC, IRunnableEntity):
     Args:
         experiments: The child items of this suite.
     """
-    _experiments: EntityContainer = field(
+    experiments: EntityContainer = field(
         default_factory=lambda: EntityContainer(),
         compare=False,
         metadata={"pickle_ignore": True}
@@ -42,7 +42,7 @@ class Suite(INamedEntity, ABC, IRunnableEntity):
         Args:
             experiment: the experiment to be linked to suite
         """
-        ids = [exp.uid for exp in self._experiments or []]
+        ids = [exp.uid for exp in self.experiments]
         if experiment.uid in ids:
             return
 
@@ -87,8 +87,8 @@ class Suite(INamedEntity, ABC, IRunnableEntity):
         """
         String representation of suite.
         """
-        num_experiments = len(self._experiments or [])
-        return f"<Suite {self.uid} - {num_experiments} experiments>"
+        count = len(self.experiments) if self.experiments is not None else 0
+        return f"<Suite {self.uid} - {count} experiments>"
 
     @property
     def done(self):
@@ -124,34 +124,43 @@ class Suite(INamedEntity, ABC, IRunnableEntity):
         result['_uid'] = self.uid
         return result
 
-    @property
-    def experiments(self) -> EntityContainer:
-        """
-        Access the list of experiments in this suite.
-
-        If experiments are not yet loaded, it will fetch them from the platform.
-
-        Returns:
-            EntityContainer: A container of Experiment objects.
-        """
-        return self._experiments
-
-    @experiments.setter
-    def experiments(self, value):
-        """
-        Set the list of experiments for the suite.
-        Args:
-            value (EntityContainer): The list of experiments to assign.
-        """
-        self._experiments = value
-
-    def get_experiments(self):
+    def get_experiments(self) -> EntityContainer:
         """
         Retrieve the experiments associated with this suite from the platform.
         Returns:
             EntityContainer: A container of Experiment objects belonging to this suite.
         """
-        return self._experiments
+        experiments = self.experiments
+        if experiments is None:
+            experiments = self.platform.get_children(self.id, ItemType.SUITE, force=True)
+        return experiments
+
+    def get_simulations_by_tags(self, tags=None, status=None, entity_type=False, skip_sims=None, max_simulations=None,
+                                **kwargs) -> Dict[str, List[str]]:
+        """
+        Retrieve simulation ids or simulation objects with matching tags across all experiments in the suite.
+        This method filters simulations based on the provided tags, skipping specified simulations,
+        and limiting the number of results if `max_simulations` is set. The return type can be
+        either a dictionary of simulation IDs or simulation objects, depending on the `entity_type` flag.
+        Args:
+            status:
+            tags (dict, optional): A simulation's tags to filter by.
+            status (EntityStatus, Optional): Simulation status.
+            entity_type (bool, optional): If True, return simulation objects; otherwise, return simulation IDs. Defaults to False.
+            skip_sims (List[str], optional): A list of simulation IDs to exclude from the results.
+            max_simulations (int, optional): The maximum number of simulations to return per experiment.
+            **kwargs: Additional filter parameters.
+        Returns:
+            Dict[str, List[str]]: A dictionary where the keys are experiment IDs and the values are lists of
+                                  simulation IDs or simulation objects, depending on the `entity_type` flag.
+        """
+        experiments = self.get_experiments()
+        sims = {}
+        for experiment in experiments:
+            sims[experiment.id] = experiment.get_simulations_by_tags(tags=tags, status=status, entity_type=entity_type,
+                                                                     skip_sims=skip_sims,
+                                                                     max_simulations=max_simulations, **kwargs)
+        return sims
 
 
 ISuiteClass = Type[Suite]

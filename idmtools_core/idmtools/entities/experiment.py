@@ -218,12 +218,12 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         """
         if parent is not None:
             try:
-                experiments = getattr(parent, "_experiments", None)
+                experiments = getattr(parent, "experiments", None)
             except AttributeError:
                 experiments = None
 
             if experiments is None:
-                parent._experiments = [self]
+                parent.experiments = [self]
             elif self not in experiments:  # Avoid duplicate
                 experiments.append(self)
         IEntity.parent.__set__(self, parent)
@@ -587,6 +587,10 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         """
         result = dict()
         for f in fields(self):
+            # Include:
+            # - public fields (not starting with '_')
+            # Exclude:
+            # - fields named 'parent'
             if not f.name.startswith("_") and f.name not in ['parent']:
                 result[f.name] = getattr(self, f.name)
 
@@ -661,6 +665,35 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
             None
         """
         self.simulations.extend(item)
+
+    def get_simulations_by_tags(self, tags=None, status=None, skip_sims=None, entity_type=False, max_simulations=None,
+                                **kwargs) -> List[str]:
+        """
+        Retrieve a list of simulation IDs or simulation objects with matching tags.
+        This method filters simulations based on the provided tags, skipping specified simulations,
+        and limiting the number of results if `max_simulations` is set. The return type can be
+        either a list of simulation IDs or simulation objects, depending on the `entity_type` flag.
+        Args:
+            tags (dict, optional): A simulation's tags to filter by.
+            status (EntityStatus, Optional): Simulation status.
+            entity_type (bool, optional): If True, return simulation objects; otherwise, return simulation IDs. Defaults to False.
+            skip_sims (list, optional): A list of simulation IDs to exclude from the results.
+            max_simulations (int, optional): The maximum number of simulations to return.
+            **kwargs: Additional filter parameters.
+        Returns:
+            list: A list of simulation IDs or simulation objects, depending on the `entity_type` flag.
+        """
+        from idmtools.utils.filter_simulations import FilterItem
+        return FilterItem.filter_item(
+            platform=self.platform,
+            item=self,
+            tags=tags,
+            status=status,
+            entity_type=entity_type,
+            skip_sims=skip_sims,
+            max_simulations=max_simulations,
+            **kwargs
+        )
 
 
 class ExperimentSpecification(ExperimentPluginSpecification):

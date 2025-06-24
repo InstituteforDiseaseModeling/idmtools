@@ -32,8 +32,34 @@ class AddAnalyzer(IAnalyzer):
         result = a + b
         return result
 
+
     def reduce(self, data):
         print(f'Sum: {str(data.values())}')
+        value = sum(data.values())
+        return value
+
+
+class AddWithFilterAnalyzer(IAnalyzer):
+    """
+    Add Analyzer with filter
+    A simple base class to add analyzers.
+
+    """
+    def __init__(self, filenames=["config.json"]):
+        super().__init__(filenames=filenames)
+
+    def map(self, data, item):
+        a = data[self.filenames[0]]['parameters']["a"]
+        b = data[self.filenames[0]]['parameters']["b"]
+        result = a + b
+        return result
+
+    def filter(self, simulation) -> bool:
+        return simulation.tags.get("b") > 3
+
+    def reduce(self, data):
+        output_msg = f'Sum: {str(data.values())}'
+        print(output_msg)
         value = sum(data.values())
         return value
 
@@ -103,3 +129,10 @@ class TestContainerPlatformAnalyzer(unittest.TestCase):
         manager.add_item(suite)
         manager.analyze()
         self.assertEqual(analyzers[0].results, 45)
+
+    def test_analyzer_with_filter(self):
+        self.case_name = os.path.basename(__file__)
+        analyzers = [AddWithFilterAnalyzer(filenames=['config.json'])]
+        am = AnalyzeManager(platform=self.platform, ids=[(self.exp_id, ItemType.EXPERIMENT)], analyzers=analyzers)
+        am.analyze()
+        self.assertEqual(analyzers[0].results, 15)  # b:5+6+4=15 (all b >3)

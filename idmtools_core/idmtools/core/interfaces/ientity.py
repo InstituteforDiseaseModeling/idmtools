@@ -5,6 +5,7 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 from abc import ABCMeta
 from dataclasses import dataclass, field
+from logging import getLogger
 from os import PathLike
 from pathlib import Path
 from typing import NoReturn, List, Any, Dict, Union, TYPE_CHECKING
@@ -15,6 +16,8 @@ from idmtools.services.platforms import PlatformPersistService
 
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
+
+logger = getLogger(__name__)
 
 
 @dataclass
@@ -31,7 +34,7 @@ class IEntity(IItem, metaclass=ABCMeta):
     #: Parent object
     _parent: 'IEntity' = field(default=None, compare=False, metadata={"pickle_ignore": False})
     #: Status of item
-    status: EntityStatus = field(default=None, compare=False, metadata={"pickle_ignore": True})
+    status: EntityStatus = field(default=None, compare=False, metadata={"pickle_ignore": False})
     #: Tags for item
     tags: Dict[str, Any] = field(default_factory=lambda: {}, metadata={"md": True})
     #: Item Type(Experiment, Suite, Asset, etc)
@@ -315,6 +318,15 @@ class IEntity(IItem, metaclass=ABCMeta):
             pathlib.Path: The path to the item's working directory on the current platform.
         """
         return self.get_directory()
+
+    def get_tags(self) -> Dict[str, Any]:
+        """
+        Get the tags associated with the entity (alias for the `tags` property).
+
+        Returns:
+            Dict[str, Any]: The dictionary of tags.
+        """
+        return self.tags
 
 
 IEntityList = List[IEntity]

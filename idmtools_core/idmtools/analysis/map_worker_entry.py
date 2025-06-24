@@ -12,6 +12,7 @@ from idmtools.utils.file_parser import FileParser
 from typing import TYPE_CHECKING, Dict
 from idmtools.core.interfaces.iitem import IItem
 from idmtools.entities.ianalyzer import TAnalyzerList
+from idmtools.utils.general import FilterSafeItem
 
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
@@ -57,7 +58,7 @@ def _get_mapped_data_for_item(item: IEntity, analyzers: TAnalyzerList, platform:
         # determine which analyzers (and by extension, which filenames) are applicable to this item
         # ensure item has a platform
         item.platform = platform
-        analyzers_to_use = [a for a in analyzers if a.filter(item)]
+        analyzers_to_use = [a for a in analyzers if a.filter(FilterSafeItem(item))]
         analyzer_uids = [a.uid for a in analyzers]
 
         filenames = set(itertools.chain(*(a.filenames for a in analyzers_to_use)))
