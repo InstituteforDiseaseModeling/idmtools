@@ -87,7 +87,8 @@ class Suite(INamedEntity, ABC, IRunnableEntity):
         """
         String representation of suite.
         """
-        return f"<Suite {self.uid} - {len(self.experiments)} experiments>"
+        count = len(self.experiments) if self.experiments is not None else 0
+        return f"<Suite {self.uid} - {count} experiments>"
 
     @property
     def done(self):
@@ -153,7 +154,7 @@ class Suite(INamedEntity, ABC, IRunnableEntity):
             Dict[str, List[str]]: A dictionary where the keys are experiment IDs and the values are lists of
                                   simulation IDs or simulation objects, depending on the `entity_type` flag.
         """
-        experiments = self.experiments
+        experiments = self.get_experiments()
         sims = {}
         for experiment in experiments:
             sims[experiment.id] = experiment.get_simulations_by_tags(tags=tags, status=status, entity_type=entity_type,

@@ -23,7 +23,7 @@ current_directory = os.path.dirname(os.path.realpath(__file__))
 # import analyzers from current dir's inputs dir
 analyzer_path = os.path.join(os.path.dirname(__file__), "inputs")
 sys.path.insert(0, analyzer_path)
-from sim_filter_analyzer import SimFilterAnalyzer
+from sim_filter_analyzer import SimFilterAnalyzer, SimLamdaFilterAnalyzer
 
 @pytest.mark.analysis
 @pytest.mark.python
@@ -323,3 +323,17 @@ class TestAnalyzeManagerPythonComps(ITestWithPersistence):
         self.assertEqual((df['tags'] == 'b').sum(), 2)  # total 2 simulations match tag b=2
         matched_sim_id_list = [sim_id1, sim_id2]
         assert df['sim_id'].isin(matched_sim_id_list).all()
+
+    def test_analyzer_filter(self):
+        exp_id = '69cab2fe-a252-ea11-a2bf-f0921c167862'  # comps2
+        filenames = ['output/result.json']
+        output_folder = f"output/{self._testMethodName}"
+        analyzers = [SimLamdaFilterAnalyzer(filenames=filenames, output_path=output_folder, result_file_name="match_exp_filter.csv")]
+        manager = AnalyzeManager(analyzers=analyzers, ids=[(exp_id, ItemType.EXPERIMENT)])
+        manager.analyze()
+        file_path = os.path.join(output_folder, exp_id, "match_exp_filter.csv")
+        self.assertTrue(os.path.exists(file_path))
+        df = pd.read_csv(file_path)
+        assert (df['tags'] == 'b').all()
+        assert (df['value'] > 2).all()
+        self.assertEqual((df['tags'] == 'b').sum(), 2)  # total 2 simulations match tag b > 2

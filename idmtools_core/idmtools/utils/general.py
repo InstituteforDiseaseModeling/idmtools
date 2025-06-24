@@ -28,8 +28,10 @@ Copyright 2025, Gates Foundation. All rights reserved.
 import json
 from typing import Dict
 
+from idmtools.core.interfaces.ientity import IEntity
 
-def parse_item_tags(item):
+
+def parse_item_tags(item: IEntity):
     """
     Normalize and update an entity's tags in place.
 
@@ -45,13 +47,11 @@ def parse_item_tags(item):
     if item.tags is None:
         return item
     else:
-        converted_tags = parse_value_tags(item.tags)
-        for k, v in converted_tags.items():
-            item.tags[k] = v
+        item.tags = parse_value_tags(item.tags)
         return item
 
 
-def parse_value_tags(tags, wrap_with_tagvalue=False):
+def parse_value_tags(tags: Dict, wrap_with_tagvalue: bool=False) -> Dict[str, any]:
     """
     Parse and normalize a tag dictionary into native Python types.
 
@@ -278,10 +278,9 @@ class FilterSafeItem:
     @property
     def tags(self):
         """
-        Get normalized tags from the wrapped item, with each value wrapped in TagValue  for type-safe comparison.
+        Get normalized tags from the wrapped item, with each value wrapped in TagValue for type-safe comparison.
 
         Returns:
-            Dict[str, TagValue]: Dictionary of tags wrapped with TagValue.
+            Dict[str, any]: Dictionary of tags.
         """
-        tag = parse_value_tags(self._item.tags)
-        return {k: v for k, v in tag.items()}
+        return parse_value_tags(self._item.tags)

@@ -73,7 +73,7 @@ class FilterItem:
                 return True
             # Normalize simulation tag values and wrap them with TagValue for safe comparisons
             # (e.g., allows "5" == 5 and supports operators like >, <, == in tag filters)
-            sim_tags = {k: v for k, v in parse_value_tags(sim.tags, wrap_with_tagvalue=True).items()}
+            sim_tags = parse_value_tags(sim.tags, wrap_with_tagvalue=True)
 
             # Iterate over each tag filter condition
             for k, v in tags.items():
