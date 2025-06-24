@@ -54,7 +54,7 @@ class FilterItem:
             If the item is an `Experiment`, returns a list of simulation IDs or simulation entities
             (if `entity_type=True`).
 
-            If the item is a `Suite`, returns a dictionary where each key is an experiment ID and
+            If the item is a `Suite`, returns list ofdictionary where each key is an experiment ID and
             each value is a list of simulation IDs or simulation entities (depending on the `entity_type` flag).
 
         """
@@ -99,10 +99,12 @@ class FilterItem:
 
         if isinstance(item, Suite):  # Suite case
             experiments = item.get_experiments()
+            result = []
             for experiment in experiments:
-                return {experiment.id: FilterItem.filter_item(platform, item=experiment, tags=tags, status=status,
-                                                              skip_sims=skip_sims, max_simulations=max_simulations,
-                                                              entity_type=entity_type, **kwargs)}
+                result.append({experiment.id: FilterItem.filter_item(platform, item=experiment, tags=tags, status=status,
+                                                              entity_type=entity_type, skip_sims=skip_sims,
+                                                              max_simulations=max_simulations, **kwargs)})
+            return result
         else:
             potential_sims = item.get_simulations()
 
