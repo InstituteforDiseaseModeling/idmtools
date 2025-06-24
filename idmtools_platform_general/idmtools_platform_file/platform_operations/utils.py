@@ -305,18 +305,16 @@ def add_dummy_suite(experiment: Experiment, suite_name: str = None, tags: Dict =
     Returns:
         Suite
     """
-    if tags is None:
-        tags = {}
+
     if suite_name is None:
         suite_name = 'Suite'
     suite = Suite(name=suite_name)
 
-    if not tags:
+    if tags is not None:
         suite.tags = tags
 
     # add experiment
     suite.add_experiment(experiment)
-
     return suite
 
 
