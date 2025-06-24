@@ -51,7 +51,7 @@ def parse_item_tags(item: IEntity):
         return item
 
 
-def parse_value_tags(tags: Dict, wrap_with_tagvalue: bool=False) -> Dict[str, any]:
+def parse_value_tags(tags: Dict, wrap_with_tagvalue: bool = False) -> Dict[str, any]:
     """
     Parse and normalize a tag dictionary into native Python types.
 
