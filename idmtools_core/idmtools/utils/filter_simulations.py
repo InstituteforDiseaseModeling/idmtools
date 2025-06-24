@@ -50,7 +50,7 @@ class FilterItem:
             **kwargs: Extra args.
 
         Returns:
-            Union[List[Union[str, Simulation]], List[str, List[Union[str, Simulation]]]]:
+            Union[List[Union[str, Simulation]], Dict[str, List[Union[str, Simulation]]]]:
             If the item is an `Experiment`, returns a list of simulation IDs or simulation entities
             (if `entity_type=True`).
 
