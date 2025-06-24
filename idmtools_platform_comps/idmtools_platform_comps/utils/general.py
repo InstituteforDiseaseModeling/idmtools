@@ -2,13 +2,13 @@
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
-import ntpath
+import os
 import re
 import uuid
+import ntpath
 from logging import getLogger, DEBUG
 from typing import List, Dict, Union, Generator, Optional
 from uuid import UUID
-
 from COMPS import Client
 from COMPS.Data import Simulation, SimulationFile, AssetCollectionFile, WorkItemFile, OutputFileMetadata, Experiment
 from COMPS.Data import AssetCollection as COMPSAssetCollection
@@ -16,14 +16,16 @@ from COMPS.Data.AssetFile import AssetFile
 from COMPS.Data.Simulation import SimulationState
 from COMPS.Data.WorkItem import WorkItemState, WorkItem
 from requests import RequestException
-
 from idmtools.assets import AssetCollection, Asset
 from idmtools.core import EntityStatus, ItemType
 from idmtools.core.context import get_current_platform
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities.iplatform import IPlatform
+from idmtools.utils.local_os import LocalOS
 
 ASSETS_PATH = "Assets\\"
+if LocalOS.is_window():
+    ASSETS_PATH = ASSETS_PATH.lower()
 
 logger = getLogger(__name__)
 
@@ -139,11 +141,19 @@ def get_file_from_collection(platform: IPlatform, collection_id: UUID, file_path
 
     # Look for the asset file in the collection
     file_name = ntpath.basename(file_path)
-    path = ntpath.dirname(file_path).lstrip(ASSETS_PATH)
+    path = ntpath.dirname(file_path)
+    if LocalOS.is_window():
+        file_name = file_name.lower()
+        path = path.lower()
+    path = os.path.normpath(path.lstrip(ASSETS_PATH).strip('/'))
 
     for asset_file in ac.assets:
-        if asset_file.file_name == file_name and (asset_file.relative_path or '') == path:
-            return asset_file.retrieve()
+        if LocalOS.is_window():
+            if asset_file.file_name.lower() == file_name and os.path.normpath(asset_file.relative_path or '').lower() == path:
+                return asset_file.retrieve()
+        else:
+            if asset_file.file_name == file_name and os.path.normpath(asset_file.relative_path or '') == path:
+                return asset_file.retrieve()
 
 
 def get_file_as_generator(file: Union[SimulationFile, AssetCollectionFile, AssetFile, WorkItemFile, OutputFileMetadata],
@@ -186,7 +196,8 @@ class Workitem(object):
     pass
 
 
-def get_asset_for_comps_item(platform: IPlatform, item: IEntity, files: List[str], cache=None, comps_item: Union[Experiment, Workitem, Simulation] = None) -> Dict[str, bytearray]:
+def get_asset_for_comps_item(platform: IPlatform, item: IEntity, files: List[str], cache=None,
+                             comps_item: Union[Experiment, Workitem, Simulation] = None) -> Dict[str, bytearray]:
     """
     Retrieve assets from an Entity(Simulation, Experiment, WorkItem).
 
@@ -263,7 +274,8 @@ def update_item(platform: IPlatform, item_id: str, item_type: ItemType, tags: di
     comps_item.save()
 
 
-def generate_ac_from_asset_md5(file_name: str, asset_md5: [str, uuid.UUID], platform: 'IPlatform' = None, tags: dict = None):
+def generate_ac_from_asset_md5(file_name: str, asset_md5: [str, uuid.UUID], platform: 'IPlatform' = None,
+                               tags: dict = None):
     """
     Get an asset collection by asset id(md5).
     Args:
