@@ -82,10 +82,10 @@ class TestContainerFilterItem(ITestWithPersistence):
                                             tags={'tag1': 1})
         potential_simulations = self.platform.flatten_item(self.suite, raw=False)
         expected_sim_ids = self.find_matched_sims_tags(potential_simulations, {'tag1': 1})
-        actual_sim_ids = actual_result[0][self.suite.experiments[0].id]
+        actual_sim_ids = actual_result[self.experiment.id]
         self.assertEqual(len(actual_sim_ids), len(expected_sim_ids))
         self.assertEqual(len(actual_sim_ids), 5)
-        self.assertSetEqual(set(actual_result[0][self.suite.experiments[0].id]), set(expected_sim_ids))
+        self.assertSetEqual(set(actual_result[self.experiment.id]), set(expected_sim_ids))
 
     # test filter with suite which only return succeed sims by default
     def test_filter_item_suite_status(self):
@@ -93,9 +93,9 @@ class TestContainerFilterItem(ITestWithPersistence):
         actual_result = FilterItem.filter_item(self.platform, suite, status=EntityStatus.SUCCEEDED)
         potential_simulations = self.platform.flatten_item(self.suite, raw=False)
         expected_sim_ids = self.find_matched_sims_status(potential_simulations, status=EntityStatus.SUCCEEDED)
-        actual_sim_ids = actual_result[0][self.suite.experiments[0].id]
+        actual_sim_ids = actual_result[self.experiment.id]
         self.assertSetEqual(set(actual_sim_ids), set(expected_sim_ids))
-        self.assertEqual(len(actual_result[0][self.suite.experiments[0].id]), 2)
+        self.assertEqual(len(actual_result[self.experiment.id]), 2)
 
     # test filter with experiment and status=failed which only return failed sims(3 in this case)
     def test_filter_item_experiment_status(self):

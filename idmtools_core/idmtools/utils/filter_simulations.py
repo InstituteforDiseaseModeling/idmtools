@@ -5,7 +5,7 @@ Copyright 2025, Gates Foundation. All rights reserved.
 """
 from idmtools.core import ItemType, EntityStatus
 from idmtools.core.interfaces.ientity import IEntity
-from idmtools.entities import Suite
+from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform import IPlatform
 from idmtools.utils.general import parse_value_tags
 
@@ -50,7 +50,7 @@ class FilterItem:
             **kwargs: Extra args.
 
         Returns:
-            Union[List[Union[str, Simulation]], Dict[str, List[Union[str, Simulation]]]]:
+            Union[List[Union[str, Simulation]], List[str, List[Union[str, Simulation]]]]:
             If the item is an `Experiment`, returns a list of simulation IDs or simulation entities
             (if `entity_type=True`).
 
@@ -58,9 +58,6 @@ class FilterItem:
             each value is a list of simulation IDs or simulation entities (depending on the `entity_type` flag).
 
         """
-        if skip_sims is None:
-            skip_sims = []
-
         def match_tags(sim: IEntity, tags=None):
             """
             Check if simulation match tags.
@@ -97,33 +94,48 @@ class FilterItem:
         if item.item_type not in [ItemType.EXPERIMENT, ItemType.SUITE]:
             raise ValueError("This method only supports Experiment and Suite types!")
 
-        if isinstance(item, Suite):  # Suite case
-            experiments = item.get_experiments()
-            result = []
-            for experiment in experiments:
-                result.append({experiment.id: FilterItem.filter_item(platform, item=experiment, tags=tags, status=status,
-                                                              entity_type=entity_type, skip_sims=skip_sims,
-                                                              max_simulations=max_simulations, **kwargs)})
-            return result
-        else:
+        if skip_sims is None:
+            skip_sims = []
+        # ------------------------------------------------------------------ #
+        # Base case  ─ Experiment
+        # ------------------------------------------------------------------ #
+        if isinstance(item, Experiment):
             potential_sims = item.get_simulations()
 
-        # filter by status
-        sims_status_filtered = [sim for sim in potential_sims if sim.status == status] if status else potential_sims
+            # filter by status
+            sims_status_filtered = [sim for sim in potential_sims if sim.status == status] if status else potential_sims
 
-        # filter tags
-        sims_tags_filtered = [sim for sim in sims_status_filtered if match_tags(sim, tags)]
+            # filter tags
+            sims_tags_filtered = [sim for sim in sims_status_filtered if match_tags(sim, tags)]
 
-        # filter sims
-        sims_id_filtered = [sim for sim in sims_tags_filtered if str(sim.uid) not in skip_sims]
+            # filter sims
+            sims_id_filtered = [sim for sim in sims_tags_filtered if str(sim.uid) not in skip_sims]
 
-        # consider max_simulations for return
-        sims_final = sims_id_filtered[0:max_simulations if max_simulations else len(sims_id_filtered)]
+            # consider max_simulations for return
+            sims_final = sims_id_filtered[0:max_simulations if max_simulations else len(sims_id_filtered)]
 
-        if entity_type:
-            return sims_final
-        else:
-            return [s.id for s in sims_final]
+            if entity_type:
+                return sims_final
+            else:
+                return [s.id for s in sims_final]
+
+        # Suite case:
+        experiments = item.get_experiments()
+        result = {}
+
+        for exp in experiments:
+            filtered = FilterItem.filter_item(
+                platform,
+                item=exp,
+                tags=tags,
+                status=status,
+                entity_type=entity_type,
+                max_simulations=max_simulations,
+                skip_sims=skip_sims,
+                **kwargs,
+            )
+            result[exp.id] = filtered
+        return result
 
     @classmethod
     def filter_item_by_id(cls, platform: IPlatform, item_id: str, item_type: ItemType = ItemType.EXPERIMENT,
