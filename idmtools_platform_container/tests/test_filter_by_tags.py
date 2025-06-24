@@ -15,7 +15,7 @@ uuid_pattern = re.compile(
 )
 
 
-class TestSimulationsWithTags(unittest.TestCase):
+class TestContainerGetSimulationByTags(unittest.TestCase):
 
     def setUp(self):
         temp_dir = os.path.join(os.getcwd(), "temp_test_output")

@@ -22,7 +22,7 @@ uuid_pattern = re.compile(
 )
 
 
-class TestSimulationsWithTags(unittest.TestCase):
+class TestCOMPSGetSimulationByTags(unittest.TestCase):
 
     def create_experiment(self):
         with tempfile.TemporaryDirectory() as temp_dir:
