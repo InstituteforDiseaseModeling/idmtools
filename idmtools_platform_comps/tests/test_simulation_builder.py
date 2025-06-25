@@ -229,11 +229,7 @@ class TestSimulationBuilder(ITestWithPersistence):
         comps_exp = self.platform.get_item(experiment.id, item_type=ItemType.EXPERIMENT, raw=True)
         comps_simulations = comps_exp.get_simulations(query_criteria=QueryCriteria().select_children("tags"))
         self.assertEqual(comps_simulations.__len__(), 6)
-        exclude_key = "task_type"
-        real_tags = [
-            {key: int(value) for key, value in simulation.tags.items() if key != exclude_key}
-            for simulation in comps_simulations
-        ]
+        real_tags = comps_simulations.tags
         expected_tags = [
             {'a': 1, 'b': 2, 'c': 4},
             {'a': 1, 'b': 2, 'c': 5},
