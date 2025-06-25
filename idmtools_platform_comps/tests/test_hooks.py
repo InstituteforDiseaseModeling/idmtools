@@ -139,6 +139,7 @@ class TestHooks(ITestWithPersistence):
 
         # validate exp has correct tag. Need to remove unrelated tags first
         exp.tags.pop('idmtools')
+        exp.tags.pop("task_type")
         self.assertEqual(exp.tags, {'pre_creation_tag': 'pre_creation'})
 
     def test_experiment_post_creation_hooks(self):
@@ -171,11 +172,13 @@ class TestHooks(ITestWithPersistence):
         self.platform.run_items(exp)
         # validate exp has correct tag. Need to remove unrelated tags first
         exp.tags.pop('idmtools')
+        exp.tags.pop("task_type")
         self.assertDictEqual(exp.tags, {'pre_run_tag': 'pre_run', 'post_run_tag': 'post_run'})
 
         # verify from comps experiment tags, note, post_run_hook tag will not show up in comps
         comps_tags = COMPSExperiment.get(exp.id, QueryCriteria().select_children('tags')).tags
         comps_tags.pop('idmtools')
+        comps_tags.pop('task_type')
         self.assertDictEqual(comps_tags, {'pre_run_tag': 'pre_run'})
 
     def test_experiment_hooks(self):
@@ -207,6 +210,7 @@ class TestHooks(ITestWithPersistence):
         # verify tags from comps are expected
         tags = COMPSExperiment.get(exp.id, QueryCriteria().select_children('tags')).tags
         tags.pop('idmtools')
+        tags.pop("task_type")
         self.assertDictEqual(tags, expected_tags)
 
         # verify we saved file from post_run_kko
@@ -252,7 +256,7 @@ class TestHooks(ITestWithPersistence):
         register_plugins(my_hook)
         exp.run(True)
         # verify idmtools experiment tags
-        expected_tags = {'tag_key': 'tag_value'}
+        expected_tags = {'tag_key': 'tag_value', 'task_type': 'idmtools.entities.command_task.CommandTask'}
         exp.tags.pop('idmtools')
         self.assertDictEqual(exp.tags, expected_tags)
         self.assertDictEqual(exp.simulations[0].tags, {'sim_tag_post_key': 'sim_tag_post_value'})
@@ -260,6 +264,7 @@ class TestHooks(ITestWithPersistence):
         # and simulation does not contain post tags
         comps_tags = COMPSExperiment.get(exp.id, QueryCriteria().select_children('tags')).tags
         comps_tags.pop('idmtools')
+        comps_tags.pop("task_type")
         self.assertDictEqual(comps_tags, expected_tags)
         sim_tags = COMPSSimulation.get(exp.simulations[0].id, QueryCriteria().select_children('tags')).tags
         self.assertDictEqual(sim_tags, {})
