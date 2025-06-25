@@ -201,7 +201,7 @@ class TestFilePlatform(unittest.TestCase):
             sim_df['outpath'] = sim_map[sim.id]
             sims_df = pd.concat([sims_df, sim_df], ignore_index=True)
         self.assertTrue(np.all(exp_df.sort_values('simid').values == sims_df.sort_values('simid').values))
-        self.assertTrue(exp_df.shape == (9, 6))
+        self.assertTrue(exp_df.shape == (9, 5))
 
     def test_create_sim_directory_csv(self):
         experiment = self.experiment
