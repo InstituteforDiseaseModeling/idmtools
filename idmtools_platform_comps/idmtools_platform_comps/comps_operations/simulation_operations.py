@@ -429,7 +429,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
 
         Args:
             simulation: Simulation to populate with task
-            comps_sim: Experiment object
+            comps_sim: COMPSSimulation object
             metadata: Metadata loaded to be used in the task object
 
         Returns:
@@ -459,7 +459,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
 
         Args:
             simulation: Simulation to populate with task
-            comps_sim: Experiment object
+            comps_sim: COMPSSimulation object
             task_type: Experiment's task type
             metadata: Metadata loaded to be used in the task object
 
