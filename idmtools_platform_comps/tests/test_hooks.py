@@ -264,7 +264,6 @@ class TestHooks(ITestWithPersistence):
         # and simulation does not contain post tags
         comps_tags = COMPSExperiment.get(exp.id, QueryCriteria().select_children('tags')).tags
         comps_tags.pop('idmtools')
-        comps_tags.pop("task_type")
         self.assertDictEqual(comps_tags, expected_tags)
         sim_tags = COMPSSimulation.get(exp.simulations[0].id, QueryCriteria().select_children('tags')).tags
         self.assertDictEqual(sim_tags, {})
