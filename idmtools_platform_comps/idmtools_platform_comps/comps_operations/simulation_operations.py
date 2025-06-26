@@ -399,7 +399,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         # should we load metadata
         metadata = self.__load_metadata_from_simulation(obj) if load_metadata else None
         if load_task:
-            self._load_task_from_simulation(obj, simulation, metadata)
+            self._load_task_from_simulation2(obj, simulation, parent.task_type, metadata)
         else:
             obj.task = None
             self.__extract_cli(simulation, parent, obj, load_cli_from_workorder)
@@ -429,7 +429,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
 
         Args:
             simulation: Simulation to populate with task
-            comps_sim: Experiment object
+            comps_sim: COMPSSimulation object
             metadata: Metadata loaded to be used in the task object
 
         Returns:
@@ -446,6 +446,37 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
                 simulation.task = TaskFactory().create(comps_sim.tags['task_type'], **metadata)
             except Exception as e:
                 user_logger.warning(f"Could not load task of type {comps_sim.tags['task_type']}. "
+                                    f"Received error {str(e)}")
+                logger.exception(e)
+        # ensure we have loaded the configuration
+        if comps_sim.configuration is None:
+            comps_sim.refresh(QueryCriteria().select_children('configuration'))
+
+    def _load_task_from_simulation2(self, simulation: Simulation, comps_sim: COMPSSimulation, task_type: str,
+                                    metadata: Dict = None):
+        """
+        Load task from the simulation object.
+
+        Args:
+            simulation: Simulation to populate with task
+            comps_sim: COMPSSimulation object
+            task_type: Experiment's task type
+            metadata: Metadata loaded to be used in the task object
+
+        Returns:
+            None
+        """
+        simulation.task = None
+        if task_type:
+            # check for metadata
+            if not metadata:
+                metadata = self.__load_metadata_from_simulation(simulation)
+            try:
+                if logger.isEnabledFor(DEBUG):
+                    logger.debug(f"Metadata: {metadata}")
+                simulation.task = TaskFactory().create(task_type, **metadata)
+            except Exception as e:
+                user_logger.warning(f"Could not load task of type {task_type}. "
                                     f"Received error {str(e)}")
                 logger.exception(e)
         # ensure we have loaded the configuration

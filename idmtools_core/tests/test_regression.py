@@ -62,7 +62,6 @@ class TestPersistenceServices(ITestWithPersistence):
         e = Experiment.from_task(TestTask(), gather_common_assets_from_task=True)
         e.tags = {"test": 1}
         e.pre_creation(None)
-        self.assertEqual(e.tags.get("task_type"), "idmtools_test.utils.test_task.TestTask")
         self.assertEqual(e.tags.get("test"), 1)
 
 
