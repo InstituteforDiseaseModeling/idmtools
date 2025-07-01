@@ -51,7 +51,7 @@ jobs:
           TWINE_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
         run: |
-          python setup.py sdist bdist_wheel
+          python -m build
           twine upload dist/*
       - name: Build and push docker image
         working-directory: idmtools_platform_comps
