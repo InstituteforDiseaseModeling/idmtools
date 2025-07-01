@@ -41,6 +41,7 @@ def update_requirements():
         with open(file, 'w') as rout:
             rout.write(new_contents)
 
+
 def update_idmtools_version_in_pyproject():
     target_pattern = re.compile(r"^idmtools(~=|==)?")
 
@@ -69,5 +70,6 @@ def update_idmtools_version_in_pyproject():
             # Write updated TOML back using tomli_w
             with open(file, "wb") as f:
                 tomli_w.dump(pyproject_data, f)
+
 
 update_idmtools_version_in_pyproject()
