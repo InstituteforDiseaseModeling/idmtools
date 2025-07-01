@@ -1,0 +1,71 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "idmtools_models"
+version = "2.1.0+nightly"
+description = "Core tools for modeling"
+readme = "README.md"
+requires-python = ">=3.8"
+keywords = ["modeling", "IDM"]
+
+authors = [
+    { name = "Ross Carter", email = "rcarter@idmod.org" },
+    { name = "Sharon Chen", email = "shchen@idmod.org" },
+    { name = "Clinton Collins", email = "ccollins@idmod.org" },
+    { name = "Zhaowei Du", email = "zdu@idmod.org" },
+    { name = "Mary Fisher", email = "mafisher@idmod.org" },
+    { name = "Mandy Izzo", email = "mizzo@idmod.org" },
+    { name = "Clark Kirkman IV", email = "ckirkman@idmod.org" },
+    { name = "Benoit Raybaud", email = "braybaud@idmod.org" },
+    { name = "Jen Schripsema", email = "jschripsema@idmod.org" }
+]
+
+classifiers = [
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12"
+]
+
+# You need to manually paste your requirements.txt here:
+dependencies = [
+    "idmtools~=2.1.0"
+]
+
+[project.urls]
+Homepage = "https://github.com/InstituteforDiseaseModeling/idmtools"
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-timeout",
+    "pytest-cache",
+    "flake8",
+    "coverage",
+    "bump2version",
+    "twine"
+]
+packaging = [
+    "flake8",
+    "coverage",
+    "bump2version",
+    "twine"
+]
+
+[project.entry-points."idmtools_task"]
+idmtools_task_python = "idmtools_models.python.python_task:PythonTaskSpecification"
+idmtools_task_python_json = "idmtools_models.python.json_python_task:JSONConfiguredPythonTaskSpecification"
+idmtools_task_templated_script = "idmtools_models.templated_script_task:TemplatedScriptTaskSpecification"
+idmtools_task_wrapper_script = "idmtools_models.templated_script_task:ScriptWrapperTaskSpecification"
+idmtools_task_r = "idmtools_models.r.r_task:RTaskSpecification"
+idmtools_task_r_json = "idmtools_models.r.json_r_task:JSONConfiguredRTaskSpecification"
+idmtools_task_json = "idmtools_models.json_configured_task:JSONConfiguredTaskSpecification"
+
+[tool.setuptools]
+packages = { find = { exclude = ["tests"] } }
+
+[tool.setuptools.package-data]
+"idmtools_models" = ["*"]

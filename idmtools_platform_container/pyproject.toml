@@ -1,0 +1,71 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "idmtools_platform_container"
+version = "2.1.0+nightly"
+description = "Container platform for IDM-Tools"
+readme = "README.md"
+requires-python = ">=3.8"
+keywords = ["modeling", "IDM"]
+
+authors = [
+    { name = "Zhaowei Du", email = "zdu@idmod.org" },
+    { name = "Sharon Chen", email = "shchen@idmod.org" },
+    { name = "Clinton Collins", email = "ccollins@idmod.org" },
+    { name = "Benoit Raybaud", email = "braybaud@idmod.org" },
+    { name = "Clark Kirkman IV", email = "ckirkman@idmod.org" },
+    { name = "Ye Chen", email = "yechen@idmod.org" },
+    { name = "Mary Fisher", email = "mafisher@idmod.org" },
+    { name = "Mandy Izzo", email = "mizzo@idmod.org" },
+    { name = "Jen Schripsema", email = "jschripsema@idmod.org" },
+    { name = "Ross Carter", email = "rcarter@idmod.org" },
+]
+
+classifiers = [
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12"
+]
+
+# Paste your actual requirements.txt content here
+dependencies = [
+    "idmtools-platform-general~=2.1.0",
+    "docker>5.0",
+    "rich"
+]
+
+[project.urls]
+Homepage = "https://github.com/InstituteforDiseaseModeling/idmtools"
+
+[project.optional-dependencies]
+test = [
+  "pytest",
+  "pytest-runner",
+  "matplotlib",
+  "pytest-timeout",
+  "pytest-cache",
+  "pytest-lazy-fixture",
+  "flake8",
+  "coverage",
+  "bump2version",
+  "twine",
+  "natsort"
+]
+
+packaging = ["flake8", "coverage", "bump2version", "twine", "natsort"]
+
+[project.entry-points."idmtools_platform"]
+idmtools_platform_container = "idmtools_platform_container.plugin_info:ContainerPlatformSpecification"
+
+[project.entry-points."idmtools_cli.cli_plugins"]
+container = "idmtools_platform_container.cli.container:container"
+
+[tool.setuptools]
+packages = { find = { exclude = ["tests"] } }
+
+[tool.setuptools.package-data]
+"idmtools_platform_container" = ["*"]
