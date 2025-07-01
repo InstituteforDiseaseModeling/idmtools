@@ -58,18 +58,23 @@ jobs:
           make bump-minor
 
       - name: Update internal dependency versions
+        working-directory: ${{ github.workspace }}
         run: |
           python dev_scripts/update_core_version.py
-
+          echo "--- Updated files ---"
+          git diff
       - name: Commit version bump
         run: |
+          cd ${{ github.workspace }}
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add .
-          git diff --quiet || git commit -m "Bump minor version [skip ci]"
+          git status
+          git diff --cached
+          git diff --cached --quiet || git commit -m "Update dependency versions [skip ci]"
           git push
       - name: Tag version
         run: |
-          VERSION=$(grep '^version =' pyproject.toml | sed -E "s/.*= *[\"'](.*)[\"']/\1/")
+          VERSION=$(python dev_scripts/get_version.py)
           git tag "v$VERSION"
           git push origin "v$VERSION"
