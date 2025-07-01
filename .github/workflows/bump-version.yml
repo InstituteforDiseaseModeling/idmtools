@@ -1,0 +1,70 @@
+name: Bump Version
+on:
+  workflow_dispatch:
+    inputs:
+      bump_type:
+        description: "Which version part to bump"
+        required: true
+        default: "patch"
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+
+jobs:
+  approve:
+    name: Approve version bump
+    environment: restricted-pr-approver
+    runs-on: ubuntu-latest
+    steps:
+      - name: Request approval
+        run: echo "Requesting approval for version bump"
+
+  version-bump:
+    name: Bump Version
+    needs: approve
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+        python-version: [ '3.12' ]
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # required for version history and tags
+      - name: Set up Python on ${{ matrix.os }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Set up Git
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git remote set-url origin https://x-access-token:${{ secrets.VERSION_PAT }}@github.com/${{ github.repository }}.git
+      - name: Install required tools
+        run: |
+          pip install bump2version tomli tomli-w
+      - name: Bump version
+        run: |
+          make bump-${{ github.event.inputs.bump_type }}
+
+      - name: Update internal dependency versions
+        run: |
+          python dev_scripts/update_core_version.py
+
+      - name: Commit version bump
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add .
+          git diff --quiet || git commit -m "Bump ${{ github.event.inputs.bump_type }} version [skip ci]"
+          git push
+      - name: Tag version
+        run: |
+          VERSION=$(grep '^version =' pyproject.toml | sed -E "s/.*= *[\"'](.*)[\"']/\1/")
+          git tag "v$VERSION"
+          git push origin "v$VERSION"
