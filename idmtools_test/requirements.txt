@@ -1,3 +1,0 @@
-idmtools~=2.1.0
-pytest
-pytest-runner~=6.0
