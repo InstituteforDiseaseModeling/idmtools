@@ -1,10 +1,10 @@
 name: Bump Version
 on:
-  push:
-    branches:
-      # only run this on
-      - dev
-      - 'release**'
+#  push:
+#    branches:
+#      # only run this on
+#      - dev
+#      - 'release**'
   workflow_dispatch:
     inputs:
       bump_type:
