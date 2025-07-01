@@ -54,8 +54,8 @@ jobs:
         run: |
           pip install bump2version tomli tomli-w
       - name: Bump version
-        run: |
-          make bump-${{ github.event.inputs.bump_type }}
+        run: |  # make bump-${{ github.event.inputs.bump_type }}          
+          make bump-minor
 
       - name: Update internal dependency versions
         run: |
@@ -66,7 +66,7 @@ jobs:
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add .
-          git diff --quiet || git commit -m "Bump ${{ github.event.inputs.bump_type }} version [skip ci]"
+          git diff --quiet || git commit -m "Bump minor version [skip ci]"
           git push
       - name: Tag version
         run: |
