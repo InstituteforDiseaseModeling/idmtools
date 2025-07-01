@@ -67,6 +67,7 @@ comps_subcommand = "idmtools_platform_comps.cli.comps:comps"
 
 [tool.setuptools]
 packages = { find = { exclude = ["tests"] } }
+include-package-data = true  # ✅ This enables MANIFEST.in for wheel builds
 
 [tool.setuptools.package-data]
 "idmtools_platform_comps" = ["*"]

@@ -66,6 +66,7 @@ container = "idmtools_platform_container.cli.container:container"
 
 [tool.setuptools]
 packages = { find = { exclude = ["tests"] } }
+include-package-data = true  # ✅ This enables MANIFEST.in for wheel builds
 
 [tool.setuptools.package-data]
 "idmtools_platform_container" = ["*"]

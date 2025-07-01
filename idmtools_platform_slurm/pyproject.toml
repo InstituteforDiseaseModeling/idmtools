@@ -47,6 +47,7 @@ slurm = "idmtools_platform_slurm.cli.slurm:slurm"
 
 [tool.setuptools]
 packages = { find = { exclude = ["tests"] } }
+include-package-data = true  # ✅ This enables MANIFEST.in for wheel builds
 
 [tool.setuptools.package-data]
 "idmtools_platform_slurm" = ["*"]

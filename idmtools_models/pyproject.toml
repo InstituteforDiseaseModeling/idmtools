@@ -66,6 +66,7 @@ idmtools_task_json = "idmtools_models.json_configured_task:JSONConfiguredTaskSpe
 
 [tool.setuptools]
 packages = { find = { exclude = ["tests"] } }
+include-package-data = true  # ✅ This enables MANIFEST.in for wheel builds
 
 [tool.setuptools.package-data]
 "idmtools_models" = ["*"]
