@@ -55,7 +55,7 @@ jobs:
           pip install bump2version tomli tomli-w
       - name: Bump version
         run: |  # make bump-${{ github.event.inputs.bump_type }}          
-          make bump-minor
+          make bump-${{ github.event.inputs.bump_type }}  
 
       - name: Update internal dependency versions
         working-directory: ${{ github.workspace }}
