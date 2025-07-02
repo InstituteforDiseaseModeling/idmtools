@@ -26,8 +26,9 @@ jobs:
     outputs:
       approved: ${{ steps.check.outputs.approved }}
     steps:
-      - name: Install GitHub CLI
-        uses: cli/cli-action@v2
+      - name: Set up GitHub CLI
+        run: |
+          sudo apt-get update && sudo apt-get install -y gh
 
       - name: Fetch PR approvals
         id: check
