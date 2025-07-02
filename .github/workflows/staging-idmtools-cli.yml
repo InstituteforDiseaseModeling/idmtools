@@ -26,6 +26,8 @@ jobs:
     outputs:
       approved: ${{ steps.check.outputs.approved }}
     steps:
+      - name: Checkout code (needed for Git operations)
+        uses: actions/checkout@v4
       - name: Set up GitHub CLI
         run: |
           sudo apt-get update && sudo apt-get install -y gh
