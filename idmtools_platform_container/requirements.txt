@@ -1,3 +1,0 @@
-idmtools-platform-general~=2.1.0
-docker
-rich

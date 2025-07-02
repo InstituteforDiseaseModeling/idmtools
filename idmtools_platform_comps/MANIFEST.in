@@ -1,4 +1,3 @@
-include requirements.txt
 include README.md
 include idmtools_platform_comps/utils/base_singularity_work_order.json
 prune tests

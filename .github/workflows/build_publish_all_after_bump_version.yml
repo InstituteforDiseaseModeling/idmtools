@@ -1,0 +1,90 @@
+# This workflows will upload a Python Package using Twine when a release is created
+
+name: "Staging: build and publish all packages"
+
+on:
+  repository_dispatch:
+    types: [ trigger-package-build ]
+
+jobs:
+  build_all_packages:
+    runs-on: ubuntu-latest
+    env:
+      TWINE_REPOSITORY_URL: https://packages.idmod.org/api/pypi/idm-pypi-staging/
+      PYPI_STAGING_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
+      PYPI_STAGING_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
+    if: |
+      github.event_name == 'repository_dispatch' && github.ref == 'refs/heads/dev'
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install setuptools wheel twine bump2version build
+          git config --global user.name "IDM Tools"
+          git config --global user.email "idmtools@idmod.org"
+      - uses: actions/checkout@v2
+      - name: Build and publish idmtools_cli
+        working-directory: idmtools_cli
+        run: |
+          python -m build
+          twine upload dist/*
+      - name: Build and publish idmtools_core
+        working-directory: idmtools_core
+        run: |
+          python -m build
+          twine upload dist/*
+      - name: Build and publish idmtools_models
+        working-directory: idmtools_models
+        run: |
+          python -m build
+          twine upload dist/*
+      - name: Build and publish idmtools_platform_general
+        working-directory: idmtools_platform_general
+        run: |
+          python -m build
+          twine upload dist/*
+      - name: Build and publish idmtools_platform_slurm
+        working-directory: idmtools_platform_slurm
+        run: |
+          python -m build
+          twine upload dist/*
+      - name: Build and publish idmtools_test
+        working-directory: idmtools_test
+        run: |
+          python -m build
+          twine upload dist/*
+      - name: Build and publish idmtools_platform_comps
+        working-directory: idmtools_platform_comps
+        run: |
+          python -m build
+          twine upload dist/*
+      - name: Build and push ssmt docker image
+        working-directory: idmtools_platform_comps
+        run: |
+          make ssmt-image
+          make ssmt-image-release
+      - name: Build and publish idmtools_platform_container
+        working-directory: idmtools_platform_container
+        run: |
+          python -m build
+          twine upload dist/*
+      - name: Verify if files changed
+        uses: tj-actions/changed-files@v45
+        id: changed_files
+        with:
+          files: |
+            idmtools_platform_container/docker_image/Dockerfile
+            idmtools_platform_container/docker_image/requirements.txt
+      - name: Print any_modified output
+        run: |
+          echo "Any modified: ${{ steps.changed_files.outputs.any_modified }}"
+      - name: Build container docker image
+        working-directory: idmtools_platform_container/docker_image
+        if: steps.changed_files.outputs.any_modified == 'true'
+        run: |
+          python build_docker_image.py --username ${{ secrets.PYPI_STAGING_USERNAME }} --password ${{ secrets.PYPI_STAGING_PASSWORD }}
+          python push_docker_image.py --username ${{ env.PYPI_STAGING_USERNAME }} --password ${{ env.PYPI_STAGING_PASSWORD }}

@@ -1,0 +1,86 @@
+name: Bump Version
+on:
+  workflow_dispatch:
+    inputs:
+      bump_type:
+        description: "Which version part to bump"
+        required: true
+        default: "patch"
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+      target_branch:
+        description: "Only bump version when branch is 'dev'"
+        required: true
+        default: dev
+
+jobs:
+  approve:
+    name: Approve version bump
+    environment: restricted-pr-approver
+    runs-on: ubuntu-latest
+    steps:
+      - name: Request approval
+        run: echo "Requesting approval for version bump"
+
+  version-bump:
+    name: Bump Version
+    needs: approve
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+        python-version: [ '3.12' ]
+    permissions:
+      contents: write
+    if: github.ref == 'refs/heads/dev' && github.event.inputs.target_branch == 'dev'
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # required for version history and tags
+      - name: Set up Python on ${{ matrix.os }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Set up Git
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git remote set-url origin https://x-access-token:${{ secrets.VERSION_PAT }}@github.com/${{ github.repository }}.git
+      - name: Install required tools
+        run: |
+          pip install bump2version tomli tomli-w
+      - name: Bump version
+        run: |  # make bump-${{ github.event.inputs.bump_type }}          
+          make bump-${{ github.event.inputs.bump_type }}  
+
+      - name: Update internal dependency versions
+        working-directory: ${{ github.workspace }}
+        run: |
+          python dev_scripts/update_core_version.py
+          echo "--- Updated files ---"
+          git diff
+      - name: Commit version bump
+        run: |
+          cd ${{ github.workspace }}
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add .
+          git status
+          git diff --cached
+          git diff --cached --quiet || git commit -m "Update dependency versions [skip ci]"
+          git push
+      - name: Tag version
+        run: |
+          VERSION=$(python dev_scripts/get_version.py)
+          git tag "v$VERSION"
+          git push origin "v$VERSION"
+      - name: Trigger package build
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.VERSION_PAT }}
+          event-type: trigger-package-build
+          client-payload: '{"branch":"dev"}'

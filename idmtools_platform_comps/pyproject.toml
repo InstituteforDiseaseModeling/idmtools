@@ -1,0 +1,73 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "idmtools_platform_comps"
+version = "2.1.0+nightly"
+description = "Comps platform for IDM-Tools"
+readme = "README.md"
+requires-python = ">=3.8"
+keywords = ["modeling", "IDM"]
+
+authors = [
+    { name = "Zhaowei Du", email = "zdu@idmod.org" },
+    { name = "Sharon Chen", email = "shchen@idmod.org" },
+    { name = "Clinton Collins", email = "ccollins@idmod.org" },
+    { name = "Benoit Raybaud", email = "braybaud@idmod.org" },
+    { name = "Clark Kirkman IV", email = "ckirkman@idmod.org" },
+    { name = "Ye Chen", email = "yechen@idmod.org" },
+    { name = "Mary Fisher", email = "mafisher@idmod.org" },
+    { name = "Mandy Izzo", email = "mizzo@idmod.org" },
+    { name = "Jen Schripsema", email = "jschripsema@idmod.org" },
+    { name = "Ross Carter", email = "rcarter@idmod.org" },
+]
+
+classifiers = [
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12"
+]
+
+dependencies = [
+    "idmtools~=2.1.0",
+    "pyCOMPS~=2.10",
+    "natsort~=8.4.0"
+]
+
+[project.urls]
+Homepage = "https://github.com/InstituteforDiseaseModeling/idmtools"
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "matplotlib",
+    "pytest-timeout",
+    "pytest-cache",
+    "pytest-lazy-fixture",
+    "flake8",
+    "coverage",
+    "bump2version",
+    "twine",
+    "natsort"
+]
+packaging = ["flake8", "coverage", "bump2version", "twine", "natsort"]
+
+[project.scripts]
+comps-cli = "idmtools_platform_comps.cli.comps:comps"
+
+[project.entry-points."idmtools_platform"]
+idmtools_platform_comps = "idmtools_platform_comps.plugin_info:COMPSPlatformSpecification"
+idmtools_platform_ssmt = "idmtools_platform_comps.plugin_info:SSMTPlatformSpecification"
+
+[project.entry-points."idmtools_cli.cli_plugins"]
+comps_subcommand = "idmtools_platform_comps.cli.comps:comps"
+
+[tool.setuptools]
+packages = { find = { exclude = ["tests"] } }
+include-package-data = true  # ✅ This enables MANIFEST.in for wheel builds
+
+[tool.setuptools.package-data]
+"idmtools_platform_comps" = ["*"]

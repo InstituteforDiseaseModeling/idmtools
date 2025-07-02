@@ -101,34 +101,39 @@ def process_output(output_line: str):
 
 def install_dev_packages(pip_url, extra_index_url):
     """
-    Install the development packages.
-
-    This loops through all our idmtools packages and runs pip install -e . on each package
-    It also runs a pip install -r requirements from the  doc directory.
-
+    Install all idmtools packages in editable mode with their extras, and also dev dependencies for docs.
     Args:
-        pip_url: Url to install package from
+        pip_url: Url to install package from.
+        extra_index_url: Extra index url to install package from.
 
     Returns:
         None
     """
-    # loop through and install our packages
     for package, extras in packages.items():
-        extras_str = f"[{','.join(extras)}]" if extras else ''
-        logger.info(f'Installing {package} with extras: {extras_str if extras_str else "None"} from {base_directory}')
+        extras_str = f"[{','.join(extras)}]" if extras else ""
+        package_dir = join(base_directory, package)
+        logger.info(f"Installing {package}{extras_str} from {package_dir}")
+
+        cmd = [
+            sys.executable, "-m", "pip", "install", "-e", f".{extras_str}",
+            f"--index-url={pip_url}", f"--extra-index-url={extra_index_url}"
+        ]
+
         try:
-            for line in execute(
-                    [sys.executable, "-m", "pip", "install", "-e", f".{extras_str}", f"--index-url={pip_url}",
-                     f"--extra-index-url={extra_index_url}"],
-                    cwd=join(base_directory, package)):
+            for line in execute(cmd, cwd=package_dir):
                 process_output(line)
         except subprocess.CalledProcessError as e:
-            logger.critical(f'{package} installed failed using {e.cmd} did not succeed')
-            result = e.returncode
-            logger.debug(f'Return Code: {result}')
-    for line in execute([sys.executable, "-m", "pip", "install", "-r", "requirements.txt", f"--index-url={pip_url}",
-                         f"--extra-index-url={extra_index_url}"],
-                        cwd=join(base_directory, 'docs')):
+            logger.critical(f"{package} installation failed: {e.cmd}")
+            logger.debug(f"Return code: {e.returncode}")
+
+    # Install doc dependencies
+    docs_dir = join(base_directory, "docs")
+    logger.info("Installing doc requirements from docs/requirements.txt")
+    cmd_docs = [
+        sys.executable, "-m", "pip", "install", "-r", "requirements.txt",
+        f"--index-url={pip_url}", f"--extra-index-url={extra_index_url}"
+    ]
+    for line in execute(cmd_docs, cwd=docs_dir):
         process_output(line)
 
 
@@ -151,6 +156,10 @@ def install_base_environment(pip_url, extra_index_url):
         process_output(line)
 
     for line in execute([sys.executable, "-m", "pip", "install", "idm-buildtools~=1.0.1", f"--index-url={pip_url}",
+                         f"--extra-index-url={extra_index_url}"]):
+        process_output(line)
+
+    for line in execute([sys.executable, "-m", "pip", "install", "build", "setuptools", f"--index-url={pip_url}",
                          f"--extra-index-url={extra_index_url}"]):
         process_output(line)
 

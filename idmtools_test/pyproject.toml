@@ -1,0 +1,57 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "idmtools_test"
+version = "2.1.0+nightly"
+description = "Test and demo data for IDM-Tools"
+readme = "README.md"
+requires-python = ">=3.8"
+keywords = ["modeling", "IDM", "test", "testdata", "demodata"]
+
+authors = [
+    { name = "Sharon Chen", email = "schen@idmod.org" },
+    { name = "Zhaowei Du", email = "zdu@idmod.org" },
+    { name = "Ye Chen", email = "yechen@idmod.org" },
+    { name = "Clinton Collins", email = "ccollins@idmod.org" },
+    { name = "Mary Fisher", email = "mfisher@idmod.org" },
+    { name = "Clark Kirkman IV", email = "ckirkman@idmod.org" },
+    { name = "Benoit Raybaud", email = "braybaud@idmod.org" }
+]
+
+classifiers = [
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12"
+]
+
+# Paste in your requirements.txt content here
+dependencies = [
+    "idmtools~=2.1.0",
+    "pytest",
+    "pypiwin32==223; sys_platform == 'win32'",
+    "pywin32; sys_platform == 'win32'"
+]
+
+[project.urls]
+Homepage = "https://github.com/InstituteforDiseaseModeling/idmtools"
+
+[project.entry-points."idmtools_platform"]
+idmtools_platform_test = "idmtools_test.utils.test_platform:TestPlatformSpecification"
+idmtools_platform_testex = "idmtools_test.utils.test_execute_platform:TestExecutePlatformSpecification"
+
+[project.entry-points."idmtools_task"]
+idmtools_model_test = "idmtools_test.utils.test_task:TestTaskSpecification"
+
+[project.entry-points."idmtools_hooks"]
+idmtools_test_hooks = "idmtools_test.test_precreate_hooks"
+
+[tool.setuptools]
+packages = { find = { exclude = ["tests"] } }
+include-package-data = true  # ✅ This enables MANIFEST.in for wheel builds
+
+[tool.setuptools.package-data]
+"idmtools_test" = ["*"]

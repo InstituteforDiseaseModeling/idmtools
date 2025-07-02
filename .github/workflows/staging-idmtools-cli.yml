@@ -19,11 +19,11 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
+          python-version: '3.12'
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install setuptools wheel twine bump2version
+          pip install setuptools wheel twine bump2version build
           git config --global user.name "IDM Tools"
           git config --global user.name "idmtools@idmod.org"
       - uses: actions/checkout@v2
@@ -39,5 +39,5 @@ jobs:
           TWINE_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
         run: |
-          python setup.py sdist bdist_wheel
+          python -m build
           twine upload dist/*

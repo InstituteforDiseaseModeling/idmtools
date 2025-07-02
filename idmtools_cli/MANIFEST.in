@@ -1,4 +1,3 @@
-include requirements.txt
 include idmtools_cli/cli/common_project_templates.json
 include README.md
 prune tests

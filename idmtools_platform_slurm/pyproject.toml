@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "idmtools_platform_slurm"
+version = "2.1.0+nightly"
+description = "Provides ability to run against Slurm"
+readme = "README.md"
+requires-python = ">=3.8"
+keywords = ["modeling", "IDM"]
+
+authors = [
+    { name = "Sharon Chen", email = "schen@idmod.org" },
+    { name = "Clinton Collins", email = "ccollins@idmod.org" },
+    { name = "Zhaowei Du", email = "zdu@idmod.org" },
+    { name = "Clark Kirkman IV", email = "ckirkman@idmod.org" },
+    { name = "Benoit Raybaud", email = "braybaud@idmod.org" }
+]
+
+classifiers = [
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12"
+]
+
+# Paste your actual requirements.txt contents here
+dependencies = [
+    "idmtools~=2.1.0"
+]
+
+[project.urls]
+Homepage = "https://github.com/InstituteforDiseaseModeling/idmtools"
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+]
+
+[project.entry-points."idmtools_platform"]
+idmtools_platform_slurm = "idmtools_platform_slurm.plugin_info:SlurmPlatformSpecification"
+
+[project.entry-points."idmtools_cli.cli_plugins"]
+slurm = "idmtools_platform_slurm.cli.slurm:slurm"
+
+[tool.setuptools]
+packages = { find = { exclude = ["tests"] } }
+include-package-data = true  # ✅ This enables MANIFEST.in for wheel builds
+
+[tool.setuptools.package-data]
+"idmtools_platform_slurm" = ["*"]
