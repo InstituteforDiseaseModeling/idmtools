@@ -11,6 +11,10 @@ on:
           - major
           - minor
           - patch
+      target_branch:
+        description: "Only bump version when branch is 'dev'"
+        required: true
+        default: dev
 
 jobs:
   approve:
@@ -31,6 +35,7 @@ jobs:
         python-version: [ '3.12' ]
     permissions:
       contents: write
+    if: github.ref == 'refs/heads/dev' && github.event.inputs.target_branch == 'dev'
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
