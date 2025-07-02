@@ -17,11 +17,12 @@ on:
     paths:
       - 'idmtools_cli/**'
       - '.github/workflows/staging-idmtools-cli.yml'
-
+  pull_request_review:
+    types: [ submitted ]
 jobs:
   check-approval:
     name: Check PR approval
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' || github.event_name == 'pull_request_review'
     runs-on: ubuntu-latest
     outputs:
       approved: ${{ steps.check.outputs.approved }}
@@ -35,7 +36,7 @@ jobs:
       - name: Fetch PR approvals
         id: check
         run: |
-          PR_NUMBER=${{ github.event.pull_request.number }}
+          PR_NUMBER=${{ github.event.pull_request.number || github.event.pull_request_review.pull_request.number }}
           APPROVED=$(gh pr view $PR_NUMBER --json reviews --jq '
             .reviews | map(select(.state == "APPROVED")) | length >= 1')
           echo "approved=$APPROVED" >> $GITHUB_OUTPUT
