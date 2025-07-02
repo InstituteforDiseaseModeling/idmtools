@@ -1,75 +1,37 @@
-# This workflow uploads idmtools-cli to staging only after PR approval or pushes to dev/release*
+# This workflows will upload a Python Package using Twine when a release is created
 
 name: "Staging: idmtools-cli"
 
 on:
   push:
     branches:
+      # only run this on
       - dev
-      - release*
+      - 'release**'
     paths:
       - 'idmtools_cli/**'
-  pull_request:
-    branches:
-      - dev
-      - release*
-    types: [ready_for_review, synchronize]
-    paths:
-      - 'idmtools_cli/**'
-      - '.github/workflows/staging-idmtools-cli.yml'
-  pull_request_review:
-    types: [ submitted ]
+
 jobs:
-  check-approval:
-    name: Check PR approval
-    if: github.event_name == 'pull_request' || github.event_name == 'pull_request_review'
-    runs-on: ubuntu-latest
-    outputs:
-      approved: ${{ steps.check.outputs.approved }}
-    steps:
-      - name: Checkout code (needed for Git operations)
-        uses: actions/checkout@v4
-      - name: Set up GitHub CLI
-        run: |
-          sudo apt-get update && sudo apt-get install -y gh
-
-      - name: Fetch PR approvals
-        id: check
-        run: |
-          PR_NUMBER=${{ github.event.pull_request.number || github.event.pull_request_review.pull_request.number }}
-          APPROVED=$(gh pr view $PR_NUMBER --json reviews --jq '
-            .reviews | map(select(.state == "APPROVED")) | length >= 1')
-          echo "approved=$APPROVED" >> $GITHUB_OUTPUT
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   deploy-cli-staging:
-    name: Deploy idmtools-cli to staging
-    needs: [check-approval]
-    if: github.event_name == 'push' || needs.check-approval.outputs.approved == 'true'
     runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'Bump version: ')"
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.12'
-
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install setuptools wheel twine bump2version build
           git config --global user.name "IDM Tools"
-          git config --global user.email "idmtools@idmod.org"
-      - name: Debug credentials (temporary)
+          git config --global user.name "idmtools@idmod.org"
+      - uses: actions/checkout@v2
+      - name: Bump build
+        working-directory: idmtools_cli
         run: |
-          echo "User is: ${TWINE_USERNAME}"
-          echo "Password length: ${#TWINE_PASSWORD}"
-        env:
-          TWINE_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
-          TWINE_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
+          bump2version build --commit --allow-dirty
+          git pull
       - name: Build and publish
         working-directory: idmtools_cli
         env:
@@ -78,4 +40,4 @@ jobs:
           TWINE_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
         run: |
           python -m build
-          twine upload dist/*  --verbose
+          twine upload dist/*
