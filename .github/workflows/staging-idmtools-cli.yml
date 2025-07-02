@@ -50,7 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -63,10 +63,13 @@ jobs:
           pip install setuptools wheel twine bump2version build
           git config --global user.name "IDM Tools"
           git config --global user.email "idmtools@idmod.org"
-      - name: Bump build
-        working-directory: idmtools_cli
+      - name: Debug credentials (temporary)
         run: |
-          bump2version build --commit --allow-dirty
+          echo "User is: ${TWINE_USERNAME}"
+          echo "Password length: ${#TWINE_PASSWORD}"
+        env:
+          TWINE_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
       - name: Build and publish
         working-directory: idmtools_cli
         env:
@@ -75,4 +78,4 @@ jobs:
           TWINE_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
         run: |
           python -m build
-          twine upload dist/*
+          twine upload dist/*  --verbose
