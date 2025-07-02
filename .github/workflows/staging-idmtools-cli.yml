@@ -63,7 +63,10 @@ jobs:
           pip install setuptools wheel twine bump2version build
           git config --global user.name "IDM Tools"
           git config --global user.email "idmtools@idmod.org"
-
+      - name: Bump build
+        working-directory: idmtools_cli
+        run: |
+          bump2version build --commit --allow-dirty
       - name: Build and publish
         working-directory: idmtools_cli
         env:
