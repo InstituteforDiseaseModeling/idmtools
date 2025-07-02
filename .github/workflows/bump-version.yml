@@ -78,3 +78,9 @@ jobs:
           VERSION=$(python dev_scripts/get_version.py)
           git tag "v$VERSION"
           git push origin "v$VERSION"
+      - name: Trigger package build
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.VERSION_PAT }}
+          event-type: trigger-package-build
+          client-payload: '{"branch":"dev"}'
