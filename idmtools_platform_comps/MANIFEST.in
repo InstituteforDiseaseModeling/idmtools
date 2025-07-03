@@ -1,4 +1,5 @@
 include README.md
 include idmtools_platform_comps/utils/base_singularity_work_order.json
+include LICENSE.TXT
 prune tests
 prune prototypes
