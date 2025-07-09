@@ -1,5 +1,8 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
+requires = [
+    "setuptools>=61.0",
+    "wheel",
+]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -8,48 +11,56 @@ version = "2.2.0"
 description = "CLI for IDM-Tools"
 readme = "README.md"
 requires-python = ">=3.8"
-keywords = ["modeling", "IDM", "cli"]
-
+keywords = [
+    "modeling",
+    "IDM",
+    "cli",
+]
 authors = [
     { name = "Sharon Chen", email = "schen@idmod.org" },
     { name = "Clinton Collins", email = "ccollins@idmod.org" },
     { name = "Zhaowei Du", email = "zdu@idmod.org" },
     { name = "Mary Fisher", email = "mfisher@idmod.org" },
     { name = "Clark Kirkman IV", email = "ckirkman@idmod.org" },
-    { name = "Benoit Raybaud", email = "braybaud@idmod.org" }
+    { name = "Benoit Raybaud", email = "braybaud@idmod.org" },
 ]
-
 classifiers = [
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12"
+    "Programming Language :: Python :: 3.12",
 ]
-
-# These should match the contents of requirements.txt
 dependencies = [
     "click~=8.1.7",
     "click-plugins",
     "colorama~=0.4.6",
     "cookiecutter~=2.6.0",
-    "idmtools~=2.1.0",
+    "idmtools~=2.2.0",
     "tabulate>=0.8.9,<0.10",
     "pyperclip~=1.8",
     "yaspin>=1.2.0,<3.1.0",
 ]
 
 [project.optional-dependencies]
-dev = ["flake8", "coverage", "bump2version"]
+dev = [
+    "flake8",
+    "coverage",
+    "bump2version",
+]
 test = [
     "pytest",
     "pytest-timeout",
     "pytest-cache",
     "flake8",
     "coverage",
-    "bump2version"
+    "bump2version",
 ]
-packaging = ["flake8", "coverage", "bump2version"]
+packaging = [
+    "flake8",
+    "coverage",
+    "bump2version",
+]
 
 [project.scripts]
 idmtools = "idmtools_cli.main:main"
@@ -58,8 +69,14 @@ idmtools = "idmtools_cli.main:main"
 Homepage = "https://github.com/InstituteforDiseaseModeling/idmtools"
 
 [tool.setuptools]
-packages = { find = { exclude = ["tests"] } }
-include-package-data = true  # ✅ This enables MANIFEST.in for wheel builds
+include-package-data = true
+
+[tool.setuptools.packages.find]
+exclude = [
+    "tests",
+]
 
 [tool.setuptools.package-data]
-"idmtools_cli" = ["*"]
+idmtools_cli = [
+    "*",
+]
