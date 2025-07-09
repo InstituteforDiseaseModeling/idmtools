@@ -1,15 +1,20 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
+requires = [
+    "setuptools>=61.0",
+    "wheel",
+]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "idmtools_models"
-version = "2.1.0+nightly"
+version = "2.2.0"
 description = "Core tools for modeling"
 readme = "README.md"
 requires-python = ">=3.8"
-keywords = ["modeling", "IDM"]
-
+keywords = [
+    "modeling",
+    "IDM",
+]
 authors = [
     { name = "Ross Carter", email = "rcarter@idmod.org" },
     { name = "Sharon Chen", email = "shchen@idmod.org" },
@@ -19,20 +24,17 @@ authors = [
     { name = "Mandy Izzo", email = "mizzo@idmod.org" },
     { name = "Clark Kirkman IV", email = "ckirkman@idmod.org" },
     { name = "Benoit Raybaud", email = "braybaud@idmod.org" },
-    { name = "Jen Schripsema", email = "jschripsema@idmod.org" }
+    { name = "Jen Schripsema", email = "jschripsema@idmod.org" },
 ]
-
 classifiers = [
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12"
+    "Programming Language :: Python :: 3.12",
 ]
-
-# You need to manually paste your requirements.txt here:
 dependencies = [
-    "idmtools~=2.1.0"
+    "idmtools~=2.2.0",
 ]
 
 [project.urls]
@@ -46,16 +48,16 @@ test = [
     "flake8",
     "coverage",
     "bump2version",
-    "twine"
+    "twine",
 ]
 packaging = [
     "flake8",
     "coverage",
     "bump2version",
-    "twine"
+    "twine",
 ]
 
-[project.entry-points."idmtools_task"]
+[project.entry-points.idmtools_task]
 idmtools_task_python = "idmtools_models.python.python_task:PythonTaskSpecification"
 idmtools_task_python_json = "idmtools_models.python.json_python_task:JSONConfiguredPythonTaskSpecification"
 idmtools_task_templated_script = "idmtools_models.templated_script_task:TemplatedScriptTaskSpecification"
@@ -65,8 +67,14 @@ idmtools_task_r_json = "idmtools_models.r.json_r_task:JSONConfiguredRTaskSpecifi
 idmtools_task_json = "idmtools_models.json_configured_task:JSONConfiguredTaskSpecification"
 
 [tool.setuptools]
-packages = { find = { exclude = ["tests"] } }
-include-package-data = true  # ✅ This enables MANIFEST.in for wheel builds
+include-package-data = true
+
+[tool.setuptools.packages.find]
+exclude = [
+    "tests",
+]
 
 [tool.setuptools.package-data]
-"idmtools_models" = ["*"]
+idmtools_models = [
+    "*",
+]

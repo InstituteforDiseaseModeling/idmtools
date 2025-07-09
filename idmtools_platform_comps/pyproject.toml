@@ -1,15 +1,20 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
+requires = [
+    "setuptools>=61.0",
+    "wheel",
+]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "idmtools_platform_comps"
-version = "2.1.0+nightly"
+version = "2.2.0"
 description = "Comps platform for IDM-Tools"
 readme = "README.md"
 requires-python = ">=3.8"
-keywords = ["modeling", "IDM"]
-
+keywords = [
+    "modeling",
+    "IDM",
+]
 authors = [
     { name = "Zhaowei Du", email = "zdu@idmod.org" },
     { name = "Sharon Chen", email = "shchen@idmod.org" },
@@ -22,19 +27,17 @@ authors = [
     { name = "Jen Schripsema", email = "jschripsema@idmod.org" },
     { name = "Ross Carter", email = "rcarter@idmod.org" },
 ]
-
 classifiers = [
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12"
+    "Programming Language :: Python :: 3.12",
 ]
-
 dependencies = [
-    "idmtools~=2.1.0",
+    "idmtools~=2.2.0",
     "pyCOMPS~=2.10",
-    "natsort~=8.4.0"
+    "natsort~=8.4.0",
 ]
 
 [project.urls]
@@ -51,14 +54,20 @@ test = [
     "coverage",
     "bump2version",
     "twine",
-    "natsort"
+    "natsort",
 ]
-packaging = ["flake8", "coverage", "bump2version", "twine", "natsort"]
+packaging = [
+    "flake8",
+    "coverage",
+    "bump2version",
+    "twine",
+    "natsort",
+]
 
 [project.scripts]
 comps-cli = "idmtools_platform_comps.cli.comps:comps"
 
-[project.entry-points."idmtools_platform"]
+[project.entry-points.idmtools_platform]
 idmtools_platform_comps = "idmtools_platform_comps.plugin_info:COMPSPlatformSpecification"
 idmtools_platform_ssmt = "idmtools_platform_comps.plugin_info:SSMTPlatformSpecification"
 
@@ -66,8 +75,14 @@ idmtools_platform_ssmt = "idmtools_platform_comps.plugin_info:SSMTPlatformSpecif
 comps_subcommand = "idmtools_platform_comps.cli.comps:comps"
 
 [tool.setuptools]
-packages = { find = { exclude = ["tests"] } }
-include-package-data = true  # ✅ This enables MANIFEST.in for wheel builds
+include-package-data = true
+
+[tool.setuptools.packages.find]
+exclude = [
+    "tests",
+]
 
 [tool.setuptools.package-data]
-"idmtools_platform_comps" = ["*"]
+idmtools_platform_comps = [
+    "*",
+]

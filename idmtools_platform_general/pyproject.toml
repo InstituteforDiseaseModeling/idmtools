@@ -1,15 +1,20 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
+requires = [
+    "setuptools>=61.0",
+    "wheel",
+]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "idmtools_platform_general"
-version = "2.1.0+nightly"
+version = "2.2.0"
 description = "General platform for IDM-Tools"
 readme = "README.md"
 requires-python = ">=3.8"
-keywords = ["modeling", "IDM"]
-
+keywords = [
+    "modeling",
+    "IDM",
+]
 authors = [
     { name = "Zhaowei Du", email = "zdu@idmod.org" },
     { name = "Sharon Chen", email = "shchen@idmod.org" },
@@ -17,18 +22,15 @@ authors = [
     { name = "Jen Schripsema", email = "jschripsema@idmod.org" },
     { name = "Ross Carter", email = "rcarter@idmod.org" },
 ]
-
 classifiers = [
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12"
+    "Programming Language :: Python :: 3.12",
 ]
-
-# Copy your requirements.txt content here
 dependencies = [
-    "idmtools~=2.1.0"
+    "idmtools~=2.2.0",
 ]
 
 [project.urls]
@@ -45,12 +47,17 @@ test = [
     "coverage",
     "bump2version",
     "twine",
-    "natsort"
+    "natsort",
+]
+packaging = [
+    "flake8",
+    "coverage",
+    "bump2version",
+    "twine",
+    "natsort",
 ]
 
-packaging = ["flake8", "coverage", "bump2version", "twine", "natsort"]
-
-[project.entry-points."idmtools_platform"]
+[project.entry-points.idmtools_platform]
 idmtools_platform_file = "idmtools_platform_file.plugin_info:FilePlatformSpecification"
 idmtools_platform_process = "idmtools_platform_process.plugin_info:ProcessPlatformSpecification"
 
@@ -58,9 +65,17 @@ idmtools_platform_process = "idmtools_platform_process.plugin_info:ProcessPlatfo
 file = "idmtools_platform_file.cli.file:file"
 
 [tool.setuptools]
-packages = { find = { exclude = ["tests"] } }
-include-package-data = true  # ✅ This enables MANIFEST.in for wheel builds
+include-package-data = true
+
+[tool.setuptools.packages.find]
+exclude = [
+    "tests",
+]
 
 [tool.setuptools.package-data]
-"idmtools_platform_file" = ["*"]
-"idmtools_platform_process" = ["*"]
+idmtools_platform_file = [
+    "*",
+]
+idmtools_platform_process = [
+    "*",
+]
