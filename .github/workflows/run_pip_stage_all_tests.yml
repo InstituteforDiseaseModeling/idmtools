@@ -4,6 +4,18 @@
 name: "run_pip_stage_all_tests"
 on:
   workflow_dispatch:
+    inputs:
+      python-version:
+        description: "Select Python version"
+        required: true
+        default: "3.12"
+        type: choice
+        options:
+          - "3.8"
+          - "3.9"
+          - "3.10"
+          - "3.11"
+          - "3.12"
 
 jobs:
   run-pip_stage:
@@ -11,7 +23,7 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest ]
-        python-version: [ '3.12' ]
+        python-version: ${{ github.event.inputs.python-version }}
     env:
       PYPI_STAGING_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
       PYPI_STAGING_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
@@ -28,7 +40,7 @@ jobs:
           python -m pip install --upgrade pip
       - name: Install Python dependencies
         run: |
-          pip install idm-buildtools flake8 wheel pygit2 matplotlib sqlalchemy natsort --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+          pip install idm-buildtools flake8 wheel pygit2 matplotlib sqlalchemy natsort keyring --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
       - name: download idmtools packages from staging jfrog
         run: |
           pip install idmtools[full] --index-url=https://${{ secrets.PYPI_STAGING_USERNAME }}:${{ secrets.PYPI_STAGING_PASSWORD }}@packages.idmod.org/api/pypi/pypi-staging/simple
