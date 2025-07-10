@@ -59,5 +59,4 @@ jobs:
           PYPI_STAGING_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
           PYPI_STAGING_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
         run: |
-        # make ssmt-image
           make ssmt-image-release
