@@ -7,11 +7,13 @@ on:
     branches:
       # only run this on
       - dev
-      - 'release**'
+      - 'release*'
     paths:
       - 'idmtools_core/**'
       - 'idmtools_platform_comps/**'
       - 'idmtools_models/**'
+      - '*.yml'
+  workflow_dispatch:
 
 jobs:
   deploy-comps-staging:
