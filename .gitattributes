@@ -3,3 +3,4 @@
 # Docker run definitions
 run text eol=lf
 *.toml text eol=lf
+*.yml text eol=lf
