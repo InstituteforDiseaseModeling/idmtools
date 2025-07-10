@@ -14,7 +14,7 @@ RUN dpkg-reconfigure --frontend noninteractive tzdata
 # install Python3
 RUN apt-get install -y python3-pip
 RUN apt-get install -y python3-dev
-RUN apt-get install -y python3-setuptools
+RUN pip install --upgrade pip setuptools
 
 # r packages to support analysis in R
 RUN apt-get install -y xz-utils llvm r-base \

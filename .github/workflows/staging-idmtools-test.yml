@@ -27,11 +27,6 @@ jobs:
           git config --global user.name "IDM Tools"
           git config --global user.email "idmtools@idmod.org"
       - uses: actions/checkout@v2
-      - name: Bump build
-        working-directory: idmtools_test
-        run: |
-          bump2version build --commit --allow-dirty
-          git pull
       - name: Build and publish
         working-directory: idmtools_test
         env:
