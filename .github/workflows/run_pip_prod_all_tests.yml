@@ -4,6 +4,18 @@
 name: "run_pip_prod_all_tests"
 on:
   workflow_dispatch:
+    inputs:
+      python-version:
+        description: "Select Python version"
+        required: true
+        default: "3.12"
+        type: choice
+        options:
+          - "3.8"
+          - "3.9"
+          - "3.10"
+          - "3.11"
+          - "3.12"
 
 jobs:
   run-pip-prod:
@@ -11,24 +23,22 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest ]
-        python-version: [ '3.12' ]
     env:
       PYPI_STAGING_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
       PYPI_STAGING_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
-      - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+      - name: Set up Python on ${{ matrix.os }} with ${{ github.event.inputs.python-version }}
+        uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
-          architecture: x64
+          python-version: ${{ github.event.inputs.python-version }}
       - name: Upgrade pip
         run: |
           python -m pip install --upgrade pip
       - name: Install Python dependencies
         run: |
-          pip install idm-buildtools flake8 wheel matplotlib sqlalchemy --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+          pip install idm-buildtools flake8 wheel matplotlib sqlalchemy keyring --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
       - name: download idmtools packages from production jfrog
         run: |
           pip install idmtools[full] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple

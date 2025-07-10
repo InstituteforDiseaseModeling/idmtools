@@ -12,7 +12,6 @@ on:
       - 'idmtools_core/**'
       - 'idmtools_platform_comps/**'
       - 'idmtools_models/**'
-      - '*.yml'
   workflow_dispatch:
 
 jobs:
