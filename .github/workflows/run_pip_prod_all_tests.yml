@@ -20,6 +20,9 @@ on:
 jobs:
   run-pip-prod:
     runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
     env:
       PYPI_STAGING_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
       PYPI_STAGING_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
