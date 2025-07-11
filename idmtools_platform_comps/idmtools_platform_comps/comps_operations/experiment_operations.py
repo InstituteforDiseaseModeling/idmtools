@@ -410,7 +410,6 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
                 suite = kwargs.get('suite') or self.platform.get_item(experiment.suite_id, item_type=ItemType.SUITE)
 
         # Create an experiment
-        experiment_type = experiment.tags.get("type") if experiment.tags is not None else ""
         obj = experiment_factory.create("idmtools.entities.experiment.Experiment", tags=experiment.tags, name=experiment.name,
                                         fallback=Experiment)
         obj.platform = self.platform
