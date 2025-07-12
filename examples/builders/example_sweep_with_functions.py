@@ -45,7 +45,7 @@ def get_sweep_builders(sweep_task_parameters):
 if __name__ == "__main__":
     platform = Platform('Calculon')
     # define our base task
-    task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model4.py"),
+    task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"),
                                          parameters=dict())
 
 
