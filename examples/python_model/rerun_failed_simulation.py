@@ -8,7 +8,7 @@ from idmtools.core.platform_factory import Platform
 from idmtools.entities import CommandLine
 from idmtools.entities.command_task import CommandTask
 
-platform = Platform('Calculo')
+platform = Platform('Calculon')
 # Get experiment by id
 experiment = platform.get_item("90ba4f1e-c45d-f011-aa23-b88303911bc1", ItemType.EXPERIMENT)
 # Get all failed simulations
