@@ -42,7 +42,7 @@ def update_requirements():
             rout.write(new_contents)
 
 
-def update_idmtools_version_in_pyproject():
+def update_idmtools_version_in_pyproject():  # noqa: D103
     target_pattern = re.compile(r"^idmtools(~=|==)?")
 
     current_version = get_current_version()
