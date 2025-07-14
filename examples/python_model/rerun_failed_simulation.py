@@ -2,12 +2,8 @@
 This is the example of how to rerun failed simulations with an existing experiment.
 Note, we can only rerun failed simulations due to server random failure.
 """
-import copy
-
 from idmtools.core import ItemType, EntityStatus
 from idmtools.core.platform_factory import Platform
-from idmtools.entities import CommandLine
-from idmtools.entities.command_task import CommandTask
 
 platform = Platform('Calculon')
 # Get experiment by id
