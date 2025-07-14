@@ -28,7 +28,7 @@ for sim_id in filter_simulation_ids:
 # Add failed simulations to the experiment
 experiment.add_simulations(failed_simulations)
 # run experiment again
-experiment.run(wait_until_done=True)
+experiment.run()
 
 
 
