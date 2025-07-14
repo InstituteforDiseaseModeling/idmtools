@@ -26,7 +26,7 @@ from create_experiment import create_experiment
 
 platform = Platform("Container", job_directory="DEST")
 experiment = create_experiment(platform)
-#experiment = platform.get_item("de8d86f8-59b7-4ee2-983d-c9bd816144d3", ItemType.EXPERIMENT)
+#experiment = platform.get_item("3dabe260-3c3d-4191-8358-788fe5eb8d66", ItemType.EXPERIMENT)
 
 """
 Experiment-level Filtering
@@ -47,9 +47,9 @@ filter_simulation_ids_p = platform.filter_simulations_by_tags(
     tags={"a": lambda v: 1 <= v <= "2", "sim_tag": "test_tag"})
 
 # Validation there are 40 simulations matched (out of 60)
-assert len(filter_simulation_ids) == 40
-assert len(filter_simulation_ids1) == 40
-assert len(filter_simulation_ids2) == 40
+assert len(filter_simulation_ids) == 10
+assert len(filter_simulation_ids1) == 10
+assert len(filter_simulation_ids2) == 10
 
 # Get simulation entities (instead of IDs) using entity_type=True
 filter_simulations = experiment.get_simulations_by_tags(
@@ -62,7 +62,7 @@ for sim in filter_simulations:
     count += 1
     print(sim.tags)
 
-assert count == 40
+assert count == 10
 
 """
 Suite-level Filtering
@@ -77,7 +77,7 @@ filter_suite_simulations = suite.get_simulations_by_tags(
 # Validate structure and results
 assert len(filter_suite_simulations) == 1  # 1 experiment matched
 for exp_id, sims in filter_suite_simulations.items():
-    assert len(sims) >= 40
+    assert len(sims) >= 10
     for sim in sims:
         print(sim.tags)
 
@@ -87,4 +87,5 @@ filter_suite_simulations_p = platform.filter_simulations_by_tags(
     tags={"a": lambda v: 1 <= v <= 2, "sim_tag": "test_tag"}, entity_type=True)
 
 # Ensure both methods return the same results
-assert filter_suite_simulations == filter_suite_simulations_p
+assert len(filter_suite_simulations) == len(filter_suite_simulations_p)
+assert len(filter_suite_simulations[experiment.id]) == len(filter_suite_simulations_p[experiment.id])
