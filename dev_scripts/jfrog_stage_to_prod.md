@@ -49,7 +49,7 @@ foreach ($distName in $packages.Keys) {
                  "idm-pypi-production/$distName/$version/$fileName-$version-py3-none-any.whl" --dry-run
 }
 
-3. Remove --dry-run command from 2. once results like this for all packages:
+3. Remove the --dry-run flag from step 2 once the results look correct for all packages.
 {
   "status": "success",
   "totals": {
