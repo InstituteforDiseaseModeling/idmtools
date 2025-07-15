@@ -65,10 +65,6 @@ class ItvFn:
         - func must accept an emod-api campaign object as its first argument.
         - func must return a dictionary of metadata (i.e: tags).
 
-    Side Effects:
-        - Resets the global campaign dictionary.
-        - Adds events and updates simulation configuration based on detected adhoc events.
-
     Returns:
         Dict[str, Any]: Metadata returned by the intervention function, with numpy types cast to Python types.
     """
