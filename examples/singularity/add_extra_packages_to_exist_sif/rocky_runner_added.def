@@ -1,0 +1,12 @@
+Bootstrap: localimage
+From: Assets/rocky_dtk_runner_py39.sif
+
+%environment
+    # ADD our asset to path so we can add live versions
+    export PYTHONPATH=Assets/:.
+
+%post
+    pip3 uninstall -y numpy pandas
+
+    # Install known compatible versions
+    pip3 install --no-cache-dir "numpy<1.25" "pandas<1.5" "matplotlib<3.8"

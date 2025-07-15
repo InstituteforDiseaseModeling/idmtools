@@ -5,9 +5,6 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 # flake8: noqa E402
 import copy
 import logging
-from uuid import UUID
-
-# fix for comps weird import
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
@@ -21,7 +18,7 @@ logging.root.handlers = HANDLERS
 logging.getLogger().setLevel(LEVEL)
 comps_logger.propagate = False
 comps_logger.handlers = [h for h in comps_logger.handlers if isinstance(h, logging.FileHandler)]
-from COMPS.Data import Simulation as COMPSSimulation, QueryCriteria
+from COMPS.Data import Simulation as COMPSSimulation
 from COMPS.Data import WorkItem as COMPSWorkItem
 from COMPS.Data import AssetCollection as COMPSAssetCollection
 from COMPS.Data import Experiment as COMPSExperiment
@@ -182,14 +179,14 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
         return result
 
-    def get_files(self, item: Union[COMPSSimulation, COMPSWorkItem, COMPSAssetCollection], files: Union[Set[str], List[str]], output: str = None, **kwargs) -> \
+    def get_files(self, item: IEntity, files: Union[Set[str], List[str]], output: str = None, **kwargs) -> \
             Union[Dict[str, Dict[str, bytearray]], Dict[str, bytearray]]:
         """
         Get files for a platform entity.
 
         Args:
             item: Item to fetch files for
-            files: List of file names to get
+            files: List of asset filenames to retrieve from each simulation
             output: save files to
             kwargs: Platform arguments
 
@@ -200,21 +197,10 @@ class COMPSPlatform(IPlatform, CacheEnabled):
             For experiments, this returns a dictionary with key as sim id and then the values as a dict of the
             simulations described above
         """
-        if isinstance(item, COMPSSimulation):
-            item = self._simulations.to_entity(item, parent=item.experiment)
-        elif isinstance(item, COMPSWorkItem):
-            item = self._workflow_items.to_entity(item)
-        elif isinstance(item, COMPSAssetCollection):
-            item = self._assets.to_entity(item)
-        elif isinstance(item, (Simulation, IWorkflowItem, AssetCollection)):
-            item = item
-        else:
-            raise Exception(f'Item Type: {type(item)} is not supported!')
-
-        file_data = super().get_files(item, files, output, **kwargs)
+        file_data = super().get_files(self._normalized_item_fields(item), files, output, **kwargs)
         return file_data
 
-    def flatten_item(self, item: object, raw=False, **kwargs) -> List[object]:
+    def flatten_item(self, item: object, raw: bool = False, **kwargs) -> List[object]:
         """
         Flatten an item: resolve the children until getting to the leaves.
 
@@ -223,56 +209,101 @@ class COMPSPlatform(IPlatform, CacheEnabled):
 
         Args:
             item: Which item to flatten
-            raw: bool
-            kwargs: extra parameters
+            raw: If True, returns raw platform objects, False, return local objects
+            kwargs: Extra parameters for conversion
 
         Returns:
-            List of leaves
+            List of leaf items, which can be from either the local platform or a COMPS server:
+            - Simulations (either local Simulation or COMPSSimulation),
+            - WorkItems (local or COMPSWorkItem),
+            - or AssetCollections (local or COMPSAssetCollection).
         """
-        if not raw:
-            return super().flatten_item(item)
-
-        if isinstance(item, COMPSSuite):
-            experiments = item.get_experiments()
-            children = list()
-            for child in experiments:
-                children += self.flatten_item(item=child)
-        elif isinstance(item, COMPSExperiment):
-            columns = ["id", "name", "state"]
-            comps_children = ["tags", "configuration", "hpc_jobs"]
-            query_criteria = QueryCriteria().select(columns).select_children(comps_children)
-            children = item.get_simulations(query_criteria=query_criteria)
-            item.uid = item.id
-
-            exp = Experiment()
-            exp.uid = item.id
-            exp.platform = self
-            exp._platform_object = item
-            exp.tags = item.tags
-
-            for comps_item in children:
-                comps_item.uid = comps_item.id if isinstance(comps_item.id, UUID) else UUID(comps_item.id)
-                comps_item.experiment = exp
-                comps_item.platform = self
-        elif isinstance(item, (COMPSSimulation, COMPSWorkItem, COMPSAssetCollection)):
-            children = [item]
-
-            if isinstance(item, COMPSSimulation):
-                exp = Experiment()
-                exp.uid = item.experiment_id
-                exp.platform = self
-                item.experiment = exp
-        elif isinstance(item, Suite):
-            comps_item = item.get_platform_object()
-            comps_item.platform = self
-            children = self.flatten_item(item=comps_item)
-        elif isinstance(item, Experiment):
-            children = item.simulations.items
-        elif isinstance(item, (Simulation, IWorkflowItem, AssetCollection)):
-            children = [item]
-        else:
+        if not isinstance(item, (Simulation, IWorkflowItem, AssetCollection, COMPSSuite, COMPSExperiment,
+                                 COMPSSimulation, COMPSWorkItem, COMPSAssetCollection, Suite, Experiment)):
             raise Exception(f'Item Type: {type(item)} is not supported!')
 
-        return children
+        # Return directly if item is already in leaf and raw = False
+        if not raw and isinstance(item, (Simulation, IWorkflowItem, AssetCollection)):
+            return [item]
 
+        # Handle platform object conversion if needed
+        if not isinstance(item, (COMPSSuite, COMPSExperiment, COMPSSimulation,
+                                 COMPSWorkItem, COMPSAssetCollection)):
+            return self.flatten_item(item.get_platform_object(), raw=raw, **kwargs)
 
+        # Process type COMPSSuite
+        if isinstance(item, COMPSSuite):
+            children = self._get_children_for_platform_item(item, children=["tags", "configuration"])
+            # Handle leaf types
+            return [leaf
+                for child in children
+                for leaf in self.flatten_item(child, raw=raw, **kwargs)]
+        # Process type COMPSExperiment
+        elif isinstance(item, COMPSExperiment):
+            if type(self) is COMPSPlatform:
+                children = self._get_children_for_platform_item(item, children=["tags", "configuration"])
+            else:
+                children = self._get_children_for_platform_item(item,
+                                                                    children=["tags", "configuration", "hpc_jobs"])
+            # Assign server experiment to child.experiment to avoid recreating child's parent
+            item = self._normalized_item_fields(item)
+            for child in children:
+                child.experiment = item
+            # Handle leaf types
+            return [leaf
+                for child in children
+                for leaf in self.flatten_item(child, raw=raw, **kwargs)]
+
+        # Handle leaf types
+        elif isinstance(item, (COMPSSimulation, COMPSWorkItem, COMPSAssetCollection)):
+            item = self._normalized_item_fields(item)
+
+        if not raw:
+            parent = item.experiment if isinstance(item, COMPSSimulation) else None
+            item = self._convert_platform_item_to_entity(item, parent=parent, **kwargs)
+
+        return [item]
+
+    def _ensure_simulation_experiment(self, simulation: COMPSSimulation) -> None:
+        """
+        Ensure the given simulation has a valid experiment attached.
+
+        If the simulation's 'experiment' attribute is missing or uninitialized,
+        fetch the experiment from the server using its ID and normalize it.
+
+        Args:
+            simulation (COMPSSimulation): The simulation object to validate.
+        Raises:
+            ValueError: If 'experiment_id' is missing or invalid.
+        """
+        experiment = getattr(simulation, "experiment", None)
+
+        if experiment is None or getattr(experiment, "configuration", None) is None:
+            if not hasattr(simulation, "experiment_id") or simulation.experiment_id is None:
+                raise ValueError("simulation.experiment_id is missing or None; cannot retrieve experiment.")
+
+            experiment = self.get_item(simulation.experiment_id,
+                                       item_type=ItemType.EXPERIMENT,
+                                       raw=True)
+            simulation.experiment = self._normalized_item_fields(experiment)
+
+    def _normalized_item_fields(self, item):
+        """
+        Add extra fields to item.
+        Args:
+            item: Item (COMPS item)
+        """
+        if not isinstance(item, (COMPSSuite, COMPSExperiment, COMPSSimulation,
+                                 COMPSWorkItem, COMPSAssetCollection)):
+            item = item.get_platform_object()
+        if isinstance(item, COMPSSimulation):
+            self._ensure_simulation_experiment(item)
+        item.uid = item.id
+        item._id = str(item.id)
+        if type(item).__name__ == "WorkItem":
+            item.item_type = ItemType.WORKFLOW_ITEM
+        elif type(item).__name__ == "AssetCollection":
+            item.item_type = ItemType.ASSETCOLLECTION
+        else:
+            item.item_type = ItemType(type(item).__name__)
+        return item

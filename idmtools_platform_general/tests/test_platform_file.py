@@ -1,16 +1,16 @@
-import csv
 import json
 import os
+import sys
 import pathlib
-import shutil
-from functools import partial
-from typing import Any, Dict
-
+import unittest
 import numpy as np
 import pandas as pd
 import pytest
+from functools import partial
+from typing import Any, Dict
 from pathlib import Path
-
+if sys.platform == "win32":
+    from win32con import FALSE
 from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
@@ -19,17 +19,16 @@ from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
-
+from idmtools_platform_file.platform_operations.utils import FileSimulation, FileExperiment, FileSuite
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.decorators import linux_only
-from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
 
 @pytest.mark.serial
 @linux_only
-class TestFilePlatform(ITestWithPersistence):
+class TestFilePlatform(unittest.TestCase):
 
-    def create_experiment(self, platform=None, a=1, b=1, retries=None, wait_until_done=False):
+    def create_experiment(self, a=1, b=1, retries=None, wait_until_done=False):
         task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model3.py"),
                                         envelope="parameters", parameters=(dict(c=0)))
         task.python_path = "python3"
@@ -45,7 +44,7 @@ class TestFilePlatform(ITestWithPersistence):
         ts.add_builder(builder)
 
         # Now we can create our Experiment using our template builder
-        experiment = Experiment.from_template(ts, name=self.case_name)
+        experiment = Experiment.from_template(ts, name="test_experiment")
         # Add our own custom tag to simulation
         experiment.tags["tag1"] = 1
         # And add common assets from local dir
@@ -57,18 +56,22 @@ class TestFilePlatform(ITestWithPersistence):
         # Add experiment to the suite
         suite.add_experiment(experiment)
         # Commission
-        suite.run(platform=platform, wait_until_done=wait_until_done, retries=retries)
+        suite.run(wait_until_done=wait_until_done, retries=retries)
         print("suite_id: " + suite.id)
         print("experiment_id: " + experiment.id)
         return experiment
 
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.job_directory = "DEST"
+        cls.platform = Platform('FILE', job_directory=cls.job_directory)
+        cls.experiment = cls.create_experiment(cls, a=3, b=3)
+
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
-        self.job_directory = "DEST"
-        self.platform = Platform('FILE', job_directory=self.job_directory)
 
     def test_suite_experiment_simulation_files(self):
-        experiment = self.create_experiment(self.platform, a=3, b=3)
+        experiment = self.experiment
         # first verify files and dirs under suite
         suite = experiment.parent
         suite_dir = self.platform.get_directory(suite)
@@ -108,8 +111,7 @@ class TestFilePlatform(ITestWithPersistence):
         self.assertEqual(count, 9)  # make sure we found total 9 symlinks for Assets folder
 
     def test_generated_scripts(self):
-        platform = Platform('FILE', job_directory=self.job_directory, retries=5)
-        experiment = self.create_experiment(platform=platform, a=5, b=5)
+        experiment = self.experiment
         experiment_dir = self.platform.get_directory(experiment)
         # verify sbatch.sh script content in experiment level
         with open(os.path.join(experiment_dir, 'batch.sh'), 'r') as fpr:
@@ -130,7 +132,7 @@ class TestFilePlatform(ITestWithPersistence):
         simulation_ids = []
         for simulation in experiment.simulations:
             simulation_ids.append(simulation.id)
-            simulation_dir = platform.get_directory(simulation)
+            simulation_dir = self.platform.get_directory(simulation)
             with open(os.path.join(simulation_dir, '_run.sh'), 'r') as fpr:
                 contents = fpr.read()
 
@@ -138,7 +140,7 @@ class TestFilePlatform(ITestWithPersistence):
 
         # verify ids in metadata.json  for suite
         suite = experiment.suite
-        suite_dir = platform.get_directory(suite)
+        suite_dir = self.platform.get_directory(suite)
         with open(os.path.join(suite_dir, 'metadata.json'), 'r') as j:
             contents = json.loads(j.read())
             self.assertEqual(contents['_uid'], suite.id)
@@ -158,12 +160,12 @@ class TestFilePlatform(ITestWithPersistence):
             self.assertEqual(contents['item_type'], 'Experiment')
             self.assertEqual(contents['status'], 'CREATED')
             self.assertEqual(len(contents['assets']), 6)
-            self.assertEqual(contents['name'], 'test_platform_file.py--test_generated_scripts')
+            self.assertEqual(contents['name'], 'test_experiment')
             self.assertEqual(contents['task_type'], 'idmtools.entities.command_task.CommandTask')
 
         # verify ids in metadata.json for simulation, also verify sweep parameter in config.json file
         for simulation in experiment.simulations:
-            simulation_dir = platform.get_directory(simulation)
+            simulation_dir = self.platform.get_directory(simulation)
             with open(os.path.join(simulation_dir, 'metadata.json'), 'r') as j:
                 contents = json.loads(j.read())
                 self.assertEqual(contents['_uid'], simulation.id)
@@ -176,7 +178,7 @@ class TestFilePlatform(ITestWithPersistence):
                 self.assertDictEqual(contents['task']['parameters'], config_contents['parameters'])
 
     def test_create_sim_directory_map(self):
-        experiment = self.create_experiment(self.platform, a=3, b=3)
+        experiment = self.experiment
         exp_map = self.platform.create_sim_directory_map(experiment.id, item_type=ItemType.EXPERIMENT)
         sims_map_dict = {}
         for sim in experiment.simulations:
@@ -188,7 +190,7 @@ class TestFilePlatform(ITestWithPersistence):
         self.assertTrue(len(exp_map) == 9)
 
     def test_create_sim_directory_df(self):
-        experiment = self.create_experiment(self.platform, a=3, b=3)
+        experiment = self.experiment
         exp_df = self.platform.create_sim_directory_df(experiment.id)
         sims_df = pd.DataFrame()
         for sim in experiment.simulations:
@@ -199,10 +201,10 @@ class TestFilePlatform(ITestWithPersistence):
             sim_df['outpath'] = sim_map[sim.id]
             sims_df = pd.concat([sims_df, sim_df], ignore_index=True)
         self.assertTrue(np.all(exp_df.sort_values('simid').values == sims_df.sort_values('simid').values))
-        self.assertTrue(exp_df.shape == (9, 6))
+        self.assertTrue(exp_df.shape == (9, 5))
 
     def test_create_sim_directory_csv(self):
-        experiment = self.create_experiment(self.platform, a=3, b=3)
+        experiment = self.experiment
         self.platform.save_sim_directory_df_to_csv(experiment.id)
         exp_df = self.platform.create_sim_directory_df(experiment.id)
         import csv
@@ -217,7 +219,7 @@ class TestFilePlatform(ITestWithPersistence):
         os.remove(f"{experiment.id}.csv")
 
     def test_platform_delete_experiment(self):
-        experiment = self.create_experiment(self.platform, a=3, b=3)
+        experiment = self.create_experiment(a=3, b=3)
         suite_dir = self.platform.get_directory(experiment.parent)
         exp_dir = self.platform.get_directory(experiment)
         self.platform._experiments.platform_delete(experiment.id)
@@ -230,10 +232,55 @@ class TestFilePlatform(ITestWithPersistence):
         self.assertTrue(f"Not found Experiment with id '{experiment.id}'" in str(context.exception.args[0]))
 
     def test_platform_delete_suite(self):
-        experiment = self.create_experiment(self.platform, a=3, b=3)
+        experiment = self.create_experiment(a=3, b=3)
         self.platform._suites.platform_delete(experiment.parent_id)
         # make sure we delete suite folder
         self.assertFalse(os.path.exists(os.path.join(self.job_directory, experiment.parent_id)))
         with self.assertRaises(RuntimeError) as context:
             self.platform.get_item(experiment.parent_id, item_type=ItemType.SUITE, raw=True)
         self.assertTrue(f"Not found Suite with id '{experiment.parent_id}'" in str(context.exception.args[0]))
+
+    def test_file_suite_experiment_simulation(self):
+        experiment = self.experiment
+        # Test FileSuite
+        file_suite = self.platform.get_item(experiment.parent.id, item_type=ItemType.SUITE, raw=True)
+        self.assertTrue(isinstance(file_suite, FileSuite))
+        self.assertEqual(repr(file_suite), f"<FileSuite {file_suite.id} - {len(file_suite.experiments)} experiments>")
+        self.assertEqual(file_suite.id, experiment.parent.id)
+        self.assertEqual(file_suite.uid, experiment.suite.id)
+        self.assertEqual(file_suite.status, "CREATED")
+        self.assertEqual(file_suite.parent, None)
+        self.assertDictEqual(file_suite.tags, experiment.parent.tags)
+        self.assertEqual(len(file_suite.experiments), 1)
+        # validate get_platform_object() method
+        file_suite1 = file_suite.get_platform_object()
+        self.assertTrue(isinstance(file_suite1, FileSuite))
+        self.assertEqual(id(file_suite), id(file_suite1))
+        # Test FileExperiment
+        file_experiment = self.platform.get_item(experiment.id, item_type=ItemType.EXPERIMENT, force=True, raw=True)
+        self.assertTrue(isinstance(file_experiment, FileExperiment))
+        self.assertEqual(file_experiment.id, experiment.id)
+        self.assertEqual(file_experiment.status, "CREATED")
+        self.assertEqual(file_experiment.parent_id, experiment.parent_id)
+        self.assertEqual(len(file_experiment.simulations), 9)
+        self.assertEqual(repr(file_experiment),
+                         f"<FileExperiment {file_experiment.id} - {len(file_experiment.simulations)} simulations>")
+        self.assertEqual(file_experiment.parent_id, experiment.parent_id)
+        # validate file_experiment assets
+        file_experiment_assets = [asset['filename'] for asset in file_experiment.assets]
+        experiment_assets = [asset.filename for asset in experiment.assets]
+        self.assertEqual(set(file_experiment_assets), set(experiment_assets))
+
+        # Test FileSimulation
+        file_simulations = self.platform.get_children(experiment.id, item_type=ItemType.EXPERIMENT, force=True, raw=True)
+        self.assertEqual(len(file_simulations), 9)
+        for file_simulation in file_simulations:
+            self.assertTrue(isinstance(file_simulation, FileSimulation))
+            self.assertEqual(file_simulation.status.name, "CREATED")
+            self.assertEqual(file_simulation.parent_id, file_experiment.id)
+
+        file_simulation_assets = [asset['filename'] for asset in file_simulations[0].assets]
+        simulation_assets = [asset.filename for asset in experiment.simulations[0].assets]
+        self.assertEqual(set(file_simulation_assets), set(simulation_assets))
+
+

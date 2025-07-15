@@ -112,7 +112,6 @@ Exact workflows for using |IT_s| is user-dependent, and can include any of the t
    analyzers/analyzers
    plots   
    reference
-   plugin_documentation/index
    recipes_index
    dtkt-convert
    faq

@@ -7,7 +7,7 @@ import pytest
 from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 import idmtools_platform_container.cli.container as container_cli
-from idmtools_platform_container.utils.job_history import JobHistory
+from idmtools_platform_file.tools.job_history import JobHistory
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(script_dir)

@@ -4,6 +4,27 @@
 name: "run_dev_install_all_tests"
 on:
   workflow_dispatch:
+    inputs:
+      all_tests:
+        description: "All tests"
+        required: false
+        default: 'true'
+      container_test:
+        description: "Container Platform Test Only"
+        required: false
+        default: 'false'
+      comps_test:
+        description: "Comps Platform Test Only"
+        required: false
+        default: 'false'
+      general_test:
+        description: "General Platform Test Only"
+        required: false
+        default: 'false'
+      slurm_test:
+        description: "Slurm Platform Test Only"
+        required: false
+        default: 'false'
 
 jobs:
   run-setup-dev-all-tests:
@@ -44,6 +65,7 @@ jobs:
           echo '${{ env.PYPI_STAGING_PASSWORD }}' | docker login idm-docker-staging.packages.idmod.org --username ${{ env.PYPI_STAGING_USERNAME }} --password-stdin
           echo '${{ env.PYPI_STAGING_PASSWORD }}' | docker login docker-staging.packages.idmod.org --username ${{ env.PYPI_STAGING_USERNAME }} --password-stdin
       - name: run idmtools_cli tests
+        if: ${{ github.event.inputs.all_tests == 'true' || github.event.inputs.general_test == 'true' || github.event.inputs.slurm_test == 'true' || github.event.inputs.comps_test == 'true'}}
         run: |
           cd idmtools_cli
           PARALLEL_TEST_COUNT=2 make test-all
@@ -54,6 +76,7 @@ jobs:
           name: idmtools_cli_test_results
           path: idmtools_cli/tests/reports/
       - name: run idmtools_core tests
+        if: ${{ github.event.inputs.all_tests == 'true' || github.event.inputs.general_test == 'true' || github.event.inputs.slurm_test == 'true' || github.event.inputs.comps_test == 'true'}}
         run: |
           cd idmtools_core
           PARALLEL_TEST_COUNT=2 make test-all
@@ -64,6 +87,7 @@ jobs:
           name: idmtools_core_test_results
           path: idmtools_core/tests/reports/
       - name: run idmtools_models tests
+        if: ${{ github.event.inputs.all_tests == 'true' || github.event.inputs.general_test == 'true' || github.event.inputs.slurm_test == 'true' || github.event.inputs.comps_test == 'true'}}
         run: |
           cd idmtools_models
           PARALLEL_TEST_COUNT=2 make test-all
@@ -73,27 +97,8 @@ jobs:
         with:
           name: idmtools_models_test_results
           path: idmtools_models/tests/reports/
-      - name: run idmtools_platform_slurm tests
-        run: |
-            cd idmtools_platform_slurm
-            make test-all
-      - name: Upload idmtools_platform_slurm all test results
-        uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: idmtools_platform_slurm_test_results
-          path: idmtools_platform_slurm/tests/reports/
-      - name: run idmtools_slurm_utils tests
-        run: |
-          cd idmtools_slurm_utils
-          make test-all
-      - name: Upload idmtools_slurm_utils all test results
-        uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: idmtools_slurm_utils_test_results
-          path: idmtools_slurm_utils/tests/reports/
       - name: run idmtools_platform_general tests
+        if: ${{ github.event.inputs.all_tests == 'true' || github.event.inputs.general_test == 'true' }}
         run: |
             cd idmtools_platform_general
             make test-all
@@ -103,7 +108,19 @@ jobs:
         with:
           name: idmtools_platform_general_test_results
           path: idmtools_platform_general/tests/reports/
+      - name: run idmtools_platform_slurm tests
+        if: ${{ github.event.inputs.all_tests == 'true' || github.event.inputs.slurm_test == 'true' }}
+        run: |
+            cd idmtools_platform_slurm
+            make test-all
+      - name: Upload idmtools_platform_slurm all test results
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: idmtools_platform_slurm_test_results
+          path: idmtools_platform_slurm/tests/reports/
       - name: run idmtools_platform_container tests
+        if: ${{ github.event.inputs.all_tests == 'true' || github.event.inputs.container_test == 'true' }}
         run: |
             cd idmtools_platform_container
             make test-all
@@ -114,6 +131,7 @@ jobs:
           name: idmtools_platform_container_test_results
           path: idmtools_platform_container/tests/reports/
       - name: run idmtools_platform_comps tests
+        if: ${{ github.event.inputs.all_tests == 'true' || github.event.inputs.comps_test == 'true' }}
         run: |
           cd idmtools_platform_comps
           PARALLEL_TEST_COUNT=2 make test-all

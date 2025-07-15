@@ -6,7 +6,9 @@ Although the use of analyzers in |DT| and |IT_s| is very similar, being aware of
 some of the differences may be helpful with the conversion process. For example
 some of the class and method names are different, as seen in the following diagram:
 
-.. uml:: /diagrams/analyzers-convert.puml
+.. image:: /diagrams/analyzers-convert.png
+   :alt: Analyzers Convert
+   :align: center
 
 As the previous diagram illustrates the |DT| methods, :py:func:`select_simulation_data`
 and :py:func:`finalize`, have been renamed to :py:func:`map`

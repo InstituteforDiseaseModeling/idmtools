@@ -6,7 +6,7 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 import shutil
 import subprocess
 from dataclasses import dataclass
-from typing import NoReturn, Dict
+from typing import NoReturn, Dict, TYPE_CHECKING
 from idmtools.core import ItemType
 from idmtools.entities.experiment import Experiment
 from idmtools_platform_file.platform_operations.experiment_operations import FilePlatformExperimentOperations
@@ -16,12 +16,16 @@ from logging import getLogger
 logger = getLogger(__name__)
 user_logger = getLogger('user')
 
+if TYPE_CHECKING:
+    from idmtools_platform_container.container_platform import ContainerPlatform
+
 
 @dataclass
 class ContainerPlatformExperimentOperations(FilePlatformExperimentOperations):
     """
     Experiment Operations for Process Platform.
     """
+    platform: 'ContainerPlatform'
 
     def platform_run_item(self, experiment: Experiment, **kwargs):
         """
@@ -52,11 +56,12 @@ class ContainerPlatformExperimentOperations(FilePlatformExperimentOperations):
             user_logger.info(
                 f'\nYou may try the following command to check simulations running status: \n  idmtools container status {experiment.id}')
 
-    def platform_cancel(self, experiment_id: str) -> NoReturn:
+    def platform_cancel(self, experiment_id: str, force: bool = True) -> NoReturn:
         """
         Cancel platform experiment's container job.
         Args:
             experiment_id: Experiment ID
+            force: bool, True/False
         Returns:
             No Return
         """
@@ -81,7 +86,7 @@ class ContainerPlatformExperimentOperations(FilePlatformExperimentOperations):
         Returns:
             No Return
         """
-        from idmtools_platform_container.utils.job_history import JobHistory
+        from idmtools_platform_file.tools.job_history import JobHistory
         job = JobHistory.get_job(experiment_id)
         exp_dir = job['EXPERIMENT_DIR']
         try:

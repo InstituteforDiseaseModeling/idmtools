@@ -5,12 +5,9 @@ import unittest
 from functools import partial
 from time import time
 from typing import Any, Dict
-
 import pytest
-
 from idmtools.assets import AssetCollection
 from idmtools.builders import SimulationBuilder
-from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
@@ -26,7 +23,7 @@ class TestFilePlatform(ITestWithPersistence):
     def setUp(self) -> None:
         self.case_name = os.path.basename(__file__) + "--" + self._testMethodName
         self.job_directory = "DEST"
-        self.platform = Platform('FILE', job_directory=self.job_directory, sym_link=False)
+        self.platform = Platform('FILE', job_directory=self.job_directory)
 
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
     def test_assetcollection_hook(self, mock_stdout):

@@ -22,7 +22,9 @@ For a description of each of these analyzers please see the following:
 
 Each of the included example analyzers inherit from the built-in analyzers and the :py:class:`~idmtools.entities.ianalyzer.IAnalyzer` abstract class:
 
-.. uml:: /diagrams/ianalyzer-exampleanalyzers.puml
+.. image:: /diagrams/ianalyzer-exampleanalyzers.png
+   :alt: Analyzer Examples
+   :align: center
 
 For more information about the built-in analyzers, see :doc:`analyzers-create`. There are also additional examples, such as forcing analyzers to use a specific working directory and how to perform partial analysis on only succeeded or failed simulations:
 

@@ -19,8 +19,8 @@
 ## Installation
 - Create and activate a virtual environment:
     ```
-    python -m venv venv
-    source venv/bin/activate  
+    python -m venv idmtools
+    source idmtools/bin/activate  
     ```
 - Install emodpy related disease models if running emod related disease models 
     ```bash

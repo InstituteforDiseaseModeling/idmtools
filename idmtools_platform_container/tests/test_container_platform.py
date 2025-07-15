@@ -27,7 +27,7 @@ class TestContainerPlatform(unittest.TestCase):
     #     except FileNotFoundError:
     #         pass
 
-    @patch('idmtools_platform_container.utils.job_history.JobHistory.save_job')
+    @patch('idmtools_platform_file.tools.job_history.JobHistory.save_job')
     @patch('idmtools_platform_container.container_platform.find_running_job', return_value=None)
     @patch.object(ContainerPlatform, 'check_container')
     @patch.object(ContainerPlatform, 'convert_scripts_to_linux')
@@ -105,7 +105,6 @@ class TestContainerPlatform(unittest.TestCase):
             self.assertEqual(platform.data_mount, '/home/container_data')
             self.assertEqual(platform.force_start, False)
             self.assertEqual(platform.user_mounts, None)
-            self.assertEqual(platform.sym_link, True)
 
     @patch('docker.from_env')
     def test_start_container_custom_data_mount(self, mock_docker):

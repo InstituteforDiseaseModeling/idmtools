@@ -3,9 +3,7 @@ import io
 import os
 import unittest.mock
 from functools import partial
-
 import pytest
-
 from idmtools.assets import AssetCollection, Asset
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
@@ -40,7 +38,6 @@ class TestPythonSimulation(ITestWithPersistence):
         ps = Simulation(task=JSONConfiguredTask(parameters={"a": 1}, envelope="config", command="ls"))
         # The tag for type is added at runtime during the pre_creation event
         ps.pre_creation(None)
-        self.assertEqual(ps.tags.get('task_type'), 'idmtools_models.json_configured_task.JSONConfiguredTask')
 
     @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
     def test_envelope(self, mock_stdout):

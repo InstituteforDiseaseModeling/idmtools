@@ -1,3 +1,3 @@
 recursive-include idmtools_test *
-include requirements.txt
 include README.md
+include LICENSE.TXT

@@ -90,21 +90,24 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         meta['uid'] = meta['_uid']
         meta['status'] = 'CREATED'
         meta['dir'] = os.path.abspath(self.platform.get_directory(item))
+        meta['tags'] = meta['tags']
 
-        if isinstance(item, Experiment):
+        if isinstance(item, Suite):
+            meta['experiments'] = [experiment.id for experiment in item.experiments]
+        elif isinstance(item, Experiment):
             meta['suite_id'] = meta["parent_id"]
+            meta['simulations'] = [simulation.id for simulation in item.simulations]
         elif isinstance(item, Simulation):
             meta['experiment_id'] = meta["parent_id"]
-
         return meta
 
-    def dump(self, item: Union[Suite, Experiment, Simulation]) -> None:
+    def dump(self, item: Union[Suite, Experiment, Simulation]) -> Dict:
         """
         Save item's metadata to a file.
         Args:
             item: idmtools entity (Suite, Experiment and Simulation)
         Returns:
-            None
+            key/value dict of metadata from the given item
         """
         if not isinstance(item, (Suite, Experiment, Simulation)):
             raise RuntimeError("Dump method supports Suite/Experiment/Simulation only.")

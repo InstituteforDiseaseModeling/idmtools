@@ -326,7 +326,10 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             ce = item or self.get_item(item_id, raw=raw, item_type=item_type)
             ce.platform = self
             kwargs['parent'] = ce
-            children = self._get_children_for_platform_item(ce.get_platform_object(), raw=raw, **kwargs)
+            if raw:
+                children = self._get_children_for_platform_item(ce, raw=raw, **kwargs)
+            else:
+                children = self._get_children_for_platform_item(ce.get_platform_object(), raw=raw, **kwargs)
             self.cache.set(cache_key, children, expire=self._object_cache_expiration)
             return children
 
@@ -637,7 +640,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         """
         if item_id is None or item_id == "":
             raise ValueError("item_id cannot be None or empty")
-        idm_item = self.get_item(item_id, item_type, raw=False)
+        idm_item = self.get_item(item_id, item_type, raw=True)
         return self.get_files(idm_item, files, output)
 
     def are_requirements_met(self, requirements: Union[PlatformRequirements, Set[PlatformRequirements]]) -> bool:
@@ -1060,6 +1063,40 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         if file_name is None:
             file_name = f'{exp_id}.csv'
         df.to_csv(os.path.join(output, file_name), header=save_header, index=False)
+
+    def filter_simulations_by_tags(self, item_id: str, item_type: ItemType, tags: Dict = None, status=None,
+                                   entity_type=False, skip_sims=None, max_simulations=None, **kwargs):
+        """
+        Filter simulations associated with a given Experiment or Suite using tag-based conditions.
+
+        This method is a platform-level convenience wrapper that delegates filtering logic to the
+        `get_simulations_by_tags` method on the retrieved item. It supports:
+        - Exact tag value matching
+        - Callable filters for flexible conditions (e.g., lambda expressions)
+        - Optionally limiting the number of returned simulations
+        - Returning either simulation entities or just their IDs
+
+        Args:
+            item_id (str): The unique ID of the Experiment or Suite.
+            item_type (ItemType): The type of the item (ItemType.EXPERIMENT or ItemType.SUITE).
+            tags (Dict, optional): Dictionary of tag filters to apply. Values can be:
+                - Exact values (e.g., {"Coverage": 0.8})
+                - Callable functions (e.g., {"Run_Number": lambda v: 0 <= v <= 10})
+                - Ellipsis (...) or None to match presence of key only.
+            status (EntityStatus, optional): Filter by status. If provided, only simulations with the specified status will be returned.
+            entity_type (bool, optional): If True, return full simulation entities; otherwise, return simulation IDs.
+            skip_sims (list, optional): A list of simulation IDs to exclude from the results.
+            max_simulations (int, optional): Maximum number of simulations to return.
+            **kwargs: Additional keyword arguments passed to the item's `get_simulations_by_tags` method.
+
+        Returns:
+            Union[List[str], List[Simulation], Dict[str, List[Simulation]]]:
+                - A list of simulation IDs (default),
+                - Or a list/dictionary of Simulation objects if `entity_type=True`.
+        """
+        item = self.get_item(item_id, item_type, force=True)
+        return item.get_simulations_by_tags(tags=tags, status=status, entity_type=entity_type, skip_sims=skip_sims,
+                                            max_simulations=max_simulations, **kwargs)
 
 
 TPlatform = TypeVar("TPlatform", bound=IPlatform)

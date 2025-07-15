@@ -3,12 +3,9 @@ import os
 import pathlib
 from functools import partial
 from typing import Any, Dict
-
 import numpy as np
 import pandas as pd
 import pytest
-from pathlib import Path
-
 from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
@@ -196,7 +193,7 @@ class TestProcessPlatform(ITestWithPersistence):
             sim_df['outpath'] = sim_map[sim.id]
             sims_df = pd.concat([sims_df, sim_df], ignore_index=True)
         self.assertTrue(np.all(exp_df.sort_values('simid').values == sims_df.sort_values('simid').values))
-        self.assertTrue(exp_df.shape == (9, 6))
+        self.assertTrue(exp_df.shape == (9, 5))
 
     def test_create_sim_directory_csv(self):
         experiment = self.create_experiment(self.platform, a=3, b=3)

@@ -16,7 +16,7 @@ import tempfile
 from idmtools_platform_container.container_operations.docker_operations import stop_container, find_running_job
 from idmtools_platform_container.container_platform import ContainerPlatform
 import idmtools_platform_container.cli.container as container_cli
-from idmtools_platform_container.utils.job_history import JobHistory
+from idmtools_platform_file.tools.job_history import JobHistory
 parent = Path(__file__).resolve().parent
 sys.path.append(str(parent))
 from utils import find_containers_by_prefix, is_valid_container_name_with_prefix, get_container_name_by_id, \
@@ -191,8 +191,7 @@ class TestPlatformExperiment(unittest.TestCase):
 
     def test_platform_with_symlink_true(self):
         with tempfile.TemporaryDirectory() as temp_dir:
-            # first create experiment with sym_link=True
-            platform = Platform("Container", job_directory=temp_dir, sym_link=True)
+            platform = Platform("Container", job_directory=temp_dir)
             command = "ls -lat"
             task = CommandTask(command=command)
             experiment = Experiment.from_task(task, name="run_command")

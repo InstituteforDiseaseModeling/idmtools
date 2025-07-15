@@ -10,7 +10,9 @@ Architecture and packages reference
 Packages overview
 =================
 
-.. uml:: /diagrams/packages_overview.puml
+.. image:: /diagrams/packages_overview.png
+   :alt: Packages Overview
+   :align: center
 
 
 Packages and APIs
@@ -21,42 +23,55 @@ The following diagrams help illustrate the primary packages and associated APIs 
 Core and job orchestration
 --------------------------
 
-.. uml:: /diagrams/core.puml
+.. image:: /diagrams/core.png
+   :alt: Core
+   :align: center
 
 
 |CONTAINER_s| Platform
 ----------------------
 
-.. uml:: /diagrams/platform_container.puml
-
+.. image:: /diagrams/platform_container.png
+   :alt: Container Platform
+   :align: center
 
 |COMPS_s| platform
 ------------------
 
-.. uml:: /diagrams/comps.puml
+.. image:: /diagrams/comps.png
+   :alt: Comps Platform
+   :align: center
 
 .. include:: /reuse/comps_note.txt
 
 |SLURM_s| platform
 ------------------
 
-.. uml:: /diagrams/slurm.puml
+.. image:: /diagrams/slurm.png
+   :alt: Slurm Platform
+   :align: center
 
 
 Models reference
 ----------------
 
-.. uml:: /diagrams/models.puml
+.. image:: /diagrams/models.png
+   :alt: Models
+   :align: center
 
 API class specifications
 ------------------------
 
-.. uml:: /diagrams/apis.puml
+.. image:: /diagrams/apis.png
+   :alt: API class
+   :align: center
 
 |EMOD_s|
 ^^^^^^^^
 
-.. uml:: /diagrams/apis-emod.puml
+.. image:: /diagrams/apis-emod.png
+   :alt: emod-api
+   :align: center
 
 |EMOD_s| support with |IT_s| is provided with the **emodpy** package, which leverages |IT_s| plugin architecture.
 
@@ -71,5 +86,4 @@ API Documentation
    api/idmtools_models_index
    api/idmtools_platform_comps_index
    api/idmtools_platform_slurm_index
-   api/idmtools_slurm_utils_index
    api/idmtools_platform_container_index
