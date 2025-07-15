@@ -4,7 +4,7 @@ Create an analyzer
 
 You can use built-in analyzers included with |IT_s| to help with creating a new analyzer. The following list some of these analyzers, all inheriting from the the :py:class:`~idmtools.entities.ianalyzer.IAnalyzer` abstract class:
 
-.. uml:: /diagrams/ianalyzer-builtins.puml
+.. image:: /diagrams/ianalyzer-builtins.png
 
 For more information about these built-in analyzers, see:
 
@@ -15,11 +15,15 @@ For more information about these built-in analyzers, see:
 
 To create an analyzer methods from the :py:class:`~idmtools.entities.ianalyzer.IAnalyzer` abstract class are used:
 
-.. uml:: /diagrams/ianalyzer-methods.puml
+.. image:: /diagrams/ianalyzer-methods.png
+   :alt: Analyzer Methods
+   :align: center
 
 All analyzers must also call the :py:class:`~idmtools.analysis.analyze_manager.AnalyzeManager` class for analysis management:
 
-.. uml:: /diagrams/ianalyzer-analyzemanager.puml
+.. image:: /diagrams/ianalyzer-analyzemanager.png
+   :alt: Analyzer Manager
+   :align: center
 
 The following python code and comments, from the :py:class:`~idmtools.analysis.csv_analyzer.CSVAnalyzer` class, is an example of how to create an analyzer for analysis of .csv output files from simulations::
 

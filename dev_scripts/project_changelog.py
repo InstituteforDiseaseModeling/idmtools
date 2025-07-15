@@ -36,7 +36,7 @@ def get_issue_type(labels):
         return 'User Experience'
     elif any(label['name'] == 'Documentation' for label in labels):
         return 'Documentation'
-    elif any(label['name'] in ['Platform support', 'COMPS', 'SLURM', 'Container Workflow'] for label in labels):
+    elif any(label['name'] in ['Platform support', 'COMPS Platform', 'SLURM Platform', 'Container Platform', "File Platform"] for label in labels):
         return 'Platforms'
     elif any(label['name'] == 'Analyzers' for label in labels):
         return 'Analyzers'
