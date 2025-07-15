@@ -99,12 +99,13 @@ def process_output(output_line: str):
         logger.debug("".join(ch for ch in output_line if unicodedata.category(ch)[0] != "C"))
 
 
-def install_dev_packages(pip_url, extra_index_url):
+def install_dev_packages(pip_url, extra_index_url, build_docs):
     """
     Install all idmtools packages in editable mode with their extras, and also dev dependencies for docs.
     Args:
         pip_url: Url to install package from.
         extra_index_url: Extra index url to install package from.
+        build_docs: Flag (True) to build docs.
 
     Returns:
         None
@@ -127,14 +128,15 @@ def install_dev_packages(pip_url, extra_index_url):
             logger.debug(f"Return code: {e.returncode}")
 
     # Install doc dependencies
-    docs_dir = join(base_directory, "docs")
-    logger.info("Installing doc requirements from docs/requirements.txt")
-    cmd_docs = [
-        sys.executable, "-m", "pip", "install", "-r", "requirements.txt",
-        f"--index-url={pip_url}", f"--extra-index-url={extra_index_url}"
-    ]
-    for line in execute(cmd_docs, cwd=docs_dir):
-        process_output(line)
+    if build_docs:
+        docs_dir = join(base_directory, "docs")
+        logger.info("Installing doc requirements from docs/requirements.txt")
+        cmd_docs = [
+            sys.executable, "-m", "pip", "install", "-r", "requirements.txt",
+            f"--index-url={pip_url}", f"--extra-index-url={extra_index_url}"
+        ]
+        for line in execute(cmd_docs, cwd=docs_dir):
+            process_output(line)
 
 
 def install_base_environment(pip_url, extra_index_url):
@@ -176,6 +178,7 @@ if __name__ == "__main__":
     parser.add_argument("--extra-index-url", default='https://pypi.org/simple',
                         help="Pip url to install dependencies from pypi")
     parser.add_argument("--verbose", default=False, action='store_true')
+    parser.add_argument('--docs', action='store_true', help='Enable build documents')
 
     args = parser.parse_args()
 
@@ -203,4 +206,4 @@ if __name__ == "__main__":
         logger.addHandler(console_handler)
 
     install_base_environment(args.index_url, args.extra_index_url)
-    sys.exit(install_dev_packages(args.index_url, args.extra_index_url))
+    sys.exit(install_dev_packages(args.index_url, args.extra_index_url, args.docs))
