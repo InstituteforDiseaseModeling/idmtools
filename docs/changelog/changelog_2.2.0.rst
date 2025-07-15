@@ -28,6 +28,7 @@ Developer/Test
 Documentation
 -------------
 * `#2475 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2475>`_ - Update idmtools documents
+* `#2535 <https://github.com/InstituteforDiseaseModeling/idmtools/issues/2535>`_ - Intermittent Sphinx Build Failures Triggered by PUML Rendering
 
 Feature Request
 ---------------
