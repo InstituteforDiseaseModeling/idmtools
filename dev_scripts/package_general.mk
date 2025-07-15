@@ -82,7 +82,7 @@ coverage-all: ## Generate a code-coverage report using all tests
 #######################
 
 dist: clean ## build our package
-	python setup.py sdist
+	python -m build --sdist
 
 release-staging: dist ## perform a release to staging
 	twine upload --verbose --repository-url $(PYPI_URL) dist/*

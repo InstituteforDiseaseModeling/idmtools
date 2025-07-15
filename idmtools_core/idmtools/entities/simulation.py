@@ -114,13 +114,6 @@ class Simulation(IAssetsEnabled, INamedEntity):
                 logger.debug(f'Setting Simulation Tag "simulation_type" to "{sn}"')
             self.tags["simulation_type"] = sn
 
-        # Add a tag to for task
-        if self.task is not None:
-            tn = get_qualified_class_name_from_obj(self.task)
-            if logger.isEnabledFor(DEBUG):
-                logger.debug(f'Setting Simulation Tag "task_type" to "{tn}"')
-            self.tags["task_type"] = tn
-
     def post_creation(self, platform: 'IPlatform') -> None:
         """
         Called after a simulation is created.
@@ -143,6 +136,7 @@ class Simulation(IAssetsEnabled, INamedEntity):
             self.task = TaskProxy.from_task(self.task)
         if self.status is None:
             self.status = EntityStatus.CREATED
+        self.platform = platform
 
     def pre_getstate(self):
         """

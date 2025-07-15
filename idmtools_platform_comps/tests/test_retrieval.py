@@ -52,7 +52,7 @@ class TestRetrieval(ITestWithPersistence):
         self.assertEqual(self.exp.name, exp.name)
 
         # Comps returns tags as string regardless of type
-        self.assertEqual({k: str(v or '') for k, v in self.exp.tags.items()}, exp.tags)
+        self.assertDictEqual({k: str(v or '') for k, v in self.exp.tags.items()}, exp.tags)
 
         # Test the raw retrieval
         comps_experiment = self.platform.get_item(self.exp.uid, ItemType.EXPERIMENT, raw=True)
@@ -79,7 +79,7 @@ class TestRetrieval(ITestWithPersistence):
         # Test attributes
         self.assertEqual(sim.uid, base.uid)
         self.assertEqual(sim.name, base.name)
-        self.assertEqual({k: str(v) for k, v in sorted(base.tags.items())},
+        self.assertDictEqual({k: str(v) for k, v in sorted(base.tags.items())},
                          {k: str(v) for k, v in sorted(sim.tags.items())})
 
         # Test the raw retrieval
@@ -87,13 +87,13 @@ class TestRetrieval(ITestWithPersistence):
         self.assertIsInstance(comps_simulation, COMPSSimulation)
         self.assertEqual(base.uid, comps_simulation.id)
         self.assertEqual(self.case_name, comps_simulation.name)
-        self.assertEqual({k: str(v) for k, v in sorted(base.tags.items())},
+        self.assertDictEqual({k: str(v) for k, v in sorted(base.tags.items())},
                          {k: str(v) for k, v in sorted(comps_simulation.tags.items())})
 
     def test_parent(self):
         parent_exp = self.platform.get_parent(self.exp.simulations[0].uid, ItemType.SIMULATION)
         self.assertEqual(self.exp.uid, parent_exp.uid)
-        self.assertEqual({k: str(v or '') for k, v in self.exp.tags.items()}, parent_exp.tags)
+        self.assertDictEqual({k: str(v or '') for k, v in self.exp.tags.items()}, parent_exp.tags)
         self.assertIsNone(self.platform.get_parent(self.exp.uid, ItemType.EXPERIMENT))
 
     def test_children(self):

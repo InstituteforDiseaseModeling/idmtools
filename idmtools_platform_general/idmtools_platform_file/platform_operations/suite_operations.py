@@ -71,6 +71,20 @@ class FilePlatformSuiteOperations(IPlatformSuiteOperations):
         # Refresh with entity ids
         self.platform._metas.dump(suite)
 
+    def post_run_item(self, suite: Suite, **kwargs) -> None:
+        """
+        Perform post-processing steps after a suite run.
+        Args:
+            suite: The suite object that has just finished running
+            **kwargs: Additional keyword arguments
+
+        Returns:
+            None
+        """
+        super().post_run_item(suite, **kwargs)
+        # Refresh platform object
+        suite._platform_object = self.get(suite.id, **kwargs)
+
     def get_parent(self, suite: FileSuite, **kwargs) -> Any:
         """
         Fetches the parent of a suite.
@@ -193,3 +207,37 @@ class FilePlatformSuiteOperations(IPlatformSuiteOperations):
             None
         """
         pass
+
+    def get_assets(self, suite: Suite, files: List[str], **kwargs) -> Dict[str, bytearray]:
+        """
+        Fetch the files associated with a suite.
+
+        Args:
+            suite: Suite (idmtools Suite or FileSuite)
+            files: List of files to download
+            **kwargs:
+
+        Returns:
+            Dict[str, Dict[Dict[str, Dict[str, str]]]]:
+                A nested dictionary structured as:
+                {
+                   suite.id{
+                        experiment.id: {
+                            simulation.id {
+                                filename: file content as string,
+                                ...
+                            },
+                            ...
+                        },
+                    }
+                }
+        """
+        ret = dict()
+        if isinstance(suite, FileSuite):
+            file_suite = suite
+        else:
+            file_suite = suite.get_platform_object()
+        children = self.platform._get_children_for_platform_item(file_suite)
+        for child in children:
+            ret[child.id] = self.platform._experiments.get_assets(child, files, **kwargs)
+        return ret

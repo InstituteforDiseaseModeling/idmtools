@@ -1,12 +1,13 @@
 """
 Filtering utility.
 
-Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+Copyright 2025, Gates Foundation. All rights reserved.
 """
-from uuid import UUID
 from idmtools.core import ItemType, EntityStatus
 from idmtools.core.interfaces.ientity import IEntity
+from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform import IPlatform
+from idmtools.utils.general import parse_value_tags
 
 
 class FilterItem:
@@ -15,48 +16,77 @@ class FilterItem:
     """
 
     @staticmethod
-    def filter_item(platform: IPlatform, item: IEntity, skip_sims=None, max_simulations: int = None, **kwargs):
+    def filter_item(platform: IPlatform, item: IEntity, tags=None, status: EntityStatus = None,
+                    entity_type: bool = False, max_simulations: int = None, skip_sims=None, **kwargs):
         """
-        Filter simulations from Experiment or Suite, by default it filter status with Succeeded.
+        Filter simulations from an Experiment or Suite using tag and status criteria.
 
-        If user wants to filter by other status, it also can be done, for example:
+        By default, this filters simulations that have a status of `EntityStatus.SUCCEEDED`.
+        Additional filtering can be applied by specifying tag values or tag-based conditions.
 
-        .. code-block:: python
+        This method supports:
+            - Skipping specific simulations by ID
+            - Filtering based on simulation status (e.g., FAILED, SUCCEEDED)
+            - Tag-based filtering (both exact match and conditional/lambda-based)
 
-                filter_item(platform, exp, status=EntityStatus.FAILED
-
-        If user wants to filter by tags, it also can be done, for example:
-
-        .. code-block:: python
-
-                filter_item(platform, exp, tags={'Run_Number': '2'})
+        Examples:
+            >>> filter_item(platform, experiment, status=EntityStatus.FAILED)
+            >>> filter_item(platform, experiment, tags={"Run_Number": "2"})
+            >>> filter_item(platform, experiment, tags={"Run_Number": lambda v: 2 <= v <= 10})
+            >>> filter_item(platform, experiment, tags={"Coverage": 0.8}, status=EntityStatus.SUCCEEDED)
+            >>> filter_item(platform, experiment, tags={"Coverage": 0.8}, max_simulations=10)
 
         Args:
-            platform: Platform item
-            item: Item to filter
-            skip_sims: list of sim ids
-            max_simulations: Total simulations
-            kwargs: extra filters
+            platform (IPlatform): The platform instance to query simulations from.
+            item (IEntity): An Experiment or Suite to filter simulations from.
+            tags (dict): A dictionary of tag key-value pairs to filter by for a simulation. Values may be:
+                * A fixed value (e.g., {"Run_Number": 2})
+                * A lambda or callable function for conditional logic
+                (e.g., {"Run_Number": lambda v: 2 <= v <= 10})
+            status (EntityStatus, Optional): The experiment's status.
+            entity_type (bool, optional): If True, return simulation entities instead of just their IDs.
+            skip_sims (list, optional): A list of simulation IDs (as strings) to exclude from the results.
+            max_simulations (int, optional): Maximum number of simulations to return. Returns all if not set.
+            **kwargs: Extra args.
 
-        Returns: list of simulation ids
+        Returns:
+            Union[List[Union[str, Simulation]], Dict[str, List[Union[str, Simulation]]]]:
+            If the item is an `Experiment`, returns a list of simulation IDs or simulation entities
+            (if `entity_type=True`).
+
+            If the item is a `Suite`, returns list ofdictionary where each key is an experiment ID and
+            each value is a list of simulation IDs or simulation entities (depending on the `entity_type` flag).
+
         """
-        if skip_sims is None:
-            skip_sims = []
-
         def match_tags(sim: IEntity, tags=None):
             """
             Check if simulation match tags.
 
             Args:
                 sim: simulation
-                tags: tags
+                tags: search tags
 
             Returns: bool True/False
             """
+            # If no tags are provided, treat it as an empty filter (match all)
             if tags is None:
-                tags = {}
+                return True
+            # Normalize simulation tag values and wrap them with TagValue for safe comparisons
+            # (e.g., allows "5" == 5 and supports operators like >, <, == in tag filters)
+            sim_tags = parse_value_tags(sim.tags, wrap_with_tagvalue=True)
+
+            # Iterate over each tag filter condition
             for k, v in tags.items():
-                if k not in sim.tags or sim.tags[k] != v:
+                sim_val = sim_tags.get(k)
+                # If the simulation does not have the tag, skip it
+                if sim_val is None:
+                    return False
+                # If the filter value is a callable (e.g., lambda), evaluate the condition
+                if callable(v):
+                    if not v(sim_val):
+                        return False
+                # Otherwise, do a direct comparison between the simulation tag and expected value
+                elif sim_val != v:
                     return False
 
             return True
@@ -64,40 +94,80 @@ class FilterItem:
         if item.item_type not in [ItemType.EXPERIMENT, ItemType.SUITE]:
             raise ValueError("This method only supports Experiment and Suite types!")
 
-        # get all possible simulations
-        potential_sims = platform.flatten_item(item=item)
+        if skip_sims is None:
+            skip_sims = []
+        # ------------------------------------------------------------------ #
+        # Base case  ─ Experiment
+        # ------------------------------------------------------------------ #
+        if isinstance(item, Experiment):
+            potential_sims = item.get_simulations()
 
-        # filter by status
-        status = kwargs.get("status", EntityStatus.SUCCEEDED)
-        sims_status_filtered = [sim for sim in potential_sims if sim.status == status]
+            # filter by status
+            sims_status_filtered = [sim for sim in potential_sims if sim.status == status] if status else potential_sims
 
-        # filter tags
-        tags = kwargs.get("tags", {})
-        sims_tags_filtered = [sim for sim in sims_status_filtered if match_tags(sim, tags)]
+            # filter tags
+            sims_tags_filtered = [sim for sim in sims_status_filtered if match_tags(sim, tags)]
 
-        # filter sims
-        sims_id_filtered = [sim for sim in sims_tags_filtered if str(sim.uid) not in skip_sims]
+            # filter sims
+            sims_id_filtered = [sim for sim in sims_tags_filtered if str(sim.uid) not in skip_sims]
 
-        # consider max_simulations for return
-        sims_final = sims_id_filtered[0:max_simulations if max_simulations else len(sims_id_filtered)]
+            # consider max_simulations for return
+            sims_final = sims_id_filtered[0:max_simulations if max_simulations else len(sims_id_filtered)]
 
-        # only return uid
-        return [s.uid for s in sims_final]
+            if entity_type:
+                return sims_final
+            else:
+                return [s.id for s in sims_final]
+
+        # Suite case:
+        experiments = item.get_experiments()
+        result = {}
+
+        for exp in experiments:
+            filtered = FilterItem.filter_item(
+                platform,
+                item=exp,
+                tags=tags,
+                status=status,
+                entity_type=entity_type,
+                max_simulations=max_simulations,
+                skip_sims=skip_sims,
+                **kwargs,
+            )
+            result[exp.id] = filtered
+        return result
 
     @classmethod
-    def filter_item_by_id(cls, platform: IPlatform, item_id: UUID, item_type: ItemType = ItemType.EXPERIMENT, skip_sims=None, max_simulations: int = None, **kwargs):
+    def filter_item_by_id(cls, platform: IPlatform, item_id: str, item_type: ItemType = ItemType.EXPERIMENT,
+                          tags=None, status=None, entity_type=False, skip_sims=None, max_simulations: int = None,
+                          **kwargs):
         """
-        Filter simulations from Experiment or Suite.
+        Retrieve and filter simulations from an Experiment or Suite by item ID.
+
+        This method looks up the specified item (Experiment or Suite) by ID on the given platform,
+        then filters its simulations using the class's `filter_item()` method.
 
         Args:
-            platform: COMPSPlatform
-            item_id: Experiment/Suite id
-            item_type:  Experiment or Suite
-            skip_sims: list of sim ids
-            max_simulations: #sims to be returned
-            kwargs: extra filters
+            platform (IPlatform): The platform instance used to fetch the item.
+            item_id (str): The unique identifier of the Experiment or Suite.
+            item_type (ItemType, optional): The type of item (Experiment or Suite). Defaults to Experiment.
+            tags (dict, optional): A simulation's tags to filter by.
+            status (EntityStatus, Optional): The experiment's status.
+            entity_type (bool, optional): If True, return simulation entities instead of just their IDs.
+            skip_sims (List[str], optional): List of simulation IDs to skip during filtering. Defaults to an empty list.
+            max_simulations (int, optional): Maximum number of simulations to return. Defaults to None (no limit).
+            **kwargs: Additional keyword arguments passed to `filter_item()`.
 
-        Returns: list of simulation ids
+        Returns:
+            Union[List[Union[str, Simulation]], Dict[str, List[Union[str, Simulation]]]]:
+            If the item is an `Experiment`, returns a list of simulation IDs or simulation entities
+            (if `entity_type=True`).
+
+            If the item is a `Suite`, returns a dictionary where each key is an experiment ID and
+            each value is a list of simulation IDs or simulation entities (depending on the `entity_type` flag).
+
+        Raises:
+            ValueError: If the provided `item_type` is not Experiment or Suite.
         """
         if skip_sims is None:
             skip_sims = []
@@ -105,7 +175,8 @@ class FilterItem:
             raise ValueError("This method only supports Experiment and Suite types!")
 
         # retrieve item by id and type
-        item = platform.get_item(item_id, item_type, raw=False)
+        item = platform.get_item(item_id, item_type, raw=False, force=True)
 
         # filter simulations
-        return cls.filter_item(platform, item, skip_sims, max_simulations, **kwargs)
+        return cls.filter_item(platform, item=item, tags=tags, status=status, entity_type=entity_type,
+                               skip_sims=skip_sims, max_simulations=max_simulations, **kwargs)

@@ -60,8 +60,7 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         if experiment.parent_id is None:
             suite = add_dummy_suite(experiment)
             self.platform._suites.platform_create(suite)
-            # update parent
-            experiment.parent = suite
+            suite.platform = self.platform
 
         # Generate Suite/Experiment/Simulation folder structure
         self.platform.mk_directory(experiment, exist_ok=True)
@@ -136,6 +135,20 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         user_logger.info(f'suite: {str(suite_id)}')
         user_logger.info(f'experiment: {experiment.id}')
         user_logger.info(f"\nExperiment Directory: \n{self.platform.get_directory(experiment)}")
+
+    def post_run_item(self, experiment: Experiment, **kwargs):
+        """
+        Perform post-processing steps after an experiment run.
+        Args:
+            experiment: The experiment object that has just finished running
+            **kwargs: Additional keyword arguments
+
+        Returns:
+            None
+        """
+        super().post_run_item(experiment, **kwargs)
+        # Refresh platform object
+        experiment._platform_object = self.get(experiment.id, **kwargs)
 
     def send_assets(self, experiment: Experiment, **kwargs):
         """
@@ -261,3 +274,35 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
             Any
         """
         pass
+
+    def get_assets(self, experiment: Experiment, files: List[str], **kwargs) -> Dict[str, bytearray]:
+        """
+        Fetch the files associated with an experiment.
+
+        Args:
+            experiment: Experiment (idmools Experiment or COMPSExperiment)
+            files: List of files to download
+            **kwargs:
+
+        Returns:
+            Dict[str, Dict[str, Dict[str, str]]]:
+                A nested dictionary structured as:
+                {
+                    experiment.id: {
+                        simulation.id {
+                            filename: file content as string,
+                            ...
+                        },
+                        ...
+                    }
+                }
+        """
+        ret = dict()
+        if isinstance(experiment, FileExperiment):
+            file_exp = experiment
+        else:
+            file_exp = experiment.get_platform_object()
+        simulations = self.platform.flatten_item(file_exp, raw=True)
+        for sim in simulations:
+            ret[sim.id] = self.platform._simulations.get_assets(sim, files, **kwargs)
+        return ret

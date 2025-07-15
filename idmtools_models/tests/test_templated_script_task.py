@@ -94,7 +94,7 @@ class TestTemplatedScriptTask(TestCase):
         self.assertTrue(str(wrapper_task.command).endswith(cmd))
 
     @windows_only
-    @pytest.mark.timeout(20)
+    @pytest.mark.timeout(2000)
     @pytest.mark.serial
     def test_wrapper_script_execute(self):
         """

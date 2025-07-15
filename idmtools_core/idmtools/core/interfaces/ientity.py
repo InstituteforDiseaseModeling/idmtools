@@ -5,7 +5,9 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 from abc import ABCMeta
 from dataclasses import dataclass, field
+from logging import getLogger
 from os import PathLike
+from pathlib import Path
 from typing import NoReturn, List, Any, Dict, Union, TYPE_CHECKING
 from idmtools.core import EntityStatus, ItemType, NoPlatformException
 from idmtools.core.interfaces.iitem import IItem
@@ -14,6 +16,8 @@ from idmtools.services.platforms import PlatformPersistService
 
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
+
+logger = getLogger(__name__)
 
 
 @dataclass
@@ -30,7 +34,7 @@ class IEntity(IItem, metaclass=ABCMeta):
     #: Parent object
     _parent: 'IEntity' = field(default=None, compare=False, metadata={"pickle_ignore": False})
     #: Status of item
-    status: EntityStatus = field(default=None, compare=False, metadata={"pickle_ignore": True})
+    status: EntityStatus = field(default=None, compare=False, metadata={"pickle_ignore": False})
     #: Tags for item
     tags: Dict[str, Any] = field(default_factory=lambda: {}, metadata={"md": True})
     #: Item Type(Experiment, Suite, Asset, etc)
@@ -278,6 +282,51 @@ class IEntity(IItem, metaclass=ABCMeta):
             None
         """
         write_id_file(filename, self, save_platform, platform_args)
+
+    def get_directory(self) -> Path:
+        """
+        Retrieve the directory path associated with the current item.
+
+        This method returns the local platform-specific directory for the item,
+        such as a simulation, experiment, or suite. It is only supported for
+        non-COMPS platforms and for items of type SIMULATION, EXPERIMENT, or SUITE.
+
+        Raises:
+            RuntimeError: If the current platform is COMPSPlatform, or if the item
+                          type is not one of SIMULATION, EXPERIMENT, or SUITE.
+            AttributeError: If the item does not have an associated platform object.
+
+        Returns:
+            pathlib.Path: The path to the item's working directory on the current platform.
+        """
+        platform = self.get_current_platform_or_error()
+        if not hasattr(platform, 'job_directory'):
+            raise RuntimeError(f'Not support get_directory for {platform.__class__.__name__}')
+        if self.item_type not in (ItemType.SIMULATION, ItemType.EXPERIMENT, ItemType.SUITE):
+            raise RuntimeError('Only support Suite/Experiment/Simulation for get_directory() for now.')
+        try:
+            item = self.get_platform_object()
+        except (NoPlatformException, RuntimeError):
+            raise AttributeError(f"{type(self).__name__} id: {self.id} not found in {platform.__class__.__name__}.")
+        return Path(item._platform_directory)
+
+    @property
+    def directory(self) -> Path:
+        """
+        The get directory for the current item. This is a convenience alias for get_directory.
+        Returns:
+            pathlib.Path: The path to the item's working directory on the current platform.
+        """
+        return self.get_directory()
+
+    def get_tags(self) -> Dict[str, Any]:
+        """
+        Get the tags associated with the entity (alias for the `tags` property).
+
+        Returns:
+            Dict[str, Any]: The dictionary of tags.
+        """
+        return self.tags
 
 
 IEntityList = List[IEntity]

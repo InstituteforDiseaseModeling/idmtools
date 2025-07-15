@@ -1,10 +1,7 @@
 from pathlib import Path
 from time import time
-
 import allure
-
 import os
-
 import pytest
 from COMPS.Data import Experiment as COMPSExperiment
 from COMPS.Data import Simulation as COMPSSimulation
@@ -124,10 +121,8 @@ class TestHooks(ITestWithPersistence):
         sim.add_post_creation_hook(update_tags)
 
         exp.run(wait_until_done=True)
-
-        tag_value = "idmtools.entities.command_task.CommandTask"
-        exp_tags = [{'e_id': exp.id, 'a': '0', 'task_type': tag_value}]
-        validate_sim_tags(self, exp.id, exp_tags, tag_value)
+        exp_tags = [{'e_id': exp.id, 'a': '0'}]
+        validate_sim_tags(self, exp.id, exp_tags)
 
     def test_experiment_pre_creation_hooks(self):
         base_task = CommandTask(command="python --version")
@@ -183,7 +178,7 @@ class TestHooks(ITestWithPersistence):
         # verify from comps experiment tags, note, post_run_hook tag will not show up in comps
         comps_tags = COMPSExperiment.get(exp.id, QueryCriteria().select_children('tags')).tags
         comps_tags.pop('idmtools')
-        comps_tags.pop("task_type")
+        comps_tags.pop('task_type')
         self.assertDictEqual(comps_tags, {'pre_run_tag': 'pre_run'})
 
     def test_experiment_hooks(self):
@@ -209,14 +204,13 @@ class TestHooks(ITestWithPersistence):
         exp.add_post_run_hook(save_id_as_file_as_hook)
 
         exp.run(wait_until_done=True)
-        tag_value = "idmtools.entities.command_task.CommandTask"
         expected_tags = {'pre_creation_tag': 'pre_creation', 'post_creation_tag': 'post_creation',
-                         'pre_run_tag': 'pre_run',
-                         'task_type': tag_value}
+                         'pre_run_tag': 'pre_run'}
 
         # verify tags from comps are expected
         tags = COMPSExperiment.get(exp.id, QueryCriteria().select_children('tags')).tags
         tags.pop('idmtools')
+        tags.pop("task_type")
         self.assertDictEqual(tags, expected_tags)
 
         # verify we saved file from post_run_kko
@@ -262,20 +256,16 @@ class TestHooks(ITestWithPersistence):
         register_plugins(my_hook)
         exp.run(True)
         # verify idmtools experiment tags
-        expected_tags = {'tag_key': 'tag_value'}
+        expected_tags = {'tag_key': 'tag_value', 'task_type': 'idmtools.entities.command_task.CommandTask'}
         exp.tags.pop('idmtools')
-        exp.tags.pop('task_type')
         self.assertDictEqual(exp.tags, expected_tags)
-        exp.simulations[0].tags.pop('task_type')
         self.assertDictEqual(exp.simulations[0].tags, {'sim_tag_post_key': 'sim_tag_post_value'})
         # verify comps experiment tag should contain only pre_create tag
         # and simulation does not contain post tags
         comps_tags = COMPSExperiment.get(exp.id, QueryCriteria().select_children('tags')).tags
         comps_tags.pop('idmtools')
-        comps_tags.pop("task_type")
         self.assertDictEqual(comps_tags, expected_tags)
         sim_tags = COMPSSimulation.get(exp.simulations[0].id, QueryCriteria().select_children('tags')).tags
-        sim_tags.pop('task_type')
         self.assertDictEqual(sim_tags, {})
         un_register_plugins(my_hook)
 
