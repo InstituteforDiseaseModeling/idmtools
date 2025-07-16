@@ -31,6 +31,7 @@ classifiers = [
 ]
 dependencies = [
     "idmtools_platform_general~=2.2.0",
+    "dataclasses-json"
 ]
 
 [project.urls]
