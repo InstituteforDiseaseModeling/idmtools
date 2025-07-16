@@ -32,6 +32,7 @@ classifiers = [
 ]
 dependencies = [
     "idmtools~=2.2.0",
+    "idmtools_cli~=2.2.0",
 ]
 
 [project.urls]
