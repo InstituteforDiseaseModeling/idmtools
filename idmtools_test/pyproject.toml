@@ -7,7 +7,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "idmtools_test"
-version = "2.2.0"
+version = "2.2.1"
 description = "Test and demo data for IDM-Tools"
 readme = "README.md"
 requires-python = ">=3.8"
