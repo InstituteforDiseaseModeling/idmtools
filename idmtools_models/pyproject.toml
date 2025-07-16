@@ -51,6 +51,7 @@ test = [
     "twine",
     "pyCOMPS~=2.10",
     "natsort~=8.4.0",
+    "idmtools_test",
 ]
 packaging = [
     "flake8",

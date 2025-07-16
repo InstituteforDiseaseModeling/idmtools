@@ -49,6 +49,8 @@ test = [
     "bump2version",
     "twine",
     "natsort",
+    "idmtools_models",
+    "idmtools_test",
 ]
 packaging = [
     "flake8",
