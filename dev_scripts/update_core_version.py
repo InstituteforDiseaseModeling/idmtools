@@ -43,7 +43,7 @@ def update_requirements():
 
 
 def update_idmtools_version_in_pyproject():  # noqa: D103
-    target_pattern = re.compile(r"^idmtools(~=|==)?")
+    target_pattern = re.compile(r'^idmtools([ \t]*(==|~=|>=|<=)?[ \t]*[\d\.]+)?$')
 
     current_version = get_current_version()
     new_dependency = f"idmtools~={current_version}"
@@ -73,3 +73,4 @@ def update_idmtools_version_in_pyproject():  # noqa: D103
 
 
 update_idmtools_version_in_pyproject()
+# TODO, need to update pyproject.toml in all idmtools_platform_general, idmtools_platform_container, idmtools_platform_slurm for other dependencies as well.

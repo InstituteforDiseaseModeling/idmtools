@@ -7,7 +7,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "idmtools_platform_container"
-version = "2.2.0"
+version = "2.2.1"
 description = "Container platform for IDM-Tools"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -35,7 +35,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
-    "idmtools~=2.2.0",
+    "idmtools_platform_general~=2.2.1",
     "docker>5.0",
     "rich",
 ]
@@ -56,6 +56,8 @@ test = [
     "bump2version",
     "twine",
     "natsort",
+    "idmtools_models",
+    "idmtools_test",
 ]
 packaging = [
     "flake8",
