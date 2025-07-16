@@ -7,7 +7,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "idmtools_platform_slurm"
-version = "2.2.0"
+version = "2.2.1"
 description = "Provides ability to run against Slurm"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -30,7 +30,8 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
-    "idmtools~=2.2.0",
+    "idmtools_platform_general~=2.2.1",
+    "dataclasses-json",
 ]
 
 [project.urls]
@@ -39,6 +40,8 @@ Homepage = "https://github.com/InstituteforDiseaseModeling/idmtools"
 [project.optional-dependencies]
 test = [
     "pytest",
+    "idmtools_models",
+    "idmtools_test",
 ]
 
 [project.entry-points.idmtools_platform]
