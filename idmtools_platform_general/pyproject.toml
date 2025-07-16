@@ -8,7 +8,6 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "idmtools_platform_general"
 version = "2.2.1"
-
 description = "General platform for IDM-Tools"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -31,8 +30,8 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
-    "idmtools~=2.2.0",
-    "idmtools_cli~=2.2.0",
+    "idmtools~=2.2.1",
+    "idmtools_cli~=2.2.1",
 ]
 
 [project.urls]

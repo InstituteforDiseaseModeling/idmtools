@@ -35,7 +35,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
-    "idmtools~=2.2.0",
+    "idmtools~=2.2.1",
     "pytest",
     "pypiwin32==223; sys_platform == 'win32'",
     "pywin32; sys_platform == 'win32'",

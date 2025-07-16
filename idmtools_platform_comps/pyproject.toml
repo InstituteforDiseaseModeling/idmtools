@@ -35,7 +35,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
-    "idmtools~=2.2.0",
+    "idmtools~=2.2.1",
     "pyCOMPS~=2.10",
     "natsort~=8.4.0",
 ]

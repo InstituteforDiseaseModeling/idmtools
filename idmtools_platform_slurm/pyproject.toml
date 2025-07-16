@@ -30,8 +30,8 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
-    "idmtools_platform_general~=2.2.0",
-    "dataclasses-json"
+    "idmtools_platform_general~=2.2.1",
+    "dataclasses-json",
 ]
 
 [project.urls]
