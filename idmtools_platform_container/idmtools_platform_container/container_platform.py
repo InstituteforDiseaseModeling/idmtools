@@ -191,7 +191,15 @@ class ContainerPlatform(FilePlatform):
         # Create a Docker client
         client = docker.from_env()
         volumes = self.build_binding_volumes()
-
+        docker_user = None
+        if platform.system() != "Windows":
+            try:
+                uid = os.getuid()
+                gid = os.getgid()
+                docker_user = f"{uid}:{gid}"
+            except AttributeError:
+                # Fallback just in case on non-Windows platforms where these aren't available
+                pass
         # Run the container
         container = client.containers.run(
             self.docker_image,
@@ -200,7 +208,8 @@ class ContainerPlatform(FilePlatform):
             stdin_open=True,
             tty=True,
             detach=True,
-            name=f"{self.container_prefix}_{str(uuid4())}" if self.container_prefix else None
+            name=f"{self.container_prefix}_{str(uuid4())}" if self.container_prefix else None,
+            **({"user": docker_user} if docker_user else {})
         )
 
         return container.short_id
