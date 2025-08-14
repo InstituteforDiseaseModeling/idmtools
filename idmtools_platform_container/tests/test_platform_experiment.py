@@ -392,7 +392,7 @@ class TestPlatformExperiment(unittest.TestCase):
             from idmtools.core import TRUTHY_VALUES
             self.assertTrue(str(platform.name_directory).lower() in TRUTHY_VALUES)
             self.assertFalse(str(platform.sim_name_directory).lower() in TRUTHY_VALUES)
-            self.assertEqual(str(exp_dir).replace("\\", "/"), os.path.join(temp_dir, f"Suite_{experiment.parent_id}/run____command_{experiment.id}").replace("\\", "/"))
+            self.assertEqual(str(exp_dir).replace("\\", "/"), os.path.join(temp_dir, f"__EXPERIMENT__/run____command_{experiment.id}").replace("\\", "/"))
             # clean up
             stop_container(platform.container_id, remove=True)
 
