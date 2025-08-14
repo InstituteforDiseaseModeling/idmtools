@@ -35,6 +35,7 @@ class FilePlatform(IPlatform):
     File Platform definition.
     """
     job_directory: str = field(default=None, metadata=dict(help="Job Directory"))
+    use_new_layout: bool = field(default=True, metadata=dict(help="New job directory layout"))
     max_job: int = field(default=4, metadata=dict(help="Maximum number of jobs to run concurrently"))
     run_sequence: bool = field(default=True, metadata=dict(help="Run jobs in sequence"))
     sym_link: bool = field(default=True, metadata=dict(help="Use symbolic links"))
@@ -64,6 +65,9 @@ class FilePlatform(IPlatform):
         self.name_directory = IdmConfigParser.get_option(None, "name_directory", 'True').lower() in TRUTHY_VALUES
         self.sim_name_directory = IdmConfigParser.get_option(None, "sim_name_directory",
                                                              'False').lower() in TRUTHY_VALUES
+        self.SUITE_DIR = "__SUITE__" if self.use_new_layout else ""
+        self.EXPERIMENT_DIR = "__EXPERIMENT__" if self.use_new_layout else ""
+
         super().__post_init__()
         self._object_cache_expiration = 600
 
