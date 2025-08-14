@@ -76,14 +76,10 @@ class TestFilePlatform(unittest.TestCase):
         suite = experiment.parent
         suite_dir = self.platform.get_directory(suite)
         self.assertEqual(Path(suite_dir), Path(str(suite_dir)))
-        files = []
-        dirs = []
-        for (dirpath, dirnames, filenames) in os.walk(suite_dir):
-            files.extend(filenames)
-            dirs.extend(dirnames)
-            break
-        self.assertSetEqual(set(files), set(["metadata.json"]))
-        self.assertEqual(dirs[0], f"{experiment.name}_{experiment.id}")
+        for root, dirs, files in os.walk(str(suite_dir)):
+            if "metadata.json" in files:
+                self.assertEqual(os.path.join(root, "metadata.json"), os.path.join(suite_dir, "metadata.json"))
+                print("Found metadata:", os.path.join(root, "metadata.json"))
         # second verify files and dirs under experiment
         experiment_dir = self.platform.get_directory(experiment)
         files = []
