@@ -185,37 +185,75 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
             Lis of metadata
         """
         if not isinstance(item, (Suite, FileSuite, Experiment, FileExperiment)):
-            raise RuntimeError("Get children method supports [File]Suite and [File]Experiment only.")
+            raise RuntimeError("get_children() supports Suite/FileSuite and Experiment/FileExperiment only.")
+
+        is_new_layout = self.platform.use_new_layout
         item_list = []
-        item_dir = self.platform.get_directory_by_id(item.id, item.item_type)
-        pattern = f'*/{self.metadata_filename}'
-        for meta_file in item_dir.glob(pattern=pattern):
-            meta = self.load_from_file(meta_file)
-            item_list.append(meta)
+
+        if isinstance(item, (Suite, FileSuite)):
+            suite_dir = self.platform.get_directory_by_id(item.id, item.item_type)
+            if is_new_layout:
+                suite_meta = self.load_from_file(suite_dir / self.metadata_filename)
+                experiment_ids = suite_meta.get("experiments", [])
+                exp_root = Path(self.platform.job_directory) / self.platform.EXPERIMENT_DIR
+                for exp_id in experiment_ids:
+                    pattern = f"*{exp_id}/{self.metadata_filename}"
+                    for exp_meta_file in exp_root.glob(pattern):
+                        if exp_meta_file.exists():
+                            item_list.append(self.load_from_file(exp_meta_file))
+            else:
+                pattern = f"*/{self.metadata_filename}"
+                for exp_meta_file in suite_dir.glob(pattern):
+                    item_list.append(self.load_from_file(exp_meta_file))
+
+        elif isinstance(item, (Experiment, FileExperiment)):
+            exp_dir = self.platform.get_directory_by_id(item.id, item.item_type)
+            pattern = f"*/{self.metadata_filename}"
+            for sim_meta_file in exp_dir.glob(pattern):
+                item_list.append(self.load_from_file(sim_meta_file))
+
         return item_list
 
     def get_all(self, item_type: ItemType, item_id: str = '') -> List[Dict]:
         """
         Obtain all the metadata for a given item type.
+
         Args:
             item_type: the type of metadata to search for matches (simulation, experiment, suite, etc.)
             item_id: item id
         Returns:
             list of metadata with given item type
         """
-        if item_type is ItemType.SIMULATION:
-            pattern = f"*/*/*{item_id}/{self.metadata_filename}"
+        job_dir = Path(self.platform.job_directory)
+        meta_filename = self.metadata_filename
+        is_new_layout = self.platform.use_new_layout
+        item_list = []
+
+        if item_type is ItemType.SUITE:
+            root = job_dir / self.platform.SUITE_DIR if is_new_layout else job_dir
+            pattern = f"*{item_id}/{meta_filename}" if item_id else f"*/{meta_filename}"
+
         elif item_type is ItemType.EXPERIMENT:
-            pattern = f"*/*{item_id}/{self.metadata_filename}"
-        elif item_type is ItemType.SUITE:
-            pattern = f"*{item_id}/{self.metadata_filename}"
+            root = job_dir / self.platform.EXPERIMENT_DIR if is_new_layout else job_dir
+            if is_new_layout:
+                pattern = f"*{item_id}/{meta_filename}" if item_id else f"*/{meta_filename}"
+            else:
+                pattern = f"*/*{item_id}/{meta_filename}" if item_id else f"*/*/{meta_filename}"
+
+        elif item_type is ItemType.SIMULATION:
+            root = job_dir / self.platform.EXPERIMENT_DIR if is_new_layout else job_dir
+            if is_new_layout:
+                pattern = f"*/*{item_id}/{meta_filename}" if item_id else f"*/*/{meta_filename}"
+            else:
+                pattern = f"*/*/*{item_id}/{meta_filename}" if item_id else f"*/*/*/{meta_filename}"
+
         else:
             raise RuntimeError(f"Unknown item type: {item_type}")
-        item_list = []
-        root = Path(self.platform.job_directory)
-        for meta_file in root.glob(pattern=pattern):
-            meta = self.load_from_file(meta_file)
-            item_list.append(meta)
+
+        for meta_file in root.glob(pattern):
+            if meta_file.exists():
+                item_list.append(self.load_from_file(meta_file))
+
         return item_list
 
     @staticmethod
