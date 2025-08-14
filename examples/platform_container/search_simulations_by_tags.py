@@ -25,8 +25,10 @@ sys.path.insert(0, os.path.dirname(__file__))
 from create_experiment import create_experiment
 
 platform = Platform("Container", job_directory="DEST")
+#platform = Platform("Container", job_directory="DEST", use_new_layout=False)
 experiment = create_experiment(platform)
-#experiment = platform.get_item("3dabe260-3c3d-4191-8358-788fe5eb8d66", ItemType.EXPERIMENT)
+#experiment = platform.get_item("8e622977-2034-4515-ad8b-1070664b1e3f", ItemType.EXPERIMENT)
+assert experiment.succeeded == True
 
 """
 Experiment-level Filtering
@@ -74,6 +76,7 @@ suite = experiment.suite
 filter_suite_simulations = suite.get_simulations_by_tags(
     tags={"a": lambda v: 1 <= v <= 2, "sim_tag": "test_tag"}, entity_type=True)
 
+print("another test")
 # Validate structure and results
 assert len(filter_suite_simulations) == 1  # 1 experiment matched
 for exp_id, sims in filter_suite_simulations.items():
@@ -87,5 +90,5 @@ filter_suite_simulations_p = platform.filter_simulations_by_tags(
     tags={"a": lambda v: 1 <= v <= 2, "sim_tag": "test_tag"}, entity_type=True)
 
 # Ensure both methods return the same results
-assert len(filter_suite_simulations) == len(filter_suite_simulations_p)
-assert len(filter_suite_simulations[experiment.id]) == len(filter_suite_simulations_p[experiment.id])
+assert len(filter_suite_simulations) == len(filter_suite_simulations_p) == 1
+assert len(filter_suite_simulations[experiment.id]) == len(filter_suite_simulations_p[experiment.id]) == 10
