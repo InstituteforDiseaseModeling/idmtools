@@ -64,33 +64,41 @@ class FileOperations(IOperations):
         Returns:
             item file directory
         """
-        if isinstance(item, (FileSimulation, FileExperiment, FileSuite)):
-            item_dir = item.get_directory()
+        is_new_layout = self.platform.use_new_layout
+
+        if isinstance(item, (FileSuite, FileExperiment, FileSimulation)):
+            return item.get_directory()
+
         elif isinstance(item, Suite):
-            item_dir = Path(self.platform.job_directory, self.entity_display_name(item))
+            if is_new_layout:
+                return Path(self.platform.job_directory, self.platform.SUITE_DIR, self.entity_display_name(item))
+            else:
+                return Path(self.platform.job_directory, self.entity_display_name(item))
+
         elif isinstance(item, Experiment):
             suite_id = item.parent_id or item.suite_id
             if suite_id is None:
-                raise RuntimeError("Experiment missing parent!")
-            suite = None
+                raise RuntimeError("Experiment is missing a parent suite ID.")
             try:
                 suite = self.platform.get_item(suite_id, ItemType.SUITE)
             except RuntimeError:
-                pass
-            if suite is None:
-                suite = item.parent
-            suite_dir = Path(self.platform.job_directory, self.entity_display_name(suite))
-            item_dir = Path(suite_dir, self.entity_display_name(item))
+                suite = item.parent  # fallback
+
+            if is_new_layout:
+                return Path(self.platform.job_directory, self.platform.EXPERIMENT_DIR, self.entity_display_name(item))
+            else:
+                suite_dir = Path(self.platform.job_directory, self.entity_display_name(suite))
+                return Path(suite_dir, self.entity_display_name(item))
+
         elif isinstance(item, Simulation):
             exp = item.parent
             if exp is None:
-                raise RuntimeError("Simulation missing parent!")
-            exp_dir = self.get_directory(exp)
-            item_dir = Path(exp_dir, self.entity_display_name(item))
-        else:
-            raise RuntimeError(f"Get directory is not supported for {type(item)} object on FilePlatform")
+                raise RuntimeError("Simulation is missing a parent experiment.")
 
-        return item_dir
+            exp_dir = self.get_directory(exp)  # Recursive call
+            return Path(exp_dir, self.entity_display_name(item))
+        else:
+            raise RuntimeError(f"get_directory() not supported for type: {type(item)}")
 
     def get_directory_by_id(self, item_id: str, item_type: ItemType) -> Path:
         """
