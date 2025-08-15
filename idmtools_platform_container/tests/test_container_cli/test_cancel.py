@@ -15,6 +15,7 @@ from helper import found_job_id_by_experiment, get_actual_rich_table_values
 
 
 @pytest.mark.serial
+@pytest.mark.cli
 class TestContainerPlatformCancelCli(TestContainerPlatformCliBase):
     @patch('rich.console.Console.print')
     def test_cancel_with_experiment_id(self, mock_console):

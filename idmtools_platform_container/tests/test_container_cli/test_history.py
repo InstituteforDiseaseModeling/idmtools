@@ -17,6 +17,7 @@ from helper import cleaned_str
 
 
 @pytest.mark.serial
+@pytest.mark.cli
 class TestContainerPlatformHistoryCli(TestContainerPlatformCliBase):
     @patch('rich.console.Console.print')
     def test_history(self, mock_console):

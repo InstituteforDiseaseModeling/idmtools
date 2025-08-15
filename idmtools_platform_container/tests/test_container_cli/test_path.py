@@ -2,8 +2,11 @@ import os
 import sys
 from unittest.mock import patch
 import pytest
+from click.testing import CliRunner
+
 import idmtools_platform_container.cli.container as container_cli
 from idmtools.core import ItemType
+from idmtools.core.platform_factory import Platform
 from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 from idmtools_platform_container.utils.general import normalize_path
@@ -13,6 +16,7 @@ from test_base import TestContainerPlatformCliBase
 
 
 @pytest.mark.serial
+@pytest.mark.cli
 class TestContainerPlatformPathCli(TestContainerPlatformCliBase):
 
     @patch('rich.console.Console.print')
@@ -63,3 +67,41 @@ class TestContainerPlatformPathCli(TestContainerPlatformCliBase):
                          '  --help  Show this message and exit.\n')
         self.assertEqual(result.exit_code, 0)
         self.assertEqual(result.output, expected_help)
+
+    @patch('rich.console.Console.print')
+    def test_path_old_style(self, mock_console):
+        runner = CliRunner()
+        command = "sleep 100"
+        task = CommandTask(command=command)
+        experiment = Experiment.from_task(task, name="run_command")
+        job_directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), "DEST")
+        # create new platform with old folder style
+        platform = Platform("Container", job_directory=job_directory, use_new_layout=False)
+        experiment.run(wait_until_done=False, platform=platform)
+        result = runner.invoke(container_cli.container, ['path', experiment.id])
+        self.assertEqual(result.exit_code, 0)
+        # check path
+        exp_dir = platform.get_directory_by_id(experiment.id, ItemType.EXPERIMENT)
+        self.assertIn(normalize_path(normalize_path(exp_dir)),
+                      normalize_path(mock_console.call_args.args[0].split(' ')[1]))
+        # Test simulation path
+        with patch("rich.console.Console.print") as mock_console:
+            result = runner.invoke(container_cli.container, ['path', experiment.simulations[0].id])
+            self.assertEqual(result.exit_code, 0)
+            sim_dir = platform.get_directory_by_id(experiment.simulations[0].id, ItemType.SIMULATION)
+            self.assertIn(normalize_path(normalize_path(sim_dir)),
+                          normalize_path(mock_console.call_args.args[0].split(' ')[1]))
+        # Test suite path
+        with patch("rich.console.Console.print") as mock_console:
+            result = runner.invoke(container_cli.container, ['path', experiment.parent_id])
+            self.assertEqual(result.exit_code, 0)
+            suite_dir = platform.get_directory_by_id(experiment.parent_id, ItemType.SUITE)
+            self.assertIn(normalize_path(normalize_path(suite_dir)),
+                          normalize_path(mock_console.call_args.args[0].split(' ')[1]))
+        # Test invalid path
+        with patch("idmtools_platform_file.tools.job_history.logger") as mock_logger:
+            result = runner.invoke(container_cli.container, ['path', "abc"])
+            mock_logger.debug.assert_called_with("Invalid item id: abc")
+        # clean up container
+        result = runner.invoke(container_cli.container, ['stop-container', platform.container_id], '--remove')
+        self.assertEqual(result.exit_code, 0)

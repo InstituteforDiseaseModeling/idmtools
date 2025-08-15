@@ -6,7 +6,8 @@ import idmtools_platform_container.cli.container as container_cli
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from test_base import TestContainerPlatformCliBase
 
-
+@pytest.mark.serial
+@pytest.mark.cli
 class TestContainerPlatformCliContainer(TestContainerPlatformCliBase):
 
     def test_container_help(self):

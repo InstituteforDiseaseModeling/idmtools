@@ -15,6 +15,7 @@ from idmtools_platform_container.container_operations.docker_operations import s
 
 
 @pytest.mark.serial
+@pytest.mark.cli
 class TestFileContainerPlatformCli(unittest.TestCase):
     def setUp(self):
         self.runner = CliRunner()

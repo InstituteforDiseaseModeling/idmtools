@@ -14,6 +14,7 @@ from test_base import TestContainerPlatformCliBase
 
 
 @pytest.mark.serial
+@pytest.mark.cli
 class TestContainerPlatformIsRunningCli(TestContainerPlatformCliBase):
 
     def test_is_running(self):
