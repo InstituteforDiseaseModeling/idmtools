@@ -44,6 +44,16 @@ dependencies = [
 [project.urls]
 Homepage = "https://github.com/InstituteforDiseaseModeling/idmtools"
 
+[project.entry-points.idmtools_platform]
+idmtools_platform_test = "idmtools_test.utils.test_platform:TestPlatformSpecification"
+idmtools_platform_testex = "idmtools_test.utils.test_execute_platform:TestExecutePlatformSpecification"
+#
+[project.entry-points.idmtools_task]
+idmtools_model_test = "idmtools_test.utils.test_task:TestTaskSpecification"
+#
+[project.entry-points.idmtools_hooks]
+idmtools_test_hooks = "idmtools_test.test_precreate_hooks"
+
 [tool.setuptools]
 include-package-data = true
 
