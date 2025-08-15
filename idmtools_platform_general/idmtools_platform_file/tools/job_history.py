@@ -8,6 +8,7 @@ from pathlib import Path
 from datetime import datetime
 from typing import NoReturn, Dict, Tuple, List
 from idmtools.core import ItemType
+from idmtools.core.context import get_current_platform
 from idmtools.entities.experiment import Experiment
 from idmtools_platform_container.utils.general import normalize_path, is_valid_uuid
 from logging import getLogger
@@ -137,23 +138,35 @@ class JobHistory:
         """
         if not is_valid_uuid(item_id):
             logger.debug(f"Invalid item id: {item_id}")
-            return
+            return None
 
-        cache = JobHistory.history
+        cache = cls.history
         item = cache.get(item_id)
 
-        # Consider Experiment case
-        if item:
-            return Path(item['EXPERIMENT_DIR']), ItemType.EXPERIMENT
+        # Get current platform
+        platform = get_current_platform()
+        # ----------------------------
+        # Case 1: Direct Experiment Hit
+        # ----------------------------
+        if item and item.get("EXPERIMENT_ID") == item_id:
+            exp_dir = Path(item.get("EXPERIMENT_DIR"))
+            return exp_dir, ItemType.EXPERIMENT
 
         for key in cache:
             value = cache.get(key)
             suite_id = value.get('SUITE_ID')
             exp_dir = value.get('EXPERIMENT_DIR')
+            job_dir = value.get('JOB_DIRECTORY')
 
-            # Consider Suite case
+            # Consider Suite case, first find if cache contains suite_id
             if suite_id == item_id:
-                return Path(exp_dir).parent, ItemType.SUITE
+                if platform.use_new_layout:
+                    suite_root = Path(job_dir) / platform.SUITE_DIR
+                    matches = list(suite_root.glob(f"*{suite_id}"))
+                    if matches:
+                        return matches[0], ItemType.SUITE
+                else:
+                    return Path(exp_dir).parent, ItemType.SUITE
 
             # Consider Simulation case
             pattern = f'*{item_id}/metadata.json'
