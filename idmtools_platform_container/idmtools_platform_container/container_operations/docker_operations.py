@@ -24,6 +24,7 @@ user_logger = getLogger('user')
 CONTAINER_STATUS = ['exited', 'running', 'paused']
 uuid_pattern = re.compile(r'[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}')
 
+
 def validate_container_running(platform, **kwargs) -> str:
     """
     Check if the docker daemon is running, find existing container or start a new container.
@@ -545,7 +546,6 @@ def list_running_jobs(container_id: str, limit: int = None) -> List[Job]:
 
             if item_type and item_id:
                 print(f"[{item_type.name}] PID={pid}, ID={item_id}, ELAPSED={etime}")
-
 
                 # Create a new job
                 job = Job(item_id=item_id, item_type=item_type, job_id=job_id, group_pid=pgid, parent_pid=ppid,
