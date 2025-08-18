@@ -3,6 +3,7 @@ Here we implement the ContainerPlatform docker operations.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+import re
 import docker
 import platform as sys_platform
 import subprocess
@@ -21,7 +22,7 @@ user_logger = getLogger('user')
 
 # Only consider the containers that can be restarted
 CONTAINER_STATUS = ['exited', 'running', 'paused']
-
+uuid_pattern = re.compile(r'[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}')
 
 def validate_container_running(platform, **kwargs) -> str:
     """
@@ -503,25 +504,48 @@ def list_running_jobs(container_id: str, limit: int = None) -> List[Job]:
     if result.returncode == 0:
         processes = result.stdout.splitlines()
         header = processes[0].split()  # Extract the header (column names)
-        for line in processes[1:]:  # Skip the first header line
-            if 'EXPERIMENT' in line or 'SIMULATION' in line:
-                # Split the line into columns
-                columns = line.split(maxsplit=len(header) - 1)
-                # Convert columns to their respective types
-                pid = int(columns[0])  # pid is an integer
-                ppid = int(columns[1])  # ppid is an integer
-                pgid = int(columns[2])  # pgid is an integer
-                etime = columns[3]  # etime is a string
-                cmd = columns[4]  # cmd is a string
 
-                # Determine the item type and job ID
-                item_type = ItemType.EXPERIMENT if 'EXPERIMENT' in cmd else ItemType.SIMULATION
-                job_id = pgid if 'EXPERIMENT' in cmd else pid
+        for line in processes[1:]:
+            columns = line.split(maxsplit=len(header) - 1)
+            pid = int(columns[0])
+            ppid = int(columns[1])
+            pgid = int(columns[2])
+            etime = columns[3]
+            cmd = columns[4]
 
-                # Find the item that starts with 'EXPERIMENT' or 'SIMULATION'
-                columns = cmd.split()
-                result = [item for item in columns if item.startswith('EXPERIMENT') or item.startswith('SIMULATION')]
-                item_id = result[0].split(':')[1]
+            item_type = None
+            item_id = None
+            job_id = None
+
+            # Case 1: legacy style: EXPERIMENT:<uuid>
+            if 'EXPERIMENT:' in cmd:
+                item_type = ItemType.EXPERIMENT
+                job_id = pgid
+                item_id = next((c.split(':')[1] for c in cmd.split() if c.startswith('EXPERIMENT:')), None)
+
+            elif 'SIMULATION:' in cmd:
+                item_type = ItemType.SIMULATION
+                job_id = pid
+                item_id = next((c.split(':')[1] for c in cmd.split() if c.startswith('SIMULATION:')), None)
+
+            # Case 2: new layout, extract last two UUIDs in command string
+            else:
+                uuids = uuid_pattern.findall(cmd)
+                if len(uuids) >= 2:
+                    exp_id, sim_id = uuids[-2], uuids[-1]
+                    item_type = ItemType.SIMULATION
+                    item_id = sim_id
+                    job_id = pid
+                elif len(uuids) == 1:
+                    exp_id = uuids[0]
+                    sim_id = None
+                    item_type = ItemType.EXPERIMENT
+                    item_id = exp_id
+                    job_id = pgid  # experiment process group
+
+            if item_type and item_id:
+                print(f"[{item_type.name}] PID={pid}, ID={item_id}, ELAPSED={etime}")
+
 
                 # Create a new job
                 job = Job(item_id=item_id, item_type=item_type, job_id=job_id, group_pid=pgid, parent_pid=ppid,
