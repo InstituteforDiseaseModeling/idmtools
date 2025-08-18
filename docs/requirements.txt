@@ -10,3 +10,4 @@ jupyterlab~=4.0
 myst-parser~=2.0
 sphinx-copybutton~=0.5
 pygithub~=2.3
+roman
