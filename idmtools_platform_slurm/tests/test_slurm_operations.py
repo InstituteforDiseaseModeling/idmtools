@@ -97,7 +97,7 @@ class TestSlurmOperations(ITestWithPersistence):
         slurm_op = SlurmOperations(platform=self.platform)
         with self.assertRaises(RuntimeError) as ex:
             actual_entity_path = slurm_op.get_directory(exp)
-        self.assertEqual(ex.exception.args[0], "Experiment missing parent!")
+        self.assertEqual(ex.exception.args[0], "Experiment is missing a parent suite ID.")
 
     # Test SlurmOperations get_directory for simulation and experiment as parent
     def test_SlurmOperations_get_directory_simulation(self):
@@ -117,7 +117,7 @@ class TestSlurmOperations(ITestWithPersistence):
         slurm_op = SlurmOperations(platform=self.platform)
         with self.assertRaises(RuntimeError) as ex:
             actual_entity_path = slurm_op.get_directory(simulation)
-        self.assertEqual(ex.exception.args[0], "Simulation missing parent!")
+        self.assertEqual(ex.exception.args[0], "Simulation is missing a parent experiment.")
 
     # Test SlurmOperations mk_directory with suite and without dest
     def test_SlurmOperations_make_dir_no_dest_suite(self):
@@ -167,7 +167,8 @@ class TestSlurmOperations(ITestWithPersistence):
         self.assertTrue(os.path.isdir(sim_dir1))
         self.assertTrue(os.path.isdir(sim_dir2))
         # delete dir after test
-        shutil.rmtree(suite_dir)
+        shutil.rmtree(sim_dir1)
+        shutil.rmtree(sim_dir2)
         self.assertFalse(os.path.isdir(sim_dir1))
         self.assertFalse(os.path.isdir(sim_dir2))
 
@@ -192,7 +193,7 @@ class TestSlurmOperations(ITestWithPersistence):
             "bash run_simulation.sh",
             contents)
         # clean up suite folder
-        shutil.rmtree(suite_dir)
+        shutil.rmtree(exp_dir)
         self.assertFalse(os.path.exists(job_path))
 
     # Test SlurmOperations create_batch_file for simulation
@@ -204,6 +205,7 @@ class TestSlurmOperations(ITestWithPersistence):
         simulation = Simulation(task=TestTask())
         simulation.parent = experiment
         suite_dir = str(self.platform.get_directory(suite))
+        exp_dir = str(self.platform.get_directory(experiment))
         simulation_dir = str(self.platform.get_directory(simulation))
         slurm_op.mk_directory(simulation)
         slurm_op.create_batch_file(simulation)
@@ -212,7 +214,7 @@ class TestSlurmOperations(ITestWithPersistence):
         self.assertTrue(os.path.exists(job_path))
         # TODO validation _run.sh content
         # clean up suite folder
-        shutil.rmtree(suite_dir)
+        shutil.rmtree(exp_dir)
         self.assertFalse(os.path.exists(job_path))
 
     # Test SlurmOperations create_batch_file with simulation

@@ -61,8 +61,7 @@ class JSONMetadataOperationsTest(unittest.TestCase):
         self.assertEqual(sim_metadata['parent_id'], sim.parent_id)
         self.assertEqual(sim_metadata['item_type'], "Simulation")
         self.assertEqual(sim_metadata['assets'], [])
-        self.assertEqual(sim_metadata['dir'], str(Path(
-            f"{self.metadata_root}/{_[0].name}_{_[0].id}/{experiments[1].name}_{sim.parent_id}/{sim.id}")))
+        self.assertEqual(sim_metadata['dir'], str(Path(f"{self.metadata_root}/__EXPERIMENT__/{experiments[1].name}_{sim.parent_id}/{sim.id}")))
 
         # test get meta for experiment
 

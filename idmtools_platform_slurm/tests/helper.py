@@ -32,8 +32,7 @@ def verify_result(self, suite):
     self.assertTrue(len(suite_files) == 1)
     self.assertEqual(suite_files[0], pathlib.Path(suite_dir + "/metadata.json"))
     # Verify all sub directories under suite
-    self.assertTrue(len(suite_sub_dirs) == 1)
-    self.assertEqual(suite_sub_dirs[0], pathlib.Path(exp_dir))
+    self.assertTrue(len(suite_sub_dirs) == 0)
 
     for experiment in suite.experiments:
         experiment_dir = self.platform.get_directory(experiment)
