@@ -34,7 +34,7 @@ jobs:
           pip install -r requirements.txt
       - name: Install tools in dev mode
         run: |
-          python dev_scripts/bootstrap.py
+          python dev_scripts/bootstrap.py --docs
       - name: Build docs
         working-directory: 'docs'
         run: |
