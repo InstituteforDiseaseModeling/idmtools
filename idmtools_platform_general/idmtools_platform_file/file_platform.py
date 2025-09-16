@@ -65,8 +65,8 @@ class FilePlatform(IPlatform):
         self.name_directory = IdmConfigParser.get_option(None, "name_directory", 'True').lower() in TRUTHY_VALUES
         self.sim_name_directory = IdmConfigParser.get_option(None, "sim_name_directory",
                                                              'False').lower() in TRUTHY_VALUES
-        self.SUITE_DIR = "__SUITE__" if self.use_new_layout else ""
-        self.EXPERIMENT_DIR = "__EXPERIMENT__" if self.use_new_layout else ""
+        self.SUITE_STORE = "__SUITE__" if self.use_new_layout else ""
+        self.EXPERIMENT_STORE = "__EXPERIMENT__" if self.use_new_layout else ""
 
         super().__post_init__()
         self._object_cache_expiration = 600
