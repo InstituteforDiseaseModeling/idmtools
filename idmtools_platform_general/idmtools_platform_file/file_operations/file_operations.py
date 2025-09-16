@@ -64,31 +64,14 @@ class FileOperations(IOperations):
         Returns:
             item file directory
         """
-        is_new_layout = self.platform.use_new_layout
-
         if isinstance(item, (FileSuite, FileExperiment, FileSimulation)):
             return item.get_directory()
 
         elif isinstance(item, Suite):
-            if is_new_layout:
-                return Path(self.platform.job_directory, self.platform.SUITE_STORE, self.entity_display_name(item))
-            else:
-                return Path(self.platform.job_directory, self.entity_display_name(item))
+            return Path(self.platform.job_directory, self.platform.SUITE_STORE, self.entity_display_name(item))
 
         elif isinstance(item, Experiment):
-            if is_new_layout:
-                return Path(self.platform.job_directory, self.platform.EXPERIMENT_STORE, self.entity_display_name(item))
-            else:
-                suite_id = item.parent_id or item.suite_id
-                if suite_id is None:
-                    raise RuntimeError("Experiment is missing a parent suite ID.")
-                try:
-                    suite = self.platform.get_item(suite_id, ItemType.SUITE)
-                except RuntimeError:
-                    suite = item.parent  # fallback
-
-                suite_dir = Path(self.platform.job_directory, self.entity_display_name(suite))
-                return Path(suite_dir, self.entity_display_name(item))
+            return Path(self.platform.job_directory, self.platform.EXPERIMENT_STORE, self.entity_display_name(item))
 
         elif isinstance(item, Simulation):
             exp = item.parent

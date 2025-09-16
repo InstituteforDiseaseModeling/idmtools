@@ -228,26 +228,19 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         """
         job_dir = Path(self.platform.job_directory)
         meta_filename = self.metadata_filename
-        is_new_layout = self.platform.use_new_layout
         item_list = []
 
         if item_type is ItemType.SUITE:
-            root = job_dir / self.platform.SUITE_STORE if is_new_layout else job_dir
+            root = job_dir / self.platform.SUITE_STORE
             pattern = f"*{item_id}/{meta_filename}" if item_id else f"*/{meta_filename}"
 
         elif item_type is ItemType.EXPERIMENT:
-            root = job_dir / self.platform.EXPERIMENT_STORE if is_new_layout else job_dir
-            if is_new_layout:
-                pattern = f"*{item_id}/{meta_filename}" if item_id else f"*/{meta_filename}"
-            else:
-                pattern = f"*/*{item_id}/{meta_filename}" if item_id else f"*/*/{meta_filename}"
+            root = job_dir / self.platform.EXPERIMENT_STORE
+            pattern = f"*{item_id}/{meta_filename}" if item_id else f"*/{meta_filename}"
 
         elif item_type is ItemType.SIMULATION:
-            root = job_dir / self.platform.EXPERIMENT_STORE if is_new_layout else job_dir
-            if is_new_layout:
-                pattern = f"*/*{item_id}/{meta_filename}" if item_id else f"*/*/{meta_filename}"
-            else:
-                pattern = f"*/*/*{item_id}/{meta_filename}" if item_id else f"*/*/*/{meta_filename}"
+            root = job_dir / self.platform.EXPERIMENT_STORE
+            pattern = f"*/*{item_id}/{meta_filename}" if item_id else f"*/*/{meta_filename}"
 
         else:
             raise RuntimeError(f"Unknown item type: {item_type}")

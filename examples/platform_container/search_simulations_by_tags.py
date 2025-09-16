@@ -25,7 +25,6 @@ sys.path.insert(0, os.path.dirname(__file__))
 from create_experiment import create_experiment
 
 platform = Platform("Container", job_directory="DEST")
-#platform = Platform("Container", job_directory="DEST", use_new_layout=False)
 experiment = create_experiment(platform)
 #experiment = platform.get_item("8e622977-2034-4515-ad8b-1070664b1e3f", ItemType.EXPERIMENT)
 assert experiment.succeeded == True

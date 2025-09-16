@@ -76,8 +76,7 @@ class JobHistory:
                     "EXPERIMENT_NAME": experiment.name,
                     "EXPERIMENT_ID": experiment.id,
                     "CONTAINER": container_id,
-                    "CREATED": current_datetime,
-                    "IS_NEW_LAYOUT": platform.use_new_layout}
+                    "CREATED": current_datetime}
         cache.set(experiment.id, new_item)
         cache.close()
 
@@ -164,10 +163,7 @@ class JobHistory:
 
             # Consider Suite case, first find if cache contains suite_id
             if suite_id == item_id:
-                if platform.use_new_layout:
-                    return platform.get_directory_by_id(item_id, ItemType.SUITE), ItemType.SUITE
-                else:
-                    return Path(exp_dir).parent, ItemType.SUITE
+                return platform.get_directory_by_id(item_id, ItemType.SUITE), ItemType.SUITE
 
             # Consider Simulation case
             pattern = f'*{item_id}/metadata.json'
