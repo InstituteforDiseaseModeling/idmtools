@@ -72,6 +72,21 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         filepath = Path(item_dir, self.metadata_filename)
         return filepath
 
+    def get_metadata_filepath_by_id(self, item_id: str, item_type: ItemType) -> Path:
+        """
+        Retrieve item's metadata file path.
+        Args:
+            item_id: item id
+            item_type: the type of metadata to search for matches (simulation, experiment, suite, etc.)
+        Returns:
+            item's metadata file path
+        """
+        if item_type not in (ItemType.SUITE, ItemType.EXPERIMENT, ItemType.SIMULATION):
+            raise RuntimeError("get_metadata_filepath method supports Suite/Experiment/Simulation only.")
+        item_dir = self.platform.get_directory_by_id(item_id, item_type)
+        filepath = Path(item_dir, self.metadata_filename)
+        return filepath
+
     def get(self, item: Union[Suite, Experiment, Simulation]) -> Dict:
         """
         Obtain item's metadata.
@@ -185,33 +200,20 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
             Lis of metadata
         """
         if not isinstance(item, (Suite, FileSuite, Experiment, FileExperiment)):
-            raise RuntimeError("get_children() supports Suite/FileSuite and Experiment/FileExperiment only.")
-
-        is_new_layout = self.platform.use_new_layout
+            raise RuntimeError("Get children method supports [File]Suite and [File]Experiment only.")
         item_list = []
-
         if isinstance(item, (Suite, FileSuite)):
-            suite_dir = self.platform.get_directory_by_id(item.id, item.item_type)
-            if is_new_layout:
-                suite_meta = self.load_from_file(suite_dir / self.metadata_filename)
-                experiment_ids = suite_meta.get("experiments", [])
-                exp_root = Path(self.platform.job_directory) / self.platform.EXPERIMENT_DIR
-                for exp_id in experiment_ids:
-                    pattern = f"*{exp_id}/{self.metadata_filename}"
-                    for exp_meta_file in exp_root.glob(pattern):
-                        if exp_meta_file.exists():
-                            item_list.append(self.load_from_file(exp_meta_file))
-            else:
-                pattern = f"*/{self.metadata_filename}"
-                for exp_meta_file in suite_dir.glob(pattern):
-                    item_list.append(self.load_from_file(exp_meta_file))
-
-        elif isinstance(item, (Experiment, FileExperiment)):
-            exp_dir = self.platform.get_directory_by_id(item.id, item.item_type)
-            pattern = f"*/{self.metadata_filename}"
-            for sim_meta_file in exp_dir.glob(pattern):
-                item_list.append(self.load_from_file(sim_meta_file))
-
+            meta = self.load(item)
+            for exp_id in meta['experiments']:
+                meta_file = self.get_metadata_filepath_by_id(exp_id, ItemType.EXPERIMENT)
+                exp_meta = self._read_from_file(meta_file)
+                item_list.append(exp_meta)
+        else:
+            item_dir = self.platform.get_directory_by_id(item.id, item.item_type)
+            pattern = f'*/{self.metadata_filename}'
+            for meta_file in item_dir.glob(pattern=pattern):
+                meta = self.load_from_file(meta_file)
+                item_list.append(meta)
         return item_list
 
     def get_all(self, item_type: ItemType, item_id: str = '') -> List[Dict]:
@@ -230,18 +232,18 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         item_list = []
 
         if item_type is ItemType.SUITE:
-            root = job_dir / self.platform.SUITE_DIR if is_new_layout else job_dir
+            root = job_dir / self.platform.SUITE_STORE if is_new_layout else job_dir
             pattern = f"*{item_id}/{meta_filename}" if item_id else f"*/{meta_filename}"
 
         elif item_type is ItemType.EXPERIMENT:
-            root = job_dir / self.platform.EXPERIMENT_DIR if is_new_layout else job_dir
+            root = job_dir / self.platform.EXPERIMENT_STORE if is_new_layout else job_dir
             if is_new_layout:
                 pattern = f"*{item_id}/{meta_filename}" if item_id else f"*/{meta_filename}"
             else:
                 pattern = f"*/*{item_id}/{meta_filename}" if item_id else f"*/*/{meta_filename}"
 
         elif item_type is ItemType.SIMULATION:
-            root = job_dir / self.platform.EXPERIMENT_DIR if is_new_layout else job_dir
+            root = job_dir / self.platform.EXPERIMENT_STORE if is_new_layout else job_dir
             if is_new_layout:
                 pattern = f"*/*{item_id}/{meta_filename}" if item_id else f"*/*/{meta_filename}"
             else:
@@ -251,8 +253,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
             raise RuntimeError(f"Unknown item type: {item_type}")
 
         for meta_file in root.glob(pattern):
-            if meta_file.exists():
-                item_list.append(self.load_from_file(meta_file))
+            item_list.append(self.load_from_file(meta_file))
 
         return item_list
 
