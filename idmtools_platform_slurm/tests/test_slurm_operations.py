@@ -95,9 +95,10 @@ class TestSlurmOperations(ITestWithPersistence):
     def test__SlurmOperations_get_directory_experiment_no_suite(self):
         exp = Experiment(name="Exp1")
         slurm_op = SlurmOperations(platform=self.platform)
-        with self.assertRaises(RuntimeError) as ex:
-            actual_entity_path = slurm_op.get_directory(exp)
-        self.assertEqual(ex.exception.args[0], "Experiment is missing a parent suite ID.")
+
+        actual_entity_path = slurm_op.get_directory(exp)
+        self.assertEqual(f"Exp1_{exp.id}", actual_entity_path.name)
+        self.assertIn("__EXPERIMENT__", str(actual_entity_path))
 
     # Test SlurmOperations get_directory for simulation and experiment as parent
     def test_SlurmOperations_get_directory_simulation(self):
