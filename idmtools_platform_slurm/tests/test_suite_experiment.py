@@ -11,7 +11,7 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools.entities.command_task import CommandTask
 cwd = os.path.dirname(__file__)
 sys.path.append(cwd)
-from helper import remove_dir, verify_result, get_dirs_and_files
+from helper import remove_dir, verify_result, get_dirs_and_files, verify_result_experiment
 
 
 @pytest.mark.smoke
@@ -39,7 +39,7 @@ class TestSuiteExperiment(ITestWithPersistence):
     def test_0(self):
         experiment = Experiment.from_task(self.task, name="run_task")
         experiment.run(platform=self.platform, wait_until_done=False, dry_run=True)
-        verify_result(self, experiment.parent)
+        verify_result_experiment(self, experiment)
 
     # Case 1,2,3,4 test with suite.add_experiment(experiment)
     # Verify suite.run with new suite
@@ -237,7 +237,7 @@ class TestSuiteExperiment(ITestWithPersistence):
     def test_21(self):
         experiment = Experiment.from_task(self.task, name="run_task")
         self.platform.run_items(items=experiment, wait_until_done=False, dry_run=True)
-        verify_result(self, experiment.suite)
+        verify_result_experiment(self, experiment)
 
     # Verify create suite/experiment with platform.run_items(suite)
     def test_22(self):

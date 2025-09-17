@@ -42,16 +42,12 @@ class TestFolder(unittest.TestCase):
     def test_0(self):
         experiment = Experiment.from_task(self.task, name="test 0")
         experiment.run(platform=self.platform, wait_until_done=False, dry_run=True)
-        suite = self.platform.get_item(experiment.parent_id, ItemType.SUITE)
-        self.verify_dir(f"{self.job_directory}/__SUITE__/Suite_{experiment.parent_id}", suite)
         self.verify_dir(f"{self.job_directory}/__EXPERIMENT__/test_0_{experiment.id}", experiment)
 
     # Test case to verify the experiment directory structure when experiment name has special character: '
     def test_1(self):
         experiment = Experiment.from_task(self.task, name="test'1")
         experiment.run(platform=self.platform, wait_until_done=False, dry_run=True)
-        suite = self.platform.get_item(experiment.parent_id, ItemType.SUITE)
-        self.verify_dir(f"{self.job_directory}/__SUITE__/Suite_{experiment.parent_id}", suite)
         self.verify_dir(f"{self.job_directory}/__EXPERIMENT__/test_1_{experiment.id}", experiment)
 
     # Test case to verify the experiment directory structure when experiment name has special character: "
