@@ -12,7 +12,7 @@ from idmtools.core import ItemType
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
-from idmtools_platform_file.platform_operations.utils import FileExperiment, FileSimulation, FileSuite, add_dummy_suite
+from idmtools_platform_file.platform_operations.utils import FileExperiment, FileSimulation, FileSuite
 from logging import getLogger
 
 logger = getLogger(__name__)
@@ -57,11 +57,6 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         """
         # ensure experiment's parent
         experiment.parent_id = experiment.parent_id or experiment.suite_id
-        if experiment.parent_id is None:
-            suite = add_dummy_suite(experiment)
-            self.platform._suites.platform_create(suite)
-            suite.platform = self.platform
-
         # Generate Suite/Experiment/Simulation folder structure
         self.platform.mk_directory(experiment, exist_ok=True)
         meta = self.platform._metas.dump(experiment)
@@ -125,14 +120,16 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
             None
         """
         # Ensure parent
-        experiment.parent.add_experiment(experiment)
-        self.platform._metas.dump(experiment.parent)
+        if experiment.parent:
+            experiment.parent.add_experiment(experiment)
+            self.platform._metas.dump(experiment.parent)
+            # Output
+            suite_id = experiment.parent_id or experiment.suite_id
+            user_logger.info(f'suite: {str(suite_id)}')
+
         # Generate/update metadata
         self.platform._metas.dump(experiment)
-        # Output
-        suite_id = experiment.parent_id or experiment.suite_id
         user_logger.info(f'job_directory: {Path(self.platform.job_directory).resolve()}')
-        user_logger.info(f'suite: {str(suite_id)}')
         user_logger.info(f'experiment: {experiment.id}')
         user_logger.info(f"\nExperiment Directory: \n{self.platform.get_directory(experiment)}")
 
@@ -202,14 +199,13 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
             Experiment object
         """
-        if parent is None:
-            parent = self.platform.get_item(file_exp.parent_id, ItemType.SUITE, force=True)
         exp = Experiment()
         exp.platform = self.platform
         exp.uid = file_exp.uid
         exp.name = file_exp.name
-        exp.parent_id = parent.id
-        exp.parent = parent
+        if parent:
+            exp.parent_id = parent.id
+            exp.parent = parent
         exp.tags = file_exp.tags
         exp._platform_object = file_exp
         exp.simulations = []
