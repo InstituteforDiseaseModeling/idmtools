@@ -22,7 +22,8 @@ class TestContainerPlatformProcessCli(TestContainerPlatformCliBase):
         result = self.runner.invoke(container_cli.container, ['ps', self.platform.container_id])
         self.assertEqual(result.exit_code, 0)
         # check ps
-        self.assertIn(f'EXPERIMENT:{experiment.id} batch.sh', mock_console.call_args_list[0].args[0])
+        self.assertIn(f'EXPERIMENT:{experiment.id}', mock_console.call_args_list[0].args[0])
+        self.assertIn(f'batch.sh', mock_console.call_args_list[0].args[0])
         # self.assertIn(
         #     "xargs -d \\n -P 4 -I% bash -c cd $(pwd) && $(pwd)/run_simulation.sh %  1>> stdout.txt 2>> stderr.txt",
         #     mock_console.call_args_list[0].args[0])

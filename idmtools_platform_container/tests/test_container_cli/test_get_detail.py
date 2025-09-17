@@ -28,8 +28,6 @@ class TestContainerPlatformGetDetailCli(TestContainerPlatformCliBase):
         self.assertEqual(result.exit_code, 0)
         self.assertIn(f'"JOB_DIRECTORY": "{normalize_path(self.job_directory)}",',
                       mock_console.call_args_list[0].args[0].text)
-        self.assertIn(f'"SUITE_ID": "{experiment.parent_id}",',
-                      mock_console.call_args_list[0].args[0].text)
         exp_dir = self.platform.get_directory_by_id(experiment.id, ItemType.EXPERIMENT)
         self.assertIn(
             f'"EXPERIMENT_DIR": "{normalize_path(exp_dir)}",',

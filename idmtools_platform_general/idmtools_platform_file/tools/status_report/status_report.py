@@ -62,8 +62,12 @@ class StatusReporter:
             user_logger.info(f'last experiment dir: {exp_dir}')
             user_logger.info('------------------------------')
 
-        self._summary = dict(suite=self._exp.parent.id, experiment=self._exp.id,
-                             job_directory=self.platform.job_directory)
+        if self._exp.parent is not None:
+            self._summary = dict(suite=self._exp.parent.id, experiment=self._exp.id,
+                                 job_directory=self.platform.job_directory)
+        else:
+            self._summary = dict(suite=None, experiment=self._exp.id,
+                                 job_directory=self.platform.job_directory)
 
     def apply_filters(self, status_filter: Tuple[str] = None, sim_filter: Tuple[str] = None,
                       verbose: bool = True) -> None:
@@ -126,7 +130,8 @@ class StatusReporter:
             None
         """
         if self._summary:
-            user_logger.info(f"{'suite: '.ljust(20)} {self._summary['suite']}")
+            if self._summary['suite'] is not None:
+                user_logger.info(f"{'suite: '.ljust(20)} {self._summary['suite']}")
             user_logger.info(f"{'experiment: '.ljust(20)} {self._summary['experiment']}")
             user_logger.info(f"{'job directory: '.ljust(20)} {self._summary['job_directory']}")
 

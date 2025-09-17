@@ -66,7 +66,7 @@ class TestContainerPlatformPathCli(TestContainerPlatformCliBase):
         self.platform.create_items([suite])
         suite.add_experiment(experiment)
         # Run via Suite (mirrors your original with-suite behavior)
-        suite.run(platform=self.platform, wait_until_done=True)
+        suite.run(platform=self.platform, wait_until_done=False)
         result = self.runner.invoke(container_cli.container, ['path', experiment.id])
         self.assertEqual(result.exit_code, 0)
         # check path

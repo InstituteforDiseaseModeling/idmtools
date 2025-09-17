@@ -280,20 +280,22 @@ class JobHistory:
     def sync(cls) -> NoReturn:
         """Sync job history."""
         cache = cls.history
-
+        suite_path = None
         for key in cache:
             value = cache.get(key)
             exp_dir = value.get('EXPERIMENT_DIR')
             suite_id = value.get('SUITE_ID')
-            suite_path, _ = cls.get_item_path(suite_id)
+            if suite_id:
+                suite_path, _ = cls.get_item_path(suite_id)
 
             root = Path(exp_dir)
             if not root.exists():
                 cache.pop(key)
                 logger.debug(f"Remove job {key} from job history.")
-                import shutil
-                shutil.rmtree(suite_path, ignore_errors=False)
-                logger.debug(f"Remove suite {suite_id} from directory.")
+                if suite_path:
+                    import shutil
+                    shutil.rmtree(suite_path, ignore_errors=False)
+                    logger.debug(f"Remove suite {suite_id} from directory.")
 
         cache.close()
 

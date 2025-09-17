@@ -43,13 +43,6 @@ class TestContainerPlatformIsRunningCli(TestContainerPlatformCliBase):
             self.assertEqual(result.exit_code, 0)
             self.assertEqual(f'Job abc is not found.', mock_console_invalid.call_args_list[0][0][0])
 
-        # test is-running with suite id
-        with patch('rich.console.Console.print') as mock_console_suite:
-            result = self.runner.invoke(container_cli.container, ['is-running', experiment.parent_id])
-            self.assertEqual(result.exit_code, 0)
-            self.assertEqual(f'{experiment.parent_id} is not a valid Experiment/Simulation ID.',
-                             mock_console_suite.call_args_list[0][0][0])
-
         # clean up container
         result = self.runner.invoke(container_cli.container, ['stop-container', self.platform.container_id], '--remove')
         self.assertEqual(result.exit_code, 0)
