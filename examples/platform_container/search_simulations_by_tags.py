@@ -26,7 +26,7 @@ from create_experiment import create_experiment
 
 platform = Platform("Container", job_directory="DEST")
 #platform = Platform("Container", job_directory="DEST", use_new_layout=False)
-experiment = create_experiment(platform)
+experiment, suite = create_experiment(platform)
 #experiment = platform.get_item("8e622977-2034-4515-ad8b-1070664b1e3f", ItemType.EXPERIMENT)
 assert experiment.succeeded == True
 
@@ -92,3 +92,46 @@ filter_suite_simulations_p = platform.filter_simulations_by_tags(
 # Ensure both methods return the same results
 assert len(filter_suite_simulations) == len(filter_suite_simulations_p) == 1
 assert len(filter_suite_simulations[experiment.id]) == len(filter_suite_simulations_p[experiment.id]) == 10
+
+
+# create experiment without suite:
+experiment1, suite1 = create_experiment(platform, use_suite=False)
+#experiment1 = platform.get_item("3a25100a-b1db-4013-9956-e8ff03c52250", ItemType.EXPERIMENT)
+assert experiment1.succeeded == True
+assert suite1 is None
+
+"""
+Experiment-level Filtering
+---------------------------
+"""
+
+# Filter simulations using different representations of tag values
+filter_simulation_ids = experiment1.get_simulations_by_tags(
+    tags={"a": lambda v: 1 <= v <= 2, "sim_tag": "test_tag"})
+filter_simulation_ids1 = experiment1.get_simulations_by_tags(
+    tags={"a": lambda v: "1" <= v <= 2, "sim_tag": "test_tag"})
+filter_simulation_ids2 = experiment1.get_simulations_by_tags(
+    tags={"a": lambda v: 1 <= v <= "2", "sim_tag": "test_tag"})
+
+# Alternative: Filter via platform method
+filter_simulation_ids_p = platform.filter_simulations_by_tags(
+    experiment1.id, item_type=ItemType.EXPERIMENT,
+    tags={"a": lambda v: 1 <= v <= "2", "sim_tag": "test_tag"})
+
+# Validation there are 40 simulations matched (out of 60)
+assert len(filter_simulation_ids) == 10
+assert len(filter_simulation_ids1) == 10
+assert len(filter_simulation_ids2) == 10
+
+# Get simulation entities (instead of IDs) using entity_type=True
+filter_simulations = experiment1.get_simulations_by_tags(
+    tags={"a": lambda v: 1 <= v <= "2", "sim_tag": "test_tag"},
+    entity_type=True)
+
+count = 0
+for sim in filter_simulations:
+    assert isinstance(sim, Simulation)
+    count += 1
+    print(sim.tags)
+
+assert count == 10
