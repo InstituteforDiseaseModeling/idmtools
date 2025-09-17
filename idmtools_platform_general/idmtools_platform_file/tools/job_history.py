@@ -9,6 +9,7 @@ from datetime import datetime
 from typing import NoReturn, Dict, Tuple, List
 from idmtools.core import ItemType
 from idmtools.core.context import get_current_platform
+from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
 from idmtools_platform_container.utils.general import normalize_path, is_valid_uuid
 from logging import getLogger
@@ -64,9 +65,8 @@ class JobHistory:
         """
         cache = cls.history
 
-        from idmtools.core.context import get_current_platform
         if platform is None:
-            platform = get_current_platform()
+            platform = Platform("File", job_directory=job_dir)
 
         # Get current datetime
         current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -148,7 +148,7 @@ class JobHistory:
         # ----------------------------
         # Case 1: Direct Experiment Hit
         # ----------------------------
-        if item and item.get("EXPERIMENT_ID") == item_id:
+        if item:
             exp_dir = Path(item.get("EXPERIMENT_DIR"))
             return exp_dir, ItemType.EXPERIMENT
 
@@ -158,15 +158,12 @@ class JobHistory:
             exp_dir = value.get('EXPERIMENT_DIR')
             job_dir = value.get('JOB_DIRECTORY')
 
+            if platform is None:
+                platform = Platform("File", job_directory=job_dir)
+
             # Consider Suite case, first find if cache contains suite_id
             if suite_id == item_id:
-                if platform.use_new_layout:
-                    suite_root = Path(job_dir) / platform.SUITE_DIR
-                    matches = list(suite_root.glob(f"*{suite_id}"))
-                    if matches:
-                        return matches[0], ItemType.SUITE
-                else:
-                    return Path(exp_dir).parent, ItemType.SUITE
+                return platform.get_directory_by_id(item_id, ItemType.SUITE), ItemType.SUITE
 
             # Consider Simulation case
             pattern = f'*{item_id}/metadata.json'
@@ -285,13 +282,18 @@ class JobHistory:
         cache = cls.history
 
         for key in cache:
-            values = cache.get(key)
-            exp_dir = values.get('EXPERIMENT_DIR')
+            value = cache.get(key)
+            exp_dir = value.get('EXPERIMENT_DIR')
+            suite_id = value.get('SUITE_ID')
+            suite_path, _ = cls.get_item_path(suite_id)
 
             root = Path(exp_dir)
             if not root.exists():
                 cache.pop(key)
                 logger.debug(f"Remove job {key} from job history.")
+                import shutil
+                shutil.rmtree(suite_path, ignore_errors=False)
+                logger.debug(f"Remove suite {suite_id} from directory.")
 
         cache.close()
 
