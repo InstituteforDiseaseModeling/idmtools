@@ -78,7 +78,7 @@ class FileOperations(IOperations):
                 try:
                     suite = self.platform.get_item(suite_id, ItemType.SUITE)
                 except RuntimeError:
-                    pass
+                    suite = item.parent
 
             if suite:
                 suite_dir = job_dir / f"s_{self.entity_display_name(suite)}"
