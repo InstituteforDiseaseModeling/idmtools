@@ -3,6 +3,7 @@ Here we implement the FilePlatform experiment operations.
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+import glob
 import shutil
 from pathlib import Path
 from dataclasses import dataclass, field
@@ -203,9 +204,21 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         exp.platform = self.platform
         exp.uid = file_exp.uid
         exp.name = file_exp.name
-        if parent:
-            exp.parent_id = parent.id
-            exp.parent = parent
+        job_dir = Path(self.platform.job_directory)
+        root = job_dir / self.platform.SUITE_STORE
+        # Determine parent_id
+        suite_id = parent.id if parent else file_exp.suite_id
+        if suite_id:
+            exp.parent_id = suite_id
+            pattern = f"*{suite_id}"
+            for path in root.glob(pattern):
+                if path.is_dir():
+                    exp.parent = self.platform.get_item(suite_id, ItemType.SUITE)
+                    break
+            else:
+                exp.parent = None
+        else:
+            exp.parent = None
         exp.tags = file_exp.tags
         exp._platform_object = file_exp
         exp.simulations = []

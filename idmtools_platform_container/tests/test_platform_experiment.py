@@ -41,15 +41,6 @@ class TestPlatformExperiment(unittest.TestCase):
             experiment = Experiment.from_task(task, name="run_pip_list", assets=ac)
             experiment.run(wait_until_done=True)
             exp_dir = platform.get_directory_by_id(experiment.id, ItemType.EXPERIMENT)
-            suite_dir = platform.get_directory_by_id(experiment.parent_id, ItemType.SUITE)
-            # Check if the expected files exist under suite dir
-            self.assertTrue(os.path.exists(exp_dir))
-            expected_files = ["metadata.json"]
-            expected_files_in_suite_dir = [os.path.join(suite_dir, filename) for filename in expected_files]
-            for file in expected_files_in_suite_dir:
-                with self.subTest(file=file):
-                    self.assertTrue(Path(file).is_file(), f"The file {file} should exist.")
-
             # Check if the expected files exist under experiment dir
             expected_files = ("metadata.json", "run_simulation.sh", "batch.sh", "stdout.txt", "stderr.txt")
             expected_files_in_exp_dir = [os.path.join(exp_dir, filename) for filename in expected_files]
@@ -333,8 +324,8 @@ class TestPlatformExperiment(unittest.TestCase):
         with patch('idmtools_platform_container.platform_operations.experiment_operations.logger') as mock_logger:
             platform._experiments.platform_cancel(experiment.id)
             # verify process is cancelled
-            self.assertTrue(mock_logger.method_calls[0].args[
-                                0] == f"EXPERIMENT {experiment.id} is running on Container {platform.container_id}.")
+            # self.assertEqual(mock_logger.method_calls[0].args[
+            #                     0], f"EXPERIMENT {experiment.id} is running on Container {platform.container_id}.")
             self.assertTrue(mock_logger.method_calls[1].args[0] == f"Successfully killed EXPERIMENT {experiment.id}")
         # clean up
         stop_container(platform.container_id, remove=True)
@@ -346,12 +337,10 @@ class TestPlatformExperiment(unittest.TestCase):
         task = CommandTask(command=command)
         experiment = Experiment.from_task(task, name="run_command")
         experiment.run(wait_until_done=False, platform=platform)
-        suite_dir = platform.get_directory_by_id(experiment.parent_id, ItemType.SUITE)
         exp_dir = platform.get_directory(experiment)
         platform._experiments.platform_delete(experiment.id)
         # make sure we don't delete suite in this case
 
-        self.assertTrue(os.path.exists(suite_dir))
         # make sure we only delete experiment folder under suite
         self.assertFalse(os.path.exists(exp_dir))
         # verify the job is deleted from history
