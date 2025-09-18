@@ -83,7 +83,7 @@ class TestFilePlatform(unittest.TestCase):
             dirs.extend(dirnames)
             break
         self.assertSetEqual(set(files), set(["metadata.json"]))
-        self.assertEqual(dirs[0], f"{experiment.name}_{experiment.id}")
+        self.assertEqual(dirs[0], f"e_{experiment.name}_{experiment.id}")
         # second verify files and dirs under experiment
         experiment_dir = self.platform.get_directory(experiment)
         files = []
