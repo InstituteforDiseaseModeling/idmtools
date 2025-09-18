@@ -13,6 +13,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from test_base import TestContainerPlatformCliBase
 
 @pytest.mark.serial
+@pytest.mark.cli
 class TestContainerPlatformSyncHistoryCli(TestContainerPlatformCliBase):
     @patch('rich.console.Console.print')
     def test_sync_history(self, mock_console):

@@ -23,7 +23,7 @@ setA = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="a")
 
 
 @pytest.mark.serial
-@linux_only
+#@linux_only
 class TestSlurmPlatform(ITestWithPersistence):
 
     def create_experiment(self, platform=None):

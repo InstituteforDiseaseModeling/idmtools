@@ -6,7 +6,7 @@ import pytest
 from idmtools.analysis.analyze_manager import AnalyzeManager
 from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType
-from idmtools.entities import IAnalyzer
+from idmtools.entities import IAnalyzer, Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
@@ -89,7 +89,12 @@ class TestContainerPlatformAnalyzer(unittest.TestCase):
         ts.add_builder(builder)
         experiment = Experiment.from_template(ts, name=case_name, tags=tags)
         experiment.assets.add_directory(assets_directory=os.path.join("inputs", "Assets"))
-        experiment.run(True, platform=cls.platform)
+        # add a suite
+        suite = Suite(name="my suite")
+        cls.platform.create_items([suite])
+        #experiment.parent = suite
+        suite.add_experiment(experiment)
+        suite.run(True, platform=cls.platform)
         cls.exp_id = experiment.uid
 
     def test_analyzer_experiment(self):
@@ -114,6 +119,7 @@ class TestContainerPlatformAnalyzer(unittest.TestCase):
         self.case_name = os.path.basename(__file__)
         analyzers = [AddAnalyzer(filenames=['config.json'])]
         exp = self.platform.get_item(self.exp_id, item_type=ItemType.EXPERIMENT)
+        # add a suite
         suite = exp.suite
         suite_tuple = [(suite.id, ItemType.SUITE)]
         am = AnalyzeManager(ids=suite_tuple, analyzers=analyzers)
