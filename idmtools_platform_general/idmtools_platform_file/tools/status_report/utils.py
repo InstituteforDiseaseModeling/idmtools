@@ -36,7 +36,6 @@ def get_latest_experiment(platform: 'IPlatform') -> Dict:
         exp_dir = Path(batch_dir).parent
         exp_id = exp_dir.name
 
-
         r = dict(experiment_id=exp_id, experiment_directory=str(exp_dir),
                  job_directory=str(platform.job_directory))
         return r

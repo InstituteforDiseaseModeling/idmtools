@@ -283,6 +283,7 @@ def clean_experiment_name(experiment_name: str, maxlen: int = 30) -> str:
     Handle some special characters in experiment names.
     Args:
         experiment_name: name of the experiment
+        maxlen: max length of the experiment name
     Returns:
         the experiment name allowed for use
     """

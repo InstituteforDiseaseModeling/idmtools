@@ -65,7 +65,6 @@ class JobHistory:
         """
         cache = cls.history
 
-        from idmtools.core.context import get_current_platform
         if platform is None:
             platform = Platform("File", job_directory=job_dir)
 

@@ -12,7 +12,7 @@ from idmtools.core import ItemType
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.iplatform_ops.iplatform_experiment_operations import IPlatformExperimentOperations
-from idmtools_platform_file.platform_operations.utils import FileExperiment, FileSimulation, FileSuite, add_dummy_suite
+from idmtools_platform_file.platform_operations.utils import FileExperiment, FileSimulation, FileSuite
 from logging import getLogger
 
 logger = getLogger(__name__)
