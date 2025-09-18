@@ -64,29 +64,33 @@ class FileOperations(IOperations):
         Returns:
             item file directory
         """
+        job_dir = Path(self.platform.job_directory)
         if isinstance(item, (FileSimulation, FileExperiment, FileSuite)):
             item_dir = item.get_directory()
         elif isinstance(item, Suite):
-            item_dir = Path(self.platform.job_directory, self.entity_display_name(item))
+            return job_dir / f"s_{self.entity_display_name(item)}"
         elif isinstance(item, Experiment):
             suite_id = item.parent_id or item.suite_id
-            if suite_id is None:
-                raise RuntimeError("Experiment missing parent!")
             suite = None
-            try:
-                suite = self.platform.get_item(suite_id, ItemType.SUITE)
-            except RuntimeError:
-                pass
-            if suite is None:
-                suite = item.parent
-            suite_dir = Path(self.platform.job_directory, self.entity_display_name(suite))
-            item_dir = Path(suite_dir, self.entity_display_name(item))
+
+            # Try to retrieve suite from platform or parent
+            if suite_id:
+                try:
+                    suite = self.platform.get_item(suite_id, ItemType.SUITE)
+                except RuntimeError:
+                    pass
+
+            if suite:
+                suite_dir = job_dir / f"s_{self.entity_display_name(suite)}"
+                return suite_dir / f"e_{self.entity_display_name(item)}"
+            else:
+                return job_dir / f"e_{self.entity_display_name(item)}"
         elif isinstance(item, Simulation):
             exp = item.parent
             if exp is None:
                 raise RuntimeError("Simulation missing parent!")
             exp_dir = self.get_directory(exp)
-            item_dir = Path(exp_dir, self.entity_display_name(item))
+            return exp_dir / self.entity_display_name(item)
         else:
             raise RuntimeError(f"Get directory is not supported for {type(item)} object on FilePlatform")
 

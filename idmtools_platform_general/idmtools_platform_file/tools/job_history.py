@@ -8,6 +8,8 @@ from pathlib import Path
 from datetime import datetime
 from typing import NoReturn, Dict, Tuple, List
 from idmtools.core import ItemType
+from idmtools.core.context import get_current_platform
+from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
 from idmtools_platform_container.utils.general import normalize_path, is_valid_uuid
 from logging import getLogger
@@ -65,7 +67,7 @@ class JobHistory:
 
         from idmtools.core.context import get_current_platform
         if platform is None:
-            platform = get_current_platform()
+            platform = Platform("File", job_directory=job_dir)
 
         # Get current datetime
         current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -139,9 +141,9 @@ class JobHistory:
             logger.debug(f"Invalid item id: {item_id}")
             return
 
-        cache = JobHistory.history
+        cache = cls.history
         item = cache.get(item_id)
-
+        platform = get_current_platform()
         # Consider Experiment case
         if item:
             return Path(item['EXPERIMENT_DIR']), ItemType.EXPERIMENT
@@ -150,10 +152,12 @@ class JobHistory:
             value = cache.get(key)
             suite_id = value.get('SUITE_ID')
             exp_dir = value.get('EXPERIMENT_DIR')
-
+            job_dir = value.get('JOB_DIRECTORY')
+            if platform is None:
+                platform = Platform("File", job_directory=job_dir)
             # Consider Suite case
             if suite_id == item_id:
-                return Path(exp_dir).parent, ItemType.SUITE
+                return platform.get_directory_by_id(item_id, ItemType.SUITE), ItemType.SUITE
 
             # Consider Simulation case
             pattern = f'*{item_id}/metadata.json'
@@ -270,15 +274,21 @@ class JobHistory:
     def sync(cls) -> NoReturn:
         """Sync job history."""
         cache = cls.history
-
+        suite_path = None
         for key in cache:
-            values = cache.get(key)
-            exp_dir = values.get('EXPERIMENT_DIR')
-
+            value = cache.get(key)
+            exp_dir = value.get('EXPERIMENT_DIR')
+            suite_id = value.get('SUITE_ID')
+            if suite_id:
+                suite_path, _ = cls.get_item_path(suite_id)
             root = Path(exp_dir)
             if not root.exists():
                 cache.pop(key)
                 logger.debug(f"Remove job {key} from job history.")
+                if suite_path:
+                    import shutil
+                    shutil.rmtree(suite_path, ignore_errors=False)
+                    logger.debug(f"Remove suite {suite_id} from directory.")
 
         cache.close()
 

@@ -203,19 +203,36 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         Returns:
             list of metadata with given item type
         """
+        root = Path(self.platform.job_directory)
+        item_list = []
+
         if item_type is ItemType.SIMULATION:
-            pattern = f"*/*/*{item_id}/{self.metadata_filename}"
+            # Match sim under experiment, under optional suite
+            patterns = [
+                f"s_*/e_*/*{item_id}/{self.metadata_filename}",  # suite/experiment/simulation
+                f"e_*/*{item_id}/{self.metadata_filename}",  # experiment/simulation (no suite)
+            ]
         elif item_type is ItemType.EXPERIMENT:
-            pattern = f"*/*{item_id}/{self.metadata_filename}"
+            patterns = [
+                f"s_*/e_*{item_id}/{self.metadata_filename}",  # suite/experiment
+                f"e_*{item_id}/{self.metadata_filename}",  # standalone experiment
+            ]
         elif item_type is ItemType.SUITE:
-            pattern = f"*{item_id}/{self.metadata_filename}"
+            patterns = [
+                f"s_*{item_id}/{self.metadata_filename}",  # suite only
+            ]
         else:
             raise RuntimeError(f"Unknown item type: {item_type}")
-        item_list = []
-        root = Path(self.platform.job_directory)
-        for meta_file in root.glob(pattern=pattern):
-            meta = self.load_from_file(meta_file)
-            item_list.append(meta)
+
+        # Search each pattern
+        for pattern in patterns:
+            for meta_file in root.glob(pattern):
+                try:
+                    meta = self.load_from_file(meta_file)
+                    item_list.append(meta)
+                except Exception as e:
+                    print(f"Warning: Failed to load metadata from {meta_file}: {e}")
+
         return item_list
 
     @staticmethod

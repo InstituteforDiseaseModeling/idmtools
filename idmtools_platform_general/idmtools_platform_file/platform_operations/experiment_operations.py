@@ -57,11 +57,6 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         """
         # ensure experiment's parent
         experiment.parent_id = experiment.parent_id or experiment.suite_id
-        if experiment.parent_id is None:
-            suite = add_dummy_suite(experiment)
-            self.platform._suites.platform_create(suite)
-            suite.platform = self.platform
-
         # Generate Suite/Experiment/Simulation folder structure
         self.platform.mk_directory(experiment, exist_ok=True)
         meta = self.platform._metas.dump(experiment)
@@ -125,14 +120,15 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
             None
         """
         # Ensure parent
-        experiment.parent.add_experiment(experiment)
-        self.platform._metas.dump(experiment.parent)
-        # Generate/update metadata
+        if experiment.parent:
+            experiment.parent.add_experiment(experiment)
+            self.platform._metas.dump(experiment.parent)
+            # Output
+            suite_id = experiment.parent_id or experiment.suite_id
+            user_logger.info(f'suite: {str(suite_id)}')
         self.platform._metas.dump(experiment)
-        # Output
-        suite_id = experiment.parent_id or experiment.suite_id
+
         user_logger.info(f'job_directory: {Path(self.platform.job_directory).resolve()}')
-        user_logger.info(f'suite: {str(suite_id)}')
         user_logger.info(f'experiment: {experiment.id}')
         user_logger.info(f"\nExperiment Directory: \n{self.platform.get_directory(experiment)}")
 
@@ -202,14 +198,16 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
             Experiment object
         """
-        if parent is None:
-            parent = self.platform.get_item(file_exp.parent_id, ItemType.SUITE, force=True)
         exp = Experiment()
         exp.platform = self.platform
         exp.uid = file_exp.uid
         exp.name = file_exp.name
-        exp.parent_id = parent.id
-        exp.parent = parent
+        if parent:
+            exp.parent_id = parent.id
+            exp.parent = parent
+        elif file_exp.suite_id:
+            exp.parent_id = file_exp.suite_id
+            exp.parent = self.platform.get_item(file_exp.suite_id, ItemType.SUITE, force=True)
         exp.tags = file_exp.tags
         exp._platform_object = file_exp
         exp.simulations = []

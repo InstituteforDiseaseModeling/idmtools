@@ -196,7 +196,7 @@ class FilePlatformSimulationOperations(IPlatformSimulationOperations):
         sim = self.platform.get_item(sim_id, ItemType.SIMULATION, raw=False)
         try:
             shutil.rmtree(self.platform.get_directory(sim))
-        except RuntimeError:
+        except Exception:
             logger.info(f"Could not delete the simulation: {sim_id}..")
             return
 
