@@ -75,10 +75,7 @@ class FileOperations(IOperations):
 
             # Try to retrieve suite from platform or parent
             if suite_id:
-                try:
-                    suite = self.platform.get_item(suite_id, ItemType.SUITE)
-                except RuntimeError:
-                    suite = item.parent
+                suite = self.platform.get_item(suite_id, ItemType.SUITE, raw=True)  # raw is True to get FileSuite object
 
             if suite:
                 suite_dir = job_dir / f"s_{self.entity_display_name(suite)}"

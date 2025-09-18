@@ -199,7 +199,6 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         Returns:
             Lis of metadata
         """
-
         if not isinstance(item, (Suite, FileSuite, Experiment, FileExperiment)):
             raise RuntimeError("Get children method supports [File]Suite and [File]Experiment only.")
         item_list = []
