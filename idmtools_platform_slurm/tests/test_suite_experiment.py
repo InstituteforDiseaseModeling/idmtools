@@ -197,7 +197,7 @@ class TestSuiteExperiment(ITestWithPersistence):
         experiment.parent_id = suite.id
         with self.assertRaises(RuntimeError) as ex:
             experiment.run(platform=self.platform, wait_until_done=False, dry_run=True)
-        self.assertEqual(ex.exception.args[0], f"Not found Suite with id '{suite.id}'")
+        self.assertEqual(ex.exception.args[0], f"Not found Experiment with id '{experiment.id}'")
 
     # Case 17, 18 test with experiment.suite_id = suite.id
     # Verify experiment.run with existing suite.id
@@ -237,7 +237,7 @@ class TestSuiteExperiment(ITestWithPersistence):
     def test_21(self):
         experiment = Experiment.from_task(self.task, name="run_task")
         self.platform.run_items(items=experiment, wait_until_done=False, dry_run=True)
-        verify_result(self, experiment.suite)
+        verify_result_experiment(self, experiment)
 
     # Verify create suite/experiment with platform.run_items(suite)
     def test_22(self):

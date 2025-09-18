@@ -23,7 +23,7 @@ setA = partial(JSONConfiguredPythonTask.set_parameter_sweep_callback, param="a")
 
 
 @pytest.mark.serial
-#@linux_only
+@linux_only
 class TestSlurmPlatform(ITestWithPersistence):
 
     def create_experiment(self, platform=None):
@@ -79,7 +79,7 @@ class TestSlurmPlatform(ITestWithPersistence):
         slurm_simulation = self.platform.get_item(base.uid, ItemType.SIMULATION, raw=True)
         self.assertIsInstance(slurm_simulation, FileSimulation)
         self.assertEqual(str(base.uid), slurm_simulation.uid)
-        self.assertEqual(self.case_name, slurm_simulation.name)
+        self.assertEqual(self.case_name[:30], slurm_simulation.name)  # we only take the first 30 chars
         self.assertEqual({k: v for k, v in base.tags.items()}, slurm_simulation.tags)
 
     def test_parent(self):
