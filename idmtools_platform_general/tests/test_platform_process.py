@@ -220,7 +220,7 @@ class TestProcessPlatform(ITestWithPersistence):
         # make sure we only delete experiment folder under suite
         self.assertFalse(os.path.exists(exp_dir))
         with self.assertRaises(RuntimeError) as context:
-            self.platform.get_item(experiment.id, item_type=ItemType.EXPERIMENT, raw=True)
+            self.platform.get_item(experiment.id, item_type=ItemType.EXPERIMENT, force=True)
         self.assertTrue(f"Not found Experiment with id '{experiment.id}'" in str(context.exception.args[0]))
 
     def test_platform_delete_suite(self):
