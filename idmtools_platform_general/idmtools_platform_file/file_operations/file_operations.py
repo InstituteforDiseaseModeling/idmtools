@@ -17,7 +17,7 @@ from idmtools.entities.simulation import Simulation
 from idmtools_platform_file.assets import generate_script, generate_simulation_script
 from idmtools_platform_file.file_operations.operations_interface import IOperations
 from idmtools_platform_file.platform_operations.utils import FILE_MAPS, validate_file_path_length, \
-    clean_experiment_name, validate_folder_files_path_length, FileExperiment, FileSimulation, FileSuite
+    clean_item_name, validate_folder_files_path_length, FileExperiment, FileSimulation, FileSuite
 from idmtools.utils.decorators import check_symlink_capabilities
 
 logger = getLogger(__name__)
@@ -38,23 +38,18 @@ class FileOperations(IOperations):
         Returns:
             str
         """
-        if self.platform.name_directory:
-            if isinstance(item, Simulation):
-                if self.platform.sim_name_directory:
-                    if item.name:
-                        title = f"{clean_experiment_name(item.name)}_{item.id}"
-                    else:
-                        title = item.id
-                else:
-                    title = item.id
-            else:
-                if item.name:
-                    title = f"{clean_experiment_name(item.name)}_{item.id}"
-                else:
-                    title = item.id
+        use_name = getattr(self.platform, "name_directory", False)
+        use_sim_name = getattr(self.platform, "sim_name_directory", True)
+
+        # Determine if we should include name
+        if isinstance(item, Simulation) and not use_sim_name:
+            use_name = False
+
+        if use_name and getattr(item, "name", None):
+            safe_name = clean_item_name(item.name)
+            return f"{safe_name}_{item.id}"
         else:
-            title = item.id
-        return title
+            return item.id
 
     def get_directory(self, item: Union[Suite, Experiment, Simulation]) -> Path:
         """

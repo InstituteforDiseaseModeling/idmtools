@@ -278,7 +278,7 @@ class FileSimulation(FileItem, Simulation):
         self.assets = metas['assets']
 
 
-def clean_experiment_name(experiment_name: str, maxlen: int = 30) -> str:
+def clean_item_name(experiment_name: str, maxlen: int = 30) -> str:
     """
     Handle some special characters in experiment names.
     Args:

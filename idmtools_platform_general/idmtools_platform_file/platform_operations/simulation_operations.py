@@ -11,7 +11,7 @@ from idmtools.core import ItemType
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
-from idmtools_platform_file.platform_operations.utils import FileSimulation, FileExperiment, clean_experiment_name
+from idmtools_platform_file.platform_operations.utils import FileSimulation, FileExperiment, clean_item_name
 from logging import getLogger
 
 logger = getLogger(__name__)
@@ -58,7 +58,7 @@ class FilePlatformSimulationOperations(IPlatformSimulationOperations):
         Returns:
             File Simulation object created.
         """
-        simulation.name = clean_experiment_name(simulation.experiment.name if not simulation.name else simulation.name)
+        simulation.name = clean_item_name(simulation.experiment.name if not simulation.name else simulation.name)
 
         # Generate Simulation folder structure
         self.platform.mk_directory(simulation)

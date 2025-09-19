@@ -152,10 +152,10 @@ class JobHistory:
             suite_id = value.get('SUITE_ID')
             exp_dir = value.get('EXPERIMENT_DIR')
             job_dir = value.get('JOB_DIRECTORY')
-            if platform is None:
-                platform = Platform("File", job_directory=job_dir)
+
             # Consider Suite case
             if suite_id == item_id:
+                platform = Platform("File", job_directory=job_dir)  # reget platform with matched dir
                 return platform.get_directory_by_id(item_id, ItemType.SUITE), ItemType.SUITE
 
             # Consider Simulation case
