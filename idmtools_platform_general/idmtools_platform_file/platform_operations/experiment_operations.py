@@ -55,11 +55,19 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
             File Experiment object created
         """
-        # ensure experiment's parent
-        experiment.parent_id = experiment.parent_id or experiment.suite_id
-        # Generate Suite/Experiment/Simulation folder structure
-        if experiment.parent:  # create suite (for dir and dump meta) if needed
-            self.platform._suites.platform_create(experiment.parent)
+        # Create suite dir and dump meta if there is suite associated with experiment
+        parent_id = experiment.parent_id or experiment.suite_id
+        suite = experiment.parent
+
+        if not suite and parent_id:
+            try:
+                suite = self.platform.get_item(parent_id, ItemType.SUITE)
+            except Exception as e:
+                print(f"Warning: Failed to retrieve suite with ID {parent_id}: {e}")
+                suite = None
+        if suite:
+            self.platform._suites.platform_create(suite)
+
         self.platform.mk_directory(experiment, exist_ok=True)
         meta = self.platform._metas.dump(experiment)
         self.platform._assets.dump_assets(experiment)
