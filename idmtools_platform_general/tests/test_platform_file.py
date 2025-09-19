@@ -237,7 +237,7 @@ class TestFilePlatform(unittest.TestCase):
         # make sure we delete suite folder
         self.assertFalse(os.path.exists(os.path.join(self.job_directory, experiment.parent_id)))
         with self.assertRaises(RuntimeError) as context:
-            self.platform.get_item(experiment.parent_id, item_type=ItemType.SUITE, raw=True)
+            self.platform.get_item(experiment.parent_id, item_type=ItemType.SUITE, force=True)
         self.assertTrue(f"Not found Suite with id '{experiment.parent_id}'" in str(context.exception.args[0]))
 
     def test_file_suite_experiment_simulation(self):
