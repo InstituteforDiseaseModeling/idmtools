@@ -63,10 +63,9 @@ class TestContainerPlatformPathCli(TestContainerPlatformCliBase):
         task = CommandTask(command=command)
         experiment = Experiment.from_task(task, name="run_command")
         suite = Suite(name="suite_name")
-        self.platform.create_items([suite])
         suite.add_experiment(experiment)
         # Run via Suite (mirrors your original with-suite behavior)
-        suite.run(platform=self.platform, wait_until_done=False)
+        experiment.run(platform=self.platform, wait_until_done=False)
         result = self.runner.invoke(container_cli.container, ['path', experiment.id])
         self.assertEqual(result.exit_code, 0)
         # check path

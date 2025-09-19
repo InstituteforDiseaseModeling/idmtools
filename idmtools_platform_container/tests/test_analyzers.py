@@ -91,10 +91,10 @@ class TestContainerPlatformAnalyzer(unittest.TestCase):
         experiment.assets.add_directory(assets_directory=os.path.join("inputs", "Assets"))
         # add a suite
         suite = Suite(name="my suite")
-        cls.platform.create_items([suite])
-        #experiment.parent = suite
-        suite.add_experiment(experiment)
-        suite.run(True, platform=cls.platform)
+        #cls.platform.create_items([suite])  # no need
+        experiment.parent = suite
+        #suite.add_experiment(experiment)  # this is another way to add an experiment to a suite
+        experiment.run(True, platform=cls.platform)  # suite.run is ok too
         cls.exp_id = experiment.uid
 
     def test_analyzer_experiment(self):
