@@ -231,5 +231,5 @@ class TestProcessPlatform(ITestWithPersistence):
         # make sure we delete suite folder
         self.assertFalse(os.path.exists(suite_dir))
         with self.assertRaises(RuntimeError) as context:
-            self.platform.get_item(experiment.parent_id, item_type=ItemType.SUITE, raw=True)
+            self.platform.get_item(experiment.parent_id, item_type=ItemType.SUITE, force=True)
         self.assertTrue(f"Not found Suite with id '{experiment.parent_id}'" in str(context.exception.args[0]))
