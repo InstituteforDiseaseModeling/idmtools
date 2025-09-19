@@ -58,7 +58,7 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         # ensure experiment's parent
         experiment.parent_id = experiment.parent_id or experiment.suite_id
         # Generate Suite/Experiment/Simulation folder structure
-        if experiment.parent: # create suite (for dir and dump meta) if needed
+        if experiment.parent:  # create suite (for dir and dump meta) if needed
             self.platform._suites.platform_create(experiment.parent)
         self.platform.mk_directory(experiment, exist_ok=True)
         meta = self.platform._metas.dump(experiment)
