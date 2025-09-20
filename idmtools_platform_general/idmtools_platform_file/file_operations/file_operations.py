@@ -100,7 +100,7 @@ class FileOperations(IOperations):
             # Try to access the parent object (may raise RuntimeError if not set or not resolvable)
             try:
                 parent = item.parent
-            except RuntimeError as e:
+            except RuntimeError:
                 parent = None
             # Case 1: Parent suite object is available, build job_dir/suite/experiment path
             if parent:

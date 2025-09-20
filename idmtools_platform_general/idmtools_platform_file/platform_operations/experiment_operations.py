@@ -59,7 +59,7 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         experiment.parent_id = experiment.parent_id or experiment.suite_id
         try:
             parent = experiment.parent
-        except RuntimeError as e:
+        except RuntimeError:
             parent = None
 
         if parent:
