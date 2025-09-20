@@ -9,7 +9,7 @@ import shutil
 from dataclasses import dataclass
 from logging import getLogger
 from pathlib import Path
-from typing import Union
+from typing import Union, Optional
 from idmtools.core import ItemType, EntityStatus
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
@@ -29,6 +29,36 @@ class FileOperations(IOperations):
     """
     Implement operations_interface.
     """
+
+    def entity_display_name_new(
+            self,
+            *,
+            id: str,
+            name: Optional[str],
+            item_type: ItemType
+    ) -> str:
+        """
+        Generate a lightweight display name for Suite, Experiment, or Simulation.
+
+        Args:
+            id: The unique ID of the entity.
+            name: Optional name string (may be None or empty).
+            item_type: The type of the item (Suite, Experiment, Simulation).
+
+        Returns:
+            A safe, display-friendly string.
+        """
+        use_name = getattr(self.platform, "name_directory", False)
+        use_sim_name = getattr(self.platform, "sim_name_directory", True)
+
+        if item_type == ItemType.SIMULATION and not use_sim_name:
+            use_name = False
+
+        if use_name and name:
+            safe_name = clean_item_name(name)
+            return f"{safe_name}_{id}"
+        else:
+            return id
 
     def entity_display_name(self, item: Union[Suite, Experiment, Simulation]) -> str:
         """
@@ -65,16 +95,26 @@ class FileOperations(IOperations):
         elif isinstance(item, Suite):
             return job_dir / f"s_{self.entity_display_name(item)}"
         elif isinstance(item, Experiment):
+            # Prefer parent_id; fallback to suite_id if set
             suite_id = item.parent_id or item.suite_id
-            suite = None
+            # Try to access the parent object (may raise RuntimeError if not set or not resolvable)
+            try:
+                parent = item.parent
+            except RuntimeError as e:
+                parent = None
+            # Case 1: Parent suite object is available, build job_dir/suite/experiment path
+            if parent:
+                suite_dir = job_dir / f"s_{self.entity_display_name(parent)}"
+                return suite_dir / f"e_{self.entity_display_name(item)}"
 
-            # Try to retrieve suite from platform or parent
-            if suite_id:
-                suite = self.platform.get_item(suite_id, ItemType.SUITE, raw=True)  # raw is True to get FileSuite object
-
-            if suite:
+            # Case 2: No suite object, but suite_id is set — try to load suite from platform
+            # then build job_dir/suite/experiment path
+            if suite_id:  # Try to retrieve suite from platform
+                suite = self.platform.get_item(suite_id, ItemType.SUITE, raw=True)
                 suite_dir = job_dir / f"s_{self.entity_display_name(suite)}"
                 return suite_dir / f"e_{self.entity_display_name(item)}"
+
+            # Case 3: No parent or suite_id — place experiment directly under job_dir
             else:
                 return job_dir / f"e_{self.entity_display_name(item)}"
         elif isinstance(item, Simulation):
