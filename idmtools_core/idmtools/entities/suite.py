@@ -35,6 +35,12 @@ class Suite(INamedEntity, ABC, IRunnableEntity):
     item_type: ItemType = field(default=ItemType.SUITE, compare=False, init=False)
     description: str = field(default=None, compare=False)
 
+    def __post_init__(self):
+        """
+        Initialize Suite.
+        """
+        self.experiments = []
+
     def add_experiment(self, experiment: 'Experiment') -> 'NoReturn':  # noqa: F821
         """
         Add an experiment to the suite.
@@ -46,8 +52,12 @@ class Suite(INamedEntity, ABC, IRunnableEntity):
         if experiment.uid in ids:
             return
 
+        # add experiment
+        self.experiments.append(experiment)
+
         # Link the suite to the experiment. Assumes the experiment suite setter adds the experiment to the suite.
-        experiment.suite = self
+        experiment._parent = self
+        experiment.parent_id = experiment.suite_id = self.id
 
     def display(self):
         """
@@ -161,6 +171,15 @@ class Suite(INamedEntity, ABC, IRunnableEntity):
                                                                      skip_sims=skip_sims,
                                                                      max_simulations=max_simulations, **kwargs)
         return sims
+
+    def __setstate__(self, state):
+        """
+        Add ignored fields back since they don't exist in the pickle.
+        """
+        # First call parent's __setstate__ to restore base attributes
+        super().__setstate__(state)
+        # Restore the pickle fields with values requested
+        self.experiments = []
 
 
 ISuiteClass = Type[Suite]
