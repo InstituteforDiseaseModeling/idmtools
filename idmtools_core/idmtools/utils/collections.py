@@ -128,8 +128,16 @@ class ExperimentParentIterator(typing.Iterator['Simulation']):  # noqa F821
         from idmtools.entities.simulation import Simulation
         if not isinstance(item, Simulation):
             raise ValueError("You can only append simulations")
+        # Check possible duplicate
+        ids = [sim.id for sim in self.items]
+        if item.id in ids:
+            return
+
+        # Set parent
         item._parent = self.parent
         item.parent_id = item.experiment_id = self.parent.id
+
+        # Add to collection
         if isinstance(self.items, (list, set)):
             self.items.append(item)
             return
@@ -149,18 +157,16 @@ class ExperimentParentIterator(typing.Iterator['Simulation']):  # noqa F821
             None
 
         Raises:
-            ValueError when the underlying data object doesn't supporting adding additional item
+            ValueError when the underlying data object doesn't support adding additional item
         """
         from idmtools.entities.templated_simulation import TemplatedSimulations
         if isinstance(self.items, (list, set)):
-            # if it is a template, try to preserve so we can user generators
+            # if it is a template, try to preserve so we can use generators
             if isinstance(item, TemplatedSimulations):
-                self.items.extend(list(item))
+                self.extend(list(item))
             else:
                 for it in item:
-                    it._parent = self.parent
-                    it.parent_id = it.experiment_id = self.parent.id
-                self.items.extend(item)
+                    self.append(it)
             return
         if isinstance(self.items, TemplatedSimulations):
             if isinstance(item, TemplatedSimulations):
