@@ -91,7 +91,7 @@ class Simulation(IAssetsEnabled, INamedEntity):
         return self._parent
 
     @parent.setter
-    def parent(self, parent: 'IEntity'):
+    def parent(self, parent: 'Experiment'):
         """
         Sets the parent object for Entity.
 
