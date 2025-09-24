@@ -315,3 +315,20 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         for sim in simulations:
             ret[sim.id] = self.platform._simulations.get_assets(sim, files, **kwargs)
         return ret
+
+    def run_item(self, experiment: Experiment, **kwargs):
+        """
+        Called during commissioning of an item. This should create the remote resource.
+
+        Args:
+            experiment:Experiment
+            **kwargs: Keyword arguments to pass to pre_run_item, platform_run_item, post_run_item
+
+        Returns:
+            None
+        """
+        # Consider Suite
+        if experiment.parent:
+            experiment.parent.add_experiment(experiment)  # may not be necessary
+            self.platform._suites.platform_create(experiment.parent)
+        super().run_item(experiment, **kwargs)
