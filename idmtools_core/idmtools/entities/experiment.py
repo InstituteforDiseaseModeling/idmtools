@@ -221,7 +221,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
                 from idmtools.core import NoPlatformException
                 raise NoPlatformException("The object has no platform set...")
             suite = self.platform.get_item(self.parent_id, ItemType.SUITE, force=True)
-            self.parent = suite
+            suite.add_experiment(self)
 
         return self._parent
 
