@@ -128,14 +128,15 @@ class ExperimentParentIterator(typing.Iterator['Simulation']):  # noqa F821
         from idmtools.entities.simulation import Simulation
         if not isinstance(item, Simulation):
             raise ValueError("You can only append simulations")
-        # Check possible duplicate
-        ids = [sim.id for sim in self.items]
-        if item.id in ids:
-            return
 
         # Set parent
         item._parent = self.parent
         item.parent_id = item.experiment_id = self.parent.id
+
+        # Check possible duplicate
+        ids = [sim.id for sim in self.items]
+        if item.id in ids:
+            return
 
         # Add to collection
         if isinstance(self.items, (list, set)):
