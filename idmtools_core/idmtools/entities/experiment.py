@@ -221,7 +221,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
                 from idmtools.core import NoPlatformException
                 raise NoPlatformException("The object has no platform set...")
             suite = self.platform.get_item(self.parent_id, ItemType.SUITE, force=True)
-            self.parent = suite
+            suite.add_experiment(self)
 
         return self._parent
 
@@ -668,6 +668,19 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         Returns:
             None
         """
+        from idmtools.entities.simulation import Simulation
+        if not isinstance(item, Simulation):
+            raise ValueError("You can only add Simulation objects")
+
+        # Prevent duplicates
+        items = getattr(self.simulations, "items", None)
+        if isinstance(items, (list, set)) and any(s.id == item.id for s in items):
+            return
+
+        # Set child's parent (safe, no recursion)
+        item.parent = self
+
+        # Append into underlying collection
         self.simulations.append(item)
 
     def add_simulations(self, item: Union[List['Simulation'], 'TemplatedSimulations']):  # noqa F821

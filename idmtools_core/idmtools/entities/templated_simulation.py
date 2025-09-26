@@ -205,6 +205,8 @@ class TemplatedSimulations:
         Returns:
             None
         """
+        if any(sim.id == simulation.id for sim in self.__extra_simulations):
+            return
         self.__extra_simulations.append(simulation)
 
     def add_simulations(self, simulations: List[Simulation]):

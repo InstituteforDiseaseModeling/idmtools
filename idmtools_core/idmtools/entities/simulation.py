@@ -55,7 +55,7 @@ class Simulation(IAssetsEnabled, INamedEntity):
         Returns:
             Parent Experiment
         """
-        return self.parent
+        return self._parent
 
     @experiment.setter
     def experiment(self, experiment: 'Experiment'):  # noqa: F821
@@ -102,7 +102,8 @@ class Simulation(IAssetsEnabled, INamedEntity):
             None
         """
         if parent is not None:
-            parent.add_simulation(self)
+            self._parent = parent
+            self.parent_id = self.experiment_id = getattr(parent, "id", None)
         else:
             self._parent = self.parent_id = self.experiment_id = None
 

@@ -65,9 +65,10 @@ class ExperimentParentIterator(typing.Iterator['Simulation']):  # noqa F821
             Next item from our list
         """
         i = next(self.__iter)
-        i._parent = self.parent
-        if hasattr(i, 'parent_id') and self.parent.uid is not None:
-            i.parent_id = self.parent.uid
+        if getattr(i, "_parent", None) is None:
+            i._parent = self.parent
+            if hasattr(i, 'parent_id') and self.parent.uid is not None:
+                i.parent_id = self.parent.uid
         return i
 
     def __getitem__(self, item):
@@ -126,6 +127,7 @@ class ExperimentParentIterator(typing.Iterator['Simulation']):  # noqa F821
         """
         from idmtools.entities.templated_simulation import TemplatedSimulations
         from idmtools.entities.simulation import Simulation
+
         if not isinstance(item, Simulation):
             raise ValueError("You can only append simulations")
 
@@ -133,18 +135,19 @@ class ExperimentParentIterator(typing.Iterator['Simulation']):  # noqa F821
         item._parent = self.parent
         item.parent_id = item.experiment_id = self.parent.id
 
-        # Check possible duplicate
-        ids = [sim.id for sim in self.items]
-        if item.id in ids:
-            return
-
-        # Add to collection
+        # --- Check for duplicates safely ---
         if isinstance(self.items, (list, set)):
+            if any(sim.id == item.id for sim in self.items):
+                return
             self.items.append(item)
             return
+
         elif isinstance(self.items, TemplatedSimulations):
+            # TemplatedSimulations has its own add_simulation method
+            # It should internally handle duplicates
             self.items.add_simulation(item)
             return
+
         raise ValueError("Items doesn't support appending")
 
     def extend(self, item: Union[List['Simulation'], 'TemplatedSimulations']):  # noqa F821

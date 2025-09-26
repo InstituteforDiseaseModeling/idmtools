@@ -7,6 +7,7 @@ import unittest
 from dataclasses import dataclass, field, fields
 import pytest
 from idmtools.builders import SimulationBuilder
+from idmtools.core import NoPlatformException, ItemType
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
@@ -289,6 +290,84 @@ class TestEntity(ITestWithPersistence):
         s.add_post_creation_hook(inc_count)
         s.post_creation(fake_platform)
 
+class TestExperimentParent:
+
+    @pytest.fixture
+    def experiment(self):
+        """Create a basic experiment instance for testing."""
+        return Experiment(name="test_experiment")
+
+    def test_parent_getter_no_parent(self, experiment):
+        """Test parent getter when no parent is set."""
+        assert experiment.parent is None
+
+    def test_parent_getter_with_parent_id_no_platform(self, experiment):
+        """Test parent getter when parent_id is set but no platform exists."""
+        experiment.parent_id = "test_parent_id"
+        with pytest.raises(NoPlatformException):
+            _ = experiment.parent
+
+    def test_parent_getter_with_parent_id_and_platform(self, experiment):
+        """Test parent getter when both parent_id and platform are set."""
+        # Mock platform and its get_item method
+        mock_platform = MagicMock()
+        mock_suite = MagicMock()
+
+        def add_experiment_impl(experiment):
+            # Simulate the actual add_experiment behavior
+            experiment._parent = mock_suite
+            experiment.parent_id = experiment.suite_id = mock_suite.id
+
+            # Add to experiments list if not already present
+            if not hasattr(mock_suite, '_experiments'):
+                mock_suite._experiments = []
+            if experiment.uid not in [exp.uid for exp in mock_suite._experiments]:
+                mock_suite._experiments.append(experiment)
+
+        mock_platform.get_item.return_value = mock_suite
+
+        experiment.parent_id = "test_parent_id"
+        experiment.platform = mock_platform
+
+        # Get parent
+        parent = experiment.parent
+
+        # Verify platform.get_item was called correctly
+        mock_platform.get_item.assert_called_once_with(
+            "test_parent_id",
+            ItemType.SUITE,
+            force=True
+        )
+        mock_suite.add_experiment.side_effect = add_experiment_impl
+        assert parent == mock_suite
+
+    def test_parent_setter_with_valid_parent(self, experiment):
+        """Test setting a valid parent."""
+        mock_parent = MagicMock()
+        experiment.parent = mock_parent
+
+        # Verify add_experiment was called on parent
+        mock_parent.add_experiment.assert_called_once_with(experiment)
+
+    def test_parent_setter_with_none(self, experiment):
+        """Test setting parent to None."""
+        experiment.parent = None
+        assert experiment._parent is None
+        assert experiment.parent_id is None
+        assert experiment.suite_id is None
+
+    def test_suite_getter(self, experiment):
+        """Test that suite getter returns parent."""
+        mock_parent = MagicMock()
+        experiment.parent = mock_parent
+        assert experiment.suite == mock_parent
+
+    def test_suite_setter(self, experiment):
+        """Test that suite setter sets parent."""
+        mock_suite = MagicMock()
+        experiment.suite = mock_suite
+        assert experiment.parent == mock_suite
+        mock_suite.add_experiment.assert_called_once_with(experiment)
 
 
 if __name__ == '__main__':

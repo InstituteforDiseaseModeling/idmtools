@@ -55,20 +55,6 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
             File Experiment object created
         """
-        # Create suite dir and dump meta if there is suite associated with experiment
-        experiment.parent_id = experiment.parent_id or experiment.suite_id
-        try:
-            parent = experiment.parent
-        except RuntimeError:
-            parent = None
-
-        if parent:
-            self.platform._suites.platform_create(parent)
-        else:
-            # fallback to fetch from parent_id
-            if experiment.parent_id:
-                suite = self.platform.get_item(experiment.parent_id, ItemType.SUITE)
-                self.platform._suites.platform_create(suite)
         self.platform.mk_directory(experiment, exist_ok=True)
         meta = self.platform._metas.dump(experiment)
         self.platform._assets.dump_assets(experiment)

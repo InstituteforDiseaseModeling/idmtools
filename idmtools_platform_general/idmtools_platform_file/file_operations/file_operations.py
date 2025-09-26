@@ -97,11 +97,7 @@ class FileOperations(IOperations):
         elif isinstance(item, Experiment):
             # Prefer parent_id; fallback to suite_id if set
             suite_id = item.parent_id or item.suite_id
-            # Try to access the parent object (may raise RuntimeError if not set or not resolvable)
-            try:
-                parent = item.parent
-            except RuntimeError:
-                parent = None
+            parent = item.parent
             # Case 1: Parent suite object is available, build job_dir/suite/experiment path
             if parent:
                 suite_dir = job_dir / f"s_{self.entity_display_name(parent)}"
