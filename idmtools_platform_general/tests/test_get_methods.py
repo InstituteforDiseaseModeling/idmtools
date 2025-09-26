@@ -14,7 +14,7 @@ from idmtools.utils.collections import ExperimentParentIterator
 if sys.platform == "win32":
     from win32con import FALSE
 from idmtools.builders import SimulationBuilder
-from idmtools.core import ItemType, EntityContainer, UnknownItemException
+from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
@@ -224,7 +224,7 @@ class TestFilePlatform(unittest.TestCase):
         experiment = Experiment("my experiment")
         suite.add_experiment(experiment)
         experiments = suite.get_experiments()
-        self.assertTrue(isinstance(experiments, EntityContainer))
+        self.assertTrue(isinstance(experiments, list))
 
     def test_get_simulations_with_no_platform(self):
         experiment = Experiment("my experiment")
