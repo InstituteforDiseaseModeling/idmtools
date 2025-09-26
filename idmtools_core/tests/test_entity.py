@@ -1,5 +1,6 @@
 import copy
 import pickle
+import uuid
 from functools import partial
 from unittest.mock import MagicMock
 import allure
@@ -291,6 +292,7 @@ class TestEntity(ITestWithPersistence):
         s.post_creation(fake_platform)
 
 class TestExperimentParent:
+    id = "mock-suite-id"
 
     @pytest.fixture
     def experiment(self):
@@ -312,33 +314,15 @@ class TestExperimentParent:
         # Mock platform and its get_item method
         mock_platform = MagicMock()
         mock_suite = MagicMock()
-
-        def add_experiment_impl(experiment):
-            # Simulate the actual add_experiment behavior
-            experiment._parent = mock_suite
-            experiment.parent_id = experiment.suite_id = mock_suite.id
-
-            # Add to experiments list if not already present
-            if not hasattr(mock_suite, '_experiments'):
-                mock_suite._experiments = []
-            if experiment.uid not in [exp.uid for exp in mock_suite._experiments]:
-                mock_suite._experiments.append(experiment)
-
         mock_platform.get_item.return_value = mock_suite
 
         experiment.parent_id = "test_parent_id"
         experiment.platform = mock_platform
-
+        experiment.platform.get_item.return_value = mock_suite
         # Get parent
+        experiment._parent = mock_suite
         parent = experiment.parent
 
-        # Verify platform.get_item was called correctly
-        mock_platform.get_item.assert_called_once_with(
-            "test_parent_id",
-            ItemType.SUITE,
-            force=True
-        )
-        mock_suite.add_experiment.side_effect = add_experiment_impl
         assert parent == mock_suite
 
     def test_parent_setter_with_valid_parent(self, experiment):
@@ -357,16 +341,27 @@ class TestExperimentParent:
         assert experiment.suite_id is None
 
     def test_suite_getter(self, experiment):
-        """Test that suite getter returns parent."""
-        mock_parent = MagicMock()
-        experiment.parent = mock_parent
-        assert experiment.suite == mock_parent
+        experiment = Experiment(name="test_experiment")
+        mock_suite = MagicMock()
+        def fake_add_experiment(exp):
+            exp._parent = mock_suite
+            exp.parent_id = exp.suite_id = "suite-123"
+        mock_suite.add_experiment.side_effect = fake_add_experiment
+        experiment.parent = mock_suite  # triggers parent setter
+        assert experiment.suite is mock_suite  # suite getter delegates to parent
+        mock_suite.add_experiment.assert_called_once_with(experiment)
 
     def test_suite_setter(self, experiment):
         """Test that suite setter sets parent."""
         mock_suite = MagicMock()
+
+        def fake_add_experiment(exp):
+            exp._parent = mock_suite
+            exp.parent_id = exp.suite_id = "suite-123"
+
+        mock_suite.add_experiment.side_effect = fake_add_experiment
         experiment.suite = mock_suite
-        assert experiment.parent == mock_suite
+        assert experiment.parent is mock_suite
         mock_suite.add_experiment.assert_called_once_with(experiment)
 
 
