@@ -233,7 +233,8 @@ class TemplatedSimulations:
         # Set UID=none to ensure it is regenerated
         sim._uid = None
         sim.assets = copy.deepcopy(self.base_simulation.assets)
-        sim.parent = self.parent
+        sim._parent = self.parent
+        sim.parent_id = sim.suite_id = self.parent.id
         return sim
 
     @property
@@ -304,3 +305,7 @@ class TemplatedSimulations:
             TemplatedSimulations from the task
         """
         return TemplatedSimulations(base_task=task, tags=tags)
+
+    def check_duplicate(self, simulation_id: str) -> bool:
+        ids = [sim.id for sim in self.__extra_simulations]
+        return simulation_id in ids

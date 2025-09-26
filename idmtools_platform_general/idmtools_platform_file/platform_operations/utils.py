@@ -213,6 +213,15 @@ class FileExperiment(FileItem, Experiment):
         Args:
             simulation (Simulation): The simulation to add.
         """
+        # Set parent
+        simulation._parent = self
+        simulation.parent_id = simulation.experiment_id = self.id
+
+        # Check possible duplicate
+        ids = [sim.id for sim in self.__simulations]
+        if simulation.id in ids:
+            return
+
         self.__simulations.append(simulation)
 
     @property

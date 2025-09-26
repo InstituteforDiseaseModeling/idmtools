@@ -709,6 +709,22 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
             **kwargs
         )
 
+    def check_duplicate(self, simulation_id: str) -> bool:
+        """
+        Check if a simulation ID already exists.
+        Args:
+            simulation_id: given Simulation ID
+        Returns:
+            True/False
+        """
+        if isinstance(self.simulations.items, (list, set)):
+            ids = [sim.id for sim in self.simulations.items]
+            return simulation_id in ids
+        elif isinstance(self.simulations.items, TemplatedSimulations):
+            return self.simulations.items.check_duplicate(simulation_id)
+        else:
+            return False
+
 
 class ExperimentSpecification(ExperimentPluginSpecification):
     """

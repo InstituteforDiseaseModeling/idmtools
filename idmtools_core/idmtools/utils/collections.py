@@ -134,8 +134,7 @@ class ExperimentParentIterator(typing.Iterator['Simulation']):  # noqa F821
         item.parent_id = item.experiment_id = self.parent.id
 
         # Check possible duplicate
-        ids = [sim.id for sim in self.items]
-        if item.id in ids:
+        if self.parent.check_duplicate(item.id):
             return
 
         # Add to collection
