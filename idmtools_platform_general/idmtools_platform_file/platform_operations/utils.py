@@ -218,7 +218,7 @@ class FileExperiment(FileItem, Experiment):
         simulation.parent_id = simulation.experiment_id = self.id
 
         # Check possible duplicate
-        ids = [sim.id for sim in self.__simulations]
+        ids = [sim.id if isinstance(sim, Simulation) else sim for sim in self.__simulations]
         if simulation.id in ids:
             return
 
