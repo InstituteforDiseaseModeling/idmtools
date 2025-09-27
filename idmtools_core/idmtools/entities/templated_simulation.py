@@ -235,9 +235,9 @@ class TemplatedSimulations:
         sim.assets = copy.deepcopy(self.base_simulation.assets)
         sim._parent = self.parent
         if sim._parent is None:
-            sim.parent_id = sim.suite_id = None
+            sim.parent_id = sim.experiment_id = None
         else:
-            sim.parent_id = sim.suite_id = self.parent.id
+            sim.parent_id = sim.experiment_id = self.parent.id
         return sim
 
     @property
