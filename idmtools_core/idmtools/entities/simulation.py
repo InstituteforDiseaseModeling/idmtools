@@ -86,7 +86,8 @@ class Simulation(IAssetsEnabled, INamedEntity):
                 from idmtools.core import NoPlatformException
                 raise NoPlatformException("The object has no platform set...")
             exp = self.platform.get_item(self.parent_id, ItemType.EXPERIMENT, force=True)
-            exp.add_simulation(self)
+            self._parent = exp
+            self.parent_id = self.suite_id = exp.id
 
         return self._parent
 
@@ -102,7 +103,8 @@ class Simulation(IAssetsEnabled, INamedEntity):
             None
         """
         if parent is not None:
-            parent.add_simulation(self)
+            self._parent = parent
+            self.parent_id = self.suite_id = parent.id
         else:
             self._parent = self.parent_id = self.experiment_id = None
 
