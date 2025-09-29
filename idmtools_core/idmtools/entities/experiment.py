@@ -518,7 +518,6 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
             name = template.base_task.__class__.__name__
         e = Experiment(name=name, tags=tags, assets=AssetCollection() if assets is None else assets)
         e.simulations = template
-        template.parent = e
         return e
 
     def __deepcopy__(self, memo):
