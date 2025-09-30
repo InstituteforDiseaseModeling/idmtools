@@ -111,7 +111,7 @@ class ExperimentParentIterator(typing.Iterator['Simulation']):  # noqa F821
             return sum([len(b) for b in self.items.builders])
         raise ValueError("Cannot get the length of a generator object")
 
-    def append(self, item: 'Simulation'): # noqa F821
+    def append(self, item: 'Simulation'):  # noqa F821
         """
         Adds a simulation to an object.
 
@@ -129,13 +129,12 @@ class ExperimentParentIterator(typing.Iterator['Simulation']):  # noqa F821
         if not isinstance(item, Simulation):
             raise ValueError("You can only append simulations")
 
-        # Set parent
-        item._parent = self.parent
-        item.parent_id = item.experiment_id = self.parent.id
-
         # Check possible duplicate
         if self.parent.check_duplicate(item.id):
             return
+
+        # Set parent
+        item.parent = self.parent
 
         # Add to collection
         if isinstance(self.items, (list, set)):
