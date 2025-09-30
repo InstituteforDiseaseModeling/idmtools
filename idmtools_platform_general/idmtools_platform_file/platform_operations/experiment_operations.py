@@ -320,6 +320,6 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         """
         # Consider Suite
         if experiment.parent:
-            experiment.parent.add_experiment(experiment)  # may not be necessary
+            experiment.parent.add_experiment(experiment)
             self.platform._suites.platform_create(experiment.parent)
         super().run_item(experiment, **kwargs)
