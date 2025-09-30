@@ -36,6 +36,7 @@ from idmtools.utils.entities import get_default_tags
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
     from idmtools.entities.simulation import Simulation  # noqa: F401
+    from idmtools.entities.suite import Suite  # noqa: F401
 
 logger = getLogger(__name__)
 user_logger = getLogger('user')
@@ -211,7 +212,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         Return parent object for item.
 
         Returns:
-            Parent entity if set
+            Parent Suite if set
         """
         if not self._parent:
             self.parent_id = self.parent_id or self.suite_id
@@ -226,7 +227,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         return self._parent
 
     @parent.setter
-    def parent(self, parent: 'IEntity'):
+    def parent(self, parent: 'Suite'):
         """
         Sets the parent object for Entity.
 
