@@ -36,6 +36,7 @@ from idmtools.utils.entities import get_default_tags
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
     from idmtools.entities.simulation import Simulation  # noqa: F401
+    from idmtools.entities.suite import Suite  # noqa: F401
 
 logger = getLogger(__name__)
 user_logger = getLogger('user')
@@ -211,7 +212,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         Return parent object for item.
 
         Returns:
-            Parent entity if set
+            Parent Suite if set
         """
         if not self._parent:
             self.parent_id = self.parent_id or self.suite_id
@@ -226,7 +227,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         return self._parent
 
     @parent.setter
-    def parent(self, parent: 'IEntity'):
+    def parent(self, parent: 'Suite'):
         """
         Sets the parent object for Entity.
 
@@ -721,6 +722,22 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
             max_simulations=max_simulations,
             **kwargs
         )
+
+    def check_duplicate(self, simulation_id: str) -> bool:
+        """
+        Check if a simulation ID already exists.
+        Args:
+            simulation_id: given Simulation ID
+        Returns:
+            True/False
+        """
+        if isinstance(self.simulations.items, (list, set)):
+            ids = [sim.id for sim in self.simulations.items]
+            return simulation_id in ids
+        elif isinstance(self.simulations.items, TemplatedSimulations):
+            return self.simulations.items.check_duplicate(simulation_id)
+        else:
+            return False
 
 
 class ExperimentSpecification(ExperimentPluginSpecification):

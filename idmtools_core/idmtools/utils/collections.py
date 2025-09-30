@@ -65,10 +65,9 @@ class ExperimentParentIterator(typing.Iterator['Simulation']):  # noqa F821
             Next item from our list
         """
         i = next(self.__iter)
-        if getattr(i, "_parent", None) is None:
-            i._parent = self.parent
-            if hasattr(i, 'parent_id') and self.parent.uid is not None:
-                i.parent_id = self.parent.uid
+        i._parent = self.parent
+        if hasattr(i, 'parent_id') and self.parent.uid is not None:
+            i.parent_id = self.parent.uid
         return i
 
     def __getitem__(self, item):
@@ -112,7 +111,7 @@ class ExperimentParentIterator(typing.Iterator['Simulation']):  # noqa F821
             return sum([len(b) for b in self.items.builders])
         raise ValueError("Cannot get the length of a generator object")
 
-    def append(self, item: 'Simulation'): # noqa F821
+    def append(self, item: 'Simulation'):  # noqa F821
         """
         Adds a simulation to an object.
 
@@ -127,27 +126,23 @@ class ExperimentParentIterator(typing.Iterator['Simulation']):  # noqa F821
         """
         from idmtools.entities.templated_simulation import TemplatedSimulations
         from idmtools.entities.simulation import Simulation
-
         if not isinstance(item, Simulation):
             raise ValueError("You can only append simulations")
 
-        # Set parent
-        item._parent = self.parent
-        item.parent_id = item.experiment_id = self.parent.id
+        # Check possible duplicate
+        if self.parent.check_duplicate(item.id):
+            return
 
-        # --- Check for duplicates safely ---
+        # Set parent
+        item.parent = self.parent
+
+        # Add to collection
         if isinstance(self.items, (list, set)):
-            if any(sim.id == item.id for sim in self.items):
-                return
             self.items.append(item)
             return
-
         elif isinstance(self.items, TemplatedSimulations):
-            # TemplatedSimulations has its own add_simulation method
-            # It should internally handle duplicates
             self.items.add_simulation(item)
             return
-
         raise ValueError("Items doesn't support appending")
 
     def extend(self, item: Union[List['Simulation'], 'TemplatedSimulations']):  # noqa F821

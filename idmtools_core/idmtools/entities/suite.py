@@ -39,7 +39,7 @@ class Suite(INamedEntity, ABC, IRunnableEntity):
         """
         Initialize Suite.
         """
-        self.experiments = []
+        self.experiments = EntityContainer()
 
     def add_experiment(self, experiment: 'Experiment') -> 'NoReturn':  # noqa: F821
         """
@@ -141,7 +141,7 @@ class Suite(INamedEntity, ABC, IRunnableEntity):
             EntityContainer: A container of Experiment objects belonging to this suite.
         """
         experiments = self.experiments
-        if experiments is None or len(experiments) == 0:
+        if not experiments:
             experiments = self.platform.get_children(self.id, ItemType.SUITE, force=True)
         return experiments
 
@@ -179,7 +179,7 @@ class Suite(INamedEntity, ABC, IRunnableEntity):
         # First call parent's __setstate__ to restore base attributes
         super().__setstate__(state)
         # Restore the pickle fields with values requested
-        self.experiments = []
+        self.experiments = EntityContainer()
 
 
 ISuiteClass = Type[Suite]

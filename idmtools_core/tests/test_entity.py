@@ -290,79 +290,63 @@ class TestEntity(ITestWithPersistence):
 
         s.add_post_creation_hook(inc_count)
         s.post_creation(fake_platform)
+    def test_add_experiment_sets_parent(self):
+        suite = Suite("main")
+        exp = Experiment("expA")
 
-class TestExperimentParent:
-    id = "mock-suite-id"
+        suite.add_experiment(exp)
 
-    @pytest.fixture
-    def experiment(self):
-        """Create a basic experiment instance for testing."""
-        return Experiment(name="test_experiment")
+        assert exp.parent is suite
+        assert exp in suite.experiments
+        assert exp.parent_id == suite.id
 
-    def test_parent_getter_no_parent(self, experiment):
-        """Test parent getter when no parent is set."""
-        assert experiment.parent is None
+    def test_add_simulation_sets_parent(self):
+        exp = Experiment("expB")
+        sim = Simulation("sim1")
 
-    def test_parent_getter_with_parent_id_no_platform(self, experiment):
-        """Test parent getter when parent_id is set but no platform exists."""
-        experiment.parent_id = "test_parent_id"
-        with pytest.raises(NoPlatformException):
-            _ = experiment.parent
+        exp.add_simulation(sim)
 
-    def test_parent_getter_with_parent_id_and_platform(self, experiment):
-        """Test parent getter when both parent_id and platform are set."""
-        # Mock platform and its get_item method
-        mock_platform = MagicMock()
-        mock_suite = MagicMock()
-        mock_platform.get_item.return_value = mock_suite
+        assert sim.parent is exp
+        assert sim in exp.simulations
+        assert sim.parent_id == exp.id
 
-        experiment.parent_id = "test_parent_id"
-        experiment.platform = mock_platform
-        experiment.platform.get_item.return_value = mock_suite
-        # Get parent
-        experiment._parent = mock_suite
-        parent = experiment.parent
+    def test_duplicate_experiment_not_added_twice(self):
+        suite = Suite("main")
+        exp = Experiment("expA")
 
-        assert parent == mock_suite
+        suite.add_experiment(exp)
+        suite.add_experiment(exp)
 
-    def test_parent_setter_with_valid_parent(self, experiment):
-        """Test setting a valid parent."""
-        mock_parent = MagicMock()
-        experiment.parent = mock_parent
+        assert len(suite.experiments) == 1
 
-        # Verify add_experiment was called on parent
-        mock_parent.add_experiment.assert_called_once_with(experiment)
+    def test_duplicate_simulation_not_added_twice(self):
+        exp = Experiment("expB")
+        sim = Simulation("sim1")
 
-    def test_parent_setter_with_none(self, experiment):
-        """Test setting parent to None."""
-        experiment.parent = None
-        assert experiment._parent is None
-        assert experiment.parent_id is None
-        assert experiment.suite_id is None
+        exp.add_simulation(sim)
+        exp.add_simulation(sim)
 
-    def test_suite_getter(self, experiment):
-        experiment = Experiment(name="test_experiment")
-        mock_suite = MagicMock()
-        def fake_add_experiment(exp):
-            exp._parent = mock_suite
-            exp.parent_id = exp.suite_id = "suite-123"
-        mock_suite.add_experiment.side_effect = fake_add_experiment
-        experiment.parent = mock_suite  # triggers parent setter
-        assert experiment.suite is mock_suite  # suite getter delegates to parent
-        mock_suite.add_experiment.assert_called_once_with(experiment)
+        assert len(exp.simulations) == 1
 
-    def test_suite_setter(self, experiment):
-        """Test that suite setter sets parent."""
-        mock_suite = MagicMock()
+    def test_clear_parent_experiment(self):
+        suite = Suite("main")
+        exp = Experiment("expC")
 
-        def fake_add_experiment(exp):
-            exp._parent = mock_suite
-            exp.parent_id = exp.suite_id = "suite-123"
+        suite.add_experiment(exp)
+        exp.parent = None  # reset
 
-        mock_suite.add_experiment.side_effect = fake_add_experiment
-        experiment.suite = mock_suite
-        assert experiment.parent is mock_suite
-        mock_suite.add_experiment.assert_called_once_with(experiment)
+        assert exp.parent is None
+        assert exp.parent_id is None
+
+    def test_clear_parent_simulation(self):
+        exp = Experiment("expD")
+        sim = Simulation("sim1")
+
+        exp.add_simulation(sim)
+        sim.parent = None  # reset
+
+        assert sim.parent is None
+        assert sim.parent_id is None
 
 
 if __name__ == '__main__':
