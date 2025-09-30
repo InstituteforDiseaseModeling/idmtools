@@ -56,6 +56,7 @@ class FileSuite(FileItem, Suite):
     """
     Represents a Suite loaded from a file platform.
     """
+
     def __init__(self, metas: Dict):
         """
         Initialize a FileSuite object from metadata.
@@ -143,6 +144,7 @@ class FileExperiment(FileItem, Experiment):
     This subclass of `Experiment` maps metadata into a lightweight experiment representation,
     where simulations may initially be stored as either IDs or resolved `Simulation` objects.
     """
+
     def __init__(self, metas: Dict):
         """
         Initialize a FileExperiment from a metadata dictionary.
@@ -213,6 +215,14 @@ class FileExperiment(FileItem, Experiment):
         Args:
             simulation (Simulation): The simulation to add.
         """
+        # Check possible duplicate
+        ids = [sim.id if isinstance(sim, Simulation) else sim for sim in self.__simulations]
+        if simulation.id in ids:
+            return
+
+        # Set parent
+        simulation.parent = self
+
         self.__simulations.append(simulation)
 
     @property
@@ -261,6 +271,7 @@ class FileSimulation(FileItem, Simulation):
         task (Any): Task definition or reference (platform-dependent).
         assets (Any): Asset metadata or collection.
     """
+
     def __init__(self, metas: Dict):
         """
         Constructor.

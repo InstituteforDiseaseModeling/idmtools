@@ -153,7 +153,7 @@ class FilePlatformSimulationOperations(IPlatformSimulationOperations):
         sim.platform = self.platform
         sim.uid = file_sim.uid
         sim.name = file_sim.name
-        sim.parent_id = parent.id
+        sim.parent_id = sim.experiment_id = parent.id
         sim.parent = parent
         sim.tags = file_sim.tags
         sim._platform_object = file_sim

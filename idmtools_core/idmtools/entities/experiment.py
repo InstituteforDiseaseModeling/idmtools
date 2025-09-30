@@ -36,6 +36,7 @@ from idmtools.utils.entities import get_default_tags
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
     from idmtools.entities.simulation import Simulation  # noqa: F401
+    from idmtools.entities.suite import Suite  # noqa: F401
 
 logger = getLogger(__name__)
 user_logger = getLogger('user')
@@ -205,8 +206,28 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         """
         self.parent = suite
 
-    @IEntity.parent.setter
-    def parent(self, parent: 'IEntity'):
+    @property
+    def parent(self):
+        """
+        Return parent object for item.
+
+        Returns:
+            Parent Suite if set
+        """
+        if not self._parent:
+            self.parent_id = self.parent_id or self.suite_id
+            if not self.parent_id:
+                return None
+            if not self.platform:
+                from idmtools.core import NoPlatformException
+                raise NoPlatformException("The object has no platform set...")
+            suite = self.platform.get_item(self.parent_id, ItemType.SUITE, force=True)
+            suite.add_experiment(self)
+
+        return self._parent
+
+    @parent.setter
+    def parent(self, parent: 'Suite'):
         """
         Sets the parent object for Entity.
 
@@ -217,16 +238,9 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
             None
         """
         if parent is not None:
-            try:
-                experiments = getattr(parent, "experiments", None)
-            except AttributeError:
-                experiments = None
-
-            if experiments is None:
-                parent.experiments = [self]
-            elif self not in experiments:  # Avoid duplicate
-                experiments.append(self)
-        IEntity.parent.__set__(self, parent)
+            parent.add_experiment(self)
+        else:
+            self._parent = self.parent_id = self.suite_id = None
 
     def display(self):
         """
@@ -562,7 +576,8 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         """
         p = super()._check_for_platform_from_context(platform)
         if 'wait_on_done' in run_opts:
-            raise TypeError("The 'wait_on_done' parameter has been removed in idmtools 1.8.0. Please update your code with 'wait_until_done'.")
+            raise TypeError(
+                "The 'wait_on_done' parameter has been removed in idmtools 1.8.0. Please update your code with 'wait_until_done'.")
         if regather_common_assets is None:
             regather_common_assets = p.is_regather_assets_on_modify()
         if regather_common_assets and not self.assets.is_editable():
@@ -694,6 +709,22 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
             max_simulations=max_simulations,
             **kwargs
         )
+
+    def check_duplicate(self, simulation_id: str) -> bool:
+        """
+        Check if a simulation ID already exists.
+        Args:
+            simulation_id: given Simulation ID
+        Returns:
+            True/False
+        """
+        if isinstance(self.simulations.items, (list, set)):
+            ids = [sim.id for sim in self.simulations.items]
+            return simulation_id in ids
+        elif isinstance(self.simulations.items, TemplatedSimulations):
+            return self.simulations.items.check_duplicate(simulation_id)
+        else:
+            return False
 
 
 class ExperimentSpecification(ExperimentPluginSpecification):
