@@ -668,18 +668,6 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         Returns:
             None
         """
-        from idmtools.entities.simulation import Simulation
-        if not isinstance(item, Simulation):
-            raise ValueError("You can only add Simulation objects")
-
-        # Prevent duplicates
-        items = getattr(self.simulations, "items", None)
-        if isinstance(items, (list, set)) and any(s.id == item.id for s in items):
-            return
-
-        # Set child's parent (safe, no recursion)
-        item.parent = self
-
         # Append into underlying collection
         self.simulations.append(item)
 
