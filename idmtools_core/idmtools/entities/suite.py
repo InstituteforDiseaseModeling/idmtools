@@ -48,13 +48,13 @@ class Suite(INamedEntity, ABC, IRunnableEntity):
         Args:
             experiment: the experiment to be linked to suite
         """
-        ids = [exp.uid for exp in self.experiments]
-        if experiment.uid in ids:
-            return
-
         # Link the suite to the experiment. Assumes the experiment suite setter adds the experiment to the suite.
         experiment._parent = self
         experiment.parent_id = experiment.suite_id = self.id
+
+        ids = [exp.uid for exp in self.experiments]
+        if experiment.uid in ids:
+            return
 
         # add experiment
         self.experiments.append(experiment)
