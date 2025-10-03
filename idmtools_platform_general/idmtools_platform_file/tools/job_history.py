@@ -8,7 +8,6 @@ from pathlib import Path
 from datetime import datetime
 from typing import NoReturn, Dict, Tuple, List
 from idmtools.core import ItemType
-from idmtools.core.context import get_current_platform
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
 from idmtools_platform_container.utils.general import normalize_path, is_valid_uuid
