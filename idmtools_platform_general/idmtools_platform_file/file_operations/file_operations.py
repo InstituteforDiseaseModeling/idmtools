@@ -9,7 +9,7 @@ import shutil
 from dataclasses import dataclass
 from logging import getLogger
 from pathlib import Path
-from typing import Union
+from typing import Union, Optional
 from idmtools.core import ItemType, EntityStatus
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
@@ -17,7 +17,7 @@ from idmtools.entities.simulation import Simulation
 from idmtools_platform_file.assets import generate_script, generate_simulation_script
 from idmtools_platform_file.file_operations.operations_interface import IOperations
 from idmtools_platform_file.platform_operations.utils import FILE_MAPS, validate_file_path_length, \
-    clean_experiment_name, validate_folder_files_path_length, FileExperiment, FileSimulation, FileSuite
+    clean_item_name, validate_folder_files_path_length, FileExperiment, FileSimulation, FileSuite
 from idmtools.utils.decorators import check_symlink_capabilities
 
 logger = getLogger(__name__)
@@ -38,23 +38,18 @@ class FileOperations(IOperations):
         Returns:
             str
         """
-        if self.platform.name_directory:
-            if isinstance(item, Simulation):
-                if self.platform.sim_name_directory:
-                    if item.name:
-                        title = f"{clean_experiment_name(item.name)}_{item.id}"
-                    else:
-                        title = item.id
-                else:
-                    title = item.id
-            else:
-                if item.name:
-                    title = f"{clean_experiment_name(item.name)}_{item.id}"
-                else:
-                    title = item.id
+        use_name = getattr(self.platform, "name_directory", False)
+        use_sim_name = getattr(self.platform, "sim_name_directory", True)
+
+        # Determine if we should include name
+        if isinstance(item, Simulation) and not use_sim_name:
+            use_name = False
+
+        if use_name and getattr(item, "name", None):
+            safe_name = clean_item_name(item.name, maxlen=self.platform.maxlen)
+            return f"{safe_name}_{item.id}"
         else:
-            title = item.id
-        return title
+            return item.id
 
     def get_directory(self, item: Union[Suite, Experiment, Simulation]) -> Path:
         """
@@ -64,29 +59,24 @@ class FileOperations(IOperations):
         Returns:
             item file directory
         """
+        job_dir = Path(self.platform.job_directory)
         if isinstance(item, (FileSimulation, FileExperiment, FileSuite)):
             item_dir = item.get_directory()
         elif isinstance(item, Suite):
-            item_dir = Path(self.platform.job_directory, self.entity_display_name(item))
+            return job_dir / f"s_{self.entity_display_name(item)}"
         elif isinstance(item, Experiment):
-            suite_id = item.parent_id or item.suite_id
-            if suite_id is None:
-                raise RuntimeError("Experiment missing parent!")
-            suite = None
-            try:
-                suite = self.platform.get_item(suite_id, ItemType.SUITE)
-            except RuntimeError:
-                pass
-            if suite is None:
-                suite = item.parent
-            suite_dir = Path(self.platform.job_directory, self.entity_display_name(suite))
-            item_dir = Path(suite_dir, self.entity_display_name(item))
+            parent = item.parent
+            if parent:  # Case 1: Parent suite object is available, build job_dir/suite/experiment path
+                suite_dir = job_dir / f"s_{self.entity_display_name(parent)}"
+                return suite_dir / f"e_{self.entity_display_name(item)}"
+            else:  # Case 2: No parent or suite_id — build job_dir/experiment path
+                return job_dir / f"e_{self.entity_display_name(item)}"
         elif isinstance(item, Simulation):
             exp = item.parent
             if exp is None:
                 raise RuntimeError("Simulation missing parent!")
             exp_dir = self.get_directory(exp)
-            item_dir = Path(exp_dir, self.entity_display_name(item))
+            return exp_dir / self.entity_display_name(item)
         else:
             raise RuntimeError(f"Get directory is not supported for {type(item)} object on FilePlatform")
 

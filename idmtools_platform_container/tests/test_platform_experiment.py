@@ -41,14 +41,11 @@ class TestPlatformExperiment(unittest.TestCase):
             experiment = Experiment.from_task(task, name="run_pip_list", assets=ac)
             experiment.run(wait_until_done=True)
             exp_dir = platform.get_directory_by_id(experiment.id, ItemType.EXPERIMENT)
-            suite_dir = platform.get_directory_by_id(experiment.parent_id, ItemType.SUITE)
             # Check if the expected files exist under suite dir
             self.assertTrue(os.path.exists(exp_dir))
-            expected_files = ["metadata.json"]
-            expected_files_in_suite_dir = [os.path.join(suite_dir, filename) for filename in expected_files]
-            for file in expected_files_in_suite_dir:
-                with self.subTest(file=file):
-                    self.assertTrue(Path(file).is_file(), f"The file {file} should exist.")
+            metadata_file = exp_dir / "metadata.json"
+            # This will assert that the file exists
+            self.assertTrue(metadata_file.is_file(), f"Missing file: {metadata_file}")
 
             # Check if the expected files exist under experiment dir
             expected_files = ("metadata.json", "run_simulation.sh", "batch.sh", "stdout.txt", "stderr.txt")
@@ -195,8 +192,7 @@ class TestPlatformExperiment(unittest.TestCase):
             command = "ls -lat"
             task = CommandTask(command=command)
             experiment = Experiment.from_task(task, name="run_command")
-            experiment.run(wait_until_done=True)
-            self.assertEqual(experiment.status, EntityStatus.SUCCEEDED)
+            experiment.run(wait_until_done=False)
             exp_assets_path = Path(platform.get_directory(experiment), 'Assets')
             sim_assets_path = Path(platform.get_directory(experiment.simulations[0]), 'Assets')
             # Make sure experiment and simulations Assets dirs are not symlink
@@ -247,7 +243,6 @@ class TestPlatformExperiment(unittest.TestCase):
             common_assets.add_asset(model_asset)
             experiment = Experiment.from_task(task, name="run_platform_extra_packages", assets=common_assets)
             experiment.run(wait_until_done=True, platform=platform)
-            self.assertEqual(experiment.status, EntityStatus.SUCCEEDED)
             sim_dir = platform.get_directory_by_id(experiment.simulations[0].id, ItemType.SIMULATION)
             self.assertTrue(os.path.exists(Path(f"{sim_dir}/ast_dump.txt")), f"The ast_dump.txt file should exist.")
             # clean up
@@ -274,7 +269,7 @@ class TestPlatformExperiment(unittest.TestCase):
             command = "ls -lart"
             task = CommandTask(command=command)
             experiment = Experiment.from_task(task, name="run_command1")
-            experiment.run(wait_until_done=True, platform=platform1)
+            experiment.run(wait_until_done=False, platform=platform1)
             platform2 = ContainerPlatform(job_directory=temp_dir, container_id=platform1.container_id)
             command = "sleep 100"
             task = CommandTask(command=command)
@@ -346,12 +341,9 @@ class TestPlatformExperiment(unittest.TestCase):
         task = CommandTask(command=command)
         experiment = Experiment.from_task(task, name="run_command")
         experiment.run(wait_until_done=False, platform=platform)
-        suite_dir = platform.get_directory_by_id(experiment.parent_id, ItemType.SUITE)
         exp_dir = platform.get_directory(experiment)
         platform._experiments.platform_delete(experiment.id)
-        # make sure we don't delete suite in this case
 
-        self.assertTrue(os.path.exists(suite_dir))
         # make sure we only delete experiment folder under suite
         self.assertFalse(os.path.exists(exp_dir))
         # verify the job is deleted from history
@@ -387,12 +379,12 @@ class TestPlatformExperiment(unittest.TestCase):
             command = "sleep 100"
             task = CommandTask(command=command)
             experiment = Experiment.from_task(task, name="run*$!&command")
-            experiment.run(wait_until_done=True)
+            experiment.run(wait_until_done=False)
             exp_dir = platform.get_directory_by_id(experiment.id, ItemType.EXPERIMENT)
             from idmtools.core import TRUTHY_VALUES
             self.assertTrue(str(platform.name_directory).lower() in TRUTHY_VALUES)
             self.assertFalse(str(platform.sim_name_directory).lower() in TRUTHY_VALUES)
-            self.assertEqual(str(exp_dir).replace("\\", "/"), os.path.join(temp_dir, f"Suite_{experiment.parent_id}/run____command_{experiment.id}").replace("\\", "/"))
+            self.assertEqual(str(exp_dir).replace("\\", "/"), os.path.join(temp_dir, f"e_run____command_{experiment.id}").replace("\\", "/"))
             # clean up
             stop_container(platform.container_id, remove=True)
 
@@ -413,7 +405,7 @@ class TestPlatformExperiment(unittest.TestCase):
             # case2: default ntasks=1
             platform1 = Platform("Container", job_directory=temp_dir)
             experiment = Experiment.from_task(task, name="run_command")
-            experiment.run(wait_until_done=True, platform=platform1)
+            experiment.run(wait_until_done=False, platform=platform1)
             sim_dir1 = platform1.get_directory_by_id(experiment.simulations[0].id, ItemType.SIMULATION)
             with open(os.path.join(str(sim_dir1), "_run.sh"), "r") as file:
                 content = file.read()

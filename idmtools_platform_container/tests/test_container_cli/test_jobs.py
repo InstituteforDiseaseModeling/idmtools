@@ -16,6 +16,7 @@ from helper import get_actual_rich_table_values
 
 
 @pytest.mark.serial
+@pytest.mark.cli
 class TestContainerPlatformJobCli(TestContainerPlatformCliBase):
 
     @patch('rich.console.Console.print')

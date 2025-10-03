@@ -289,11 +289,12 @@ class FileSimulation(FileItem, Simulation):
         self.assets = metas['assets']
 
 
-def clean_experiment_name(experiment_name: str) -> str:
+def clean_item_name(experiment_name: str, maxlen: int = 30) -> str:
     """
     Handle some special characters in experiment names.
     Args:
         experiment_name: name of the experiment
+        maxlen: max length of the experiment name
     Returns:
         the experiment name allowed for use
     """
@@ -303,7 +304,9 @@ def clean_experiment_name(experiment_name: str) -> str:
     clean_names_expr = re.compile(f'[{re.escape("".join(chars_to_replace))}]')
 
     experiment_name = clean_names_expr.sub("_", experiment_name)
-    return experiment_name.encode("ascii", "ignore").decode('utf8').strip()
+    s = experiment_name.encode("ascii", "ignore").decode('utf8').strip()
+    # Truncate to maxlen
+    return s[:maxlen]
 
 
 def add_dummy_suite(experiment: Experiment, suite_name: str = None, tags: Dict = None) -> Suite:

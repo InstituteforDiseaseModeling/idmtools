@@ -23,7 +23,6 @@ from idmtools.core.interfaces.inamed_entity import INamedEntity
 from idmtools.core.interfaces.irunnable_entity import IRunnableEntity
 from idmtools.core.logging import SUCCESS, NOTICE
 from idmtools.entities.itask import ITask
-from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools.registry.experiment_specification import ExperimentPluginSpecification, get_model_impl, \
@@ -669,6 +668,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         Returns:
             None
         """
+        # Append into underlying collection
         self.simulations.append(item)
 
     def add_simulations(self, item: Union[List['Simulation'], 'TemplatedSimulations']):  # noqa F821

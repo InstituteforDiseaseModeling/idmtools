@@ -11,7 +11,7 @@ from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools.entities.command_task import CommandTask
 cwd = os.path.dirname(__file__)
 sys.path.append(cwd)
-from helper import remove_dir, verify_result, get_dirs_and_files
+from helper import remove_dir, verify_result, get_dirs_and_files, verify_result_experiment
 
 
 @pytest.mark.smoke
@@ -39,7 +39,7 @@ class TestSuiteExperiment(ITestWithPersistence):
     def test_0(self):
         experiment = Experiment.from_task(self.task, name="run_task")
         experiment.run(platform=self.platform, wait_until_done=False, dry_run=True)
-        verify_result(self, experiment.parent)
+        verify_result_experiment(self, experiment)
 
     # Case 1,2,3,4 test with suite.add_experiment(experiment)
     # Verify suite.run with new suite
@@ -187,8 +187,8 @@ class TestSuiteExperiment(ITestWithPersistence):
         # add suite.id as experiment.parent_id
         experiment = Experiment.from_task(self.task, name="run_task")
         experiment.parent_id = suite.id
-        suite.run(platform=self.platform, wait_until_done=False, dry_run=True)
-        self.verify_suite_only_case(suite)
+        experiment.run(platform=self.platform, wait_until_done=False, dry_run=True)
+        verify_result(self, suite)
 
     # Verify experiment.run with suite not existing yet, it will throw RunTimeError
     def test_16(self):
@@ -197,7 +197,7 @@ class TestSuiteExperiment(ITestWithPersistence):
         experiment.parent_id = suite.id
         with self.assertRaises(RuntimeError) as ex:
             experiment.run(platform=self.platform, wait_until_done=False, dry_run=True)
-        self.assertEqual(ex.exception.args[0], f"Not found Experiment with id '{experiment.id}'")
+        self.assertEqual(ex.exception.args[0], f"Not found Suite with id '{suite.id}'")
 
     # Case 17, 18 test with experiment.suite_id = suite.id
     # Verify experiment.run with existing suite.id
@@ -233,11 +233,11 @@ class TestSuiteExperiment(ITestWithPersistence):
         experiment.run(platform=self.platform, wait_until_done=False, dry_run=True)
         verify_result(self, suite)
 
-    # Verify create suite/experiment with platform.run_items(experiment)
+    # Verify create experiment only
     def test_21(self):
         experiment = Experiment.from_task(self.task, name="run_task")
         self.platform.run_items(items=experiment, wait_until_done=False, dry_run=True)
-        verify_result(self, experiment.suite)
+        verify_result_experiment(self, experiment)
 
     # Verify create suite/experiment with platform.run_items(suite)
     def test_22(self):

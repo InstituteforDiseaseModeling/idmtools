@@ -11,7 +11,7 @@ from idmtools.core import ItemType
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.iplatform_ops.iplatform_simulation_operations import IPlatformSimulationOperations
-from idmtools_platform_file.platform_operations.utils import FileSimulation, FileExperiment, clean_experiment_name
+from idmtools_platform_file.platform_operations.utils import FileSimulation, FileExperiment, clean_item_name
 from logging import getLogger
 
 logger = getLogger(__name__)
@@ -58,7 +58,7 @@ class FilePlatformSimulationOperations(IPlatformSimulationOperations):
         Returns:
             File Simulation object created.
         """
-        simulation.name = clean_experiment_name(simulation.experiment.name if not simulation.name else simulation.name)
+        simulation.name = clean_item_name(simulation.experiment.name if not simulation.name else simulation.name, maxlen=self.platform.maxlen)
 
         # Generate Simulation folder structure
         self.platform.mk_directory(simulation)
@@ -196,7 +196,7 @@ class FilePlatformSimulationOperations(IPlatformSimulationOperations):
         sim = self.platform.get_item(sim_id, ItemType.SIMULATION, raw=False)
         try:
             shutil.rmtree(self.platform.get_directory(sim))
-        except RuntimeError:
+        except Exception:
             logger.info(f"Could not delete the simulation: {sim_id}..")
             return
 
