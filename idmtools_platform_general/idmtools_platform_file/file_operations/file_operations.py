@@ -30,36 +30,6 @@ class FileOperations(IOperations):
     Implement operations_interface.
     """
 
-    def entity_display_name_new(
-            self,
-            *,
-            id: str,
-            name: Optional[str],
-            item_type: ItemType
-    ) -> str:
-        """
-        Generate a lightweight display name for Suite, Experiment, or Simulation.
-
-        Args:
-            id: The unique ID of the entity.
-            name: Optional name string (may be None or empty).
-            item_type: The type of the item (Suite, Experiment, Simulation).
-
-        Returns:
-            A safe, display-friendly string.
-        """
-        use_name = getattr(self.platform, "name_directory", False)
-        use_sim_name = getattr(self.platform, "sim_name_directory", True)
-
-        if item_type == ItemType.SIMULATION and not use_sim_name:
-            use_name = False
-
-        if use_name and name:
-            safe_name = clean_item_name(name)
-            return f"{safe_name}_{id}"
-        else:
-            return id
-
     def entity_display_name(self, item: Union[Suite, Experiment, Simulation]) -> str:
         """
         Get display name for entity.
@@ -76,7 +46,7 @@ class FileOperations(IOperations):
             use_name = False
 
         if use_name and getattr(item, "name", None):
-            safe_name = clean_item_name(item.name)
+            safe_name = clean_item_name(item.name, maxlen=self.platform.maxlen)
             return f"{safe_name}_{item.id}"
         else:
             return item.id

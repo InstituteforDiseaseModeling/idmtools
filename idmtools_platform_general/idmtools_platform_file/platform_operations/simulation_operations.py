@@ -58,7 +58,7 @@ class FilePlatformSimulationOperations(IPlatformSimulationOperations):
         Returns:
             File Simulation object created.
         """
-        simulation.name = clean_item_name(simulation.experiment.name if not simulation.name else simulation.name)
+        simulation.name = clean_item_name(simulation.experiment.name if not simulation.name else simulation.name, maxlen=self.platform.maxlen)
 
         # Generate Simulation folder structure
         self.platform.mk_directory(simulation)
