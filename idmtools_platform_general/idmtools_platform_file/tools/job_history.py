@@ -70,13 +70,23 @@ class JobHistory:
 
         # Get current datetime
         current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        new_item = {"JOB_DIRECTORY": normalize_path(job_dir),
-                    "SUITE_ID": experiment.parent_id,
-                    "EXPERIMENT_DIR": normalize_path(platform.get_directory(experiment)),
-                    "EXPERIMENT_NAME": experiment.name,
-                    "EXPERIMENT_ID": experiment.id,
-                    "CONTAINER": container_id,
-                    "CREATED": current_datetime}
+        if experiment.parent:
+            new_item = {"JOB_DIRECTORY": normalize_path(job_dir),
+                        "SUITE_DIR": normalize_path(platform.get_directory(experiment.parent)),
+                        "SUITE_NAME": experiment.parent.name,
+                        "SUITE_ID": experiment.parent_id,
+                        "EXPERIMENT_DIR": normalize_path(platform.get_directory(experiment)),
+                        "EXPERIMENT_NAME": experiment.name,
+                        "EXPERIMENT_ID": experiment.id,
+                        "CONTAINER": container_id,
+                        "CREATED": current_datetime}
+        else:
+            new_item = {"JOB_DIRECTORY": normalize_path(job_dir),
+                        "EXPERIMENT_DIR": normalize_path(platform.get_directory(experiment)),
+                        "EXPERIMENT_NAME": experiment.name,
+                        "EXPERIMENT_ID": experiment.id,
+                        "CONTAINER": container_id,
+                        "CREATED": current_datetime}
         cache.set(experiment.id, new_item)
         cache.close()
 
@@ -142,7 +152,6 @@ class JobHistory:
 
         cache = cls.history
         item = cache.get(item_id)
-        platform = get_current_platform()
         # Consider Experiment case
         if item:
             return Path(item['EXPERIMENT_DIR']), ItemType.EXPERIMENT
@@ -284,10 +293,6 @@ class JobHistory:
             if not root.exists():
                 cache.pop(key)
                 logger.debug(f"Remove job {key} from job history.")
-                if suite_path:
-                    import shutil
-                    shutil.rmtree(suite_path, ignore_errors=False)
-                    logger.debug(f"Remove suite {suite_id} from directory.")
 
         cache.close()
 

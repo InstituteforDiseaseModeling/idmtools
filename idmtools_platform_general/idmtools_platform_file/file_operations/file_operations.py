@@ -95,23 +95,11 @@ class FileOperations(IOperations):
         elif isinstance(item, Suite):
             return job_dir / f"s_{self.entity_display_name(item)}"
         elif isinstance(item, Experiment):
-            # Prefer parent_id; fallback to suite_id if set
-            suite_id = item.parent_id or item.suite_id
             parent = item.parent
-            # Case 1: Parent suite object is available, build job_dir/suite/experiment path
-            if parent:
+            if parent:  # Case 1: Parent suite object is available, build job_dir/suite/experiment path
                 suite_dir = job_dir / f"s_{self.entity_display_name(parent)}"
                 return suite_dir / f"e_{self.entity_display_name(item)}"
-
-            # Case 2: No suite object, but suite_id is set — try to load suite from platform
-            # then build job_dir/suite/experiment path
-            if suite_id:  # Try to retrieve suite from platform
-                suite = self.platform.get_item(suite_id, ItemType.SUITE, raw=True)
-                suite_dir = job_dir / f"s_{self.entity_display_name(suite)}"
-                return suite_dir / f"e_{self.entity_display_name(item)}"
-
-            # Case 3: No parent or suite_id — place experiment directly under job_dir
-            else:
+            else:  # Case 2: No parent or suite_id — build job_dir/experiment path
                 return job_dir / f"e_{self.entity_display_name(item)}"
         elif isinstance(item, Simulation):
             exp = item.parent

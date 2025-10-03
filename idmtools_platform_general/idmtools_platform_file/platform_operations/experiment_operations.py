@@ -117,13 +117,9 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
             None
         """
         # Ensure parent
-        if experiment.parent:
-            experiment.parent.add_experiment(experiment)
-            self.platform._metas.dump(experiment.parent)
-            # Output
-            suite_id = experiment.parent_id or experiment.suite_id
-            user_logger.info(f'suite: {str(suite_id)}')
         self.platform._metas.dump(experiment)
+        if experiment.parent:
+            user_logger.info(f'suite: {str(experiment.parent.id)}')
 
         user_logger.info(f'job_directory: {Path(self.platform.job_directory).resolve()}')
         user_logger.info(f'experiment: {experiment.id}')
@@ -200,10 +196,8 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         exp.uid = file_exp.uid
         exp.name = file_exp.name
         if parent:
-            exp.parent_id = parent.id
             exp.parent = parent
         elif file_exp.suite_id:
-            exp.parent_id = file_exp.suite_id
             exp.parent = self.platform.get_item(file_exp.suite_id, ItemType.SUITE, force=True)
         exp.tags = file_exp.tags
         exp._platform_object = file_exp
