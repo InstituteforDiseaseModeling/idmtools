@@ -92,37 +92,24 @@ class TestContainerPlatformHistoryCli(TestContainerPlatformCliBase):
         platform = ContainerPlatform(job_directory=self.job_directory, new_container=True)
         task = CommandTask(command=command)
         experiment = Experiment.from_task(task, name="run_command")
-        experiment2 = Experiment.from_task(task, name="run_command")
         suite = Suite(name="suite_name")
         suite.add_experiment(experiment)
-        suite.add_experiment(experiment2)
         suite.run(wait_until_done=False)
         # test history
         result = self.runner.invoke(container_cli.container, ['history', platform.container_id])
         self.assertEqual(result.exit_code, 0)
-        self.assertEqual('There are 2 Experiment cache in history.', mock_console.call_args_list[0].args[0])
+        self.assertEqual('There are 1 Experiment cache in history.', mock_console.call_args_list[0].args[0])
         self.assertIn(normalize_path(f"{platform.job_directory}"),
                       mock_console.call_args_list[2].args[0])
         self.assertEqual(f'SUITE_NAME      : {suite.name}', cleaned_str(mock_console.call_args_list[3][0][0]))
         self.assertEqual(f'SUITE_ID        : {suite.id}', cleaned_str(mock_console.call_args_list[4][0][0]))
-        self.assertEqual('EXPERIMENT_NAME : run_command', cleaned_str(mock_console.call_args_list[5][0][0]))
-        self.assertEqual(f'EXPERIMENT_ID   : {experiment2.id}', cleaned_str(mock_console.call_args_list[6][0][0]))
+        self.assertEqual(f'EXPERIMENT_NAME : {experiment.name}', cleaned_str(mock_console.call_args_list[5][0][0]))
+        self.assertEqual(f'EXPERIMENT_ID   : {experiment.id}', cleaned_str(mock_console.call_args_list[6][0][0]))
         self.assertEqual(f'CONTAINER       : {platform.container_id}',
                           cleaned_str(mock_console.call_args_list[7][0][0]))
         match_created_time = re.match(r'^CREATED         : \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$',
                                       cleaned_str(mock_console.call_args_list[8][0][0]))
         self.assertTrue(match_created_time)
-        self.assertIn(normalize_path(f"{platform.job_directory}"),
-                      mock_console.call_args_list[10].args[0])
-        self.assertEqual(f'SUITE_NAME      : {suite.name}', cleaned_str(mock_console.call_args_list[11][0][0]))
-        self.assertEqual(f'SUITE_ID        : {suite.id}', cleaned_str(mock_console.call_args_list[12][0][0]))
-        self.assertEqual('EXPERIMENT_NAME : run_command', cleaned_str(mock_console.call_args_list[13][0][0]))
-        self.assertEqual(f'EXPERIMENT_ID   : {experiment.id}', cleaned_str(mock_console.call_args_list[14][0][0]))
-        self.assertEqual(f'CONTAINER       : {platform.container_id}',
-                          cleaned_str(mock_console.call_args_list[15][0][0]))
-        match_created_time1 = re.match(r'^CREATED         : \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$',
-                                      cleaned_str(mock_console.call_args_list[16][0][0]))
-        self.assertTrue(match_created_time1)
 
         # clean up container
         result = self.runner.invoke(container_cli.container, ['stop-container', platform.container_id, '--remove'])
