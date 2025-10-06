@@ -9,7 +9,7 @@ import shutil
 from dataclasses import dataclass
 from logging import getLogger
 from pathlib import Path
-from typing import Union, Optional
+from typing import Union
 from idmtools.core import ItemType, EntityStatus
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment

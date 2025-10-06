@@ -159,7 +159,6 @@ class JobHistory:
             value = cache.get(key)
             suite_id = value.get('SUITE_ID')
             exp_dir = value.get('EXPERIMENT_DIR')
-            job_dir = value.get('JOB_DIRECTORY')
 
             # Consider Suite case
             if suite_id == item_id:
@@ -280,7 +279,6 @@ class JobHistory:
     def sync(cls) -> NoReturn:
         """Sync job history."""
         cache = cls.history
-        suite_path = None
         for key in cache:
             value = cache.get(key)
             exp_dir = value.get('EXPERIMENT_DIR')
