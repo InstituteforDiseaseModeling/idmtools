@@ -2,25 +2,28 @@
 # Replace the following lines with above line after the offical image is available
 #############################################################
 FROM rockylinux:9.2
-# Set the timezone and the frontend
-ENV TZ=UTC DEBIAN_FRONTEND=noninteractive
-# To suppress warning without altering the installation when pip install with root user
-ENV PIP_ROOT_USER_ACTION=ignore
-# Install the necessary packages
-RUN yum -y install rpm dnf-plugins-core \
- && yum -y update \
- && dnf -y install \
-    python3 \
-    python3-devel \
-    mpich \
-    snappy \
-    glibc-devel \
-    epel-release \
-    wget \
-    nano
 
-# Update the system
-RUN yum clean all
+ENV TZ=UTC \
+    DEBIAN_FRONTEND=noninteractive \
+    PIP_ROOT_USER_ACTION=ignore \
+    PATH="${PATH}:/usr/lib64/mpich/bin" \
+    LD_LIBRARY_PATH="/usr/lib64/mpich/lib:${LD_LIBRARY_PATH:-}"
+
+# Install the necessary packages
+RUN set -eux; \
+    dnf -y clean all && \
+    dnf -y install dnf-plugins-core epel-release && \
+    dnf config-manager --set-enabled crb && \
+    dnf -y update && \
+    dnf -y install \
+        python3 \
+        python3-devel \
+        mpich \
+        snappy \
+        glibc-devel \
+        wget \
+        nano && \
+    dnf clean all
 
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone # This is for setting up the timezone
 
@@ -33,10 +36,6 @@ RUN mkdir /root/.pip
 # Copy the pip configuration file
 COPY pip.conf /root/.pip
 
-# Set the path and library path
-ENV PATH ${PATH}:/usr/lib64/mpich/bin
-ENV LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:/usr/lib64/mpich/lib
-
 # Add the requirements file
 ADD requirements.txt /tmp/
 
@@ -44,7 +43,7 @@ ADD requirements.txt /tmp/
 ARG CONTAINER_VERSION
 
 # Install the packages
-RUN bash -c "pip3 install -r /tmp/requirements.txt"
+RUN pip3 install -r /tmp/requirements.txt
 
 # -----------------------------
 # ADD ENTRYPOINT SCRIPT FOR NON-ROOT USER SUPPORT
