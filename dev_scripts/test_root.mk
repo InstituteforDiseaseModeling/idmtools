@@ -94,6 +94,9 @@ test-python: reports-exist ## Run our python tests
 test-ssmt: reports-exist ## Run our ssmt tests
 	$(TEST_COMMAND) -m "ssmt"
 
+test-cli: reports-exist ## Run any tests that takes more than 30s
+	$(TEST_COMMAND) -m "cli"
+
 test-smoke: reports-exist ## Run our smoke tests
 ifneq (1, $(PARALLEL_TESTING)) # Only run these tests if Parallel Only Testing is disabled
 	-echo "Running Serial Tests"

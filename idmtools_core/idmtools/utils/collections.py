@@ -111,7 +111,7 @@ class ExperimentParentIterator(typing.Iterator['Simulation']):  # noqa F821
             return sum([len(b) for b in self.items.builders])
         raise ValueError("Cannot get the length of a generator object")
 
-    def append(self, item: 'Simulation'): # noqa F821
+    def append(self, item: 'Simulation'):  # noqa F821
         """
         Adds a simulation to an object.
 
@@ -128,6 +128,15 @@ class ExperimentParentIterator(typing.Iterator['Simulation']):  # noqa F821
         from idmtools.entities.simulation import Simulation
         if not isinstance(item, Simulation):
             raise ValueError("You can only append simulations")
+
+        # Check possible duplicate
+        if self.parent.check_duplicate(item.id):
+            return
+
+        # Set parent
+        item.parent = self.parent
+
+        # Add to collection
         if isinstance(self.items, (list, set)):
             self.items.append(item)
             return
@@ -147,15 +156,16 @@ class ExperimentParentIterator(typing.Iterator['Simulation']):  # noqa F821
             None
 
         Raises:
-            ValueError when the underlying data object doesn't supporting adding additional item
+            ValueError when the underlying data object doesn't support adding additional item
         """
         from idmtools.entities.templated_simulation import TemplatedSimulations
         if isinstance(self.items, (list, set)):
-            # if it is a template, try to preserve so we can user generators
+            # if it is a template, try to preserve so we can use generators
             if isinstance(item, TemplatedSimulations):
-                self.items.extend(list(item))
+                self.extend(list(item))
             else:
-                self.items.extend(item)
+                for it in item:
+                    self.append(it)
             return
         if isinstance(self.items, TemplatedSimulations):
             if isinstance(item, TemplatedSimulations):

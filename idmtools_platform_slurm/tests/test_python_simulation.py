@@ -86,7 +86,7 @@ class TestPythonSimulation(ITestWithPersistence):
                     # verify Assets folder under simulation is symlink and it link to experiment's Assets
                     self.assertTrue(os.path.islink(asserts_dir))
                     target_link = pathlib.Path(asserts_dir).resolve()
-                    self.assertEqual(os.path.basename(target_link.parent), f"{experiment.name}_{experiment.id}")
+                    self.assertEqual(os.path.basename(target_link.parent), f"e_{experiment.name}_{experiment.id}")
                     count = count + 1
                 files.extend(filenames)
             self.assertSetEqual(set(files), set(["metadata.json", "_run.sh", "config.json"]))

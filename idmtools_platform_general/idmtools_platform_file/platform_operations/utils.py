@@ -56,6 +56,7 @@ class FileSuite(FileItem, Suite):
     """
     Represents a Suite loaded from a file platform.
     """
+
     def __init__(self, metas: Dict):
         """
         Initialize a FileSuite object from metadata.
@@ -143,6 +144,7 @@ class FileExperiment(FileItem, Experiment):
     This subclass of `Experiment` maps metadata into a lightweight experiment representation,
     where simulations may initially be stored as either IDs or resolved `Simulation` objects.
     """
+
     def __init__(self, metas: Dict):
         """
         Initialize a FileExperiment from a metadata dictionary.
@@ -213,6 +215,14 @@ class FileExperiment(FileItem, Experiment):
         Args:
             simulation (Simulation): The simulation to add.
         """
+        # Check possible duplicate
+        ids = [sim.id if isinstance(sim, Simulation) else sim for sim in self.__simulations]
+        if simulation.id in ids:
+            return
+
+        # Set parent
+        simulation.parent = self
+
         self.__simulations.append(simulation)
 
     @property
@@ -261,6 +271,7 @@ class FileSimulation(FileItem, Simulation):
         task (Any): Task definition or reference (platform-dependent).
         assets (Any): Asset metadata or collection.
     """
+
     def __init__(self, metas: Dict):
         """
         Constructor.
@@ -278,11 +289,12 @@ class FileSimulation(FileItem, Simulation):
         self.assets = metas['assets']
 
 
-def clean_experiment_name(experiment_name: str) -> str:
+def clean_item_name(experiment_name: str, maxlen: int = 30) -> str:
     """
     Handle some special characters in experiment names.
     Args:
         experiment_name: name of the experiment
+        maxlen: max length of the experiment name
     Returns:
         the experiment name allowed for use
     """
@@ -292,7 +304,9 @@ def clean_experiment_name(experiment_name: str) -> str:
     clean_names_expr = re.compile(f'[{re.escape("".join(chars_to_replace))}]')
 
     experiment_name = clean_names_expr.sub("_", experiment_name)
-    return experiment_name.encode("ascii", "ignore").decode('utf8').strip()
+    s = experiment_name.encode("ascii", "ignore").decode('utf8').strip()
+    # Truncate to maxlen
+    return s[:maxlen]
 
 
 def add_dummy_suite(experiment: Experiment, suite_name: str = None, tags: Dict = None) -> Suite:

@@ -10,6 +10,7 @@ from test_base import TestContainerPlatformCliBase
 
 
 @pytest.mark.serial
+@pytest.mark.cli
 class TestContainerPlatformPackagesCli(TestContainerPlatformCliBase):
 
     @patch('rich.console.Console.print')
