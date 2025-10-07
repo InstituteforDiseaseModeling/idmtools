@@ -1,0 +1,19 @@
+@startuml
+
+package "idmtools-core" as registry {
+    () "PlatformAPI" as PlatformAPI
+}
+
+package "idmtools-platform-file" as file_platform {
+    [FilePlatform]
+}
+
+package "idmtools-platform-container" as container_platform {
+    [ContainerPlatform]
+}
+
+
+PlatformAPI <-down-- FilePlatform: FilePlatform\nImplementation
+FilePlatform <-- ContainerPlatform: ContainerPlatform\nImplementation
+
+@enduml

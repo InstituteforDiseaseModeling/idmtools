@@ -7,11 +7,12 @@ on:
     branches:
       # only run this on
       - dev
-      - 'release**'
+      - 'release*'
     paths:
       - 'idmtools_core/**'
       - 'idmtools_platform_comps/**'
       - 'idmtools_models/**'
+  workflow_dispatch:
 
 jobs:
   deploy-comps-staging:
@@ -21,13 +22,13 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
+          python-version: '3.12'
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install setuptools wheel twine bump2version coloredlogs idm-buildtools natsort --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+          pip install setuptools wheel twine bump2version idm-buildtools natsort build --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
           git config --global user.name "IDM Tools"
-          git config --global user.name "idmtools@idmod.org"
+          git config --global user.email "idmtools@idmod.org"
       - uses: azure/docker-login@v1
         with:
           login-server: idm-docker-staging.packages.idmod.org
@@ -51,7 +52,7 @@ jobs:
           TWINE_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
         run: |
-          python setup.py sdist bdist_wheel
+          python -m build
           twine upload dist/*
       - name: Build and push docker image
         working-directory: idmtools_platform_comps
@@ -59,5 +60,4 @@ jobs:
           PYPI_STAGING_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
           PYPI_STAGING_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
         run: |
-          make ssmt-image
           make ssmt-image-release

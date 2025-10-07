@@ -1,9 +1,12 @@
-=====
-SLURM
-=====
+.. _Slurm Platform:
+
+==============
+Slurm Platform
+==============
+
 The |SLURM_s| platform allows use of the |SLURM_l|. "Slurm is an open source, fault-tolerant, and highly scalable cluster management and job scheduling system for large and small Linux clusters.", as quoted from (https://slurm.schedmd.com/overview.html). For high-level architecture information about |SLURM_s|,
 see (https://slurm.schedmd.com/quickstart.html#arch).
-For architecure and included packages information about |IT_s| and |SLURM_s|,
+For architecture and included packages information about |IT_s| and |SLURM_s|,
 see (:doc:`../../reference`).
 
 
@@ -45,7 +48,7 @@ You can also do this directly from code by passing the minimum requirements
 
 
 
-Configuration Options
+Configuration options
 `````````````````````
 .. list-table:: Title
    :header-rows: 1
@@ -54,60 +57,11 @@ Configuration Options
      - Description
    * - **job_directory**
      - This defines the location that |IT_s| will use to manage experiments on the |SLURM_s| cluster. The directory should be located somewhere that is mounted on all |SLURM_s| nodes at the same location. If you are unsure, ask your |SLURM_s| server administrator for guidance.
-   * - mode
-     - Allows you to control the operational mode for |IT_s|. There are two modes currently supported.
-       * - local
-       * - bridged
-       Bridged mode is *required* if you are running from within a Singularity container. See :ref:``Operation Modes`` for details.
+
 
 .. note::
 
     Bold parameters are required
-
-Operation Modes
-===============
-
-The |SLURM_s| platform supports two modes of operation, Local and Bridged. Local is the default mode.
-
-Bridged
-```````
-Bridged mode allows you to utilize the emodpy/idmtools Singularity environment containers.
-This is accomplished through a script that manages the communication to Slurm outside the container.
-
-Bridged mode requires the package `idmtools-slurm-utils`.
-
-To use bridged mode, before running your container you must run the bridge script outside the container::
-
-    idmtools-slurm-bridge
-
-If you plan on using the same terminal, you may want to run the bridge in the background::
-
-    idmtools-slurm-bridge &
-
-Once you have the bridge running, you can now run idmtools scripts from within Singularity containers. Ensure your platform is configured to use bridged mode::
-
-    singularity exec idmtools_1.6.8 bash
-    $ python my_script.py
-
-Tips
-....
-When using the slurm-bridge, there are a few tips for use
-
-1. When you background the process by running::
-
-       idmtools-slurm-bridge &
-
-   You will need to run::
-
-       fg
-
-   See [Foreground and Background Processes](https://www.linuxshelltips.com/foreground-and-background-process-in-linux/) in Linux
-
-2. You may need to load modules before executing the bridge. See [Modules documentation](https://curc.readthedocs.io/en/latest/compute/modules.html) for more details.
-
-Local
-`````
-Local operation is meant to be executed directly on a |SLURM_s| cluster node.
 
 
 Recommendations

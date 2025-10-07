@@ -11,7 +11,7 @@ information, see :doc:`analyzers/analyzers`.
 
 If you are running simulations on |COMPS_s|, the configuration of the
 "idmtools.ini" file will determine where output files can be found. 
-For more information, see :doc:`cli/wizard`
+For more information, see :doc:`cli/comps/wizard`
 
 .. include:: reuse/comps_note.txt
 

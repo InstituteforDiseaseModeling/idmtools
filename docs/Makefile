@@ -69,14 +69,14 @@ generate-api:
 	sphinx-apidoc -f -e -M -o ./api --templatedir api_templates ../idmtools_platform_slurm/idmtools_platform_slurm
 	mv ./api/modules.rst ./api/idmtools_platform_slurm_index.rst
 
-	-rm ./api/idmtools_slurm_utils_index.rst
-	sphinx-apidoc -f -e -M -o ./api --templatedir api_templates ../idmtools_slurm_utils/idmtools_slurm_utils
-	mv ./api/modules.rst ./api/idmtools_slurm_utils_index.rst
+	-rm ./api/idmtools_platform_container_index.rst
+	sphinx-apidoc -f -e -M -o ./api --templatedir api_templates ../idmtools_platform_container/idmtools_platform_container
+	mv ./api/modules.rst ./api/idmtools_platform_container_index.rst
 
 
 .PHONY: html
 html:
-	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
+	$(SPHINXBUILD) -T -W --keep-going -b html -d $(BUILDDIR)/doctrees -D language=en . $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
 

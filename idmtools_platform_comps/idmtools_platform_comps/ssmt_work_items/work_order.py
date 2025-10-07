@@ -47,7 +47,7 @@ class BuildDefinition:
 class ImageBuilderWorkOrder(IWorkOrder):
     """Defines our Image Builder service workorder."""
     WorkItem_Type: str = field(default='ImageBuilderWorker')
-    Build: str = field(default=BuildDefinition())
+    Build: str = field(default=BuildDefinition)
     Output: str = field(default='image.sif')
     Tags: Dict[str, str] = field(default_factory=lambda: dict(type='singularity'))
     AdditionalMounts: List[str] = field(default_factory=list)

@@ -9,7 +9,7 @@ from colorama import Fore, Style
 from idmtools.registry.platform_specification import PlatformPlugins
 from idmtools_cli.cli.entrypoint import cli
 
-IGNORED_PLATFORMS = ["Test", "Slurm"]
+IGNORED_PLATFORMS = ["Test", "Slurm", "File", "Container", "SSMT", "TestExecute", "Process"]
 AVAILABLE_PLATFORMS = PlatformPlugins().get_plugin_map()
 for platform in IGNORED_PLATFORMS:
     if platform in AVAILABLE_PLATFORMS:
@@ -96,7 +96,7 @@ def validate_block_name(context, value):
               help="Name of the new block in the file",
               callback=lambda c, p, v: validate_block_name(c, v),
               type=click.STRING)
-@click.option('--platform', default=None, type=click.Choice(AVAILABLE_PLATFORMS.keys()), prompt="Platform type")
+@click.option('--platform', default='COMPS', type=click.Choice(AVAILABLE_PLATFORMS.keys()), prompt="Platform type")
 @click.pass_context
 def block(ctx, block_name, platform):
     """

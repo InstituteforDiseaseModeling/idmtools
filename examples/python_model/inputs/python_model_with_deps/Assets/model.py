@@ -8,7 +8,7 @@ if __name__ == "__main__":
         config = json.load(fp)
         run_number = config["a"]
 
-    os.makedirs(os.path.join(current_directory, "output"))
+    os.makedirs(os.path.join(current_directory, "output"), exist_ok = True)
     with open(os.path.join(current_directory, "output", "output.json"), 'w') as fp:
         json.dump({"a": run_number}, fp)
 

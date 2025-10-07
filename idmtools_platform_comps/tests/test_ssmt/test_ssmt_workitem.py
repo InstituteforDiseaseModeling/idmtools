@@ -321,7 +321,7 @@ class TestSSMTWorkItem(ITestWithPersistence):
 
         wi = self.platform.get_item(wi_id, ItemType.WORKFLOW_ITEM, columns=cols, load_children=children)
         self.assertIsNone(wi.assets.id)
-        self.assertIsNone(wi.tags)
+        self.assertIn(wi.tags, [None, {}])
         self.assertEqual(len(wi.transient_assets), 0)
 
     @warn_amount_ssmt_image_decorator

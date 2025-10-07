@@ -7,7 +7,6 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import os
 import copy
-import warnings
 from abc import ABCMeta
 from dataclasses import dataclass
 from dataclasses import fields, field
@@ -18,7 +17,7 @@ from pathlib import PureWindowsPath, PurePath
 from itertools import groupby
 from logging import getLogger, DEBUG
 from typing import Dict, List, NoReturn, Type, TypeVar, Any, Union, Tuple, Set, Iterator, Callable, Optional
-
+from idmtools.core.context import set_current_platform
 from idmtools import IdmConfigParser
 from idmtools.core import CacheEnabled, UnknownItemException, EntityContainer, UnsupportedPlatformType
 from idmtools.core.enums import ItemType, EntityStatus
@@ -47,11 +46,12 @@ from idmtools.utils.entities import validate_user_inputs_against_dataclass
 logger = getLogger(__name__)
 user_logger = getLogger('user')
 
-CALLER_LIST = ['_create_from_block',  # create platform through Platform Factory
+CALLER_LIST = ['_create_platform_from_block',  # create platform through Platform Factory
                'fetch',  # create platform through un-pickle
                'get',  # create platform through platform spec' get method
                '__newobj__',  # create platform through copy.deepcopy
-               '_main']  # create platform through analyzer manager
+               '_main',  # create platform through analyzer manager
+               '<module>']  # create platform through specific module
 
 # Maps an object type to a platform interface object. We use strings to use getattr. This also let's us also reduce
 # all the if else crud
@@ -121,7 +121,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         # Action based on the caller
         if caller not in CALLER_LIST:
-            warnings.warn(
+            logger.warning(
                 "Please use Factory to create Platform! For example: \n    platform = Platform('COMPS', **kwargs)")
         return super().__new__(cls)
 
@@ -139,7 +139,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
                 self.platform_type_map[getattr(self, interface).platform_type] = item_type
 
         self.validate_inputs_types()
-
+        set_current_platform(self)
         # Initialize the cache
         self.initialize_cache()
 
@@ -208,8 +208,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             ValueError: If the item type is not supported
             UnknownItemException: If the item type is not found on platform
         """
-        if not item_type or item_type not in self.platform_type_map.values():
-            raise ValueError("The provided type is invalid or not supported by this platform...")
+        self.validate_type(item_type)
 
         cache_key = self.get_cache_key(force, item_id, item_type, kwargs, raw, 'r' if raw else 'o')
 
@@ -327,7 +326,10 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             ce = item or self.get_item(item_id, raw=raw, item_type=item_type)
             ce.platform = self
             kwargs['parent'] = ce
-            children = self._get_children_for_platform_item(ce.get_platform_object(), raw=raw, **kwargs)
+            if raw:
+                children = self._get_children_for_platform_item(ce, raw=raw, **kwargs)
+            else:
+                children = self._get_children_for_platform_item(ce.get_platform_object(), raw=raw, **kwargs)
             self.cache.set(cache_key, children, expire=self._object_cache_expiration)
             return children
 
@@ -394,8 +396,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             The parent of the object or None.
 
         """
-        if not item_type or item_type not in self.platform_type_map.values():
-            raise UnsupportedPlatformType("The provided type is invalid or not supported by this platform...")
+        self.validate_type(item_type)
 
         # Create the cache key based on everything we pass to the function
         cache_key = f'p_{item_id}' + ('r' if raw else 'o') + '_'.join(f"{k}_{v}" for k, v in kwargs.items())
@@ -580,8 +581,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         Args:
             item: The item to check status for.
         """
-        if item.item_type not in self.platform_type_map.values():
-            raise UnsupportedPlatformType("The provided type is invalid or not supported by this platform...")
+        self.validate_type(item)
         interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
         if item.platform is None:
             item.platform = self
@@ -605,14 +605,13 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
             For experiments, this returns a dictionary with key as sim id and then the values as a dict of the
             simulations described above
         """
-        if item.item_type not in self.platform_type_map.values():
-            raise UnsupportedPlatformType("The provided type is invalid or not supported by this platform...")
+        self.validate_type(item)
         interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
         ret = getattr(self, interface).get_assets(item, files, **kwargs)
 
         if output:
-            if item.item_type not in (ItemType.SIMULATION, ItemType.WORKFLOW_ITEM):
-                user_logger.info("Currently 'output' only supports Simulation and WorkItem!")
+            if item.item_type not in (ItemType.SIMULATION, ItemType.WORKFLOW_ITEM, ItemType.ASSETCOLLECTION):
+                user_logger.info("Currently 'output' only supports Simulation, WorkItem and AssetCollection!")
             else:
                 for ofi, ofc in ret.items():
                     file_path = os.path.join(output, str(item.uid), ofi)
@@ -639,7 +638,9 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         Returns: dict with key/value: file_name/file_content
         """
-        idm_item = self.get_item(item_id, item_type, raw=False)
+        if item_id is None or item_id == "":
+            raise ValueError("item_id cannot be None or empty")
+        idm_item = self.get_item(item_id, item_type, raw=True)
         return self.get_files(idm_item, files, output)
 
     def are_requirements_met(self, requirements: Union[PlatformRequirements, Set[PlatformRequirements]]) -> bool:
@@ -850,10 +851,31 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         Returns: dict with key the object type
         """
-        if item.item_type != ItemType.WORKFLOW_ITEM:
-            raise UnsupportedPlatformType("The provided type is invalid or not supported by this platform...")
+        self.validate_type(item, ItemType.WORKFLOW_ITEM)
         interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
         return getattr(self, interface).get_related_items(item, relation_type)
+
+    def validate_type(self, item: Union[IEntity, ItemType], target: ItemType = None) -> NoReturn:
+        """
+        Validate if the item is supported by the platform.
+
+        Args:
+            item: Item to validate
+            target: Target type to validate against
+
+        Returns:
+            No return
+        """
+        valid = True
+        _type = item if isinstance(item, (str, ItemType)) else item.item_type
+        if target is not None and _type != target:
+            valid = False
+        elif _type not in self.platform_type_map.values():
+            valid = False
+
+        if not valid:
+            raise UnsupportedPlatformType(
+                f"The provided type {_type} is invalid or not supported by platform {self.__class__.__name__}. It only supports ItemType: {', '.join([value.name for value in self.platform_type_map.values()])}")
 
     def __enter__(self):
         """
@@ -862,7 +884,6 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         Returns:
             Platform
         """
-        from idmtools.core.context import set_current_platform
         set_current_platform(self)
         return self
 
@@ -1042,6 +1063,40 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         if file_name is None:
             file_name = f'{exp_id}.csv'
         df.to_csv(os.path.join(output, file_name), header=save_header, index=False)
+
+    def filter_simulations_by_tags(self, item_id: str, item_type: ItemType, tags: Dict = None, status=None,
+                                   entity_type=False, skip_sims=None, max_simulations=None, **kwargs):
+        """
+        Filter simulations associated with a given Experiment or Suite using tag-based conditions.
+
+        This method is a platform-level convenience wrapper that delegates filtering logic to the
+        `get_simulations_by_tags` method on the retrieved item. It supports:
+        - Exact tag value matching
+        - Callable filters for flexible conditions (e.g., lambda expressions)
+        - Optionally limiting the number of returned simulations
+        - Returning either simulation entities or just their IDs
+
+        Args:
+            item_id (str): The unique ID of the Experiment or Suite.
+            item_type (ItemType): The type of the item (ItemType.EXPERIMENT or ItemType.SUITE).
+            tags (Dict, optional): Dictionary of tag filters to apply. Values can be:
+                - Exact values (e.g., {"Coverage": 0.8})
+                - Callable functions (e.g., {"Run_Number": lambda v: 0 <= v <= 10})
+                - Ellipsis (...) or None to match presence of key only.
+            status (EntityStatus, optional): Filter by status. If provided, only simulations with the specified status will be returned.
+            entity_type (bool, optional): If True, return full simulation entities; otherwise, return simulation IDs.
+            skip_sims (list, optional): A list of simulation IDs to exclude from the results.
+            max_simulations (int, optional): Maximum number of simulations to return.
+            **kwargs: Additional keyword arguments passed to the item's `get_simulations_by_tags` method.
+
+        Returns:
+            Union[List[str], List[Simulation], Dict[str, List[Simulation]]]:
+                - A list of simulation IDs (default),
+                - Or a list/dictionary of Simulation objects if `entity_type=True`.
+        """
+        item = self.get_item(item_id, item_type, force=True)
+        return item.get_simulations_by_tags(tags=tags, status=status, entity_type=entity_type, skip_sims=skip_sims,
+                                            max_simulations=max_simulations, **kwargs)
 
 
 TPlatform = TypeVar("TPlatform", bound=IPlatform)

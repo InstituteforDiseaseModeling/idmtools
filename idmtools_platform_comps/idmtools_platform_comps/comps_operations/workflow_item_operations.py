@@ -214,8 +214,7 @@ class CompsPlatformWorkflowItemOperations(IPlatformWorkflowItemOperations):
 
         Returns: dict with key/value: file_path/file_content
         """
-        wi = self.platform.get_item(workflow_item.uid, ItemType.WORKFLOW_ITEM, raw=True)
-        byte_arrs = wi.retrieve_output_files(files)
+        byte_arrs = workflow_item.retrieve_output_files(files)
         return dict(zip(files, byte_arrs))
 
     def to_entity(self, work_item: COMPSWorkItem, **kwargs) -> IWorkflowItem:

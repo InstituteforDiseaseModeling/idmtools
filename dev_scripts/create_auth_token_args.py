@@ -58,6 +58,6 @@ if __name__ == '__main__':
         sys.exit(-1)
 
     compshost = args.comps_url
-
+    Client.logout(compshost)
     Client.login(compshost, StaticCredentialPrompt(comps_url=args.comps_url, username=args.username,
                                                    password=args.password))

@@ -81,7 +81,7 @@ class TestEntity(ITestWithPersistence):
         s = Suite(name="test")
         self.assertSetEqual(s.pickle_ignore_fields, set(f.name for f in fields(s) if "pickle_ignore" in f.metadata and f.metadata["pickle_ignore"]))
         b = pickle.loads(pickle.dumps(s))
-        self.assertIsNone(b.experiments)
+        self.assertIsNone(getattr(b, "_experiments", None))
 
         a = EntityWithIgnoreField(ignore=10, ignore_with_restore=5)
         self.assertEqual(a.ignore, 10)
@@ -221,7 +221,7 @@ class TestEntity(ITestWithPersistence):
         s.post_creation(fake_platform)
 
     def test_experiment_pre_creation_hooks(self):
-        fake_platform = Platform("TestExecute", missing_ok=True)
+        fake_platform = Platform("TestExecute", type="TestExecute")
         base_task = TestTask()
         sim = Simulation.from_task(base_task)
         builder = SimulationBuilder()
@@ -234,7 +234,7 @@ class TestEntity(ITestWithPersistence):
             self.assertEqual(mock_hook.call_count, 1)
 
     def test_experiment_post_creation_hooks(self):
-        fake_platform = Platform("TestExecute", missing_ok=True)
+        fake_platform = Platform("TestExecute", type="TestExecute")
         base_task = TestTask()
         sim = Simulation.from_task(base_task)
         builder = SimulationBuilder()

@@ -90,19 +90,24 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         meta['uid'] = meta['_uid']
         meta['status'] = 'CREATED'
         meta['dir'] = os.path.abspath(self.platform.get_directory(item))
+        meta['tags'] = meta['tags']
 
-        if isinstance(item, Experiment):
+        if isinstance(item, Suite):
+            meta['experiments'] = [experiment.id for experiment in item.experiments]
+        elif isinstance(item, Experiment):
             meta['suite_id'] = meta["parent_id"]
-
+            meta['simulations'] = [simulation.id for simulation in item.simulations]
+        elif isinstance(item, Simulation):
+            meta['experiment_id'] = meta["parent_id"]
         return meta
 
-    def dump(self, item: Union[Suite, Experiment, Simulation]) -> None:
+    def dump(self, item: Union[Suite, Experiment, Simulation]) -> Dict:
         """
         Save item's metadata to a file.
         Args:
             item: idmtools entity (Suite, Experiment and Simulation)
         Returns:
-            None
+            key/value dict of metadata from the given item
         """
         if not isinstance(item, (Suite, Experiment, Simulation)):
             raise RuntimeError("Dump method supports Suite/Experiment/Simulation only.")
@@ -171,7 +176,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
             raise RuntimeError("Clear method supports Suite/Experiment/Simulation only.")
         self.update(item=item, metadata={}, replace=True)
 
-    def get_children(self, item: Union[Suite, Experiment]) -> List[Dict]:
+    def get_children(self, item: Union[Suite, Experiment, FileSuite, FileExperiment]) -> List[Dict]:
         """
         Fetch item's children.
         Args:
@@ -189,20 +194,21 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
             item_list.append(meta)
         return item_list
 
-    def get_all(self, item_type: ItemType) -> List[Dict]:
+    def get_all(self, item_type: ItemType, item_id: str = '') -> List[Dict]:
         """
         Obtain all the metadata for a given item type.
         Args:
-            item_type: the type of metadata to search for matches (simulation, experiment, suite, etc)
+            item_type: the type of metadata to search for matches (simulation, experiment, suite, etc.)
+            item_id: item id
         Returns:
             list of metadata with given item type
         """
         if item_type is ItemType.SIMULATION:
-            pattern = f"*/*/*/{self.metadata_filename}"
+            pattern = f"*/*/*{item_id}/{self.metadata_filename}"
         elif item_type is ItemType.EXPERIMENT:
-            pattern = f"*/*/{self.metadata_filename}"
+            pattern = f"*/*{item_id}/{self.metadata_filename}"
         elif item_type is ItemType.SUITE:
-            pattern = f"*/{self.metadata_filename}"
+            pattern = f"*{item_id}/{self.metadata_filename}"
         else:
             raise RuntimeError(f"Unknown item type: {item_type}")
         item_list = []
@@ -245,7 +251,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         Obtain all items that match the given properties key/value pairs passed.
         The two filters are applied on item with 'AND' logical checking.
         Args:
-            item_type: the type of items to search for matches (simulation, experiment, suite, etc)
+            item_type: the type of items to search for matches (simulation, experiment, suite, etc.)
             property_filter: a dict of metadata key/value pairs for exact match searching
             tag_filter: a dict of metadata key/value pairs for exact match searching
             meta_items: list of metadata
@@ -254,7 +260,8 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
             a list of metadata matching the properties key/value with given item type
         """
         if meta_items is None:
-            meta_items = self.get_all(item_type)
+            item_id = property_filter["id"] if property_filter and "id" in property_filter else ''
+            meta_items = self.get_all(item_type, item_id=item_id)
         item_list = []
         for meta in meta_items:
             is_match = True

@@ -3,10 +3,8 @@
 # printed to stdout.txt file and output/result.txt file in each simulation folder.
 # Path for simulation in cluster machine: /home/username/example/suite_id/experiment_id/simulation_id
 import os
-import sys
 from functools import partial
 from typing import Any, Dict
-
 from idmtools.builders import SimulationBuilder
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import Suite
@@ -20,7 +18,7 @@ from idmtools_test import COMMON_INPUT_PATH
 # job dir should be /home/username/example
 job_directory = os.path.join(os.path.expanduser('~'), "example")
 # Define Slurm Platform. Note, this code can only run in slurm cluster.
-platform = Platform('FILE', job_directory=job_directory)
+platform = Platform("File", job_directory=job_directory)
 
 #Define our base task. Normally, you want to do set any assets/configurations you want across the
 # all the different Simulations we are going to build for our experiment. Here we set c to 0 since we do not want to

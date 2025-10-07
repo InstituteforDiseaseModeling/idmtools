@@ -29,8 +29,9 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
     """
     platform: 'FilePlatform'  # noqa: F821
     platform_type: Type = field(default=FileExperiment)
+    RUN_SIMULATION_SCRIPT_PATH = Path(__file__).parent.parent.joinpath('assets/run_simulation.sh')
 
-    def get(self, experiment_id: str, **kwargs) -> Dict:
+    def get(self, experiment_id: str, **kwargs) -> FileExperiment:
         """
         Gets an experiment from the File platform.
         Args:
@@ -59,19 +60,17 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         if experiment.parent_id is None:
             suite = add_dummy_suite(experiment)
             self.platform._suites.platform_create(suite)
-            # update parent
-            experiment.parent = suite
+            suite.platform = self.platform
 
         # Generate Suite/Experiment/Simulation folder structure
-        self.platform.mk_directory(experiment)
+        self.platform.mk_directory(experiment, exist_ok=True)
         meta = self.platform._metas.dump(experiment)
         self.platform._assets.dump_assets(experiment)
         self.platform.create_batch_file(experiment, **kwargs)
 
         # Copy file run_simulation.sh
-        run_simulation_script = Path(__file__).parent.parent.joinpath('assets/run_simulation.sh')
         dest_script = Path(self.platform.get_directory(experiment)).joinpath('run_simulation.sh')
-        shutil.copy(str(run_simulation_script), str(dest_script))
+        shutil.copy(str(self.RUN_SIMULATION_SCRIPT_PATH), str(dest_script))
 
         # Make executable
         self.platform.update_script_mode(dest_script)
@@ -91,7 +90,7 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
             List of file simulations
         """
         sim_list = []
-        sim_meta_list = self.platform._metas.get_children(parent)
+        sim_meta_list = self.platform._metas.get_children(experiment)
         for meta in sim_meta_list:
             file_sim = FileSimulation(meta)
             file_sim.status = self.platform.get_simulation_status(file_sim.id)
@@ -135,6 +134,21 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         user_logger.info(f'job_directory: {Path(self.platform.job_directory).resolve()}')
         user_logger.info(f'suite: {str(suite_id)}')
         user_logger.info(f'experiment: {experiment.id}')
+        user_logger.info(f"\nExperiment Directory: \n{self.platform.get_directory(experiment)}")
+
+    def post_run_item(self, experiment: Experiment, **kwargs):
+        """
+        Perform post-processing steps after an experiment run.
+        Args:
+            experiment: The experiment object that has just finished running
+            **kwargs: Additional keyword arguments
+
+        Returns:
+            None
+        """
+        super().post_run_item(experiment, **kwargs)
+        # Refresh platform object
+        experiment._platform_object = self.get(experiment.id, **kwargs)
 
     def send_assets(self, experiment: Experiment, **kwargs):
         """
@@ -170,9 +184,10 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
         """
         assets = AssetCollection()
         assets_dir = Path(self.platform.get_directory_by_id(experiment.id, ItemType.EXPERIMENT), 'Assets')
-        assets_list = AssetCollection.assets_from_directory(assets_dir, recursive=True)
-        for a in assets_list:
-            assets.add_asset(a)
+        if assets_dir.exists():
+            assets_list = AssetCollection.assets_from_directory(assets_dir, recursive=True)
+            for a in assets_list:
+                assets.add_asset(a)
         return assets
 
     def to_entity(self, file_exp: FileExperiment, parent: Optional[Suite] = None, children: bool = True,
@@ -259,3 +274,35 @@ class FilePlatformExperimentOperations(IPlatformExperimentOperations):
             Any
         """
         pass
+
+    def get_assets(self, experiment: Experiment, files: List[str], **kwargs) -> Dict[str, bytearray]:
+        """
+        Fetch the files associated with an experiment.
+
+        Args:
+            experiment: Experiment (idmools Experiment or COMPSExperiment)
+            files: List of files to download
+            **kwargs:
+
+        Returns:
+            Dict[str, Dict[str, Dict[str, str]]]:
+                A nested dictionary structured as:
+                {
+                    experiment.id: {
+                        simulation.id {
+                            filename: file content as string,
+                            ...
+                        },
+                        ...
+                    }
+                }
+        """
+        ret = dict()
+        if isinstance(experiment, FileExperiment):
+            file_exp = experiment
+        else:
+            file_exp = experiment.get_platform_object()
+        simulations = self.platform.flatten_item(file_exp, raw=True)
+        for sim in simulations:
+            ret[sim.id] = self.platform._simulations.get_assets(sim, files, **kwargs)
+        return ret

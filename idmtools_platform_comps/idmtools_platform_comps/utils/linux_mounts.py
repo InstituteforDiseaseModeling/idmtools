@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING, List, Dict
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
 
-DEFAULT_ENVIRONMENTS = ["SLURMSTAGE", "CALCULON"]
+DEFAULT_ENVIRONMENTS = ["SLURMSTAGE", "CALCULON", "NIBBLER"]
 
 
 def set_linux_mounts(platform: 'IPlatform', linux_environment: str = None) -> None:

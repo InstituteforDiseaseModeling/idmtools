@@ -12,25 +12,32 @@ term_handler()
 trap 'term_handler' SIGINT SIGTERM
 
 n=0
+{% set mpi_command = "mpirun -n " + ntasks|string if ntasks > 1 else "" %}
+
 until [ "$n" -ge {{retries}} ]
 do
     echo "100" > job_status.txt
     {% if simulation.task.sif_path is defined and simulation.task.sif_path %}
         {% if simulation.task.command.cmd.startswith('singularity') %}
-            {{simulation.task.command.cmd}}
+            {{ mpi_command }} {{simulation.task.command.cmd}} &
         {% else %}
-            singularity exec {{simulation.task.sif_path}} {{simulation.task.command.cmd}}
+           singularity exec {{simulation.task.sif_path}} {{ mpi_command }} {{simulation.task.command.cmd}} &
         {% endif %}
     {% else %}
-        {{simulation.task.command.cmd}}
+        exec -a "SIMULATION:{{simulation.id}}" {{ mpi_command }} {{simulation.task.command.cmd}} &
     {% endif %}
+
+   child_pid=$!
+   echo "Running simulation with PID: $child_pid"
+   # Wait for the child process to complete
+   wait $child_pid
+
    RESULT=$?
    if [ $RESULT -eq 0 ]; then
       echo "0" > job_status.txt
       exit $RESULT
    fi
    n=$((n+1))
-   sleep 15
 done
 echo "-1" > job_status.txt
 exit $RESULT
