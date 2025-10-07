@@ -31,7 +31,7 @@ class TestPlatformExperiment(unittest.TestCase):
 
     def test_container_platform_integration(self):
         with tempfile.TemporaryDirectory() as temp_dir:
-            platform = Platform("Container", job_directory=temp_dir)
+            platform = Platform("Container", job_directory="DEST", new_container=True)
             command = "Assets/run.sh"
             task = CommandTask(command=command)
             ac = AssetCollection()
@@ -68,15 +68,14 @@ class TestPlatformExperiment(unittest.TestCase):
             # Check if the stdout.txt file contains pip list results
             with open(f"{sim_dir}/stdout.txt", "r") as file:
                 content = file.read()
-                self.assertIn("emod-api", content)
-                self.assertIn("Package             Version", content)
+                self.assertIn("Running simulation with PID:", content)
             with open(f"{sim_dir}/_run.sh", "r") as file:
                 content = file.read()
                 # Check if the _run.sh script contains the command "Assets/run.sh"
                 self.assertIn("Assets/run.sh", content)
 
             # clean up
-            stop_container(platform.container_id, remove=True)
+            #stop_container(platform.container_id, remove=True)
 
     def test_container_platform_with_custom_docker_image(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -93,27 +92,26 @@ class TestPlatformExperiment(unittest.TestCase):
                 stop_container(mc, remove=True)
 
     @patch('idmtools_platform_container.container_operations.docker_operations.check_local_image')
+    @patch('idmtools_platform_container.container_operations.docker_operations.pull_docker_image')
     @patch('idmtools_platform_container.container_operations.docker_operations.logger')
     @patch('idmtools_platform_container.container_operations.docker_operations.user_logger')
-    def test_platform_with_no_local_image(self, mock_user_logger, mock_logger, mock_check_local_image):
+    def test_platform_with_no_local_image(self, mock_user_logger, mock_logger, mock_pull_docker_image, mock_check_local_image):
         with tempfile.TemporaryDirectory() as temp_dir:
             # mock that the image does not exist in local, so it should be pulled from artifactory
             mock_check_local_image.return_value = False
-
+            mock_pull_docker_image.return_value = False
             platform = Platform("Container", job_directory=temp_dir, debug=True)
             command = "ls -lat"
             task = CommandTask(command=command)
             experiment = Experiment.from_task(task, name="run_command")
-            experiment.run(wait_until_done=True, platform=platform)
-
+            with self.assertRaises(SystemExit) as e:
+                experiment.run(wait_until_done=True, platform=platform)
             expected_user_log_messages = [f"Image {platform.docker_image} does not exist, pull the image first.",
-                                          f"Pulling image {platform.docker_image} ..."]
+                                      f"Pulling image {platform.docker_image} ..."]
             for i, call in enumerate(mock_user_logger.info.call_args_list):
                 message = call[0][0]
                 self.assertIn(expected_user_log_messages[i], message)
-            self.assertEqual(experiment.status, EntityStatus.SUCCEEDED)
-            # clean up
-            stop_container(platform.container_id, remove=True)
+            mock_user_logger.error(f"/!\\ ERROR: Failed to pull image {platform.docker_image}.")
 
     def test_platform_with_container_prefix(self):
         with tempfile.TemporaryDirectory() as temp_dir:

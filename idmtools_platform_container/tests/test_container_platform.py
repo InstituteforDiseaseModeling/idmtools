@@ -124,12 +124,12 @@ class TestContainerPlatform(unittest.TestCase):
         # mock_docker.assert_called_once()
         mock_client.containers.run.assert_called_once_with(
             platform.docker_image,
-            command="bash",
             volumes={
                 platform.job_directory: {"bind": platform.data_mount, "mode": "rw"},
                 "src1": {"bind": "dest1", "mode": "rw"},
                 "src2": {"bind": "dest2", "mode": "rw"}
             },
+            environment={'HOME': '/home/container_data', 'PIP_USER': 'yes'},
             stdin_open=True,
             tty=True,
             detach=True,
