@@ -1,5 +1,6 @@
 import os
 import sys
+import shutil
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -233,16 +234,19 @@ class TestPlatformExperiment(unittest.TestCase):
     def test_extra_packages(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             platform = Platform('CONTAINER', job_directory=temp_dir, new_container=True, extra_packages=['astor'])
-            command = "python Assets/model.py"
+            command = "python Assets/model1.py"
             task = CommandTask(command=command)
 
-            model_asset = Asset(absolute_path=os.path.join("inputs", "model.py"))
+            model_asset = Asset(absolute_path=os.path.join("inputs", "model1.py"))
             common_assets = AssetCollection()
             common_assets.add_asset(model_asset)
             experiment = Experiment.from_task(task, name="run_platform_extra_packages", assets=common_assets)
             experiment.run(wait_until_done=True, platform=platform)
             sim_dir = platform.get_directory_by_id(experiment.simulations[0].id, ItemType.SIMULATION)
-            self.assertTrue(os.path.exists(Path(f"{sim_dir}/ast_dump.txt")), f"The ast_dump.txt file should exist.")
+            self.assertTrue(os.path.exists(Path(f"{sim_dir}/output/ast_dump.txt")), f"The ast_dump.txt file should exist.")
+            # test user has permission to delete the sim_dir
+            shutil.rmtree(sim_dir, ignore_errors=True)
+            self.assertFalse(sim_dir.exists(), f"{sim_dir} should be deleted")
             # clean up
             stop_container(platform.container_id, remove=True)
 
