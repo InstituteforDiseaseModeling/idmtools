@@ -205,7 +205,6 @@ class ContainerPlatform(FilePlatform):
         # Run the container
         container = client.containers.run(
             self.docker_image,
-            command="bash",
             volumes=volumes,
             environment=env_vars,
             stdin_open=True,
