@@ -25,6 +25,7 @@ from idmtools_platform_file.file_platform import FilePlatform
 from idmtools_platform_container.platform_operations.experiment_operations import ContainerPlatformExperimentOperations
 from logging import getLogger, DEBUG
 
+
 logger = getLogger(__name__)
 user_logger = getLogger('user')
 
@@ -34,7 +35,7 @@ class ContainerPlatform(FilePlatform):
     """
     Container Platform definition.
     """
-    __CONTAINER_IMAGE = "docker-production-public.packages.idmod.org/idmtools/container-rocky-runtime:0.0.4"
+    __CONTAINER_IMAGE = 'idm-docker-staging.packages.idmod.org/idmtools/container-rocky-runtime:1.0.0'  # todo, change to production when it is ready
     __CONTAINER_MOUNT = "/home/container_data"
     docker_image: str = field(default=None, metadata=dict(help="Docker image to run the container"))
     data_mount: str = field(default=None, metadata=dict(help="Data mount point in the container"))
@@ -190,6 +191,7 @@ class ContainerPlatform(FilePlatform):
         """
         # Create a Docker client
         client = docker.from_env()
+        env_vars = {"HOME": self.__CONTAINER_MOUNT, "PIP_USER": "yes"}
         volumes = self.build_binding_volumes()
         docker_user = None
         if platform.system() != "Windows":
@@ -205,6 +207,7 @@ class ContainerPlatform(FilePlatform):
             self.docker_image,
             command="bash",
             volumes=volumes,
+            environment=env_vars,
             stdin_open=True,
             tty=True,
             detach=True,
