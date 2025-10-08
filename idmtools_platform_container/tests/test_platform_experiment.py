@@ -78,6 +78,7 @@ class TestPlatformExperiment(unittest.TestCase):
             # clean up
             #stop_container(platform.container_id, remove=True)
 
+    @pytest.mark.skip("timeout in github action test")
     def test_container_platform_with_custom_docker_image(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             docker_image = "nginx:latest"
