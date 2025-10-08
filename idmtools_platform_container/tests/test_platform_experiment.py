@@ -81,16 +81,13 @@ class TestPlatformExperiment(unittest.TestCase):
     def test_container_platform_with_custom_docker_image(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             docker_image = "nginx:latest"
-            Platform("Container", job_directory=temp_dir, docker_image=docker_image)
+            platform = Platform("Container", job_directory=temp_dir, docker_image=docker_image)
             command = "ls -lat"
             task = CommandTask(command=command)
-            experiment = Experiment.from_task(task, name="run_nginx")
-            experiment.run(wait_until_done=True)
+            experiment = Experiment.from_task(task, name="run_nginx-latest")
+            experiment.run(wait_until_done=True, platform=platform)
             self.assertEqual(experiment.status, EntityStatus.SUCCEEDED)
-            # check container exist
-            matched_containers = find_containers_by_prefix("", image_name=docker_image)
-            for mc in matched_containers:
-                stop_container(mc, remove=True)
+            stop_container(platform.container_id, remove=True)
 
     @patch('idmtools_platform_container.container_operations.docker_operations.check_local_image')
     @patch('idmtools_platform_container.container_operations.docker_operations.pull_docker_image')
