@@ -32,7 +32,7 @@ class TestPlatformExperiment(unittest.TestCase):
 
     def test_container_platform_integration(self):
         with tempfile.TemporaryDirectory() as temp_dir:
-            platform = Platform("Container", job_directory="DEST", new_container=True)
+            platform = Platform("Container", job_directory=temp_dir, new_container=True)
             command = "Assets/run.sh"
             task = CommandTask(command=command)
             ac = AssetCollection()
@@ -142,7 +142,7 @@ class TestPlatformExperiment(unittest.TestCase):
             command = "ls -lat"
             task = CommandTask(command=command)
             experiment = Experiment.from_task(task, name="run_command")
-            experiment.run(wait_until_done=True)
+            experiment.run(wait_until_done=True, platform=platform1)
             self.assertEqual(experiment.status, EntityStatus.SUCCEEDED)
             # reuse the previous container with new_container=False
             platform2 = Platform("Container", job_directory=temp_dir, new_container=False)
@@ -163,7 +163,7 @@ class TestPlatformExperiment(unittest.TestCase):
             command = "ls -lat"
             task = CommandTask(command=command)
             experiment = Experiment.from_task(task, name="run_command")
-            experiment.run(wait_until_done=True)
+            experiment.run(wait_until_done=True, platform=platform1)
             self.assertEqual(experiment.status, EntityStatus.SUCCEEDED)
             container_name1 = get_container_name_by_id(platform1.container_id)
             # reuse the previous container with force_start=True
@@ -189,7 +189,7 @@ class TestPlatformExperiment(unittest.TestCase):
             command = "ls -lat"
             task = CommandTask(command=command)
             experiment = Experiment.from_task(task, name="run_command")
-            experiment.run(wait_until_done=False)
+            experiment.run(wait_until_done=False, platform=platform)
             exp_assets_path = Path(platform.get_directory(experiment), 'Assets')
             sim_assets_path = Path(platform.get_directory(experiment.simulations[0]), 'Assets')
             # Make sure experiment and simulations Assets dirs are not symlink
@@ -205,7 +205,7 @@ class TestPlatformExperiment(unittest.TestCase):
             command = "ls -lat"
             task = CommandTask(command=command)
             experiment = Experiment.from_task(task, name="run_command")
-            experiment.run(wait_until_done=False, dry_run=True)
+            experiment.run(wait_until_done=False, dry_run=True, platform=platform)
             self.assertEqual(experiment.status, EntityStatus.CREATED)
             mock_user_logger.info.assert_called_with(f"\nDry run: True")
             # clean up - dry run should not create container, so nothing to stop and remove
@@ -220,7 +220,7 @@ class TestPlatformExperiment(unittest.TestCase):
             command = "ls -lat"
             task = CommandTask(command=command)
             experiment = Experiment.from_task(task, name="run_command")
-            experiment.run(wait_until_done=True)
+            experiment.run(wait_until_done=True, platform=platform)
             self.assertEqual(experiment.status, EntityStatus.SUCCEEDED)
             sim_dir = platform.get_directory_by_id(experiment.simulations[0].id, ItemType.SIMULATION)
             with open(os.path.join(str(sim_dir), "_run.sh"), "r") as file:
@@ -280,13 +280,14 @@ class TestPlatformExperiment(unittest.TestCase):
                 runner = CliRunner()
                 # get detail of experiment2
                 result = runner.invoke(container_cli.container, ['get-detail', experiment2.id])
+                self.assertEqual(result.exit_code, 0)
                 # verify experiment2 is running in platform1's container
-                self.assertIn(f'"CONTAINER": "{platform1.container_id}",',
-                              mock_console.call_args_list[0].args[0].text)
-                self.assertIn(f'"EXPERIMENT_NAME": "run_command2",',
-                              mock_console.call_args_list[0].args[0].text)
-                self.assertIn(f'"EXPERIMENT_ID": "{experiment2.id}",',
-                              mock_console.call_args_list[0].args[0].text)
+                mock_console.assert_called()
+                printed_text = mock_console.call_args_list[0].args[0].text
+                # Verify experiment2 metadata and reused container ID
+                self.assertIn(f'"CONTAINER": "{platform1.container_id}",', printed_text)
+                self.assertIn(f'"EXPERIMENT_NAME": "run_command2",', printed_text)
+                self.assertIn(f'"EXPERIMENT_ID": "{experiment2.id}",', printed_text)
             # clean up
             stop_container(platform1.container_id, remove=True)
 
