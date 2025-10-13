@@ -123,6 +123,7 @@ class TestContainerPlatform(unittest.TestCase):
         container_id = platform_obj.start_container()
 
         expected_kwargs = dict(
+            command="bash",
             volumes={
                 platform_obj.job_directory: {"bind": platform_obj.data_mount, "mode": "rw"},
                 "src1": {"bind": "dest1", "mode": "rw"},
@@ -138,6 +139,8 @@ class TestContainerPlatform(unittest.TestCase):
         # Add user only on Linux/macOS
         if platform.system() != "Windows":
            expected_kwargs["user"] = f"{os.getuid()}:{os.getgid()}"
+        else:
+            expected_kwargs["user"] = None
 
         mock_client.containers.run.assert_called_once_with(
             platform_obj.docker_image,

@@ -35,7 +35,7 @@ class ContainerPlatform(FilePlatform):
     """
     Container Platform definition.
     """
-    __CONTAINER_IMAGE = 'idm-docker-staging.packages.idmod.org/idmtools/container-rocky-runtime:1.0.0'  # todo, change to production when it is ready
+    __CONTAINER_IMAGE = 'docker-production-public.packages.idmod.org/idmtools/container-rocky-runtime:0.0.4'
     __CONTAINER_MOUNT = "/home/container_data"
     docker_image: str = field(default=None, metadata=dict(help="Docker image to run the container"))
     data_mount: str = field(default=None, metadata=dict(help="Data mount point in the container"))
@@ -194,24 +194,21 @@ class ContainerPlatform(FilePlatform):
         env_vars = {"HOME": self.__CONTAINER_MOUNT, "PIP_USER": "yes"}
         volumes = self.build_binding_volumes()
         docker_user = None
-        if platform.system() != "Windows":
-            try:
-                uid = os.getuid()
-                gid = os.getgid()
-                docker_user = f"{uid}:{gid}"
-            except AttributeError:
-                # Fallback just in case on non-Windows platforms where these aren't available
-                pass
+        if hasattr(os, 'getuid'):
+            uid = os.getuid()
+            gid = os.getgid()
+            docker_user = f"{uid}:{gid}"
         # Run the container
         container = client.containers.run(
             self.docker_image,
+            command="bash",
             volumes=volumes,
             environment=env_vars,
             stdin_open=True,
             tty=True,
             detach=True,
             name=f"{self.container_prefix}_{str(uuid4())}" if self.container_prefix else None,
-            **({"user": docker_user} if docker_user else {})
+            user=docker_user
         )
 
         return container.short_id
