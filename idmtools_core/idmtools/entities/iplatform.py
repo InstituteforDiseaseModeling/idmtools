@@ -102,7 +102,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     #: Defines the path to common assets
     _common_asset_path: str = field(default="Assets", repr=True, init=False, compare=False)
 
-    refresh_interval: int = field(default=None, repr=False, init=True, compare=False, metadata=dict(help="Refresh Interval during wait."))
+    refresh_interval: int = field(default=5, repr=False, init=True, compare=False, metadata=dict(help="Refresh Interval during wait."))
 
     def __new__(cls, *args, **kwargs):
         """
