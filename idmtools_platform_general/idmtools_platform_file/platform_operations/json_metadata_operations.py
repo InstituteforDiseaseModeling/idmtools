@@ -58,6 +58,15 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         with filepath.open(mode='w') as f:
             json.dump(data, f, cls=IDMJSONEncoder)
 
+        # Also write tags.json file
+        keys_to_extract = ["id", "tags", "item_type"]
+        extracted = {key: data[key] for key in keys_to_extract if key in data and data[key]}
+
+        if extracted:  # Only write if at least one key exists
+            tags_path = filepath.parent / "tags.json"
+            with tags_path.open(mode="w") as tf:
+                json.dump(extracted, tf, indent=2)
+
     def get_metadata_filepath(self, item: Union[Suite, Experiment, Simulation]) -> Path:
         """
         Retrieve item's metadata file path.
