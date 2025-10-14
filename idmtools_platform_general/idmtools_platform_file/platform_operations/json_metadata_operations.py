@@ -58,15 +58,6 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         with filepath.open(mode='w') as f:
             json.dump(data, f, cls=IDMJSONEncoder)
 
-        # Also write tags.json file
-        keys_to_extract = ["id", "tags", "item_type"]
-        extracted = {key: data[key] for key in keys_to_extract if key in data and data[key]}
-
-        if extracted:  # Only write if at least one key exists
-            tags_path = filepath.parent / "tags.json"
-            with tags_path.open(mode="w") as tf:
-                json.dump(extracted, tf, indent=2)
-
     def get_metadata_filepath(self, item: Union[Suite, Experiment, Simulation]) -> Path:
         """
         Retrieve item's metadata file path.
@@ -126,7 +117,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
 
     def dump(self, item: Union[Suite, Experiment, Simulation]) -> Dict:
         """
-        Save item's metadata to a file.
+        Save item's metadata to a file and also save tags.json file if any tags exist in the metadata dict.
         Args:
             item: idmtools entity (Suite, Experiment and Simulation)
         Returns:
@@ -137,6 +128,15 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         dest = self.get_metadata_filepath(item)
         meta = self.get(item)
         self._write_to_file(dest, meta)
+
+        # Also write tags.json file
+        keys_to_extract = ["id", "item_type", "tags"]
+        extracted = {key: meta[key] for key in keys_to_extract if key in meta and meta[key]}
+
+        if extracted:  # Only write if at least one key exists
+            tags_path = dest.parent / "tags.json"
+            with tags_path.open(mode="w") as tf:
+                json.dump(extracted, tf, indent=2)
         return meta
 
     def load(self, item: Union[Suite, Experiment, Simulation]) -> Dict:
