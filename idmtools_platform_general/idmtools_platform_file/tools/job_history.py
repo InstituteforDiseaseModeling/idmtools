@@ -71,7 +71,6 @@ class JobHistory:
         current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         if experiment.parent:
             new_item = {"JOB_DIRECTORY": normalize_path(job_dir),
-                        "SUITE_DIR": normalize_path(platform.get_directory(experiment.parent)),
                         "SUITE_NAME": experiment.parent.name,
                         "SUITE_ID": experiment.parent_id,
                         "EXPERIMENT_DIR": normalize_path(platform.get_directory(experiment)),
@@ -162,7 +161,7 @@ class JobHistory:
 
             # Consider Suite case
             if suite_id == item_id:
-                return value.get('SUITE_DIR'), ItemType.SUITE
+                return Path(exp_dir).parent, ItemType.SUITE
 
             # Consider Simulation case
             pattern = f'*{item_id}/metadata.json'

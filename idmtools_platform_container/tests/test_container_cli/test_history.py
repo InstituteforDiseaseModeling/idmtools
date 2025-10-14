@@ -88,7 +88,6 @@ class TestContainerPlatformHistoryCli(TestContainerPlatformCliBase):
         result = self.runner.invoke(container_cli.container, ['clear-history'])
         self.assertEqual(result.exit_code, 0)
         command = "sleep 100"
-        task = CommandTask(command=command)
         platform = ContainerPlatform(job_directory=self.job_directory, new_container=True)
         task = CommandTask(command=command)
         experiment = Experiment.from_task(task, name="run_command")
