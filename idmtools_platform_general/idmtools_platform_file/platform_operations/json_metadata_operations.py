@@ -44,19 +44,20 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         return metadata
 
     @staticmethod
-    def _write_to_file(filepath: Union[Path, str], data: Dict) -> None:
+    def _write_to_file(filepath: Union[Path, str], data: Dict, indent: int = None) -> None:
         """
         Utility: save metadata to a file.
         Args:
             filepath: metadata file path
             data: metadata as dictionary
+            indent: indent level for pretty printing the JSON file. None for compact JSON.
         Returns:
             None
         """
         filepath = Path(filepath)
         filepath.parent.mkdir(parents=True, exist_ok=True)
         with filepath.open(mode='w') as f:
-            json.dump(data, f, cls=IDMJSONEncoder)
+            json.dump(data, f, indent=indent, cls=IDMJSONEncoder)
 
     def get_metadata_filepath(self, item: Union[Suite, Experiment, Simulation]) -> Path:
         """
@@ -131,12 +132,10 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
 
         # Also write tags.json file
         keys_to_extract = ["id", "item_type", "tags"]
-        extracted = {key: meta[key] for key in keys_to_extract if key in meta and meta[key]}
+        extracted = {key: meta[key] for key in keys_to_extract}
 
-        if extracted:  # Only write if at least one key exists
-            tags_path = dest.parent / "tags.json"
-            with tags_path.open(mode="w") as tf:
-                json.dump(extracted, tf, indent=2)
+        tags_path = dest.parent / "tags.json"
+        self._write_to_file(tags_path, extracted, indent=2)
         return meta
 
     def load(self, item: Union[Suite, Experiment, Simulation]) -> Dict:
