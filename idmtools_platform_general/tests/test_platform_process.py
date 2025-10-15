@@ -74,14 +74,14 @@ class TestProcessPlatform(ITestWithPersistence):
             files.extend(filenames)
             dirs.extend(dirnames)
             break
-        self.assertSetEqual(set(files), set(["metadata.json"]))
+        self.assertSetEqual(set(files), set(["metadata.json", "tags.json"]))
         # second verify files and dirs under experiment
         experiment_dir = self.platform.get_directory(experiment)
         files = []
         for (dirpath, dirnames, filenames) in os.walk(experiment_dir):
             files.extend(filenames)
             break
-        self.assertSetEqual(set(files), set(["metadata.json", "run_simulation.sh", "batch.sh", "stdout.txt", "stderr.txt"]))
+        self.assertSetEqual(set(files), set(["metadata.json", "run_simulation.sh", "batch.sh", "stdout.txt", "stderr.txt", "tags.json"]))
 
         # verify all files under simulations
         self.assertEqual(experiment.simulation_count, 9)
@@ -98,7 +98,7 @@ class TestProcessPlatform(ITestWithPersistence):
                     self.assertEqual(os.path.basename(pathlib.Path(target_link).parent), "..")
                     count = count + 1
                 files.extend(filenames)
-            self.assertSetEqual(set(files), set(["metadata.json", "_run.sh", "config.json", "stdout.txt", "stderr.txt", "job_status.txt", "result.txt"]))
+            self.assertSetEqual(set(files), set(["metadata.json", "_run.sh", "config.json", "stdout.txt", "stderr.txt", "job_status.txt", "result.txt", "tags.json"]))
         self.assertEqual(count, 9)  # make sure we found total 9 symlinks for Assets folder
 
     def test_generated_scripts(self):
