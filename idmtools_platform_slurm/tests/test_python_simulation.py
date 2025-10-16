@@ -72,7 +72,7 @@ class TestPythonSimulation(ITestWithPersistence):
         for (dirpath, dirnames, filenames) in os.walk(experiment_dir):
             files.extend(filenames)
             break
-        self.assertSetEqual(set(files), set(["metadata.json", "run_simulation.sh", "sbatch.sh", "batch.sh"]))
+        self.assertSetEqual(set(files), set(["metadata.json", "run_simulation.sh", "sbatch.sh", "batch.sh", "tags.json"]))
 
         # verify all files under simulations
         self.assertEqual(experiment.simulation_count, 9)
@@ -89,7 +89,7 @@ class TestPythonSimulation(ITestWithPersistence):
                     self.assertEqual(os.path.basename(target_link.parent), f"e_{experiment.name}_{experiment.id}")
                     count = count + 1
                 files.extend(filenames)
-            self.assertSetEqual(set(files), set(["metadata.json", "_run.sh", "config.json"]))
+            self.assertSetEqual(set(files), set(["metadata.json", "_run.sh", "config.json", "tags.json"]))
         self.assertEqual(count, 9)  # make sure we found total 9 symlinks for Assets folder
 
     def test_scripts(self):
