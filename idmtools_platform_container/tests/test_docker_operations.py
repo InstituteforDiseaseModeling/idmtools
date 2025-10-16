@@ -6,7 +6,7 @@ import pytest
 from docker.models.containers import Container
 from unittest.mock import patch, MagicMock
 import docker
-from docker.errors import NotFound, APIError
+from docker.errors import NotFound, APIError, ImageNotFound
 
 from idmtools.core import ItemType
 from idmtools_platform_container.container_operations.docker_operations import stop_container, stop_all_containers, \
@@ -306,7 +306,8 @@ class TestDockerOperations(unittest.TestCase):
 
         # test local image not found
         with self.subTest("test_with_local_image_not_found"):
-            result = check_local_image('non_existent_image')
+            mock_client.images.get.side_effect = ImageNotFound("not found")
+            result = check_local_image('fake_image')
             self.assertFalse(result)
 
     @patch('docker.from_env')
