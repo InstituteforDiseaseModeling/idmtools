@@ -274,9 +274,27 @@ class ParallelizeDecorator:
 
 def check_symlink_capabilities(func):
     """Decorator to check symlink creation capabilities."""
+
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         if sys.platform == 'win32' and sys.version_info < (3, 8):
             user_logger.debug('Need administrator privileges to create symbolic links on Windows.')
         return func(*args, **kwargs)
+
+    return wrapper
+
+
+def cache_directory(func):
+    """Decorator to cache Suite/Experiment/simulation directory."""
+
+    @functools.wraps(func)
+    def wrapper(self, item, *args, **kwargs):
+        _platform_directory = getattr(item, '_platform_directory', None)
+        if _platform_directory:
+            item_dir = _platform_directory
+        else:
+            item_dir = func(self, item, *args, **kwargs)
+            setattr(item, '_platform_directory', item_dir)
+        return item_dir
+
     return wrapper

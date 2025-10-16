@@ -590,7 +590,10 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         run_opts['regather_common_assets'] = regather_common_assets
         p.run_items(self, **run_opts)
         if wait_until_done:
-            self.wait(wait_on_done_progress=wait_on_done_progress)
+            _refresh_interval = run_opts.get('refresh_interval', None)
+            if _refresh_interval is None:
+                _refresh_interval = p.refresh_interval
+            self.wait(wait_on_done_progress=wait_on_done_progress, refresh_interval=_refresh_interval)
 
     def to_dict(self):
         """

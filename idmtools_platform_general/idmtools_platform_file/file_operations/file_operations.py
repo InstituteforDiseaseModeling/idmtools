@@ -18,7 +18,7 @@ from idmtools_platform_file.assets import generate_script, generate_simulation_s
 from idmtools_platform_file.file_operations.operations_interface import IOperations
 from idmtools_platform_file.platform_operations.utils import FILE_MAPS, validate_file_path_length, \
     clean_item_name, validate_folder_files_path_length, FileExperiment, FileSimulation, FileSuite
-from idmtools.utils.decorators import check_symlink_capabilities
+from idmtools.utils.decorators import check_symlink_capabilities, cache_directory
 
 logger = getLogger(__name__)
 user_logger = getLogger('user')
@@ -51,6 +51,7 @@ class FileOperations(IOperations):
         else:
             return item.id
 
+    @cache_directory
     def get_directory(self, item: Union[Suite, Experiment, Simulation]) -> Path:
         """
         Get item's path.

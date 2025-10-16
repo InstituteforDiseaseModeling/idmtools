@@ -7,7 +7,6 @@ import os
 from pathlib import Path
 from logging import getLogger
 from typing import Dict, Union, List, Optional
-
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities import Suite
 from idmtools.core import EntityStatus, ItemType
@@ -31,7 +30,7 @@ class FileItem:
     """
 
     _metas: Dict
-    _platform_directory: str
+    _platform_directory: Path
 
     def __init__(self, metas: Dict):
         """
@@ -40,7 +39,7 @@ class FileItem:
             metas: metadata
         """
         self._metas = metas
-        self._platform_directory = metas["dir"]
+        self._platform_directory = Path(metas["dir"])
 
     def get_platform_object(self):
         """
