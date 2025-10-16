@@ -109,10 +109,7 @@ class IRunnableEntity(IEntity, metaclass=ABCMeta):
         if dry_run:
             return
         if wait_until_done:
-            _refresh_interval = run_opts.get('refresh_interval', None)
-            if _refresh_interval is None:
-                _refresh_interval = p.refresh_interval
-            self.wait(wait_on_done_progress=wait_on_done_progress, platform=p, refresh_interval=_refresh_interval)
+            self.wait(wait_on_done_progress=wait_on_done_progress, platform=p)
 
     def wait(self, wait_on_done_progress: bool = True, timeout: int = None, refresh_interval=None, platform: 'IPlatform' = None, **kwargs):
         """

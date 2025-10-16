@@ -34,8 +34,6 @@ class Simulation(IAssetsEnabled, INamedEntity):
 
     This class needs to be implemented for each model type with specifics.
     """
-    #: Experiment ID
-    experiment_id: str = field(default=None)
     #: Task representing the configuration of the command to be executed
     task: 'ITask' = field(default=None)  # noqa: F821
     #: Item Type. Should not be changed from Simulation
@@ -69,44 +67,6 @@ class Simulation(IAssetsEnabled, INamedEntity):
             None
         """
         self.parent = experiment
-
-    @property
-    def parent(self):
-        """
-        Return parent object for item.
-
-        Returns:
-            Parent entity if set
-        """
-        if not self._parent:
-            self.parent_id = self.parent_id or self.experiment_id
-            if not self.parent_id:
-                return None
-            if not self.platform:
-                from idmtools.core import NoPlatformException
-                raise NoPlatformException("The object has no platform set...")
-            exp = self.platform.get_item(self.parent_id, ItemType.EXPERIMENT, force=True)
-            self._parent = exp
-            self.parent_id = self.suite_id = exp.id
-
-        return self._parent
-
-    @parent.setter
-    def parent(self, parent: 'Experiment'):
-        """
-        Sets the parent object for Entity.
-
-        Args:
-            parent: Parent object
-
-        Returns:
-            None
-        """
-        if parent is not None:
-            self._parent = parent
-            self.parent_id = self.suite_id = parent.id
-        else:
-            self._parent = self.parent_id = self.experiment_id = None
 
     def __repr__(self):
         """

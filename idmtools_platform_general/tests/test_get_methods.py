@@ -14,7 +14,7 @@ from idmtools.utils.collections import ExperimentParentIterator
 if sys.platform == "win32":
     from win32con import FALSE
 from idmtools.builders import SimulationBuilder
-from idmtools.core import ItemType, EntityContainer
+from idmtools.core import ItemType, EntityContainer, UnknownItemException
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
@@ -383,12 +383,3 @@ class TestFilePlatform(unittest.TestCase):
         tags = file_suite.get_tags()
         expected_suite_tags = {'name': 'suite_tag', 'idmtools': '123', "new_file_suite_tag": "abc"}
         self.assertTrue(all(tags.get(k) == v for k, v in expected_suite_tags.items()))
-
-    def test_duplicate_simulation_not_added_twice(self):
-        exp = Experiment("expB")
-        sim = Simulation("sim1")
-
-        exp.add_simulation(sim)
-        exp.add_simulation(sim)
-
-        assert len(exp.simulations) == 1

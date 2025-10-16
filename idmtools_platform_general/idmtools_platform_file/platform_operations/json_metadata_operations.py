@@ -44,20 +44,19 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         return metadata
 
     @staticmethod
-    def _write_to_file(filepath: Union[Path, str], data: Dict, indent: int = None) -> None:
+    def _write_to_file(filepath: Union[Path, str], data: Dict) -> None:
         """
         Utility: save metadata to a file.
         Args:
             filepath: metadata file path
             data: metadata as dictionary
-            indent: indent level for pretty printing the JSON file. None for compact JSON.
         Returns:
             None
         """
         filepath = Path(filepath)
         filepath.parent.mkdir(parents=True, exist_ok=True)
         with filepath.open(mode='w') as f:
-            json.dump(data, f, indent=indent, cls=IDMJSONEncoder)
+            json.dump(data, f, cls=IDMJSONEncoder)
 
     def get_metadata_filepath(self, item: Union[Suite, Experiment, Simulation]) -> Path:
         """
@@ -70,21 +69,6 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         if not isinstance(item, (Suite, Experiment, Simulation)):
             raise RuntimeError("get_metadata_filepath method supports Suite/Experiment/Simulation only.")
         item_dir = self.platform.get_directory(item)
-        filepath = Path(item_dir, self.metadata_filename)
-        return filepath
-
-    def get_metadata_filepath_by_id(self, item_id: str, item_type: ItemType) -> Path:
-        """
-        Retrieve item's metadata file path.
-        Args:
-            item_id: item id
-            item_type: the type of metadata to search for matches (simulation, experiment, suite, etc.)
-        Returns:
-            item's metadata file path
-        """
-        if item_type not in (ItemType.SUITE, ItemType.EXPERIMENT, ItemType.SIMULATION):
-            raise RuntimeError("get_metadata_filepath method supports Suite/Experiment/Simulation only.")
-        item_dir = self.platform.get_directory_by_id(item_id, item_type)
         filepath = Path(item_dir, self.metadata_filename)
         return filepath
 
@@ -106,6 +90,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         meta['uid'] = meta['_uid']
         meta['status'] = 'CREATED'
         meta['dir'] = os.path.abspath(self.platform.get_directory(item))
+        meta['tags'] = meta['tags']
 
         if isinstance(item, Suite):
             meta['experiments'] = [experiment.id for experiment in item.experiments]
@@ -118,7 +103,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
 
     def dump(self, item: Union[Suite, Experiment, Simulation]) -> Dict:
         """
-        Save item's metadata to a file and also save tags.json file.
+        Save item's metadata to a file.
         Args:
             item: idmtools entity (Suite, Experiment and Simulation)
         Returns:
@@ -129,13 +114,6 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         dest = self.get_metadata_filepath(item)
         meta = self.get(item)
         self._write_to_file(dest, meta)
-
-        # Also write tags.json file
-        keys_to_extract = ["id", "item_type", "tags"]
-        extracted = {key: meta[key] for key in keys_to_extract}
-
-        tags_path = dest.parent / "tags.json"
-        self._write_to_file(tags_path, extracted, indent=2)
         return meta
 
     def load(self, item: Union[Suite, Experiment, Simulation]) -> Dict:
@@ -209,18 +187,11 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         if not isinstance(item, (Suite, FileSuite, Experiment, FileExperiment)):
             raise RuntimeError("Get children method supports [File]Suite and [File]Experiment only.")
         item_list = []
-        if isinstance(item, (Suite, FileSuite)):
-            meta = self.load(item)
-            for exp_id in meta['experiments']:
-                meta_file = self.get_metadata_filepath_by_id(exp_id, ItemType.EXPERIMENT)
-                exp_meta = self._read_from_file(meta_file)
-                item_list.append(exp_meta)
-        else:
-            item_dir = self.platform.get_directory(item)
-            pattern = f'*/{self.metadata_filename}'
-            for meta_file in item_dir.glob(pattern=pattern):
-                meta = self.load_from_file(meta_file)
-                item_list.append(meta)
+        item_dir = self.platform.get_directory_by_id(item.id, item.item_type)
+        pattern = f'*/{self.metadata_filename}'
+        for meta_file in item_dir.glob(pattern=pattern):
+            meta = self.load_from_file(meta_file)
+            item_list.append(meta)
         return item_list
 
     def get_all(self, item_type: ItemType, item_id: str = '') -> List[Dict]:
@@ -232,36 +203,19 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         Returns:
             list of metadata with given item type
         """
-        root = Path(self.platform.job_directory)
-        item_list = []
-
         if item_type is ItemType.SIMULATION:
-            # Match sim under experiment, under optional suite
-            patterns = [
-                f"s_*/e_*/*{item_id}/{self.metadata_filename}",  # suite/experiment/simulation
-                f"e_*/*{item_id}/{self.metadata_filename}",  # experiment/simulation (no suite)
-            ]
+            pattern = f"*/*/*{item_id}/{self.metadata_filename}"
         elif item_type is ItemType.EXPERIMENT:
-            patterns = [
-                f"s_*/e_*{item_id}/{self.metadata_filename}",  # suite/experiment
-                f"e_*{item_id}/{self.metadata_filename}",  # standalone experiment
-            ]
+            pattern = f"*/*{item_id}/{self.metadata_filename}"
         elif item_type is ItemType.SUITE:
-            patterns = [
-                f"s_*{item_id}/{self.metadata_filename}",  # suite only
-            ]
+            pattern = f"*{item_id}/{self.metadata_filename}"
         else:
             raise RuntimeError(f"Unknown item type: {item_type}")
-
-        # Search each pattern
-        for pattern in patterns:
-            for meta_file in root.glob(pattern):
-                try:
-                    meta = self.load_from_file(meta_file)
-                    item_list.append(meta)
-                except Exception as e:
-                    print(f"Warning: Failed to load metadata from {meta_file}: {e}")
-
+        item_list = []
+        root = Path(self.platform.job_directory)
+        for meta_file in root.glob(pattern=pattern):
+            meta = self.load_from_file(meta_file)
+            item_list.append(meta)
         return item_list
 
     @staticmethod

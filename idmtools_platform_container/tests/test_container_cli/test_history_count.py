@@ -11,7 +11,6 @@ from test_base import TestContainerPlatformCliBase
 
 
 @pytest.mark.serial
-@pytest.mark.cli
 class TestContainerPlatformHistoryCountCli(TestContainerPlatformCliBase):
     @patch('rich.console.Console.print')
     def test_history_count(self, mock_console):

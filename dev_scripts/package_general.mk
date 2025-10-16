@@ -60,9 +60,6 @@ test-smoke: ## Run our smoke tests
 test-ssmt: ## Run our ssmt tests
 	$(MAKE) -C tests $@
 
-test-cli: ## Run our cli tests
-	$(MAKE) -C tests $@
-
 test-report: ## Launch test report in browser
 	$(MAKE) -C tests $@
 

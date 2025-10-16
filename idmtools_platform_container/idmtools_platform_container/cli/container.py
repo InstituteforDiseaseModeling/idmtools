@@ -298,7 +298,7 @@ def history(container_id: str = None, limit: int = 10, next: int = 0):
         console.print(f"{'':-^100}")
         for k, v in job.items():
             # Skip some keys
-            if k in ('EXPERIMENT_DIR', 'SUITE_DIR'):
+            if k in ('EXPERIMENT_DIR', 'SUITE_ID'):
                 continue
             console.print(f"[bold][cyan]{k:16}[/][/]: {v}")
 

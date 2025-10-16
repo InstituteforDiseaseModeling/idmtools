@@ -32,9 +32,6 @@ class TestSuite(unittest.TestCase):
 
     def test_suite_complex(self):
         self.experiment1.suite = self.suite
-        assert self.experiment1.parent is self.suite
-        assert self.experiment1 in self.suite.experiments
-        assert len(self.suite.experiments) == 1
         self.suite.add_experiment(self.experiment2)
         self.assertEqual(len(self.suite.experiments), 2)
         self.assertEqual(self.suite.id, self.experiment1.suite.id)
