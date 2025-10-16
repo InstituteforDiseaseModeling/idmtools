@@ -44,19 +44,20 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         return metadata
 
     @staticmethod
-    def _write_to_file(filepath: Union[Path, str], data: Dict) -> None:
+    def _write_to_file(filepath: Union[Path, str], data: Dict, indent: int = None) -> None:
         """
         Utility: save metadata to a file.
         Args:
             filepath: metadata file path
             data: metadata as dictionary
+            indent: indent level for pretty printing the JSON file. None for compact JSON.
         Returns:
             None
         """
         filepath = Path(filepath)
         filepath.parent.mkdir(parents=True, exist_ok=True)
         with filepath.open(mode='w') as f:
-            json.dump(data, f, cls=IDMJSONEncoder)
+            json.dump(data, f, indent=indent, cls=IDMJSONEncoder)
 
     def get_metadata_filepath(self, item: Union[Suite, Experiment, Simulation]) -> Path:
         """
@@ -117,7 +118,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
 
     def dump(self, item: Union[Suite, Experiment, Simulation]) -> Dict:
         """
-        Save item's metadata to a file.
+        Save item's metadata to a file and also save tags.json file.
         Args:
             item: idmtools entity (Suite, Experiment and Simulation)
         Returns:
@@ -128,6 +129,13 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         dest = self.get_metadata_filepath(item)
         meta = self.get(item)
         self._write_to_file(dest, meta)
+
+        # Also write tags.json file
+        keys_to_extract = ["id", "item_type", "tags"]
+        extracted = {key: meta[key] for key in keys_to_extract}
+
+        tags_path = dest.parent / "tags.json"
+        self._write_to_file(tags_path, extracted, indent=2)
         return meta
 
     def load(self, item: Union[Suite, Experiment, Simulation]) -> Dict:

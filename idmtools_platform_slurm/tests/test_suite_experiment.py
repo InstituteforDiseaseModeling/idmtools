@@ -30,8 +30,9 @@ class TestSuiteExperiment(ITestWithPersistence):
     def verify_suite_only_case(self, suite):
         suite_dir = self.platform.get_directory(suite)
         suite_sub_dirs, suite_files = get_dirs_and_files(self, suite_dir)
-        self.assertTrue(len(suite_files) == 1)
-        self.assertEqual(suite_files[0], pathlib.Path(str(suite_dir) + "/metadata.json"))
+        self.assertTrue(len(suite_files) == 2)
+        self.assertSetEqual(set(suite_files), set([pathlib.Path(str(suite_dir) + "/metadata.json"),
+                                                   pathlib.Path(str(suite_dir) + "/tags.json")]))
         # Verify no sub directory under suite at this point
         self.assertTrue(len(suite_sub_dirs) == 0)
 
