@@ -118,7 +118,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
 
     def dump(self, item: Union[Suite, Experiment, Simulation]) -> Dict:
         """
-        Save item's metadata to a file and also save tags.json file if any tags exist in the metadata dict.
+        Save item's metadata to a file and also save tags.json file.
         Args:
             item: idmtools entity (Suite, Experiment and Simulation)
         Returns:
