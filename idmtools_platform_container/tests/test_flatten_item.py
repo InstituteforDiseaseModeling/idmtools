@@ -5,7 +5,6 @@ from typing import Any, Dict
 from idmtools.builders import SimulationBuilder
 from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
-from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
 from idmtools.entities.templated_simulation import TemplatedSimulations
@@ -36,8 +35,6 @@ class TestFlattenItem(unittest.TestCase):
         ts.add_builder(builder)
         experiment = Experiment.from_template(ts, name=case_name, tags=tags)
         experiment.assets.add_directory(assets_directory=os.path.join("inputs", "Assets"))
-        suite = Suite(name= "test_suite")
-        suite.add_experiment(experiment)
         experiment.run(True, platform=cls.platform)
         cls.exp_id = experiment.uid
         cls.experiment = experiment

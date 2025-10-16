@@ -35,12 +35,6 @@ class Suite(INamedEntity, ABC, IRunnableEntity):
     item_type: ItemType = field(default=ItemType.SUITE, compare=False, init=False)
     description: str = field(default=None, compare=False)
 
-    def __post_init__(self):
-        """
-        Initialize Suite.
-        """
-        self.experiments = EntityContainer()
-
     def add_experiment(self, experiment: 'Experiment') -> 'NoReturn':  # noqa: F821
         """
         Add an experiment to the suite.
@@ -48,16 +42,12 @@ class Suite(INamedEntity, ABC, IRunnableEntity):
         Args:
             experiment: the experiment to be linked to suite
         """
-        # Link the suite to the experiment. Assumes the experiment suite setter adds the experiment to the suite.
-        experiment._parent = self
-        experiment.parent_id = experiment.suite_id = self.id
-
         ids = [exp.uid for exp in self.experiments]
         if experiment.uid in ids:
             return
 
-        # add experiment
-        self.experiments.append(experiment)
+        # Link the suite to the experiment. Assumes the experiment suite setter adds the experiment to the suite.
+        experiment.suite = self
 
     def display(self):
         """
@@ -141,7 +131,7 @@ class Suite(INamedEntity, ABC, IRunnableEntity):
             EntityContainer: A container of Experiment objects belonging to this suite.
         """
         experiments = self.experiments
-        if not experiments:
+        if experiments is None:
             experiments = self.platform.get_children(self.id, ItemType.SUITE, force=True)
         return experiments
 
@@ -171,15 +161,6 @@ class Suite(INamedEntity, ABC, IRunnableEntity):
                                                                      skip_sims=skip_sims,
                                                                      max_simulations=max_simulations, **kwargs)
         return sims
-
-    def __setstate__(self, state):
-        """
-        Add ignored fields back since they don't exist in the pickle.
-        """
-        # First call parent's __setstate__ to restore base attributes
-        super().__setstate__(state)
-        # Restore the pickle fields with values requested
-        self.experiments = EntityContainer()
 
 
 ISuiteClass = Type[Suite]

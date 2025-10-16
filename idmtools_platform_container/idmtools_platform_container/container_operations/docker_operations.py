@@ -12,7 +12,7 @@ from idmtools.core import ItemType
 from idmtools_platform_container.utils.general import normalize_path, parse_iso8601
 from idmtools_platform_file.tools.job_history import JobHistory
 from docker.models.containers import Container
-from docker.errors import NotFound as ErrorNotFound, ImageNotFound, DockerException
+from docker.errors import NotFound as ErrorNotFound
 from docker.errors import APIError as DockerAPIError
 from logging import getLogger, DEBUG
 
@@ -375,19 +375,11 @@ def check_local_image(image_name: str) -> bool:
     Returns:
         True/False
     """
-    try:
-        client = docker.from_env()
-        # Add ':latest' if no tag provided
-        if ":" not in image_name:
-            image_name = f"{image_name}:latest"
-        client.images.get(image_name)
-        return True
-    except ImageNotFound:
-        return False
-    except DockerException as ex:
-        if logger.isEnabledFor(DEBUG):
-            logger.debug(f"Error checking Docker daemon: {ex}")
-        return False
+    client = docker.from_env()
+    for image in client.images.list():
+        if image_name in image.tags:
+            return True
+    return False
 
 
 def pull_docker_image(image_name, tag='latest') -> bool:

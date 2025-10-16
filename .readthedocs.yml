@@ -30,6 +30,7 @@ formats:
 python:
   install:
     - requirements: dev_scripts/package_requirements.txt
+    - requirements: docs/requirements.txt
     - method: pip
       path: idmtools_core
       extra_requirements:
@@ -62,8 +63,6 @@ python:
       path: idmtools_platform_container
       extra_requirements:
         - test
-    - requirements: docs/requirements.txt
-
 
 
 

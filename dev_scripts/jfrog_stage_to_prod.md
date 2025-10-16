@@ -43,10 +43,10 @@ foreach ($distName in $packages.Keys) {
     $version = "2.2.0"
 
     jf rt cp "idm-pypi-staging/$distName/$version/$fileName-$version.tar.gz" `
-                 "idm-pypi-production/$distName/$version/" --flat=true --dry-run
+                 "idm-pypi-production/$distName/$version/$fileName-$version.tar.gz" --dry-run
 
     jf rt cp "idm-pypi-staging/$distName/$version/$fileName-$version-py3-none-any.whl" `
-                 "idm-pypi-production/$distName/$version/" --flat=true --dry-run
+                 "idm-pypi-production/$distName/$version/$fileName-$version-py3-none-any.whl" --dry-run
 }
 
 3. Remove the --dry-run flag from step 2 once the results look correct for all packages.

@@ -19,7 +19,6 @@ from utils import delete_containers_by_image_prefix
 
 
 @pytest.mark.serial
-@pytest.mark.cli
 class TestContainerPlatformListContainersCli(TestContainerPlatformCliBase):
     def setUp(self):
         super(TestContainerPlatformListContainersCli, self).setUpClass()

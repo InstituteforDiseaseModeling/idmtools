@@ -10,7 +10,6 @@ from test_base import TestContainerPlatformCliBase
 
 
 @pytest.mark.serial
-@pytest.mark.cli
 class TestContainerPlatformPackagesCli(TestContainerPlatformCliBase):
 
     @patch('rich.console.Console.print')
@@ -20,7 +19,8 @@ class TestContainerPlatformPackagesCli(TestContainerPlatformCliBase):
         experiment = Experiment.from_task(task, name="run_command")
         experiment.run(wait_until_done=False)
         result = self.runner.invoke(container_cli.container, ['packages', self.platform.container_id])
-        self.assertEqual(result.exit_code, 0)
+        self.assertIn('Package             Version', mock_console.call_args_list[0][0][0])
+        self.assertIn('numpy', mock_console.call_args_list[0][0][0])
         # clean up container
         result = self.runner.invoke(container_cli.container, ['stop-container', self.platform.container_id], '--remove')
         self.assertEqual(result.exit_code, 0)

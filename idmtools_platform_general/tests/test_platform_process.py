@@ -74,14 +74,14 @@ class TestProcessPlatform(ITestWithPersistence):
             files.extend(filenames)
             dirs.extend(dirnames)
             break
-        self.assertSetEqual(set(files), set(["metadata.json", "tags.json"]))
+        self.assertSetEqual(set(files), set(["metadata.json"]))
         # second verify files and dirs under experiment
         experiment_dir = self.platform.get_directory(experiment)
         files = []
         for (dirpath, dirnames, filenames) in os.walk(experiment_dir):
             files.extend(filenames)
             break
-        self.assertSetEqual(set(files), set(["metadata.json", "run_simulation.sh", "batch.sh", "stdout.txt", "stderr.txt", "tags.json"]))
+        self.assertSetEqual(set(files), set(["metadata.json", "run_simulation.sh", "batch.sh", "stdout.txt", "stderr.txt"]))
 
         # verify all files under simulations
         self.assertEqual(experiment.simulation_count, 9)
@@ -98,7 +98,7 @@ class TestProcessPlatform(ITestWithPersistence):
                     self.assertEqual(os.path.basename(pathlib.Path(target_link).parent), "..")
                     count = count + 1
                 files.extend(filenames)
-            self.assertSetEqual(set(files), set(["metadata.json", "_run.sh", "config.json", "stdout.txt", "stderr.txt", "job_status.txt", "result.txt", "tags.json"]))
+            self.assertSetEqual(set(files), set(["metadata.json", "_run.sh", "config.json", "stdout.txt", "stderr.txt", "job_status.txt", "result.txt"]))
         self.assertEqual(count, 9)  # make sure we found total 9 symlinks for Assets folder
 
     def test_generated_scripts(self):
@@ -220,7 +220,7 @@ class TestProcessPlatform(ITestWithPersistence):
         # make sure we only delete experiment folder under suite
         self.assertFalse(os.path.exists(exp_dir))
         with self.assertRaises(RuntimeError) as context:
-            self.platform.get_item(experiment.id, item_type=ItemType.EXPERIMENT, force=True)
+            self.platform.get_item(experiment.id, item_type=ItemType.EXPERIMENT, raw=True)
         self.assertTrue(f"Not found Experiment with id '{experiment.id}'" in str(context.exception.args[0]))
 
     def test_platform_delete_suite(self):
@@ -231,5 +231,5 @@ class TestProcessPlatform(ITestWithPersistence):
         # make sure we delete suite folder
         self.assertFalse(os.path.exists(suite_dir))
         with self.assertRaises(RuntimeError) as context:
-            self.platform.get_item(experiment.parent_id, item_type=ItemType.SUITE, force=True)
+            self.platform.get_item(experiment.parent_id, item_type=ItemType.SUITE, raw=True)
         self.assertTrue(f"Not found Suite with id '{experiment.parent_id}'" in str(context.exception.args[0]))

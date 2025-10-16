@@ -19,7 +19,6 @@ from helper import get_actual_rich_table_values, found_job_id_by_experiment, cle
 
 
 @pytest.mark.serial
-@pytest.mark.cli
 class TestContainerPlatformStatusCli(TestContainerPlatformCliBase):
     def test_status(self):
         command = "python3 Assets/sleep.py"

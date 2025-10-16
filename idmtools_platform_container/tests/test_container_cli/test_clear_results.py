@@ -20,18 +20,18 @@ class TestContainerPlatformClearResultsCli(TestContainerPlatformCliBase):
         self.assertEqual(result.exit_code, 0)
         # check if the EXPERIMENT_FILES are removed
         for f in container_cli.EXPERIMENT_FILES:
-            self.assertFalse(os.path.exists(os.path.join(self.job_directory, experiment.id, f)))
+            self.assertFalse(os.path.exists(os.path.join(self.job_directory, experiment.parent_id, experiment.id, f)))
         # check if the SIMULATION_FILES are removed
         for f in container_cli.SIMULATION_FILES:
             self.assertFalse(os.path.exists(
-                os.path.join(self.job_directory,experiment.id, experiment.simulations[0].id, f)))
+                os.path.join(self.job_directory, experiment.parent_id, experiment.id, experiment.simulations[0].id, f)))
         # clear-results Assets for simulation extra folder
         result = self.runner.invoke(container_cli.container, ['clear-results', experiment.id, '-r',
-                                                              os.path.join(self.job_directory,
+                                                              os.path.join(self.job_directory, experiment.parent_id,
                                                                            experiment.id, experiment.simulations[0].id,
                                                                            "Assets")])
         self.assertFalse(os.path.exists(
-            os.path.join(self.job_directory, experiment.id, experiment.simulations[0].id,
+            os.path.join(self.job_directory, experiment.parent_id, experiment.id, experiment.simulations[0].id,
                          "Assets")))
         # clean up container
         result = self.runner.invoke(container_cli.container, ['stop-container', self.platform.container_id], '--remove')
