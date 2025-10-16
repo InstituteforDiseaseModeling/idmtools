@@ -9,9 +9,7 @@ and running simulations, through the analysis of results. Modelers can use |IT_s
 locally or send suites of simulations to an HPC or other computing source. This framework is
 free, open-source, and model agnostic: it can be used to interact with a variety of models,
 such as custom models written in R or Python, or IDM's own |EMOD_s|. Additional functionality 
-for interacting with |EMOD_s| is provided in the :doc:`emod_api:emod_api` and 
-:doc:`emodpy:emodpy`.
-
+for interacting with |EMOD_s| is provided in `emod-api <https://docs.idmod.org/projects/emod-api/en/latest/>`__ and :doc:`emodpy:emodpy`.
 
 
 |IT_s| workflow
