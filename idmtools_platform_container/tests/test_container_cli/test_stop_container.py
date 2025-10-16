@@ -13,6 +13,7 @@ from test_base import TestContainerPlatformCliBase
 
 
 @pytest.mark.serial
+@pytest.mark.cli
 class TestContainerPlatformStopContainerCli(TestContainerPlatformCliBase):
 
     @patch('rich.console.Console.print')

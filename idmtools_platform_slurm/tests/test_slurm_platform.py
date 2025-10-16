@@ -79,7 +79,7 @@ class TestSlurmPlatform(ITestWithPersistence):
         slurm_simulation = self.platform.get_item(base.uid, ItemType.SIMULATION, raw=True)
         self.assertIsInstance(slurm_simulation, FileSimulation)
         self.assertEqual(str(base.uid), slurm_simulation.uid)
-        self.assertEqual(self.case_name, slurm_simulation.name)
+        self.assertEqual(self.case_name[:30], slurm_simulation.name)  # we only take the first 30 chars
         self.assertEqual({k: v for k, v in base.tags.items()}, slurm_simulation.tags)
 
     def test_parent(self):
@@ -138,20 +138,21 @@ class TestSlurmPlatform(ITestWithPersistence):
 
         with self.subTest('test_list_assets_add_exclude'):
             assets = self.platform._simulations.list_assets(self.exp.simulations[0], exclude='hello.sh')
-            self.assertEqual(4, len(assets))
+            self.assertEqual(5, len(assets))
             self.assertTrue(["hello.sh" is not asset.filename for asset in assets])
 
     def test_simulation_list_assets(self):
         count = 0
         for sim in self.exp.simulations:
             assets = self.platform._simulations.list_assets(sim)
-            self.assertEqual(3, len(assets))
+            self.assertEqual(4, len(assets))
             self.assertEqual(set([asset.filename for asset in assets]),
-                             set(['model1.py', 'hello.sh', 'config.json']))
+                             set(['model1.py', 'hello.sh', 'config.json', 'tags.json']))
             simulation_dir = Path.resolve(self.platform.get_directory(sim))
             expected_assets_path = [str(simulation_dir.joinpath('Assets/model1.py')),
                                     str(simulation_dir.joinpath('Assets/hello.sh')),
-                                    str(simulation_dir.joinpath('config.json'))]
+                                    str(simulation_dir.joinpath('config.json')),
+                                    str(simulation_dir.joinpath('tags.json'))]
             self.assertEqual(set([asset.absolute_path for asset in assets]), set(expected_assets_path))
             count += 1
         self.assertEqual(count, 2)
