@@ -82,15 +82,15 @@ class TestFilePlatform(unittest.TestCase):
             files.extend(filenames)
             dirs.extend(dirnames)
             break
-        self.assertSetEqual(set(files), set(["metadata.json"]))
-        self.assertEqual(dirs[0], f"{experiment.name}_{experiment.id}")
+        self.assertSetEqual(set(files), set(["metadata.json", "tags.json"]))
+        self.assertEqual(dirs[0], f"e_{experiment.name}_{experiment.id}")
         # second verify files and dirs under experiment
         experiment_dir = self.platform.get_directory(experiment)
         files = []
         for (dirpath, dirnames, filenames) in os.walk(experiment_dir):
             files.extend(filenames)
             break
-        self.assertSetEqual(set(files), set(["metadata.json", "run_simulation.sh", "batch.sh"]))
+        self.assertSetEqual(set(files), set(["metadata.json", "run_simulation.sh", "batch.sh", "tags.json"]))
 
         # verify all files under simulations
         self.assertEqual(experiment.simulation_count, 9)
@@ -107,7 +107,7 @@ class TestFilePlatform(unittest.TestCase):
                     self.assertEqual(os.path.basename(pathlib.Path(target_link).parent), "..")
                     count = count + 1
                 files.extend(filenames)
-            self.assertSetEqual(set(files), set(["metadata.json", "_run.sh", "config.json"]))
+            self.assertSetEqual(set(files), set(["metadata.json", "_run.sh", "config.json", "tags.json"]))
         self.assertEqual(count, 9)  # make sure we found total 9 symlinks for Assets folder
 
     def test_generated_scripts(self):
@@ -237,7 +237,7 @@ class TestFilePlatform(unittest.TestCase):
         # make sure we delete suite folder
         self.assertFalse(os.path.exists(os.path.join(self.job_directory, experiment.parent_id)))
         with self.assertRaises(RuntimeError) as context:
-            self.platform.get_item(experiment.parent_id, item_type=ItemType.SUITE, raw=True)
+            self.platform.get_item(experiment.parent_id, item_type=ItemType.SUITE, force=True)
         self.assertTrue(f"Not found Suite with id '{experiment.parent_id}'" in str(context.exception.args[0]))
 
     def test_file_suite_experiment_simulation(self):

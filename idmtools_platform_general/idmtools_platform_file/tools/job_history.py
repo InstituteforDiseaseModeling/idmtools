@@ -8,6 +8,7 @@ from pathlib import Path
 from datetime import datetime
 from typing import NoReturn, Dict, Tuple, List
 from idmtools.core import ItemType
+from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
 from idmtools_platform_container.utils.general import normalize_path, is_valid_uuid
 from logging import getLogger
@@ -63,19 +64,27 @@ class JobHistory:
         """
         cache = cls.history
 
-        from idmtools.core.context import get_current_platform
         if platform is None:
-            platform = get_current_platform()
+            platform = Platform("File", job_directory=job_dir)
 
         # Get current datetime
         current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        new_item = {"JOB_DIRECTORY": normalize_path(job_dir),
-                    "SUITE_ID": experiment.parent_id,
-                    "EXPERIMENT_DIR": normalize_path(platform.get_directory(experiment)),
-                    "EXPERIMENT_NAME": experiment.name,
-                    "EXPERIMENT_ID": experiment.id,
-                    "CONTAINER": container_id,
-                    "CREATED": current_datetime}
+        if experiment.parent:
+            new_item = {"JOB_DIRECTORY": normalize_path(job_dir),
+                        "SUITE_NAME": experiment.parent.name,
+                        "SUITE_ID": experiment.parent_id,
+                        "EXPERIMENT_DIR": normalize_path(platform.get_directory(experiment)),
+                        "EXPERIMENT_NAME": experiment.name,
+                        "EXPERIMENT_ID": experiment.id,
+                        "CONTAINER": container_id,
+                        "CREATED": current_datetime}
+        else:
+            new_item = {"JOB_DIRECTORY": normalize_path(job_dir),
+                        "EXPERIMENT_DIR": normalize_path(platform.get_directory(experiment)),
+                        "EXPERIMENT_NAME": experiment.name,
+                        "EXPERIMENT_ID": experiment.id,
+                        "CONTAINER": container_id,
+                        "CREATED": current_datetime}
         cache.set(experiment.id, new_item)
         cache.close()
 
@@ -139,9 +148,8 @@ class JobHistory:
             logger.debug(f"Invalid item id: {item_id}")
             return
 
-        cache = JobHistory.history
+        cache = cls.history
         item = cache.get(item_id)
-
         # Consider Experiment case
         if item:
             return Path(item['EXPERIMENT_DIR']), ItemType.EXPERIMENT
@@ -270,10 +278,9 @@ class JobHistory:
     def sync(cls) -> NoReturn:
         """Sync job history."""
         cache = cls.history
-
         for key in cache:
-            values = cache.get(key)
-            exp_dir = values.get('EXPERIMENT_DIR')
+            value = cache.get(key)
+            exp_dir = value.get('EXPERIMENT_DIR')
 
             root = Path(exp_dir)
             if not root.exists():

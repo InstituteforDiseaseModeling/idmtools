@@ -47,6 +47,7 @@ class FilePlatform(IPlatform):
     modules: list = field(default_factory=list, metadata=dict(help="Modules to load"))
     # extra packages to install
     extra_packages: list = field(default_factory=list, metadata=dict(help="Extra packages to install"))
+    maxlen: int = field(default=30, metadata=dict(help="Maximum length of suite/experiment name"))
 
     _suites: FilePlatformSuiteOperations = field(**op_defaults, repr=False, init=False)
     _experiments: FilePlatformExperimentOperations = field(**op_defaults, repr=False, init=False)

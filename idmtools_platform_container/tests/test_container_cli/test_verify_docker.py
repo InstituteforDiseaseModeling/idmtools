@@ -8,6 +8,7 @@ from test_base import TestContainerPlatformCliBase
 
 
 @pytest.mark.serial
+@pytest.mark.cli
 class TestContainerPlatformVerifyDockerCli(TestContainerPlatformCliBase):
 
     @patch('rich.console.Console.print')

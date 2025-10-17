@@ -1,5 +1,6 @@
 import os
 import shutil
+import platform
 import subprocess
 import sys
 import tempfile
@@ -106,6 +107,7 @@ class TestContainerPlatform(unittest.TestCase):
             self.assertEqual(platform.force_start, False)
             self.assertEqual(platform.user_mounts, None)
 
+
     @patch('docker.from_env')
     def test_start_container_custom_data_mount(self, mock_docker):
         # Mocking the Docker client and its methods
@@ -115,27 +117,37 @@ class TestContainerPlatform(unittest.TestCase):
         mock_client.containers.run.return_value = mock_container
 
         # Creating a ContainerPlatform instance
-        platform = ContainerPlatform(job_directory="DEST", user_mounts={"src1": "dest1", "src2": "dest2"})
+        platform_obj = ContainerPlatform(job_directory="DEST", user_mounts={"src1": "dest1", "src2": "dest2"})
 
         # Calling the start_container method
-        container_id = platform.start_container()
+        container_id = platform_obj.start_container()
 
-        # Asserting the calls
-        # mock_docker.assert_called_once()
-        mock_client.containers.run.assert_called_once_with(
-            platform.docker_image,
+        expected_kwargs = dict(
             command="bash",
             volumes={
-                platform.job_directory: {"bind": platform.data_mount, "mode": "rw"},
+                platform_obj.job_directory: {"bind": platform_obj.data_mount, "mode": "rw"},
                 "src1": {"bind": "dest1", "mode": "rw"},
-                "src2": {"bind": "dest2", "mode": "rw"}
+                "src2": {"bind": "dest2", "mode": "rw"},
             },
+            environment={"HOME": "/home/container_data", "PIP_USER": "yes"},
             stdin_open=True,
             tty=True,
             detach=True,
-            name=None
+            name=None,
+        )
+
+        # Add user only on Linux/macOS
+        if platform.system() != "Windows":
+           expected_kwargs["user"] = f"{os.getuid()}:{os.getgid()}"
+        else:
+            expected_kwargs["user"] = None
+
+        mock_client.containers.run.assert_called_once_with(
+            platform_obj.docker_image,
+            **expected_kwargs,
         )
         self.assertEqual(container_id, mock_container.short_id)
+
 
     @patch('idmtools_platform_container.container_platform.user_logger.warning')
     @patch('subprocess.run')  # Mock subprocess.run
@@ -201,9 +213,9 @@ class TestContainerPlatform(unittest.TestCase):
             platform = ContainerPlatform(job_directory="DEST", data_mount="/home/container_data")
             result = platform.get_container_directory(exp1)
             if sys.platform == "win32":
-                expected_result = f"/home/container_data/{suite1.name.lower()}_{suite1.id}/{exp1.name.lower()}_{exp1.id}"
+                expected_result = f"/home/container_data/s_{suite1.name.lower()}_{suite1.id}/e_{exp1.name.lower()}_{exp1.id}"
             else:
-                expected_result = f"/home/container_data/{suite1.name}_{suite1.id}/{exp1.name}_{exp1.id}"
+                expected_result = f"/home/container_data/s_{suite1.name}_{suite1.id}/e_{exp1.name}_{exp1.id}"
             self.assertEqual(expected_result, result)
 
         # test get_container_directory with Suite instance
@@ -211,7 +223,7 @@ class TestContainerPlatform(unittest.TestCase):
             suite1= Suite(name='Suite1')
             platform = ContainerPlatform(job_directory="DEST", data_mount="/home/container_data")
             result = platform.get_container_directory(suite1)
-            expected_result = f"/home/container_data/{suite1.name.lower()}_{suite1.id}"
+            expected_result = f"/home/container_data/s_{suite1.name.lower()}_{suite1.id}"
             self.assertEqual(expected_result, result.lower())
 
         # test get_container_directory with Simulation instance
@@ -223,7 +235,7 @@ class TestContainerPlatform(unittest.TestCase):
             exp1.parent = suite1
             platform = ContainerPlatform(job_directory="DEST", data_mount="/home/container_data")
             result = platform.get_container_directory(sim1)
-            expected_result = f"/home/container_data/{suite1.name.lower()}_{suite1.id}/{exp1.name.lower()}_{exp1.id}/{sim1.id}"
+            expected_result = f"/home/container_data/s_{suite1.name.lower()}_{suite1.id}/e_{exp1.name.lower()}_{exp1.id}/{sim1.id}"
             self.assertEqual(expected_result, result.lower())
 
         # test get_container_directory with Simulation instance
@@ -239,7 +251,7 @@ class TestContainerPlatform(unittest.TestCase):
             exp1.parent = suite1
             platform = ContainerPlatform(job_directory="DEST", data_mount="/home/container_data")
             result = platform.get_container_directory(sim1)
-            expected_result = f"/home/container_data/{suite1.name.lower()}_{suite1.id}/{exp1.name.lower()}_{exp1.id}/{sim1.name.lower()}_{sim1.id}"
+            expected_result = f"/home/container_data/s_{suite1.name.lower()}_{suite1.id}/e_{exp1.name.lower()}_{exp1.id}/{sim1.name.lower()}_{sim1.id}"
             self.assertEqual(expected_result, result.lower())
 
         # test get_container_directory with Simulation instance
@@ -256,7 +268,7 @@ class TestContainerPlatform(unittest.TestCase):
             exp1.parent = suite1
             platform = ContainerPlatform(job_directory="DEST", data_mount="/home/container_data")
             result = platform.get_container_directory(sim1)
-            expected_result = f"/home/container_data/{suite1.id}/{exp1.id}/{sim1.id}"
+            expected_result = f"/home/container_data/s_{suite1.id}/e_{exp1.id}/{sim1.id}"
             self.assertEqual(expected_result, result.lower())
 
     @patch('idmtools_platform_container.container_platform.find_container_by_image')

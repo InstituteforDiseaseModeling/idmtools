@@ -28,14 +28,15 @@ def get_latest_experiment(platform: 'IPlatform') -> Dict:
         Dictionary with experiment info
     """
     try:
-        # take the last suite as the search scope
-        last_suite_dir = max(Path(platform.job_directory).glob('*/'), key=os.path.getmtime)
-        batch_dir = max(Path(last_suite_dir).glob('*/batch.sh'), key=os.path.getmtime)
+        last_dir = max(Path(platform.job_directory).glob('*/'), key=os.path.getmtime)
+        if last_dir.name.startswith("s_"):
+            batch_dir = max(Path(last_dir).glob('*/batch.sh'), key=os.path.getmtime)
+        elif last_dir.name.startswith("e_"):
+            batch_dir = max(Path(last_dir).glob('batch.sh'), key=os.path.getmtime)
         exp_dir = Path(batch_dir).parent
         exp_id = exp_dir.name
-        suite_id = exp_dir.parent.name
 
-        r = dict(suite_id=suite_id, experiment_id=exp_id, experiment_directory=str(exp_dir),
+        r = dict(experiment_id=exp_id, experiment_directory=str(exp_dir),
                  job_directory=str(platform.job_directory))
         return r
     except:
