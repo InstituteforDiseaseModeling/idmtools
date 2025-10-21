@@ -305,7 +305,10 @@ class IEntity(IItem, metaclass=ABCMeta):
         if self.item_type not in (ItemType.SIMULATION, ItemType.EXPERIMENT, ItemType.SUITE):
             raise RuntimeError('Only support Suite/Experiment/Simulation for get_directory() for now.')
         try:
-            item = self.get_platform_object()
+            if self._platform_object is None:
+                return platform.get_directory(self)
+            else:
+                return self._platform_object._platform_directory
         except (NoPlatformException, RuntimeError):
             raise AttributeError(f"{type(self).__name__} id: {self.id} not found in {platform.__class__.__name__}.")
         return Path(item._platform_directory)
