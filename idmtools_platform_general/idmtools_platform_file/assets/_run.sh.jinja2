@@ -35,7 +35,11 @@ do
    RESULT=$?
    if [ $RESULT -eq 0 ]; then
       echo "0" > job_status.txt
-      exit $RESULT
+      exit 0
+   elif [ $RESULT -eq 255 ] || [ $RESULT -eq -1 ]; then   # Normalize -1 or 255 to 1 to avoid process abort
+      echo "-1" > job_status.txt
+      echo "_run.sh exiting with code: $RESULT" >> exit_code.log
+      exit 1
    fi
    n=$((n+1))
 done
