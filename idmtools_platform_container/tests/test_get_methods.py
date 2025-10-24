@@ -1,4 +1,5 @@
 import os
+import pathlib
 import sys
 import unittest
 
@@ -165,3 +166,19 @@ class TestFilePlatform(unittest.TestCase):
         file_exp_ids = [exp.id for exp in file_experiments]
         converted_exp_ids = [exp.id for exp in suite.experiments]
         self.assertSetEqual(set(file_exp_ids), set(converted_exp_ids))
+
+    def test_get_directory_before_and_after_run(self):
+        task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model3.py"), envelope="parameters", parameters=(dict(c=0)))
+        experiment = Experiment.from_task(task, name="test_dir")
+        # test get_directory before run
+        exp_dir = experiment.get_directory()
+        self.assertEqual(exp_dir, pathlib.Path(os.path.join(os.path.dirname(os.path.abspath(__file__)), self.job_directory, f"e_test_dir_{experiment.id}")))
+        experiment.assets.add_directory(assets_directory=os.path.join(COMMON_INPUT_PATH, "python", "Assets"))
+        suite = Suite(name='my_suite')
+        experiment.parent = suite
+        suite.run(platform=self.platform, wait_until_done=False)
+        # test get_directory after run
+        exp_dir_again = experiment.get_directory()
+        self.assertEqual(exp_dir_again, pathlib.Path(os.path.join(os.path.dirname(os.path.abspath(__file__)), self.job_directory, f"s_my_suite_{suite.id}", f"e_test_dir_{experiment.id}")))
+
+
