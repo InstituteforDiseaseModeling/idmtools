@@ -116,8 +116,8 @@ class TestFilePlatform(unittest.TestCase):
         sim = Simulation(name="my_sim")
         try:
             sim.get_directory()
-        except AttributeError as e:
-            self.assertTrue(f"Simulation id: {sim.id} not found in ContainerPlatform." in str(e))
+        except RuntimeError as e:
+            self.assertTrue("Simulation missing parent!" in str(e))
 
     def test_get_directory_workitem(self):
         workitem = GenericWorkItem(name="test_workitem")
