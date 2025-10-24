@@ -62,7 +62,8 @@ class IEntity(IItem, metaclass=ABCMeta):
         super().post_creation(platform)
 
     @classmethod
-    def from_id_file(cls, filename: Union[PathLike, str], platform: 'IPlatform' = None, **kwargs) -> 'IEntity':  # noqa E821:
+    def from_id_file(cls, filename: Union[PathLike, str], platform: 'IPlatform' = None,
+                     **kwargs) -> 'IEntity':  # noqa E821:
         """
         Load from a file that container the id.
 
@@ -86,7 +87,8 @@ class IEntity(IItem, metaclass=ABCMeta):
             else:
                 platform = cls.get_current_platform_or_error()
         if cls.item_type is None:
-            raise EnvironmentError("ItemType is None. This is most likely a badly derived IEntity that doesn't run set the default item type on the class")
+            raise EnvironmentError(
+                "ItemType is None. This is most likely a badly derived IEntity that doesn't run set the default item type on the class")
 
         return platform.get_item(item_id, cls.item_type, **kwargs)
 
@@ -106,7 +108,8 @@ class IEntity(IItem, metaclass=ABCMeta):
         if platform is None:
             platform = cls.get_current_platform_or_error()
         if cls.item_type is None:
-            raise EnvironmentError("ItemType is None. This is most likely a badly derived IEntity that doesn't run set the default item type on the class")
+            raise EnvironmentError(
+                "ItemType is None. This is most likely a badly derived IEntity that doesn't run set the default item type on the class")
         return platform.get_item(item_id, cls.item_type, **kwargs)
 
     @property
@@ -127,7 +130,7 @@ class IEntity(IItem, metaclass=ABCMeta):
         return self._parent
 
     @parent.setter
-    def parent(self, parent: 'IEntity'): # noqa E821
+    def parent(self, parent: 'IEntity'):  # noqa E821
         """
         Sets the parent object for item.
 
@@ -304,14 +307,7 @@ class IEntity(IItem, metaclass=ABCMeta):
             raise RuntimeError(f'Not support get_directory for {platform.__class__.__name__}')
         if self.item_type not in (ItemType.SIMULATION, ItemType.EXPERIMENT, ItemType.SUITE):
             raise RuntimeError('Only support Suite/Experiment/Simulation for get_directory() for now.')
-        try:
-            if self._platform_object is None:
-                return platform.get_directory(self)
-            else:
-                return self._platform_object._platform_directory
-        except (NoPlatformException, RuntimeError):
-            raise AttributeError(f"{type(self).__name__} id: {self.id} not found in {platform.__class__.__name__}.")
-        return Path(item._platform_directory)
+        return platform.get_directory(self)
 
     @property
     def directory(self) -> Path:
