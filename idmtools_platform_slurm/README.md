@@ -12,6 +12,7 @@
 - [Manually run a script as a Slurm job](#manually-run-a-script-as-a-slurm-job)
 - [Use SlurmJob to run a script as a Slurm job](#use-slurmjob-to-run-a-script-as-a-slurm-job)
 - [With SlurmPlatform to run a script as a Slurm job](#with-slurmplatform-to-run-a-script-as-a-slurm-job)
+- [Folder structure:](#folder-structure)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
