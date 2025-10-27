@@ -157,3 +157,5 @@ We have SlurmJob integrated into SlurmPlatform and any Python script can run as 
    experiment.run(platform=platform)
 ```
 
+## Folder structure:
+[See Folder Structure](../idmtools_platform_container/README.md#folder-structure)

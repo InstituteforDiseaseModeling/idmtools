@@ -135,17 +135,17 @@ To run `example_demo.py` in the virtual environment on the host machine:
 
 The running this example will output the following:
 
-.. image:: images/example_demo.png
+.. image:: images/example_demo_new.png
    :scale: 55%
 
 The output will be saved in the `destination_directory` folder on the host machine:
 
-.. image:: images/example_demo_host_result.png
+.. image:: images/example_demo_host_result_new.png
    :scale: 55%
 
 User can also view the same results inside the Docker container:
 
-.. image:: images/example_demo_container_result.png
+.. image:: images/example_demo_container_result_new.png
    :scale: 55%
 
 More examples
@@ -154,22 +154,51 @@ Run the following included Python example to submit and run a job on your |CONTA
 
 .. literalinclude:: ../../../examples/platform_container/python_sims_for_containerplatform.py
 
+.. _folder-structure-section:
 
 Folder structure
 ----------------
 
-By default, `idmtools` will generate simulations with the following structure:
+By default, **idmtools** will generate simulations with the following structure for container, slurm and general platforms:
 
-`job_directory/suite_name_uuid/experiment_name_uuid/simulation_uuid`
+``job_directory/s_suite_name_uuid/e_experiment_name_uuid/simulation_uuid``
 
-    - `job_directory` is the base directory for suite, experiment and simulations.
-    - `suite_name_uuid` is the name of the suite as prefix plus a suite uuid.
-    - `experiment_name_uuid` is the name of the experiment plus a experiment uuid.
-    - `simulation_uuid` is only simulation uuid.
+- `job_directory` is the base directory for suite, experiment and simulations.
+- `s_suite_name_uuid` is the suite directory, where the suite name (truncated to a maximum of 30 characters) is prefixed with ``s_``, followed by its unique suite UUID.
+- `e_experiment_name_uuid` is the experiment directory, where the experiment name (also truncated to 30 characters) is prefixed with ``e_``, followed by its unique experiment UUID.
+- `simulation_uuid` is only simulation uuid.
 
-    The user can customize the folder structure by setting the following parameters in the `idmtools.ini` file:
-    - `name_directory = False`: The suite and experiment names will be excluded in the simulation path.
-    - `sim_name_directory = True`: The simulation name will be included in the simulation path.
+Suite is optional. If the user does not specify a suite, the folder will be:
+
+- ``job_directory/e_<experiment_name>_<experiment_uuid>/simulation_uuid``
+
+Example:
+
+If you create a suite named: `my_very_long_suite_name_for_malaria_experiment`
+
+and an experiment named: `test_experiment_with_calibration_phase`,
+**idmtools** will automatically truncate both names to a maximum of 30 characters and apply the prefixes ``s_`` for suites and ``e_`` for experiments, resulting in a path like:
+
+The actual folder looks like::
+
+    job_directory/
+    └── s_my_very_long_suite_name_for_m_12345678-9abc-def0-1234-56789abcdef0/
+        └── e_test_experiment_with_calibrati_abcd1234-5678-90ef-abcd-1234567890ef/
+            └── 7c9e6679-7425-40de-944b-e07fc1f90ae7/
+
+
+Or for no suite case::
+
+    job_directory/
+    └── e_test_experiment_with_calibrati_abcd1234-5678-90ef-abcd-1234567890ef/
+        └── 7c9e6679-7425-40de-944b-e07fc1f90ae7/
+
+
+The user can customize the folder structure by setting the following parameters in the ``idmtools.ini`` file:
+
+- ``name_directory = False`` — The suite and experiment names will be excluded in the simulation path.
+- ``sim_name_directory = True`` — The simulation name will be included in the simulation path.
+
 
 Additionally, You can view the same results inside the Docker container at `/home/container-data/<suite_path>/<experiment_path>/<simulation_path>`.
 The `container-data` directory is the default data mount point in the container.

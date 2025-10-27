@@ -93,6 +93,8 @@ Run the following included Python script to submit and run a job on your |SLURM_
 
     /examples/native_slurm/python_sims.py
 
+For information about how output directories are structured, see the
+:ref:`folder-structure-section`.
 
 .. note::
 
