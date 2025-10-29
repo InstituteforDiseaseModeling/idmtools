@@ -392,3 +392,38 @@ class TestFilePlatform(unittest.TestCase):
         exp.add_simulation(sim)
 
         assert len(exp.simulations) == 1
+
+    def test_get_directory_for_extra_simulations(self):
+        class setParam:
+            def __init__(self, param):
+                self.param = param
+
+            def __call__(self, simulation, value):
+                return simulation.task.set_parameter(self.param, value)
+
+        task = JSONConfiguredPythonTask(script_path=os.path.join(COMMON_INPUT_PATH, "python", "model1.py"))
+        ts = TemplatedSimulations(base_task=task)
+        builder = SimulationBuilder()
+        builder.add_sweep_definition(setParam("a"), range(2))
+        builder.add_sweep_definition(setParam("b"), range(3))
+        ts.add_builder(builder)
+        experiment = Experiment.from_template(ts, name="test_get_directory_for_extra_simulations")
+        # Create suite
+        suite = Suite(name='Idm Suite')
+        # Add experiment to the suite
+        suite.add_experiment(experiment)
+        # add extra simulation to experiment
+        extra_sim = Simulation(name="sim1")
+        extra_sim.task = task
+        experiment.add_simulation(extra_sim)
+        s_dir = extra_sim.get_directory()
+        experiment.run(wait_until_done=False)
+        e_dir = experiment.get_directory()
+        s_dir_again = extra_sim.get_directory()
+        # Verify extra sim is in experiment directory
+        self.assertTrue(os.path.isdir(os.path.join(e_dir, s_dir)))
+        self.assertTrue(os.path.isdir(os.path.join(e_dir, s_dir_again)))
+        self.assertTrue(len(experiment.simulations) == 7)
+        for sim in experiment.get_simulations():
+            self.assertTrue(os.path.isdir(os.path.join(e_dir, sim.get_directory())))
+
