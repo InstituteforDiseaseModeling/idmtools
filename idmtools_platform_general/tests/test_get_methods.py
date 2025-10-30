@@ -408,22 +408,36 @@ class TestFilePlatform(unittest.TestCase):
         builder.add_sweep_definition(setParam("b"), range(3))
         ts.add_builder(builder)
         experiment = Experiment.from_template(ts, name="test_get_directory_for_extra_simulations")
-        # Create suite
-        suite = Suite(name='Idm Suite')
-        # Add experiment to the suite
-        suite.add_experiment(experiment)
+        # lookup experiment directory before run
+        exp_dir = experiment.get_directory()
         # add extra simulation to experiment
         extra_sim = Simulation(name="sim1")
         extra_sim.task = task
         experiment.add_simulation(extra_sim)
+        # lookup sim directory before run
         s_dir = extra_sim.get_directory()
+        self.assertTrue(s_dir.resolve().is_relative_to(exp_dir.resolve()))
+        # Create suite after experiment is created
+        suite = Suite(name='My_Suite')
+        # Add experiment to the suite
+        suite.add_experiment(experiment)
         experiment.run(wait_until_done=False)
-        e_dir = experiment.get_directory()
-        s_dir_again = extra_sim.get_directory()
+        suite_dir = suite.get_directory()
+        e_dir_final = experiment.get_directory()
+        s_dir_final = extra_sim.get_directory()
+        # Verify experiment directory before run is not created
+        self.assertFalse(exp_dir.exists())
+        # Verify experiment directory after run is not created
+        self.assertTrue(e_dir_final.exists())
+        # Verify experiment dir is in suite directory
+        self.assertTrue(e_dir_final.resolve().is_relative_to(suite_dir.resolve()))
         # Verify extra sim is in experiment directory
-        self.assertTrue(os.path.isdir(os.path.join(e_dir, s_dir)))
-        self.assertTrue(os.path.isdir(os.path.join(e_dir, s_dir_again)))
+        self.assertTrue(s_dir_final.resolve().is_relative_to(e_dir_final.resolve()))
         self.assertTrue(len(experiment.simulations) == 7)
+        # verify there is 7 total sim dirs under experiment dir
+        count = 0
         for sim in experiment.get_simulations():
-            self.assertTrue(os.path.isdir(os.path.join(e_dir, sim.get_directory())))
+            self.assertTrue(os.path.isdir(os.path.join(experiment.get_directory(), sim.get_directory())))
+            count += 1
+        self.assertEqual(count, 7)
 
