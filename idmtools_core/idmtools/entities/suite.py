@@ -59,6 +59,9 @@ class Suite(INamedEntity, ABC, IRunnableEntity):
         # add experiment
         self.experiments.append(experiment)
 
+        # clear possible directory cache for Experiment and Simulation
+        experiment.clear_directory_cache()
+
     def display(self):
         """
         Display workflowitem.
