@@ -8,6 +8,7 @@ on:
       # only run this on
       - dev
       - 'release**'
+      - revert-revert-dev
     paths:
       - 'idmtools_core/**'
       - 'idmtools_platform_container/**'

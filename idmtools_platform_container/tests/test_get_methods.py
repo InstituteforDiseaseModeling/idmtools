@@ -70,7 +70,7 @@ class TestFilePlatform(unittest.TestCase):
         experiment = self.experiment
         suite: Suite = experiment.parent
         file_suite: FileSuite = suite.get_platform_object()
-        # verify get_directory for server suite (file_suite)
+        # Verify get_directory for server suite (file_suite)
         self.assertEqual(self.platform.get_directory(file_suite), file_suite.get_directory())
         # verify get_directory for local suite (idmtools suite)
         self.assertEqual(self.platform.get_directory(suite), suite.get_directory())
