@@ -733,10 +733,11 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         """
         Clear directory cache for Experiment and Simulations.
         """
-        platform = self.get_current_platform_or_error()
+        from idmtools.core.context import get_current_platform
+        platform = get_current_platform()
 
         # Skip COMPS Platform
-        if hasattr(platform, 'job_directory'):
+        if platform and hasattr(platform, 'job_directory'):
             # Clear experiment directory cache
             r1 = getattr(self, "_platform_directory", None)
             if r1:
