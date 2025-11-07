@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "idmtools"
-version = "2.2.1+nightly"
+version = "3.0.0"
 description = "Core tools for modeling"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -125,7 +125,7 @@ slurm = [
 
 [tool.setuptools]
 packages = { find = { exclude = ["tests"] } }
-include-package-data = true  # ✅ This enables MANIFEST.in for wheel builds
+include-package-data = true  #  This enables MANIFEST.in for wheel builds
 
 [tool.setuptools.package-data]
 "idmtools" = ["*"]

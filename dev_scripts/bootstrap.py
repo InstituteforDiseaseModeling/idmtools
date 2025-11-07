@@ -101,7 +101,8 @@ def process_output(output_line: str):
 
 def install_dev_packages(pip_url, extra_index_url, build_docs):
     """
-    Install all idmtools packages in editable mode with their extras, and also dev dependencies for docs.
+    Install all idmtools packages in editable mode with their extras.
+    Skips `.test` extras when building docs (build_docs=True).
     Args:
         pip_url: Url to install package from.
         extra_index_url: Extra index url to install package from.
@@ -111,7 +112,10 @@ def install_dev_packages(pip_url, extra_index_url, build_docs):
         None
     """
     for package, extras in packages.items():
-        extras_str = f"[{','.join(extras)}]" if extras else ""
+        # When building docs, skip 'test' extras
+        effective_extras = [e for e in extras if not (build_docs and e == "test")]
+
+        extras_str = f"[{','.join(effective_extras)}]" if effective_extras else ""
         package_dir = join(base_directory, package)
         logger.info(f"Installing {package}{extras_str} from {package_dir}")
 
@@ -127,7 +131,7 @@ def install_dev_packages(pip_url, extra_index_url, build_docs):
             logger.critical(f"{package} installation failed: {e.cmd}")
             logger.debug(f"Return code: {e.returncode}")
 
-    # Install doc dependencies
+    # Install doc-specific dependencies only if requested
     if build_docs:
         docs_dir = join(base_directory, "docs")
         logger.info("Installing doc requirements from docs/requirements.txt")

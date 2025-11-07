@@ -7,7 +7,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "idmtools_models"
-version = "2.2.1+nightly"
+version = "3.0.0"
 description = "Core tools for modeling"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -34,7 +34,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
-    "idmtools~=2.2.1",
+    "idmtools~=3.0.0",
 ]
 
 [project.urls]

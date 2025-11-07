@@ -1,2 +1,2 @@
 """iidmtools_cli version definition file."""
-__version__ = "2.2.1+nightly"
+__version__ = "3.0.0"
