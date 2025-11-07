@@ -30,8 +30,8 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
-    "idmtools~=2.2.1",
-    "idmtools_cli~=2.2.1",
+    "idmtools~=3.0.0",
+    "idmtools_cli~=3.0.0",
 ]
 
 [project.urls]

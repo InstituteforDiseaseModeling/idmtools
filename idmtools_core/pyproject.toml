@@ -125,7 +125,7 @@ slurm = [
 
 [tool.setuptools]
 packages = { find = { exclude = ["tests"] } }
-include-package-data = true  # ✅ This enables MANIFEST.in for wheel builds
+include-package-data = true  #  This enables MANIFEST.in for wheel builds
 
 [tool.setuptools.package-data]
 "idmtools" = ["*"]
