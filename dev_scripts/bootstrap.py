@@ -19,6 +19,7 @@ import logging
 import os
 import subprocess
 import sys
+from importlib.metadata import version, PackageNotFoundError
 import unicodedata
 from logging import getLogger
 from os.path import abspath, join, dirname
@@ -37,17 +38,25 @@ data_class_default = default_install
 escapes = ''.join([chr(char) for char in range(1, 32)])
 translator = str.maketrans('', '', escapes)
 
+# Minimum versions required for editable pyproject installs
+REQUIRED = {
+    "pip": "23.1",
+    "setuptools": "64.0",
+    "wheel": "0.38",
+}
+
 # Our packages and the extras to install
 packages = dict(
     idmtools_core=data_class_default,
     idmtools_cli=default_install,
-    idmtools_platform_comps=data_class_default,
+    idmtools_test=[],
     idmtools_models=data_class_default,
+    idmtools_platform_comps=data_class_default,
     idmtools_platform_general=data_class_default,
     idmtools_platform_container=data_class_default,
     idmtools_platform_slurm=data_class_default,
-    idmtools_test=[]
 )
+
 logger = getLogger("bootstrap")
 
 
@@ -142,6 +151,33 @@ def install_dev_packages(pip_url, extra_index_url, build_docs):
         for line in execute(cmd_docs, cwd=docs_dir):
             process_output(line)
 
+def compare_versions(current: str, minimum: str) -> bool:
+    """Return True if current >= minimum."""
+    from packaging.version import parse
+    return parse(current) >= parse(minimum)
+
+def check_min_req():
+    missing = []
+    for pkg, min_ver in REQUIRED.items():
+        try:
+            cur_ver = version(pkg)
+        except PackageNotFoundError:
+            print(f"{pkg} not found. Please install it (minimum {min_ver}).")
+            sys.exit(1)
+
+        if not compare_versions(cur_ver, min_ver):
+            missing.append((pkg, cur_ver, min_ver))
+        else:
+            print(f"{pkg} {cur_ver} (meets requirement ≥ {min_ver})")
+
+    if missing:
+        print("\nEnvironment check failed:")
+        for pkg, cur, req in missing:
+            print(f"   - {pkg}: {cur} < required {req}")
+        print("\nPlease run:")
+        print("   python -m pip install --upgrade " +
+              " ".join([pkg for pkg, _, _ in missing]))
+        sys.exit(1)
 
 def install_base_environment(pip_url, extra_index_url):
     """
@@ -153,11 +189,7 @@ def install_base_environment(pip_url, extra_index_url):
 
     Lastly, we create an idmtools ini in example for developers
     """
-    # install wheel first to benefit from binaries
-    for line in execute([sys.executable, "-m", "pip", "install", "wheel", f"--index-url={pip_url}",
-                         f"--extra-index-url={extra_index_url}"]):
-        process_output(line)
-
+    check_min_req()
     for line in execute([sys.executable, "-m", "pip", "uninstall", "-y", "py-make"], ignore_error=True):
         process_output(line)
 
@@ -165,7 +197,7 @@ def install_base_environment(pip_url, extra_index_url):
                          f"--extra-index-url={extra_index_url}"]):
         process_output(line)
 
-    for line in execute([sys.executable, "-m", "pip", "install", "build", "setuptools", f"--index-url={pip_url}",
+    for line in execute([sys.executable, "-m", "pip", "install", "build", f"--index-url={pip_url}",
                          f"--extra-index-url={extra_index_url}"]):
         process_output(line)
 

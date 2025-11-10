@@ -5,4 +5,4 @@ coverage>=5.3,<7.5
 packaging~=24.0
 idm-buildtools~=1.0.5
 twine~=4.0.2
-wheel
+wheel>=0.38

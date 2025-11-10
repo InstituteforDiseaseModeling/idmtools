@@ -35,15 +35,15 @@ python:
     - method: pip
       path: idmtools_cli
     - method: pip
-      path: idmtools_platform_comps
+      path: idmtools_test
     - method: pip
       path: idmtools_models
+    - method: pip
+      path: idmtools_platform_comps
     - method: pip
       path: idmtools_platform_general
     - method: pip
       path: idmtools_platform_slurm
-    - method: pip
-      path: idmtools_test
     - method: pip
       path: idmtools_platform_container
     - requirements: docs/requirements.txt
