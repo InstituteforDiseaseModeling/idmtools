@@ -41,13 +41,14 @@ translator = str.maketrans('', '', escapes)
 packages = dict(
     idmtools_core=data_class_default,
     idmtools_cli=default_install,
-    idmtools_platform_comps=data_class_default,
+    idmtools_test=[],
     idmtools_models=data_class_default,
+    idmtools_platform_comps=data_class_default,
     idmtools_platform_general=data_class_default,
     idmtools_platform_container=data_class_default,
     idmtools_platform_slurm=data_class_default,
-    idmtools_test=[]
 )
+
 logger = getLogger("bootstrap")
 
 
@@ -147,27 +148,33 @@ def install_base_environment(pip_url, extra_index_url):
     """
     Installs the base packages needed for development environments.
 
-    We install wheel first(so we can utilize it in later installs).
+    We install base packages needed for development environments.
     We then uninstall py-make
     We then install idm-buildtools
 
     Lastly, we create an idmtools ini in example for developers
     """
-    # install wheel first to benefit from binaries
-    for line in execute([sys.executable, "-m", "pip", "install", "wheel", f"--index-url={pip_url}",
-                         f"--extra-index-url={extra_index_url}"]):
+    """Install base tools for development."""
+    # Upgrade to ensure minimum versions
+    logger.info("Upgrading pip, setuptools, and wheel to required versions...")
+    for line in execute([
+        sys.executable, "-m", "pip", "install", "--upgrade",
+        "pip>=23.1", "setuptools>=64.0", "wheel>=0.38",
+        f"--index-url={pip_url}", f"--extra-index-url={extra_index_url}"
+    ]):
         process_output(line)
 
+    # Uninstall py-make
     for line in execute([sys.executable, "-m", "pip", "uninstall", "-y", "py-make"], ignore_error=True):
         process_output(line)
 
-    for line in execute([sys.executable, "-m", "pip", "install", "idm-buildtools~=1.0.1", f"--index-url={pip_url}",
-                         f"--extra-index-url={extra_index_url}"]):
-        process_output(line)
-
-    for line in execute([sys.executable, "-m", "pip", "install", "build", "setuptools", f"--index-url={pip_url}",
-                         f"--extra-index-url={extra_index_url}"]):
-        process_output(line)
+    # Install idm-buildtools
+    for pkg in ["build", "idm-buildtools~=1.0.1"]:
+        for line in execute([
+            sys.executable, "-m", "pip", "install", pkg,
+            f"--index-url={pip_url}", f"--extra-index-url={extra_index_url}"
+        ]):
+            process_output(line)
 
     dev_idmtools_ini = join(base_directory, "examples", "idmtools.ini")
     if not os.path.exists(dev_idmtools_ini):
