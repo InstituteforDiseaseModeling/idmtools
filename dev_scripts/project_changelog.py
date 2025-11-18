@@ -15,6 +15,42 @@ import subprocess
 import json
 import pandas as pd
 
+EXCLUDE_LABELS = ['Research', 'wontfix', 'Discuss', 'duplicate', 'Exclude from Changelog', 'Epic', 'Release/Packaging', 'Transition']
+
+SECTION_ORDER = [
+    "Feature Request",
+    "Bugs",
+    "Platforms",
+    "Core",
+    "Configuration",
+    "CLI",
+    "Analyzers",
+    "Models",
+    "Documentation",
+    "Developer/Test",
+    "User Experience"
+    "Support",
+    "Dependencies",
+    "Release/Packaging",
+    "Other",
+]
+
+
+def has_excluded_label(label_list):
+    """
+    Check if label is excluded from changelog.
+    Args:
+        label_list (list[dict]): List of label dictionaries, where each has a 'name' key.
+
+    Returns:
+        bool: True if any label in the list matches one of EXCLUDE_LABELS, otherwise False.
+
+    """
+    if not isinstance(label_list, list):
+        return False
+    label_names = [lbl.get('name', '').lower() for lbl in label_list if isinstance(lbl, dict)]
+    return any(lbl.lower() in label_names for lbl in EXCLUDE_LABELS)
+
 
 def get_issue_type(labels):
     """
@@ -68,6 +104,9 @@ def generate_release_change_log(project_df: pd.DataFrame, docs_path: str):
     Returns:
         None
     """
+    # --- Filter out excluded labels ---
+    project_df = project_df[~project_df['label'].apply(has_excluded_label)]
+
     release_templates = '''
 
 {release_under}
@@ -85,9 +124,11 @@ def generate_release_change_log(project_df: pd.DataFrame, docs_path: str):
     if os.path.exists(release_file):
         os.remove(release_file)
     final_out += release_templates.format(release=releases[0], release_under='=' * len(releases[0]))
-    issue_types = project_df['issue_type'].unique()
+    all_issue_types = project_df['issue_type'].unique()
+    ordered_issue_types = [s for s in SECTION_ORDER if s in all_issue_types] + \
+                          [s for s in all_issue_types if s not in SECTION_ORDER]
     section_out = final_out
-    for issue in sorted(issue_types):
+    for issue in ordered_issue_types:
 
         section_out += section_template.format(section=issue, section_under='-' * len(issue))
         section_data = project_df[project_df['issue_type'] == issue]
@@ -142,6 +183,9 @@ def generate_changelog_for_releasenote(project_df: pd.DataFrame):
     import os
     dir_path = "release_notes"
     os.makedirs(dir_path, exist_ok=True)
+    # --- Filter out excluded labels ---
+    if 'label' in project_df.columns:
+        project_df = project_df[~project_df['label'].apply(has_excluded_label)]
 
     releases = project_df['release'].unique()
     release_file = os.path.join(dir_path, f'changelog_release_{releases[0]}.rst')
@@ -149,9 +193,11 @@ def generate_changelog_for_releasenote(project_df: pd.DataFrame):
     if os.path.exists(release_file):
         os.remove(release_file)
 
-    issue_types = project_df['issue_type'].unique()
+    all_issue_types = project_df['issue_type'].unique()
+    ordered_issue_types = [s for s in SECTION_ORDER if s in all_issue_types] + \
+                          [s for s in all_issue_types if s not in SECTION_ORDER]
     section_out = '## Change log:'
-    for issue_type in sorted(issue_types):
+    for issue_type in ordered_issue_types:
         section_out += section_template.format(section='### ' + issue_type)
         section_data = project_df[project_df['issue_type'] == issue_type]
         for _, issue in section_data.iterrows():
