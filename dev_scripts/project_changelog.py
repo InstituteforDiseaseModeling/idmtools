@@ -129,10 +129,13 @@ def generate_release_change_log(project_df: pd.DataFrame, docs_path: str):
                           [s for s in all_issue_types if s not in SECTION_ORDER]
     section_out = final_out
     for issue in ordered_issue_types:
-
         section_out += section_template.format(section=issue, section_under='-' * len(issue))
         section_data = project_df[project_df['issue_type'] == issue]
         for _, issue in section_data.iterrows():
+            url = issue.get('url', '')
+            # Skip rows with empty or not issues, we do not include pull requests
+            if not isinstance(url, str) or 'issues' not in url.lower():
+                continue
             section_out += f"* `#{issue['issue_number']} <{issue['url']}>`_ - {issue['title']}\n"
     with open(release_file, 'w') as out:
         out.write(section_out)
@@ -201,6 +204,10 @@ def generate_changelog_for_releasenote(project_df: pd.DataFrame):
         section_out += section_template.format(section='### ' + issue_type)
         section_data = project_df[project_df['issue_type'] == issue_type]
         for _, issue in section_data.iterrows():
+            url = issue.get('url', '')
+            # Skip rows with empty or not issues, we do not include pull requests
+            if not isinstance(url, str) or 'issues' not in url.lower():
+                continue
             section_out += f"* #{issue['issue_number']} - {issue['title']}\n"
     with open(release_file, 'w') as out:
         out.write(section_out)
