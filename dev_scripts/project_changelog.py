@@ -28,11 +28,11 @@ SECTION_ORDER = [
     "Models",
     "Documentation",
     "Developer/Test",
-    "User Experience"
+    "User Experience",
     "Support",
     "Dependencies",
     "Release/Packaging",
-    "Other",
+    "Other"
 ]
 
 
