@@ -408,7 +408,7 @@ class TestFilePlatform(unittest.TestCase):
         builder.add_sweep_definition(setParam("b"), range(3))
         ts.add_builder(builder)
         experiment = Experiment.from_template(ts, name="test_get_directory_for_extra_simulations")
-        # lookup experiment directory before run
+        # Lookup experiment directory before run
         exp_dir = experiment.get_directory()
         # add extra simulation to experiment
         extra_sim = Simulation(name="sim1")

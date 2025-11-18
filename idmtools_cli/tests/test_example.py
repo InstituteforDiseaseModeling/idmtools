@@ -90,4 +90,3 @@ class TestExample(unittest.TestCase):
         r5, _ = validate("1  3 all 9", choice_set)
         self.assertFalse(r5)
         self.assertEqual(_, [9])
-

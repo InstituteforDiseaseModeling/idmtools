@@ -163,12 +163,6 @@ class TestExperimentStatus(unittest.TestCase):
                          f'Expected {expected_status}, was {self.experiment.status}, sim statuses: {statuses}')
 
     def test_status_is_correct(self) -> None:
-        #
-        # single sim status cases
-        #
-
-        # no simulations in exp
-
         # all sims are CREATED
         expected = EntityStatus.CREATED
         statuses = {EntityStatus.CREATED: 5}

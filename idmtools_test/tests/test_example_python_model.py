@@ -11,3 +11,4 @@ python_model = os.path.join(examples_folder, 'python_model')
 class TestPythonModelDirectory(TestCase):
     def test_python_model_directory(self):
         test_example_folder(self, python_model)
+
