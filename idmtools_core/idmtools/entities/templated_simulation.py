@@ -316,3 +316,10 @@ class TemplatedSimulations:
         """
         ids = [sim.id for sim in self.__extra_simulations]
         return simulation_id in ids
+
+    def clear_extra_simulation_directory_cache(self):
+        """
+        Clear templated extra simulations directory cache.
+        """
+        for sim in self.__extra_simulations:
+            sim._platform_directory = None

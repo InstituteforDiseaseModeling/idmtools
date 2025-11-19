@@ -108,18 +108,39 @@
 
 
 ### Folder structure
-By default, `idmtools` will generate simulations with the following structure:
-`job_directory/suite_name_uuid/experiment_name_uuid/simulation_uuid`
-- `job_directory` is the base directory for suite, experiment and simulations.
-- `suite_name_uuid` is the name of the suite as prefix plus a suite uuid.
-- `experiment_name_uuid` is the name of the experiment plus a experiment uuid.
-- `simulation_uuid` is only simulation uuid.
+By default, `idmtools` now generates simulations with the following structure:
+`job_directory/s_<suite_name>_<suite_uuid>/e_<experiment_name>_<experiment_uuid>/simulation_uuid`
+- `job_directory` — The base directory that contains all suite, experiment, and simulation folders.
+- `s_<suite_name>_<suite_uuid>` — The suite directory, where the suite name (truncated to a maximum of 30 characters) is prefixed with s_, followed by its unique suite UUID.
+- `e_<experiment_name>_<experiment_uuid>` — The experiment directory, where the experiment name (also truncated to 30 characters) is prefixed with e_, followed by its unique experiment UUID.
+- `simulation_uuid` — The simulation folder identified only by its UUID.
 
-The user can customize the folder structure by setting the following parameters in the `idmtools.ini` file:
-- `name_directory = False`: The suite and experiment names will be excluded in the simulation path.
-- `sim_name_directory = True`: The simulation name will be included in the simulation path with name_directory is True.
+Suite is optional. If the user does not specify a suite, the folder will be:
+`job_directory/e_<experiment_name>_<experiment_uuid>/simulation_uuid`
 
+Examples:
 
+If you create a suite named: `my_very_long_suite_name_for_malaria_experiment`
+
+and an experiment named: `test_experiment_with_calibration_phase`
+`idmtools` will automatically truncate both names to a maximum of 30 characters and apply the prefixes s_ for suites and e_ for experiments, resulting in a path like:
+```
+job_directory/
+└── s_my_very_long_suite_name_for_m_12345678-9abc-def0-1234-56789abcdef0/
+    └── e_test_experiment_with_calibrati_abcd1234-5678-90ef-abcd-1234567890ef/
+        └── 7c9e6679-7425-40de-944b-e07fc1f90ae7/
+```
+
+Or for no suite case:
+```
+job_directory/
+└── e_test_experiment_with_calibrati_abcd1234-5678-90ef-abcd-1234567890ef/
+    └── 7c9e6679-7425-40de-944b-e07fc1f90ae7/
+```
+
+Users can customize this structure through the idmtools.ini configuration file:
+- `name_directory = False` — Excludes the suite and experiment names (and their prefixes) from the simulation path.
+- `sim_name_directory = True` — Includes the simulation name in the simulation folder path when name_directory = True.
 
 ## Basic CLI commands
 

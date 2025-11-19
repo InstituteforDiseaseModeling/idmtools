@@ -729,6 +729,30 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         else:
             return False
 
+    def clear_directory_cache(self):
+        """
+        Clear directory cache for Experiment and Simulations.
+        """
+        from idmtools.core.context import get_current_platform
+        platform = get_current_platform()
+
+        # Skip COMPS Platform
+        if platform and hasattr(platform, 'job_directory'):
+            # Clear experiment directory cache
+            r1 = getattr(self, "_platform_directory", None)
+            if r1:
+                self._platform_directory = None
+                logger.warning(f"The Experiment {self.uid} referenced a temporary directory {r1}.")
+
+            # Clear Children's directory cache
+            if isinstance(self.simulations.items, (list, set)):
+                for sim in self.simulations.items:
+                    sim._platform_directory = None
+            elif isinstance(self.simulations.items, TemplatedSimulations):
+                self.simulations.items.clear_extra_simulation_directory_cache()
+            else:
+                pass
+
 
 class ExperimentSpecification(ExperimentPluginSpecification):
     """

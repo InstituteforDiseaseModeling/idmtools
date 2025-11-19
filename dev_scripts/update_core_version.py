@@ -42,11 +42,17 @@ def update_requirements():
             rout.write(new_contents)
 
 
-def update_idmtools_version_in_pyproject():  # noqa: D103
-    target_pattern = re.compile(r'^idmtools([ \t]*(==|~=|>=|<=)?[ \t]*[\d\.]+)?$')
+def update_idmtools_version_in_pyproject():
+    """Update idmtools and idmtools_platform_general dependency versions in pyproject.toml files."""
+    # Match idmtools or idmtools_platform_general optionally with version specifier
+    pattern_idmtools = re.compile(r'^idmtools([ \t]*(==|~=|>=|<=)?[ \t]*[\d\.]+)?$')
+    pattern_general = re.compile(r'^idmtools_platform_general([ \t]*(==|~=|>=|<=)?[ \t]*[\d\.]+)?$')
+    pattern_cli = re.compile(r'^idmtools_cli([ \t]*(==|~=|>=|<=)?[ \t]*[\d\.]+)?$')
 
     current_version = get_current_version()
-    new_dependency = f"idmtools~={current_version}"
+    new_idmtools_dep = f"idmtools~={current_version}"
+    new_general_dep = f"idmtools_platform_general~={current_version}"
+    new_cli_dep = f"idmtools_cli~={current_version}"
 
     for file in glob.glob(os.path.join(REPO_PATH, "**", "pyproject.toml"), recursive=True):
         with open(file, "rb") as f:
@@ -56,21 +62,32 @@ def update_idmtools_version_in_pyproject():  # noqa: D103
                 print(f"Skipping {file} due to TOML parse error: {e}")
                 continue
 
-        dependencies = pyproject_data.get("project", {}).get("dependencies", [])
+        deps = pyproject_data.get("project", {}).get("dependencies", [])
         updated = False
 
-        for i, dep in enumerate(dependencies):
-            if target_pattern.match(dep):
-                if dep != new_dependency:
-                    print(f"Updating {file}: {dep} → {new_dependency}")
-                    dependencies[i] = new_dependency
+        for i, dep in enumerate(deps):
+            if pattern_idmtools.match(dep):
+                if dep != new_idmtools_dep:
+                    print(f"Updating {file}: {dep} → {new_idmtools_dep}")
+                    deps[i] = new_idmtools_dep
                     updated = True
 
+            elif pattern_general.match(dep):
+                if dep != new_general_dep:
+                    print(f"Updating {file}: {dep} → {new_general_dep}")
+                    deps[i] = new_general_dep
+                    updated = True
+
+            elif pattern_cli.match(dep):
+                if dep != new_cli_dep:
+                    print(f"Updating {file}: {dep} → {new_cli_dep}")
+                    deps[i] = new_cli_dep
+                    updated = True
+
+        # Only write once if something changed
         if updated:
-            # Write updated TOML back using tomli_w
             with open(file, "wb") as f:
                 tomli_w.dump(pyproject_data, f)
 
 
 update_idmtools_version_in_pyproject()
-# TODO, need to update pyproject.toml in all idmtools_platform_general, idmtools_platform_container, idmtools_platform_slurm for other dependencies as well.

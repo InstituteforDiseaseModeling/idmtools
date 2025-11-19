@@ -41,13 +41,14 @@ translator = str.maketrans('', '', escapes)
 packages = dict(
     idmtools_core=data_class_default,
     idmtools_cli=default_install,
-    idmtools_platform_comps=data_class_default,
+    idmtools_test=[],
     idmtools_models=data_class_default,
+    idmtools_platform_comps=data_class_default,
     idmtools_platform_general=data_class_default,
     idmtools_platform_container=data_class_default,
     idmtools_platform_slurm=data_class_default,
-    idmtools_test=[]
 )
+
 logger = getLogger("bootstrap")
 
 
@@ -101,7 +102,8 @@ def process_output(output_line: str):
 
 def install_dev_packages(pip_url, extra_index_url, build_docs):
     """
-    Install all idmtools packages in editable mode with their extras, and also dev dependencies for docs.
+    Install all idmtools packages in editable mode with their extras.
+    Skips `.test` extras when building docs (build_docs=True).
     Args:
         pip_url: Url to install package from.
         extra_index_url: Extra index url to install package from.
@@ -111,7 +113,10 @@ def install_dev_packages(pip_url, extra_index_url, build_docs):
         None
     """
     for package, extras in packages.items():
-        extras_str = f"[{','.join(extras)}]" if extras else ""
+        # When building docs, skip 'test' extras
+        effective_extras = [e for e in extras if not (build_docs and e == "test")]
+
+        extras_str = f"[{','.join(effective_extras)}]" if effective_extras else ""
         package_dir = join(base_directory, package)
         logger.info(f"Installing {package}{extras_str} from {package_dir}")
 
@@ -127,7 +132,7 @@ def install_dev_packages(pip_url, extra_index_url, build_docs):
             logger.critical(f"{package} installation failed: {e.cmd}")
             logger.debug(f"Return code: {e.returncode}")
 
-    # Install doc dependencies
+    # Install doc-specific dependencies only if requested
     if build_docs:
         docs_dir = join(base_directory, "docs")
         logger.info("Installing doc requirements from docs/requirements.txt")
@@ -143,27 +148,33 @@ def install_base_environment(pip_url, extra_index_url):
     """
     Installs the base packages needed for development environments.
 
-    We install wheel first(so we can utilize it in later installs).
+    We install base packages needed for development environments.
     We then uninstall py-make
     We then install idm-buildtools
 
     Lastly, we create an idmtools ini in example for developers
     """
-    # install wheel first to benefit from binaries
-    for line in execute([sys.executable, "-m", "pip", "install", "wheel", f"--index-url={pip_url}",
-                         f"--extra-index-url={extra_index_url}"]):
+    """Install base tools for development."""
+    # Upgrade to ensure minimum versions
+    logger.info("Upgrading pip, setuptools, and wheel to required versions...")
+    for line in execute([
+        sys.executable, "-m", "pip", "install", "--upgrade",
+        "pip>=23.1", "setuptools>=64.0", "wheel>=0.38",
+        f"--index-url={pip_url}", f"--extra-index-url={extra_index_url}"
+    ]):
         process_output(line)
 
+    # Uninstall py-make
     for line in execute([sys.executable, "-m", "pip", "uninstall", "-y", "py-make"], ignore_error=True):
         process_output(line)
 
-    for line in execute([sys.executable, "-m", "pip", "install", "idm-buildtools~=1.0.1", f"--index-url={pip_url}",
-                         f"--extra-index-url={extra_index_url}"]):
-        process_output(line)
-
-    for line in execute([sys.executable, "-m", "pip", "install", "build", "setuptools", f"--index-url={pip_url}",
-                         f"--extra-index-url={extra_index_url}"]):
-        process_output(line)
+    # Install idm-buildtools
+    for pkg in ["build", "idm-buildtools~=1.0.1"]:
+        for line in execute([
+            sys.executable, "-m", "pip", "install", pkg,
+            f"--index-url={pip_url}", f"--extra-index-url={extra_index_url}"
+        ]):
+            process_output(line)
 
     dev_idmtools_ini = join(base_directory, "examples", "idmtools.ini")
     if not os.path.exists(dev_idmtools_ini):
