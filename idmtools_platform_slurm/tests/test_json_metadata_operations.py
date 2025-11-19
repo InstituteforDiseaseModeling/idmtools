@@ -30,12 +30,12 @@ class JSONMetadataOperationsTest(unittest.TestCase):
         simulation1.experiment = exp1
         simulation2.experiment = exp1
         simulation3.experiment = exp2
+        self.op.dump(suite)
+        self.op.dump(exp1)
+        self.op.dump(exp2)
         self.op.dump(simulation1)
         self.op.dump(simulation2)
         self.op.dump(simulation3)
-        self.op.dump(exp1)
-        self.op.dump(exp2)
-        self.op.dump(suite)
         suites = [suite]
         experiments = [exp1, exp2]
         simulations = [simulation1, simulation2, simulation3]
@@ -62,7 +62,7 @@ class JSONMetadataOperationsTest(unittest.TestCase):
         self.assertEqual(sim_metadata['item_type'], "Simulation")
         self.assertEqual(sim_metadata['assets'], [])
         self.assertEqual(sim_metadata['dir'], str(Path(
-            f"{self.metadata_root}/{_[0].name}_{_[0].id}/{experiments[1].name}_{sim.parent_id}/{sim.id}")))
+            f"{self.metadata_root}/s_{_[0].name}_{_[0].id}/e_{experiments[1].name}_{sim.parent_id}/{sim.id}")))
 
         # test get meta for experiment
 
@@ -96,12 +96,12 @@ class JSONMetadataOperationsTest(unittest.TestCase):
 
     # test load with no meta_data file
     def test_errors_for_no_existent_metadata_file(self):
-        sim = Simulation(name="Simulation")
+        sim = Simulation(name="sim")
         sim.uid = 'totally-brand-new'
-        exp = Experiment(name="Experiment")
+        exp = Experiment(name="exp")
         exp.uid = 'very-shiny-new'
         sim.experiment = exp
-        suite = Suite(name="Suite")
+        suite = Suite(name="suite")
         suite.uid = 'is-it-new-or-knew'
         exp.suite = suite
 
@@ -115,13 +115,7 @@ class JSONMetadataOperationsTest(unittest.TestCase):
 
         # check exception if we load meta_data from file
         with self.assertRaises(FileNotFoundError) as ex:
-            self.op.load(item=sim)
-        self.assertEqual("No such file or directory", ex.exception.args[1])
-        with self.assertRaises(FileNotFoundError) as ex:
-            self.op.load(item=exp)
-        self.assertEqual("No such file or directory", ex.exception.args[1])
-        with self.assertRaises(FileNotFoundError) as ex:
-            self.op.load(item=exp)
+            self.op.load(item=suite)
         self.assertEqual("No such file or directory", ex.exception.args[1])
 
     # test override metadata

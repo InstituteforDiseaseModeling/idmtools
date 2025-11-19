@@ -102,6 +102,8 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
     #: Defines the path to common assets
     _common_asset_path: str = field(default="Assets", repr=True, init=False, compare=False)
 
+    refresh_interval: int = field(default=5, repr=False, init=True, compare=False, metadata=dict(help="Refresh Interval during wait."))
+
     def __new__(cls, *args, **kwargs):
         """
         Create a new object.
@@ -506,6 +508,7 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
 
         for item in items:
             item.platform = self
+            item._platform_directory = None
             interface = ITEM_TYPE_TO_OBJECT_INTERFACE[item.item_type]
             getattr(self, interface).run_item(item, **kwargs)
 

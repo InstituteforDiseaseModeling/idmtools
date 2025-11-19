@@ -4,9 +4,12 @@ import unittest
 import re
 from unittest.mock import patch
 import pytest
+
+from idmtools.entities import Suite
 from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
 import idmtools_platform_container.cli.container as container_cli
+from idmtools_platform_container.container_platform import ContainerPlatform
 from idmtools_platform_file.tools.job_history import JobHistory
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -16,6 +19,7 @@ from helper import get_actual_rich_table_values
 
 
 @pytest.mark.serial
+@pytest.mark.cli
 class TestContainerPlatformJobCli(TestContainerPlatformCliBase):
 
     @patch('rich.console.Console.print')
@@ -71,6 +75,33 @@ class TestContainerPlatformJobCli(TestContainerPlatformCliBase):
         job = JobHistory.get_job(experiment.id)
         # test jobs with container id
         result = self.runner.invoke(container_cli.container, ['jobs'], self.platform.container_id)
+        self.assertEqual(result.exit_code, 0)
+        actual_table = get_actual_rich_table_values(mock_console)
+        expected_job = ['EXPERIMENT', experiment.id, job['CONTAINER']]
+        found = False
+        for row in actual_table[1:]:
+            if all(item in row for item in expected_job):  # if all items in expected_job are in row
+                found = True  # set found to True
+        self.assertEqual(found, True)
+        # clean up by stop the job
+        result = self.runner.invoke(container_cli.container, ['cancel', experiment.id])
+        self.assertEqual(result.exit_code, 0)
+
+    @patch('rich.console.Console.print')
+    def test_jobs_with_container_suite(self, mock_console):
+        # first clear the history
+        result = self.runner.invoke(container_cli.container, ['clear-history'])
+        self.assertEqual(result.exit_code, 0)
+        command = "sleep 100"
+        platform = ContainerPlatform(job_directory=self.job_directory, new_container=True)
+        task = CommandTask(command=command)
+        experiment = Experiment.from_task(task, name="run_command")
+        suite = Suite(name="suite_name")
+        suite.add_experiment(experiment)
+        suite.run(wait_until_done=False, platform=platform)
+        job = JobHistory.get_job(experiment.id)
+        # test history
+        result = self.runner.invoke(container_cli.container, ['jobs'], platform.container_id)
         self.assertEqual(result.exit_code, 0)
         actual_table = get_actual_rich_table_values(mock_console)
         expected_job = ['EXPERIMENT', experiment.id, job['CONTAINER']]

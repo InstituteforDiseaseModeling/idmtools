@@ -7,7 +7,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "idmtools_test"
-version = "2.2.1"
+version = "3.0.0"
 description = "Test and demo data for IDM-Tools"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -35,7 +35,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
-    "idmtools~=2.2.1",
+    "idmtools~=3.0.0",
     "pytest",
     "pypiwin32==223; sys_platform == 'win32'",
     "pywin32; sys_platform == 'win32'",

@@ -1,0 +1,105 @@
+Performance Evaluation of Container Platform Configurations
+
+Test Objective
+Evaluate CPU utilization, runtime efficiency, and output behavior when running 1,000 burn-in simulations (20-year and 10-year) on an 8-vCPU VM using different Platform("Container") configurations.
+
+Test example:
+~/github/emodpy-malaria/examples-container/burnin_create_and_use with Serialization_Time_Steps = [[365*20, 365*10]] for burnin
+and serialize_days = 365*20 for use burnin experiment
+
+1. Test Configuration
+    Parameter	Value / Description
+    Workload	1,000 simulation burn-in runs (20 yr + 10 yr)
+    Host	    8 vCPUs, 16 GB RAM
+    Input	    demographics.json (4 nodes)
+    Output	    State files (*.dtk) for burnin
+    Platform	idmtools_platform_container.ContainerPlatform
+
+
+2. Generate burnin Experiment Scenarios
+  Case #1 – Default Configuration
+    platform = Platform("Container", job_directory="DEST")   # default max_job = 4
+    Launched: 4 compute workers on 8 vCPUs (≈ 50 % CPU saturation)
+
+    Runtime: ~ 11 minutes
+
+    CPU Behavior:
+    PID	%CPU	%MEM	Command	Interpretation
+    2237948	99	0.3	Eradication	compute thread #1
+    2237973	99	0.3	Eradication	compute thread #2
+    2237998	82	0.2	Eradication	compute thread #3
+    2238021	39	0.2	Eradication	compute thread #4
+
+    Observation:
+    Balanced usage — CPU-bound, efficient parallelization on half the cores.
+    Output example:
+        state-03650.dtk   17 MB
+        state-07300.dtk   17 MB
+
+  Case #2 – Over-Subscribed Run
+    platform = Platform("Container", job_directory="DEST", ntasks=4) # default max_job = 4
+    Launched: 16 compute workers on 8 vCPUs
+
+    Runtime: very slow — only ~2 % progress after 9 min
+
+    Symptoms:
+    All 8 CPUs fully utilized (16 workers contending).
+    mpirun output shows 4 ranks × 4 tasks in stdout.txt:
+    [0] Rank 0 ...
+    [1] Rank 1 ...
+    [2] Rank 2 ...
+    [3] Rank 3 ...
+    "top" command shows ~16 Eradication processes sharing cores (30–75 % each).
+    Observation: CPU over-subscription causes severe slowdown.
+
+  Case #3 – Sequential Job Dispatch
+    platform = Platform("Container", job_directory="DEST", ntasks=4, max_job=1)
+    Launched: 4 workers sequentially on 8 vCPUs (OK utilization).
+
+    Runtime: slower than Case #1 (extra output handling). But it is still running relative fast
+    Side effect: produced > 130 k files — disk full in middle of run
+        state-03650-000.dtk … state-03650-003.dtk
+        state-07300-000.dtk … state-07300-003.dtk
+    Observation: file explosion due to per-task state outputs; I/O overhead dominates.
+
+3. Burn-in Phase Behavior
+    Using existing burn-in experiment with 100 simulations, total simulations = 100x10(run_number)=1000
+    During “Initializing objects for creation” phase, memory spikes (VIRT ≈ 70–75 MB per worker).
+    After commission → CPU-bound; stable full-core utilization (~99 % × 4 workers).
+    Representative snapshot:
+    PID	%CPU	%MEM	Command
+    2384144	99	0.3	Eradication
+    2384173	99	0.3	Eradication
+    2384196	99	0.3	Eradication
+    2384225	38	0.3	Eradication
+
+    Memory → CPU transition typical of using burn-in; system remains healthy after initialization
+
+    With run_number=100, total simulations=100*100=10000
+    Top Consumers
+    PID	    USER	%CPU	%MEM	    VIRT	RES	Process	Interpretation
+    2427662	shchen	99	    11.7	    3.2 GB	1.8 GB	python example_container.py	Main orchestrator; 1 core fully used, ~12 % of RAM
+    2466688	shchen	100	    0.3	        78 MB	44 MB	Eradication	Worker #1, CPU-bound
+    2466660	shchen	99	    0.3	        81 MB	45 MB	Eradication	Worker #2
+    2466724	shchen	59	    0.3	        67 MB	41 MB	Eradication	Worker #3
+    2466752	shchen	15	    0.8	        157 MB	131 MB	Eradication	Worker #4
+
+    Run command "ps aux --sort=-%mem | head -n 10" in different time stamps to capture snapshots :
+    Burn-in = 10000 simulations on an 8 vCPU / 16 GB VM.
+    Timestamp (approx)	    PID	    %CPU	%MEM	VSZ (virtual)	RSS (resident)	Comment / Interpretation
+    15:39 ( t + 0 min )	    2427662	101	    35.8	6.7 GB	        5.9 GB	Script start – allocating data structures / loading input with "python example_container.py"
+    15:39 ( t + ~1 min )	2427662	101	    36.9	6.9 GB	        6.0 GB	Memory continues to grow during initialization.
+    15:39 ( t + ~2 min )	2427662	101	    38.9	7.2 GB	        6.4 GB	Peak allocation phase – approaching 40 % of system RAM.
+    15:41 ( t + ~4 min )	2427662	100	    6.8	    2.7 GB	        1.1 GB	After initialization – objects released, steady state ≈ 7 % RAM.
+    15:43 ( t + ~6 min )	2427662	100	    6.8	    2.7 GB	        1.1 GB	Stable CPU-bound phase (Eradication compute loop).
+
+    Observation:
+    Memory growth at startup corresponds to the burn-in initialization phase.
+    Once the simulation enters the compute loop, memory drops and remains stable.
+    CPU utilization remains at ~100 % of one core throughout execution.
+    No swap activity observed; overall system health normal.
+
+    Overall:
+        Use burnin file can cause serious memory spike on initialization phase. It also depends on how big your .dtk files  and how many simulations to run
+        With my VM setting, I can 10K using burning file
+        with 1/5 run took 35 mins already: 2111/10000 [35:06<2:04:31]

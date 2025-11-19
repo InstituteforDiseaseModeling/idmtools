@@ -6,7 +6,7 @@ from idmtools.core import ItemType
 
 def remove_dir(self):
     if os.path.exists(self.job_directory):
-        shutil.rmtree(self.job_directory)
+        shutil.rmtree(self.job_directory, ignore_errors=True)
 
 
 def get_dirs_and_files(self,dir):
@@ -29,25 +29,42 @@ def verify_result(self, suite):
     exp_dir = str(self.platform.get_directory(experiment))
     suite_sub_dirs, suite_files = get_dirs_and_files(self, pathlib.Path(suite_dir))
     # Verify all files under suite
-    self.assertTrue(len(suite_files) == 1)
-    self.assertEqual(suite_files[0], pathlib.Path(suite_dir + "/metadata.json"))
-    # Verify all sub directories under suite
-    self.assertTrue(len(suite_sub_dirs) == 1)
-    self.assertEqual(suite_sub_dirs[0], pathlib.Path(exp_dir))
+    self.assertTrue(len(suite_files) == 2)
+    self.assertSetEqual(set(suite_files), set([pathlib.Path(suite_dir + "/metadata.json"),
+                                          pathlib.Path(suite_dir + "/tags.json")]))
 
     for experiment in suite.experiments:
         experiment_dir = self.platform.get_directory(experiment)
         experiment_sub_dirs, experiment_files = get_dirs_and_files(self, experiment_dir)
         # Verify all files under experiment
-        self.assertTrue(len(experiment_files) == 4)
         experiment_path_prefix = exp_dir + "/"
         expected_files = set([pathlib.Path(experiment_path_prefix + "metadata.json"),
                               pathlib.Path(experiment_path_prefix + "run_simulation.sh"),
                               pathlib.Path(experiment_path_prefix + "sbatch.sh"),
-                              pathlib.Path(experiment_path_prefix + "batch.sh")])
+                              pathlib.Path(experiment_path_prefix + "batch.sh"),
+                              pathlib.Path(experiment_path_prefix + "tags.json")])
         self.assertSetEqual(set(experiment_files), expected_files)
         # Verify all sub directories under experiment
         self.assertTrue(len(experiment_sub_dirs) == 2)
         self.assertSetEqual(set(experiment_sub_dirs),
                             set([pathlib.Path(exp_dir + "/" + experiment.simulations[0].id),
                                  pathlib.Path(experiment_path_prefix + "Assets")]))
+
+def verify_result_experiment(self, experiment):
+    experiment_dir = self.platform.get_directory(experiment)
+    experiment_sub_dirs, experiment_files = get_dirs_and_files(self, experiment_dir)
+    # Verify all files under experiment
+    self.assertTrue(len(experiment_files) == 5)
+    experiment_path_prefix = str(experiment_dir) + "/"
+    expected_files = set([pathlib.Path(experiment_path_prefix + "metadata.json"),
+                          pathlib.Path(experiment_path_prefix + "run_simulation.sh"),
+                          pathlib.Path(experiment_path_prefix + "sbatch.sh"),
+                          pathlib.Path(experiment_path_prefix + "batch.sh"),
+                          pathlib.Path(experiment_path_prefix + "tags.json")
+                          ])
+    self.assertSetEqual(set(experiment_files), expected_files)
+    # Verify all sub directories under experiment
+    self.assertTrue(len(experiment_sub_dirs) == 2)
+    self.assertSetEqual(set(experiment_sub_dirs),
+                        set([pathlib.Path(str(experiment_dir) + "/" + experiment.simulations[0].id),
+                             pathlib.Path(experiment_path_prefix + "Assets")]))

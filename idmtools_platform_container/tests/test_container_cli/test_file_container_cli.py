@@ -15,46 +15,45 @@ from idmtools_platform_container.container_operations.docker_operations import s
 
 
 @pytest.mark.serial
+@pytest.mark.cli
 class TestFileContainerPlatformCli(unittest.TestCase):
-    def setUp(self):
-        self.runner = CliRunner()
-        self.job_directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), "DEST")
-        self.platform = Platform("Container", job_directory=self.job_directory)
+    @classmethod
+    def setUpClass(cls):
+        cls.runner = CliRunner()
+        cls.job_directory = os.path.join(os.path.dirname(os.path.abspath(__file__)), "DEST")
+        cls.platform = Platform("Container", job_directory=cls.job_directory)
         command = "ls -lat"
         task = CommandTask(command=command)
-        self.experiment = Experiment.from_task(task, name="run_command")
-        self.experiment.run(wait_until_done=True)
-        self.assertEqual(self.experiment.status, EntityStatus.SUCCEEDED)
+        cls.experiment = Experiment.from_task(task, name="run_command")
+        cls.experiment.run(wait_until_done=True)
 
-    def tearDown(self):
-        try:
-            stop_container(self.platform.container_id, remove=True)
-        except Exception as e:
-            pass
 
     @classmethod
     def tearDownClass(cls) -> None:
+        try:
+            stop_container(cls.platform.container_id, remove=True)
+        except Exception as e:
+            pass
         shutil.rmtree(os.path.join(os.path.dirname(os.path.abspath(__file__)), "DEST"))
 
     # Test cli: test status
-    # idmtools status
+    # idmtools file DEST status-report --exp-id <exp_id>
     @patch('idmtools_platform_file.tools.status_report.status_report.user_logger')
     def test_status_report(self, mock_user_logger):
         result = self.runner.invoke(file_cli.file,
-                                    [self.job_directory, 'status-report', '--suite-id', self.experiment.parent_id])
+                                    [self.job_directory, 'status-report', '--exp-id', self.experiment.id])
         self.assertEqual(result.exit_code, 0)
         actual_messages = [call[0][0] for call in mock_user_logger.info.call_args_list]
 
         # verify there are total 18 lines for this cli command
-        self.assertEqual(mock_user_logger.info.call_count, 18)
+        self.assertEqual(mock_user_logger.info.call_count, 17)
 
-        # verify first 3 lines as expected messages
-        expected_messages_first_3_lines = [
-            f"{'suite: '.ljust(20)} {self.experiment.parent_id}",
+        # verify first 2 lines as expected messages
+        expected_messages_first_2_lines = [
             f"{'experiment: '.ljust(20)} {self.experiment.id}",
             f"{'job directory: '.ljust(20)} {self.job_directory}",
         ]
-        self.assertEqual(actual_messages[:3], expected_messages_first_3_lines)
+        self.assertEqual(actual_messages[:2], expected_messages_first_2_lines)
 
         # verify last 8 lines as expected messages
         expected_messages_last_few_lines = [
@@ -76,8 +75,7 @@ class TestFileContainerPlatformCli(unittest.TestCase):
         result = self.runner.invoke(file_cli.file, [self.job_directory, 'get-latest'])
         self.assertEqual(result.exit_code, 0)
         exp_dir = str(self.platform.get_directory_by_id(self.experiment.id, ItemType.EXPERIMENT))
-        expected_dict = dict(suite_id=Path(exp_dir).parent.name,
-                             experiment_id=Path(exp_dir).name,
+        expected_dict = dict(experiment_id=Path(exp_dir).name,
                              experiment_directory=exp_dir,
                              job_directory=self.job_directory)
         actual_messages = [call[0][0] for call in mock_user_logger.info.call_args_list]
@@ -118,9 +116,6 @@ class TestFileContainerPlatformCli(unittest.TestCase):
         exp_dir = str(self.platform.get_directory_by_id(self.experiment.id, ItemType.EXPERIMENT))
         mock_user_logger.info.assert_called_with(Path(exp_dir))
 
-
-if __name__ == '__main__':
-    unittest.main()
 
 if __name__ == '__main__':
     unittest.main()

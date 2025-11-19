@@ -304,3 +304,22 @@ class TemplatedSimulations:
             TemplatedSimulations from the task
         """
         return TemplatedSimulations(base_task=task, tags=tags)
+
+    def check_duplicate(self, simulation_id: str) -> bool:
+        """
+        Check if a simulation id is already in the templated simulations.
+        Args:
+            simulation_id:
+
+        Returns:
+            True if the simulation id is already in the templated simulations, False otherwise.
+        """
+        ids = [sim.id for sim in self.__extra_simulations]
+        return simulation_id in ids
+
+    def clear_extra_simulation_directory_cache(self):
+        """
+        Clear templated extra simulations directory cache.
+        """
+        for sim in self.__extra_simulations:
+            sim._platform_directory = None
