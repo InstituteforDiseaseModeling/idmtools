@@ -1,4 +1,0 @@
---index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
-coloredlogs
-watchdog
-watchdog_gevent

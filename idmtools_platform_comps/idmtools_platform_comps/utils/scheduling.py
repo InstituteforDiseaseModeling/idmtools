@@ -36,11 +36,9 @@ def default_add_workorder_sweep_callback(simulation, file_name, file_path):
     add_work_order(simulation, file_name=file_name, file_path=file_path)
 
 
-def default_add_schedule_config_sweep_callback(simulation, command: str = None, node_group: str = None,
-                                               num_cores: int = 1, **config_opts):
+def default_add_schedule_config_sweep_callback(simulation, command: str = None, **config_opts):
     """Default callback to be used for sweeps that affect a scheduling config."""
-    add_schedule_config(simulation, command=command, node_group=node_group, num_cores=num_cores,
-                        **config_opts["config_opts"])
+    add_schedule_config(simulation, command=command, **config_opts["config_opts"])
 
 
 def scheduled(simulation: Simulation):
@@ -126,8 +124,7 @@ def add_work_order(item: Union[Experiment, Simulation, TemplatedSimulations], fi
     _add_work_order_asset(item, config, file_name=file_name)
 
 
-def add_schedule_config(item: Union[Experiment, Simulation, TemplatedSimulations], command: str = None,
-                        node_group: str = None, num_cores: int = 1, **config_opts):
+def add_schedule_config(item: Union[Experiment, Simulation, TemplatedSimulations], command: str = None, **config_opts):
     """
     Add scheduling config to an Item.
 
@@ -136,20 +133,22 @@ def add_schedule_config(item: Union[Experiment, Simulation, TemplatedSimulations
     Args:
         item: Item to add scheduling config to
         command: Command to run
-        node_group: Node group name
-        num_cores: Num of cores to use
         **config_opts: Additional config options
+
+    config_opts details:
+            - Environment: Environment variables to set in the job environment; these can be dynamically expanded
+            - SingleNode (HPC only): A flag to limit all reserved cores to being on the same compute node
+            - Exclusive (HPC only): A flag that controls whether nodes should be exclusively allocated to this job
+            - EnableMpi (HPC or Slurm): A flag that controls whether to run the job with mpiexec
+            - NodeGroupName (HPC or Slurm): The cluster node-group to commission to
+            - NumCores (HPC or Slurm): The number of cores to reserve
+            - NumNodes (Slurm Only): The number of nodes to schedule
+            - NumProcesses (Slurm Only): The number of processes to execute
+            - additionalProperties (HPC or Slurm): True or False
 
     Returns:
         None
-
-    Raises:
-        ValueError - If experiment is empty
-                     If item is not an experiment, simulation, or TemplatedSimulations
-
-    Notes:
-        - TODO refactor to reuse the add_work_order if possible. The complication is simulation command possibly
     """
-    config = dict(Command=command, NodeGroupName=node_group, NumCores=num_cores)
+    config = dict(Command=command)
     config.update(config_opts)
     _add_work_order_asset(item, config, file_name="WorkOrder.json")

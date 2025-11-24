@@ -136,7 +136,7 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
         obj.name = suite.name
         obj.description = suite.description
         obj.tags = suite.tags
-        obj.comps_suite = suite
+        obj._platform_object = suite
 
         # Convert all experiments
         if children:
@@ -172,7 +172,11 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
         Returns:
             None
         """
-        comps_suite = self.platform.get_item(suite_id, ItemType.SUITE, raw=True)
+        try:
+            comps_suite = self.platform.get_item(suite_id, ItemType.SUITE, raw=True)
+        except RuntimeError:
+            return
+
         comps_exps = comps_suite.get_experiments()
         for comps_exp in comps_exps:
             try:
@@ -185,3 +189,40 @@ class CompsPlatformSuiteOperations(IPlatformSuiteOperations):
         except RuntimeError:
             logger.info(f"Could not delete suite ({suite_id})...")
             return
+
+    def get_assets(self, suite: Suite, files: List[str], **kwargs) -> Dict[str, bytearray]:
+        """
+        Fetch the files associated with a suite.
+
+        Args:
+            suite (Suite): The suite object.
+            files (List[str]): List of filenames to download.
+            **kwargs: Additional keyword arguments for platform-specific options.
+
+        Returns:
+            Dict[str, Dict[str, Dict[str, Dict[str, Union[str, bytearray]]]]]: A nested dictionary structured as::
+
+                {
+                    "suite_id": {
+                        "experiment_id": {
+                            "simulation_id": {
+                                "filename": file_content,
+                                ...
+                            },
+                            ...
+                        },
+                        ...
+                    }
+                }
+
+            File content may be returned as either a decoded string or a bytearray.
+        """
+        ret = dict()
+        if isinstance(suite, COMPSSuite):
+            comps_suite = suite
+        else:
+            comps_suite = suite.get_platform_object()
+        children = self.platform._get_children_for_platform_item(comps_suite)
+        for child in children:
+            ret[child.id] = self.platform._experiments.get_assets(child, files, **kwargs)
+        return ret

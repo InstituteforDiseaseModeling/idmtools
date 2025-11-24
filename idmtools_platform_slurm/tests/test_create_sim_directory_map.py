@@ -4,12 +4,12 @@ import allure
 import os
 
 from idmtools.builders import SimulationBuilder
-from idmtools.core import ItemType
+from idmtools.core import ItemType, EntityStatus
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
-from idmtools_platform_slurm.platform_operations.utils import add_dummy_suite
+from idmtools_platform_file.platform_operations.utils import add_dummy_suite
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 from idmtools_test.utils.utils import get_case_name
@@ -48,13 +48,13 @@ class TestCreateSimDirectoryMap(ITestWithPersistence):
         experiment = self.platform.get_item(self.exp.uid, ItemType.EXPERIMENT, raw=False)
         sims = experiment.simulations
         for sim in sims:
-            self.assertEqual(workdir_dict[sim.id].replace("\\", "/"), f'DEST/{self.suite.id}/{self.exp.id}/{sim.id}')
+            self.assertEqual(workdir_dict[sim.id], str(self.platform.get_directory_by_id(sim.id, ItemType.SIMULATION)))
 
     # test create_sim_directory_map from platform for simulation
     def test_create_sim_directory_map_sim(self):
         sims = self.platform.get_children(item_id=self.exp.id, item_type=ItemType.EXPERIMENT)
         workdir_dict = self.platform.create_sim_directory_map(item_id=sims[0].id, item_type=ItemType.SIMULATION)
-        self.assertEqual(workdir_dict[sims[0].id].replace("\\", "/"), f'DEST/{self.suite.id}/{self.exp.id}/{sims[0].id}')
+        self.assertEqual(workdir_dict[sims[0].id], str(self.platform.get_directory_by_id(sims[0].id, ItemType.SIMULATION)))
 
     # test create_sim_directory_map from platform for suite
     def test_create_sim_directory_map_suite(self):
@@ -62,6 +62,13 @@ class TestCreateSimDirectoryMap(ITestWithPersistence):
         experiment = self.platform.get_item(self.exp.uid, ItemType.EXPERIMENT, raw=False)
         sims = experiment.simulations
         for sim in sims:
-            self.assertEqual(workdir_dict[sim.id].replace("\\", "/"), f'DEST/{self.suite.id}/{self.exp.id}/{sim.id}')
+            self.assertEqual(workdir_dict[sim.id], str(self.platform.get_directory_by_id(sim.id, ItemType.SIMULATION)))
+
+    def test_aliases(self):
+        platform = Platform("SLURM_CLUSTER", job_directory=self.job_directory)
+        suite, exp = self.create_experiment(platform)
+        self.assertTrue(suite.platform._config_block == "SLURM_CLUSTER")
+
+
 
 

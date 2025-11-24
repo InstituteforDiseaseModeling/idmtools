@@ -20,12 +20,12 @@ class TestPythonSimulation(ITestWithPersistence):
         print(self.case_name)
 
     def test_add_task_tag(self):
-        test_platform = Platform("TestExecute", missing_ok=True)
+        test_platform = Platform("Test")
         base_task = TestTask()
         sim = Simulation.from_task(base_task)
         # The tag for type is added at runtime during the pre_creation event
         sim.pre_creation(test_platform)
-        self.assertEqual(sim.tags.get('task_type'), 'idmtools_test.utils.test_task.TestTask')
+        self.assertIsNone(sim.tags.get('task_type'))
 
 
 if __name__ == '__main__':

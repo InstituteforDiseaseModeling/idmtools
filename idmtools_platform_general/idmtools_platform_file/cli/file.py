@@ -14,7 +14,7 @@ from logging import getLogger
 user_logger = getLogger('user')
 
 
-@click.group(short_help="FILE PLATFORM Related Commands")
+@click.group(short_help="File platform related commands.")
 @click.argument('job-directory')
 @click.pass_context
 def file(ctx: click.Context, job_directory):

@@ -11,6 +11,7 @@ The following user recipes provide specific examples on accomplishing some commo
    cookbook/assets
    cookbook/builders
    cookbook/comps/index
+   cookbook/simulation_filter/filter_simulations
    cookbook/environment
    cookbook/experiments
    cookbook/logging

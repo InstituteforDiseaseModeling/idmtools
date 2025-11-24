@@ -1,9 +1,8 @@
 {
-  "Command": "python3 Assets/model1.py",
+  "Command": "python3 Assets/model.py",
   "NodeGroupName": "idm_abcd",
-  "NumCores": 1,
   "NumProcesses": 1,
-  "NumNodes": 1,
+  "NumNodes": 2,
   "Environment": {
     "key1": "value1",
     "key2": "value2",

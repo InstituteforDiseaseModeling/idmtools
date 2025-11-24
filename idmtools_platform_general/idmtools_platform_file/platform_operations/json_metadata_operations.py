@@ -44,19 +44,20 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         return metadata
 
     @staticmethod
-    def _write_to_file(filepath: Union[Path, str], data: Dict) -> None:
+    def _write_to_file(filepath: Union[Path, str], data: Dict, indent: int = None) -> None:
         """
         Utility: save metadata to a file.
         Args:
             filepath: metadata file path
             data: metadata as dictionary
+            indent: indent level for pretty printing the JSON file. None for compact JSON.
         Returns:
             None
         """
         filepath = Path(filepath)
         filepath.parent.mkdir(parents=True, exist_ok=True)
         with filepath.open(mode='w') as f:
-            json.dump(data, f, cls=IDMJSONEncoder)
+            json.dump(data, f, indent=indent, cls=IDMJSONEncoder)
 
     def get_metadata_filepath(self, item: Union[Suite, Experiment, Simulation]) -> Path:
         """
@@ -69,6 +70,21 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         if not isinstance(item, (Suite, Experiment, Simulation)):
             raise RuntimeError("get_metadata_filepath method supports Suite/Experiment/Simulation only.")
         item_dir = self.platform.get_directory(item)
+        filepath = Path(item_dir, self.metadata_filename)
+        return filepath
+
+    def get_metadata_filepath_by_id(self, item_id: str, item_type: ItemType) -> Path:
+        """
+        Retrieve item's metadata file path.
+        Args:
+            item_id: item id
+            item_type: the type of metadata to search for matches (simulation, experiment, suite, etc.)
+        Returns:
+            item's metadata file path
+        """
+        if item_type not in (ItemType.SUITE, ItemType.EXPERIMENT, ItemType.SIMULATION):
+            raise RuntimeError("get_metadata_filepath method supports Suite/Experiment/Simulation only.")
+        item_dir = self.platform.get_directory_by_id(item_id, item_type)
         filepath = Path(item_dir, self.metadata_filename)
         return filepath
 
@@ -91,24 +107,35 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         meta['status'] = 'CREATED'
         meta['dir'] = os.path.abspath(self.platform.get_directory(item))
 
-        if isinstance(item, Experiment):
+        if isinstance(item, Suite):
+            meta['experiments'] = [experiment.id for experiment in item.experiments]
+        elif isinstance(item, Experiment):
             meta['suite_id'] = meta["parent_id"]
-
+            meta['simulations'] = [simulation.id for simulation in item.simulations]
+        elif isinstance(item, Simulation):
+            meta['experiment_id'] = meta["parent_id"]
         return meta
 
-    def dump(self, item: Union[Suite, Experiment, Simulation]) -> None:
+    def dump(self, item: Union[Suite, Experiment, Simulation]) -> Dict:
         """
-        Save item's metadata to a file.
+        Save item's metadata to a file and also save tags.json file.
         Args:
             item: idmtools entity (Suite, Experiment and Simulation)
         Returns:
-            None
+            key/value dict of metadata from the given item
         """
         if not isinstance(item, (Suite, Experiment, Simulation)):
             raise RuntimeError("Dump method supports Suite/Experiment/Simulation only.")
         dest = self.get_metadata_filepath(item)
         meta = self.get(item)
         self._write_to_file(dest, meta)
+
+        # Also write tags.json file
+        keys_to_extract = ["id", "item_type", "tags"]
+        extracted = {key: meta[key] for key in keys_to_extract}
+
+        tags_path = dest.parent / "tags.json"
+        self._write_to_file(tags_path, extracted, indent=2)
         return meta
 
     def load(self, item: Union[Suite, Experiment, Simulation]) -> Dict:
@@ -171,7 +198,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
             raise RuntimeError("Clear method supports Suite/Experiment/Simulation only.")
         self.update(item=item, metadata={}, replace=True)
 
-    def get_children(self, item: Union[Suite, Experiment]) -> List[Dict]:
+    def get_children(self, item: Union[Suite, Experiment, FileSuite, FileExperiment]) -> List[Dict]:
         """
         Fetch item's children.
         Args:
@@ -182,34 +209,59 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         if not isinstance(item, (Suite, FileSuite, Experiment, FileExperiment)):
             raise RuntimeError("Get children method supports [File]Suite and [File]Experiment only.")
         item_list = []
-        item_dir = self.platform.get_directory_by_id(item.id, item.item_type)
-        pattern = f'*/{self.metadata_filename}'
-        for meta_file in item_dir.glob(pattern=pattern):
-            meta = self.load_from_file(meta_file)
-            item_list.append(meta)
+        if isinstance(item, (Suite, FileSuite)):
+            meta = self.load(item)
+            for exp_id in meta['experiments']:
+                meta_file = self.get_metadata_filepath_by_id(exp_id, ItemType.EXPERIMENT)
+                exp_meta = self._read_from_file(meta_file)
+                item_list.append(exp_meta)
+        else:
+            item_dir = self.platform.get_directory(item)
+            pattern = f'*/{self.metadata_filename}'
+            for meta_file in item_dir.glob(pattern=pattern):
+                meta = self.load_from_file(meta_file)
+                item_list.append(meta)
         return item_list
 
-    def get_all(self, item_type: ItemType) -> List[Dict]:
+    def get_all(self, item_type: ItemType, item_id: str = '') -> List[Dict]:
         """
         Obtain all the metadata for a given item type.
         Args:
-            item_type: the type of metadata to search for matches (simulation, experiment, suite, etc)
+            item_type: the type of metadata to search for matches (simulation, experiment, suite, etc.)
+            item_id: item id
         Returns:
             list of metadata with given item type
         """
+        root = Path(self.platform.job_directory)
+        item_list = []
+
         if item_type is ItemType.SIMULATION:
-            pattern = f"*/*/*/{self.metadata_filename}"
+            # Match sim under experiment, under optional suite
+            patterns = [
+                f"s_*/e_*/*{item_id}/{self.metadata_filename}",  # suite/experiment/simulation
+                f"e_*/*{item_id}/{self.metadata_filename}",  # experiment/simulation (no suite)
+            ]
         elif item_type is ItemType.EXPERIMENT:
-            pattern = f"*/*/{self.metadata_filename}"
+            patterns = [
+                f"s_*/e_*{item_id}/{self.metadata_filename}",  # suite/experiment
+                f"e_*{item_id}/{self.metadata_filename}",  # standalone experiment
+            ]
         elif item_type is ItemType.SUITE:
-            pattern = f"*/{self.metadata_filename}"
+            patterns = [
+                f"s_*{item_id}/{self.metadata_filename}",  # suite only
+            ]
         else:
             raise RuntimeError(f"Unknown item type: {item_type}")
-        item_list = []
-        root = Path(self.platform.job_directory)
-        for meta_file in root.glob(pattern=pattern):
-            meta = self.load_from_file(meta_file)
-            item_list.append(meta)
+
+        # Search each pattern
+        for pattern in patterns:
+            for meta_file in root.glob(pattern):
+                try:
+                    meta = self.load_from_file(meta_file)
+                    item_list.append(meta)
+                except Exception as e:
+                    print(f"Warning: Failed to load metadata from {meta_file}: {e}")
+
         return item_list
 
     @staticmethod
@@ -245,7 +297,7 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
         Obtain all items that match the given properties key/value pairs passed.
         The two filters are applied on item with 'AND' logical checking.
         Args:
-            item_type: the type of items to search for matches (simulation, experiment, suite, etc)
+            item_type: the type of items to search for matches (simulation, experiment, suite, etc.)
             property_filter: a dict of metadata key/value pairs for exact match searching
             tag_filter: a dict of metadata key/value pairs for exact match searching
             meta_items: list of metadata
@@ -254,7 +306,8 @@ class JSONMetadataOperations(imetadata_operations.IMetadataOperations):
             a list of metadata matching the properties key/value with given item type
         """
         if meta_items is None:
-            meta_items = self.get_all(item_type)
+            item_id = property_filter["id"] if property_filter and "id" in property_filter else ''
+            meta_items = self.get_all(item_type, item_id=item_id)
         item_list = []
         for meta in meta_items:
             is_match = True

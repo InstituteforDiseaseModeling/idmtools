@@ -9,9 +9,7 @@ and running simulations, through the analysis of results. Modelers can use |IT_s
 locally or send suites of simulations to an HPC or other computing source. This framework is
 free, open-source, and model agnostic: it can be used to interact with a variety of models,
 such as custom models written in R or Python, or IDM's own |EMOD_s|. Additional functionality 
-for interacting with |EMOD_s| is provided in the :doc:`emod_api:emod_api` and 
-:doc:`emodpy:emodpy`.
-
+for interacting with |EMOD_s| is provided in `emod-api <https://docs.idmod.org/projects/emod-api/en/latest/>`__ and :doc:`emodpy:emodpy`.
 
 
 |IT_s| workflow
@@ -39,13 +37,17 @@ an end-to-end workflow using |EMOD_s| as the disease transmission model.
    hide stereotype
    skinparam component {
      BackgroundColor<<emodpy-disease>> F9BA9D
-     BackgroundColor<<idmtools>> 006CA6
+     BackgroundColor<<idmtools>> 40FF40
      BackgroundColor<<calibration>> gray
      BackgroundColor<<emodpy-core>> F18153
-     BackgroundColor<<COMPS>> lightgray
+     BackgroundColor<<Platforms>> lightgray
      BackgroundColor<<EMOD>> 47C8F5
    }
-
+    package "Platforms" {
+        [Slurm]
+        [COMPS]
+        [Container]
+    }
 
    [emodpy-generic] <<emodpy-disease>>
    [emodpy-generic] --> [emodpy]
@@ -70,16 +72,14 @@ an end-to-end workflow using |EMOD_s| as the disease transmission model.
    [emodpy] <-> [idmtools]
 
    [idmtools] <<idmtools>>
-   [COMPS] <<COMPS>>
-   [idmtools] <-> [COMPS] : Commission and status
+
+   [idmtools] <--> [Platforms] : Commission and status
+
 
    [idmtools-calibra] <<calibration>>
    [idmtools-calibra] <--> [idmtools] : Commission and analysis
    [idmtools-calibra] <--> [emodpy] : Calibration
 
-   [emodpy-calibra] <<calibration>>
-   [emodpy-calibra] <--> [emodpy]: EMOD-specific calibration utils
-   [emodpy-calibra] <--> [idmtools-calibra]
    [Input files] <<EMOD>>
    [emod-api] --> [Input files] : Create
 
@@ -103,15 +103,14 @@ Exact workflows for using |IT_s| is user-dependent, and can include any of the t
    configuration
    platforms/platforms
    create-sims
-   containers/containers
+   cli/cli_index
+   singularity/singularity-containers
    parameter-sweeps
    reports
    analyzers/analyzers
    plots   
    reference
-   plugin_documentation/index
    recipes_index
-   cli/cli_index
    dtkt-convert
    faq
    glossary

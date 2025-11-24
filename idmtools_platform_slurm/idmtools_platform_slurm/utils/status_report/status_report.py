@@ -13,7 +13,7 @@ from dataclasses import dataclass, field
 from typing import Dict, Tuple, TYPE_CHECKING
 from idmtools.core import ItemType, EntityStatus
 from idmtools.entities.experiment import Experiment
-from idmtools_platform_slurm.slurm_operations.slurm_constants import SLURM_MAPS
+from idmtools_platform_file.platform_operations.utils import FILE_MAPS
 
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
@@ -143,7 +143,7 @@ class StatusViewer:
         Returns:
             None
         """
-        slurm_map = copy.deepcopy(SLURM_MAPS)
+        slurm_map = copy.deepcopy(FILE_MAPS)
         slurm_map.pop('None', None)
         user_logger.info('------------------------------')
         user_logger.info("STATUS DEFINITION")

@@ -5,12 +5,9 @@ import unittest
 from functools import partial
 from time import time
 from typing import Any, Dict
-
 import pytest
-
 from idmtools.assets import AssetCollection
 from idmtools.builders import SimulationBuilder
-from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import Suite
 from idmtools.entities.experiment import Experiment

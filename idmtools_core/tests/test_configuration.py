@@ -95,13 +95,14 @@ class TestConfig(ITestWithPersistence):
 
     @skip_if_global_configuration_is_enabled
     @run_in_temp_dir
-    def test_no_idmtools_common(self):
+    @unittest.mock.patch("idmtools.config.idm_config_parser.logger")
+    def test_no_idmtools_common(self, mock_logger):
         with captured_output() as (out, err):
             IdmConfigParser(file_name="idmtools.ini")
             IdmConfigParser.ensure_init()
             max_workers = IdmConfigParser.get_option("COMMON", 'max_workers')
             self.assertIsNone(max_workers)
-            self.assertIn("WARNING: File 'idmtools.ini' Not Found!", out.getvalue())
+            mock_logger.warning.call_args_list[0].assert_called_with("File 'idmtools.ini' Not Found!")
 
     # enable config only through special file
     @pytest.mark.skipif(not all([os.environ.get("TEST_GLOBAL_CONFIG", 'n').lower() in TRUTHY_VALUES, os.environ.get('IDMTOOLS_CONFIG_FILE', None) is None, not os.path.exists(IdmConfigParser.get_global_configuration_name())]), reason="Either the environment variable TEST_GLOBAL_CONFIG is not set to true, you already have a global configuration, or IDMTOOLS_CONFIG_FILE is set")

@@ -15,7 +15,7 @@ logger = getLogger(__name__)
 user_logger = getLogger('user')
 
 
-@click.group(short_help="SLURM Related Commands")
+@click.group(short_help="Slurm platform related commands.")
 @click.argument('job-directory')
 @click.pass_context
 def slurm(ctx: click.Context, job_directory):

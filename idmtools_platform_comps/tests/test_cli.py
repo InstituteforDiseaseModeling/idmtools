@@ -179,7 +179,7 @@ class TestCompsCLI(unittest.TestCase):
                              '--pattern', '**/*.png', '--pattern', '**/*.xlsx', '--no-delete-after-download')
 
         self.assertTrue(result.exit_code == 0)
-        # verify download files correctly
+        # Verify download files correctly
         path, dirs, files = next(os.walk(os.path.join("output")))
         for dir in dirs:
             p, d, f = next(os.walk(os.path.join('output', dir, 'outputs')))

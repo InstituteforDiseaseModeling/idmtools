@@ -1,4 +1,4 @@
-Singularity Build
+Singularity build
 =================
 
 The |COMPS_s| platform supports building singularity images remotely with 

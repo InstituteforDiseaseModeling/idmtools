@@ -8,7 +8,7 @@ from idmtools_cli.cli.entrypoint import cli
 user_logger = getLogger('user')
 
 
-@cli.group(short_help="Contains commands related to package versions")
+@cli.group(short_help="Contains commands related to package versions.")
 def package():
     """Package group cli command."""
     pass

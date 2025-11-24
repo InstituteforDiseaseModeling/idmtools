@@ -176,6 +176,20 @@ pipeline {
                 }
             }
         }
+        stage('run platform_container tests') {
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    script {
+                        withPythonEnv("/usr/bin/python3.10") {
+                            sh '''#!/bin/bash
+                            cd idmtools_platform_container
+                            make test-all
+                            '''
+                        }
+					}
+                }
+            }
+        }
         stage('Run idmtools platform comps tests') {
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {

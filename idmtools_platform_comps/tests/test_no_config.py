@@ -43,21 +43,23 @@ class TestNoConfig(unittest.TestCase):
         os.chdir(cls.current_directory)
         IdmConfigParser.clear_instance()
 
-    @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
+    @unittest.mock.patch("idmtools.config.idm_config_parser.logger")
+    @unittest.mock.patch("idmtools.core.platform_factory.user_logger")
+    @unittest.mock.patch("idmtools.core.platform_factory.logger")
     @pytest.mark.comps
     @pytest.mark.serial
     @run_in_temp_dir
-    def test_success(self, output):
+    def test_success(self, mock_logger, mock_user_logger, mock_config_logger):
         logger.info(f'Current Directory: {os.getcwd()}')
         logger.info(f'Current idmtools file: {IdmConfigParser.get_config_path()}')
         sim_root_dir = os.path.join('$COMPS_PATH(USER)', 'output')
-        plat_obj = Platform('COMPS',
+        plat_obj = Platform('SlurmStage',
                             endpoint='https://comps2.idmod.org',
                             environment='SlurmStage',
                             priority='Normal',
                             simulation_root=sim_root_dir,
                             node_group='idm_abcd',
-                            num_cores='1',
+                            num_cores=1,
                             num_retries='0',
                             exclusive='False', missing_ok=True)
 
@@ -66,16 +68,27 @@ class TestNoConfig(unittest.TestCase):
             experiment = Experiment.from_id('73ba8f3b-8848-ee11-92fb-f0921c167864')
         except:  # noqa: E722
             pass
-        self.assertIn("File 'idmtools.ini' Not Found!", output.getvalue())
+        mock_config_logger.warning.call_args_list[0].assert_called_with("File 'idmtools.ini' Not Found!")
+        self.assertIn('\nInitializing COMPSPlatform with:', mock_user_logger.log.call_args_list[0].args[1])
+        self.assertIn('"endpoint": "https://comps2.idmod.org"', mock_user_logger.log.call_args_list[1].args[1])
+        self.assertIn('"environment": "SlurmStage"', mock_user_logger.log.call_args_list[1].args[1])
+        self.assertIn('"node_group": "idm_abcd"', mock_user_logger.log.call_args_list[1].args[1])
+        self.assertIn('"num_cores": 1', mock_user_logger.log.call_args_list[1].args[1])
+        self.assertIn('"priority": "Normal"', mock_user_logger.log.call_args_list[1].args[1])
+        self.assertIn('"exclusive": false', mock_user_logger.log.call_args_list[1].args[1])
+        self.assertIn('"num_retries": 0', mock_user_logger.log.call_args_list[1].args[1])
+        self.assertIn('"simulation_root": "$COMPS_PATH(USER)', mock_user_logger.log.call_args_list[1].args[1])
+        mock_logger.warning.call_args_list[0].assert_called_with(
+            "the following Config Settings are not used when creating Platform:")
+        mock_logger.warning.call_args_list[1].assert_called_with("- missing_ok = True")
 
     @pytest.mark.comps
-    @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
     @run_in_temp_dir
-    def test_failure(self, output):
+    def test_failure(self):
         logger.info(f'Current Directory: {os.getcwd()}')
         sim_root_dir = os.path.join('$COMPS_PATH(USER)', 'output')
         with self.assertRaises(ValueError) as a:
-            plat_obj = Platform('COMPS',
+            plat_obj = Platform('SlurmStage',
                                 endpoint='https://comps2.idmod.org',
                                 environment='SlurmStage',
                                 priority='Normal',
@@ -85,17 +98,18 @@ class TestNoConfig(unittest.TestCase):
                                 num_retries='0',
                                 exclusive='False', missing_ok=True)
             experiment = Experiment.from_id('73ba8f3b-8848-ee11-92fb-f0921c167864')
-        self.assertIn("File 'idmtools.ini' Not Found!", output.getvalue())
+        self.assertIn("invalid literal for int() with base 10: 'abc'", a.exception.args[0])
         # Need to identify how to capture output after log changes
         # self.assertIn("The field num_cores requires a value of type int. You provided <abc>", output.getvalue())
 
     @pytest.mark.comps
-    @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
+    @unittest.mock.patch("idmtools.core.platform_factory.user_logger")
+    @unittest.mock.patch("idmtools.core.platform_factory.logger")
     @run_in_temp_dir
-    def test_env_success(self, output):
+    def test_env_success(self, mock_logger, mock_user_logger):
         logger.info(f'Current Directory: {os.getcwd()}')
         sim_root_dir = os.path.join('$COMPS_PATH(USER)', 'output')
-        plat_obj = Platform('COMPS',
+        plat_obj = Platform('SlurmStage',
                             endpoint='https://comps2.idmod.org',
                             environment='SlurmStage',
                             priority='Normal',
@@ -112,6 +126,17 @@ class TestNoConfig(unittest.TestCase):
             # ignore error is it is comps error about not finding id
             if "404 Not Found" in ex.args[0]:
                 pass
-        self.assertIn("File 'idmtools.ini' Not Found!", output.getvalue())
+        self.assertIn('\nInitializing COMPSPlatform with:', mock_user_logger.log.call_args_list[0].args[1])
+        self.assertIn('"endpoint": "https://comps2.idmod.org"', mock_user_logger.log.call_args_list[1].args[1])
+        self.assertIn('"environment": "SlurmStage"', mock_user_logger.log.call_args_list[1].args[1])
+        self.assertIn('"node_group": "idm_abcd"', mock_user_logger.log.call_args_list[1].args[1])
+        self.assertIn('"num_cores": 1', mock_user_logger.log.call_args_list[1].args[1])
+        self.assertIn('"priority": "Normal"', mock_user_logger.log.call_args_list[1].args[1])
+        self.assertIn('"exclusive": false', mock_user_logger.log.call_args_list[1].args[1])
+        self.assertIn('"num_retries": 0', mock_user_logger.log.call_args_list[1].args[1])
+        self.assertIn('"simulation_root": "$COMPS_PATH(USER)', mock_user_logger.log.call_args_list[1].args[1])
+        mock_logger.warning.call_args_list[0].assert_called_with(
+            "the following Config Settings are not used when creating Platform:")
+        mock_logger.warning.call_args_list[1].assert_called_with("- missing_ok = True")
         # Need to identify how to capture output after log changes
         # self.assertIn("The field num_cores requires a value of type int. You provided <abc>", output.getvalue())

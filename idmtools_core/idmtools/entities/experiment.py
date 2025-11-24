@@ -8,7 +8,6 @@ TemplatedSimulations are useful for building large numbers of similar simulation
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import copy
-import warnings
 from dataclasses import dataclass, field, InitVar, fields
 from logging import getLogger, DEBUG
 from types import GeneratorType
@@ -24,7 +23,6 @@ from idmtools.core.interfaces.inamed_entity import INamedEntity
 from idmtools.core.interfaces.irunnable_entity import IRunnableEntity
 from idmtools.core.logging import SUCCESS, NOTICE
 from idmtools.entities.itask import ITask
-from idmtools.core.interfaces.ientity import IEntity
 from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.entities.templated_simulation import TemplatedSimulations
 from idmtools.registry.experiment_specification import ExperimentPluginSpecification, get_model_impl, \
@@ -37,6 +35,7 @@ from idmtools.utils.entities import get_default_tags
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
     from idmtools.entities.simulation import Simulation  # noqa: F401
+    from idmtools.entities.suite import Suite  # noqa: F401
 
 logger = getLogger(__name__)
 user_logger = getLogger('user')
@@ -72,7 +71,7 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
     #: Simulation in this experiment
     simulations: InitVar[SUPPORTED_SIM_TYPE] = None
     #: Internal storage of simulation
-    __simulations: Union[SUPPORTED_SIM_TYPE] = field(default_factory=lambda: EntityContainer(), compare=False)
+    __simulations: SUPPORTED_SIM_TYPE = field(default_factory=lambda: EntityContainer(), compare=False)
 
     #: Determines if we should gather assets from the first task. Only use when not using TemplatedSimulations
     gather_common_assets_from_task: bool = field(default=None, compare=False)
@@ -206,8 +205,28 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         """
         self.parent = suite
 
-    @IEntity.parent.setter
-    def parent(self, parent: 'IEntity'):
+    @property
+    def parent(self):
+        """
+        Return parent object for item.
+
+        Returns:
+            Parent Suite if set
+        """
+        if not self._parent:
+            self.parent_id = self.parent_id or self.suite_id
+            if not self.parent_id:
+                return None
+            if not self.platform:
+                from idmtools.core import NoPlatformException
+                raise NoPlatformException("The object has no platform set...")
+            suite = self.platform.get_item(self.parent_id, ItemType.SUITE, force=True)
+            suite.add_experiment(self)
+
+        return self._parent
+
+    @parent.setter
+    def parent(self, parent: 'Suite'):
         """
         Sets the parent object for Entity.
 
@@ -217,12 +236,10 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         Returns:
             None
         """
-        if parent:
-            if parent.experiments is None:
-                parent.experiments = [self]
-            else:
-                parent.experiments.append(self)
-        IEntity.parent.__set__(self, parent)
+        if parent is not None:
+            parent.add_experiment(self)
+        else:
+            self._parent = self.parent_id = self.suite_id = None
 
     def display(self):
         """
@@ -326,47 +343,59 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         return any([s.failed for s in self.simulations])
 
     @property
-    def simulations(self) -> ExperimentParentIterator:
+    def simulations(self) -> ExperimentParentIterator:  # noqa: F811
         """
-        Returns the Simulations.
+        Get the experiment's simulations.
 
         Returns:
-            Simulations
+            ExperimentParentIterator: Iterator wrapping internal simulation container.
         """
+        if self.__simulations is None:
+            return ExperimentParentIterator([], parent=self)
         return ExperimentParentIterator(self.__simulations, parent=self)
 
-    @simulations.setter
-    def simulations(self, simulations: Union[SUPPORTED_SIM_TYPE]):
+    def get_simulations(self) -> ExperimentParentIterator:  # noqa: F811:
         """
-        Set the simulations object.
-
-        Args:
-            simulations:
+        Resolve and return simulations from internal container.
 
         Returns:
-            None
+            ExperimentParentIterator
+        """
+        return self.simulations
+
+    @simulations.setter
+    def simulations(self, simulations: SUPPORTED_SIM_TYPE):
+        """
+        Set and normalize the simulations input.
+
+        Args:
+            simulations (SUPPORTED_SIM_TYPE): Simulations, task list, or generator.
 
         Raises:
-            ValueError - If simulations is a list has items that are not simulations or tasks
-                         If simulations is not a list, set, TemplatedSimulations or EntityContainer
+            ValueError: If unsupported input type or invalid simulation list item.
         """
-        if isinstance(simulations, (GeneratorType, TemplatedSimulations, EntityContainer)):
-            self.gather_common_assets_from_task = isinstance(simulations, (GeneratorType, EntityContainer))
+        from idmtools.entities.simulation import Simulation
+        if isinstance(simulations, GeneratorType):
+            simulations = list(simulations)
+
+        if isinstance(simulations, (EntityContainer, TemplatedSimulations)):
             self.__simulations = simulations
+            self.gather_common_assets_from_task = isinstance(simulations, EntityContainer)
         elif isinstance(simulations, (list, set)):
-            from idmtools.entities.simulation import Simulation  # noqa: F811
             self.gather_common_assets_from_task = True
-            self.__simulations = EntityContainer()
+            container = EntityContainer()
             for sim in simulations:
                 if isinstance(sim, ITask):
-                    self.__simulations.append(sim.to_simulation())
+                    container.append(sim.to_simulation())
                 elif isinstance(sim, Simulation):
-                    self.__simulations.append(sim)
+                    container.append(sim)
                 else:
-                    raise ValueError("Only list of tasks/simulations can be passed to experiment simulations")
+                    raise ValueError("Only Simulation or Task objects are allowed in simulation list.")
+            self.__simulations = container
         else:
-            raise ValueError("You can only set simulations to an EntityContainer, a Generator, a TemplatedSimulations "
-                             "or a List/Set of Simulations")
+            raise ValueError(
+                "Simulations must be an EntityContainer, Generator, TemplatedSimulations, or a List/Set of Simulations."
+            )
 
     @property
     def simulation_count(self) -> int:
@@ -546,8 +575,8 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         """
         p = super()._check_for_platform_from_context(platform)
         if 'wait_on_done' in run_opts:
-            warnings.warn("wait_on_done will be deprecated soon. Please use wait_until_done instead.", DeprecationWarning, 2)
-            user_logger.warning("wait_on_done will be deprecated soon. Please use wait_until_done instead.")
+            raise TypeError(
+                "The 'wait_on_done' parameter has been removed in idmtools 1.8.0. Please update your code with 'wait_until_done'.")
         if regather_common_assets is None:
             regather_common_assets = p.is_regather_assets_on_modify()
         if regather_common_assets and not self.assets.is_editable():
@@ -560,8 +589,11 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
                 "You are modifying and existing experiment by using a template without gathering common assets. Ensure your Template configuration is the same as existing experiments or enable gathering of new common assets through regather_common_assets.")
         run_opts['regather_common_assets'] = regather_common_assets
         p.run_items(self, **run_opts)
-        if wait_until_done or run_opts.get('wait_on_done', False):
-            self.wait(wait_on_done_progress=wait_on_done_progress)
+        if wait_until_done:
+            _refresh_interval = run_opts.get('refresh_interval', None)
+            if _refresh_interval is None:
+                _refresh_interval = p.refresh_interval
+            self.wait(wait_on_done_progress=wait_on_done_progress, refresh_interval=_refresh_interval)
 
     def to_dict(self):
         """
@@ -572,6 +604,10 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         """
         result = dict()
         for f in fields(self):
+            # Include:
+            # - public fields (not starting with '_')
+            # Exclude:
+            # - fields named 'parent'
             if not f.name.startswith("_") and f.name not in ['parent']:
                 result[f.name] = getattr(self, f.name)
 
@@ -626,6 +662,96 @@ class Experiment(IAssetsEnabled, INamedEntity, IRunnableEntity):
         if verbose:
             user_logger.info(f"Simulation Type: {type(self.__simulations)}")
             user_logger.info(f"Assets: {self.assets}")
+
+    def add_simulation(self, item: 'Simulation'):  # noqa F821
+        """
+        Adds a simulation to an experiment.
+        Args:
+            item: Item to add
+        Returns:
+            None
+        """
+        # Append into underlying collection
+        self.simulations.append(item)
+
+    def add_simulations(self, item: Union[List['Simulation'], 'TemplatedSimulations']):  # noqa F821
+        """
+        Extends experiment's simulations.
+        Args:
+            item: Item to extend
+        Returns:
+            None
+        """
+        self.simulations.extend(item)
+
+    def get_simulations_by_tags(self, tags=None, status=None, skip_sims=None, entity_type=False, max_simulations=None,
+                                **kwargs) -> List[str]:
+        """
+        Retrieve a list of simulation IDs or simulation objects with matching tags.
+        This method filters simulations based on the provided tags, skipping specified simulations,
+        and limiting the number of results if `max_simulations` is set. The return type can be
+        either a list of simulation IDs or simulation objects, depending on the `entity_type` flag.
+        Args:
+            tags (dict, optional): A simulation's tags to filter by.
+            status (EntityStatus, Optional): Simulation status.
+            entity_type (bool, optional): If True, return simulation objects; otherwise, return simulation IDs. Defaults to False.
+            skip_sims (list, optional): A list of simulation IDs to exclude from the results.
+            max_simulations (int, optional): The maximum number of simulations to return.
+            **kwargs: Additional filter parameters.
+        Returns:
+            list: A list of simulation IDs or simulation objects, depending on the `entity_type` flag.
+        """
+        from idmtools.utils.filter_simulations import FilterItem
+        return FilterItem.filter_item(
+            platform=self.platform,
+            item=self,
+            tags=tags,
+            status=status,
+            entity_type=entity_type,
+            skip_sims=skip_sims,
+            max_simulations=max_simulations,
+            **kwargs
+        )
+
+    def check_duplicate(self, simulation_id: str) -> bool:
+        """
+        Check if a simulation ID already exists.
+        Args:
+            simulation_id: given Simulation ID
+        Returns:
+            True/False
+        """
+        if isinstance(self.simulations.items, (list, set)):
+            ids = [sim.id for sim in self.simulations.items]
+            return simulation_id in ids
+        elif isinstance(self.simulations.items, TemplatedSimulations):
+            return self.simulations.items.check_duplicate(simulation_id)
+        else:
+            return False
+
+    def clear_directory_cache(self):
+        """
+        Clear directory cache for Experiment and Simulations.
+        """
+        from idmtools.core.context import get_current_platform
+        platform = get_current_platform()
+
+        # Skip COMPS Platform
+        if platform and hasattr(platform, 'job_directory'):
+            # Clear experiment directory cache
+            r1 = getattr(self, "_platform_directory", None)
+            if r1:
+                self._platform_directory = None
+                logger.warning(f"The Experiment {self.uid} referenced a temporary directory {r1}.")
+
+            # Clear Children's directory cache
+            if isinstance(self.simulations.items, (list, set)):
+                for sim in self.simulations.items:
+                    sim._platform_directory = None
+            elif isinstance(self.simulations.items, TemplatedSimulations):
+                self.simulations.items.clear_extra_simulation_directory_cache()
+            else:
+                pass
 
 
 class ExperimentSpecification(ExperimentPluginSpecification):

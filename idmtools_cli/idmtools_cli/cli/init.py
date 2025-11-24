@@ -19,7 +19,7 @@ def init():
     pass
 
 
-@cli.command(help="Export list of project templates")
+@cli.command(help="Export list of project templates.")
 def init_export():
     """Export project templates."""
     with open('templates.json', 'w') as o:

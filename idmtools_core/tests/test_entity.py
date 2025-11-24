@@ -1,5 +1,6 @@
 import copy
 import pickle
+import uuid
 from functools import partial
 from unittest.mock import MagicMock
 import allure
@@ -7,6 +8,7 @@ import unittest
 from dataclasses import dataclass, field, fields
 import pytest
 from idmtools.builders import SimulationBuilder
+from idmtools.core import NoPlatformException, ItemType
 from idmtools.core.interfaces.ientity import IEntity
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
@@ -81,7 +83,7 @@ class TestEntity(ITestWithPersistence):
         s = Suite(name="test")
         self.assertSetEqual(s.pickle_ignore_fields, set(f.name for f in fields(s) if "pickle_ignore" in f.metadata and f.metadata["pickle_ignore"]))
         b = pickle.loads(pickle.dumps(s))
-        self.assertIsNone(b.experiments)
+        self.assertIsNone(getattr(b, "_experiments", None))
 
         a = EntityWithIgnoreField(ignore=10, ignore_with_restore=5)
         self.assertEqual(a.ignore, 10)
@@ -221,7 +223,7 @@ class TestEntity(ITestWithPersistence):
         s.post_creation(fake_platform)
 
     def test_experiment_pre_creation_hooks(self):
-        fake_platform = Platform("TestExecute", missing_ok=True)
+        fake_platform = Platform("TestExecute", type="TestExecute")
         base_task = TestTask()
         sim = Simulation.from_task(base_task)
         builder = SimulationBuilder()
@@ -234,7 +236,7 @@ class TestEntity(ITestWithPersistence):
             self.assertEqual(mock_hook.call_count, 1)
 
     def test_experiment_post_creation_hooks(self):
-        fake_platform = Platform("TestExecute", missing_ok=True)
+        fake_platform = Platform("TestExecute", type="TestExecute")
         base_task = TestTask()
         sim = Simulation.from_task(base_task)
         builder = SimulationBuilder()
@@ -288,8 +290,65 @@ class TestEntity(ITestWithPersistence):
 
         s.add_post_creation_hook(inc_count)
         s.post_creation(fake_platform)
+    def test_add_experiment_sets_parent(self):
+        suite = Suite("main")
+        exp = Experiment("expA")
 
+        suite.add_experiment(exp)
+
+        assert exp.parent is suite
+        assert exp in suite.experiments
+        assert exp.parent_id == suite.id
+
+    def test_add_simulation_sets_parent(self):
+        exp = Experiment("expB")
+        sim = Simulation("sim1")
+
+        exp.add_simulation(sim)
+
+        assert sim.parent is exp
+        assert sim in exp.simulations
+        assert sim.parent_id == exp.id
+
+    def test_duplicate_experiment_not_added_twice(self):
+        suite = Suite("main")
+        exp = Experiment("expA")
+
+        suite.add_experiment(exp)
+        suite.add_experiment(exp)
+
+        assert len(suite.experiments) == 1
+
+    def test_duplicate_simulation_not_added_twice(self):
+        exp = Experiment("expB")
+        sim = Simulation("sim1")
+
+        exp.add_simulation(sim)
+        exp.add_simulation(sim)
+
+        assert len(exp.simulations) == 1
+
+    def test_clear_parent_experiment(self):
+        suite = Suite("main")
+        exp = Experiment("expC")
+
+        suite.add_experiment(exp)
+        exp.parent = None  # reset
+
+        assert exp.parent is None
+        assert exp.parent_id is None
+
+    def test_clear_parent_simulation(self):
+        exp = Experiment("expD")
+        sim = Simulation("sim1")
+
+        exp.add_simulation(sim)
+        sim.parent = None  # reset
+
+        assert sim.parent is None
+        assert sim.parent_id is None
 
 
 if __name__ == '__main__':
     unittest.main()
+
