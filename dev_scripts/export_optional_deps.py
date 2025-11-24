@@ -18,12 +18,14 @@ ALLOWED_GROUPS = {"dev", "build", "test"}
 # Identify internal package name prefixes
 INTERNAL_PREFIXES = ("idmtools_", "idmtools")
 
+
 def is_internal_package(dep: str) -> bool:
     """
     Determine if a dependency looks like an internal idmtools package.
     """
     dep_name = dep.split("[")[0].split("==")[0].split(">=")[0].strip()
     return dep_name.startswith(INTERNAL_PREFIXES)
+
 
 for pyfile in pyprojects:
     project_dir = pyfile.parent
