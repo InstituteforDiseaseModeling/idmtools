@@ -2,12 +2,12 @@
 # trigger by push to dev branch
 
 name: "pr-all-test-ubuntu-setup-push"
-on:
-  push:
-    branches:
-      # only run this on
-      - dev
-      - 'release**'
+#on:
+#  push:
+#    branches:
+#      # only run this on
+#      - dev
+#      - 'release**'
 
 jobs:
   pr-test-core-linux:

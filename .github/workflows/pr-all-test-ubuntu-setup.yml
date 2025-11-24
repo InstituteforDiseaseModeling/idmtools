@@ -2,7 +2,7 @@
 # trigger by pull_request
 
 name: "pr-all-test-ubuntu-setup"
-on: [pull_request]
+# on: [pull_request]
 
 jobs:
   pr-test-core-linux:

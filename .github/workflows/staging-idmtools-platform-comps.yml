@@ -7,7 +7,6 @@ on:
     branches:
       # only run this on
       - dev
-      - revert-revert-dev
       - 'release*'
     paths:
       - 'idmtools_core/**'
