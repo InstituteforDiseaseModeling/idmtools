@@ -35,8 +35,9 @@ class TestExperimentFactory(ITestWithPersistence):
         self.assertEqual(len(experiment.simulations), 2)
         self.assertEqual(experiment.assets.assets[0].filename, "working_model.py")
         tag_value = "idmtools_test.utils.test_task.TestTask"
-        self.assertEqual(experiment.simulations[0].tags, {'p': 0, 'task_type': tag_value})
-        self.assertEqual(experiment.simulations[1].tags, {'p': 1, 'task_type': tag_value})
+        self.assertEqual(experiment.simulations[0].tags, {'p': 0})
+        self.assertEqual(experiment.simulations[1].tags, {'p': 1})
+        self.assertEqual(experiment.tags['task_type'], tag_value)
 
         test_platform.cleanup()
 

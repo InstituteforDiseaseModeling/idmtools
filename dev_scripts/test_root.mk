@@ -20,8 +20,6 @@ DOCKER_REPO?=docker-staging
 NO_SPINNER?=1
 PARALLEL_TEST_COUNT?=8
 TEST_COMMAND =  py.test --timeout=600 --junitxml=$(REPORT_DIR)/$(TEST_REPORT) --html=$(REPORT_DIR)/$(HTML_TEST_REPORT) --self-contained-html $(TEST_EXTRA_OPTS)
-COVERAGE_OPTS := --cov-config=.coveragerc --cov-branch --cov-append --cov=idmtools --cov=idmtoools_cli --cov=idmtools_models --cov=idmtools_platform_comps --cov=../../idmtools_cli/
-
 
 help:  ## This help
 	help-from-makefile -f $(mkfile_path)
@@ -96,6 +94,9 @@ test-python: reports-exist ## Run our python tests
 test-ssmt: reports-exist ## Run our ssmt tests
 	$(TEST_COMMAND) -m "ssmt"
 
+test-cli: reports-exist ## Run any tests that takes more than 30s
+	$(TEST_COMMAND) -m "cli"
+
 test-smoke: reports-exist ## Run our smoke tests
 ifneq (1, $(PARALLEL_TESTING)) # Only run these tests if Parallel Only Testing is disabled
 	-echo "Running Serial Tests"
@@ -115,15 +116,20 @@ endif
 test-report: ## Launch test report in browser
 	$(PDS)/launch_dir_in_browser.py $(REPORT_DIR)/
 
-coverage-report: ## Generate HTML report from coverage. Requires running coverage run first(coverage, coverage-smoke, coverage-all)
+coverage: .coverage
+
+.coverage:
+	$(TEST_COMMAND) $(COVERAGE_OPTS) -m "not performance"
+
+coverage-report: .coverage
 	coverage report -m
 	coverage html -i --directory=$(REPORT_DIR)/coverage
 
-coverage-report-view: coverage-report ## Launch coverage report. Require running coverage beforehand
-	$(PDS)/launch_dir_in_browser.py $(REPORT_DIR)/coverage/index.html
+coverage-report-view: $(REPORT_DIR)/coverage/index.html
+	$(PDS)/launch_dir_in_browser.py $<
 
-coverage: clean ## Generate a code-coverage report
-	$(TEST_COMMAND) $(COVERAGE_OPTS) -m "not comps and not docker and not performance"
+$(REPORT_DIR)/coverage/index.html: .coverage
+	coverage html -i --directory=$(REPORT_DIR)/coverage
 
 coverage-smoke: clean ## Generate a code-coverage report
 ifneq (1, $(PARALLEL_TESTING)) # Only run these tests if Parallel Only Testing is disabled

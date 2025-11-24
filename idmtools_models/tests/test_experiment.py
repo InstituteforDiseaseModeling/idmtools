@@ -25,7 +25,7 @@ model_path = os.path.abspath(os.path.join("..", "..", "examples", "python_model"
 @allure.suite("idmtools_core")
 class TestAddingSimulationsToExistingExperiment(unittest.TestCase):
     def setUp(self):
-        self.platform = Platform("TestExecute", missing_ok=True, default_missing=dict(type='TestExecute'))
+        self.platform = Platform("TestExecute", type='TestExecute')
 
     def test_adding_template_to_existing(self):
         base_task = JSONConfiguredPythonTask(script_path=model_path, python_path=sys.executable)
@@ -64,8 +64,7 @@ class TestAddingSimulationsToExistingExperiment(unittest.TestCase):
         sim = Simulation.from_task(base_task)
         exp = Experiment(disable_default_pre_create=True)
         exp.simulations.append(sim)
-        platform = Platform("TestExecute", missing_ok=True)
-        exp.pre_creation(platform=platform)
+        exp.pre_creation(platform=self.platform)
         self.assertEqual(exp.tags, {})
 
     def test_empty_experiment_template(self):
@@ -95,7 +94,7 @@ class TestAddingSimulationsToExistingExperiment(unittest.TestCase):
         # add new simulations
         new_sim = Simulation.from_task(base_task)
         new_sim.task.set_parameter("Run_Number", 6)
-        exp.simulations.append(new_sim)
+        exp.add_simulation(new_sim)
 
         count = 0
         for sim in exp.simulations:
@@ -164,12 +163,6 @@ class TestExperimentStatus(unittest.TestCase):
                          f'Expected {expected_status}, was {self.experiment.status}, sim statuses: {statuses}')
 
     def test_status_is_correct(self) -> None:
-        #
-        # single sim status cases
-        #
-
-        # no simulations in exp
-
         # all sims are CREATED
         expected = EntityStatus.CREATED
         statuses = {EntityStatus.CREATED: 5}

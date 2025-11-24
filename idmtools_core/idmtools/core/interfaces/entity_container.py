@@ -57,7 +57,7 @@ class EntityContainer(list):
             ValueError when the item_id is not in the children list
         """
         for entity in self:
-            if entity.uid == item_id:
+            if str(entity.uid) == str(item_id):
                 entity.status = status
                 return
 

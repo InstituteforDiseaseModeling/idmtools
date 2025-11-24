@@ -23,15 +23,18 @@ import sys
 #import sphinx_rtd_theme
 from datetime import datetime
 
+
 if sys.platform in ["linux", "darwin"]:
     subprocess.check_output(["make", "generate-api"], cwd=os.path.dirname(os.path.abspath(__file__)))
 else:
     subprocess.check_output(["make.bat", "generate-api"], cwd=os.path.dirname(os.path.abspath(__file__)))
+    # Remove the api/modules.rst file which is intermediate file from template api
+    subprocess.run(['del', 'api\modules.rst'], check=True, shell=True)
 
 # -- General configuration ------------------------------------------------
 
-# This is the equivalent of -t in SPHINXOPTS for the RTD build
-tags.add('idmtools')
+# # This is the equivalent of -t in SPHINXOPTS for the RTD build
+# tags.add('idmtools')
 
 # If your docs needs a minimal Sphinx version, state it here.
 #
@@ -54,7 +57,6 @@ extensions = [
     # automatic section names so linking between section is easy
     'sphinx.ext.autosectionlabel',
     'sphinxext.rediraffe',
-    'sphinx_search.extension', # search across multiple docsets in domain
     'sphinx.ext.viewcode', # link to view source code
     'myst_parser', # source files written in MD or RST
 ]
@@ -81,7 +83,7 @@ plantuml = 'plantweb'
 autodoc_default_options = {
     'member-order': 'bysource',
     'members': None,
-    'special-members': '__init__',
+    'special-members': '__new__,__init__',
     'exclude-members': '__all__'
 }
 
@@ -112,7 +114,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'idmtools'
-copyright = f'1999 - {datetime.today().year}, Bill & Melinda Gates Foundation. All rights reserved'
+copyright = f'1999 - {datetime.today().year}, Gates Foundation. All rights reserved'
 author = u'Institute for Disease Modeling'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -211,7 +213,7 @@ html_theme_options = {
     ],
     "navbar_end": ["theme-switcher", "navbar-icon-links"],
     "secondary_sidebar_items": ["navbar-side"],
-    "header_links_before_dropdown": 5,
+    "header_links_before_dropdown": 6,
     "footer_start": ["copyright", "footer_start"],
     "footer_end": ["theme-version", "footer_end"],
 }
@@ -234,6 +236,9 @@ html_context = {
 # Add customizations
 def setup(app):
     app.add_css_file("theme_overrides.css")
+    if os.environ.get('READTHEDOCS') == 'True':
+        # Set a tag for Read the Docs environment
+        app.tags.add('idmtools')
 
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
@@ -467,7 +472,6 @@ texinfo_documents = [
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'python': ('https://docs.python.org/3', None),
-                       'emod_api': ('https://docs.idmod.org/projects/emod-api/en/latest/', None),
                        'emodpy': ('https://docs.idmod.org/projects/emodpy/en/latest/', None),
                        'pycomps': ('https://docs.idmod.org/projects/pycomps/en/latest/', None)
                        }

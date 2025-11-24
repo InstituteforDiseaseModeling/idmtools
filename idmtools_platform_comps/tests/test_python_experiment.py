@@ -123,10 +123,9 @@ class TestPythonExperiment(ITestWithPersistence):
 
         # validation each simulation output to compare output/config.json is equal to config.json
         validate_output(self, exp_id, 4)
-        tag_value = "idmtools_models.python.json_python_task.JSONConfiguredPythonTask"
-        expected_tags = [{'a': '0', 'b': '1', 'task_type': tag_value}, {'a': '0', 'b': '9', 'task_type': tag_value},
-                         {'a': '1', 'b': '1', 'task_type': tag_value}, {'a': '1', 'b': '9', 'task_type': tag_value}]
-        validate_sim_tags(self, exp_id, expected_tags, tag_value)
+        expected_tags = [{'a': '0', 'b': '1'}, {'a': '0', 'b': '9'},
+                         {'a': '1', 'b': '1'}, {'a': '1', 'b': '9'}]
+        validate_sim_tags(self, exp_id, expected_tags)
 
         # validate experiment tags
         actual_exp_tags = experiment.get(experiment.id, QueryCriteria().select_children('tags')).tags
@@ -192,10 +191,10 @@ class TestPythonExperiment(ITestWithPersistence):
 
         # validate b is not in tag since it is not sweep parameter, it just depend on sweep parameter
         tag_value = "idmtools_models.python.json_python_task.JSONConfiguredPythonTask"
-        expected_tags = [{'a': '0', 'task_type': tag_value}, {'a': '1', 'task_type': tag_value},
-                         {'a': '2', 'task_type': tag_value}, {'a': '3', 'task_type': tag_value},
-                         {'a': '4', 'task_type': tag_value}]
-        validate_sim_tags(self, exp_id, expected_tags, tag_value)
+        expected_tags = [{'a': '0' }, {'a': '1'},
+                         {'a': '2'}, {'a': '3'},
+                         {'a': '4'}]
+        validate_sim_tags(self, exp_id, expected_tags)
 
     @pytest.mark.long
     @pytest.mark.comps
@@ -394,14 +393,13 @@ class TestPythonExperiment(ITestWithPersistence):
         wait_on_experiment_and_check_all_sim_status(self, e, self.platform)
         exp_id = e.uid
         validate_output(self, exp_id, 6)
-        tag_value = "idmtools_models.python.json_python_task.JSONConfiguredPythonTask"
-        expected_tags = [{'a': '1', 'b': '2', 'c': '4', 'task_type': tag_value},
-                         {'a': '1', 'b': '2', 'c': '5', 'task_type': tag_value},
-                         {'a': '1', 'b': '3', 'c': '4', 'task_type': tag_value},
-                         {'a': '1', 'b': '3', 'c': '5', 'task_type': tag_value},
-                         {'a': '6', 'b': '2', 'task_type': tag_value},
-                         {'a': '7', 'b': '2', 'task_type': tag_value}]
-        validate_sim_tags(self, exp_id, expected_tags, tag_value)
+        expected_tags = [{'a': '1', 'b': '2', 'c': '4'},
+                         {'a': '1', 'b': '2', 'c': '5'},
+                         {'a': '1', 'b': '3', 'c': '4'},
+                         {'a': '1', 'b': '3', 'c': '5'},
+                         {'a': '6', 'b': '2'},
+                         {'a': '7', 'b': '2'}]
+        validate_sim_tags(self, exp_id, expected_tags)
 
     @pytest.mark.comps
     def test_duplicate_asset_files_not_allowed(self):
@@ -475,7 +473,6 @@ class TestPythonExperiment(ITestWithPersistence):
         e.add_assets(copy.deepcopy(new_ac.assets))
         for asset in new_ac:
             self.assertIn(asset, e.assets)
-        e.assets.add_assets(AssetCollection.from_id(self.ac_id, platform=self.platform, as_copy=True))
         wait_on_experiment_and_check_all_sim_status(self, e, self.platform)
         exp_id = e.uid
         # don't validate stdout since we it isn't the typical out since we use different parameters
@@ -604,10 +601,9 @@ class TestPythonExperiment(ITestWithPersistence):
         # update experiment tags
         tags_exp = {"exp_tag": "test"}
         update_item(self.platform, experiment.id, ItemType.EXPERIMENT, tags_exp)
-        tag_value = "idmtools_models.python.json_python_task.JSONConfiguredPythonTask"
-        expected_tags = [{'a': '0', 'aa': '1', 'b': 'test', 'task_type': tag_value},
-                         {'a': '1', 'aa': '1', 'b': 'test', 'task_type': tag_value}]
-        validate_sim_tags(self, experiment.id, expected_tags, tag_value)
+        expected_tags = [{'a': '0', 'aa': '1', 'b': 'test'},
+                         {'a': '1', 'aa': '1', 'b': 'test'}]
+        validate_sim_tags(self, experiment.id, expected_tags)
 
 
 if __name__ == '__main__':

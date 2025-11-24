@@ -36,8 +36,6 @@ def start() -> NoReturn:
     from idmtools_cli.iplatform_cli import PlatformCLIPlugins
     color_init()
     import idmtools_cli.cli.init  # noqa: F401
-    import idmtools_cli.cli.experiment  # noqa: F401
-    import idmtools_cli.cli.simulation  # noqa: F401
     import idmtools_cli.cli.config_file  # noqa: F401
     import idmtools_cli.cli.system_info  # noqa: F401
     import idmtools_cli.cli.gitrepo  # noqa: F401

@@ -59,7 +59,7 @@ def comps_batch_worker(simulations: List[Simulation], interface: 'CompsPlatformS
     Returns:
         List of Comps Simulations
     """
-    global COMPS_EXPERIMENT_BATCH_COMMISSION_LOCK, COMPS_EXPERIMENT_BATCH_COMMISSION_TIMESTAMP
+    global COMPS_EXPERIMENT_BATCH_COMMISSION_LOCK, COMPS_EXPERIMENT_BATCH_COMMISSION_TIMESTAMP  # noqa: F824
     if logger.isEnabledFor(DEBUG):
         logger.debug(f'Converting {len(simulations)} to COMPS')
     created_simulations = []
@@ -251,7 +251,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
 
         return Configuration(**comps_configuration)
 
-    def batch_create(self, simulations: List[Simulation], num_cores: int = None, priority: str = None, 
+    def batch_create(self, simulations: List[Simulation], num_cores: int = None, priority: str = None,
                      asset_collection_id: str = None, **kwargs) -> List[COMPSSimulation]:
         """
         Perform batch creation of Simulations.
@@ -399,7 +399,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         # should we load metadata
         metadata = self.__load_metadata_from_simulation(obj) if load_metadata else None
         if load_task:
-            self._load_task_from_simulation(obj, simulation, metadata)
+            self._load_task_from_simulation2(obj, simulation, parent.task_type, metadata)
         else:
             obj.task = None
             self.__extract_cli(simulation, parent, obj, load_cli_from_workorder)
@@ -429,7 +429,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
 
         Args:
             simulation: Simulation to populate with task
-            comps_sim: Experiment object
+            comps_sim: COMPSSimulation object
             metadata: Metadata loaded to be used in the task object
 
         Returns:
@@ -446,6 +446,37 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
                 simulation.task = TaskFactory().create(comps_sim.tags['task_type'], **metadata)
             except Exception as e:
                 user_logger.warning(f"Could not load task of type {comps_sim.tags['task_type']}. "
+                                    f"Received error {str(e)}")
+                logger.exception(e)
+        # ensure we have loaded the configuration
+        if comps_sim.configuration is None:
+            comps_sim.refresh(QueryCriteria().select_children('configuration'))
+
+    def _load_task_from_simulation2(self, simulation: Simulation, comps_sim: COMPSSimulation, task_type: str,
+                                    metadata: Dict = None):
+        """
+        Load task from the simulation object.
+
+        Args:
+            simulation: Simulation to populate with task
+            comps_sim: COMPSSimulation object
+            task_type: Experiment's task type
+            metadata: Metadata loaded to be used in the task object
+
+        Returns:
+            None
+        """
+        simulation.task = None
+        if task_type:
+            # check for metadata
+            if not metadata:
+                metadata = self.__load_metadata_from_simulation(simulation)
+            try:
+                if logger.isEnabledFor(DEBUG):
+                    logger.debug(f"Metadata: {metadata}")
+                simulation.task = TaskFactory().create(task_type, **metadata)
+            except Exception as e:
+                user_logger.warning(f"Could not load task of type {task_type}. "
                                     f"Received error {str(e)}")
                 logger.exception(e)
         # ensure we have loaded the configuration
@@ -499,8 +530,11 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             ValueError when command cannot be detected
         """
         cli = None
-        # do we have a configuration?
-        po: COMPSExperiment = experiment.get_platform_object()
+        if isinstance(experiment, COMPSExperiment):
+            po = experiment
+        else:
+            # do we have a configuration?
+            po: COMPSExperiment = experiment.get_platform_object()
         if po.configuration is None:
             po.refresh(QueryCriteria().select_children('configuration'))
         # simulation configuration for executable?
@@ -551,18 +585,17 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         """
         # since assets could be in the common assets, we should check that firs
         # load comps config first
-        comps_sim: COMPSSimulation = simulation.get_platform_object(load_children=["files", "configuration"])
         if include_experiment_assets and (
-                comps_sim.configuration is None or comps_sim.configuration.asset_collection_id is None):
+                simulation.configuration is None or simulation.configuration.asset_collection_id is None):
             if logger.isEnabledFor(DEBUG):
                 logger.debug("Gathering assets from experiment first")
             exp_assets = get_asset_for_comps_item(self.platform, simulation.experiment, files, self.cache,
-                                                  load_children=["configuration"])
+                                                  comps_item=simulation.experiment)
             if exp_assets is None:
                 exp_assets = dict()
         else:
             exp_assets = dict()
-        exp_assets.update(get_asset_for_comps_item(self.platform, simulation, files, self.cache, comps_item=comps_sim))
+        exp_assets.update(get_asset_for_comps_item(self.platform, simulation, files, self.cache, comps_item=simulation))
         return exp_assets
 
     def list_assets(self, simulation: Simulation, common_assets: bool = False, **kwargs) -> List[Asset]:

@@ -24,7 +24,6 @@ logger = getLogger(__name__)
 current_directory = os.path.dirname(os.path.realpath(__file__))
 data_path = os.path.abspath(os.path.join(current_directory, "..", "..", "data"))
 EXPERIMENTS_LOCK = Lock()
-SEQUENCE_FILE_DEFAULT_PATH = IDMTOOLS_USER_HOME.joinpath("itemsequence", "index.json")
 
 
 class ExperimentDict(dict):
@@ -200,6 +199,7 @@ class TestExecutePlatformExperimentOperation(IPlatformExperimentOperations):
         excluded = ['platform_id', 'item_type', 'frozen', 'simulations']
         experiment = Experiment(**{k: v for k, v in data.items() if k not in excluded})
         experiment.platform_metadata = data
+        experiment.task_type = data['tags']['task_type']
         if data['assets']:
             assets = AssetCollection()
             exp_path = os.path.join(self.get_experiment_path(experiment.uid), "Assets")

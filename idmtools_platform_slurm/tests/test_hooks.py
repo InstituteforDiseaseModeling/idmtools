@@ -82,3 +82,4 @@ class TestFilePlatform(ITestWithPersistence):
         self.assertTrue("hello add_post_creation_hook! succeeded = EntityStatus.CREATED" in stdout)
         self.assertTrue("hello add_sim_pre_creation_hook! succeeded = False" in stdout)
         self.assertTrue("hello add_sim_post_creation_hook! succeeded = EntityStatus.CREATED" in stdout)
+

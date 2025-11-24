@@ -41,14 +41,14 @@ translator = str.maketrans('', '', escapes)
 packages = dict(
     idmtools_core=data_class_default,
     idmtools_cli=default_install,
-    idmtools_platform_comps=data_class_default,
+    idmtools_test=[],
     idmtools_models=data_class_default,
-    idmtools_platform_slurm=data_class_default,
+    idmtools_platform_comps=data_class_default,
     idmtools_platform_general=data_class_default,
     idmtools_platform_container=data_class_default,
-    idmtools_slurm_utils=[],
-    idmtools_test=[]
+    idmtools_platform_slurm=data_class_default,
 )
+
 logger = getLogger("bootstrap")
 
 
@@ -100,55 +100,81 @@ def process_output(output_line: str):
         logger.debug("".join(ch for ch in output_line if unicodedata.category(ch)[0] != "C"))
 
 
-def install_dev_packages(pip_url):
+def install_dev_packages(pip_url, extra_index_url, build_docs):
     """
-    Install the development packages.
-
-    This loops through all our idmtools packages and runs pip install -e . on each package
-    It also runs a pip install -r requirements from the  doc directory.
-
+    Install all idmtools packages in editable mode with their extras.
+    Skips `.test` extras when building docs (build_docs=True).
     Args:
-        pip_url: Url to install package from
+        pip_url: Url to install package from.
+        extra_index_url: Extra index url to install package from.
+        build_docs: Flag (True) to build docs.
 
     Returns:
         None
     """
-    # loop through and install our packages
     for package, extras in packages.items():
-        extras_str = f"[{','.join(extras)}]" if extras else ''
-        logger.info(f'Installing {package} with extras: {extras_str if extras_str else "None"} from {base_directory}')
+        # When building docs, skip 'test' extras
+        effective_extras = [e for e in extras if not (build_docs and e == "test")]
+
+        extras_str = f"[{','.join(effective_extras)}]" if effective_extras else ""
+        package_dir = join(base_directory, package)
+        logger.info(f"Installing {package}{extras_str} from {package_dir}")
+
+        cmd = [
+            sys.executable, "-m", "pip", "install", "-e", f".{extras_str}",
+            f"--index-url={pip_url}", f"--extra-index-url={extra_index_url}"
+        ]
+
         try:
-            for line in execute(["pip3", "install", "-e", f".{extras_str}", f"--extra-index-url={pip_url}"],
-                                cwd=join(base_directory, package)):
+            for line in execute(cmd, cwd=package_dir):
                 process_output(line)
         except subprocess.CalledProcessError as e:
-            logger.critical(f'{package} installed failed using {e.cmd} did not succeed')
-            result = e.returncode
-            logger.debug(f'Return Code: {result}')
-    for line in execute(["pip3", "install", "-r", "requirements.txt", f"--extra-index-url={pip_url}"],
-                        cwd=join(base_directory, 'docs')):
-        process_output(line)
+            logger.critical(f"{package} installation failed: {e.cmd}")
+            logger.debug(f"Return code: {e.returncode}")
+
+    # Install doc-specific dependencies only if requested
+    if build_docs:
+        docs_dir = join(base_directory, "docs")
+        logger.info("Installing doc requirements from docs/requirements.txt")
+        cmd_docs = [
+            sys.executable, "-m", "pip", "install", "-r", "requirements.txt",
+            f"--index-url={pip_url}", f"--extra-index-url={extra_index_url}"
+        ]
+        for line in execute(cmd_docs, cwd=docs_dir):
+            process_output(line)
 
 
-def install_base_environment(pip_url):
+def install_base_environment(pip_url, extra_index_url):
     """
     Installs the base packages needed for development environments.
 
-    We install wheel first(so we can utilize it in later installs).
+    We install base packages needed for development environments.
     We then uninstall py-make
     We then install idm-buildtools
 
     Lastly, we create an idmtools ini in example for developers
     """
-    # install wheel first to benefit from binaries
-    for line in execute(["pip3", "install", "wheel", f"--extra-index-url={pip_url}"]):
+    """Install base tools for development."""
+    # Upgrade to ensure minimum versions
+    logger.info("Upgrading pip, setuptools, and wheel to required versions...")
+    for line in execute([
+        sys.executable, "-m", "pip", "install", "--upgrade",
+        "pip>=23.1", "setuptools>=64.0", "wheel>=0.38",
+        f"--index-url={pip_url}", f"--extra-index-url={extra_index_url}"
+    ]):
         process_output(line)
 
-    for line in execute(["pip3", "uninstall", "-y", "py-make"], ignore_error=True):
+    # Uninstall py-make
+    for line in execute([sys.executable, "-m", "pip", "uninstall", "-y", "py-make"], ignore_error=True):
         process_output(line)
 
-    for line in execute(["pip3", "install", "idm-buildtools~=1.0.1", f"--index-url={pip_url}"]):
-        process_output(line)
+    # Install idm-buildtools
+    for pkg in ["build", "idm-buildtools~=1.0.1"]:
+        for line in execute([
+            sys.executable, "-m", "pip", "install", pkg,
+            f"--index-url={pip_url}", f"--extra-index-url={extra_index_url}"
+        ]):
+            process_output(line)
 
     dev_idmtools_ini = join(base_directory, "examples", "idmtools.ini")
     if not os.path.exists(dev_idmtools_ini):
@@ -160,7 +186,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Bootstrap the development environment")
     parser.add_argument("--index-url", default='https://packages.idmod.org/api/pypi/pypi-production/simple',
                         help="Pip url to install dependencies from")
+    parser.add_argument("--extra-index-url", default='https://pypi.org/simple',
+                        help="Pip url to install dependencies from pypi")
     parser.add_argument("--verbose", default=False, action='store_true')
+    parser.add_argument('--docs', action='store_true', help='Enable build documents')
 
     args = parser.parse_args()
 
@@ -172,18 +201,20 @@ if __name__ == "__main__":
     logger.addHandler(file_handler)
     # use colorful logs except the first time
     console_log_level = logging.DEBUG if 'BUILD_DEBUG' in os.environ or args.verbose else logging.INFO
+
+    logging.addLevelName(15, 'VERBOSE')
+    logging.addLevelName(35, 'SUCCESS')
+    logging.addLevelName(50, 'CRITICAL')
+
     try:
         import coloredlogs  # noqa: I900
 
         coloredlogs.install(logger=logger, level=console_log_level, fmt="%(asctime)s [%(levelname)-8.8s]  %(message)s")
-        logging.addLevelName(15, 'VERBOSE')
-        logging.addLevelName(35, 'SUCCESS')
-        logging.addLevelName(50, 'CRITICAL')
     except ImportError:
         console_handler = logging.StreamHandler(stream=sys.stdout)
         console_handler.setFormatter(log_formatter)
         console_handler.setLevel(console_log_level)
         logger.addHandler(console_handler)
 
-    install_base_environment(args.index_url)
-    sys.exit(install_dev_packages(args.index_url))
+    install_base_environment(args.index_url, args.extra_index_url)
+    sys.exit(install_dev_packages(args.index_url, args.extra_index_url, args.docs))

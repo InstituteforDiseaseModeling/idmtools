@@ -15,7 +15,7 @@ If no configuration file is found, an error is displayed. To supress this error,
 
    common-parameters
    logging
-   cli/wizard
+   cli/comps/wizard
 
 Below is an example configuration file:
 

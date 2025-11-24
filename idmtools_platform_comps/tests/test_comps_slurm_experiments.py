@@ -79,9 +79,8 @@ class TestCOMPSSlurmExperiment(ITestWithPersistence):
         validate_output(self, exp_id, 4)
 
         expected_tags = [{'a': '0', 'b': '1'}, {'a': '0', 'b': '9'}, {'a': '1', 'b': '1'}, {'a': '1', 'b': '9'}]
+        validate_sim_tags(self, exp_id, expected_tags)
         task_type = 'idmtools_models.python.json_python_task.JSONConfiguredPythonTask'
-        validate_sim_tags(self, exp_id, expected_tags, task_type)
-
         # validate experiment tags
         actual_exp_tags = experiment.get(experiment.id, QueryCriteria().select_children('tags')).tags
         expected_exp_tags = {'idmtools': __version__, 'number_tag': '123', 'string_tag': 'test',

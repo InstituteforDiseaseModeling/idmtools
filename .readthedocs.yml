@@ -8,10 +8,10 @@ version: 2
 build:
   os: "ubuntu-20.04"
   tools:
-    python: "3.9"
+    python: "3.11"
   jobs:
     pre_build:
-      - pip install -e "idmtools_core[test]"
+      - echo "Building docs without [test] extras"
 
 # Build documentation in the docs/ directory with Sphinx
 sphinx:
@@ -30,35 +30,24 @@ formats:
 python:
   install:
     - requirements: dev_scripts/package_requirements.txt
-    - requirements: docs/requirements.txt
     - method: pip
       path: idmtools_core
-      extra_requirements:
-        - test
     - method: pip
       path: idmtools_cli
-      extra_requirements:
-        - test
-    - method: pip
-      path: idmtools_platform_comps
-      extra_requirements:
-        - test
-    - method: pip
-      path: idmtools_models
-      extra_requirements:
-        - test
-    - method: pip
-      path: idmtools_platform_slurm
-      extra_requirements:
-        - test
     - method: pip
       path: idmtools_test
-      extra_requirements:
-        - test
     - method: pip
-      path: idmtools_slurm_utils
-      extra_requirements:
-        - test
+      path: idmtools_models
+    - method: pip
+      path: idmtools_platform_comps
+    - method: pip
+      path: idmtools_platform_general
+    - method: pip
+      path: idmtools_platform_slurm
+    - method: pip
+      path: idmtools_platform_container
+    - requirements: docs/requirements.txt
+
 
 
 

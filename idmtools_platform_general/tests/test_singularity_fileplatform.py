@@ -1,12 +1,9 @@
 import os
-
 import pytest
-
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import Suite
 from idmtools.entities.command_task import CommandTask
 from idmtools.entities.experiment import Experiment
-
 from idmtools_test.utils.decorators import linux_only
 from idmtools_test.utils.itest_with_persistence import ITestWithPersistence
 
@@ -62,4 +59,4 @@ class TestSingularity(ITestWithPersistence):
             self.assertTrue(os.access(exe, os.X_OK))
             with open(os.path.join(simulation_dir, '_run.sh'), 'r') as fpr:
                 contents = fpr.read()
-            self.assertIn("singularity exec " + task.sif_path + " " + command + " --python-script-path ./Assets/python", contents)
+            self.assertIn("singularity exec " + task.sif_path + "  " + command + " --python-script-path ./Assets/python", contents)

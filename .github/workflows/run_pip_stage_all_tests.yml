@@ -4,6 +4,18 @@
 name: "run_pip_stage_all_tests"
 on:
   workflow_dispatch:
+    inputs:
+      python-version:
+        description: "Select Python version"
+        required: true
+        default: "3.12"
+        type: choice
+        options:
+          - "3.8"
+          - "3.9"
+          - "3.10"
+          - "3.11"
+          - "3.12"
 
 jobs:
   run-pip_stage:
@@ -11,24 +23,22 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest ]
-        python-version: [ 3.9, 3.7, 3.8 ]
     env:
       PYPI_STAGING_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
       PYPI_STAGING_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v2
-      - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        uses: actions/checkout@v4
+      - name: Set up Python on ${{ matrix.os }} with ${{ github.event.inputs.python-version }}
+        uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
-          architecture: x64
+          python-version: ${{ github.event.inputs.python-version }}
       - name: Upgrade pip
         run: |
           python -m pip install --upgrade pip
       - name: Install Python dependencies
         run: |
-          pip install idm-buildtools flake8 wheel pygit2 matplotlib sqlalchemy natsort --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+          pip install idm-buildtools flake8 wheel pygit2 matplotlib sqlalchemy natsort keyring --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
       - name: download idmtools packages from staging jfrog
         run: |
           pip install idmtools[full] --index-url=https://${{ secrets.PYPI_STAGING_USERNAME }}:${{ secrets.PYPI_STAGING_PASSWORD }}@packages.idmod.org/api/pypi/pypi-staging/simple
@@ -48,7 +58,7 @@ jobs:
           cd idmtools_cli
           PARALLEL_TEST_COUNT=2 make test-all
       - name: Upload idmtools_cli all test results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: idmtools_cli_test_results
@@ -58,7 +68,7 @@ jobs:
           cd idmtools_core
           PARALLEL_TEST_COUNT=2 make test-all
       - name: Upload idmtools_core all test results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: idmtools_core_test_results
@@ -68,47 +78,47 @@ jobs:
           cd idmtools_models
           PARALLEL_TEST_COUNT=2 make test-all
       - name: Upload idmtools_models all test results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: idmtools_models_test_results
           path: idmtools_models/tests/reports/
-      - name: run idmtools_platform_slurm tests
-        run: |
-          cd idmtools_platform_slurm
-          make test-all
-      - name: Upload idmtools_platform_slurm all test results
-        uses: actions/upload-artifact@v2
-        if: failure()
-        with:
-          name: idmtools_platform_slurm_test_results
-          path: idmtools_platform_slurm/tests/reports/
-      - name: run idmtools_slurm_utils tests
-        run: |
-          cd idmtools_slurm_utils
-          make test-all
-      - name: Upload idmtools_slurm_utils all test results
-        uses: actions/upload-artifact@v2
-        if: failure()
-        with:
-          name: idmtools_slurm_utils_test_results
-          path: idmtools_slurm_utils/tests/reports/
       - name: run idmtools_platform_general tests
         run: |
           cd idmtools_platform_general
           make test-all
       - name: Upload idmtools_platform_general all test results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: idmtools_platform_general_test_results
           path: idmtools_platform_general/tests/reports/
+      - name: run idmtools_platform_slurm tests
+        run: |
+          cd idmtools_platform_slurm
+          make test-all
+      - name: Upload idmtools_platform_slurm all test results
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: idmtools_platform_slurm_test_results
+          path: idmtools_platform_slurm/tests/reports/
+      - name: run idmtools_platform_container tests
+        run: |
+            cd idmtools_platform_container
+            make test-all
+      - name: Upload idmtools_platform_container all test results
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: idmtools_platform_container_test_results
+          path: idmtools_platform_container/tests/reports/
       - name: run idmtools_platform_comps tests
         run: |
           cd idmtools_platform_comps
           PARALLEL_TEST_COUNT=2 make test-all
       - name: Upload idmtools_platform_comps test results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: idmtools_platform_comps_test_results

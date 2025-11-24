@@ -1,0 +1,32 @@
+========================================
+ System Summary (vm-test)
+========================================
+
+.  CPU Information
+Architecture:        x86_64
+Model name:          Intel(R) Xeon(R) Gold 6126 CPU @ 2.60GHz
+CPU(s):              8
+Thread(s) per core:  1
+Core(s) per socket:  1
+Socket(s):           8
+Vendor ID:           GenuineIntel
+Hypervisor vendor:   VMware
+
+. Memory Information
+Total: 31Gi | Used: 14Gi | Free: 12Gi | Available: 15Gi
+
+. Disk Usage (top-level filesystems)
+/dev/sda2 ext4 476G 128G 324G 29% /
+
+. Virtualization
+Virtualization type: vmware
+
+. OS and Kernel
+OS: Ubuntu 22.04.3 LTS
+Kernel: 5.15.0-91-generic
+
+. Current CPU Load (1/5/15 min)
+ 0.12, 0.09, 0.10
+
+Summary complete.
+========================================

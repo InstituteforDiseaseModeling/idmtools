@@ -1,0 +1,4 @@
+{
+  "python.defaultInterpreterPath": "/usr/local/python/current/bin/python3",
+  "python.terminal.executeInFileDir": true
+}
