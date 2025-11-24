@@ -1,0 +1,27 @@
+name: Export all optional dependencies
+on:
+  push:
+    paths:
+      - "**/pyproject.toml"
+    branches:
+      - dev
+  workflow_dispatch:
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Export all optional dependencies
+        run: python dev_scripts/export_optional_deps.py
+      - name: Commit exported requirements
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git remote set-url origin https://x-access-token:${{ secrets.VERSION_PAT }}@github.com/${{ github.repository }}.git
+          git add idmtools_*/requirements-*.txt
+          git diff --cached --quiet || git commit -m "Update exported requirements files"
+          git push
