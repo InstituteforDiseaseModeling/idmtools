@@ -25,6 +25,10 @@ on:
         description: "Slurm Platform Test Only"
         required: false
         default: 'false'
+  pull_request:
+    types: [ opened, reopened, synchronize ]
+    branches:
+      - dev
 
 jobs:
   run-setup-dev-all-tests:
@@ -36,6 +40,13 @@ jobs:
     env:
       PYPI_STAGING_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
       PYPI_STAGING_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
+    # Run for:
+    # 1) Manual workflow_dispatch
+    # 2) Dependabot pull requests ONLY
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      github.actor == 'dependabot[bot]' ||
+      github.actor == 'dependabot-preview[bot]'
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v4
