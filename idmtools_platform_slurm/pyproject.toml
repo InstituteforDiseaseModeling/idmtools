@@ -39,7 +39,7 @@ Homepage = "https://github.com/InstituteforDiseaseModeling/idmtools"
 
 [project.optional-dependencies]
 test = [
-    "pytest",
+    "idmtools[test]",
     "idmtools_models",
     "idmtools_test",
 ]

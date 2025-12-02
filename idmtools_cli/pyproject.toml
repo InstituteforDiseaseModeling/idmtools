@@ -43,23 +43,8 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = [
-    "flake8",
-    "coverage",
-    "bump2version",
-]
 test = [
-    "pytest",
-    "pytest-timeout",
-    "pytest-cache",
-    "flake8",
-    "coverage",
-    "bump2version",
-]
-packaging = [
-    "flake8",
-    "coverage",
-    "bump2version",
+    "idmtools[test]",
 ]
 
 [project.scripts]

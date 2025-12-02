@@ -42,15 +42,8 @@ Homepage = "https://github.com/InstituteforDiseaseModeling/idmtools"
 
 [project.optional-dependencies]
 test = [
-    "pytest",
-    "pytest-timeout",
-    "pytest-cache",
-    "flake8",
-    "coverage",
-    "bump2version",
-    "twine",
-    "pyCOMPS~=2.10",
-    "natsort~=8.4.0",
+    "idmtools[test]",
+    "pyCOMPS~=2.11",
     "idmtools_test",
 ]
 packaging = [

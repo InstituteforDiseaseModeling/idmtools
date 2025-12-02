@@ -36,7 +36,7 @@ classifiers = [
 ]
 dependencies = [
     "idmtools~=3.0.0",
-    "pyCOMPS~=2.10",
+    "pyCOMPS~=2.11",
     "natsort~=8.4.0",
 ]
 
@@ -45,18 +45,9 @@ Homepage = "https://github.com/InstituteforDiseaseModeling/idmtools"
 
 [project.optional-dependencies]
 test = [
-    "pytest",
-    "matplotlib",
-    "pytest-timeout",
-    "pytest-cache",
-    "pytest-lazy-fixture",
-    "flake8",
-    "coverage",
-    "bump2version",
-    "twine",
-    "natsort",
-    "idmtools_models",
+    "idmtools[test]",
     "idmtools_test",
+    "idmtools_models",
 ]
 packaging = [
     "flake8",
