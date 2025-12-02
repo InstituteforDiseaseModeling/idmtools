@@ -25,8 +25,8 @@ on:
         description: "Slurm Platform Test Only"
         required: false
         default: 'false'
-  pull_request:
-    types: [ opened, reopened, synchronize ]
+  pull_request_target:
+    types: [ opened, synchronize ]
     branches:
       - dev
 
@@ -48,7 +48,20 @@ jobs:
       github.actor == 'dependabot[bot]' ||
       github.actor == 'dependabot-preview[bot]'
     steps:
-      - name: Check out Git repository
+      # ------------------------
+      # Dependabot checkout
+      # ------------------------
+      - name: Checkout (Dependabot PR)
+        if: ${{ github.actor == 'dependabot[bot]' }}
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      # ------------------------
+      # Normal checkout for all other PRs / triggers
+      # ------------------------
+      - name: Checkout (normal PR)
+        if: ${{ github.actor != 'dependabot[bot]' }}
         uses: actions/checkout@v4
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
