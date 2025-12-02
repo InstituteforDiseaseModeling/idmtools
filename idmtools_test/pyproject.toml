@@ -23,7 +23,6 @@ authors = [
     { name = "Zhaowei Du", email = "zdu@idmod.org" },
     { name = "Ye Chen", email = "yechen@idmod.org" },
     { name = "Clinton Collins", email = "ccollins@idmod.org" },
-    { name = "Mary Fisher", email = "mfisher@idmod.org" },
     { name = "Clark Kirkman IV", email = "ckirkman@idmod.org" },
     { name = "Benoit Raybaud", email = "braybaud@idmod.org" },
 ]
