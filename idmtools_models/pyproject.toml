@@ -45,6 +45,7 @@ test = [
     "idmtools[test]",
     "pyCOMPS~=2.11",
     "idmtools_test",
+    "matplotlib~=3.10"
 ]
 packaging = [
     "flake8",
