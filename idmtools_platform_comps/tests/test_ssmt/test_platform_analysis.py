@@ -28,6 +28,12 @@ def platform_slurm_2():
     return Platform('SLURMSTAGE', docker_image="idm-docker-staging.packages.idmod.org/idmtools/comps_ssmt_worker:" +
                                                get_latest_image_stage())
 
+@pytest.fixture
+def platform(request):
+    # This lets us pass fixture names as strings in parametrize,
+    # exactly like pytest.lazy_fixture used to.
+    return request.getfixturevalue(request.param)
+
 
 # Test PlatformAnalysis with PopulationAnalyzer for experiment id
 def do_platform_analysis_experiment(platform: Platform):
