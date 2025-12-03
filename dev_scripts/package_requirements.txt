@@ -2,7 +2,7 @@
 bump2version~=1.0.1
 flake8~=7.3.0
 coverage>=5.3,<7.5
-packaging~=24.0
+packaging~=25.0
 idm-buildtools~=1.0.5
 twine~=6.2.0
 wheel>=0.38
