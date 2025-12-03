@@ -1,5 +1,5 @@
 # dev install and run all test
-# trigger by clicking button "Run Workflow".
+# trigger by clicking button "Run Workflow" or dependabot PR.
 
 name: "run_dev_install_all_tests"
 on:
