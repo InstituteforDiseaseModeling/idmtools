@@ -74,7 +74,7 @@ test = [
     "pytest-timeout~=2.4.0",
     "pytest-xdist~=3.8",
     "flake8>=7.0",
-    "flake8-docstrings~=1.6",
+    "flake8-docstrings~=1.7",
     "coverage~=7.4",
     "twine>=3.4.1",
 ]
