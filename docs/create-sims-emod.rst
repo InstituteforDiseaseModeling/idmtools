@@ -2,7 +2,7 @@
 Create |EMOD_s| simulations
 ===========================
 
-To create simulations using |EMOD_s| you must use the :doc:`emodpy:emodpy` with |IT_s|. Included with emodpy is the :py:class:`~emodpy.emod_task.EMODTask` class, inheriting from the :py:class:`~idmtools.entities.itask.ITask` abstract class, and used for the running and configuration of |EMOD_s| simulations and experiments.
+To create simulations using |EMOD_s| you must use the `emodpy <https://emod-hub.github.io/emodpy/>`__ with |IT_s|. Included with emodpy is the :py:class:`~emodpy.emod_task.EMODTask` class, inheriting from the :py:class:`~idmtools.entities.itask.ITask` abstract class, and used for the running and configuration of |EMOD_s| simulations and experiments.
 
 .. uml::
 
