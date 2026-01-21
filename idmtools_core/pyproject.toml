@@ -62,7 +62,7 @@ Documentation = "https://idmtools.readthedocs.io"
 
 [project.optional-dependencies]
 test = [
-    "allure-pytest>=2.8.34,<2.14",
+    "allure-pytest>=2.8.34,<2.16",
     "junitparser>=4.0.2",
     "livereload~=2.6.3",
     "pytest>=7.4.4",
