@@ -2,12 +2,13 @@
 requires = [
     "setuptools>=61.0",
     "wheel",
+    "setuptools_scm[toml]>=8.0"
 ]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "idmtools_platform_comps"
-version = "3.0.0+nightly"
+name = "idmtools-platform-comps"
+dynamic = ["version"]
 description = "Comps platform for IDM-Tools"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -33,6 +34,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
 ]
 dependencies = [
     "idmtools~=3.0.0",
@@ -68,14 +70,13 @@ idmtools_platform_ssmt = "idmtools_platform_comps.plugin_info:SSMTPlatformSpecif
 comps_subcommand = "idmtools_platform_comps.cli.comps:comps"
 
 [tool.setuptools]
-include-package-data = true
+package-data = { "idmtools_platform_comps" = ["*"] }
+
+[tool.setuptools_scm]
+version_scheme = "guess-next-dev"     # 3.0.0 → 3.0.1.devN after tag
+local_scheme = "node-and-date"        # adds +gHASH.YYYYMMDD in dev
+fallback_version = "3.0.0.dev0"
 
 [tool.setuptools.packages.find]
-exclude = [
-    "tests",
-]
-
-[tool.setuptools.package-data]
-idmtools_platform_comps = [
-    "*",
-]
+where = ["."]
+exclude = ["tests*"]

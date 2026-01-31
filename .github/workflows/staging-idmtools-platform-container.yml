@@ -55,7 +55,7 @@ jobs:
           TWINE_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
         run: |
           python -m build
-          twine upload dist/*
+          # twine upload dist/*
       - name: Verify if files changed
         uses: tj-actions/changed-files@v45
         id: changed_files
@@ -66,12 +66,12 @@ jobs:
       - name: Print any_modified output
         run: |
           echo "Any modified: ${{ steps.changed_files.outputs.any_modified }}"
-      - name: Build container docker image
-        working-directory: idmtools_platform_container/docker_image
-        env:
-          PYPI_STAGING_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
-          PYPI_STAGING_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
-        if: steps.changed_files.outputs.any_modified == 'true'
-        run: |
-          python build_docker_image.py --username ${{ secrets.PYPI_STAGING_USERNAME }} --password ${{ secrets.PYPI_STAGING_PASSWORD }}
-          python push_docker_image.py --username ${{ env.PYPI_STAGING_USERNAME }} --password ${{ env.PYPI_STAGING_PASSWORD }}
+#      - name: Build container docker image
+#        working-directory: idmtools_platform_container/docker_image
+#        env:
+#          PYPI_STAGING_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
+#          PYPI_STAGING_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
+#        if: steps.changed_files.outputs.any_modified == 'true'
+#        run: |
+#          python build_docker_image.py --username ${{ secrets.PYPI_STAGING_USERNAME }} --password ${{ secrets.PYPI_STAGING_PASSWORD }}
+#          python push_docker_image.py --username ${{ env.PYPI_STAGING_USERNAME }} --password ${{ env.PYPI_STAGING_PASSWORD }}

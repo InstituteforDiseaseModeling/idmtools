@@ -35,7 +35,7 @@ COPY .depends/* /tmp/
 RUN pip3 install -U pip && \
     pip install pygit2
 
-RUN bash -c "pip3 install /tmp/*.gz --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple"
+RUN bash -c "pip3 install /tmp/*.gz --index-url=https://pypi.org/simple --extra-index-url=https://test.pypi.org/simple"
 
 # make the PIP index configurable so we can build against staging, production, or a local PyPI server
 ARG SSMT_VERSION

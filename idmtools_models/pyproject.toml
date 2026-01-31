@@ -2,12 +2,13 @@
 requires = [
     "setuptools>=61.0",
     "wheel",
+    "setuptools_scm[toml]>=8.0"
 ]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "idmtools_models"
-version = "3.0.0+nightly"
+name = "idmtools-models"
+dynamic = ["version"]
 description = "Core tools for modeling"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -32,6 +33,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
 ]
 dependencies = [
     "idmtools~=3.0.0",
@@ -63,15 +65,14 @@ idmtools_task_r = "idmtools_models.r.r_task:RTaskSpecification"
 idmtools_task_r_json = "idmtools_models.r.json_r_task:JSONConfiguredRTaskSpecification"
 idmtools_task_json = "idmtools_models.json_configured_task:JSONConfiguredTaskSpecification"
 
-[tool.setuptools]
-include-package-data = true
-
 [tool.setuptools.packages.find]
-exclude = [
-    "tests",
-]
+where = ["."]
+exclude = ["tests*"]
 
-[tool.setuptools.package-data]
-idmtools_models = [
-    "*",
-]
+[tool.setuptools]
+package-data = { "idmtools_models" = ["*"] }
+
+[tool.setuptools_scm]
+version_scheme = "guess-next-dev"
+local_scheme = "node-and-date"
+fallback_version = "3.0.0.dev0"

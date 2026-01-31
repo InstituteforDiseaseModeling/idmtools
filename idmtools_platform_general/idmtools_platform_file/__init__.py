@@ -4,4 +4,4 @@ idmtools file platform.
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 # flake8: noqa F821
-__version__ = "3.0.0+nightly"
+__version__ = "3.0.0"

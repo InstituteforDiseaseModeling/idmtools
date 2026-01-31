@@ -53,11 +53,11 @@ jobs:
           TWINE_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
         run: |
           python -m build
-          twine upload dist/*
-      - name: Build and push docker image
-        working-directory: idmtools_platform_comps
-        env:
-          PYPI_STAGING_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
-          PYPI_STAGING_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
-        run: |
-          make ssmt-image-release
+#          twine upload dist/*
+#      - name: Build and push docker image
+#        working-directory: idmtools_platform_comps
+#        env:
+#          PYPI_STAGING_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
+#          PYPI_STAGING_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
+#        run: |
+#          make ssmt-image-release

@@ -1,0 +1,96 @@
+# .github/workflows/publish.yml
+name: Publish to PyPI
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish-to-testpypi:
+        description: 'Publish to TestPyPI instead of real PyPI?'
+        required: true
+        default: 'true'
+        type: boolean
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package: [core, cli, models, platform_comps, platform_general, platform_slurm, platform_container, test]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0           # required for setuptools_scm to see tags
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install build tools
+        run: pip install build twine setuptools_scm
+      # ────────────────────────────────────────────────
+      # Only for platform_comps: compute clean version
+      - name: Determine clean version from scm (platform_comps only)
+        if: matrix.package == 'platform_comps'
+        id: scm-version
+        run: |
+          cd idmtools_platform_comps
+          python -c "from setuptools_scm import get_version; print(get_version())" > temp_version.txt
+          cat temp_version.txt
+          echo "clean_version=$(cat temp_version.txt)" >> $GITHUB_OUTPUT
+        working-directory: .
+
+      # Only update VERSION when:
+      # - package = platform_comps
+      # - publishing to real PyPI
+      # - on a tagged commit (vX.Y.Z)
+      - name: Update VERSION file for platform_comps (real release only)
+        if: matrix.package == 'platform_comps' && inputs.publish-to-testpypi == 'false' && startsWith(github.ref, 'refs/tags/v')
+        run: |
+          VERSION_FILE="idmtools_platform_comps/VERSION"
+          
+          echo "${{ steps.scm-version.outputs.clean_version }}" > "$VERSION_FILE"
+          echo "Updated $VERSION_FILE → $(cat "$VERSION_FILE")"
+          
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          
+          git add "$VERSION_FILE"
+          # Only commit if actually changed
+          git diff --quiet --exit-code "$VERSION_FILE" || \
+            git commit -m "chore: update VERSION in idmtools_platform_comps to ${{ steps.scm-version.outputs.clean_version }} [skip ci]"
+          
+          git push origin HEAD:${{ github.ref_name }} || echo "Push not needed or already up-to-date"
+        working-directory: .
+
+      # Safety: never allow untagged publish to real PyPI
+      - name: Prevent untagged publish to real PyPI
+        if: inputs.publish-to-testpypi == 'false' && !startsWith(github.ref, 'refs/tags/v')
+        run: |
+          echo "::error::Publishing to real PyPI is only allowed from tagged commits (vX.Y.Z)"
+          exit 1
+
+      # ────────────────────────────────────────────────
+      # Normal build & publish for every package
+      - name: Build ${{ matrix.package }}
+        working-directory: ./idmtools_${{ matrix.package }}
+        run: python -m build
+      - name: Show computed version for ${{ matrix.package }}
+        run: |
+          cd idmtools_${{ matrix.package }}
+          python -c "from setuptools_scm import get_version; print('Version:', get_version())"
+
+      - name: Publish package
+        continue-on-error: true
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: idmtools_${{ matrix.package }}/dist/
+          repository-url: ${{ inputs.publish-to-testpypi == 'true' && 'https://test.pypi.org/legacy/' || 'https://pypi.org/legacy/' }}
+          username: __token__
+          password: ${{ inputs.publish-to-testpypi == 'true' && secrets.TEST_PYPI_API_TOKEN || secrets.PYPI_API_TOKEN }}
+          skip-existing: true
+#         For local act test
+#          repository-url: https://test.pypi.org/legacy/
+#          username: __token__
+#          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+#          skip-existing: true

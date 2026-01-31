@@ -54,6 +54,9 @@ class SSMTWorkItem(ICOMPSWorkflowItem):
         """
         Build comps ssmt docker image name.
 
+        Uses Docker Hub if use_docker_hub is True (with fallback to Artifactory).
+        Otherwise uses Artifactory directly.
+
         Returns: final validated name
         """
         if self.docker_image:
@@ -62,21 +65,46 @@ class SSMTWorkItem(ICOMPSWorkflowItem):
         if self.platform.docker_image:
             return self.platform.docker_image
 
-        SSMT_PRODUCTION_IMAGE = 'docker-production.packages.idmod.org/idmtools/comps_ssmt_worker'
-        SSMT_STAGING_IMAGE = 'docker-staging.packages.idmod.org/idmtools/comps_ssmt_worker'
-
-        from idmtools_platform_comps.utils.package_version import get_latest_ssmt_image_version_from_artifactory
+        from idmtools_platform_comps.utils.package_version import (
+            get_latest_ssmt_image_version,
+            DOCKER_HUB_PRODUCTION,
+            DOCKER_HUB_STAGING,
+            GHCR_PRODUCTION,
+            GHCR_STAGING
+        )
         from idmtools_platform_comps import __version__
 
-        # Determine the default ssmt docker image
-        if "comps.idmod.org" in self.platform.endpoint.lower():
-            ssmt_image = SSMT_PRODUCTION_IMAGE
+        # Determine if we're using production or staging
+        is_production = "comps.idmod.org" in self.platform.endpoint.lower()
+
+        # Get use_ghcr setting from platform (default to True)
+        # Also check legacy use_docker_hub for backward compatibility
+        use_ghcr = getattr(self.platform, 'use_ghcr', True)
+        if not use_ghcr and hasattr(self.platform, 'use_docker_hub'):
+            # Backward compatibility: if use_docker_hub is False, use GHCR
+            use_ghcr = not self.platform.use_docker_hub
+
+        # Get the version using GHCR or Docker Hub
+        try:
+            release = get_latest_ssmt_image_version(
+                use_ghcr=use_ghcr,
+                is_production=is_production,
+                base_version=__version__
+            )
+        except ValueError as e:
+            logger.error(f"Could not determine SSMT image version: {e}")
+            raise
+
+        # Build the full image path based on source
+        if use_ghcr:
+            # GitHub Container Registry path format (recommended)
+            docker_repo = GHCR_PRODUCTION if is_production else GHCR_STAGING
+            docker_image = f'{docker_repo}:{release}'
         else:
-            ssmt_image = SSMT_STAGING_IMAGE
+            # Docker Hub path format (legacy)
+            docker_repo = DOCKER_HUB_PRODUCTION if is_production else DOCKER_HUB_STAGING
+            docker_image = f'{docker_repo}:{release}'
 
-        release = get_latest_ssmt_image_version_from_artifactory(base_version=__version__)
-
-        docker_image = f'{ssmt_image}:{release}'
         if logger.isEnabledFor(DEBUG):
             logger.debug(f'docker_image in use: {docker_image}')
 
