@@ -32,8 +32,8 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "idmtools~=3.0.0",
-    "idmtools_cli~=3.0.0",
+    "idmtools~=3.1.0",
+    "idmtools_cli~=3.1.0",
 ]
 
 [project.urls]

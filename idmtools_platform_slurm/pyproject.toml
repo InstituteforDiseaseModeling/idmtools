@@ -32,7 +32,7 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "idmtools_platform_general~=3.0.0",
+    "idmtools_platform_general~=3.1.0",
     "dataclasses-json",
 ]
 
