@@ -241,7 +241,7 @@ def build_image(username, token, disable_keyring_load, disable_keyring_save, use
         logger.info(f"All tags pushed successfully for version {version}")
     else:
         logger.info("Skipping push (use --push to push to registry)")
-        logger.info(f"To push manually, run:")
+        logger.info("To push manually, run:")
         logger.info(f"  docker push {image}:{version}")
         if base_version:
             logger.info(f"  docker push {image}:{base_version}")
@@ -277,23 +277,23 @@ Authentication:
     )
 
     parser.add_argument("--username", default=None,
-                       help="GitHub username (default: uses 'token' or GITHUB_ACTOR)")
+                        help="GitHub username (default: uses 'token' or GITHUB_ACTOR)")
     parser.add_argument("--token", default=None, dest="password",
-                       help="GitHub Personal Access Token (or set GITHUB_TOKEN env var)")
+                        help="GitHub Personal Access Token (or set GITHUB_TOKEN env var)")
     parser.add_argument("--disable-keyring-load", action="store_true",
-                       help="Disable loading token from keyring")
+                        help="Disable loading token from keyring")
     parser.add_argument("--disable-keyring-save", action="store_true",
-                       help="Disable saving token to keyring")
+                        help="Disable saving token to keyring")
     parser.add_argument("--production", action="store_true",
-                       help="Use production image repository instead of staging")
+                        help="Use production image repository instead of staging")
     parser.add_argument("--push", action="store_true",
-                       help="Push image to ghcr.io after building")
+                        help="Push image to ghcr.io after building")
     parser.add_argument("--skip-login", action="store_true",
-                       help="Skip docker login (assumes already logged in)")
+                        help="Skip docker login (assumes already logged in)")
     parser.add_argument("--verbose", action="store_true",
-                       help="Enable verbose logging")
+                        help="Enable verbose logging")
     parser.add_argument("--debug", action="store_true",
-                       help="Enable debug logging")
+                        help="Enable debug logging")
 
     args = parser.parse_args()
 

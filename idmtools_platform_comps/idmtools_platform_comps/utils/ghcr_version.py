@@ -18,7 +18,7 @@ from natsort import natsorted
 
 # Adjust these to match your actual repositories
 GHCR_PRODUCTION = "ghcr.io/shchen-idmod/idmtools-comps-ssmt-worker"
-GHCR_STAGING    = "ghcr.io/shchen-idmod/idmtools-comps-ssmt-worker-staging"
+GHCR_STAGING = "ghcr.io/shchen-idmod/idmtools-comps-ssmt-worker-staging"
 # GHCR_PRODUCTION = 'ghcr.io/institutefordiseasemodeling/idmtools-comps-ssmt-worker'
 # GHCR_STAGING = 'ghcr.io/institutefordiseasemodeling/idmtools-comps-ssmt-worker-staging'
 
@@ -43,7 +43,7 @@ def _fetch_latest_tag(image: str, token: Optional[str] = None) -> Optional[str]:
     if not image.startswith("ghcr.io/"):
         raise ValueError(f"Expected GHCR image format: {image}")
 
-    #path = image.replace("ghcr.io/", "").rstrip("/")
+    # path = image.replace("ghcr.io/", "").rstrip("/")
     path = image.replace("ghcr.io/", "")
     org_repo = path.rstrip("/")
 
@@ -93,6 +93,7 @@ def _parse_version(tag: str) -> Tuple[str, int]:
     build = int(parts[3]) if len(parts) == 4 else 0
     return base, build
 
+
 def _is_valid_version_tag(tag: str) -> bool:
     """Basic check: x.y.z.b where all parts are digits."""
     parts = tag.split(".")
@@ -102,6 +103,7 @@ def _is_valid_version_tag(tag: str) -> bool:
 def _get_base_part(tag: str) -> str:
     """Return x.y.z part of tag."""
     return ".".join(tag.split(".")[:3])
+
 
 def _fetch_all_tags(image: str, token: Optional[str] = None) -> list:
     """Fetch list of tags from GHCR."""
@@ -135,6 +137,7 @@ def _fetch_all_tags(image: str, token: Optional[str] = None) -> list:
     except Exception as e:
         print(f"Could not reach GHCR for {image}: {e}")
         return []
+
 
 def get_current_ssmt_image_version(use_production: bool = False) -> str:
     """
