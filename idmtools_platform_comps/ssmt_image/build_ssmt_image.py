@@ -18,7 +18,7 @@ from logging import getLogger, basicConfig, DEBUG, INFO
 import sys
 from getpass import getpass
 import keyring
-from idmtools_platform_comps.utils.ghcr_version import get_next_ssmt_image_version, GHCR_PRODUCTION
+from idmtools_platform_comps.utils.ghcr_version import get_next_ssmt_image_version, GHCR_PRODUCTION, GHCR_STAGING
 
 logger = getLogger(__name__)
 
@@ -158,7 +158,7 @@ def build_image(username, token, disable_keyring_load, disable_keyring_save, use
         username, token = get_github_token(disable_keyring_load, disable_keyring_save)
 
     # Select image repository
-    image = GHCR_PRODUCTION
+    image = GHCR_PRODUCTION if use_production else GHCR_STAGING
     logger.info(f"Target image: {image}")
 
     # Login to ghcr.io if pushing and not skipping login
@@ -174,7 +174,7 @@ def build_image(username, token, disable_keyring_load, disable_keyring_save, use
     # Get next version
     logger.info("Determining next version...")
 
-    version = get_next_ssmt_image_version(use_production=True)
+    version = get_next_ssmt_image_version(use_production=use_production)
 
     # Build Docker image
     build_cmd = [

@@ -65,8 +65,7 @@ class SSMTWorkItem(ICOMPSWorkflowItem):
         if self.platform.docker_image:
             return self.platform.docker_image
 
-        from idmtools_platform_comps.utils.ghcr_version import get_current_ssmt_image_version, GHCR_PRODUCTION
-        from idmtools_platform_comps import __version__
+        from idmtools_platform_comps.utils.ghcr_version import get_current_ssmt_image_version, GHCR_PRODUCTION, GHCR_STAGING
 
         # Determine if we're using production or staging
         is_production = "comps.idmod.org" in self.platform.endpoint.lower()
@@ -92,10 +91,10 @@ class SSMTWorkItem(ICOMPSWorkflowItem):
             # GitHub Container Registry path format (recommended)
             docker_repo = GHCR_PRODUCTION if is_production else GHCR_STAGING
             docker_image = f'{docker_repo}:{release}'
-        else:
-            # Docker Hub path format (legacy)
-            docker_repo = DOCKER_HUB_PRODUCTION if is_production else DOCKER_HUB_STAGING
-            docker_image = f'{docker_repo}:{release}'
+        # else:
+        #     # Docker Hub path format (legacy)
+        #     docker_repo = DOCKER_HUB_PRODUCTION if is_production else DOCKER_HUB_STAGING
+        #     docker_image = f'{docker_repo}:{release}'
 
         if logger.isEnabledFor(DEBUG):
             logger.debug(f'docker_image in use: {docker_image}')
