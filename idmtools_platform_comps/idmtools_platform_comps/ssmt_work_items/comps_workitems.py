@@ -65,13 +65,7 @@ class SSMTWorkItem(ICOMPSWorkflowItem):
         if self.platform.docker_image:
             return self.platform.docker_image
 
-        from idmtools_platform_comps.utils.package_version import (
-            get_latest_ssmt_image_version,
-            DOCKER_HUB_PRODUCTION,
-            DOCKER_HUB_STAGING,
-            GHCR_PRODUCTION,
-            GHCR_STAGING
-        )
+        from idmtools_platform_comps.utils.ghcr_version import get_current_ssmt_image_version, GHCR_PRODUCTION
         from idmtools_platform_comps import __version__
 
         # Determine if we're using production or staging
@@ -86,10 +80,8 @@ class SSMTWorkItem(ICOMPSWorkflowItem):
 
         # Get the version using GHCR or Docker Hub
         try:
-            release = get_latest_ssmt_image_version(
-                use_ghcr=use_ghcr,
-                is_production=is_production,
-                base_version=__version__
+            release = get_current_ssmt_image_version(
+                use_production=is_production
             )
         except ValueError as e:
             logger.error(f"Could not determine SSMT image version: {e}")
