@@ -11,7 +11,7 @@ except ImportError:
     from importlib_metadata import version, PackageNotFoundError
 
 try:
-    __version__ = version("idmtools-container")  # Use your actual package name
+    __version__ = version("idmtools-platform-container")  # Use your actual package name
 except PackageNotFoundError:
     # Package not installed, use fallback
     __version__ = "0.0.0+unknown"

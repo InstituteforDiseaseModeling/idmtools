@@ -58,9 +58,8 @@ file = "idmtools_platform_file.cli.file:file"
 include-package-data = true
 
 [tool.setuptools.packages.find]
-exclude = [
-    "tests",
-]
+where = ["."]
+include = ["idmtools_platform_*"]
 
 [tool.setuptools.package-data]
 idmtools_platform_file = [
