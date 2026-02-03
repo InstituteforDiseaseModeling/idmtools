@@ -1,13 +1,10 @@
 [build-system]
-requires = [
-    "setuptools>=61.0",
-    "wheel",
-]
+requires = ["setuptools>=61", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "idmtools_cli"
-version = "3.0.0+nightly"
+dynamic = ["version"]
 description = "CLI for IDM-Tools"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -36,7 +33,7 @@ dependencies = [
     "click-plugins",
     "colorama~=0.4.6",
     "cookiecutter~=2.6.0",
-    "idmtools~=3.0.0",
+    "idmtools>=3.0.0,<4.0.0",
     "tabulate>=0.8.9,<0.10",
     "pyperclip~=1.8",
     "yaspin>=1.2.0,<3.1.0",
@@ -65,3 +62,9 @@ exclude = [
 idmtools_cli = [
     "*",
 ]
+
+[tool.setuptools_scm]
+root = ".."                           # keep if your monorepo needs it
+version_scheme = "no-guess-dev"       # ← change to this (or "guess-next-dev")
+local_scheme = "no-local-version"     # ← change to this (critical for PyPI/TestPyPI uploads)
+fallback_version = "0.0.0.dev0"

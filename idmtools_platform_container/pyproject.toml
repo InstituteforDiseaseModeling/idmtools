@@ -1,13 +1,12 @@
 [build-system]
-requires = [
-    "setuptools>=61.0",
-    "wheel",
-]
+requires = ["setuptools>=61", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
+
+
 
 [project]
 name = "idmtools_platform_container"
-version = "3.0.0+nightly"
+dynamic = ["version"]
 description = "Container platform for IDM-Tools"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -75,3 +74,10 @@ exclude = [
 idmtools_platform_container = [
     "*",
 ]
+
+
+[tool.setuptools_scm]
+root = ".."                           # keep if your monorepo needs it
+version_scheme = "no-guess-dev"       # ← change to this (or "guess-next-dev")
+local_scheme = "no-local-version"     # ← change to this (critical for PyPI/TestPyPI uploads)
+fallback_version = "0.0.0.dev0"

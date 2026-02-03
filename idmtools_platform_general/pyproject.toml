@@ -1,13 +1,10 @@
 [build-system]
-requires = [
-    "setuptools>=61.0",
-    "wheel",
-]
+requires = ["setuptools>=61", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "idmtools_platform_general"
-version = "3.0.0+nightly"
+dynamic = ["version"]
 description = "General platform for IDM-Tools"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -30,8 +27,8 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
-    "idmtools~=3.0.0",
-    "idmtools_cli~=3.0.0",
+    "idmtools>=3.0.0,<4.0.0",
+    "idmtools_cli>=3.0.0,<4.0.0",
 ]
 
 [project.urls]
@@ -72,3 +69,9 @@ idmtools_platform_file = [
 idmtools_platform_process = [
     "*",
 ]
+
+[tool.setuptools_scm]
+root = ".."                           # keep if your monorepo needs it
+version_scheme = "no-guess-dev"       # ← change to this (or "guess-next-dev")
+local_scheme = "no-local-version"     # ← change to this (critical for PyPI/TestPyPI uploads)
+fallback_version = "0.0.0.dev0"
