@@ -27,7 +27,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
-    "idmtools>=3.0.0,<4.0.0",
+    "idmtools>=0.0.0,<1.0.0",
     "idmtools_cli>=3.0.0,<4.0.0",
 ]
 
