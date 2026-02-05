@@ -17,7 +17,7 @@ from idmtools.core import ItemType
 from idmtools.entities.experiment import Experiment
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 from idmtools_platform_comps.comps_platform import COMPSPlatform, SLURM_ENVS
-from idmtools_platform_comps.utils.package_version import get_highest_version
+from idmtools_platform_comps.utils.package_version_new import get_highest_version
 
 CURRENT_DIRECTORY = os.path.dirname(__file__)
 REQUIREMENT_FILE = 'requirements_updated.txt'

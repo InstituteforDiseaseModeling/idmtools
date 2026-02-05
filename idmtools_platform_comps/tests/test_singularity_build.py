@@ -6,7 +6,7 @@ import pytest
 from idmtools.assets import Asset
 from idmtools.core import TRUTHY_VALUES
 from idmtools.core.platform_factory import Platform
-from idmtools_platform_comps.utils.package_version import get_docker_manifest, get_digest_from_docker_hub
+from idmtools_platform_comps.utils.package_version_new import get_ghcr_manifest, get_digest_from_docker_hub
 from idmtools_platform_comps.utils.singularity_build import SingularityBuildWorkItem
 from idmtools_test import COMMON_INPUT_PATH
 from idmtools_test.utils.decorators import linux_only, windows_only
@@ -27,14 +27,14 @@ class TestSingularityBuild(unittest.TestCase):
         self.platform = Platform("SlurmStage")
 
     def test_get_docker_manifest(self):
-        manifest, tag = get_docker_manifest("idm/dtk-ubuntu-py3.7-mpich3.3-runtime:20.04.09")
+        manifest, tag = get_ghcr_manifest("idm/dtk-ubuntu-py3.7-mpich3.3-runtime:20.04.09")
         self.assertIsInstance(manifest, dict)
         self.assertEqual(manifest['config']['digest'], 'sha256:d0fd5396c017aa2b1da9022bb9e9ce420317b2bb36c3c3b4986da13b0c9755b9')
 
     # we can't do this everytime since latest changes
     @pytest.mark.skip
     def test_get_docker_manifest_latest(self):
-        manifest, tag = get_docker_manifest("idm/dtk-ubuntu-py3.7-mpich3.3-runtime:latest")
+        manifest, tag = get_ghcr_manifest("idm/dtk-ubuntu-py3.7-mpich3.3-runtime:latest")
         self.assertIsInstance(manifest, dict)
         self.assertEqual(manifest['config']['digest'], 'sha256:d0fd5396c017aa2b1da9022bb9e9ce420317b2bb36c3c3b4986da13b0c9755b9')
         self.assertEqual(tag, "idm/dtk-ubuntu-py3.7-mpich3.3-runtime:20.04.09")
@@ -52,15 +52,15 @@ class TestSingularityBuild(unittest.TestCase):
         self.assertIsInstance(manifest, str)
         self.assertEqual(manifest, 'sha256:cb64bbe7fa613666c234e1090e91427314ee18ec6420e9426cf4e7f314056813')
 
-    @pytest.mark.skip
+    #@pytest.mark.skip
     def test_get_ssmt_manifest_latest(self):
-        manifest, tag = get_docker_manifest("idmtools/comps_ssmt_worker")
-        self.assertEqual(tag, "idmtools/comps_ssmt_worker:1.6.0.1")
+        manifest= get_ghcr_manifest('idmtools-comps-ssmt-worker', tag='1.0.0.3',org='shchen-idmod')
+        self.assertEqual(manifest, "idmtools/comps_ssmt_worker:1.6.0.1")
         self.assertIsInstance(manifest, dict)
 
     def test_docker_fetch_version_tag(self):
         sbi = SingularityBuildWorkItem(name=self.case_name, force=FORCE)
-        sbi.image_url = "docker://docker-production.packages.idmod.org/idm/dtk-ubuntu-py3.7-mpich3.3-runtime:20.04.09"
+        sbi.image_url = "https://ghcr.io/institutefordiseasemodeling/hello-world:0.0.0"
         getattr(sbi, '_SingularityBuildWorkItem__add_tags')()
         self.assertIn('image_name', sbi.image_tags)
         self.assertEqual(sbi.image_tags['image_name'], 'idm_dtk-ubuntu-py3.7-mpich3.3-runtime_20.04.09.sif')

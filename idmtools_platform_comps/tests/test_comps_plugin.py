@@ -13,7 +13,7 @@ from idmtools.entities.platform_requirements import PlatformRequirements
 from idmtools.registry.platform_specification import PlatformPlugins
 from idmtools_platform_comps.comps_platform import COMPSPlatform
 from idmtools_platform_comps.plugin_info import COMPSPlatformSpecification
-from idmtools_platform_comps.utils.package_version import IDMTOOLS_DOCKER_PROD, fetch_versions_from_server, get_latest_ssmt_image_version_from_artifactory
+from idmtools_platform_comps.utils.package_version_new import fetch_docker_tags_from_ghcr, get_latest_docker_image_version_from_ghcr
 
 
 @allure.story("COMPS")
@@ -96,8 +96,8 @@ class TestCompsPlugin(unittest.TestCase):
             IdmConfigParser.clear_instance()
 
     def test_get_ssmt_versions(self):
-        url = os.path.join(IDMTOOLS_DOCKER_PROD, 'comps_ssmt_worker')
-        versions = fetch_versions_from_server(url)
+        versions = fetch_docker_tags_from_ghcr("idmtools-comps-ssmt-worker")
+        versions = [t for t in versions if t not in ['latest', 'dev', 'main', 'master']]
         prev_major = None
         pre_minor = None
         for ver in versions:
@@ -112,12 +112,10 @@ class TestCompsPlugin(unittest.TestCase):
     def test_get_next_ssmt_version(self):
         test_versions = ['1.10.0.2', '1.10.0.1', '1.6.0.1', '1.5.1.7', '1.5.1.6', '1.5.0.2', '1.4.0.0', '1.3.0.0', '1.2.2.0', '1.2.0.0',
                          '1.1.0.2', '1.1.0.0', '1.0.1.0', '1.0.0', '1.0.0.0']
-        with mock.patch('idmtools_platform_comps.utils.package_version.get_versions_from_site', return_value=test_versions) as mocK_fetch:
-            self.assertEqual(get_latest_ssmt_image_version_from_artifactory(base_version="1.10.0.0"), "1.10.0.2")
-            self.assertEqual(get_latest_ssmt_image_version_from_artifactory(base_version="1.5.0.1"), "1.5.1.7")
-            self.assertEqual(get_latest_ssmt_image_version_from_artifactory(base_version="1.5.1.1"), "1.5.1.7")
-            self.assertEqual(get_latest_ssmt_image_version_from_artifactory(base_version="1.5.1.7"), "1.5.1.7")
-            self.assertEqual(get_latest_ssmt_image_version_from_artifactory(base_version="1.6.0.0"), "1.6.0.1")
-            self.assertEqual(get_latest_ssmt_image_version_from_artifactory(base_version="1.1.0.0"), "1.1.0.2")
-            self.assertEqual(get_latest_ssmt_image_version_from_artifactory(base_version="1.5.1+nightly.0"), "1.5.1.7")
-            self.assertEqual(get_latest_ssmt_image_version_from_artifactory(base_version="1.6.0+nightly.0"), "1.6.0.1")
+        with mock.patch('idmtools_platform_comps.utils.package_version_new.fetch_docker_tags_from_ghcr', return_value=test_versions) as mocK_fetch:
+            self.assertEqual(get_latest_docker_image_version_from_ghcr("idmtools-comps_ssmt_worker", base_version="1.10.0"), "1.10.0.2")
+            self.assertEqual(get_latest_docker_image_version_from_ghcr("idmtools-comps_ssmt_worker", base_version="1.5.1"), "1.5.1.7")
+            self.assertEqual(get_latest_docker_image_version_from_ghcr("idmtools-comps_ssmt_worker", base_version="1.6.0"), "1.6.0.1")
+            self.assertEqual(get_latest_docker_image_version_from_ghcr("idmtools-comps_ssmt_worker", base_version="1.1.0"), "1.1.0.2")
+            self.assertEqual(get_latest_docker_image_version_from_ghcr("idmtools-comps_ssmt_worker", base_version="1.5.1+nightly.0"), "1.5.1.7")
+            self.assertEqual(get_latest_docker_image_version_from_ghcr("idmtools-comps_ssmt_worker", base_version="1.6.0+nightly.0"), "1.6.0.1")

@@ -7,7 +7,7 @@ import pytest
 from unittest import mock
 from idmtools_test.utils.cli import run_command
 from idmtools.assets import AssetCollection
-from idmtools_platform_comps.utils.package_version import get_latest_version, \
+from idmtools_platform_comps.utils.package_version_new import get_latest_version, \
     fetch_package_versions, get_highest_version, get_latest_compatible_version
 from idmtools_test import COMMON_INPUT_PATH
 

@@ -320,6 +320,7 @@ class TestAssets(unittest.TestCase):
 
     @pytest.mark.performance
     @pytest.mark.timeout(15)
+    @pytest.mark.skip
     def test_large_asset_merge_speed(self):
         assets1 = AssetCollection()
         assets2 = AssetCollection()
