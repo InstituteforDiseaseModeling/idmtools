@@ -3,9 +3,9 @@
 Notes:
     Authentication options:
     1. GitHub Personal Access Token (PAT) with packages:write scope
-       Set GHCR_TOKEN environment variable
+       Set GITHUB_TOKEN environment variable
     2. Docker login: docker login ghcr.io -u USERNAME -p TOKEN
-    3. GitHub Actions: Automatically authenticated when using GHCR_TOKEN
+    3. GitHub Actions: Automatically authenticated when using GITHUB_TOKEN
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
@@ -53,7 +53,7 @@ def get_github_token(disable_keyring_load=False, disable_keyring_save=False):
     Get GitHub token for authentication with ghcr.io.
 
     Priority order:
-    1. GHCR_TOKEN environment variable (GitHub Actions)
+    1. GITHUB_TOKEN environment variable (GitHub Actions)
     2. GH_TOKEN environment variable (GitHub CLI)
     3. Keyring (if not disabled)
     4. User prompt
@@ -66,7 +66,7 @@ def get_github_token(disable_keyring_load=False, disable_keyring_save=False):
         tuple: (username, token)
     """
     # Try environment variables first
-    token = os.environ.get('GHCR_TOKEN') or os.environ.get('GHCR_TOKEN')
+    token = os.environ.get('GITHUB_TOKEN') or os.environ.get('GITHUB_TOKEN')
 
     if token:
         logger.info("Using GitHub token from environment variable")
@@ -266,11 +266,11 @@ Examples:
   python build_docker_image.py --push --production
 
   # Use environment variable for token
-  export GHCR_TOKEN=ghp_xxxxxxxxxxxx
+  export GITHUB_TOKEN=ghp_xxxxxxxxxxxx
   python build_docker_image.py --push
 
 Authentication:
-  Set GHCR_TOKEN or GH_TOKEN environment variable, or you will be prompted.
+  Set GITHUB_TOKEN or GH_TOKEN environment variable, or you will be prompted.
   Token needs 'write:packages' and 'read:packages' scopes.
   Create at: https://github.com/settings/tokens/new
         """
@@ -279,7 +279,7 @@ Authentication:
     parser.add_argument("--username", default=None,
                         help="GitHub username (default: uses 'token' or GITHUB_ACTOR)")
     parser.add_argument("--token", default=None, dest="password",
-                        help="GitHub Personal Access Token (or set GHCR_TOKEN env var)")
+                        help="GitHub Personal Access Token (or set GITHUB_TOKEN env var)")
     parser.add_argument("--disable-keyring-load", action="store_true",
                         help="Disable loading token from keyring")
     parser.add_argument("--disable-keyring-save", action="store_true",

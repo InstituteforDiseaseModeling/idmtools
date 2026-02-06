@@ -137,13 +137,13 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_TOKEN }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       # Build and push Docker image using pre-built packages
       - name: Build and push Docker image
         working-directory: idmtools_platform_comps
         env:
-          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
 #          python build_ssmt_image.py --production --push
            python build_ssmt_image.py --push
