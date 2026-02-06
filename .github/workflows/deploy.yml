@@ -93,11 +93,12 @@ jobs:
           verbose: true
 
 
-  build-and-publish-docker:
+  build-and-publish-docker-staging:
     #needs: publish-to-pypi
     needs: build   # wait for test pypi publish
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
+#    if: startsWith(github.ref, 'refs/tags/')
+    if: github.event_name == 'workflow_dispatch' && inputs.target == 'test'
     steps:
       - uses: actions/checkout@v4
         with:
