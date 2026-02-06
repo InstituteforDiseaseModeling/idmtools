@@ -143,7 +143,7 @@ jobs:
       - name: Build and push Docker image
         working-directory: idmtools_platform_comps
         env:
-          GITHUB_TOKEN: ${{ secrets.GHCR_TOKEN }}
+          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
         run: |
 #          python build_ssmt_image.py --production --push
            python build_ssmt_image.py --push
