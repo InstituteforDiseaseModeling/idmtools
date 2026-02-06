@@ -13,8 +13,9 @@ on:
         options: [test, prod]
 
 permissions:
-  id-token: write
-  contents: read
+  id-token: write  # For OIDC/Trusted Publishers (PyPI publishing)
+  contents: read   # For read repo
+  packages: write  # ← Added for GHCR
 
 jobs:
   build:
@@ -90,3 +91,58 @@ jobs:
         with:
           skip-existing: true
           verbose: true
+
+
+  build-and-publish-docker:
+    #needs: publish-to-pypi
+    needs: build   # wait for test pypi publish
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # Download the pre-built artifacts instead of rebuilding
+      - name: Download core artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-idmtools_core
+          path: idmtools_core/dist/
+
+      - name: Download models artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-idmtools_models
+          path: idmtools_models/dist/
+
+      - name: Download platform_comps artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-idmtools_platform_comps
+          path: idmtools_platform_comps/dist/
+
+      # Set up Docker Buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Login to GHCR
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Build and push Docker image using pre-built packages
+      - name: Build and push Docker image
+        working-directory: idmtools_platform_comps
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+#          python build_ssmt_image.py --production --push
+           python build_ssmt_image.py --push
