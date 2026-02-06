@@ -19,7 +19,7 @@ GHCR_ORG = 'institutefordiseasemodeling'  # Default organization name
 #GHCR_ORG = 'shchen-idmod'  # Default organization name
 GHCR_IMAGE = 'idmtools-comps-ssmt-worker'
 GHCR_PRODUCTION = f"ghcr.io/{GHCR_ORG}/{GHCR_IMAGE}"
-GHCR_STAGING = f"ghcr.io/{GHCR_ORG}/{GHCR_IMAGE}-staging"
+GHCR_STAGING = f"ghcr.io/shchen-idmod/{GHCR_IMAGE}-staging"
 MANIFEST_URL = "https://hub.docker.com/v2/repositories/library/{repository}/tags/?page_size=25&page=1&name={tag}"
 
 
