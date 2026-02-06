@@ -139,7 +139,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Build and push Docker image using pre-built packages
       - name: Build and push Docker image
         working-directory: idmtools_platform_comps
         env:
