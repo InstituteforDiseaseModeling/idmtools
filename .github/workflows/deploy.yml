@@ -131,7 +131,10 @@ jobs:
         with:
           name: dist-idmtools_platform_comps
           path: idmtools_platform_comps/dist/
-
+      - name: install idmtools_platform_comps
+        working-directory: idmtools_platform_comps/dist/
+        run: |
+          pip install idmtools_platform_comps*.whl -i https://test.pypi.org/simple/ --extra-index-url=https://pypi.org/simple/
       # Set up Docker Buildx
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
