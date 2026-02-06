@@ -36,10 +36,10 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install build setuptools-scm twine
-      - name: Lint & test
-        working-directory:  idmtools_${{ matrix.package }}
-        run: |
-          pip install black flake8 pytest
+#      - name: Lint & test
+#        working-directory:  idmtools_${{ matrix.package }}
+#        run: |
+#          pip install black flake8 pytest
 #          black --check .
 #          flake8 .
 #          run:
@@ -50,7 +50,7 @@ jobs:
           SETUPTOOLS_SCM_LOCAL_SCHEME_OVERRIDE: no-local-version
         run: python -m build
 
-      # Upload artifacts for the publish job
+      # Upload artifacts for publishing the job
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -87,8 +87,6 @@ jobs:
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
-#        with:
-#          user: __token__
-#          password: ${{ secrets.PYPI_API_TOKEN }}
-#          packages-dir: dist/
-#          verbose: true
+        with:
+          skip-existing: true
+          verbose: true
