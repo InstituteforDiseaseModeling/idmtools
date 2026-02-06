@@ -156,4 +156,63 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python build_ssmt_image.py --push
-#          python build_ssmt_image.py --production --push
+
+  build-and-publish-docker:
+    #needs: publish-to-pypi
+    needs: publish-to-pypi   # wait for publish-to-pypi job finished
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install keyring
+
+      # Download the pre-built artifacts instead of rebuilding
+      - name: Download core artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-idmtools_core
+          path: idmtools_core/dist/
+
+      - name: Download models artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-idmtools_models
+          path: idmtools_models/dist/
+
+      - name: Download platform_comps artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-idmtools_platform_comps
+          path: idmtools_platform_comps/dist/
+      - name: install idmtools_platform_comps
+        working-directory: idmtools_platform_comps/dist/
+        run: |
+          pip install idmtools_platform_comps*.whl -i https://test.pypi.org/simple/ --extra-index-url=https://pypi.org/simple/
+      # Set up Docker Buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Login to GHCR
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        working-directory: idmtools_platform_comps/ssmt_image
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python build_ssmt_image.py --production --push
