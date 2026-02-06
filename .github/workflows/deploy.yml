@@ -144,5 +144,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          python build_ssmt_image.py --push
 #          python build_ssmt_image.py --production --push
-           python build_ssmt_image.py --push
