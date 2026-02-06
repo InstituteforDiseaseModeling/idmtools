@@ -1,7 +1,7 @@
 name: Deploy Packages
 on:
   push:
-    branches: [main]
+    branches: [pypi]
     tags: ['v*']
   workflow_dispatch:
     inputs:
@@ -24,8 +24,11 @@ jobs:
       matrix:
         package: [core, cli, models, platform_comps, platform_general, platform_slurm, platform_container, test]
     if: |
-      github.event_name == 'workflow_dispatch' ||
-      startsWith(github.ref, 'refs/tags/')
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/pypi') ||
+      (startsWith(github.ref, 'refs/tags/') && github.ref_name == 'pypi')
+#    if: |
+#      github.event_name == 'workflow_dispatch' ||
+#      startsWith(github.ref, 'refs/tags/')
     steps:
       - uses: actions/checkout@v4
         with:
