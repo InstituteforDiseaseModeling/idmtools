@@ -1,17 +1,14 @@
 [build-system]
-requires = [
-    "setuptools>=61.0",
-    "wheel",
-    "setuptools_scm[toml]>=8.0"
-]
+requires = ["setuptools>=61", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "idmtools-platform-slurm"
+name = "idmtools_platform_slurm"
 dynamic = ["version"]
 description = "Provides ability to run against Slurm"
 readme = "README.md"
 requires-python = ">=3.8"
+license-files = ["LICENSE.txt"]
 keywords = [
     "modeling",
     "IDM",
@@ -32,7 +29,7 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "idmtools_platform_general~=3.1.0",
+    "idmtools_platform_general>=0.0.0,<1.0.0",
     "dataclasses-json",
 ]
 
@@ -46,20 +43,27 @@ test = [
     "idmtools_test",
 ]
 
-[project.entry-points.idmtools_platform]
+[project.entry-points."idmtools_platform"]
 idmtools_platform_slurm = "idmtools_platform_slurm.plugin_info:SlurmPlatformSpecification"
 
 [project.entry-points."idmtools_cli.cli_plugins"]
 slurm = "idmtools_platform_slurm.cli.slurm:slurm"
 
 [tool.setuptools]
-package-data = { "idmtools_platform_slurm" = ["*"] }
-
-[tool.setuptools_scm]
-version_scheme = "guess-next-dev"     # 3.0.0 → 3.0.1.devN after tag
-local_scheme = "node-and-date"        # adds +gHASH.YYYYMMDD in dev
-fallback_version = "3.0.0.dev0"
+include-package-data = true
 
 [tool.setuptools.packages.find]
-where = ["."]
-exclude = ["tests*"]
+exclude = [
+    "tests",
+]
+
+[tool.setuptools.package-data]
+idmtools_platform_slurm = [
+    "*",
+]
+
+[tool.setuptools_scm]
+root = ".."                           # keep if your monorepo needs it
+version_scheme = "no-guess-dev"       # ← change to this (or "guess-next-dev")
+local_scheme = "no-local-version"     # ← change to this (critical for PyPI/TestPyPI uploads)
+fallback_version = "0.0.0.dev0"

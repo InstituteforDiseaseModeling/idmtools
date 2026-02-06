@@ -1,9 +1,9 @@
 idmtools
 idmtools_models
 idmtools_platform_comps
-pyarrow~=0.17.1
-tables~=3.6.1
-rpy2~=3.3.4
-numba~=0.50.1
-matplotlib~=3.7.1
-scipy~=1.5.0
+pyarrow~=23.0.0
+tables~=3.10.1
+rpy2~=3.6.4
+numba~=0.63.1
+matplotlib~=3.10.8
+scipy~=1.15.3

@@ -11,3 +11,6 @@ ssmt-image: ## Build SSMT Docker image
 
 ssmt-image-release: ## Push image to staging
 	$(MAKE) -C ssmt_image  docker-release-staging
+
+ssmt-image-release-new: ## Push image to staging
+	$(MAKE) -C ssmt_image  docker-build-publish

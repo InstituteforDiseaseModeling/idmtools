@@ -1,17 +1,14 @@
 [build-system]
-requires = [
-    "setuptools>=61.0",
-    "wheel",
-    "setuptools_scm[toml]>=8.0"
-]
+requires = ["setuptools>=61", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "idmtools-models"
+name = "idmtools_models"
 dynamic = ["version"]
 description = "Core tools for modeling"
 readme = "README.md"
 requires-python = ">=3.8"
+license-files = ["LICENSE.txt"]
 keywords = [
     "modeling",
     "IDM",
@@ -36,7 +33,7 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "idmtools~=3.1.0",
+    "idmtools>=0.0.0,<1.0.0",
 ]
 
 [project.urls]
@@ -56,7 +53,7 @@ packaging = [
     "twine",
 ]
 
-[project.entry-points.idmtools_task]
+[project.entry-points."idmtools_task"]
 idmtools_task_python = "idmtools_models.python.python_task:PythonTaskSpecification"
 idmtools_task_python_json = "idmtools_models.python.json_python_task:JSONConfiguredPythonTaskSpecification"
 idmtools_task_templated_script = "idmtools_models.templated_script_task:TemplatedScriptTaskSpecification"
@@ -65,14 +62,21 @@ idmtools_task_r = "idmtools_models.r.r_task:RTaskSpecification"
 idmtools_task_r_json = "idmtools_models.r.json_r_task:JSONConfiguredRTaskSpecification"
 idmtools_task_json = "idmtools_models.json_configured_task:JSONConfiguredTaskSpecification"
 
-[tool.setuptools.packages.find]
-where = ["."]
-exclude = ["tests*"]
-
 [tool.setuptools]
-package-data = { "idmtools_models" = ["*"] }
+include-package-data = true
+
+[tool.setuptools.packages.find]
+exclude = [
+    "tests",
+]
+
+[tool.setuptools.package-data]
+idmtools_models = [
+    "*",
+]
 
 [tool.setuptools_scm]
-version_scheme = "guess-next-dev"
-local_scheme = "node-and-date"
-fallback_version = "3.0.0.dev0"
+root = ".."
+version_scheme = "no-guess-dev"
+local_scheme = "no-local-version"
+fallback_version = "0.0.0.dev0"

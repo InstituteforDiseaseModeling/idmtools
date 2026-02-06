@@ -1,9 +1,5 @@
 [build-system]
-requires = [
-    "setuptools>=61.0",
-    "wheel",
-    "setuptools_scm[toml]>=8.0"
-]
+requires = ["setuptools>=61", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -12,7 +8,6 @@ dynamic = ["version"]
 description = "Core tools for modeling"
 readme = "README.md"
 requires-python = ">=3.8"
-license = "CC-BY-NC-SA-4.0"
 license-files = ["LICENSE.txt"]
 authors = [
     { name = "Zhaowei Du", email = "zdu@idmod.org" },
@@ -80,9 +75,9 @@ test = [
     "twine>=3.4.1",
 ]
 notebooks = [
-    "docker>=5.0",
+    "docker>5.0",
 ]
-
+packaging = []
 idm = [
     "idmtools_platform_comps",
     "idmtools_cli",
@@ -109,24 +104,31 @@ slurm = [
     "idmtools_platform_slurm",
 ]
 
-[project.entry-points.idmtools_experiment]
+[project.entry-points."idmtools_experiment"]
 idmtools_experiment = "idmtools.entities.experiment:ExperimentSpecification"
 
-[project.entry-points.idmtools_task]
+[project.entry-points."idmtools_task"]
 idmtools_task_command = "idmtools.entities.command_task:CommandTaskSpecification"
 idmtools_task_docker = "idmtools.core.docker_task:DockerTaskSpecification"
 
-[project.entry-points.idmtools_hooks]
+[project.entry-points."idmtools_hooks"]
 idmtools_add_git_tag = "idmtools.plugins.git_commit"
 
-[tool.setuptools.packages.find]
-where = ["."]
-exclude = ["tests*"]
-
 [tool.setuptools]
-package-data = { "idmtools" = ["*"] }
+include-package-data = true
+
+[tool.setuptools.packages.find]
+exclude = [
+    "tests",
+]
+
+[tool.setuptools.package-data]
+idmtools = [
+    "*",
+]
 
 [tool.setuptools_scm]
-version_scheme = "guess-next-dev"
-local_scheme = "node-and-date"
-fallback_version = "3.0.0.dev0"
+root = ".."
+version_scheme = "no-guess-dev"
+local_scheme = "no-local-version"
+fallback_version = "0.0.0.dev0"

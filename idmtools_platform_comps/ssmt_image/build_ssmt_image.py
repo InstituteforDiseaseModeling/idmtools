@@ -18,7 +18,7 @@ from logging import getLogger, basicConfig, DEBUG, INFO
 import sys
 from getpass import getpass
 import keyring
-from idmtools_platform_comps.utils.ghcr_version import get_next_ssmt_image_version, GHCR_PRODUCTION, GHCR_STAGING
+from idmtools_platform_comps.utils.package_version_new import get_next_docker_image_version_from_ghcr, GHCR_PRODUCTION, GHCR_STAGING
 
 logger = getLogger(__name__)
 
@@ -174,7 +174,7 @@ def build_image(username, token, disable_keyring_load, disable_keyring_save, use
     # Get next version
     logger.info("Determining next version...")
 
-    version = get_next_ssmt_image_version(use_production=use_production)
+    version = get_next_docker_image_version_from_ghcr()
 
     # Build Docker image
     build_cmd = [

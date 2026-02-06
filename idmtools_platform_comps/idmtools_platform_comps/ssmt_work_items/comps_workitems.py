@@ -65,36 +65,21 @@ class SSMTWorkItem(ICOMPSWorkflowItem):
         if self.platform.docker_image:
             return self.platform.docker_image
 
-        from idmtools_platform_comps.utils.ghcr_version import get_current_ssmt_image_version, GHCR_PRODUCTION, GHCR_STAGING
-
-        # Determine if we're using production or staging
-        is_production = "comps.idmod.org" in self.platform.endpoint.lower()
-
-        # Get use_ghcr setting from platform (default to True)
-        # Also check legacy use_docker_hub for backward compatibility
-        use_ghcr = getattr(self.platform, 'use_ghcr', True)
-        if not use_ghcr and hasattr(self.platform, 'use_docker_hub'):
-            # Backward compatibility: if use_docker_hub is False, use GHCR
-            use_ghcr = not self.platform.use_docker_hub
+        from idmtools_platform_comps.utils.package_version_new import get_latest_docker_image_version_from_ghcr, \
+            GHCR_IMAGE, GHCR_PRODUCTION
+        from idmtools_platform_comps import __version__
 
         # Get the version using GHCR or Docker Hub
         try:
-            release = get_current_ssmt_image_version(
-                use_production=is_production
-            )
+            # __version__ = "1.0.0.3"
+            release = get_latest_docker_image_version_from_ghcr(GHCR_IMAGE, base_version=__version__)
         except ValueError as e:
             logger.error(f"Could not determine SSMT image version: {e}")
             raise
 
-        # Build the full image path based on source
-        if use_ghcr:
-            # GitHub Container Registry path format (recommended)
-            docker_repo = GHCR_PRODUCTION if is_production else GHCR_STAGING
-            docker_image = f'{docker_repo}:{release}'
-        # else:
-        #     # Docker Hub path format (legacy)
-        #     docker_repo = DOCKER_HUB_PRODUCTION if is_production else DOCKER_HUB_STAGING
-        #     docker_image = f'{docker_repo}:{release}'
+        # GitHub Container Registry path format (recommended)
+        docker_repo = GHCR_PRODUCTION
+        docker_image = f'{docker_repo}:{release}'
 
         if logger.isEnabledFor(DEBUG):
             logger.debug(f'docker_image in use: {docker_image}')
