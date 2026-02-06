@@ -100,13 +100,12 @@ def process_output(output_line: str):
         logger.debug("".join(ch for ch in output_line if unicodedata.category(ch)[0] != "C"))
 
 
-def install_dev_packages(pip_url, extra_index_url, build_docs):
+def install_dev_packages(pip_url, build_docs):
     """
     Install all idmtools packages in editable mode with their extras.
     Skips `.test` extras when building docs (build_docs=True).
     Args:
         pip_url: Url to install package from.
-        extra_index_url: Extra index url to install package from.
         build_docs: Flag (True) to build docs.
 
     Returns:
@@ -122,7 +121,7 @@ def install_dev_packages(pip_url, extra_index_url, build_docs):
 
         cmd = [
             sys.executable, "-m", "pip", "install", "-e", f".{extras_str}",
-            f"--index-url={pip_url}", f"--extra-index-url={extra_index_url}"
+            f"--index-url={pip_url}"
         ]
 
         try:
@@ -138,13 +137,13 @@ def install_dev_packages(pip_url, extra_index_url, build_docs):
         logger.info("Installing doc requirements from docs/requirements.txt")
         cmd_docs = [
             sys.executable, "-m", "pip", "install", "-r", "requirements.txt",
-            f"--index-url={pip_url}", f"--extra-index-url={extra_index_url}"
+            f"--index-url={pip_url}"
         ]
         for line in execute(cmd_docs, cwd=docs_dir):
             process_output(line)
 
 
-def install_base_environment(pip_url, extra_index_url):
+def install_base_environment(pip_url):
     """
     Installs the base packages needed for development environments.
 
@@ -160,7 +159,7 @@ def install_base_environment(pip_url, extra_index_url):
     for line in execute([
         sys.executable, "-m", "pip", "install", "--upgrade",
         "pip>=23.1", "setuptools>=64.0", "wheel>=0.38",
-        f"--index-url={pip_url}", f"--extra-index-url={extra_index_url}"
+        f"--index-url={pip_url}"
     ]):
         process_output(line)
 
@@ -169,10 +168,10 @@ def install_base_environment(pip_url, extra_index_url):
         process_output(line)
 
     # Install idm-buildtools
-    for pkg in ["build", "idm-buildtools~=1.0.1"]:
+    for pkg in ["build"]:
         for line in execute([
             sys.executable, "-m", "pip", "install", pkg,
-            f"--index-url={pip_url}", f"--extra-index-url={extra_index_url}"
+            f"--index-url={pip_url}"
         ]):
             process_output(line)
 
@@ -184,10 +183,8 @@ def install_base_environment(pip_url, extra_index_url):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Bootstrap the development environment")
-    parser.add_argument("--index-url", default='https://packages.idmod.org/api/pypi/pypi-production/simple',
+    parser.add_argument("--index-url", default='https://pypi.org/simple',
                         help="Pip url to install dependencies from")
-    parser.add_argument("--extra-index-url", default='https://pypi.org/simple',
-                        help="Pip url to install dependencies from pypi")
     parser.add_argument("--verbose", default=False, action='store_true')
     parser.add_argument('--docs', action='store_true', help='Enable build documents')
 
@@ -216,5 +213,6 @@ if __name__ == "__main__":
         console_handler.setLevel(console_log_level)
         logger.addHandler(console_handler)
 
-    install_base_environment(args.index_url, args.extra_index_url)
-    sys.exit(install_dev_packages(args.index_url, args.extra_index_url, args.docs))
+    install_base_environment(args.index_url)
+    sys.exit(install_dev_packages(args.index_url, args.docs))
+

@@ -2,14 +2,13 @@
 requires = ["setuptools>=61", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
-
-
 [project]
 name = "idmtools_platform_comps"
 dynamic = ["version"]
 description = "Comps platform for IDM-Tools"
 readme = "README.md"
 requires-python = ">=3.8"
+license-files = ["LICENSE.txt"]
 keywords = [
     "modeling",
     "IDM",
@@ -32,10 +31,12 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
 ]
 dependencies = [
     "idmtools>=0.0.0,<1.0.0",
-    "pyCOMPS~=2.11",
+    #"pyCOMPS~=2.11",
+    "idm-comps",
     "natsort~=8.4.0",
 ]
 
@@ -59,7 +60,7 @@ packaging = [
 [project.scripts]
 comps-cli = "idmtools_platform_comps.cli.comps:comps"
 
-[project.entry-points.idmtools_platform]
+[project.entry-points."idmtools_platform"]
 idmtools_platform_comps = "idmtools_platform_comps.plugin_info:COMPSPlatformSpecification"
 idmtools_platform_ssmt = "idmtools_platform_comps.plugin_info:SSMTPlatformSpecification"
 
@@ -80,7 +81,7 @@ idmtools_platform_comps = [
 ]
 
 [tool.setuptools_scm]
-root = ".."                           # keep if your monorepo needs it
-version_scheme = "no-guess-dev"       # ← change to this (or "guess-next-dev")
-local_scheme = "no-local-version"     # ← change to this (critical for PyPI/TestPyPI uploads)
+root = ".."
+version_scheme = "no-guess-dev"
+local_scheme = "no-local-version"
 fallback_version = "0.0.0.dev0"

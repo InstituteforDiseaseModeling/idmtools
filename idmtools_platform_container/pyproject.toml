@@ -2,14 +2,13 @@
 requires = ["setuptools>=61", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
-
-
 [project]
 name = "idmtools_platform_container"
 dynamic = ["version"]
 description = "Container platform for IDM-Tools"
 readme = "README.md"
 requires-python = ">=3.8"
+license-files = ["LICENSE.txt"]
 keywords = [
     "modeling",
     "IDM",
@@ -32,6 +31,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
 ]
 dependencies = [
     "idmtools_platform_general>=0.0.0,<1.0.0",
@@ -56,7 +56,7 @@ packaging = [
     "natsort",
 ]
 
-[project.entry-points.idmtools_platform]
+[project.entry-points."idmtools_platform"]
 idmtools_platform_container = "idmtools_platform_container.plugin_info:ContainerPlatformSpecification"
 
 [project.entry-points."idmtools_cli.cli_plugins"]
@@ -75,9 +75,8 @@ idmtools_platform_container = [
     "*",
 ]
 
-
 [tool.setuptools_scm]
-root = ".."                           # keep if your monorepo needs it
-version_scheme = "no-guess-dev"       # ← change to this (or "guess-next-dev")
-local_scheme = "no-local-version"     # ← change to this (critical for PyPI/TestPyPI uploads)
+root = ".."
+version_scheme = "no-guess-dev"
+local_scheme = "no-local-version"
 fallback_version = "0.0.0.dev0"

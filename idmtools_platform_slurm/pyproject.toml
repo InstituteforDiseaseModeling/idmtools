@@ -8,6 +8,7 @@ dynamic = ["version"]
 description = "Provides ability to run against Slurm"
 readme = "README.md"
 requires-python = ">=3.8"
+license-files = ["LICENSE.txt"]
 keywords = [
     "modeling",
     "IDM",
@@ -25,6 +26,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
 ]
 dependencies = [
     "idmtools_platform_general>=0.0.0,<1.0.0",
@@ -41,7 +43,7 @@ test = [
     "idmtools_test",
 ]
 
-[project.entry-points.idmtools_platform]
+[project.entry-points."idmtools_platform"]
 idmtools_platform_slurm = "idmtools_platform_slurm.plugin_info:SlurmPlatformSpecification"
 
 [project.entry-points."idmtools_cli.cli_plugins"]

@@ -2,13 +2,13 @@
 requires = ["setuptools>=61", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
-
 [project]
 name = "idmtools"
 dynamic = ["version"]
 description = "Core tools for modeling"
 readme = "README.md"
 requires-python = ">=3.8"
+license-files = ["LICENSE.txt"]
 authors = [
     { name = "Zhaowei Du", email = "zdu@idmod.org" },
     { name = "Sharon Chen", email = "shchen@idmod.org" },
@@ -33,6 +33,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
 ]
 dependencies = [
     "backoff>=1.10.0,<2.3",
@@ -49,9 +50,6 @@ dependencies = [
     "jinja2~=3.1.3",
     "packaging>=20.4,<25.0",
 ]
-
-[project.license]
-text = "Proprietary or specify if known"
 
 [project.urls]
 Homepage = "https://github.com/InstituteforDiseaseModeling/idmtools"
@@ -106,14 +104,14 @@ slurm = [
     "idmtools_platform_slurm",
 ]
 
-[project.entry-points.idmtools_experiment]
+[project.entry-points."idmtools_experiment"]
 idmtools_experiment = "idmtools.entities.experiment:ExperimentSpecification"
 
-[project.entry-points.idmtools_task]
+[project.entry-points."idmtools_task"]
 idmtools_task_command = "idmtools.entities.command_task:CommandTaskSpecification"
 idmtools_task_docker = "idmtools.core.docker_task:DockerTaskSpecification"
 
-[project.entry-points.idmtools_hooks]
+[project.entry-points."idmtools_hooks"]
 idmtools_add_git_tag = "idmtools.plugins.git_commit"
 
 [tool.setuptools]
@@ -130,7 +128,7 @@ idmtools = [
 ]
 
 [tool.setuptools_scm]
-root = ".."                           # keep if your monorepo needs it
-version_scheme = "no-guess-dev"       # ← change to this (or "guess-next-dev")
-local_scheme = "no-local-version"     # ← change to this (critical for PyPI/TestPyPI uploads)
+root = ".."
+version_scheme = "no-guess-dev"
+local_scheme = "no-local-version"
 fallback_version = "0.0.0.dev0"

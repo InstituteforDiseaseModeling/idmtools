@@ -8,6 +8,7 @@ dynamic = ["version"]
 description = "Test and demo data for IDM-Tools"
 readme = "README.md"
 requires-python = ">=3.8"
+license-files = ["LICENSE.txt"]
 keywords = [
     "modeling",
     "IDM",
@@ -29,6 +30,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
 ]
 dependencies = [
     "idmtools>=0.0.0,<1.0.0",
@@ -40,14 +42,14 @@ dependencies = [
 [project.urls]
 Homepage = "https://github.com/InstituteforDiseaseModeling/idmtools"
 
-[project.entry-points.idmtools_platform]
+[project.entry-points."idmtools_platform"]
 idmtools_platform_test = "idmtools_test.utils.test_platform:TestPlatformSpecification"
 idmtools_platform_testex = "idmtools_test.utils.test_execute_platform:TestExecutePlatformSpecification"
 
-[project.entry-points.idmtools_task]
+[project.entry-points."idmtools_task"]
 idmtools_model_test = "idmtools_test.utils.test_task:TestTaskSpecification"
 
-[project.entry-points.idmtools_hooks]
+[project.entry-points."idmtools_hooks"]
 idmtools_test_hooks = "idmtools_test.test_precreate_hooks"
 
 [tool.setuptools]

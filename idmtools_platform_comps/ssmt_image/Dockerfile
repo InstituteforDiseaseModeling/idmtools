@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 # Install dependencies
 RUN apt-get update
@@ -35,7 +35,9 @@ COPY .depends/* /tmp/
 RUN pip3 install -U pip && \
     pip install pygit2
 
-RUN bash -c "pip3 install /tmp/*.gz --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple"
+#idm-comps
+RUN bash -c "pip3 install idm-comps --index-url=https://test.pypi.org/simple --extra-index-url=https://pypi.org/simple"
+RUN bash -c "pip3 install /tmp/*.gz --index-url=https://pypi.org/simple"
 
 # make the PIP index configurable so we can build against staging, production, or a local PyPI server
 ARG SSMT_VERSION
