@@ -11,6 +11,7 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import argparse
 import glob
+import json
 import os
 import shutil
 import subprocess
@@ -228,24 +229,31 @@ def build_image(username, token, disable_keyring_load, disable_keyring_save, use
             tags_to_push.append(base_version)
 
         for tag in tags_to_push:
-            push_cmd = f'docker push {image}:{tag}'
             logger.info(f"Pushing: {image}:{tag}")
 
-            push_result = os.system(push_cmd)
+            push_cmd_list = ['docker', 'push', f'{image}:{tag}']
+            push_result = subprocess.run(push_cmd_list, capture_output=True, text=True)
 
-            if push_result != 0:
+            if push_result.returncode != 0:
                 logger.error(f"Failed to push {image}:{tag}")
-                return push_result
+                logger.error(f"Error: {push_result.stderr}")
+                return push_result.returncode
 
             logger.info(f"Successfully pushed: {image}:{tag}")
-            if push_result.returncode == 0:
-                import json
-                image_info = json.loads(push_result.stdout)
+
+            # Get image info after push
+            inspect_cmd = ['docker', 'inspect', f'{image}:{tag}', '--format', '{{json .}}']
+            inspect_result = subprocess.run(inspect_cmd, capture_output=True, text=True)
+
+            if inspect_result.returncode == 0:
+                image_info = json.loads(inspect_result.stdout)
 
                 print(f"\nImage Details:")
                 print(f"  Tags: {', '.join(image_info[0]['RepoTags'])}")
                 print(f"  Size: {image_info[0]['Size'] / (1024 ** 2):.2f} MB")
-                print(f"  Created: {image_info[0]['Created']}")
+                print(f"  Created: {image_info[0]['Created'][:19]}")
+            else:
+                logger.warning("Could not retrieve image details")
 
         logger.info(f"All tags pushed successfully for version {version}")
     else:
