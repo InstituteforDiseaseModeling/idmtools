@@ -168,79 +168,164 @@ def get_latest_docker_image_version_from_ghcr(
 
     return version_tags[0]
 
-
-def get_ghcr_manifest(repository: str, tag: str, platform: str = "linux/amd64") -> dict:
+def get_ghcr_manifest(
+        image_name: str,
+        tag: str = 'latest',
+        org: str = GHCR_ORG,
+        token: Optional[str] = None,
+        platform: str = 'linux/amd64'
+) -> Optional[Dict]:
     """
-    Get the manifest from GitHub Container Registry.
-    Handles both direct manifests and manifest lists (multi-platform images).
+    Get Docker manifest from GitHub Container Registry.
+    Automatically handles manifest lists/indexes and returns platform-specific manifest.
 
     Args:
-        repository: Repository path (e.g., "username/imagename")
-        tag: Image tag (e.g., "latest", "v1.0")
-        platform: Platform string like "linux/amd64" or "linux/arm64"
+        image_name: Image name (e.g., 'idmtools-comps-ssmt-worker')
+        tag: Image tag (default: 'latest')
+        org: Organization name or username
+        token: Optional GitHub PAT for private images
+        platform: Target platform (default: 'linux/amd64')
 
     Returns:
-        Full manifest dictionary with config
+        Platform-specific manifest dictionary or None if not found
+
+    Examples:
+        >>> manifest = get_ghcr_manifest('idmtools-comps-ssmt-worker', '1.0.0.3')
+        >>> manifest = get_ghcr_manifest('myimage', 'latest', platform='linux/arm64')
     """
-    import requests
+    manifest_url = f"https://ghcr.io/v2/{org}/{image_name}/manifests/{tag}"
 
-    url = f"https://ghcr.io/v2/{repository}/manifests/{tag}"
+    try:
+        # Get authentication token
+        auth_url = f"https://ghcr.io/token?scope=repository:{org}/{image_name}:pull"
+        auth_headers = {}
 
-    headers = {
-        # Accept both OCI and Docker v2 formats
-        "Accept": ", ".join([
-            "application/vnd.oci.image.index.v1+json",
-            "application/vnd.oci.image.manifest.v1+json",
-            "application/vnd.docker.distribution.manifest.v2+json",
-            "application/vnd.docker.distribution.manifest.list.v2+json"
-        ])
-    }
+        if token:
+            auth_headers['Authorization'] = f'Bearer {token}'
 
-    token = os.getenv("GITHUB_TOKEN")
-    if token:
-        headers["Authorization"] = f"Bearer {token}"
+        auth_response = requests.get(auth_url, headers=auth_headers, timeout=10)
 
-    response = requests.get(url, headers=headers)
-    response.raise_for_status()
+        if not auth_response.ok:
+            logger.warning(f"Failed to get token for {org}/{image_name}")
+            return None
 
-    manifest = response.json()
+        bearer_token = auth_response.json().get('token', '')
+        if not bearer_token:
+            logger.warning(f"No token returned for {org}/{image_name}")
+            return None
 
-    # Check if this is a manifest list/index (multi-platform)
-    media_type = manifest.get("mediaType", "")
-    if "index" in media_type or "manifest.list" in media_type:
-        # Parse platform (e.g., "linux/amd64" -> os="linux", arch="amd64")
-        os_name, arch = platform.split("/") if "/" in platform else ("linux", platform)
+        # Try different manifest formats
+        accept_formats = [
+            'application/vnd.oci.image.index.v1+json',
+            'application/vnd.docker.distribution.manifest.list.v2+json',
+            'application/vnd.oci.image.manifest.v1+json',
+            'application/vnd.docker.distribution.manifest.v2+json',
+        ]
 
-        # Find the matching platform manifest
+        manifest = None
+        headers = {
+            'Authorization': f'Bearer {bearer_token}',
+            'Accept': ', '.join(accept_formats)
+        }
+
+        response = requests.get(manifest_url, headers=headers, timeout=10)
+
+        if response.status_code != 200:
+            logger.warning(f"Failed to fetch manifest for {org}/{image_name}:{tag}")
+            return None
+
+        manifest = response.json()
+        media_type = manifest.get('mediaType', '')
+
+        # Check if it's a manifest list/index (multi-platform)
+        if 'index' in media_type or 'manifest.list' in media_type:
+            logger.info(f"Found multi-platform image, extracting {platform} manifest")
+            manifest = _extract_platform_manifest(
+                manifest,
+                platform,
+                manifest_url,
+                bearer_token,
+                org,
+                image_name
+            )
+
+        return manifest
+
+    except requests.RequestException as e:
+        logger.error(f"Error fetching GHCR manifest: {e}")
+        return None
+
+
+def _extract_platform_manifest(
+        manifest_list: Dict,
+        platform: str,
+        base_url: str,
+        bearer_token: str,
+        org: str,
+        image_name: str
+) -> Optional[Dict]:
+    """
+    Extract platform-specific manifest from a manifest list/index.
+
+    Args:
+        manifest_list: The manifest list/index
+        platform: Target platform (e.g., 'linux/amd64')
+        base_url: Base manifest URL
+        bearer_token: Authentication token
+        org: Organization name
+        image_name: Image name
+
+    Returns:
+        Platform-specific manifest or None
+    """
+    try:
+        # Parse platform string
+        if '/' in platform:
+            os_name, arch = platform.split('/', 1)
+        else:
+            os_name, arch = 'linux', platform
+
+        # Find matching platform
+        manifests = manifest_list.get('manifests', [])
         platform_manifest = None
-        for m in manifest.get("manifests", []):
-            p = m.get("platform", {})
-            if p.get("os") == os_name and p.get("architecture") == arch:
+
+        for m in manifests:
+            p = m.get('platform', {})
+            if p.get('os') == os_name and p.get('architecture') == arch:
                 platform_manifest = m
                 break
 
         if not platform_manifest:
-            # Fallback: use first manifest if platform not found
-            print(f"Warning: Platform {platform} not found, using first available manifest")
-            platform_manifest = manifest["manifests"][0]
+            logger.warning(f"Platform {platform} not found, using first available")
+            if manifests:
+                platform_manifest = manifests[0]
+            else:
+                logger.error("No manifests found in manifest list")
+                return None
 
         # Fetch the platform-specific manifest using its digest
-        platform_digest = platform_manifest["digest"]
-        platform_url = f"https://ghcr.io/v2/{repository}/manifests/{platform_digest}"
+        digest = platform_manifest['digest']
+        platform_url = f"https://ghcr.io/v2/{org}/{image_name}/manifests/{digest}"
 
-        response = requests.get(platform_url, headers=headers)
-        response.raise_for_status()
-        manifest = response.json()
+        headers = {
+            'Authorization': f'Bearer {bearer_token}',
+            'Accept': ', '.join([
+                'application/vnd.oci.image.manifest.v1+json',
+                'application/vnd.docker.distribution.manifest.v2+json',
+            ])
+        }
 
-    # Now we should have the actual manifest with config
-    if "config" not in manifest:
-        raise ValueError(
-            f"Manifest does not contain 'config' field. "
-            f"MediaType: {manifest.get('mediaType')}, "
-            f"Keys: {list(manifest.keys())}"
-        )
+        response = requests.get(platform_url, headers=headers, timeout=10)
 
-    return manifest
+        if response.status_code == 200:
+            return response.json()
+        else:
+            logger.error(f"Failed to fetch platform manifest: {response.status_code}")
+            return None
+
+    except Exception as e:
+        logger.error(f"Error extracting platform manifest: {e}")
+        return None
 
 def get_ghcr_image_info(
         image_name: str,

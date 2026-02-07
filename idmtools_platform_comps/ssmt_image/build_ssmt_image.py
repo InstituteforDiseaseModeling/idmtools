@@ -178,14 +178,15 @@ def build_image(username, token, disable_keyring_load, disable_keyring_save, use
 
     # Build Docker image
     build_cmd = [
-        'docker', 'build',
+        'docker', 'buildx', 'build',
+        '--provenance=false',
+        '--output', 'type=docker',  # change to only get single platform due to comps docker worker restriction
         '--network=host',
         '--build-arg', f'SSMT_VERSION={version}',
         '--tag', f'{image}:{version}',
         '--tag', f'{image}:latest',
         '.'
     ]
-
     logger.info(f'Building image: {" ".join(build_cmd)}')
 
     build_process = subprocess.Popen(
