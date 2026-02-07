@@ -246,14 +246,19 @@ def build_image(username, token, disable_keyring_load, disable_keyring_save, use
             inspect_result = subprocess.run(inspect_cmd, capture_output=True, text=True)
 
             if inspect_result.returncode == 0:
-                image_info = json.loads(inspect_result.stdout)
+                try:
+                    image_info = json.loads(inspect_result.stdout)
 
-                print(f"\nImage Details:")
-                print(f"  Tags: {', '.join(image_info[0]['RepoTags'])}")
-                print(f"  Size: {image_info[0]['Size'] / (1024 ** 2):.2f} MB")
-                print(f"  Created: {image_info[0]['Created'][:19]}")
-            else:
-                logger.warning("Could not retrieve image details")
+                    # Get first element if list, otherwise use as-is
+                    info = image_info[0] if isinstance(image_info, list) else image_info
+
+                    print(f"\nImage Details:")
+                    print(f"  Image: {image}:{tag}")
+                    print(f"  Tags: {', '.join(info.get('RepoTags', []))}")
+                    print(f"  Size: {info.get('Size', 0) / (1024 ** 2):.2f} MB")
+
+                except Exception as e:
+                    logger.debug(f"Could not display image details: {e}")
 
         logger.info(f"All tags pushed successfully for version {version}")
     else:
