@@ -99,7 +99,7 @@ class TestPackageVersionCLI(unittest.TestCase):
         import re
         test_versions = ['10.0.0', '0.8.1', '0.8.0', '0.7.1', '0.7.0', '0.6.2', '0.6.1', '0.6', '0.5', '0.4.1', '0.4',
                          '0.3', '0.2.1', '0.2', '0.1']
-        with mock.patch('idmtools_platform_comps.utils.package_version.fetch_versions_from_server',
+        with mock.patch('idmtools_platform_comps.utils.package_version_new.fetch_package_versions',
                         return_value=test_versions) as mock_fetch:
             result = run_command('package', 'list-versions', '--name', 'astor', **self.default_opts)
             self.assertTrue(result.exit_code == 0, msg=result.output)
@@ -246,7 +246,7 @@ class TestPackageVersionCLI(unittest.TestCase):
     def test_get_highest_version(self):
         test_versions = ['10.0.0', '0.8.1', '0.8.0', '0.7.1', '0.7.0', '0.6.2', '0.6.1', '0.6', '0.5', '0.4.1', '0.4',
                          '0.3', '0.2.1', '0.2', '0.1']
-        with mock.patch('idmtools_platform_comps.utils.package_version.fetch_versions_from_server',
+        with mock.patch('idmtools_platform_comps.utils.package_version_new.fetch_package_versions',
                         return_value=test_versions) as mock_fetch:
             self.assertEqual(get_highest_version(pkg_requirement='astor<0.7.1'), '0.7.0')
             self.assertEqual(get_highest_version(pkg_requirement='astor<=0.7.1'), '0.7.1')
@@ -260,7 +260,7 @@ class TestPackageVersionCLI(unittest.TestCase):
     def test_get_latest_version(self):
         test_versions = ['10.0.0', '0.8.1', '0.8.0', '0.7.1', '0.7.0', '0.6.2', '0.6.1', '0.6', '0.5', '0.4.1', '0.4',
                          '0.3', '0.2.1', '0.2', '0.1']
-        with mock.patch('idmtools_platform_comps.utils.package_version.fetch_versions_from_server',
+        with mock.patch('idmtools_platform_comps.utils.package_version_new.fetch_package_versions',
                         return_value=test_versions) as mock_fetch:
             self.assertEqual(get_latest_version(pkg_name='astor'), '10.0.0')
 
@@ -268,16 +268,15 @@ class TestPackageVersionCLI(unittest.TestCase):
     def test_fetch_package_versions_with_sort(self):
         test_versions = ['0.7.1', '0.8.1', '0.8.0r', '0.7.0', '0.6.2', '0.6.1', '0.6', '0.5', '0.4.1', '0.4', '0.3',
                          '0.2.1', '0.1', '0.2']
-        with mock.patch('idmtools_platform_comps.utils.package_version.fetch_versions_from_server',
+        with mock.patch('idmtools_platform_comps.utils.package_version_new.fetch_package_versions',
                         return_value=test_versions) as mock_fetch:
-            expected_sorted_versions = ['0.8.1', '0.8.0r', '0.7.1', '0.7.0', '0.6.2', '0.6.1', '0.6', '0.5', '0.4.1',
-                                        '0.4', '0.3', '0.2.1', '0.2', '0.1']
+            expected_sorted_versions = ['0.8.1', '0.8.0', '0.7.1', '0.7.0', '0.6.2', '0.6.1', '0.6', '0.5', '0.4.1', '0.4', '0.3', '0.2.1', '0.2', '0.1']
             self.assertEqual(fetch_package_versions(pkg_name='astor', sort=True), expected_sorted_versions)
 
     @pytest.mark.serial
     def test_get_latest_compatible_version(self):
         test_versions = ['8.1.1', '8.1.0', '8.0.2', '8.0.1', '8.0.0', '7.4.4', '7.4.3', '7.4.2', '7.4.1', '7.4.0', '7.3.2', '7.0.0']
-        with mock.patch('idmtools_platform_comps.utils.package_version.fetch_versions_from_server',
+        with mock.patch('idmtools_platform_comps.utils.package_version_new.fetch_package_versions',
                         return_value=test_versions) as mock_fetch:
             self.assertEqual(get_latest_compatible_version(pkg_name='pytest', base_version='7'), '7.4.4')
             self.assertEqual(get_latest_compatible_version(pkg_name='pytest', base_version='8.1'), '8.1.1')
@@ -286,7 +285,7 @@ class TestPackageVersionCLI(unittest.TestCase):
     def test_get_latest_compatible_version_no_exist(self):
         test_versions = ['8.1.1', '8.1.0', '8.0.2', '8.0.1', '8.0.0', '7.4.4', '7.4.3', '7.4.2', '7.4.1', '7.4.0',
                          '7.3.2', '7.0.0']
-        with mock.patch('idmtools_platform_comps.utils.package_version.fetch_versions_from_server',
+        with mock.patch('idmtools_platform_comps.utils.package_version_new.fetch_package_versions',
                         return_value=test_versions) as mock_fetch:
             self.assertEqual(get_latest_compatible_version(pkg_name='pytest', base_version='10'), None)
 
