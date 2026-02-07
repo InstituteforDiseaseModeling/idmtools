@@ -238,6 +238,14 @@ def build_image(username, token, disable_keyring_load, disable_keyring_save, use
                 return push_result
 
             logger.info(f"Successfully pushed: {image}:{tag}")
+            if push_result.returncode == 0:
+                import json
+                image_info = json.loads(push_result.stdout)
+
+                print(f"\nImage Details:")
+                print(f"  Tags: {', '.join(image_info[0]['RepoTags'])}")
+                print(f"  Size: {image_info[0]['Size'] / (1024 ** 2):.2f} MB")
+                print(f"  Created: {image_info[0]['Created']}")
 
         logger.info(f"All tags pushed successfully for version {version}")
     else:
