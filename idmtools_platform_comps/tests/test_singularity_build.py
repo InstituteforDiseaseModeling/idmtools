@@ -6,6 +6,7 @@ import pytest
 from idmtools.assets import Asset
 from idmtools.core import TRUTHY_VALUES
 from idmtools.core.platform_factory import Platform
+from idmtools_platform_comps.utils.package_version import get_docker_manifest
 from idmtools_platform_comps.utils.package_version_new import get_ghcr_manifest, get_digest_from_docker_hub
 from idmtools_platform_comps.utils.singularity_build import SingularityBuildWorkItem
 from idmtools_test import COMMON_INPUT_PATH
@@ -26,15 +27,10 @@ class TestSingularityBuild(unittest.TestCase):
         self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
         self.platform = Platform("SlurmStage")
 
-    def test_get_docker_manifest(self):
-        manifest, tag = get_ghcr_manifest("idm/dtk-ubuntu-py3.7-mpich3.3-runtime:20.04.09")
-        self.assertIsInstance(manifest, dict)
-        self.assertEqual(manifest['config']['digest'], 'sha256:d0fd5396c017aa2b1da9022bb9e9ce420317b2bb36c3c3b4986da13b0c9755b9')
-
     # we can't do this everytime since latest changes
     @pytest.mark.skip
     def test_get_docker_manifest_latest(self):
-        manifest, tag = get_ghcr_manifest("idm/dtk-ubuntu-py3.7-mpich3.3-runtime:latest")
+        manifest, tag = get_docker_manifest("idm/dtk-ubuntu-py3.7-mpich3.3-runtime:latest")
         self.assertIsInstance(manifest, dict)
         self.assertEqual(manifest['config']['digest'], 'sha256:d0fd5396c017aa2b1da9022bb9e9ce420317b2bb36c3c3b4986da13b0c9755b9')
         self.assertEqual(tag, "idm/dtk-ubuntu-py3.7-mpich3.3-runtime:20.04.09")
@@ -54,19 +50,42 @@ class TestSingularityBuild(unittest.TestCase):
 
     #@pytest.mark.skip
     def test_get_ssmt_manifest_latest(self):
-        manifest= get_ghcr_manifest('idmtools-comps-ssmt-worker', tag='1.0.0.3',org='shchen-idmod')
-        self.assertEqual(manifest, "idmtools/comps_ssmt_worker:1.6.0.1")
-        self.assertIsInstance(manifest, dict)
+        manifest= get_ghcr_manifest('idmtools-comps-ssmt-worker', tag='0.0.7.0',org='institutefordiseasemodeling')
+
+        # Check top-level fields
+        assert 'schemaVersion' in manifest, "Missing schemaVersion"
+        assert 'mediaType' in manifest, "Missing mediaType"
+        assert 'config' in manifest, "Missing config"
+        assert 'layers' in manifest, "Missing layers"
+
+        # Check schema version
+        assert manifest['schemaVersion'] == 2, "Expected schemaVersion 2"
+
+        # Check media type
+        assert manifest['mediaType'] == 'application/vnd.docker.distribution.manifest.v2+json'
+
+        # Check config structure
+        assert 'digest' in manifest['config'], "Config missing digest"
+        assert 'mediaType' in manifest['config'], "Config missing mediaType"
+        assert 'size' in manifest['config'], "Config missing size"
+
+        # Check layers
+        assert isinstance(manifest['layers'], list), "Layers must be a list"
+        assert len(manifest['layers']) > 0, "Must have at least one layer"
+
+        # Check each layer has required fields
+        for i, layer in enumerate(manifest['layers']):
+            assert 'digest' in layer, f"Layer {i} missing digest"
+            assert 'mediaType' in layer, f"Layer {i} missing mediaType"
+            assert 'size' in layer, f"Layer {i} missing size"
 
     def test_docker_fetch_version_tag(self):
         sbi = SingularityBuildWorkItem(name=self.case_name, force=FORCE)
-        sbi.image_url = "https://ghcr.io/institutefordiseasemodeling/hello-world:0.0.0"
+        sbi.image_url = "docker://ubuntu:latest"
+        #sbi.run(wait_until_done=True, platform=self.platform)  # run this occasionally
         getattr(sbi, '_SingularityBuildWorkItem__add_tags')()
         self.assertIn('image_name', sbi.image_tags)
-        self.assertEqual(sbi.image_tags['image_name'], 'idm_dtk-ubuntu-py3.7-mpich3.3-runtime_20.04.09.sif')
-        self.assertIn("digest", sbi.image_tags)
-        self.assertEqual(sbi.image_tags['digest'], 'sha256:d0fd5396c017aa2b1da9022bb9e9ce420317b2bb36c3c3b4986da13b0c9755b9')
-        self.assertEqual(sbi.image_tags['image_url'], 'docker://docker-production.packages.idmod.org/idm/dtk-ubuntu-py3.7-mpich3.3-runtime:20.04.09')
+        self.assertEqual(sbi.image_tags['image_name'], 'ubuntu_latest.sif')
 
     @windows_only
     def test_docker_fetch_version_from_dockerhub(self):

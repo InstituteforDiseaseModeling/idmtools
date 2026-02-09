@@ -10,7 +10,7 @@ import re
 from abc import ABC
 from datetime import datetime
 from logging import getLogger, DEBUG
-from typing import Optional, List, Type
+from typing import Optional, List, Type, Dict, Tuple
 from urllib import request
 import requests
 from packaging.requirements import Requirement
@@ -167,40 +167,234 @@ def get_latest_ssmt_image_version_from_artifactory(pkg_name='comps_ssmt_worker',
                                         parser=LinkHTMLParser)
 
 
-def get_docker_manifest(image_path="idmtools/comps_ssmt_worker", repo_base=IDM_DOCKER_PROD):
+def get_docker_manifest(
+        image_path: str = "library/ubuntu",
+        tag: str = "latest",
+        registry: str = "registry-1.docker.io",
+        token: Optional[str] = None
+) -> Optional[Tuple[Dict, str]]:
     """
-    Get docker manifest from IDM Artifactory. It mimics latest even when user has no latest tag defined.
+    Get Docker manifest from Docker Hub.
+    Handles both official images (library/*) and user/org images.
 
     Args:
-        image_path:Path of docker image we want
-        repo_base:Base of the repo
+        image_path: Image path (e.g., 'library/ubuntu' or 'username/image')
+        tag: Image tag (default: 'latest')
+        registry: Docker registry URL (default: Docker Hub)
+        token: Optional Docker Hub auth token
 
     Returns:
-        None
+        Tuple of (manifest dict, full image path with tag) or None if not found
+
+    Examples:
+        >>> manifest, path = get_docker_manifest('library/ubuntu', 'latest')
+        >>> manifest, path = get_docker_manifest('username/myimage', '1.0.0')
 
     Raises:
-        ValueError - When the manifest cannot be found
+        ValueError: When the manifest cannot be found
     """
-    if ":" not in image_path:
-        image_path += ":latest"
+    try:
+        # Parse image path - handle both "image:tag" and separate args
+        if ":" in image_path:
+            image_path, tag = image_path.split(":", 1)
 
-    path, tag = image_path.split(":")
-    if tag == "latest":
-        url = "/".join([IDM_DOCKER_PROD, path])
-        response = requests.get(url)
-        content = response.text
-        lines = [link.split(">") for link in content.split("\n") if "<a href" in link and "pre" not in link]
-        lines = {item_date[1].replace("/</a", ''): datetime.strptime(item_date[2].strip(" -"), '%d-%b-%Y %H:%M') for
-                 item_date in lines}
-        tag = list(sorted(lines.items(), key=operator.itemgetter(1), reverse=True))[0][0]
-        image_path = ":".join([path, tag])
-    final_path = "/".join([path, tag, "manifest.json"])
-    pkg_path = f'{repo_base}/{final_path}'
-    response = requests.get(pkg_path)
-    if response.status_code != 200:
-        raise ValueError("Could not find manifest for file")
-    return response.json(), image_path
+        # Normalize image path for Docker Hub
+        # Official images need 'library/' prefix
+        if '/' not in image_path:
+            image_path = f'library/{image_path}'
 
+        # Get authentication token
+        auth_url = f"https://auth.docker.io/token?service=registry.docker.io&scope=repository:{image_path}:pull"
+        auth_headers = {}
+
+        if token:
+            # If user provided Docker Hub token
+            auth_headers['Authorization'] = f'Bearer {token}'
+
+        auth_response = requests.get(auth_url, headers=auth_headers, timeout=10)
+
+        if not auth_response.ok:
+            logger.warning(f"Failed to get token for {image_path}")
+            raise ValueError(f"Failed to authenticate with Docker Hub for {image_path}")
+
+        bearer_token = auth_response.json().get('token', '')
+        if not bearer_token:
+            logger.warning(f"No token returned for {image_path}")
+            raise ValueError(f"No authentication token received for {image_path}")
+
+        # Fetch manifest
+        manifest_url = f"https://{registry}/v2/{image_path}/manifests/{tag}"
+
+        # Accept multiple manifest formats
+        accept_formats = [
+            'application/vnd.oci.image.index.v1+json',
+            'application/vnd.docker.distribution.manifest.list.v2+json',
+            'application/vnd.oci.image.manifest.v1+json',
+            'application/vnd.docker.distribution.manifest.v2+json',
+        ]
+
+        headers = {
+            'Authorization': f'Bearer {bearer_token}',
+            'Accept': ', '.join(accept_formats)
+        }
+
+        response = requests.get(manifest_url, headers=headers, timeout=10)
+
+        if response.status_code != 200:
+            raise ValueError(f"Could not find manifest for {image_path}:{tag} (status: {response.status_code})")
+
+        manifest = response.json()
+        media_type = manifest.get('mediaType', '')
+
+        # Handle manifest lists (multi-platform images)
+        if 'index' in media_type or 'manifest.list' in media_type:
+            logger.info(f"Found multi-platform image for {image_path}:{tag}")
+            manifest = _extract_platform_manifest_dockerhub(
+                manifest,
+                'linux/amd64',  # Default platform
+                registry,
+                image_path,
+                bearer_token
+            )
+
+            if not manifest:
+                raise ValueError(f"Could not extract platform manifest for {image_path}:{tag}")
+
+        full_image_path = f"{image_path}:{tag}"
+        return manifest, full_image_path
+
+    except requests.RequestException as e:
+        logger.error(f"Error fetching Docker Hub manifest: {e}")
+        raise ValueError(f"Network error fetching manifest for {image_path}:{tag}: {e}")
+    except Exception as e:
+        logger.error(f"Unexpected error: {e}")
+        raise ValueError(f"Error fetching manifest for {image_path}:{tag}: {e}")
+
+
+def _extract_platform_manifest_dockerhub(
+        manifest_list: Dict,
+        platform: str,
+        registry: str,
+        image_path: str,
+        bearer_token: str
+) -> Optional[Dict]:
+    """
+    Extract platform-specific manifest from Docker Hub manifest list.
+
+    Args:
+        manifest_list: The manifest list/index
+        platform: Target platform (e.g., 'linux/amd64')
+        registry: Docker registry URL
+        image_path: Image path
+        bearer_token: Authentication token
+
+    Returns:
+        Platform-specific manifest or None
+    """
+    try:
+        # Parse platform
+        if '/' in platform:
+            os_name, arch = platform.split('/', 1)
+        else:
+            os_name, arch = 'linux', platform
+
+        # Find matching platform
+        manifests = manifest_list.get('manifests', [])
+        platform_manifest = None
+
+        for m in manifests:
+            p = m.get('platform', {})
+            if p.get('os') == os_name and p.get('architecture') == arch:
+                platform_manifest = m
+                break
+
+        if not platform_manifest:
+            logger.warning(f"Platform {platform} not found, using first available")
+            platform_manifest = manifests[0] if manifests else None
+
+        if not platform_manifest:
+            logger.error("No manifests found in manifest list")
+            return None
+
+        # Fetch platform-specific manifest
+        digest = platform_manifest['digest']
+        platform_url = f"https://{registry}/v2/{image_path}/manifests/{digest}"
+
+        headers = {
+            'Authorization': f'Bearer {bearer_token}',
+            'Accept': ', '.join([
+                'application/vnd.oci.image.manifest.v1+json',
+                'application/vnd.docker.distribution.manifest.v2+json',
+            ])
+        }
+
+        response = requests.get(platform_url, headers=headers, timeout=10)
+
+        if response.status_code == 200:
+            return response.json()
+        else:
+            logger.error(f"Failed to fetch platform manifest: {response.status_code}")
+            return None
+
+    except Exception as e:
+        logger.error(f"Error extracting platform manifest: {e}")
+        return None
+
+
+def get_latest_tag_dockerhub(image_path: str) -> str:
+    """
+    Get the latest tag for a Docker Hub image by checking available tags.
+
+    Args:
+        image_path: Image path (e.g., 'library/ubuntu' or 'username/image')
+
+    Returns:
+        Latest tag name
+
+    Examples:
+        >>> tag = get_latest_tag_dockerhub('library/ubuntu')
+    """
+    try:
+        # Normalize path
+        if '/' not in image_path:
+            image_path = f'library/{image_path}'
+
+        # Get auth token
+        auth_url = f"https://auth.docker.io/token?service=registry.docker.io&scope=repository:{image_path}:pull"
+        auth_response = requests.get(auth_url, timeout=10)
+
+        if not auth_response.ok:
+            return 'latest'
+
+        bearer_token = auth_response.json().get('token', '')
+
+        # List tags
+        tags_url = f"https://registry-1.docker.io/v2/{image_path}/tags/list"
+        headers = {'Authorization': f'Bearer {bearer_token}'}
+
+        response = requests.get(tags_url, headers=headers, timeout=10)
+
+        if response.status_code == 200:
+            tags = response.json().get('tags', [])
+
+            # Filter out 'latest' and sort
+            version_tags = [t for t in tags if t != 'latest' and not any(x in t for x in ['dev', 'test', 'rc'])]
+
+            if version_tags:
+                # Try to sort by version
+                try:
+                    from packaging.version import parse, InvalidVersion
+                    sorted_tags = sorted(version_tags, key=lambda x: parse(x) if x[0].isdigit() else x, reverse=True)
+                    return sorted_tags[0]
+                except (ImportError, InvalidVersion):
+                    # Fallback to alphabetical
+                    return sorted(version_tags, reverse=True)[0]
+
+        return 'latest'
+
+    except Exception as e:
+        logger.warning(f"Could not determine latest tag: {e}")
+        return 'latest'
 
 def get_digest_from_docker_hub(repo, tag='latest'):
     """

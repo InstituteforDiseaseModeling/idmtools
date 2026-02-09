@@ -30,7 +30,8 @@ from idmtools.entities.relation_type import RelationType
 from idmtools.utils.hashing import calculate_md5_stream
 from idmtools_platform_comps.ssmt_work_items.comps_workitems import InputDataWorkItem
 from idmtools_platform_comps.utils.general import save_sif_asset_md5_from_ac_id
-from idmtools_platform_comps.utils.package_version import get_docker_manifest, get_digest_from_docker_hub
+from idmtools_platform_comps.utils.package_version import get_docker_manifest
+from idmtools_platform_comps.utils.package_version_new import get_ghcr_manifest, get_digest_from_docker_hub
 
 if TYPE_CHECKING:
     from idmtools.entities.iplatform import IPlatform
@@ -129,7 +130,10 @@ class SingularityBuildWorkItem(InputDataWorkItem):
         """
         url_info = urlparse(value)
         if url_info.scheme == "docker":
-            if "packages.idmod.org" in value:
+            if "ghcr.io" in value:
+                full_manifest = get_ghcr_manifest(url_info.path)
+                self.__digest = full_manifest['config']['digest']
+            elif "packages.idmod.org" in value:
                 full_manifest, self.__image_tag = get_docker_manifest(url_info.path)
                 self.__digest = full_manifest['config']['digest']
             else:

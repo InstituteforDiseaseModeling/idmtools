@@ -11,6 +11,7 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import argparse
 import glob
+import json
 import os
 import shutil
 import subprocess
@@ -66,7 +67,7 @@ def get_github_token(disable_keyring_load=False, disable_keyring_save=False):
         tuple: (username, token)
     """
     # Try environment variables first
-    token = os.environ.get('GITHUB_TOKEN') or os.environ.get('GH_TOKEN')
+    token = os.environ.get('GITHUB_TOKEN') or os.environ.get('GITHUB_TOKEN')
 
     if token:
         logger.info("Using GitHub token from environment variable")
@@ -178,14 +179,15 @@ def build_image(username, token, disable_keyring_load, disable_keyring_save, use
 
     # Build Docker image
     build_cmd = [
-        'docker', 'build',
+        'docker', 'buildx', 'build',
+        '--provenance=false',
+        '--output', 'type=docker',  # change to only get single platform due to comps docker worker restriction
         '--network=host',
         '--build-arg', f'SSMT_VERSION={version}',
         '--tag', f'{image}:{version}',
         '--tag', f'{image}:latest',
         '.'
     ]
-
     logger.info(f'Building image: {" ".join(build_cmd)}')
 
     build_process = subprocess.Popen(
@@ -227,16 +229,36 @@ def build_image(username, token, disable_keyring_load, disable_keyring_save, use
             tags_to_push.append(base_version)
 
         for tag in tags_to_push:
-            push_cmd = f'docker push {image}:{tag}'
             logger.info(f"Pushing: {image}:{tag}")
 
-            push_result = os.system(push_cmd)
+            push_cmd_list = ['docker', 'push', f'{image}:{tag}']
+            push_result = subprocess.run(push_cmd_list, capture_output=True, text=True)
 
-            if push_result != 0:
+            if push_result.returncode != 0:
                 logger.error(f"Failed to push {image}:{tag}")
-                return push_result
+                logger.error(f"Error: {push_result.stderr}")
+                return push_result.returncode
 
             logger.info(f"Successfully pushed: {image}:{tag}")
+
+            # Get image info after push
+            inspect_cmd = ['docker', 'inspect', f'{image}:{tag}', '--format', '{{json .}}']
+            inspect_result = subprocess.run(inspect_cmd, capture_output=True, text=True)
+
+            if inspect_result.returncode == 0:
+                try:
+                    image_info = json.loads(inspect_result.stdout)
+
+                    # Get first element if list, otherwise use as-is
+                    info = image_info[0] if isinstance(image_info, list) else image_info
+
+                    print(f"\nImage Details:")
+                    print(f"  Image: {image}:{tag}")
+                    print(f"  Tags: {', '.join(info.get('RepoTags', []))}")
+                    print(f"  Size: {info.get('Size', 0) / (1024 ** 2):.2f} MB")
+
+                except Exception as e:
+                    logger.debug(f"Could not display image details: {e}")
 
         logger.info(f"All tags pushed successfully for version {version}")
     else:

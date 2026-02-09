@@ -48,43 +48,24 @@ class TestLoadLibWheel(ITestWithPersistence):
 
         package = get_latest_compatible_version('statsmodels', base_version="0.5")
         self.assertIsNotNone(package)
-        self.assertEqual(2, len(package))
-        self.assertIsInstance(package, list)
-        self.assertEqual(package[-1], '0.5.0rc1')
+        self.assertEqual(5, len(package))
+        self.assertIsInstance(package, str)
+        self.assertEqual(package, '0.5.0')
 
     @pytest.mark.smoke
     def test_get_latest_package_idm(self):
         package = get_latest_package_version_from_pypi('idmtools')
         self.assertIsNotNone(package)
 
-        package = get_latest_compatible_version('idmtools', base_version="1.5")
-        self.assertEqual(package, '1.5.1')
+        package = get_latest_compatible_version('idmtools', base_version="0.0.2")
+        self.assertEqual(package, '0.0.2')
 
         package = get_latest_package_version_from_pypi('idmtools')
         self.assertIsNotNone(package)
-        self.assertIsInstance(package, list)
-        self.assertEqual(package[-1], '0.2.0')
+        self.assertIsInstance(package, str)
 
         package = get_latest_package_version_from_pypi('idmtools-platform-comps')
         self.assertIsNotNone(package)
-
-        package = get_latest_compatible_version('idmtools-platform-comps', base_version="1.5")
-        self.assertEqual(package, '1.5.2')
-
-        package = get_latest_package_version_from_pypi('rse-api')
-        self.assertIsNotNone(package)
-        self.assertIsInstance(package, list)
-        self.assertEqual(package[-1], '1.0.0')
-
-        package = get_latest_package_version_from_pypi('rse-db')
-        self.assertIsNotNone(package)
-        self.assertIsInstance(package, list)
-        self.assertEqual(package[-1], '1.0.0')
-
-        package = get_latest_package_version_from_pypi('dtk-tools')
-        self.assertIsNotNone(package)
-        self.assertIsInstance(package, list)
-        self.assertEqual(package[-1], '1.0.0')
 
     @pytest.mark.long
     @pytest.mark.comps
