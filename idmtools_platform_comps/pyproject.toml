@@ -51,7 +51,6 @@ test = [
 ]
 packaging = [
     "flake8",
-    "coverage",
     "bump2version",
     "twine",
     "natsort",
