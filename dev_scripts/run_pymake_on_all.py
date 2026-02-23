@@ -31,7 +31,6 @@ if __name__ == '__main__':
     # fallback to os default
     else:
         raise FileNotFoundError("Cannot find make. If you are on Windows, run pip install almake or pip install py-make. On Linux install make")
-    
     cmd = f'python "{os.path.join(base_directory, "dev_scripts", "run_all.py")}" {env_str} {p_str}--exec "{make_command} {args.command}"'
     print(cmd)
     sys.exit(os.system(cmd))
