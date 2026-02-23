@@ -5,6 +5,8 @@ Notes:
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
+from idmtools_models.singularity_json_task import SingularityJSONConfiguredTask
+
 SLURM_ENVIRONMENTS = ['slurmdev', 'slurm2', 'slurmstage', 'calculon']
 PYTHON_EXECUTABLE = 'python3'
 
@@ -25,6 +27,8 @@ def platform_task_hooks(task, platform):
     try:
         from idmtools_models.python.python_task import PythonTask
         from idmtools.entities.command_task import CommandTask
+        if isinstance(task, SingularityJSONConfiguredTask):
+            return task
         if isinstance(task, PythonTask):
             if platform.environment.lower() in SLURM_ENVIRONMENTS:
                 task.python_path = PYTHON_EXECUTABLE
