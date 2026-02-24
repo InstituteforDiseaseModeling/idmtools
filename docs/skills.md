@@ -142,7 +142,7 @@ See [Parameter Sweeps](tutorials/parameter-sweeps.md) for more patterns includin
 
 ---
 
-## Analyzer Pattern
+## Analyzer
 
 ```python
 class MyAnalyzer(IAnalyzer):
