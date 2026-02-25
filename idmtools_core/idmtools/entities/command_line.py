@@ -111,6 +111,22 @@ class CommandLine:
         """
         self._options[option] = str(value)
 
+    def adjust_python(self, python_executable: str = 'python3'):
+        """
+        Adjust python executable for the target environment.
+        Args:
+            python_executable: target python executable
+
+        Returns:
+            adjusted python executable
+        """
+        if self.executable.lower() == 'python':
+            self._executable = python_executable
+        elif self.executable.lower() == 'singularity':
+            self._args = ['python3' if item.lower() == 'python' else item for item in self._args]
+        else:
+            self._args = [python_executable if item.lower() == 'python' else item for item in self._args]
+
     @property
     def options(self):
         """

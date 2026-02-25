@@ -79,35 +79,43 @@ class COMPSPlatformSpecification(PlatformSpecification):
         config_aliases = dict(
             CALCULON=dict(
                 endpoint="https://comps.idmod.org",
-                environment="Calculon"
+                environment="Calculon",
+                python_executable='python3'
             ),
             IDMCLOUD=dict(
                 endpoint="https://comps.idmod.org",
-                environment="IDMcloud"
+                environment="IDMcloud",
+                python_executable='python'
             ),
             NDCLOUD=dict(
                 endpoint="https://comps.idmod.org",
-                environment="NDcloud"
+                environment="NDcloud",
+                python_executable='python3'
             ),
             BMGF_IPMCLOUD=dict(
                 endpoint="https://comps.idmod.org",
-                environment="BMGF_IPMcloud"
+                environment="BMGF_IPMcloud",
+                python_executable='python3'
             ),
             QSTART=dict(
                 endpoint="https://comps.idmod.org",
-                environment="Qstart"
+                environment="Qstart",
+                python_executable='python3'
             ),
             NIBBLER=dict(
                 endpoint="https://comps.idmod.org",
-                environment="Nibbler"
+                environment="Nibbler",
+                python_executable='python3'
             ),
             SLURMSTAGE=dict(
                 endpoint="https://comps2.idmod.org",
-                environment="SlurmStage"
+                environment="SlurmStage",
+                python_executable='python3'
             ),
             CUMULUS=dict(
                 endpoint="https://comps2.idmod.org",
-                environment="Cumulus"
+                environment="Cumulus",
+                python_executable='python3'
             )
         )
         config_aliases['SLURM'] = config_aliases['CALCULON']
@@ -115,6 +123,24 @@ class COMPSPlatformSpecification(PlatformSpecification):
         # Friendly names for dev/staging environments from @clorton
         config_aliases['BOXY'] = config_aliases['SLURMSTAGE']
         return config_aliases
+
+    def get_python_executable(self, alias: str = None) -> str:
+        """
+        Get the target Python executable.
+
+        Args:
+            alias: platform alias
+
+        Returns:
+            The Python executable.
+        """
+
+        alias_map = self.get_configuration_aliases()
+        alias = alias.upper()
+        if alias in alias_map:
+            return alias_map[alias]['python_executable']
+        else:
+            return 'python3'
 
 
 class SSMTPlatformSpecification(COMPSPlatformSpecification):

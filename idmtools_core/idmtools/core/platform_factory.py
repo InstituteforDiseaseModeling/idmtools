@@ -186,6 +186,7 @@ class Platform:
         # Make data to the requested type
         inputs = IdmConfigParser.retrieve_dict_config_block(field_type, section)
         inputs.pop('type', None)  # Remove 'type' dict from inputs since it is not a field to create platform
+        inputs.pop('python_executable', None)  # Remove 'python_executable' dict from inputs since it is not a field to create platform
         # Make sure the user values have the requested type
         fs_kwargs = validate_user_inputs_against_dataclass(field_type, kwargs)  # noqa: F841
 
@@ -214,7 +215,10 @@ class Platform:
         cls._display_inputs(platform_cls, inputs)
 
         # Now create Platform using the data with the correct data types
-        return platform_cls(**inputs)
+        p = platform_cls(**inputs)
+        # Save target python executable
+        p._python_executable = platform_spec.get_python_executable(p.environment if platform_type == 'COMPS' else None)
+        return p
 
     @classmethod
     def _get_platform_type(cls, block: str, **kwargs):

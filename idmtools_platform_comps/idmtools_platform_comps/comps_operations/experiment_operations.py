@@ -234,10 +234,11 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
             sim_gen1, sim_gen2 = tee(experiment.simulations)
             experiment.simulations = sim_gen2
             sim = next(sim_gen1)
-            if check_command:
-                task = platform_task_hooks(sim.task, self.platform)
+            task = sim.task
             # run pre-creation in case task use it to produce the command line dynamically
             task.pre_creation(sim, self.platform)
+            if check_command:
+                task.command.adjust_python(self.platform._python_executable)
             exp_command = task.command
         elif isinstance(experiment.simulations, ExperimentParentIterator) and isinstance(experiment.simulations.items,
                                                                                          TemplatedSimulations):
@@ -245,19 +246,19 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
                 logger.debug("ParentIterator/TemplatedSimulations detected. Using base_task for command")
             from idmtools.entities.simulation import Simulation
             task = experiment.simulations.items.base_task
-            if check_command:
-                task = platform_task_hooks(task, self.platform)
             # run pre-creation in case task use it to produce the command line dynamically
             task.pre_creation(Simulation(task=task), self.platform)
+            if check_command:
+                task.command.adjust_python(self.platform._python_executable)
             exp_command = task.command
         else:
             if logger.isEnabledFor(DEBUG):
                 logger.debug("List of simulations detected. Using base_task for command")
             task = experiment.simulations[0].task
-            if check_command:
-                task = platform_task_hooks(task, self.platform)
             # run pre-creation in case task use it to produce the command line dynamically
             task.pre_creation(experiment.simulations[0], self.platform)
+            if check_command:
+                task.command.adjust_python(self.platform._python_executable)
             exp_command = task.command
         return exp_command
 
