@@ -79,35 +79,28 @@ class COMPSPlatformSpecification(PlatformSpecification):
         config_aliases = dict(
             CALCULON=dict(
                 endpoint="https://comps.idmod.org",
-                environment="Calculon"
-            ),
-            IDMCLOUD=dict(
-                endpoint="https://comps.idmod.org",
-                environment="IDMcloud"
+                environment="Calculon",
+                python_executable='python3'
             ),
             NDCLOUD=dict(
                 endpoint="https://comps.idmod.org",
-                environment="NDcloud"
-            ),
-            BMGF_IPMCLOUD=dict(
-                endpoint="https://comps.idmod.org",
-                environment="BMGF_IPMcloud"
-            ),
-            QSTART=dict(
-                endpoint="https://comps.idmod.org",
-                environment="Qstart"
+                environment="NDcloud",
+                python_executable='python3'
             ),
             NIBBLER=dict(
                 endpoint="https://comps.idmod.org",
-                environment="Nibbler"
+                environment="Nibbler",
+                python_executable='python3'
             ),
             SLURMSTAGE=dict(
                 endpoint="https://comps2.idmod.org",
-                environment="SlurmStage"
+                environment="SlurmStage",
+                python_executable='python3'
             ),
             CUMULUS=dict(
                 endpoint="https://comps2.idmod.org",
-                environment="Cumulus"
+                environment="Cumulus",
+                python_executable='python'
             )
         )
         config_aliases['SLURM'] = config_aliases['CALCULON']
@@ -115,6 +108,21 @@ class COMPSPlatformSpecification(PlatformSpecification):
         # Friendly names for dev/staging environments from @clorton
         config_aliases['BOXY'] = config_aliases['SLURMSTAGE']
         return config_aliases
+
+    def get_python_executable(self, alias: str = None) -> str:
+        """
+        Get the target Python executable.
+        Args:
+            alias: platform alias.
+        Returns:
+            The Python executable.
+        """
+        alias_map = self.get_configuration_aliases()
+        alias = alias.upper()
+        if alias in alias_map:
+            return alias_map[alias]['python_executable']
+        else:
+            return 'python3'
 
 
 class SSMTPlatformSpecification(COMPSPlatformSpecification):
@@ -166,3 +174,18 @@ class SSMTPlatformSpecification(COMPSPlatformSpecification):
         config_aliases = super().get_configuration_aliases()
         ssmt_config_aliases = {f"{a}_SSMT": p for a, p in config_aliases.items()}
         return ssmt_config_aliases
+
+    def get_python_executable(self, alias: str = None) -> str:
+        """
+        Get the target Python executable.
+        Args:
+            alias: platform alias
+        Returns:
+            The Python executable.
+        """
+        alias_map = super().get_configuration_aliases()
+        alias = alias.upper()
+        if alias in alias_map:
+            return alias_map[alias]['python_executable']
+        else:
+            return 'python3'

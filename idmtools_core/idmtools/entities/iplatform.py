@@ -42,6 +42,7 @@ from idmtools.assets.asset_collection import AssetCollection
 from idmtools.services.platforms import PlatformPersistService
 from idmtools.utils.caller import get_caller
 from idmtools.utils.entities import validate_user_inputs_against_dataclass
+from idmtools.registry.platform_specification import PlatformSpecification
 
 logger = getLogger(__name__)
 user_logger = getLogger('user')
@@ -1100,6 +1101,42 @@ class IPlatform(IItem, CacheEnabled, metaclass=ABCMeta):
         item = self.get_item(item_id, item_type, force=True)
         return item.get_simulations_by_tags(tags=tags, status=status, entity_type=entity_type, skip_sims=skip_sims,
                                             max_simulations=max_simulations, **kwargs)
+
+    def get_platform_type(self) -> str:
+        """
+        Get platform type.
+        Returns:
+            The platform type.
+        """
+        cls_name = self.__class__.__name__
+        cls_type = cls_name.replace('Platform', '')
+        return cls_type
+
+    def get_platform_specification(self) -> PlatformSpecification:
+        """
+        Get the platform specification associated wtih this platform..
+        Returns:
+            The associated platform specification.
+        """
+        from idmtools.registry.platform_specification import PlatformPlugins
+        _platform_plugins = PlatformPlugins().get_plugin_map()
+
+        cls_type = self.get_platform_type()
+        spec = _platform_plugins[cls_type]
+        return spec
+
+    def get_platform_python(self) -> str:
+        """
+        Get the python version associated with this platform.
+        Returns:
+            The python or python3.
+        """
+        spec = self.get_platform_specification()
+        if spec.get_name().upper() in ('COMPS', 'SSMT'):
+            alias = self.environment
+        else:
+            alias = None
+        return spec.get_python_executable(alias)
 
 
 TPlatform = TypeVar("TPlatform", bound=IPlatform)
