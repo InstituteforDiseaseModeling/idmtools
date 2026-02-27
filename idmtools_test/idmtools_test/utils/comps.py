@@ -78,7 +78,7 @@ def get_asset_collection_id_for_simulation_id(sim_id):
         ['id', 'experiment_id']).select_children(
         ["files", "configuration"]))
 
-    if simulation.configuration is None:
+    if simulation.configuration is None or simulation.configuration.asset_collection_id is None:
         # check experiment
         experiment = COMPSExperiment.get(simulation.experiment_id, query_criteria=QueryCriteria().select(
             ['id']).select_children("configuration")

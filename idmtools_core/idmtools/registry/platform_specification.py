@@ -86,6 +86,20 @@ class PlatformSpecification(PluginSpecification, ABC):
         """
         return {}
 
+    def get_python_executable(self, alias: str = None) -> str:
+        """
+        Get the target Python executable.
+        Args:
+            alias: platform alias.
+        Returns:
+            The Python executable.
+        """
+        from idmtools.utils.local_os import LocalOS
+        if LocalOS.is_window():
+            return 'python'
+        else:
+            return 'python3'
+
 
 class PlatformPlugins(SingletonMixin):
     """
