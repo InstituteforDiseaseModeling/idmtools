@@ -315,15 +315,13 @@ class ITask(metaclass=ABCMeta):
                     result[f.name] = getattr(self, f.name)
         return result
 
-
     def adjust_command_python(self, python_executable: str = 'python3'):
         """
         Adjust python executable for the target environment.
         Args:
-            python_executable: target python executable
-
+            python_executable: target python executable.
         Returns:
-            adjusted python executable
+            adjusted python executable.
         """
         if self.command.executable.lower() == 'python':
             self.command._executable = python_executable

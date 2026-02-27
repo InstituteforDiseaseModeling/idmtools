@@ -226,7 +226,6 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
             Command line for Experiment
         """
-
         if isinstance(experiment.simulations, Generator):
             if logger.isEnabledFor(DEBUG):
                 logger.debug("Simulations generator detected. Copying generator and using first task as command")

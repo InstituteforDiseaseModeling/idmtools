@@ -112,14 +112,11 @@ class COMPSPlatformSpecification(PlatformSpecification):
     def get_python_executable(self, alias: str = None) -> str:
         """
         Get the target Python executable.
-
         Args:
-            alias: platform alias
-
+            alias: platform alias.
         Returns:
             The Python executable.
         """
-
         alias_map = self.get_configuration_aliases()
         alias = alias.upper()
         if alias in alias_map:
@@ -181,14 +178,11 @@ class SSMTPlatformSpecification(COMPSPlatformSpecification):
     def get_python_executable(self, alias: str = None) -> str:
         """
         Get the target Python executable.
-
         Args:
             alias: platform alias
-
         Returns:
             The Python executable.
         """
-
         alias_map = super().get_configuration_aliases()
         alias = alias.upper()
         if alias in alias_map:
