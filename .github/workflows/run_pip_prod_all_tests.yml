@@ -8,7 +8,7 @@ on:
       python-version:
         description: "Select Python version"
         required: true
-        default: "3.12"
+        default: "3.13"
         type: choice
         options:
           - "3.10"

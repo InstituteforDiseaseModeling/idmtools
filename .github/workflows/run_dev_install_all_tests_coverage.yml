@@ -28,10 +28,18 @@ on:
 jobs:
   run-setup-dev-all-tests-coverage:
     runs-on: ${{ matrix.os }}
+    env:
+      IS_DEPENDABOT: ${{ github.actor == 'dependabot[bot]' || github.actor == 'dependabot-preview[bot]' }}
     strategy:
       matrix:
         os: [ ubuntu-latest ]
         python-version: ['3.13']
+    # Run for:
+    # 1) Manual workflow_dispatch
+    # 2) Dependabot pull requests ONLY
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      env.IS_DEPENDABOT == 'true'
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v4
@@ -59,7 +67,17 @@ jobs:
         env:
           COMPS_PASS: ${{ secrets.COMPS_PASSWORD }}
       - name: run idmtools_cli tests
-        if: ${{ github.event.inputs.all_tests || inputs.general_test || inputs.slurm_test || inputs.comps_test == 'true'}}
+        if: >-
+          env.IS_DEPENDABOT == 'true' ||
+          (
+            github.event_name == 'workflow_dispatch' &&
+            (
+              inputs.all_tests == 'true' ||
+              inputs.general_test == 'true' ||
+              inputs.slurm_test == 'true' ||
+              inputs.comps_test == 'true'
+            )
+          )
         run: |
           cd idmtools_cli
           PARALLEL_TEST_COUNT=2 make coverage-report
@@ -76,7 +94,17 @@ jobs:
           name: idmtools_cli_test_results
           path: idmtools_cli/tests/reports/
       - name: run idmtools_core tests
-        if: ${{ inputs.all_tests || inputs.general_test || inputs.slurm_test || inputs.comps_test}}
+        if: >-
+          env.IS_DEPENDABOT == 'true' ||
+          (
+            github.event_name == 'workflow_dispatch' &&
+            (
+              inputs.all_tests == 'true' ||
+              inputs.general_test == 'true' ||
+              inputs.slurm_test == 'true' ||
+              inputs.comps_test == 'true'
+            )
+          )
         run: |
           cd idmtools_core
           PARALLEL_TEST_COUNT=2 make coverage-report
@@ -93,7 +121,17 @@ jobs:
           name: idmtools_core_test_results
           path: idmtools_core/tests/reports/
       - name: run idmtools_models tests coverage
-        if: ${{ inputs.all_tests || inputs.general_test || inputs.slurm_test || inputs.comps_test}}
+        if: >-
+          env.IS_DEPENDABOT == 'true' ||
+          (
+            github.event_name == 'workflow_dispatch' &&
+            (
+              inputs.all_tests == 'true' ||
+              inputs.general_test == 'true' ||
+              inputs.slurm_test == 'true' ||
+              inputs.comps_test == 'true'
+            )
+          )
         run: |
           cd idmtools_models
           PARALLEL_TEST_COUNT=2 make coverage-report
@@ -110,7 +148,15 @@ jobs:
           name: idmtools_models_test_results
           path: idmtools_models/tests/reports/
       - name: run idmtools_platform_general tests coverage
-        if: ${{ inputs.all_tests || inputs.general_test }}
+        if: >-
+          env.IS_DEPENDABOT == 'true' ||
+          (
+            github.event_name == 'workflow_dispatch' &&
+            (
+              inputs.all_tests == 'true' ||
+              inputs.general_test == 'true' 
+            )
+          )
         run: |
             cd idmtools_platform_general
             make coverage-report
@@ -127,7 +173,15 @@ jobs:
           name: idmtools_platform_general_test_results
           path: idmtools_platform_general/tests/reports/
       - name: run idmtools_platform_slurm tests coverage
-        if: ${{ inputs.all_tests || inputs.slurm_test }}
+        if: >-
+          env.IS_DEPENDABOT == 'true' ||
+          (
+            github.event_name == 'workflow_dispatch' &&
+            (
+              inputs.all_tests == 'true' ||
+              inputs.slurm_test == 'true' 
+            )
+          )
         run: |
             cd idmtools_platform_slurm
             make coverage-report
@@ -144,7 +198,15 @@ jobs:
           name: idmtools_platform_slurm_test_results
           path: idmtools_platform_slurm/tests/reports/
       - name: run idmtools_platform_container tests coverage
-        if: ${{ inputs.all_tests || inputs.container_test }}
+        if: >-
+          env.IS_DEPENDABOT == 'true' ||
+          (
+            github.event_name == 'workflow_dispatch' &&
+            (
+              inputs.all_tests == 'true' ||
+              inputs.container_test == 'true' 
+            )
+          )
         run: |
             cd idmtools_platform_container
             make coverage-report
@@ -161,7 +223,15 @@ jobs:
           name: idmtools_platform_container_test_results
           path: idmtools_platform_container/tests/reports/
       - name: run idmtools_platform_comps tests coverage
-        if: ${{ inputs.all_tests || inputs.comps_test }}
+        if: >-
+          env.IS_DEPENDABOT == 'true' ||
+          (
+            github.event_name == 'workflow_dispatch' &&
+            (
+              inputs.all_tests == 'true' ||
+              inputs.comps_test == 'true' 
+            )
+          )
         run: |
           cd idmtools_platform_comps
           PARALLEL_TEST_COUNT=2 make coverage-report
