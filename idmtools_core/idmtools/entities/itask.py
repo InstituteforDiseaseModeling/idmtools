@@ -326,8 +326,8 @@ class ITask(metaclass=ABCMeta):
         if self.command.executable.lower() == 'python':
             self.command._executable = python_executable
         elif self.command.executable.lower() == 'singularity':
-            self.command._args = ['python3' if item.lower() == 'python' else item for item in self._args]
+            self.command._args = ['python3' if item.lower() == 'python' else item for item in self.command._args]
         else:
-            self.command._args = [python_executable if item.lower() == 'python' else item for item in self._args]
+            self.command._args = [python_executable if item.lower() == 'python' else item for item in self.command._args]
 
         self.python_path = python_executable
