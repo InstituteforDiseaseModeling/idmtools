@@ -33,8 +33,6 @@ on:
 jobs:
   run-setup-dev-all-tests:
     runs-on: ${{ matrix.os }}
-    env:
-      IS_DEPENDABOT: ${{ github.actor == 'dependabot[bot]' || github.actor == 'dependabot-preview[bot]' }}
     strategy:
       matrix:
         os: [ ubuntu-latest ]
@@ -44,7 +42,8 @@ jobs:
     # 2) Dependabot pull requests ONLY
     if: |
       github.event_name == 'workflow_dispatch' ||
-      env.IS_DEPENDABOT == 'true'
+      github.actor == 'dependabot[bot]' ||
+      github.actor == 'dependabot-preview[bot]'
     steps:
       # ------------------------
       # Dependabot checkout
@@ -86,7 +85,8 @@ jobs:
           COMPS_PASS: ${{ secrets.COMPS_PASSWORD }}
       - name: run idmtools_cli tests
         if: >-
-          env.IS_DEPENDABOT == 'true' ||
+          github.actor == 'dependabot[bot]' ||
+          github.actor == 'dependabot-preview[bot]' ||
           (
             github.event_name == 'workflow_dispatch' &&
             (
@@ -107,7 +107,8 @@ jobs:
           path: idmtools_cli/tests/reports/
       - name: run idmtools_core tests
         if: >
-          env.IS_DEPENDABOT == 'true' ||
+          github.actor == 'dependabot[bot]' ||
+          github.actor == 'dependabot-preview[bot]' ||
           (
             github.event_name == 'workflow_dispatch' &&
             (
@@ -128,7 +129,8 @@ jobs:
           path: idmtools_core/tests/reports/
       - name: run idmtools_models tests
         if: >
-          env.IS_DEPENDABOT == 'true' ||
+          github.actor == 'dependabot[bot]' ||
+          github.actor == 'dependabot-preview[bot]' ||
           (
             github.event_name == 'workflow_dispatch' &&
             (
@@ -149,7 +151,8 @@ jobs:
           path: idmtools_models/tests/reports/
       - name: run idmtools_platform_general tests
         if: >
-          env.IS_DEPENDABOT == 'true' ||
+          github.actor == 'dependabot[bot]' ||
+          github.actor == 'dependabot-preview[bot]' ||
           (
             github.event_name == 'workflow_dispatch' &&
             (
@@ -168,7 +171,8 @@ jobs:
           path: idmtools_platform_general/tests/reports/
       - name: run idmtools_platform_slurm tests
         if: >
-          env.IS_DEPENDABOT == 'true' ||
+          github.actor == 'dependabot[bot]' ||
+          github.actor == 'dependabot-preview[bot]' ||
           (
             github.event_name == 'workflow_dispatch' &&
             (
@@ -187,7 +191,8 @@ jobs:
           path: idmtools_platform_slurm/tests/reports/
       - name: run idmtools_platform_container tests
         if: >
-          env.IS_DEPENDABOT == 'true' ||
+          github.actor == 'dependabot[bot]' ||
+          github.actor == 'dependabot-preview[bot]' ||
           (
             github.event_name == 'workflow_dispatch' &&
             (
@@ -206,7 +211,8 @@ jobs:
           path: idmtools_platform_container/tests/reports/
       - name: run idmtools_platform_comps tests
         if: >
-          env.IS_DEPENDABOT == 'true' ||
+          github.actor == 'dependabot[bot]' ||
+          github.actor == 'dependabot-preview[bot]' ||
           (
             github.event_name == 'workflow_dispatch' &&
             (
