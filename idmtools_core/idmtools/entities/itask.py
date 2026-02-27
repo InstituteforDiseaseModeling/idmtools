@@ -314,3 +314,22 @@ class ITask(metaclass=ABCMeta):
                 except ImportError:
                     result[f.name] = getattr(self, f.name)
         return result
+
+
+    def adjust_command_python(self, python_executable: str = 'python3'):
+        """
+        Adjust python executable for the target environment.
+        Args:
+            python_executable: target python executable
+
+        Returns:
+            adjusted python executable
+        """
+        if self.command.executable.lower() == 'python':
+            self.command._executable = python_executable
+        elif self.command.executable.lower() == 'singularity':
+            self.command._args = ['python3' if item.lower() == 'python' else item for item in self._args]
+        else:
+            self.command._args = [python_executable if item.lower() == 'python' else item for item in self._args]
+
+        self.python_path = python_executable

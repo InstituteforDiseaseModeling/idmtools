@@ -77,3 +77,14 @@ class ContainerPlatformSpecification(PlatformSpecification):
             )
         )
         return config_aliases
+
+    def get_python_executable(self, alias: str = None) -> str:
+        """
+        Get the target Python executable.
+        Args:
+            alias: platform alias
+
+        Returns:
+            The Python executable.
+        """
+        return 'python3'
