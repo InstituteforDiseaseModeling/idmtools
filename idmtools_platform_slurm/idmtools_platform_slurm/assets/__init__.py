@@ -68,7 +68,7 @@ def generate_batch(platform: 'SlurmPlatform', experiment: Experiment,
     template_vars['dependency'] = dependency
 
     # Control propagation of inherited SLURM env vars into downstream scripts
-    template_vars['propogate_slurm_env_var'] = getattr(platform, 'propogate_slurm_env_var', True)
+    template_vars['propagate_slurm_env_var'] = getattr(platform, 'propagate_slurm_env_var', True)
 
     # Update with possible override values
     template_vars.update(kwargs)

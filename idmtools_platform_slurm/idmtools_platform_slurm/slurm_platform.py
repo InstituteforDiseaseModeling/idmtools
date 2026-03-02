@@ -99,7 +99,7 @@ class SlurmPlatform(FilePlatform):
     # If running idmtools from an allocated partition, you likely want to change 
     # this to False to avoid issues with child jobs inheriting
     # SLURM env vars from your interactive terminal.
-    propogate_slurm_env_var: bool = field(default=True, metadata=dict(sbatch=False,
+    propagate_slurm_env_var: bool = field(default=True, metadata=dict(sbatch=False,
                                                                      help="Keep SLURM env vars available to child scripts"))
 
     # determine if run script as Slurm job
@@ -120,6 +120,10 @@ class SlurmPlatform(FilePlatform):
 
     def __post_init__(self):
         super().__post_init__()
+        # Preserve backwards compatibility with legacy config key
+        if hasattr(self, 'propogate_slurm_env_var'):
+            self.propagate_slurm_env_var = getattr(self, 'propogate_slurm_env_var')
+            delattr(self, 'propogate_slurm_env_var')
         self.__init_interfaces()
 
         # check max_array_size from slurm configuration

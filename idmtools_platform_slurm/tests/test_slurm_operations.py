@@ -235,16 +235,16 @@ class TestSlurmOperations(ITestWithPersistence):
         shutil.rmtree(exp_dir)
         self.assertFalse(os.path.exists(job_path))
 
-    def test_simtools_ini_propogate_slurm_env_var_updates_batch_script(self):
+    def test_simtools_ini_propagate_slurm_env_var_updates_batch_script(self):
         contents = self._generate_batch_from_simtools_config([
-            "propogate_slurm_env_var = False"
+            "propagate_slurm_env_var = False"
         ])
         self.assertIn("unset SLURM_JOB_ID", contents)
         self.assertIn("unset SLURM_MEM_PER_NODE", contents)
 
-    def test_simtools_ini_propogate_true_or_default_keeps_slurm_env_vars(self):
+    def test_simtools_ini_propagate_true_or_default_keeps_slurm_env_vars(self):
         scenarios = {
-            "explicit_true": ["propogate_slurm_env_var = True"],
+            "explicit_true": ["propagate_slurm_env_var = True"],
             "unspecified": None,
         }
         for name, extra_lines in scenarios.items():
@@ -252,6 +252,12 @@ class TestSlurmOperations(ITestWithPersistence):
                 contents = self._generate_batch_from_simtools_config(extra_lines)
                 self.assertNotIn("unset SLURM_JOB_ID", contents)
                 self.assertNotIn("unset SLURM_MEM_PER_NODE", contents)
+
+    def test_legacy_propogate_key_still_supported(self):
+        contents = self._generate_batch_from_simtools_config([
+            "propogate_slurm_env_var = False"
+        ])
+        self.assertIn("unset SLURM_JOB_ID", contents)
 
     # Test SlurmOperations create_batch_file for simulation
     def test_SlurmOperations_create_batch_file_simulation(self):
