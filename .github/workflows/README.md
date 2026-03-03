@@ -1,11 +1,12 @@
 # Recommended real-world flow (matches what you described)
-
+<!-- START doctoc -->
+<!-- END doctoc -->
 ## Develop & test on feature / dev branch
-Work on feature/xyz or dev branch
-When you want to test the package:
-Go to GitHub → Actions → "Deploy Packages" → Run workflow
-Select your feature/dev branch
-Choose target: test
+- Work on feature/xyz or dev branch
+- When you want to test the package:
+  - Go to GitHub → Actions → "Deploy Packages" → Run workflow
+  - Select your feature/dev branch
+  - Choose target: test
 
 This builds + uploads to TestPyPI (only manual, no automatic runs)
 Install from TestPyPI and test thoroughly (pip install -i https://test.pypi.org/simple/ toy-package-a==0.1.0.postX.devY)

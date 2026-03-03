@@ -95,6 +95,13 @@ class SlurmPlatform(FilePlatform):
     # Set array max size for Slurm job
     array_batch_size: int = field(default=None, metadata=dict(sbatch=False, help="Array batch size"))
 
+    # Toggle propagation of inherited SLURM env vars into generated scripts. 
+    # If running idmtools from an allocated partition, you likely want to change 
+    # this to False to avoid issues with child jobs inheriting
+    # SLURM env vars from your interactive terminal.
+    propagate_slurm_env_var: bool = field(default=True, metadata=dict(sbatch=False,
+                                                                     help="Keep SLURM env vars available to child scripts"))
+
     # determine if run script as Slurm job
     run_on_slurm: bool = field(default=False, repr=False, compare=False, metadata=dict(help="Run script as Slurm job"))
 

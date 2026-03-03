@@ -66,6 +66,10 @@ def comps_batch_worker(simulations: List[Simulation], interface: 'CompsPlatformS
 
     new_sims = 0
     for simulation in simulations:
+        if kwargs.get("scheduling", False) and not getattr(simulation, 'scheduling', False):
+            raise ValueError(
+                "Scheduling is enabled but no 'WorkOrder.json' file was found in simulation assets. "
+                "Please add a WorkOrder.json asset to your simulation by calling add_work_order(item, file_path)")
         if simulation.status is None:
             interface.pre_create(simulation)
             new_sims += 1

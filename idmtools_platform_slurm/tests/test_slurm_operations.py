@@ -18,6 +18,12 @@ from idmtools_test.utils.test_task import TestTask
 
 job_dir = os.path.expanduser('~')
 
+slurm_vars = [
+    'SLURM_JOB_ID', 'SLURM_CPU_BIND', 'SLURM_CPU_BIND_TYPE',
+    'SLURM_JOB_NODELIST', 'SLURM_NODELIST', 'SLURM_NNODES',
+    'SLURM_NTASKS', 'SLURM_TASKS_PER_NODE', 'SLURM_MEM_PER_CPU',
+    'SLURM_MEM_PER_NODE',
+]
 
 @pytest.mark.smoke
 @pytest.mark.serial
@@ -25,6 +31,46 @@ class TestSlurmOperations(ITestWithPersistence):
 
     def setUp(self) -> None:
         self.platform = Platform('SLURM_LOCAL')
+
+    def _generate_batch_from_simtools_config(self, extra_config_lines=None):
+        """Create a batch file using a temporary simtools.ini and return its contents."""
+        original_config = os.environ.get("IDMTOOLS_CONFIG_FILE")
+        IdmConfigParser.clear_instance()
+        contents = None
+        with tempfile.TemporaryDirectory() as temp_dir:
+            job_dir = os.path.join(temp_dir, "jobs")
+            os.makedirs(job_dir, exist_ok=True)
+            simtools_ini = os.path.join(temp_dir, "simtools.ini")
+            config_lines = [
+                "[SLURM_SIMTOOLS]",
+                "type = Slurm",
+                f"job_directory = {job_dir}",
+            ]
+            if extra_config_lines:
+                config_lines.extend(extra_config_lines)
+            with open(simtools_ini, "w") as config_file:
+                config_file.write("\n".join(config_lines))
+            os.environ["IDMTOOLS_CONFIG_FILE"] = simtools_ini
+            IdmConfigParser.clear_instance()
+            try:
+                platform = Platform('SLURM_SIMTOOLS')
+                slurm_op = SlurmOperations(platform=platform)
+                suite = Suite(name="Suite")
+                experiment = Experiment(name="ExpSimtools")
+                experiment.parent = suite
+                slurm_op.mk_directory(experiment)
+                slurm_op.create_batch_file(experiment)
+                batch_path = os.path.join(platform.get_directory(experiment), "batch.sh")
+                self.assertTrue(os.path.exists(batch_path))
+                with open(batch_path, 'r') as batch_file:
+                    contents = batch_file.read()
+            finally:
+                IdmConfigParser.clear_instance()
+                if original_config is None:
+                    os.environ.pop("IDMTOOLS_CONFIG_FILE", None)
+                else:
+                    os.environ["IDMTOOLS_CONFIG_FILE"] = original_config
+        return contents
 
     # Test platform slurm_fields property
     def test_slurm_platform_fields(self):
@@ -194,6 +240,177 @@ class TestSlurmOperations(ITestWithPersistence):
         # clean up suite folder
         shutil.rmtree(exp_dir)
         self.assertFalse(os.path.exists(job_path))
+
+    def _generate_batch_for_platform(self, platform):
+        """Generate batch.sh for a given platform instance and return its contents."""
+        slurm_op = SlurmOperations(platform=platform)
+        suite = Suite(name="Suite")
+        experiment = Experiment(name="PropagateTest")
+        experiment.parent = suite
+        slurm_op.mk_directory(experiment)
+        slurm_op.create_batch_file(experiment)
+        batch_path = platform.get_directory(experiment).joinpath("batch.sh")
+        self.assertTrue(batch_path.exists(), "batch.sh was not created")
+        with open(batch_path, 'r') as f:
+            return f.read()
+
+    # Tests for propagate_slurm_env_var field definition
+    def test_propagate_slurm_env_var_field_default_is_true_and_meta(self):
+        """Test that the propagate_slurm_env_var field defaults to True."""
+        from dataclasses import fields as dc_fields
+        field_map = {f.name: f for f in dc_fields(SlurmPlatform)}
+        self.assertIn('propagate_slurm_env_var', field_map)
+        self.assertTrue(field_map['propagate_slurm_env_var'].default)
+        meta = field_map['propagate_slurm_env_var'].metadata
+        self.assertIn('sbatch', meta)
+        self.assertFalse(meta['sbatch'])
+
+    def test_propagate_slurm_env_var_excluded_from_slurm_fields(self):
+        """Test that propagate_slurm_env_var is not exposed as an sbatch parameter."""
+        self.assertNotIn('propagate_slurm_env_var', self.platform.slurm_fields)
+
+    # Tests for propagate_slurm_env_var platform instantiation
+    def test_propagate_slurm_env_var_default_value_on_platform(self):
+        """Test that platform instance has propagate_slurm_env_var=True by default."""
+        IdmConfigParser.clear_instance()
+        with tempfile.TemporaryDirectory() as temp_dir:
+            try:
+                platform = Platform("SLURM_TEST", job_directory=temp_dir)
+                self.assertTrue(platform.propagate_slurm_env_var)
+            finally:
+                IdmConfigParser.clear_instance()
+
+    def test_propagate_slurm_env_var_false_via_constructor(self):
+        """Test that propagate_slurm_env_var=False passed via constructor is retained."""
+        IdmConfigParser.clear_instance()
+        with tempfile.TemporaryDirectory() as temp_dir:
+            try:
+                platform = Platform("SLURM_TEST", job_directory=temp_dir,
+                                    propagate_slurm_env_var=False)
+                self.assertFalse(platform.propagate_slurm_env_var)
+            finally:
+                IdmConfigParser.clear_instance()
+
+    def test_propagate_slurm_env_var_true_via_constructor(self):
+        """Test that propagate_slurm_env_var=True passed via constructor is retained."""
+        IdmConfigParser.clear_instance()
+        with tempfile.TemporaryDirectory() as temp_dir:
+            try:
+                platform = Platform("SLURM_TEST", job_directory=temp_dir,
+                                    propagate_slurm_env_var=True)
+                self.assertTrue(platform.propagate_slurm_env_var)
+            finally:
+                IdmConfigParser.clear_instance()
+
+    # Tests for propagate_slurm_env_var effect on batch.sh content
+    def test_propagate_slurm_env_var_false_adds_unset_block_to_batch(self):
+        """Test that propagate_slurm_env_var=False produces unset commands in batch.sh."""
+        IdmConfigParser.clear_instance()
+        with tempfile.TemporaryDirectory() as temp_dir:
+            try:
+                platform = Platform("SLURM_TEST", job_directory=temp_dir)
+                platform.propagate_slurm_env_var = False
+                contents = self._generate_batch_for_platform(platform)
+            finally:
+                IdmConfigParser.clear_instance()
+        self.assertIn("unset SLURM_JOB_ID", contents)
+        self.assertIn("unset SLURM_MEM_PER_NODE", contents)
+
+    def test_propagate_slurm_env_var_true_omits_unset_block_from_batch(self):
+        """Test that propagate_slurm_env_var=True excludes unset commands from batch.sh."""
+        IdmConfigParser.clear_instance()
+        with tempfile.TemporaryDirectory() as temp_dir:
+            try:
+                platform = Platform("SLURM_TEST", job_directory=temp_dir)
+                platform.propagate_slurm_env_var = True
+                contents = self._generate_batch_for_platform(platform)
+            finally:
+                IdmConfigParser.clear_instance()
+        self.assertNotIn("unset SLURM_JOB_ID", contents)
+        self.assertNotIn("unset SLURM_MEM_PER_NODE", contents)
+
+    def test_propagate_slurm_env_var_false_unsets_all_slurm_env_vars(self):
+        """Test that all expected SLURM env vars appear in the unset block when False."""
+        IdmConfigParser.clear_instance()
+        with tempfile.TemporaryDirectory() as temp_dir:
+            try:
+                platform = Platform("SLURM_TEST", job_directory=temp_dir)
+                platform.propagate_slurm_env_var = False
+                contents = self._generate_batch_for_platform(platform)
+            finally:
+                IdmConfigParser.clear_instance()
+        for var in slurm_vars:
+            self.assertIn(f"unset {var}", contents,
+                          f"Expected 'unset {var}' in batch.sh when propagate_slurm_env_var=False")
+
+    def test_propagate_slurm_env_var_true_keeps_all_slurm_env_vars(self):
+        """Test that no SLURM env vars are unset in batch.sh when propagate_slurm_env_var=True."""
+        IdmConfigParser.clear_instance()
+        with tempfile.TemporaryDirectory() as temp_dir:
+            try:
+                platform = Platform("SLURM_TEST", job_directory=temp_dir)
+                platform.propagate_slurm_env_var = True
+                contents = self._generate_batch_for_platform(platform)
+            finally:
+                IdmConfigParser.clear_instance()
+        for var in slurm_vars:
+            self.assertNotIn(f"unset {var}", contents,
+                             f"Unexpected 'unset {var}' in batch.sh when propagate_slurm_env_var=True")
+
+    def test_propagate_slurm_env_var_false_via_constructor_generates_unset_block(self):
+        """End-to-end: propagate_slurm_env_var=False via constructor produces unset block."""
+        IdmConfigParser.clear_instance()
+        with tempfile.TemporaryDirectory() as temp_dir:
+            try:
+                platform = Platform("SLURM_TEST", job_directory=temp_dir,
+                                    propagate_slurm_env_var=False)
+                contents = self._generate_batch_for_platform(platform)
+            finally:
+                IdmConfigParser.clear_instance()
+        for var in slurm_vars:
+            self.assertIn(f"unset {var}", contents,
+                          f"Expected 'unset {var}' in batch.sh when propagate_slurm_env_var=False")
+
+    def test_propagate_slurm_env_var_true_via_constructor_omits_unset_block(self):
+        """End-to-end: propagate_slurm_env_var=True via constructor omits unset block."""
+        IdmConfigParser.clear_instance()
+        with tempfile.TemporaryDirectory() as temp_dir:
+            try:
+                platform = Platform("SLURM_TEST", job_directory=temp_dir,
+                                    propagate_slurm_env_var=True)
+                contents = self._generate_batch_for_platform(platform)
+            finally:
+                IdmConfigParser.clear_instance()
+        for var in slurm_vars:
+            self.assertNotIn(f"unset {var}", contents,
+                             f"Unexpected 'unset {var}' in batch.sh when propagate_slurm_env_var=True")
+
+    def test_simtools_ini_propagate_slurm_env_var_updates_batch_script(self):
+        contents = self._generate_batch_from_simtools_config([
+            "propagate_slurm_env_var = False"
+        ])
+        for var in slurm_vars:
+            self.assertIn(f"unset {var}", contents,
+                          f"Expected 'unset {var}' in batch.sh when propagate_slurm_env_var=False")
+
+    def test_simtools_ini_propagate_true_or_default_keeps_slurm_env_vars(self):
+        scenarios = {
+            "explicit_true": ["propagate_slurm_env_var = True"],
+            "unspecified": None,
+        }
+        for name, extra_lines in scenarios.items():
+            with self.subTest(case=name):
+                contents = self._generate_batch_from_simtools_config(extra_lines)
+                self.assertNotIn("unset SLURM_JOB_ID", contents)
+                self.assertNotIn("unset SLURM_MEM_PER_NODE", contents)
+
+    def test_legacy_propagate_key_still_supported(self):
+        contents = self._generate_batch_from_simtools_config([
+            "propagate_slurm_env_var = False"
+        ])
+        for var in slurm_vars:
+            self.assertIn(f"unset {var}", contents,
+                          f"Expected 'unset {var}' in batch.sh when propagate_slurm_env_var=False")
 
     # Test SlurmOperations create_batch_file for simulation
     def test_SlurmOperations_create_batch_file_simulation(self):
