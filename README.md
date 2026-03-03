@@ -11,7 +11,6 @@
   - [Installation](#installation)
   - [Advanced install](#advanced-install)
   - [Installing development/early release versions](#installing-developmentearly-release-versions)
-    - [Installing from idmod's pypi staging registry](#installing-from-idmods-pypi-staging-registry)
     - [Developer Installation from source code](#developer-installation-from-source-code)
   - [More instructions for MAC users](#more-instructions-for-mac-users)
   - [Build the documentation locally](#build-the-documentation-locally)
