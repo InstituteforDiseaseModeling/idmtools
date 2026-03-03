@@ -6,16 +6,16 @@ on:
   push:
     paths:
       - '**.md'
-
+      - '!docs/**'
+  pull_request:
+    paths:
+      - '**.md'
+      - '!docs/**'
 jobs:
   generateTOC:
     name: TOC Generator
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
     steps:
       - uses: technote-space/toc-generator@v2
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TARGET_PATHS: .
+          TARGET_PATHS: '**.md,!docs/**'
