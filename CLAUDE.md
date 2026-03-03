@@ -2,8 +2,30 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-<!-- START doctoc -->
-<!-- END doctoc -->
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Project Overview](#project-overview)
+- [Repository Structure](#repository-structure)
+- [Development Setup](#development-setup)
+  - [Initial Setup](#initial-setup)
+  - [IDE Configuration (PyCharm)](#ide-configuration-pycharm)
+- [Common Development Commands](#common-development-commands)
+  - [Top-Level Commands (run from repo root)](#top-level-commands-run-from-repo-root)
+  - [Package-Level Commands (run from individual package directories)](#package-level-commands-run-from-individual-package-directories)
+  - [Running Specific Tests](#running-specific-tests)
+- [Test Markers](#test-markers)
+- [Architecture](#architecture)
+  - [Plugin System](#plugin-system)
+  - [Core Entity Hierarchy](#core-entity-hierarchy)
+  - [Platform Interface (IPlatform)](#platform-interface-iplatform)
+- [Linting Configuration](#linting-configuration)
+- [Version Management](#version-management)
+- [Installation Extras](#installation-extras)
+- [Important Notes](#important-notes)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Project Overview
 
