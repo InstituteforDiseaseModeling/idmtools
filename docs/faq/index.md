@@ -29,13 +29,14 @@ A: Yes! Use the Container platform. See [Platform Overview](../platforms/index.m
 
 ### Q: How do I debug failed simulations?
 
-A: Check simulation logs, stderr.txt file, use local platform for testing, and enable verbose logging.
+A: Check simulation logs, stderr.txt file, use docker container platform for local testing, and enable verbose logging.
 
 ## Performance
 
 ### Q: How many simulations can I run at once?
 
 A: Depends on platform:
+
 - COMPS: Thousands or more
 - Slurm: Cluster-dependent
 - Container: Limited by local resources
@@ -63,7 +64,7 @@ A: Reduce batch size, use fewer workers, or increase system resources.
 ### Q: How do I check if my experiment is still running?
 
 Use `experiment.status` after calling `experiment.run()`, or check the platform's web interface (e.g., COMPS portal).
-Or use idmtools cli command for Container and Slurm platforms
+Or use idmtools cli command for Container and Slurm platforms.
 
 ### Q: Why is my `config.json` empty?
 
@@ -71,13 +72,13 @@ Make sure you pass a JSON string to `Asset(content=..., filename=config.json)`, 
 
 ### Q: How do I add files my model needs?
 
-Use `task.common_assets` for files shared across all simulations, and `task.transient_assets` for per-simulation files.
+Use `experiment.assets` for files shared across all simulations, and `simulation.assets` for per-simulation files.
 
 ### Q: Can I run experiments locally for testing?
 
 Yes, use `Platform("Container")` to run experiments locally using Docker containers.
 
-### Q: How do I resume a failed experiment?
+### Q: How do I rerun a failed experiment?
 
 You can retrieve an existing experiment by ID and resubmit:
 

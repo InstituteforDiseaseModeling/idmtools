@@ -17,16 +17,10 @@ from idmtools.entities.simulation import Simulation
 from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
 
 # Create platform
-platform = Platform('Container')
+platform = Platform('Container', job_directory='anywhere')
 
-# Create a python task that runs a model
+# Create a python task that runs a model.py. Make sure model.py exists in local dir
 task = JSONConfiguredPythonTask(script_path="model.py")
-
-# Create a simulation from the task
-sim = Simulation.from_task(task)
-
-# Add tags for the simulation
-sim.tags = {"my_model": "1.0"}
 
 # Add to experiment (required for commission)
 experiment = Experiment.from_task(

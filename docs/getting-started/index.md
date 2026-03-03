@@ -4,10 +4,9 @@ Welcome to idmtools! This section will help you get up and running quickly.
 
 ## Prerequisites
 
-- **Python**: 3.10, 3.11, 3.12, 3.13, or 3.14 (64-bit)
+- **Python**: Versions 3.10, 3.11, 3.12, 3.13, or 3.14 are supported.
 - **Operating System**:
-  - Windows 10 Pro or Enterprise
-  - Windows 11 Pro or Enterprise
+  - Windows 10+ Pro or Enterprise
   - Linux
   - macOS (10.15 Catalina or later)
 - **Docker** (optional): Required for Container platform

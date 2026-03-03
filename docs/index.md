@@ -4,7 +4,7 @@
 
 ## Idmtools Workflow
 
-idmtools provides a variety of options for each step of the modeling process. To accommodate different workflows, the tool suite was designed in a modular fashion, allowing users to select only the utilities they need. To simplify workflows, facilitate the modeling process, and make models and their results reusable and shareable, idmtools allows users to create assets. Assets can be added at any level of the process — from running a specific task, to creating a simulation, to creating an experiment — giving users the flexibility to create inputs based on their specific needs, whether transient or shared across multiple simulations.
+idmtools provides a variety of options for each step of the modeling process. To accommodate different workflows, the tool suite was designed in a modular fashion, allowing users to select only the utilities they need. To simplify workflows, facilitate the modeling process, and make models and their results reusable and shareable, idmtools allows users to create assets. Assets can be added at any level of the process — from running a specific task, to creating a simulation, to creating an experiment.
 The diagram below shows how idmtools and its related packages are used in an end-to-end workflow using EMOD as the disease transmission model.
 
 ![Screenshot](images/overall.png)
@@ -60,7 +60,7 @@ The diagram below shows how idmtools and its related packages are used in an end
 idmtools supports multiple compute platforms:
 
 - **COMPS** - Computational Modeling Platform Service
-- **Slurm** - HPC cluster workload manager
+- **Slurm** - HPC Slurm cluster workload manager
 - **Container** - Docker-based local execution
 
 ## Architecture

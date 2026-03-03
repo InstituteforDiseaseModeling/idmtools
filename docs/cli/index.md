@@ -42,42 +42,37 @@ idmtools <command> --help    # Command-specific help
 
 **Command:**
 ```bash
-idmtools info plugins platform-aliases --help
+idmtools info plugins platform-aliases
 ```
 
 **Output:**
 ```
-+---------------------------+-------------------------------------------------------------------------+
-| Platform Plugin Aliases   | Configuration Options                                                   |
-|---------------------------+-------------------------------------------------------------------------|
-| SLURM_LOCAL               | {'job_directory': 'user_job_directory'}                                 |
-| SLURM_CLUSTER             | {'job_directory': 'user_job_directory'}                                 |
-| FILE                      | {'job_directory': 'user_job_directory'}                                 |
-| PROCESS                   | {'job_directory': 'user_job_directory'}                                 |
-| CALCULON_SSMT             | {'endpoint': 'https://comps.idmod.org', 'environment': 'Calculon'}      |
-| IDMCLOUD_SSMT             | {'endpoint': 'https://comps.idmod.org', 'environment': 'IDMcloud'}      |
-| NDCLOUD_SSMT              | {'endpoint': 'https://comps.idmod.org', 'environment': 'NDcloud'}       |
-| BMGF_IPMCLOUD_SSMT        | {'endpoint': 'https://comps.idmod.org', 'environment': 'BMGF_IPMcloud'} |
-| QSTART_SSMT               | {'endpoint': 'https://comps.idmod.org', 'environment': 'Qstart'}        |
-| NIBBLER_SSMT              | {'endpoint': 'https://comps.idmod.org', 'environment': 'Nibbler'}       |
-| SLURMSTAGE_SSMT           | {'endpoint': 'https://comps2.idmod.org', 'environment': 'SlurmStage'}   |
-| CUMULUS_SSMT              | {'endpoint': 'https://comps2.idmod.org', 'environment': 'Cumulus'}      |
-| SLURM_SSMT                | {'endpoint': 'https://comps.idmod.org', 'environment': 'Calculon'}      |
-| SLURM2_SSMT               | {'endpoint': 'https://comps2.idmod.org', 'environment': 'SlurmStage'}   |
-| BOXY_SSMT                 | {'endpoint': 'https://comps2.idmod.org', 'environment': 'SlurmStage'}   |
-| CONTAINER                 | {'job_directory': 'user_job_directory'}                                 |
-| CALCULON                  | {'endpoint': 'https://comps.idmod.org', 'environment': 'Calculon'}      |
-| IDMCLOUD                  | {'endpoint': 'https://comps.idmod.org', 'environment': 'IDMcloud'}      |
-| NDCLOUD                   | {'endpoint': 'https://comps.idmod.org', 'environment': 'NDcloud'}       |
-| BMGF_IPMCLOUD             | {'endpoint': 'https://comps.idmod.org', 'environment': 'BMGF_IPMcloud'} |
-| QSTART                    | {'endpoint': 'https://comps.idmod.org', 'environment': 'Qstart'}        |
-| NIBBLER                   | {'endpoint': 'https://comps.idmod.org', 'environment': 'Nibbler'}       |
-| SLURMSTAGE                | {'endpoint': 'https://comps2.idmod.org', 'environment': 'SlurmStage'}   |
-| CUMULUS                   | {'endpoint': 'https://comps2.idmod.org', 'environment': 'Cumulus'}      |
-| SLURM                     | {'endpoint': 'https://comps.idmod.org', 'environment': 'Calculon'}      |
-| SLURM2                    | {'endpoint': 'https://comps2.idmod.org', 'environment': 'SlurmStage'}   |
-| BOXY                      | {'endpoint': 'https://comps2.idmod.org', 'environment': 'SlurmStage'}   |
-+---------------------------+-------------------------------------------------------------------------+
+(idmtools_pypi_313) PS C:\git_pypi\idmtools> idmtools info plugins platform-aliases
++---------------------------+-------------------------------------------------------------------------------------------------------+
+| Platform Plugin Aliases   | Configuration Options                                                                                 |
+|---------------------------+-------------------------------------------------------------------------------------------------------|
+| CALCULON                  | {'endpoint': 'https://comps.idmod.org', 'environment': 'Calculon', 'python_executable': 'python3'}    |
+| NDCLOUD                   | {'endpoint': 'https://comps.idmod.org', 'environment': 'NDcloud', 'python_executable': 'python3'}     |
+| NIBBLER                   | {'endpoint': 'https://comps.idmod.org', 'environment': 'Nibbler', 'python_executable': 'python3'}     |
+| SLURMSTAGE                | {'endpoint': 'https://comps2.idmod.org', 'environment': 'SlurmStage', 'python_executable': 'python3'} |
+| CUMULUS                   | {'endpoint': 'https://comps2.idmod.org', 'environment': 'Cumulus', 'python_executable': 'python'}     |
+| SLURM                     | {'endpoint': 'https://comps.idmod.org', 'environment': 'Calculon', 'python_executable': 'python3'}    |
+| SLURM2                    | {'endpoint': 'https://comps2.idmod.org', 'environment': 'SlurmStage', 'python_executable': 'python3'} |
+| BOXY                      | {'endpoint': 'https://comps2.idmod.org', 'environment': 'SlurmStage', 'python_executable': 'python3'} |
+| CONTAINER                 | {'job_directory': 'C:\\Users\\sharonch'}                                                              |
+| PROCESS                   | {'job_directory': 'C:\\Users\\sharonch'}                                                              |
+| SLURM_LOCAL               | {'job_directory': 'C:\\Users\\sharonch'}                                                              |
+| SLURM_CLUSTER             | {'job_directory': 'C:\\Users\\sharonch'}                                                              |
+| CALCULON_SSMT             | {'endpoint': 'https://comps.idmod.org', 'environment': 'Calculon', 'python_executable': 'python3'}    |
+| NDCLOUD_SSMT              | {'endpoint': 'https://comps.idmod.org', 'environment': 'NDcloud', 'python_executable': 'python3'}     |
+| NIBBLER_SSMT              | {'endpoint': 'https://comps.idmod.org', 'environment': 'Nibbler', 'python_executable': 'python3'}     |
+| SLURMSTAGE_SSMT           | {'endpoint': 'https://comps2.idmod.org', 'environment': 'SlurmStage', 'python_executable': 'python3'} |
+| CUMULUS_SSMT              | {'endpoint': 'https://comps2.idmod.org', 'environment': 'Cumulus', 'python_executable': 'python'}     |
+| SLURM_SSMT                | {'endpoint': 'https://comps.idmod.org', 'environment': 'Calculon', 'python_executable': 'python3'}    |
+| SLURM2_SSMT               | {'endpoint': 'https://comps2.idmod.org', 'environment': 'SlurmStage', 'python_executable': 'python3'} |
+| BOXY_SSMT                 | {'endpoint': 'https://comps2.idmod.org', 'environment': 'SlurmStage', 'python_executable': 'python3'} |
+| FILE                      | {'job_directory': 'C:\\Users\\sharonch'}                                                              |
++---------------------------+-------------------------------------------------------------------------------------------------------+
 
 ```
 

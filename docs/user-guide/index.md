@@ -16,7 +16,8 @@ This guide covers all aspects of using idmtools:
 - Task — Defines *what* to run. A task wraps your model script, its parameters, and any assets it needs.
 - Simulation — A single run of a task with a specific set of parameters.
 - Experiment — A collection of simulations, typically created from a parameter sweep.
-- Platform — Where your experiment runs (COMPS, Slurm, Container).
+- Suite - A collection of experiments, it is optional for most of the cases.
+- Platform — Where your experiment runs (COMPS, Slurm, Container, Process).
 - Assets — Files your simulations need (scripts, data files, config files, container images).
 - Analyzer — Post-processing logic that runs after simulations complete.
 

@@ -74,12 +74,12 @@ Requires Docker or Docker Desktop.
 Install only what you need:
 
 ```bash
-pip install idmtools              # Core only
-pip install idmtools-cli          # CLI tools
-pip install idmtools-models       # Python/R models
-pip install idmtools-platform-comps
-pip install idmtools-platform-slurm
-pip install idmtools-platform-container
+pip install idmtools                     # Core only
+pip install idmtools-cli                 # CLI tools
+pip install idmtools-models              # Python/R models
+pip install idmtools-platform-comps      # IDM COMPS platform related packages
+pip install idmtools-platform-slurm      # Slurm platform related packages
+pip install idmtools-platform-container  # Local Container platform related packages
 ```
 
 ## Verify Installation
@@ -94,7 +94,7 @@ python -c "import idmtools; print(idmtools.__version__)"
 
 ## Project Structure
 
-A typical idmtools project looks like this:
+A typical user project that depends on idmtools looks like this:
 
 ```
 my_project/

@@ -19,8 +19,13 @@ Model implementations
 **Modules:**
 
 - `python` - Python model support
+  - PythonTask
+  - JSONConfiguredTask
+  - SingularityJSONConfiguredTask
 - `r` - R model support
 - `templated_script_task` - Templated models
+
+
 
 ### [idmtools.platforms](platforms.md)
 Platform implementations
@@ -31,13 +36,6 @@ Platform implementations
 - `slurm` - Slurm platform
 - `container` - Container platform
 - `process` - Local process platforms
-
-## Quick Links
-
-- **Entities**: Simulation, Experiment, Suite
-- **Builders**: SimulationBuilder
-- **Analysis**: Analyzers, AnalyzeManager
-- **Assets**: AssetCollection, Asset
 
 ## API Navigation
 
