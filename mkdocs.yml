@@ -97,7 +97,7 @@ nav:
     - Core: api/core.md
     - Models: api/models.md
     - Platforms: api/platforms.md
-    - Data Analysis: api/data-analysis.md
+    - Data Analysis: data-analysis/index.md
 
   - CLI Reference:
     - cli/index.md
