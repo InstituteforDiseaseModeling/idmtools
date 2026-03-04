@@ -69,13 +69,14 @@ nav:
     - Installation: getting-started/installation.md
     - Quick Start: getting-started/quickstart.md
     - Configuration: getting-started/configuration.md
+    - Data Analysis: data-analysis/index.md
 
   - User Guide:
     - user-guide/index.md
     - Creating Simulations & Experiments: user-guide/creating-simulations.md
     - Asset Management: user-guide/assets.md
     - Parameter Sweeps: tutorials/parameter-sweeps.md
-    - Analyzing Results: user-guide/analyzers.md
+    - Data Analysis: data-analysis/index.md
 
   - Tutorials:
     - tutorials/index.md
@@ -83,6 +84,7 @@ nav:
     - Running Sweeps: tutorials/parameter-sweeps.md
     - Singularity Containers: tutorials/singularity.md
     - Filter Simulations: tutorials/filter-simulations.md
+    - Data Analysis: data-analysis/index.md
 
   - Platforms:
     - platforms/index.md
@@ -95,6 +97,7 @@ nav:
     - Core: api/core.md
     - Models: api/models.md
     - Platforms: api/platforms.md
+    - Data Analysis: api/data-analysis.md
 
   - CLI Reference:
     - cli/index.md

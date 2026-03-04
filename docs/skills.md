@@ -13,7 +13,7 @@ A one-page cheat sheet of the most common idmtools patterns. Each section links 
 | [Quick Start](getting-started/quickstart.md) | Your first experiment end-to-end |
 | [Creating Simulations](user-guide/creating-simulations.md) | Task types, `from_builder`, `from_template` patterns |
 | [Asset Management](user-guide/assets.md) | Adding files to tasks and simulations |
-| [Analyzers](user-guide/analyzers.md) | `IAnalyzer`, `AnalyzeManager`, `PlatformAnalysis` (SSMT) |
+| [Data Analysis](data-analysis/index.md) | `IAnalyzer`, `AnalyzeManager`, `PlatformAnalysis` (SSMT) |
 | [Parameter Sweeps](tutorials/parameter-sweeps.md) | `SimulationBuilder`, multi-parameter sweeps |
 | [Singularity](tutorials/singularity.md) | Container-based workflows |
 | [COMPS Platform](platforms/comps.md) | COMPS-specific options |
@@ -170,7 +170,7 @@ with Platform("CALCULON") as platform:
     manager.analyze()
 ```
 
-See [Analyzers](user-guide/analyzers.md) for CSV analyzers, `parse=False`, multiple analyzers, and `PlatformAnalysis` (SSMT).
+See [Data Analysis](data-analysis/index.md) for CSV analyzers, `parse=False`, multiple analyzers, and `PlatformAnalysis` (SSMT).
 
 ---
 

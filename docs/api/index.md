@@ -37,6 +37,16 @@ Platform implementations
 - `container` - Container platform
 - `process` - Local process platforms
 
+### [Data Analysis](data-analysis.md)
+Analysis framework for post-processing simulation outputs
+
+**Key Classes:**
+
+- `IAnalyzer` - Abstract base class for all analyzers
+- `AnalyzeManager` - Run analyzers locally with a parallel worker pool
+- `PlatformAnalysis` - Run analyzers remotely on COMPS via SSMT
+- `DownloadAnalyzer`, `CSVAnalyzer`, `TagsAnalyzer`, `AddAnalyzer` - Built-in analyzers
+
 ## API Navigation
 
 Browse by module or use the search function to find specific classes and functions.

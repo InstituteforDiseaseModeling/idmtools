@@ -36,7 +36,7 @@ This guide covers all aspects of using idmtools:
 - [Creating Simulations & Experiments](creating-simulations.md) - Build simulations and organize them into experiments
 - [Asset Management](assets.md) - Handle files and resources
 - [Parameter Sweeps](../tutorials/parameter-sweeps.md) - Run parameter variations
-- [Analyzing Results](analyzers.md) - Process simulation outputs
+- [Data Analysis](../data-analysis/index.md) - Process simulation outputs with Analyzers, AnalyzeManager, and PlatformAnalysis
 
 ### Quick Navigation
 
@@ -58,7 +58,7 @@ This guide covers all aspects of using idmtools:
 
     Process and analyze simulation results
 
-    [Go to guide →](analyzers.md)
+    [Go to guide →](../data-analysis/index.md)
 
 </div>
 
