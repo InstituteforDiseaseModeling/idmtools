@@ -13,6 +13,7 @@ Step-by-step tutorials for common idmtools workflows.
 
 - [Parameter Sweeps](parameter-sweeps.md) - Systematic parameter exploration
 - [Filter Simulations](filter-simulations.md) - Search simulations by tags
+- [Data Analysis](../data-analysis/index.md) - Analyze simulation outputs with Analyzers, AnalyzeManager, and PlatformAnalysis
 - Coming soon: Calibration, Optimization, and more
 
 ## Tutorial Format

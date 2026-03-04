@@ -91,4 +91,4 @@ suite_results_p = platform.filter_simulations_by_tags(
 ## Next Steps
 
 - [Parameter Sweeps](parameter-sweeps.md) - Tag simulations during sweeps for easy filtering
-- [Analyzing Results](../user-guide/analyzers.md) - Analyze filtered simulation outputs
+- [Analyzing Results](../data-analysis/index.md) - Analyze filtered simulation outputs

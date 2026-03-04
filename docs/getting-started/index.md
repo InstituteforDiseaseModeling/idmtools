@@ -94,6 +94,7 @@ with Platform("Local") as platform:
 - [Installation Guide](installation.md) - Detailed installation instructions
 - [Configuration](configuration.md) - Configure your environment
 - [Quick Start Tutorial](quickstart.md) - Complete walkthrough
+- [Data Analysis](../data-analysis/index.md) - Analyze simulation outputs with Analyzers, AnalyzeManager, and PlatformAnalysis
 
 ## Need Help?
 
