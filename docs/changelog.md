@@ -3,6 +3,29 @@
 All notable changes to idmtools will be documented here.
 
 ---
+## [3.1.0]
+
+### Feature Requests
+
+- Migrated package management from JFrog Artifactory to PyPI and GitHub Container Registry.
+- Extended Python support from 3.10 to 3.14. 
+- Adopted dynamic versioning via `setuptools-scm`.
+- Corrected Python executable targeting for different platform environments.
+- Added new `SingularityJsonTask` and `SingularityJsonPythonTask` classes. 
+- Added `propagate_slurm_env_var` parameter to SlurmPlatform to control SLURM environment variable inheritance when submitting from a non-head node.
+
+### Bug Fixes
+- **Scheduling error messages**: Added explicit error messages when `add_work_order` / `add_schedule_config` are called without a `workorder.json` file or object. 
+
+### CI / Infrastructure
+- Created GitHub Actions to build and publish packages to PyPI
+- Created GitHub Actions to build and publish Docker images to GitHub Container Registry.
+- Created GitHub Actions to build and publish MKDocs to idmtools GitHub Pages.
+
+### Documentation
+- Migrated documentation from Sphinx to MkDocs.
+
+---
 
 ## [3.0.0]
 
@@ -16,7 +39,7 @@ All notable changes to idmtools will be documented here.
 - [#2572](https://github.com/InstituteforDiseaseModeling/idmtools/issues/2572) - Add tags.json file for simulation/experiment/suite folder
 - [#2578](https://github.com/InstituteforDiseaseModeling/idmtools/issues/2578) - Better to clear up the entity's _platform_directory cache before run entity
 
-### Bugs
+### Bug Fixes
 
 - [#2553](https://github.com/InstituteforDiseaseModeling/idmtools/issues/2553) - User should not need to call platform.create_item themself
 - [#2554](https://github.com/InstituteforDiseaseModeling/idmtools/issues/2554) - Access exp.parent may throw exception
@@ -37,7 +60,7 @@ All notable changes to idmtools will be documented here.
 
 ## [2.2.0]
 
-### Bugs
+### Bug Fixes
 
 - [#2478](https://github.com/InstituteforDiseaseModeling/idmtools/issues/2478) - bootstrap.py didn't initialize logging well
 - [#2207](https://github.com/InstituteforDiseaseModeling/idmtools/issues/2207) - Fix AnalyzeManager: output message
@@ -96,7 +119,7 @@ All notable changes to idmtools will be documented here.
 
 ## [2.1.0]
 
-### Bugs
+### Bug Fixes
 
 - [#2420](https://github.com/InstituteforDiseaseModeling/idmtools/issues/2420) - Fix Macbook issues to support ContainerPlatform
 - [#2413](https://github.com/InstituteforDiseaseModeling/idmtools/issues/2413) - CommandLine.add_option adds extra double quotes around strings with spaces, making file paths inaccessible
@@ -126,7 +149,7 @@ All notable changes to idmtools will be documented here.
 
 ## [2.0.2]
 
-### Bugs
+### Bug Fixes
 
 - [#2391](https://github.com/InstituteforDiseaseModeling/idmtools/issues/2391) - Random fail with large number of simulations with NoneType of platform
 - [#2393](https://github.com/InstituteforDiseaseModeling/idmtools/issues/2393) - Calibra may fail with ContainerPlatform
@@ -163,7 +186,7 @@ All notable changes to idmtools will be documented here.
 
 ## [2.0.1]
 
-### Bugs
+### Bug Fixes
 
 - [#2380](https://github.com/InstituteforDiseaseModeling/idmtools/issues/2380) - Needs to put Nibbler to linux_mounts.py
 
