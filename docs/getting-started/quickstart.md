@@ -141,6 +141,6 @@ Simulation outputs are written to the `DEST/` job directory.
 ## Next Steps
 
 - [Parameter Sweeps](../tutorials/parameter-sweeps.md) — run multiple simulations with different `beta`/`gamma` values
-- [Analyzing Results](../user-guide/analyzers.md) — aggregate results across simulations
+- [Data Analysis](../data-analysis/index.md) — aggregate results across simulations
 - [Platforms](../platforms/index.md) — run on COMPS or Slurm instead
 - [Tutorials](../tutorials/index.md) — more detailed walkthroughs

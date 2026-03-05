@@ -162,5 +162,5 @@ See [Parameter Sweeps](../tutorials/parameter-sweeps.md) for more sweep patterns
 
 - [Parameter Sweeps](../tutorials/parameter-sweeps.md) - Run systematic parameter variations
 - [Asset Management](assets.md) - Manage input files and resources
-- [Analyzing Results](analyzers.md) - Process simulation outputs
+- [Data Analysis](../data-analysis/analyzers.md) - Process simulation outputs
 - [Platform Guides](../platforms/index.md) - Platform-specific details

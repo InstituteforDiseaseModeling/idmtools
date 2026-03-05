@@ -37,7 +37,7 @@ Platform implementations
 - `container` - Container platform
 - `process` - Local process platforms
 
-### [Data Analysis](data-analysis.md)
+### [Data Analysis](../data-analysis/index.md)
 Analysis framework for post-processing simulation outputs
 
 **Key Classes:**

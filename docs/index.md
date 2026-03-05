@@ -16,6 +16,7 @@ The diagram below shows how idmtools and its related packages are used in an end
 - **Flexible Workflows**: From input creation to calibration, commissioning, and analysis
 - **Asset Management**: Share configurations and files across simulations
 - **Parameter Sweeps**: Easily run parameter sweeps and sensitivity analyses
+- **Data Analysis**: Aggregate and analyze simulation outputs using built-in analyzers and the AnalyzeManager
 
 ## Quick Links
 

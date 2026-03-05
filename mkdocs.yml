@@ -97,7 +97,11 @@ nav:
     - Core: api/core.md
     - Models: api/models.md
     - Platforms: api/platforms.md
-    - Data Analysis: data-analysis/index.md
+    - Data Analysis:
+      - data-analysis/index.md
+      - Analyzers: data-analysis/analyzers.md
+      - Analyze Manager: data-analysis/analyze-manager.md
+      - Platform Analysis: data-analysis/platform-analysis.md
 
   - CLI Reference:
     - cli/index.md
@@ -105,6 +109,9 @@ nav:
   - FAQ: faq/index.md
 
   - Quick Reference: quick_ref.md
+
+  - Development:
+    - Release Process: development/release-process.md
 
   - Changelog: changelog.md
 

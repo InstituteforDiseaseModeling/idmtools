@@ -1,5 +1,3 @@
-from examples.native_slurm.slurm_job.example_analyzer import job_directory
-
 # Platforms API Reference
 
 Platform implementations for different compute environments.
@@ -204,12 +202,3 @@ job_dirrectory = /tmp/idmtools
 - [Models API](models.md) - Task implementations
 - [Platform Guides](../platforms/index.md) - Platform-specific documentation
 - [Tutorials](../tutorials/index.md) - Hands-on examples
-
-## Full API Documentation
-
-For complete API documentation:
-
-- `idmtools_platform_comps.comps_platform`
-- `idmtools_platform_slurm.slurm_platform`
-- `idmtools_platform_container.container_platform`
-- `idmtools.core.platform_factory`

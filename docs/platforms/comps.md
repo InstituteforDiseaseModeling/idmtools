@@ -227,7 +227,7 @@ files = platform.get_files(experiment, files=files, output="output")
 
 ### Using Analyzers
 
-See [Analyzing Results](../user-guide/analyzers.md) for full examples of using analyzers with COMPS.
+See [Analyzing Results](../data-analysis/analyzers.md) for full examples of using analyzers with COMPS.
 
 ## Advanced Features
 
@@ -366,10 +366,5 @@ experiment.run(platform=platform)
 - [User Guide](../user-guide/index.md) - General idmtools concepts
 - [Tutorials](../tutorials/index.md) - Hands-on examples
 - [Platform Comparison](index.md#platform-comparison) - Compare with other platforms
-- [Analyzers](../user-guide/analyzers.md) - Process COMPS results
+- [Analyzers](../data-analysis/analyzers.md) - Process COMPS results
 
-## See Also
-
-- [COMPS Platform API][idmtools_platform_comps.comps_platform.COMPSPlatform]
-- [COMPS Operations][idmtools_platform_comps.comps_operations]
-- [SSMT Work Items][idmtools_platform_comps.ssmt_work_items]

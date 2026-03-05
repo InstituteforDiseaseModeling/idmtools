@@ -20,7 +20,7 @@ The `idmtools.core` package provides the foundational classes and interfaces for
 | [`AssetCollection`](#assetcollection) | `idmtools.assets` | A collection of files for simulations |
 | [`Asset`](#asset) | `idmtools.assets` | A single file asset |
 | [`ITask`](#itask) | `idmtools.entities.itask` | Base class for all tasks |
-| `IAnalyzer` | `idmtools.entities` | Base class for analyzers |
+| [`IAnalyzer`](../data-analysis/analyzers.md) | `idmtools.entities` | Base class for analyzers |
 
 ### Common Methods
 
@@ -296,13 +296,3 @@ experiment.post_creation_hooks.append(on_post_creation)
 - [Platforms API](platforms.md) - Platform implementations
 - [User Guide](../user-guide/index.md) - Usage examples
 - [Tutorials](../tutorials/index.md) - Hands-on examples
-
-## Full API Documentation
-
-For complete API documentation including all methods, parameters, and examples, see the auto-generated API docs:
-
-- `idmtools.core.platform_factory`
-- `idmtools.entities`
-- `idmtools.builders`
-- `idmtools.assets`
-- `idmtools.core.interfaces`
