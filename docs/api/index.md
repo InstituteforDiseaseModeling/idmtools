@@ -19,9 +19,9 @@ Model implementations
 **Modules:**
 
 - `python` - Python model support
-  - PythonTask
-  - JSONConfiguredTask
-  - SingularityJSONConfiguredTask
+  - `PythonTask`
+  - `JSONConfiguredPythonTask`
+  - `SingularityJSONConfiguredPythonTask`
 - `r` - R model support
 - `templated_script_task` - Templated models
 
