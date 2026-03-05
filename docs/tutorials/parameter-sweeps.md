@@ -235,5 +235,5 @@ print(f"Status: {experiment.status}")
 ## Next Steps
 
 - [Creating Simulations & Experiments](../user-guide/creating-simulations.md) - Core concepts
-- [Analyzing Results](../user-guide/analyzers.md) - Process sweep results
+- [Data Analysis](../data-analysis/index.md) - Process simulation results
 - [Python Models](python-models.md) - Model implementation examples

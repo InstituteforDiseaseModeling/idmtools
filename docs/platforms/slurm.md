@@ -1,5 +1,3 @@
-from examples.native_slurm.slurm_job.example_analyzer import job_directory
-
 # Slurm Platform
 
 Comprehensive guide to using idmtools with Slurm HPC clusters.
@@ -401,7 +399,7 @@ sshare -A <account_name>
 - [User Guide](../user-guide/index.md) - General concepts
 - [Tutorials](../tutorials/index.md) - Hands-on examples
 - [Platform Comparison](index.md#platform-comparison) - Compare platforms
-- [Analyzers](../user-guide/analyzers.md) - Process results
+- [Analyzers](../data-analysis/analyzers.md) - Process simulation results
 
 ## See Also
 - [Official Slurm Documentation](https://slurm.schedmd.com/)

@@ -424,6 +424,6 @@ elif platform_type == 'ContainerPlatform':
 
 ## See Also
 
-- [API Reference: PythonTask][idmtools_models.python.python_task.PythonTask]
+- [API Reference](../api/index.md)
 - [Creating Simulations](../user-guide/creating-simulations.md)
-- [Analyzers](../user-guide/analyzers.md)
+- [Analyzers](../data-analysis/index.md)
