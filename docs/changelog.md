@@ -25,6 +25,8 @@ All notable changes to idmtools will be documented here.
 ### Documentation
 - Migrated documentation from Sphinx to MkDocs.
 
+---
+
 ## [3.0.0]
 
 ### Feature Requests
