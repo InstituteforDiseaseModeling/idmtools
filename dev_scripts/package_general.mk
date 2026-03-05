@@ -1,4 +1,4 @@
-.PHONY: help clean lint test test-all test-failed test-long test-no-long test-comps test-docer test-docker test-python test-smoke test-report coverage-report coverage coverage-smoke coverage-all coverage-report-view merge-reports dist release-staging bump-release bump-release-dry-run bump-minor bump-minor-dry-run bump-major bump-major-dry-run bump-patch bump-patch-dry-run
+.PHONY: help clean lint test test-all test-failed test-long test-no-long test-comps test-docer test-docker test-python test-smoke test-report coverage-report coverage coverage-smoke coverage-all coverage-report-view merge-reports dist release-staging
 .EXPORT_ALL_VARIABLES:
 # Get dev scripts from any location
 mkfile_path := $(lastword $(MAKEFILE_LIST))
@@ -90,27 +90,3 @@ dist: clean ## build our package
 release-staging: dist ## perform a release to staging
 	twine upload --verbose --repository-url $(PYPI_URL) dist/*
 
-bump-release: ## bump the release version.
-	bump2version release --commit
-
-# Use before release-staging-release-commit to confirm next version.
-bump-release-dry-run: ## bump the release version. (dry run)
-	bump2version release --dry-run --allow-dirty --verbose
-
-bump-patch: ## bump the patch version
-	bump2version patch --commit
-
-bump-minor: ## bump the minor version
-	bump2version minor --commit
-
-bump-major: ## bump the major version
-	bump2version major --commit
-
-bump-patch-dry-run: ## bump the patch version(dry run)
-	bump2version patch --dry-run --allow-dirty --verbose
-
-bump-minor-dry-run: ## bump the minor version(dry run)
-	bump2version minor --dry-run --allow-dirty --verbose
-
-bump-major-dry-run: ## bump the major version(dry run)
-	bump2version major --dry-run --allow-dirty --verbose

@@ -43,7 +43,6 @@ test = [
 ]
 packaging = [
     "flake8~=7.3",
-    "bump2version",
     "twine~=6.2",
     "natsort~=8.4",
 ]
