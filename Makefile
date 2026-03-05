@@ -122,30 +122,6 @@ linux-dev-env: ## Runs docker dev env
 changelog: ## Generate partial changelog
 	$(PDS)changelog.py
 
-bump-release: #bump the release version.
-	$(MAKEALL) bump-release
-
-# Use before release-staging-release-commit to confirm next version.
-bump-release-dry-run: ## perform a release to staging and bump the minor version.
-	$(MAKEALL) bump-release-dry-run
-
-bump-patch: ## bump the patch version
-	$(MAKEALL) bump-patch
-
-bump-minor: ## bump the minor version
-	$(MAKEALL) bump-minor
-
-bump-major: ## bump the major version
-	$(MAKEALL) bump-major
-
-bump-patch-dry-run: ## bump the patch version(dry run)
-	$(MAKEALL) bump-patch-dry-run
-
-bump-minor-dry-run: ## bump the minor version(dry run)
-	$(MAKEALL) bump-minor-dry-run
-
-bump-major-dry-run: ## bump the major version(dry run)
-	$(MAKEALL) bump-major-dry-run
 
 build-docs: ## build docs
 	$(PDR) -wd 'docs' -ex 'make html'

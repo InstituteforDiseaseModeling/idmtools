@@ -48,7 +48,6 @@ test = [
 ]
 packaging = [
     "flake8",
-    "bump2version",
     "twine",
 ]
 
