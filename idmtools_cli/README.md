@@ -57,14 +57,14 @@ To determine version of idmtools and related plugins, use the version cli comman
 
 Example output
 ```bash
-emodpy                               Version: 1.3.0                           
+emodpy                               Version: 1.3.0                          
   Plugins:
     EMODTask                  
-idmtools                             Version: 1.4.0+nightly.0                 
+idmtools                             Version: 3.1.0                 
   Plugins:
     CommandTask               
-idmtools-cli                         Version: 1.4.0+nightly.0                 
-idmtools-models                      Version: 1.4.0+nightly.0                 
+idmtools-cli                         Version: 3.1.0                
+idmtools-models                      Version: 3.1.0                 
   Plugins:
     JSONConfiguredPythonTask  
     JSONConfiguredRTask       
@@ -73,11 +73,11 @@ idmtools-models                      Version: 1.4.0+nightly.0
     RTask                     
     ScriptWrapperTask         
     TemplatedScriptTask       
-idmtools-platform-comps              Version: 1.4.0+nightly.0                 
+idmtools-platform-comps              Version: 3.1.0                
   Plugins:
     COMPSPlatform             
     SSMTPlatform                        
-idmtools-platform-slurm              Version: 1.0.0+nightly                   
+idmtools-platform-slurm              Version: 3.1.0                  
   Plugins:
     SlurmPlatform             
 ```
