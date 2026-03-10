@@ -17,7 +17,7 @@
 
 idmtools provides the APIS, logic, and other operations to provision, execute, analysis, and manage jobs running on an HPC cluster
 
-To see the full API documentation, see https://institutefordiseasemodeling.github.io/idmtools/idmtools_index.html
+To see the full API documentation, see https://institutefordiseasemodeling.github.io/idmtools/index.html
 
 
 # Installing
