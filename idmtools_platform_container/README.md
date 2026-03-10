@@ -29,9 +29,9 @@
 **ContainerPlatform** is a platform designed to facilitate the execution of experiments and simulations within Docker containers. It provides a robust environment with all necessary tools and dependencies installed, allowing for seamless integration and execution of computational tasks.
 
 ## Pre-requisites
-- Python 3.8/3.9/3.10/3.11/3.12 x64-bit
+- Python 3.10/3.11/3.12/3.13/3.14 x64-bit
 - OS: 
-  - Windows 10 Pro or Enterprise
+  - Windows 10+ Pro or Enterprise
   - Linux
   - macOS (10.15 Catalina or later) 
 - Docker or Docker Desktop(required for the container platform)
