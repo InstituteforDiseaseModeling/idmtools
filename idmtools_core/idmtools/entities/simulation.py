@@ -144,6 +144,7 @@ class Simulation(IAssetsEnabled, INamedEntity):
         if logger.isEnabledFor(DEBUG):
             logger.debug('Calling task pre creation')
         self.task.pre_creation(self, platform)
+        self.task.adjust_command_python(platform.get_platform_python())
 
         self.gather_assets()
 
