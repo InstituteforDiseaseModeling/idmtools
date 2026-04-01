@@ -5,6 +5,8 @@ Notes:
     These can be set to your idm email/password
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+
+Note: this script is deprecated, use build_ssmt_image.py instead.
 """
 import argparse
 import glob

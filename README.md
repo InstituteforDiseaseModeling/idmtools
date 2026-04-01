@@ -24,7 +24,7 @@
 **idmtools** is a collection of Python scripts and utilities designed to streamline interactions with disease modeling workflows. It can be used to run simulations on various platforms, including COMPS, Slurm, and Docker containers.
 
 # Documentation
-Documentation is located at https://docs.idmod.org/projects/idmtools/en/latest/. 
+Documentation is located at https://institutefordiseasemodeling.github.io/idmtools/. 
 
 # User Installation
 ## Pre-requisites
@@ -71,7 +71,7 @@ Documentation is located at https://docs.idmod.org/projects/idmtools/en/latest/.
 
 - For run unittests, you may need to install the idmtools-test package:
     ```bash
-    pip install idmtools-test --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+    pip install idmtools-test
     ```
 - **Note**: If running above command on **macOS**, you may need to escape the square brackets with a backslash. for example:
     ```bash
@@ -104,18 +104,13 @@ You can also install just the individual packages to create minimal environments
 - Navigate to the root directory of the repo and enter the following:
 
   ```
-  pip install -r dev_scripts/package_requirements.txt
   pip install -r docs/requirements.txt
   python dev_scripts/bootstrap.py
   cd docs
-  make html
+  mkdocs build
+  mkdocs serve
   ```
-- (Optional) To automatically serve the built docs locally in your browser, enter the following from
-   the root directory:
-
-    ```
-    python dev_scripts/serve_docs.py
-    ```
+- To view docs locally: http://127.0.0.1:8000/idmtools/
 # Reporting issues
 
 Include the following information in your post:

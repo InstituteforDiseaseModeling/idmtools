@@ -11,13 +11,13 @@ clean-all: clean ## Deleting package info hides plugins so we only want to do th
 	$(CLDIR) --dir-patterns "**/*.egg-info/"
 	docker rmi idmtools_comps_ssmt_worker
 
-docker: ## Build our docker image using the local pypi
+docker: ## Build ssmt docker image --deprecated
 	$(MAKE) -C ../../idmtools_core dist
 	$(MAKE) -C ../../idmtools_models dist
 	$(MAKE) -C ../../idmtools_platform_comps dist
 	python build_docker_image.py
 
-docker-release-staging: docker
+docker-release-staging: docker  ## --deprecated
 	python push_docker_image.py
 
 docker-build: ## Build our docker image using the local pypi

@@ -70,10 +70,11 @@ idmtools supports multiple compute platforms:
 graph LR
     A[User Code] --> B[idmtools Core]
     B --> C[COMPS Platform]
-    B --> D[Slurm Platform]
-    B --> E[Container Platform]
-    C --> G[HPC Cluster]
-    D --> G
+    B --> F[File Platform]
+    F --> D[Slurm Platform]
+    F --> E[Container Platform]
+    C --> G[COMPS Cluster]
+    D --> I[Slurm Cluster]
     E --> H[Docker]
 ```
 

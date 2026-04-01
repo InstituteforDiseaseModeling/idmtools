@@ -201,7 +201,7 @@ class PlatformAnalysis:
             for argname, value in self.extra_args.items():
                 if argname not in argspec.parameters:
                     raise ValueError(
-                        f"AnalyzerManager does not support the argument {argname}. Valid args are {' '.join([str(s) for s in argspec.parameters.keys()])}. See {get_help_version_url('idmtools.analysis.analyze_manager.html#idmtools.analysis.analyze_manager.AnalyzeManager')} for a valid list of arguments.")
+                        f"AnalyzerManager does not support the argument {argname}. Valid args are {' '.join([str(s) for s in argspec.parameters.keys()])}. See {get_help_version_url('https://institutefordiseasemodeling.github.io/idmtools/data-analysis/analyze-manager/#constructor-parameters')} for a valid list of arguments.")
                 # TODO do type validations later
             self.additional_files.add_or_replace_asset(
                 Asset(filename="extra_args.pkl", content=pickle.dumps(self.extra_args)))
