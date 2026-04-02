@@ -36,9 +36,13 @@ def validate_container_running(platform, **kwargs) -> str:
     if not check_local_image(platform.docker_image):
         user_logger.info(f"Image {platform.docker_image} does not exist, pull the image first.")
         succeeded = pull_docker_image(platform.docker_image)
-        if not succeeded:
-            user_logger.error(f"/!\\ ERROR: Failed to pull image {platform.docker_image}.")
-            exit(-1)
+    else:
+        # Image exists locally — check if server has a newer version
+        succeeded = pull_docker_image_if_changed(platform.docker_image)
+
+    if not succeeded:
+        user_logger.error(f"/!\\ ERROR: Failed to pull image {platform.docker_image}.")
+        exit(-1)
 
     # User configuration
     if logger.isEnabledFor(DEBUG):
@@ -416,6 +420,55 @@ def pull_docker_image(image_name, tag='latest') -> bool:
     except DockerAPIError as e:
         if logger.isEnabledFor(DEBUG):
             logger.debug(f'Error pulling {full_image_name}: {e}')
+        return False
+
+
+def pull_docker_image_if_changed(image_name, tag='latest') -> bool:
+    """
+    Compare local and server digests for an existing local image.
+    Pull from server only if they differ.
+    Assumes the image already exists locally (call after check_local_image returns True).
+    Args:
+        image_name: image name
+        tag: image tag
+    Returns:
+        True/False
+    """
+    if ':' in image_name:
+        full_image_name = image_name
+    else:
+        full_image_name = f'{image_name}:{tag}'
+
+    try:
+        client = docker.from_env()
+
+        # Get local digest
+        local_image = client.images.get(full_image_name)
+        local_digests = [d.split('@')[-1] for d in local_image.attrs.get('RepoDigests', [])]
+
+        # Get server digest (no layer download)
+        try:
+            registry_data = client.images.get_registry_data(full_image_name)
+            server_digest = registry_data.attrs.get('Descriptor', {}).get('digest')
+        except DockerAPIError as e:
+            logger.debug(f'Could not fetch registry data for {full_image_name}: {e}')
+            user_logger.warning(f'Could not compare digests for {full_image_name}, skipping re-pull.')
+            return True  # true means safe to use local image
+
+        if not server_digest:
+            logger.debug(f'Server digest unavailable for {full_image_name}, skipping re-pull.')
+            return True
+
+        if local_digests and server_digest in local_digests:
+            user_logger.info(f'Local image {full_image_name} is up to date, skipping pull.')
+            return True
+
+        user_logger.info(f'Local image {full_image_name} is outdated, pulling latest from server...')
+        return pull_docker_image(full_image_name)
+
+    except DockerAPIError as e:
+        if logger.isEnabledFor(DEBUG):
+            logger.debug(f'Error checking image {full_image_name}: {e}')
         return False
 
 
