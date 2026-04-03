@@ -28,6 +28,7 @@ ts = TemplatedSimulations(base_task=task)
 ts.base_simulation.tags['tag1'] = 1
 
 # load WorkOrder.json file from local to each simulation via task. the actual command in comps will contain in this file
+# For all parameters for MSHPC cluster, please see: https://github.com/InstituteforDiseaseModeling/COMPS-Postman-Tests/blob/master/mshpc-conf.csv
 add_work_order(ts, file_path=os.path.join("inputs", "scheduling", "hpc", "WorkOrder.json"))
 
 # Since we have our templated simulation object now, let's define our sweeps

@@ -286,7 +286,7 @@ class TestWorkOrder(ITestWithPersistence):
         sb.add_sweep_definition(
             partial(default_add_schedule_config_sweep_callback,
                     command="python3 Assets/commandline_model.py {pop_size} {pop_infected} {n_days} {rand_seed}"),
-            [dict(NodeGroupName='idm_cd', NumProcesses=1, NumNodes=2, Environment={"key1": "value1", "key2": "value2"})])
+            NodeGroupName='idm_cd', NumProcesses=1, NumNodes=2, Environment={"key1": "value1", "key2": "value2"})
 
         ts.add_builder(sb)
 

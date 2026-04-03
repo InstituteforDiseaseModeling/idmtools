@@ -41,6 +41,7 @@ with Platform('CALCULON') as platform:
     ts = TemplatedSimulations(base_task=task)
 
     # add WorkOrder.json to each simulation as transient_assets
+    # For all parameters for slurm cluster, please see: https://github.com/InstituteforDiseaseModeling/COMPS-Postman-Tests/blob/master/Slurm-conf.csv
     add_work_order(ts, file_path=os.path.join("inputs", "scheduling", "WorkOrder.json"))
 
     # create build and define our sweeps
