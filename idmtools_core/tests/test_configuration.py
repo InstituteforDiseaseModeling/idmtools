@@ -47,12 +47,12 @@ class TestConfig(ITestWithPersistence):
         config_file = IdmConfigParser.get_config_path()
         self.assertEqual(os.path.basename(config_file), 'idmtools.ini')
 
-        max_threads = IdmConfigParser.get_option("COMMON", 'max_threads')
-        self.assertEqual(int(max_threads), 16)
+        max_workers = IdmConfigParser.get_option("COMMON", 'max_workers')
+        self.assertEqual(int(max_workers), 16)
 
         idm = IdmConfigParser()
-        max_threads = idm.get_option("COMMON", 'max_threads')
-        self.assertEqual(int(max_threads), 16)
+        max_workers = idm.get_option("COMMON", 'max_workers')
+        self.assertEqual(int(max_workers), 16)
 
     def test_section(self):
         config_file = IdmConfigParser.get_config_path()
