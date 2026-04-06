@@ -35,7 +35,7 @@ class ContainerPlatform(FilePlatform):
     """
     Container Platform definition.
     """
-    __CONTAINER_IMAGE = 'ghcr.io/emod-hub/emod-ubuntu-runtime:latest'
+    __CONTAINER_IMAGE = 'ghcr.io/institutefordiseasemodeling/container-rocky-runtime:0.0.6'
     __CONTAINER_MOUNT = "/home/container_data"
     docker_image: str = field(default=None, metadata=dict(help="Docker image to run the container"))
     data_mount: str = field(default=None, metadata=dict(help="Data mount point in the container"))
