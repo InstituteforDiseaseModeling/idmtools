@@ -17,7 +17,7 @@
 
 idmtools provides the APIS, logic, and other operations to provision, execute, analysis, and manage jobs running on an HPC cluster
 
-To see the full API documentation, see https://institutefordiseasemodeling.github.io/idmtools/index.html
+To see the full documentation, see https://institutefordiseasemodeling.github.io/idmtools/index.html
 
 
 # Installing
@@ -39,9 +39,3 @@ coverage    -   Run tests and generate coverage report that is shown in browser
 
 On Windows, you can use `pymake` instead of `make`
 
-# Future Work
-
-* Add new analyze api to platform
-    * Where does this go?
-    * Move current code to Comps
-    * Add support for platform specific bootstrap scripts
