@@ -4,7 +4,7 @@ Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
 """
 import json
 from os import PathLike
-from typing import List, Union, Dict
+from typing import List, Union, Dict, Optional
 from idmtools.assets import Asset
 from idmtools.entities.experiment import Experiment
 from idmtools.entities.simulation import Simulation
@@ -36,9 +36,31 @@ def default_add_workorder_sweep_callback(simulation, file_name, file_path):
     add_work_order(simulation, file_name=file_name, file_path=file_path)
 
 
-def default_add_schedule_config_sweep_callback(simulation, command: str = None, **config_opts):
+def default_add_schedule_config_sweep_callback(
+    simulation,
+    command: str = None,
+    NodeGroupName: Optional[str] = None,    # COMPS Windows HPC or COMPS Slurm
+    NumCores: Optional[int] = None,         # COMPS Windows HPC or COMPS Slurm
+    NumNodes: Optional[int] = None,         # COMPS Slurm only
+    NumProcesses: Optional[int] = None,     # COMPS Slurm only
+    EnableMpi: Optional[bool] = None,       # COMPS Slurm only
+    Environment: Optional[dict] = None,     # COMPS Slurm only
+    SingleNode: Optional[bool] = None,      # COMPS Windows HPC only
+    Exclusive: Optional[bool] = None        # COMPS Windows HPC only
+):
     """Default callback to be used for sweeps that affect a scheduling config."""
-    add_schedule_config(simulation, command=command, **config_opts["config_opts"])
+    add_schedule_config(
+        simulation,
+        command=command,
+        NodeGroupName=NodeGroupName,
+        NumCores=NumCores,
+        NumNodes=NumNodes,
+        NumProcesses=NumProcesses,
+        EnableMpi=EnableMpi,
+        Environment=Environment,
+        SingleNode=SingleNode,
+        Exclusive=Exclusive
+    )
 
 
 def scheduled(simulation: Simulation):
@@ -124,7 +146,18 @@ def add_work_order(item: Union[Experiment, Simulation, TemplatedSimulations], fi
     _add_work_order_asset(item, config, file_name=file_name)
 
 
-def add_schedule_config(item: Union[Experiment, Simulation, TemplatedSimulations], command: str = None, **config_opts):
+def add_schedule_config(
+    item: Union[Experiment, Simulation, TemplatedSimulations],
+    command: str = None,
+    NodeGroupName: Optional[str] = None,    # COMPS MSHPC or COMPS Slurm
+    NumCores: Optional[int] = None,         # COMPS MSHPC or COMPS Slurm
+    NumNodes: Optional[int] = None,         # COMPS Slurm only
+    NumProcesses: Optional[int] = None,     # COMPS Slurm only
+    EnableMpi: Optional[bool] = None,       # COMPS Slurm only
+    Environment: Optional[dict] = None,     # COMPS Slurm only
+    SingleNode: Optional[bool] = None,      # COMPS MSHPC only
+    Exclusive: Optional[bool] = None        # COMPS MSHPC only
+):
     """
     Add scheduling config to an Item.
 
@@ -133,22 +166,30 @@ def add_schedule_config(item: Union[Experiment, Simulation, TemplatedSimulations
     Args:
         item: Item to add scheduling config to
         command: Command to run
-        **config_opts: Additional config options
-
-    config_opts details:
-            - Environment: Environment variables to set in the job environment; these can be dynamically expanded
-            - SingleNode (HPC only): A flag to limit all reserved cores to being on the same compute node
-            - Exclusive (HPC only): A flag that controls whether nodes should be exclusively allocated to this job
-            - EnableMpi (HPC or Slurm): A flag that controls whether to run the job with mpiexec
-            - NodeGroupName (HPC or Slurm): The cluster node-group to commission to
-            - NumCores (HPC or Slurm): The number of cores to reserve
-            - NumNodes (Slurm Only): The number of nodes to schedule
-            - NumProcesses (Slurm Only): The number of processes to execute
-            - additionalProperties (HPC or Slurm): True or False
+        NodeGroupName: The cluster node-group to commission to (COMPS MSHPC and COMPS Slurm)
+        NumCores: The number of cores to reserve (COMPS MSHPC and COMPS Slurm)
+        NumNodes: The number of nodes to schedule (COMPS Slurm only)
+        NumProcesses: The number of processes to execute (COMPS Slurm only)
+        EnableMpi: Whether to run the job with mpiexec (COMPS Slurm only)
+        Environment: Environment variables to set in the job environment (COMPS Slurm only)
+        Exclusive: Whether nodes should be exclusively allocated to this job (COMPS MSHPC only)
+        SingleNode: Limit all reserved cores to the same compute node (COMPS MSHPC only)
 
     Returns:
         None
+
+    Ref: https://github.com/InstituteforDiseaseModeling/COMPS-Postman-Tests/blob/master/Slurm-conf.csv
+         https://github.com/InstituteforDiseaseModeling/COMPS-Postman-Tests/blob/master/mshpc-conf.csv
     """
     config = dict(Command=command)
-    config.update(config_opts)
+    config.update({k: v for k, v in {
+        'NodeGroupName': NodeGroupName,
+        'NumCores': NumCores,
+        'NumNodes': NumNodes,
+        'NumProcesses': NumProcesses,
+        'EnableMpi': EnableMpi,
+        'Environment': Environment,
+        'SingleNode': SingleNode,
+        'Exclusive': Exclusive,
+    }.items() if v is not None})  # only include params that were explicitly passed
     _add_work_order_asset(item, config, file_name="WorkOrder.json")
