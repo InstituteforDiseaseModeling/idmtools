@@ -139,7 +139,7 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
         )
 
     def platform_create(self, simulation: Simulation, num_cores: int = None, priority: str = None,
-                        enable_platform_task_hooks: bool = True, asset_collection_id: str = None, **kwargs) -> COMPSSimulation:
+                        asset_collection_id: str = None, **kwargs) -> COMPSSimulation:
         """
         Create Simulation on COMPS.
 
@@ -147,16 +147,12 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             simulation: Simulation to create
             num_cores: Optional number of MPI Cores to allocate
             priority: Priority to load
-            enable_platform_task_hooks: Should platform task hoooks be ran
             asset_collection_id: Override for asset collection id on sim
             **kwargs: Expansion fields
 
         Returns:
             COMPS Simulation
         """
-        from idmtools_platform_comps.utils.python_version import platform_task_hooks
-        if enable_platform_task_hooks:
-            simulation.task = platform_task_hooks(simulation.task, self.platform)
         s = self.to_comps_sim(simulation, num_cores=num_cores, priority=priority,
                               asset_collection_id=asset_collection_id, **kwargs)
         COMPSSimulation.save(s, save_semaphore=COMPSSimulation.get_save_semaphore())
@@ -239,8 +235,6 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             comps_configuration['priority'] = priority
         if comps_exp_config.executable_path != simulation.task.command.executable:
             logger.info(f'Overriding executable_path for sim to {simulation.task.command.executable}')
-            from idmtools_platform_comps.utils.python_version import platform_task_hooks
-            platform_task_hooks(simulation.task, self.platform)
             comps_configuration['executable_path'] = simulation.task.command.executable
         sim_task = simulation.task.command.arguments + " " + simulation.task.command.options
         sim_task = sim_task.strip()
