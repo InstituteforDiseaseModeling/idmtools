@@ -4,23 +4,11 @@
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**
 
   - [Installing](#installing)
 - [Development tips](#development-tips)
 - [Using the CLI](#using-the-cli)
   - [Version command](#version-command)
-  - [Experiment commands for Local Platform](#experiment-commands-for-local-platform)
-    - [Status](#status)
-    - [Delete](#delete)
-  - [Simulation commands for Local Platform](#simulation-commands-for-local-platform)
-  - [Status](#status-1)
-  - [GitRepo commands](#gitrepo-commands)
-    - [View](#view)
-    - [Repos](#repos)
-    - [Releases](#releases)
-    - [Peep](#peep)
-    - [Download](#download)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
