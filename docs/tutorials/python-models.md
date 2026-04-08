@@ -22,7 +22,7 @@ pip install idmtools[full]       # All platforms
 First, create a simple SIR model in `sir_model.py`:
 
 ```python
-# sir_model.py
+# examples/python_model/python_sir_models/sir_model.py
 import sys
 import json
 import matplotlib.pyplot as plt
@@ -118,7 +118,7 @@ if __name__ == "__main__":
 Create `run_python_sir.py` to run the model with idmtools:
 
 ```python
-# run_python_sir.py
+# examples/python_model/python_sir_models/run_python_sir.py
 from idmtools.assets import AssetCollection
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
@@ -174,7 +174,7 @@ Status: Succeeded
 Now let's explore different beta values using `SimulationBuilder`:
 
 ```python
-# run_python_sir_sweep.py
+# examples/python_model/python_sir_models/run_python_sir_sweep.py
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
 from idmtools.builders import SimulationBuilder
@@ -229,7 +229,7 @@ print(f"Status: {experiment.status}")
 For complex models, use JSON configuration files to sweep parameters — each simulation gets its own config file with its specific parameter values:
 
 ```python
-# run_python_sir_with_config.py
+# examples/python_model/python_sir_models/run_python_sir_with_config.py
 import json
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
@@ -295,7 +295,7 @@ print(f"Status: {experiment.status}")
 Create an analyzer to process outputs:
 
 ```python
-# analyze_sir_results.py
+# examples/python_model/python_sir_models/analyze_sir_results.py
 import pandas as pd
 import matplotlib.pyplot as plt
 

@@ -1,5 +1,5 @@
 """
-Multi-Dimensional Sweep with Automated Analysis on COMPS.
+Latin Hypercube Sampling Sweep with Automated Analysis on COMPS.
 
 This example shows how to run a parameter sweep and automatically
 run analysis after all simulations complete.

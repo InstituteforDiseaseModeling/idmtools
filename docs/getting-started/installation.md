@@ -37,13 +37,20 @@ pip install idmtools[full]
 ```
 
 **Includes:**
-- idmtools-core
-- idmtools-cli
-- idmtools-models
-- idmtools-platform-comps
-- idmtools-platform-container
-- idmtools-platform-general
-- idmtools-platform-slurm
+
+* idmtools-core
+
+* idmtools-cli
+
+* idmtools-models
+
+* idmtools-platform-comps
+
+* idmtools-platform-container
+
+* idmtools-platform-general
+
+* idmtools-platform-slurm
 
 ### Platform-Specific
 
@@ -80,6 +87,7 @@ pip install idmtools-models              # Python/R models
 pip install idmtools-platform-comps      # IDM COMPS platform related packages
 pip install idmtools-platform-slurm      # Slurm platform related packages
 pip install idmtools-platform-container  # Local Container platform related packages
+pip install idmtools-platform-general    # File and Process platform packages
 ```
 
 ## Verify Installation
@@ -91,6 +99,7 @@ idmtools --version
 # Or using Python
 python -c "import idmtools; print(idmtools.__version__)"
 ```
+Note, Run the above command after installing the latest packages.
 
 ## Project Structure
 

@@ -106,7 +106,6 @@ You can also install just the individual packages to create minimal environments
   ```
   pip install -r docs/requirements.txt
   python dev_scripts/bootstrap.py
-  cd docs
   mkdocs build
   mkdocs serve
   ```

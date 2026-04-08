@@ -1,6 +1,6 @@
 # PlatformAnalysis
 
-`PlatformAnalysis` runs analyzers as a remote **SSMT (Shared Services Management Tool) work item** on COMPS, rather than locally. Simulation output files stay on the cluster, eliminating the need to transfer large datasets to your local machine.
+`PlatformAnalysis` runs analyzers as a remote **SSMT** work item on COMPS, rather than locally. Simulation output files stay on the cluster, eliminating the need to transfer large datasets to your local machine.
 
 ## What Can PlatformAnalysis Do?
 

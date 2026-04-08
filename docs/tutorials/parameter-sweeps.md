@@ -5,6 +5,7 @@ Systematic parameter exploration with idmtools.
 ## Part 1: Simple Single-Parameter Sweep
 
 ```python
+# examples/parameter_sweeps/single_sweep_in_container.py
 from idmtools.core.platform_factory import Platform
 from idmtools.entities.experiment import Experiment
 from idmtools.builders import SimulationBuilder
@@ -49,6 +50,7 @@ print(f"Status: {experiment.status}")
 Sweeps all combinations of `beta` and `gamma`:
 
 ```python
+# examples/parameter_sweeps/grid_sweep.py
 from itertools import product
 from idmtools.builders import SimulationBuilder
 from idmtools.entities.experiment import Experiment
@@ -81,6 +83,7 @@ experiment.run(platform=platform, wait_until_done=True)
 Sweeps four parameters:
 
 ```python
+# examples/parameter_sweeps/multidimensional_sweep.py
 from itertools import product
 import numpy as np
 from idmtools.builders import SimulationBuilder
@@ -130,6 +133,7 @@ experiment.run(platform=platform, wait_until_done=True)
 Efficiently samples high-dimensional parameter spaces:
 
 ```python
+# examples/parameter_sweeps/lhs_sweep.py
 from scipy.stats import qmc
 from idmtools.builders import SimulationBuilder
 from idmtools.entities.experiment import Experiment
@@ -179,6 +183,7 @@ experiment.run(platform=platform, wait_until_done=True)
 Organizes sweeps by named scenarios:
 
 ```python
+# examples/parameter_sweeps/scenario_sweep.py
 from itertools import product
 from idmtools.builders import SimulationBuilder
 from idmtools.entities.experiment import Experiment
