@@ -1,3 +1,37 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+- [Singularity Definition Files](#singularity-definition-files)
+  - [Available Definition Files](#available-definition-files)
+    - [Python Environments](#python-environments)
+    - [Other Languages](#other-languages)
+    - [Utilities](#utilities)
+  - [Quick Start](#quick-start)
+    - [Option 1: Build on COMPS (Recommended)](#option-1-build-on-comps-recommended)
+    - [Option 2: Build Locally](#option-2-build-locally)
+  - [Using Built Images with idmtools](#using-built-images-with-idmtools)
+    - [With Python Tasks](#with-python-tasks)
+    - [With Generic Tasks (R, Julia, Shell)](#with-generic-tasks-r-julia-shell)
+  - [Choosing the Right Definition File](#choosing-the-right-definition-file)
+    - [For Quick Prototyping](#for-quick-prototyping)
+    - [For General Scientific Computing](#for-general-scientific-computing)
+    - [For Machine Learning](#for-machine-learning)
+    - [For Disease Modeling](#for-disease-modeling)
+    - [For Statistical Analysis](#for-statistical-analysis)
+    - [For Multi-Language Projects](#for-multi-language-projects)
+  - [Build Times and Sizes](#build-times-and-sizes)
+  - [Customizing Definition Files](#customizing-definition-files)
+  - [Troubleshooting](#troubleshooting)
+    - [Build Fails with "Out of Memory"](#build-fails-with-out-of-memory)
+    - ["Module not found" at Runtime](#module-not-found-at-runtime)
+    - [Slow Build Times](#slow-build-times)
+    - [Image Too Large](#image-too-large)
+  - [Best Practices](#best-practices)
+  - [Examples](#examples)
+  - [Support](#support)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Singularity Definition Files
 
 This directory contains Singularity definition files (.def) for various computational environments. These can be built on COMPS or locally and used with idmtools.
