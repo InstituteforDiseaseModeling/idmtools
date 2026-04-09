@@ -295,7 +295,7 @@ class SingularityBuildWorkItem(InputDataWorkItem):
                     if self.__image_tag is not None:
                         self.image_name = self.__image_tag.strip(" /").replace(":", "_").replace("/", "_") + ".sif"
                     else:
-                        self.image_name = self.image_url.split('/')[-1].split(':')[0]+'.sif'
+                        self.image_name = self.image_url.split('/')[-1].split(':')[0] + '.sif'
             # If we are building from a file, add the build context
             elif self.definition_file:
                 self.image_tags['build_context'] = self.context_checksum()
