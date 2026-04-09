@@ -177,9 +177,3 @@ See the [Parameter Sweeps Tutorial](../../../docs/tutorials/parameter-sweeps.md)
 
 ### Import errors
 - Install required packages: `pip install idmtools-models`
-
-## Support
-For questions or issues:
-- Check the [User Guide](../../../docs/user-guide/index.md)
-- See [Tutorials](../../../docs/tutorials/index.md)
-- Open an issue on [GitHub](https://github.com/institutefordiseasemodeling/idmtools/issues)
