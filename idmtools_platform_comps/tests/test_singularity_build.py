@@ -82,7 +82,7 @@ class TestSingularityBuild(unittest.TestCase):
     def test_docker_fetch_version_tag(self):
         sbi = SingularityBuildWorkItem(name=self.case_name, force=FORCE)
         sbi.image_url = "docker://ubuntu:latest"
-        #sbi.run(wait_until_done=True, platform=self.platform)  # run this occasionally
+        # sbi.run(wait_until_done=True, platform=self.platform)  # run this occasionally
         getattr(sbi, '_SingularityBuildWorkItem__add_tags')()
         self.assertIn('image_name', sbi.image_tags)
         self.assertEqual(sbi.image_tags['image_name'], 'ubuntu_latest.sif')
@@ -204,3 +204,15 @@ From: python:3.8.6
         self.assertIn('build_context', sbi.image_tags)
         self.assertIn('image_name', sbi.image_tags)
         self.assertIn('created_by', sbi.image_tags)
+
+    @pytest.mark.skip
+    def test_build_singularity_from_docker_image(self):
+        sbi = SingularityBuildWorkItem(name=self.case_name, force=FORCE)
+        sbi.image_url = "docker://ghcr.io/emod-hub/emod-ubuntu-runtime:latest"
+        sbi.run(wait_until_done=True)
+
+    @pytest.mark.skip
+    def test_build_singularity_from_docker_image_rocky(self):
+        sbi = SingularityBuildWorkItem(name=self.case_name, force=FORCE)
+        sbi.image_url = "docker://ghcr.io/institutefordiseasemodeling/container-rocky-runtime:0.0.6"
+        sbi.run(wait_until_done=True)
