@@ -1,3 +1,35 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Sphinx → MkDocs Documentation Migration](#sphinx-%E2%86%92-mkdocs-documentation-migration)
+  - [Project Context](#project-context)
+  - [Migration Overview](#migration-overview)
+  - [Phase 1: Install MkDocs and Plugins](#phase-1-install-mkdocs-and-plugins)
+  - [Phase 2: Create `mkdocs.yml`](#phase-2-create-mkdocsyml)
+  - [Phase 3: Build the `nav:` Structure](#phase-3-build-the-nav-structure)
+  - [Phase 4: Convert RST Files to Markdown](#phase-4-convert-rst-files-to-markdown)
+    - [4.1 Expand Substitution Variables](#41-expand-substitution-variables)
+    - [4.2 Headings](#42-headings)
+    - [4.3 Cross-References](#43-cross-references)
+    - [4.4 Admonitions / Directives](#44-admonitions--directives)
+    - [4.5 Code Blocks](#45-code-blocks)
+    - [4.7 Images](#47-images)
+    - [4.8 UML Diagrams](#48-uml-diagrams)
+    - [4.10 toctree Directives](#410-toctree-directives)
+    - [4.11 Include Directives](#411-include-directives)
+    - [4.12 Glossary](#412-glossary)
+    - [4.13 Version Directives](#413-version-directives)
+    - [4.14 Anchors / Labels](#414-anchors--labels)
+  - [Phase 5: API Documentation](#phase-5-api-documentation)
+  - [Phase 6: Static Assets](#phase-6-static-assets)
+  - [Phase 7: Build and Verify](#phase-7-build-and-verify)
+  - [Recommended Conversion Order](#recommended-conversion-order)
+  - [Files to Delete After Migration](#files-to-delete-after-migration)
+  - [Handling Redirects](#handling-redirects)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ---
 name: sphinx-to-mkdocs
 description: Converts Sphinx RST documentation to MkDocs Markdown format. Use this skill whenever the user asks to migrate, convert, or port documentation from Sphinx to MkDocs, wants to replace conf.py with mkdocs.yml, needs to convert .rst files to .md, wants to switch from Sphinx to MkDocs Material theme, or asks about modernizing Python project documentation. Also trigger for requests like "migrate docs to mkdocs", "convert rst to markdown for docs site", or "replace sphinx with mkdocs".
