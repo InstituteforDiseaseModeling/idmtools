@@ -38,6 +38,7 @@ jobs:
             | xargs doctoc --github --notitle
 
       - name: Commit and push if changed
+        if: github.event_name == 'push'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
