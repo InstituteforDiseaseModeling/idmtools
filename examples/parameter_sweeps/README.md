@@ -18,7 +18,6 @@
     - [Model doesn't run](#model-doesnt-run)
     - [No output files](#no-output-files)
     - [Import errors](#import-errors)
-  - [Support](#support)
 
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
