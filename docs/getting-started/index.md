@@ -43,7 +43,7 @@ Install only what you need:
     pip install idmtools[slurm]
     ```
 
-    Includes: core, CLI, models, Slurm platform
+    Includes: core, CLI, models, General platform, Slurm platform
 
 === "Container Platform"
 

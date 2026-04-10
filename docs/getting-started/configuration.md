@@ -14,30 +14,34 @@ You do not need this file — platforms can always be configured directly in cod
 
 ```ini
 # idmtools.ini
-[COMPS]
+[My_COMPS]  # This is block name. user can give any name
 type = COMPS
 endpoint = https://comps.idmod.org
 environment = Calculon
 ```
 
 ```python
-platform = Platform("COMPS")
+# With idmtools.ini
+platform = Platform("My_COMPS")   # block name
+
+# Or without idmtools.ini
+platform = Platform("Calculon")   # platform configuration alias
 ```
 
 ### Slurm
 
 ```ini
 # idmtools.ini
-[Slurm_Local]
+[My_Slurm]
 type = SLURM_LOCAL
 job_directory = MY_JOB_DIRECTORY
 ```
 
 ```python
 # With idmtools.ini
-platform = Platform("Slurm_Local")
+platform = Platform("My_Slurm")
 
-# Without idmtools.ini
+# Or without idmtools.ini
 platform = Platform("Slurm_Local", job_directory="MY_JOB_DIRECTORY")
 ```
 
@@ -57,6 +61,9 @@ platform = Platform("My_container")
 # Without idmtools.ini
 platform = Platform("Container", job_directory="MY_JOB_DIRECTORY")
 ```
+Note, to get platform aliases, run idmtools cli command:
+
+`idmtools info plugins platform-aliases`
 
 ## Next Steps
 

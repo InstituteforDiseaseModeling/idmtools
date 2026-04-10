@@ -2,10 +2,9 @@
 
 **idmtools** is a collection of Python tools designed to streamline disease modeling workflows on HPC clusters and various compute platforms.
 
-## Idmtools Workflow
+## idmtools Workflow
 
-idmtools provides a variety of options for each step of the modeling process. To accommodate different workflows, the tool suite was designed in a modular fashion, allowing users to select only the utilities they need. To simplify workflows, facilitate the modeling process, and make models and their results reusable and shareable, idmtools allows users to create assets. Assets can be added at any level of the process — from running a specific task, to creating a simulation, to creating an experiment.
-The diagram below shows how idmtools and its related packages are used in an end-to-end workflow using EMOD as the disease transmission model.
+idmtools provides a variety of options for each step of the modeling process. To accommodate different workflows, the tool suite is designed in a modular fashion, allowing users to select only the components they need. To simplify workflows, facilitate the modeling process, and make models and their results reusable and shareable, idmtools allows users to create and manage assets. Assets can be added at any level of the process — from running a specific task, to creating a simulation, to creating an experiment. The diagram below illustrates how idmtools and its related packages are used in an end-to-end workflow, using EMOD as the disease transmission model.
 
 ![Screenshot](images/overall.png)
 
@@ -73,7 +72,7 @@ graph LR
     B --> F[File Platform]
     F --> D[Slurm Platform]
     F --> E[Container Platform]
-    C --> G[COMPS Cluster]
+    C --> G[IDM COMPS]
     D --> I[Slurm Cluster]
     E --> H[Docker]
 ```
@@ -82,8 +81,8 @@ graph LR
 
 - **GitHub**: [institutefordiseasemodeling/idmtools](https://github.com/institutefordiseasemodeling/idmtools)
 - **Issues**: Report bugs and request features on GitHub
-- **PyPI**: [idmtools package](https://pypi.org/project/idmtools/)
+- **PyPI**: [All idmtools packages](https://pypi.org/search/?q=idmtools)
 
 ## License
 
-Copyright © 2019-2026 Bill & Melinda Gates Foundation. All rights reserved.
+Copyright © 2019-2026 Gates Foundation. All rights reserved.

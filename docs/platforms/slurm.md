@@ -4,7 +4,7 @@ Comprehensive guide to using idmtools with Slurm HPC clusters.
 
 ## Overview
 
-**Slurm** (Simple Linux Utility for Resource Management) is a popular open-source workload manager for HPC clusters. idmtools provides seamless integration with Slurm clusters, allowing you to submit and manage large-scale simulation workflows.
+**Slurm** is a popular open-source workload manager for HPC clusters. idmtools provides seamless integration with Slurm clusters, allowing you to submit and manage large-scale simulation workflows.
 
 ## Key Features
 
@@ -71,34 +71,24 @@ LocalQ*      up   infinite      1   idle localhost
 
 ## Basic Configuration
 
-### Connection Configuration
-
-```python
-from idmtools.core.platform_factory import Platform
-
-# Create Slurm platform
-platform = Platform(
-    "Slurm",
-    host="cluster.example.com",
-    username="myusername",
-    job_directory="/home/myusername/idmtools_jobs"
-)
-```
-
 ### Minimum Configuration
 
 Minimum required in `idmtools.ini`:
 
 ```ini
-[SLURM_LOCAL]
+[MY_SLURM]
 type = SLURM
-job_directory = /home/userxyz/experiments
+job_directory = /home/userxyz/my_outputs
+```
+```python
+# call with ini file
+Platform('MY_SLURM')
 ```
 
 Or directly from code:
 
 ```python
-Platform('SLURM_LOCAL', job_directory='/home/userxyz/experiments')
+Platform('SLURM_LOCAL', job_directory='/home/userxyz/my_outputs')
 ```
 
 
@@ -107,10 +97,8 @@ Platform('SLURM_LOCAL', job_directory='/home/userxyz/experiments')
 Create `~/.idmtools/idmtools.ini`:
 
 ```ini
-[Slurm]
+[my_Slurm]
 type = Slurm
-host = cluster.example.com
-username = myusername
 job_directory = /home/myusername/idmtools_jobs
 partition = general
 account = myproject
@@ -122,7 +110,7 @@ mem_per_cpu = 4G
 Load configuration:
 
 ```python
-platform = Platform("Slurm_Local")
+platform = Platform("my_Slurm")
 ```
 
 ## SlurmPlatform Attributes

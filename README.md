@@ -2,7 +2,6 @@
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**
 
 - [Introduction](#introduction)
 - [Documentation](#documentation)
@@ -106,7 +105,6 @@ You can also install just the individual packages to create minimal environments
   ```
   pip install -r docs/requirements.txt
   python dev_scripts/bootstrap.py
-  cd docs
   mkdocs build
   mkdocs serve
   ```

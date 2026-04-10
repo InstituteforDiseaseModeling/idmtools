@@ -1,3 +1,27 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+- [Parameter Sweeps Tutorial Examples](#parameter-sweeps-tutorial-examples)
+  - [Files](#files)
+  - [Quick Start](#quick-start)
+    - [1. Install idmtools](#1-install-idmtools)
+    - [2. Run the Simple Sweep Example](#2-run-the-simple-sweep-example)
+    - [3. Test the Model Directly](#3-test-the-model-directly)
+  - [Example Output](#example-output)
+  - [Model Parameters](#model-parameters)
+    - [Understanding Beta and Gamma](#understanding-beta-and-gamma)
+  - [Output Format](#output-format)
+  - [Analyzing Results](#analyzing-results)
+  - [Next Steps](#next-steps)
+  - [Related Examples](#related-examples)
+  - [Troubleshooting](#troubleshooting)
+    - [Model doesn't run](#model-doesnt-run)
+    - [No output files](#no-output-files)
+    - [Import errors](#import-errors)
+  - [Support](#support)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Parameter Sweeps Tutorial Examples
 
 This directory contains working examples for the Parameter Sweeps Tutorial.

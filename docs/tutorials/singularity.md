@@ -83,6 +83,7 @@ From: ubuntu:22.04
 ### Step 1: Build the Image
 
 ```python
+# examples/singularity/definitions/build_images.py
 from idmtools.core.platform_factory import Platform
 from idmtools_platform_comps.utils.singularity_build import SingularityBuildWorkItem
 
@@ -118,6 +119,7 @@ else:
 Once built, reference the `.sif.id` file in your task:
 
 ```python
+# examples/singularity/singularity_task_examples/simple_simulator.py
 from idmtools.core.platform_factory import Platform
 from idmtools.entities import CommandLine
 from idmtools.entities.experiment import Experiment

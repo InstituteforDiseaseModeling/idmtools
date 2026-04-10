@@ -136,7 +136,7 @@ Experiment ID: ...
 Status: EntityStatus.SUCCEEDED
 ```
 
-Simulation outputs are written to the `DEST/` job directory.
+Simulation outputs are written to the `DEST/` job directory including ![Screenshot](../images/sir_curve.png)
 
 ## Next Steps
 

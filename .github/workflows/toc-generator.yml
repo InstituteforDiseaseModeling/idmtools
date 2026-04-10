@@ -1,21 +1,51 @@
-# This is a basic workflow to help you get started with Actions
-
 name: Generate Table of Contents in Markdown
 
 on:
   push:
+    branches-ignore:
+      - 'gh-pages'
     paths:
       - '**.md'
       - '!docs/**'
+      - '!.github/**'
   pull_request:
     paths:
       - '**.md'
       - '!docs/**'
+      - '!.github/**'
+
+permissions:
+  contents: write
+
 jobs:
   generateTOC:
     name: TOC Generator
     runs-on: ubuntu-latest
     steps:
-      - uses: technote-space/toc-generator@v2
+      - uses: actions/checkout@v4
         with:
-          TARGET_PATHS: '**.md,!docs/**'
+          ref: ${{ github.head_ref || github.ref_name }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install doctoc
+        run: npm install -g doctoc
+
+      - name: Run doctoc on all markdown files
+        run: |
+          find . -name "*.md" \
+            -not -path "./docs/*" \
+            -not -path "./.git/*" \
+            -not -path "./.github/*" \
+            | xargs doctoc --github --notitle
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --staged --quiet; then
+            echo "No TOC changes to commit."
+          else
+            git commit -m "chore: auto-update table of contents"
+            git push
+          fi

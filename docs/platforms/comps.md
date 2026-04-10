@@ -56,16 +56,20 @@ idmtools info plugins platform-aliases
 ```
 
 
-### Simple Connection
+### Simple platform creation
 
 ```python
 from idmtools.core.platform_factory import Platform
 
 # Connect to COMPS
 platform = Platform(
-    "COMPS",
-    endpoint="https://comps.idmod.org",
-    environment="Nibbler"
+    "Nibbler",  # platform block name or platform alias name
+    endpoint="https://comps.idmod.org",  # platform endpoint
+    environment="Nibbler",   # platform environment
+    type = "COMPS",  # platform type
+    priority="Highest", 
+    node_group="idm_abcd",
+    num_cores=1
 )
 ```
 
@@ -74,7 +78,7 @@ platform = Platform(
 Create `~/.idmtools/idmtools.ini`:
 
 ```ini
-[COMPS]
+[My_COMPS]
 type = COMPS
 endpoint = https://comps.idmod.org
 environment = Nibbler
@@ -88,7 +92,10 @@ Create platform:
 ```python
 from idmtools.core.platform_factory import Platform
 
-platform = Platform("Nibbler")
+platform = Platform("Nibbler")  # Here Nibbler is a predefined platform alias
+
+# Or use idmtools.ini:
+platform = Platform("My_COMPS")
 ```
 
 ## Running Simulations
@@ -101,11 +108,7 @@ from idmtools.entities.experiment import Experiment
 from idmtools_models.python.python_task import PythonTask
 
 # Create platform
-platform = Platform(
-    "COMPS",
-    endpoint="https://comps.idmod.org",
-    environment="Nibbler"
-)
+platform = Platform("Nibbler")
 
 # Create task
 task = PythonTask(
