@@ -8,6 +8,7 @@ import pytest
 
 from idmtools.analysis.platform_anaylsis import PlatformAnalysis
 from idmtools.core.platform_factory import Platform
+from idmtools_platform_comps.utils.package_version_new import get_latest_docker_image_version_from_ghcr
 from idmtools_test.utils.decorators import warn_amount_ssmt_image_decorator
 from idmtools.core import ItemType
 from idmtools.analysis.download_analyzer import DownloadAnalyzer
@@ -25,8 +26,9 @@ def platform_slurm_2():
     Returns:
 
     """
-    return Platform('SLURMSTAGE', docker_image="idm-docker-staging.packages.idmod.org/idmtools/comps_ssmt_worker:" +
-                                               get_latest_image_stage())
+    from idmtools_platform_comps import __version__
+
+    return Platform('SLURMSTAGE', docker_image="ghcr.io/institutefordiseasemodeling/idmtools-comps-ssmt-worker:"+ get_latest_image_stage())
 
 @pytest.fixture
 def platform(request):

@@ -30,10 +30,11 @@ sb.add_sweep_definition(update_parameter_callback, pop_size=[10000, 20000], pop_
                                            n_days=[100, 110], rand_seed=[1234, 4567])
 
 # using default_add_schedule_config_sweep_callback to add workorder.json to each simulation with updated cmd arguments
+# please see scheduling parameters in https://github.com/InstituteforDiseaseModeling/COMPS-Postman-Tests/blob/master/Slurm-conf.csv
 sb.add_sweep_definition(
     partial(default_add_schedule_config_sweep_callback,
             command="python3 Assets/commandline_model.py {pop_size} {pop_infected} {n_days} {rand_seed}"),
-    [dict(NodeGroupName='idm_cd', NumProcesses=1, NumNodes=2, Environment={"key1": "value1", "key2": "value2"})])
+            NodeGroupName='idm_cd', NumProcesses=1, NumNodes=2, Environment={"key1": "value1", "key2": "value2"})
 ts.add_builder(sb)
 
 experiment = Experiment.from_template(ts, name=os.path.split(sys.argv[0])[1])

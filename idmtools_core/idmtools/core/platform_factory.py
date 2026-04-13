@@ -186,6 +186,7 @@ class Platform:
         # Make data to the requested type
         inputs = IdmConfigParser.retrieve_dict_config_block(field_type, section)
         inputs.pop('type', None)  # Remove 'type' dict from inputs since it is not a field to create platform
+        inputs.pop('python_executable', None)  # Remove 'python_executable' dict from inputs since it is not a field to create platform
         # Make sure the user values have the requested type
         fs_kwargs = validate_user_inputs_against_dataclass(field_type, kwargs)  # noqa: F841
 

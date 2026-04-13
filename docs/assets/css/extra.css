@@ -1,0 +1,13 @@
+/* Custom CSS for idmtools documentation */
+
+:root {
+  --md-primary-fg-color: #3f51b5;
+  --md-accent-fg-color: #3f51b5;
+}
+
+/* Custom grid cards styling */
+.md-typeset .grid.cards > ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}

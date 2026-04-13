@@ -4,7 +4,6 @@
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**
 
 - [Introduction](#introduction)
 - [Setting Up Virtual Environment](#setting-up-virtual-environment)
@@ -48,7 +47,7 @@ To set up a virtual environment for **SlurmPlatform**, follow these steps:
 
 4. **Install SlurmPlatform**
     ```bash
-    pip install idmtools-platform-slurm --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+    pip install idmtools-platform-slurm
     ```
 
 5. **Install Dependencies**
@@ -57,7 +56,7 @@ To set up a virtual environment for **SlurmPlatform**, follow these steps:
     ```
 6. **Optional(No need step #4 and #5), Install all slurm platform related packages**
     ```bash
-    pip install idmtools[slurm] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+    pip install idmtools[slurm]
     ```
 
 ## Development Tips

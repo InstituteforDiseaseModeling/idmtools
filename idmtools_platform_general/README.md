@@ -4,7 +4,6 @@
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**
 
   - [Installing](#installing)
 - [Development Tips](#development-tips)
@@ -16,7 +15,7 @@
 ## Installing
 
 ```bash
-pip install idmtools-platform-general --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+pip install idmtools-platform-general
 ```
 
 # Development Tips

@@ -1,0 +1,67 @@
+Bootstrap: library
+From: ubuntu:22.04
+
+%labels
+    Author idmtools
+    Version 1.0
+    Description R environment for statistical analysis and data visualization
+
+%help
+    This container provides R 4.3+ with common statistical and visualization packages:
+    - tidyverse (dplyr, ggplot2, tidyr, etc.)
+    - data.table (fast data manipulation)
+    - jsonlite (JSON reading/writing)
+    - rmarkdown (reporting)
+    - caret (machine learning)
+    - forecast (time series)
+
+    Usage:
+        singularity exec r_analysis.sif Rscript my_script.R
+        singularity exec r_analysis.sif R --version
+
+%post
+    # Update and install system dependencies
+    apt-get update && apt-get install -y \
+        r-base \
+        r-base-dev \
+        libcurl4-openssl-dev \
+        libssl-dev \
+        libxml2-dev \
+        libfontconfig1-dev \
+        libharfbuzz-dev \
+        libfribidi-dev \
+        libfreetype6-dev \
+        libpng-dev \
+        libtiff5-dev \
+        libjpeg-dev \
+        jq \
+        wget \
+        ca-certificates
+
+    # Install R packages
+    R -e "install.packages(c(\
+        'tidyverse', \
+        'data.table', \
+        'jsonlite', \
+        'rmarkdown', \
+        'caret', \
+        'forecast', \
+        'ggplot2', \
+        'dplyr', \
+        'readr', \
+        'purrr', \
+        'tibble', \
+        'stringr', \
+        'lubridate' \
+    ), repos='https://cloud.r-project.org/')"
+
+    # Clean up
+    apt-get clean
+    rm -rf /var/lib/apt/lists/*
+
+%environment
+    export LC_ALL=C
+    export R_LIBS_USER=/usr/local/lib/R/site-library
+
+%runscript
+    exec Rscript "$@"

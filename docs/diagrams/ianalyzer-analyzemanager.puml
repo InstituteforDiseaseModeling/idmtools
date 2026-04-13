@@ -1,7 +1,0 @@
-@startuml
-
-abstract class IAnalyzer        
-IAnalyzer <|-- Analyzers
-Analyzers *-- AnalyzeManager  
-
-@enduml

@@ -351,11 +351,6 @@ venv.bak/
 # mkdocs docs
 /site
 
-# sphinx docs
-docs/api/
-docs/_build
-docs/idmtools.log*
-
 # mypy
 .mypy_cache/
 .dmypy.json
@@ -425,3 +420,7 @@ allure_report.zip
 /examples/singularity/covasim/.covasim_versions/
 **/.snakemake/
 !/idmtools_test/idmtools_test/inputs/id_files/*
+**/*.md5
+**/DEST
+.github/workflows/.secrets
+placeholder_packages

@@ -1,3 +1,0 @@
-.. note::
-
-    |COMPS_s| access is restricted to |IDM_s| employees. See additional documentation for using |IT_s| with other high-performance computing clusters. 

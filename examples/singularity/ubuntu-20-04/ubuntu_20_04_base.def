@@ -1,5 +1,6 @@
 Bootstrap: library
-From: ubuntu:20.04
+From: ubuntu:22.04
+
 
 # can we bootstrap from other images...?
 

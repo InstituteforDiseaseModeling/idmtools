@@ -1,1 +1,9 @@
-emod-api~=1.30
+matplotlib
+scipy
+pandas
+numpy
+shapely
+pyproj
+geographiclib
+scikit-learn
+lz4

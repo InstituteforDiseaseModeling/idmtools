@@ -10,7 +10,6 @@ from idmtools.registry.platform_specification import example_configuration_impl,
     get_platform_type_impl, PlatformSpecification
 from idmtools.registry.plugin_specification import get_description_impl
 
-
 SLURM_EXAMPLE_CONFIG = """
 [Slurm]
 job_directory = /data
@@ -73,3 +72,14 @@ class SlurmPlatformSpecification(PlatformSpecification):
             )
         )
         return config_aliases
+
+    def get_python_executable(self, alias: str = None) -> str:
+        """
+        Get the target Python executable.
+        Args:
+            alias: platform alias
+
+        Returns:
+            The Python executable.
+        """
+        return 'python3'

@@ -139,8 +139,39 @@ class TestCOMPSPlatform(ITestWithPersistence):
         self.assertIsNotNone(sim1.configuration)
         self.assertIsNone(sim0.configuration.simulation_input_args)
         self.assertIsNone(sim0.configuration.executable_path)
+        self.assertIsNone(sim1.configuration.executable_path)
         self.assertEqual(sim1.configuration.simulation_input_args, "--help")
-        self.assertEqual(sim1.configuration.executable_path, "python3")
+        self.assertEqual(sim1.configuration.min_cores, 2)
+        self.assertEqual(sim1.configuration.max_cores, 2)
+        self.assertEqual(sim1.configuration.priority, Priority.Highest)
+
+    def test_multiple_different_executables(self):
+        # test platform hooks(rename python3)
+        # test ordering is maintained
+        # test that we can override take at task label
+        # test num cores
+        # test priority override
+        experiment = Experiment(name=self.case_name, gather_common_assets_from_task=True)
+        experiment.simulations.append(Simulation.from_task(CommandTask(command="python --version")))
+        experiment.simulations.append(Simulation.from_task(CommandTask(command="pip list")))
+        experiment.simulations.items[1]._platform_kwargs['num_cores'] = 2
+        experiment.simulations.items[1]._platform_kwargs['priority'] = Priority.Highest
+        experiment.run(wait_until_done=True, platform=self.platform)
+        self.assertTrue(experiment.succeeded)
+
+        exp_raw = experiment.get_platform_object()
+        self.assertEqual(exp_raw.configuration.simulation_input_args, "--version")
+        self.assertEqual(exp_raw.configuration.executable_path, "python3")
+        # because of ordering, we have to check both items
+        sim0 = experiment.simulations[0].get_platform_object()
+        sim1 = experiment.simulations[1].get_platform_object()
+        self.assertIsNotNone(sim0.configuration)
+        self.assertIsNotNone(sim1.configuration)
+        self.assertIsNone(sim0.configuration.executable_path)
+        self.assertIsNone(sim0.configuration.simulation_input_args)
+        self.assertIsNotNone(sim1.configuration.executable_path)
+        self.assertEqual(sim1.configuration.executable_path, "pip")
+        self.assertEqual(sim1.configuration.simulation_input_args, "list")
         self.assertEqual(sim1.configuration.min_cores, 2)
         self.assertEqual(sim1.configuration.max_cores, 2)
         self.assertEqual(sim1.configuration.priority, Priority.Highest)

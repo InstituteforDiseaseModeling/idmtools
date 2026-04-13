@@ -1,0 +1,195 @@
+site_name: idmtools
+site_url: https://institutefordiseasemodeling.github.io/idmtools/
+site_description: Python tools for streamlining disease modeling workflows on HPC clusters
+site_author: Institute for Disease Modeling
+
+# Repository
+repo_url: https://github.com/institutefordiseasemodeling/idmtools
+repo_name: institutefordiseasemodeling/idmtools
+edit_uri: edit/main/docs/
+
+# Copyright
+copyright: Copyright &copy; 2019-2026 Bill & Melinda Gates Foundation. All rights reserved.
+
+# Configuration
+docs_dir: docs
+site_dir: site
+
+# Theme
+theme:
+  name: material
+  palette:
+    # Light mode
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+  font:
+    text: Roboto
+    code: Roboto Mono
+
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.path
+    - navigation.top
+    - navigation.indexes
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.tabs.link
+    - content.code.copy
+    - content.code.annotate
+    - toc.follow
+
+  icon:
+    repo: fontawesome/brands/github
+    logo: material/dna
+
+# Navigation
+nav:
+  - Home: index.md
+
+  - Getting Started:
+    - getting-started/index.md
+    - Installation: getting-started/installation.md
+    - Configuration: getting-started/configuration.md
+    - Quick Start: getting-started/quickstart.md
+
+  - User Guide:
+    - user-guide/index.md
+    - Creating Simulations & Experiments: user-guide/creating-simulations.md
+    - Asset Management: user-guide/assets.md
+    - Parameter Sweeps: tutorials/parameter-sweeps.md
+    - Data Analysis: data-analysis/index.md
+
+  - Tutorials:
+    - tutorials/index.md
+    - Python Models: tutorials/python-models.md
+    - Running Sweeps: tutorials/parameter-sweeps.md
+    - Singularity Containers: tutorials/singularity.md
+    - Filter Simulations: tutorials/filter-simulations.md
+    - Data Analysis: data-analysis/index.md
+
+  - Platforms:
+    - platforms/index.md
+    - COMPS: platforms/comps.md
+    - Slurm: platforms/slurm.md
+    - Container: platforms/container.md
+
+  - API:
+    - api/index.md
+    - Core: api/core.md
+    - Models: api/models.md
+    - Platforms: api/platforms.md
+    - Data Analysis:
+      - data-analysis/index.md
+      - Analyzers: data-analysis/analyzers.md
+      - Analyze Manager: data-analysis/analyze-manager.md
+      - Platform Analysis: data-analysis/platform-analysis.md
+
+  - CLI Reference:
+    - cli/index.md
+
+  - FAQ: faq/index.md
+
+  - Quick Reference: quick_ref.md
+
+  - Development:
+    - Release Process: development/release-process.md
+
+  - Changelog: changelog.md
+
+# Plugins
+plugins:
+  - search:
+      separator: '[\s\-,:!=\[\]()"/]+|(?!\b)(?=[A-Z][a-z])|\.(?!\d)|&[lg]t;'
+      lang: en
+
+  - minify:
+      minify_html: true
+      minify_js: true
+      minify_css: true
+      htmlmin_opts:
+        remove_comments: true
+
+# Markdown Extensions
+markdown_extensions:
+  # Python Markdown
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      toc_depth: 3
+      permalink_title: Anchor link to this section
+
+  # PyMdown Extensions
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+      auto_title: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+# Extra
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/institutefordiseasemodeling/idmtools
+      name: idmtools on GitHub
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/search/?q=idmtools
+      name: idmtools on PyPI
+
+  generator: false
+
+# Extra CSS
+extra_css:
+  - assets/css/extra.css
+
+# Extra JavaScript
+extra_javascript:
+  - assets/js/extra.js
+
+# Watch
+watch:
+  - mkdocs.yml

@@ -1,4 +1,5 @@
 """This is the script to push docker image to idm staging artifactory.
+This build script is deprecated — migrate to the new Docker build script: build_container_image.py --push.
 
 Copyright 2024, Bill Gates Foundation. All rights reserved.
 """

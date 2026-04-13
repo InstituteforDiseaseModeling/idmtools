@@ -1,0 +1,59 @@
+Bootstrap: library
+From: ubuntu:22.04
+
+%labels
+    Author idmtools
+    Version 1.0
+    Description Shell environment with common Unix utilities and tools
+
+%help
+    This container provides common shell tools and utilities:
+    - awk, sed, grep (text processing)
+    - jq, yq (JSON/YAML processing)
+    - parallel (GNU parallel for batch processing)
+    - curl, wget (data download)
+    - git (version control)
+    - vim, nano (text editors)
+
+    Usage:
+        singularity exec shell_tools.sif bash script.sh
+        singularity exec shell_tools.sif jq '.' config.json
+
+%post
+    # Update and install tools
+    apt-get update && apt-get install -y \
+        bash \
+        coreutils \
+        findutils \
+        grep \
+        sed \
+        gawk \
+        jq \
+        curl \
+        wget \
+        git \
+        vim \
+        nano \
+        parallel \
+        zip \
+        unzip \
+        tar \
+        gzip \
+        bzip2 \
+        xz-utils \
+        bc \
+        ca-certificates
+
+    # Install yq (YAML processor)
+    wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
+    chmod +x /usr/bin/yq
+
+    # Clean up
+    apt-get clean
+    rm -rf /var/lib/apt/lists/*
+
+%environment
+    export LC_ALL=C
+
+%runscript
+    exec bash "$@"

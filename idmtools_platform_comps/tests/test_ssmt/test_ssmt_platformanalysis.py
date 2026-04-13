@@ -56,9 +56,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
         print(self._testMethodName)
         self.case_name = get_case_name(os.path.basename(__file__) + "--" + self._testMethodName)
         print(self.case_name)
-        self.platform = Platform('SlurmStage',
-                                 docker_image="idm-docker-staging.packages.idmod.org/idmtools/comps_ssmt_worker:" +
-                                              get_latest_image_stage())
+        self.platform = Platform('SLURMSTAGE', docker_image="ghcr.io/institutefordiseasemodeling/idmtools-comps-ssmt-worker:"+ get_latest_image_stage())
         self.tags = {'idmtools': self._testMethodName, 'WorkItem type': 'Docker'}
         self.input_file_path = analyzer_path
 

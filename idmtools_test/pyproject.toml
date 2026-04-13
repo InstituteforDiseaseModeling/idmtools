@@ -1,16 +1,14 @@
 [build-system]
-requires = [
-    "setuptools>=61.0",
-    "wheel",
-]
+requires = ["setuptools>=61", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "idmtools_test"
-version = "3.0.0+nightly"
+dynamic = ["version"]
 description = "Test and demo data for IDM-Tools"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
+license-files = ["LICENSE.txt"]
 keywords = [
     "modeling",
     "IDM",
@@ -27,30 +25,30 @@ authors = [
     { name = "Benoit Raybaud", email = "braybaud@idmod.org" },
 ]
 classifiers = [
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Operating System :: OS Independent",
 ]
 dependencies = [
-    "idmtools~=3.0.0",
-    "pytest",
-    "pypiwin32==223; sys_platform == 'win32'",
-    "pywin32; sys_platform == 'win32'",
+    "idmtools~=3.0",
+    "pytest~=9.0",
+    "pywin32>=306; sys_platform == 'win32'",
 ]
 
 [project.urls]
 Homepage = "https://github.com/InstituteforDiseaseModeling/idmtools"
 
-[project.entry-points.idmtools_platform]
+[project.entry-points."idmtools_platform"]
 idmtools_platform_test = "idmtools_test.utils.test_platform:TestPlatformSpecification"
 idmtools_platform_testex = "idmtools_test.utils.test_execute_platform:TestExecutePlatformSpecification"
 
-[project.entry-points.idmtools_task]
+[project.entry-points."idmtools_task"]
 idmtools_model_test = "idmtools_test.utils.test_task:TestTaskSpecification"
 
-[project.entry-points.idmtools_hooks]
+[project.entry-points."idmtools_hooks"]
 idmtools_test_hooks = "idmtools_test.test_precreate_hooks"
 
 [tool.setuptools]
@@ -65,3 +63,9 @@ exclude = [
 idmtools_test = [
     "*",
 ]
+
+[tool.setuptools_scm]
+root = ".."                           # keep if your monorepo needs it
+version_scheme = "no-guess-dev"       # ← change to this (or "guess-next-dev")
+local_scheme = "no-local-version"     # ← change to this (critical for PyPI/TestPyPI uploads)
+fallback_version = "0.0.0.dev0"

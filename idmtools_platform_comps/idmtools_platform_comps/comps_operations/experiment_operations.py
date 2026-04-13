@@ -226,40 +226,34 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         Returns:
             Command line for Experiment
         """
-        from idmtools_platform_comps.utils.python_version import platform_task_hooks
-
         if isinstance(experiment.simulations, Generator):
             if logger.isEnabledFor(DEBUG):
                 logger.debug("Simulations generator detected. Copying generator and using first task as command")
             sim_gen1, sim_gen2 = tee(experiment.simulations)
             experiment.simulations = sim_gen2
             sim = next(sim_gen1)
-            if check_command:
-                task = platform_task_hooks(sim.task, self.platform)
+            task = sim.task
             # run pre-creation in case task use it to produce the command line dynamically
             task.pre_creation(sim, self.platform)
-            exp_command = task.command
         elif isinstance(experiment.simulations, ExperimentParentIterator) and isinstance(experiment.simulations.items,
                                                                                          TemplatedSimulations):
             if logger.isEnabledFor(DEBUG):
                 logger.debug("ParentIterator/TemplatedSimulations detected. Using base_task for command")
             from idmtools.entities.simulation import Simulation
             task = experiment.simulations.items.base_task
-            if check_command:
-                task = platform_task_hooks(task, self.platform)
             # run pre-creation in case task use it to produce the command line dynamically
             task.pre_creation(Simulation(task=task), self.platform)
-            exp_command = task.command
         else:
             if logger.isEnabledFor(DEBUG):
                 logger.debug("List of simulations detected. Using base_task for command")
             task = experiment.simulations[0].task
-            if check_command:
-                task = platform_task_hooks(task, self.platform)
             # run pre-creation in case task use it to produce the command line dynamically
             task.pre_creation(experiment.simulations[0], self.platform)
-            exp_command = task.command
-        return exp_command
+
+        if check_command:
+            task.adjust_command_python(self.platform.get_platform_python())
+
+        return task.command
 
     def post_create(self, experiment: Experiment, **kwargs) -> NoReturn:
         """
@@ -410,7 +404,8 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
                 suite = kwargs.get('suite') or self.platform.get_item(experiment.suite_id, item_type=ItemType.SUITE)
 
         # Create an experiment
-        obj = experiment_factory.create("idmtools.entities.experiment.Experiment", tags=experiment.tags, name=experiment.name,
+        obj = experiment_factory.create("idmtools.entities.experiment.Experiment", tags=experiment.tags,
+                                        name=experiment.name,
                                         fallback=Experiment)
         obj.platform = self.platform
         obj._platform_object = experiment
@@ -530,7 +525,8 @@ class CompsPlatformExperimentOperations(IPlatformExperimentOperations):
         if comps_experiment and experiment_is_running(comps_experiment):
             comps_experiment.cancel()
 
-    def get_assets(self, experiment: Experiment, files: List[str], include_experiment_assets: bool = True, **kwargs) -> Dict[str, bytearray]:
+    def get_assets(self, experiment: Experiment, files: List[str], include_experiment_assets: bool = True, **kwargs) -> \
+            Dict[str, bytearray]:
         """
         Fetch the files associated with an experiment and its simulations.
 

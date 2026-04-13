@@ -1,0 +1,61 @@
+Bootstrap: library
+From: ubuntu:22.04
+
+%labels
+    Author idmtools
+    Version 1.0
+    Description Bioinformatics and genomics analysis environment
+
+%help
+    This container provides Python 3.11 with bioinformatics libraries:
+    - Biopython (sequence analysis)
+    - Pysam (BAM/SAM file handling)
+    - Pandas, NumPy (data manipulation)
+    - Scikit-bio (biological computation)
+    - Matplotlib, Seaborn (visualization)
+
+    Usage:
+        singularity exec bioinformatics.sif python3 analysis.py
+        singularity exec bioinformatics.sif python3 -c "import Bio; print(Bio.__version__)"
+
+%post
+    # Update system
+    apt-get update && apt-get install -y \
+        python3.11 \
+        python3-pip \
+        python3-dev \
+        build-essential \
+        zlib1g-dev \
+        libbz2-dev \
+        liblzma-dev \
+        libncurses5-dev \
+        wget \
+        ca-certificates
+
+    # Upgrade pip
+    python3 -m pip install --upgrade pip setuptools wheel
+
+    # Install bioinformatics packages
+    pip3 install --no-cache-dir \
+        numpy>=1.24.0 \
+        pandas>=2.0.0 \
+        matplotlib>=3.7.0 \
+        seaborn>=0.12.0 \
+        scipy>=1.10.0 \
+        biopython>=1.81 \
+        pysam>=0.21.0 \
+        scikit-bio>=0.5.8 \
+        plotly>=5.14.0 \
+        jupyter>=1.0.0
+
+    # Clean up
+    apt-get clean
+    rm -rf /var/lib/apt/lists/*
+    pip3 cache purge
+
+%environment
+    export PYTHONUNBUFFERED=1
+    export MPLBACKEND=Agg
+
+%runscript
+    exec python3 "$@"

@@ -10,4 +10,16 @@ try: # since cli is not required but we always try to load file, wrap in try exc
     from idmtools_platform_comps.comps_cli import CompsCLI
 except ImportError:
     pass
-__version__ = "3.0.0+nightly"
+
+try:
+    from importlib.metadata import version, PackageNotFoundError
+except ImportError:
+    # Python < 3.8
+    from importlib_metadata import version, PackageNotFoundError
+
+try:
+    __version__ = version("idmtools-platform-comps")  # Use your actual package name
+except PackageNotFoundError:
+    # Package not installed, use fallback
+    __version__ = "0.0.0+unknown"
+
