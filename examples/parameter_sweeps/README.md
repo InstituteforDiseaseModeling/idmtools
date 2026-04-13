@@ -197,6 +197,3 @@ See the [Parameter Sweeps Tutorial](../../../docs/tutorials/parameter-sweeps.md)
 ### No output files
 - Check the results directory path printed by the script
 - Verify simulations succeeded: Look for "Status: Succeeded" message
-
-### Import errors
-- Install required packages: `pip install idmtools-models`
