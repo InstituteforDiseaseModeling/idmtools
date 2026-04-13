@@ -1,6 +1,6 @@
 # COMPS Platform
 
-Comprehensive guide to using the Computational Modeling Platform Service (COMPS) with idmtools.
+Comprehensive guide to using the COMPS platform (Computational Modeling Platform Service) with idmtools.
 
 ![COMPS Platform](images/comps.png)
 

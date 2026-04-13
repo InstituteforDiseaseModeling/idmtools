@@ -6,6 +6,9 @@ Comprehensive guide to using idmtools with Slurm HPC clusters.
 
 **Slurm** is a popular open-source workload manager for HPC clusters. idmtools provides seamless integration with Slurm clusters, allowing you to submit and manage large-scale simulation workflows.
 
+!!! note "External HPC clusters"
+    Unlike [COMPS](comps.md), which is IDM's internal cloud platform, the Slurm platform is designed for **any** Slurm-managed HPC cluster — including those operated by universities, research institutions, and national labs. If your institution provides HPC access (e.g., a university computing cluster), you can use idmtools to run simulations there without any IDM-specific account.
+
 ## Key Features
 
 - **HPC Integration**: Use existing cluster infrastructure

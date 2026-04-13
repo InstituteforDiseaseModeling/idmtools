@@ -53,48 +53,13 @@ Install only what you need:
 
     Includes: core, CLI, models, General platform, Container platform
 
-## Quick Start
-
-Create your first simulation in 3 steps:
-
-### 1. Import idmtools
-
-```python
-from idmtools.core.platform_factory import Platform
-from idmtools.entities.experiment import Experiment
-from idmtools.entities.simulation import Simulation
-from idmtools_models.python.json_python_task import JSONConfiguredPythonTask
-```
-
-### 2. Create a Task
-
-```python
-task = JSONConfiguredPythonTask(
-    script_path="my_model.py",
-    parameters={"param1": 10, "param2": 20}
-)
-```
-
-### 3. Run Experiment
-
-```python
-# Create experiment
-experiment = Experiment.from_task(
-    task,
-    name="My First Experiment"
-)
-
-# Get platform and run
-with Platform("Local") as platform:
-    experiment.run(wait_until_done=True)
-```
 
 ## Next Steps
 
 - [Installation Guide](installation.md) - Detailed installation instructions
 - [Configuration](configuration.md) - Configure your environment
-- [Quick Start Tutorial](quickstart.md) - Complete walkthrough
-- [Data Analysis](../data-analysis/index.md) - Analyze simulation outputs with Analyzers, AnalyzeManager, and PlatformAnalysis
+- [Quick Start](quickstart.md) - Complete walkthrough
+
 
 ## Need Help?
 
