@@ -1,4 +1,5 @@
 """This script is used to build a docker image for the idmtools_platform_container.
+This build script is deprecated — migrate to the new Docker build script: build_container_image.py.
 
 Copyright 2024, Bill Gates Foundation. All rights reserved.
 """

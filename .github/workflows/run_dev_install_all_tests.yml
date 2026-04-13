@@ -1,5 +1,5 @@
 # dev install and run all test
-# trigger by clicking button "Run Workflow".
+# trigger by clicking button "Run Workflow" or dependabot PR.
 
 name: "run_dev_install_all_tests"
 on:
@@ -25,6 +25,10 @@ on:
         description: "Slurm Platform Test Only"
         required: false
         default: 'false'
+  pull_request_target:
+    types: [ opened, synchronize ]
+    branches:
+      - dev
 
 jobs:
   run-setup-dev-all-tests:
@@ -32,13 +36,32 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest ]
-        python-version: ['3.12']
-    env:
-      PYPI_STAGING_USERNAME: ${{ secrets.PYPI_STAGING_USERNAME }}
-      PYPI_STAGING_PASSWORD: ${{ secrets.PYPI_STAGING_PASSWORD }}
+        python-version: ['3.13']
+    # Run for:
+    # 1) Manual workflow_dispatch
+    # 2) Dependabot pull requests ONLY
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      github.actor == 'dependabot[bot]' ||
+      github.actor == 'dependabot-preview[bot]'
     steps:
-      - name: Check out Git repository
-        uses: actions/checkout@v2
+      # ------------------------
+      # Dependabot checkout
+      # ------------------------
+      - name: Checkout (Dependabot PR)
+        if: ${{ github.actor == 'dependabot[bot]' }}
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      # ------------------------
+      # Normal checkout for all other PRs / triggers
+      # ------------------------
+      - name: Checkout (normal PR)
+        if: ${{ github.actor != 'dependabot[bot]' }}
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # fetch full history and all tags
       - name: ${{ matrix.os }} Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
@@ -49,23 +72,30 @@ jobs:
           python -m pip install --upgrade pip
       - name: Install Python dependencies
         run: |
-          pip install idm-buildtools wheel pygit2 --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+          pip install wheel pygit2
 
-      - name: install idmtools
+      - name: Dev install idmtools
         run: |
-          make setup-dev-no-docker
+          python dev_scripts/bootstrap.py
       - name: login to comps2
 
         run: |
           python dev_scripts/create_auth_token_args.py --username "${{ secrets.COMPS_USER }}"
         env:
           COMPS_PASS: ${{ secrets.COMPS_PASSWORD }}
-      - name: login to docker staging
-        run: |
-          echo '${{ env.PYPI_STAGING_PASSWORD }}' | docker login idm-docker-staging.packages.idmod.org --username ${{ env.PYPI_STAGING_USERNAME }} --password-stdin
-          echo '${{ env.PYPI_STAGING_PASSWORD }}' | docker login docker-staging.packages.idmod.org --username ${{ env.PYPI_STAGING_USERNAME }} --password-stdin
       - name: run idmtools_cli tests
-        if: ${{ github.event.inputs.all_tests == 'true' || github.event.inputs.general_test == 'true' || github.event.inputs.slurm_test == 'true' || github.event.inputs.comps_test == 'true'}}
+        if: >-
+          github.actor == 'dependabot[bot]' ||
+          github.actor == 'dependabot-preview[bot]' ||
+          (
+            github.event_name == 'workflow_dispatch' &&
+            (
+              inputs.all_tests == 'true' ||
+              inputs.general_test == 'true' ||
+              inputs.slurm_test == 'true' ||
+              inputs.comps_test == 'true'
+            )
+          )
         run: |
           cd idmtools_cli
           PARALLEL_TEST_COUNT=2 make test-all
@@ -76,7 +106,18 @@ jobs:
           name: idmtools_cli_test_results
           path: idmtools_cli/tests/reports/
       - name: run idmtools_core tests
-        if: ${{ github.event.inputs.all_tests == 'true' || github.event.inputs.general_test == 'true' || github.event.inputs.slurm_test == 'true' || github.event.inputs.comps_test == 'true'}}
+        if: >
+          github.actor == 'dependabot[bot]' ||
+          github.actor == 'dependabot-preview[bot]' ||
+          (
+            github.event_name == 'workflow_dispatch' &&
+            (
+              inputs.all_tests == 'true' ||
+              inputs.general_test == 'true' ||
+              inputs.slurm_test == 'true' ||
+              inputs.comps_test == 'true'
+            )
+          )
         run: |
           cd idmtools_core
           PARALLEL_TEST_COUNT=2 make test-all
@@ -87,7 +128,18 @@ jobs:
           name: idmtools_core_test_results
           path: idmtools_core/tests/reports/
       - name: run idmtools_models tests
-        if: ${{ github.event.inputs.all_tests == 'true' || github.event.inputs.general_test == 'true' || github.event.inputs.slurm_test == 'true' || github.event.inputs.comps_test == 'true'}}
+        if: >
+          github.actor == 'dependabot[bot]' ||
+          github.actor == 'dependabot-preview[bot]' ||
+          (
+            github.event_name == 'workflow_dispatch' &&
+            (
+              inputs.all_tests == 'true' ||
+              inputs.general_test == 'true' ||
+              inputs.slurm_test == 'true' ||
+              inputs.comps_test == 'true'
+            )
+          )
         run: |
           cd idmtools_models
           PARALLEL_TEST_COUNT=2 make test-all
@@ -98,7 +150,16 @@ jobs:
           name: idmtools_models_test_results
           path: idmtools_models/tests/reports/
       - name: run idmtools_platform_general tests
-        if: ${{ github.event.inputs.all_tests == 'true' || github.event.inputs.general_test == 'true' }}
+        if: >
+          github.actor == 'dependabot[bot]' ||
+          github.actor == 'dependabot-preview[bot]' ||
+          (
+            github.event_name == 'workflow_dispatch' &&
+            (
+              inputs.all_tests == 'true' ||
+              inputs.general_test == 'true' 
+            )
+          )
         run: |
             cd idmtools_platform_general
             make test-all
@@ -109,7 +170,16 @@ jobs:
           name: idmtools_platform_general_test_results
           path: idmtools_platform_general/tests/reports/
       - name: run idmtools_platform_slurm tests
-        if: ${{ github.event.inputs.all_tests == 'true' || github.event.inputs.slurm_test == 'true' }}
+        if: >
+          github.actor == 'dependabot[bot]' ||
+          github.actor == 'dependabot-preview[bot]' ||
+          (
+            github.event_name == 'workflow_dispatch' &&
+            (
+              inputs.all_tests == 'true' ||
+              inputs.slurm_test == 'true' 
+            )
+          )
         run: |
             cd idmtools_platform_slurm
             make test-all
@@ -120,7 +190,16 @@ jobs:
           name: idmtools_platform_slurm_test_results
           path: idmtools_platform_slurm/tests/reports/
       - name: run idmtools_platform_container tests
-        if: ${{ github.event.inputs.all_tests == 'true' || github.event.inputs.container_test == 'true' }}
+        if: >
+          github.actor == 'dependabot[bot]' ||
+          github.actor == 'dependabot-preview[bot]' ||
+          (
+            github.event_name == 'workflow_dispatch' &&
+            (
+              inputs.all_tests == 'true' ||
+              inputs.container_test == 'true' 
+            )
+          )
         run: |
             cd idmtools_platform_container
             make test-all
@@ -131,7 +210,16 @@ jobs:
           name: idmtools_platform_container_test_results
           path: idmtools_platform_container/tests/reports/
       - name: run idmtools_platform_comps tests
-        if: ${{ github.event.inputs.all_tests == 'true' || github.event.inputs.comps_test == 'true' }}
+        if: >
+          github.actor == 'dependabot[bot]' ||
+          github.actor == 'dependabot-preview[bot]' ||
+          (
+            github.event_name == 'workflow_dispatch' &&
+            (
+              inputs.all_tests == 'true' ||
+              inputs.comps_test == 'true'
+            )
+          )
         run: |
           cd idmtools_platform_comps
           PARALLEL_TEST_COUNT=2 make test-all

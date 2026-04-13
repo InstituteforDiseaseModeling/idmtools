@@ -4,11 +4,10 @@
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**
 
   - [Installing](#installing)
 - [Development Tips](#development-tips)
-- [Building SSMT Docker Image](#building-ssmt-docker-image)
+- [Building SSMT Docker Image Locally](#building-ssmt-docker-image-locally)
 - [Choose SSMT Docker Image to use in test/script](#choose-ssmt-docker-image-to-use-in-testscript)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -16,7 +15,7 @@
 ## Installing
 
 ```bash
-pip install idmtools-platform-comps --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+pip install idmtools-platform-comps
 ```
 
 # Development Tips
@@ -30,17 +29,16 @@ coverage    -   Run tests and generate coverage report that is shown in browser
 ```
 On Windows, you can use `pymake` instead of `make`
 
-# Building SSMT Docker Image
+# Building SSMT Docker Image Locally
 
 To build the SSMT Docker image, follow these steps
 
 1. ```bash
-   docker login docker-production.packages.idmod.org
+   docker login ghcr.io -u username -p password
    ```
 2. ```bash
-   make ssmt-image
+   make ssmt-image-docker-build
    ```
-3. When prompted, enter your idm username and password
 
 # Choose SSMT Docker Image to use in test/script
 
@@ -52,19 +50,10 @@ There are three ways to choose which ssmt docker image to use in your script:
 ```   
 2. define docker_image in your idmtools.ini, for example:
 ```bash
-    [COMPS2]
+    [COMPS]
     type = COMPS
     endpoint = https://comps.idmod.org
     environment = Calculon
     ......
     docker_image = my_test_ssmt_docker_image
 ```
-
-3. if not above two cases, idomtools system will determine the default ssmt docker image from platform for you:
-
-   if endpoint = https://comps.idmod.org, it will use production docker image
-   
-   for all other cases, it will use the staging docker image
-   
-Note: if user overrode docker image in wi (case #1) and also defined docker image in idmtools.ini (case #2), 
-      it will take #1 as higher priority

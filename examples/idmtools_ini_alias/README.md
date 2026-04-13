@@ -1,6 +1,5 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**
 
 - [Notes:](#notes)
 
@@ -15,3 +14,5 @@ There are 2 cases for platform config:
    example_override_config_calculon.py
    example_override_config_belegost.py
 
+3. Validate platform type in idmtools.ini:
+{'COMPS', 'CONTAINER', 'FILE', 'PROCESS', 'SLURM', 'SSMT', 'TEST', 'TESTEXECUTE'}

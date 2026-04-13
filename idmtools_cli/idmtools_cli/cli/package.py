@@ -23,7 +23,7 @@ def latest_version(name: Optional[str]):
     Args:
         name: package name
     """
-    from idmtools_platform_comps.utils.package_version import get_latest_version
+    from idmtools_platform_comps.utils.package_version_new import get_latest_version
     v = get_latest_version(name)
     print(v)
 
@@ -39,7 +39,7 @@ def compatible_version(name: Optional[str], base_version: Optional[str]):
         name: package name
         base_version: package version
     """
-    from idmtools_platform_comps.utils.package_version import get_latest_compatible_version
+    from idmtools_platform_comps.utils.package_version_new import get_latest_compatible_version
     v = get_latest_compatible_version(name, base_version)
     print(v)
 
@@ -55,7 +55,7 @@ def list_versions(name: Optional[str], all: Optional[bool]):
         name: package name
         all: True/False - return all or only released versions
     """
-    from idmtools_platform_comps.utils.package_version import fetch_package_versions
+    from idmtools_platform_comps.utils.package_version_new import fetch_package_versions
     versions = fetch_package_versions(name, not all)
     print(versions)
 

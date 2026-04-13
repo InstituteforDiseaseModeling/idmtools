@@ -30,7 +30,8 @@ from idmtools.entities.relation_type import RelationType
 from idmtools.utils.hashing import calculate_md5_stream
 from idmtools_platform_comps.ssmt_work_items.comps_workitems import InputDataWorkItem
 from idmtools_platform_comps.utils.general import save_sif_asset_md5_from_ac_id
-from idmtools_platform_comps.utils.package_version import get_docker_manifest, get_digest_from_docker_hub
+from idmtools_platform_comps.utils.package_version import get_docker_manifest
+from idmtools_platform_comps.utils.package_version_new import get_ghcr_manifest, get_digest_from_docker_hub
 
 if TYPE_CHECKING:
     from idmtools.entities.iplatform import IPlatform
@@ -129,9 +130,22 @@ class SingularityBuildWorkItem(InputDataWorkItem):
         """
         url_info = urlparse(value)
         if url_info.scheme == "docker":
-            if "packages.idmod.org" in value:
+            if "ghcr.io" in value:
+                path = url_info.path
+                image_name = path.split('/')[2].split(':')[0]
+
+                # Get image tag
+                tag = path.split(':')[1]
+
+                # Get owner/org
+                org = path.split('/')[1]
+
+                full_manifest = get_ghcr_manifest(image_name, tag, org)
+                self.__digest = full_manifest.get('config', {}).get('digest') or full_manifest.get('digest')
+                self.__image_tag = f"{image_name}:{tag}"
+            elif "packages.idmod.org" in value:
                 full_manifest, self.__image_tag = get_docker_manifest(url_info.path)
-                self.__digest = full_manifest['config']['digest']
+                self.__digest = full_manifest.get('config', {}).get('digest') or full_manifest.get('digest')
             else:
                 self.__image_tag = url_info.netloc + ":latest" if ":" not in value else url_info.netloc
                 image, tag = url_info.netloc.split(":")
@@ -278,7 +292,10 @@ class SingularityBuildWorkItem(InputDataWorkItem):
                 self.image_tags['digest'] = self.__digest
                 self.image_tags['image_from'] = self.__image_tag
                 if self.image_name is None:
-                    self.image_name = self.__image_tag.strip(" /").replace(":", "_").replace("/", "_") + ".sif"
+                    if self.__image_tag is not None:
+                        self.image_name = self.__image_tag.strip(" /").replace(":", "_").replace("/", "_") + ".sif"
+                    else:
+                        self.image_name = self.image_url.split('/')[-1].split(':')[0] + '.sif'
             # If we are building from a file, add the build context
             elif self.definition_file:
                 self.image_tags['build_context'] = self.context_checksum()

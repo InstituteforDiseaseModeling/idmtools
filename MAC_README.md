@@ -1,6 +1,5 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**
 
 - [Instruction for running idmtools on macOS](#instruction-for-running-idmtools-on-macos)
   - [Pre-requisites](#pre-requisites)
@@ -24,17 +23,17 @@
     ```
 - Install emodpy related disease models if running emod related disease models 
     ```bash
-    pip install emodpy-xxx --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple
+    pip install emodpy-xxx
     ```
   xxx can be replaced with the specific emodpy package name you want to install.
 
 - Install/update the latest idmtools related packages
     ```bash
-    pip install idmtools\[full\] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple --full-reinstall --no-cache-dir --upgrade
+    pip install idmtools\[full\] --full-reinstall --no-cache-dir --upgrade
     ```
 - Optional: Install only idmtools **container** packages if you are only interested in running simulations on local Docker container platform
     ```bash
-    pip install idmtools\[container\] --index-url=https://packages.idmod.org/api/pypi/pypi-production/simple --full-reinstall --no-cache-dir --upgrade
+    pip install idmtools\[container\] --full-reinstall --no-cache-dir --upgrade
     ```
   
 ## Run examples

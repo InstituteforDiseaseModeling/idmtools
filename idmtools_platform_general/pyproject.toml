@@ -1,16 +1,14 @@
 [build-system]
-requires = [
-    "setuptools>=61.0",
-    "wheel",
-]
+requires = ["setuptools>=61", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "idmtools_platform_general"
-version = "3.0.0"
+dynamic = ["version"]
 description = "General platform for IDM-Tools"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
+license-files = ["LICENSE.txt"]
 keywords = [
     "modeling",
     "IDM",
@@ -23,15 +21,16 @@ authors = [
     { name = "Ross Carter", email = "rcarter@idmod.org" },
 ]
 classifiers = [
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Operating System :: OS Independent",
 ]
 dependencies = [
-    "idmtools~=3.0.0",
-    "idmtools_cli~=3.0.0",
+    "idmtools~=3.0",
+    "idmtools_cli~=3.0",
 ]
 
 [project.urls]
@@ -39,28 +38,16 @@ Homepage = "https://github.com/InstituteforDiseaseModeling/idmtools"
 
 [project.optional-dependencies]
 test = [
-    "pytest",
-    "matplotlib",
-    "pytest-timeout",
-    "pytest-cache",
-    "pytest-lazy-fixture",
-    "flake8",
-    "coverage",
-    "bump2version",
-    "twine",
-    "natsort",
-    "idmtools_models",
+    "idmtools[test]",
     "idmtools_test",
 ]
 packaging = [
-    "flake8",
-    "coverage",
-    "bump2version",
-    "twine",
-    "natsort",
+    "flake8~=7.3",
+    "twine~=6.2",
+    "natsort~=8.4",
 ]
 
-[project.entry-points.idmtools_platform]
+[project.entry-points."idmtools_platform"]
 idmtools_platform_file = "idmtools_platform_file.plugin_info:FilePlatformSpecification"
 idmtools_platform_process = "idmtools_platform_process.plugin_info:ProcessPlatformSpecification"
 
@@ -71,9 +58,8 @@ file = "idmtools_platform_file.cli.file:file"
 include-package-data = true
 
 [tool.setuptools.packages.find]
-exclude = [
-    "tests",
-]
+where = ["."]
+include = ["idmtools_platform_*"]
 
 [tool.setuptools.package-data]
 idmtools_platform_file = [
@@ -82,3 +68,9 @@ idmtools_platform_file = [
 idmtools_platform_process = [
     "*",
 ]
+
+[tool.setuptools_scm]
+root = ".."
+version_scheme = "no-guess-dev"
+local_scheme = "no-local-version"
+fallback_version = "0.0.0.dev0"

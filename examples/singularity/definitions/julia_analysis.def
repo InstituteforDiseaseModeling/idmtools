@@ -1,0 +1,55 @@
+Bootstrap: library
+From: ubuntu:22.04
+
+%labels
+    Author idmtools
+    Version 1.0
+    Description Julia environment for scientific computing
+
+%help
+    This container provides Julia 1.9+ with common scientific packages:
+    - DataFrames.jl (data manipulation)
+    - Plots.jl (visualization)
+    - DifferentialEquations.jl (ODEs/PDEs)
+    - Optimization.jl (optimization)
+    - JSON.jl (JSON reading/writing)
+    - CSV.jl (CSV reading/writing)
+
+    Usage:
+        singularity exec julia_analysis.sif julia my_script.jl
+        singularity exec julia_analysis.sif julia --version
+
+%post
+    # Update and install dependencies
+    apt-get update && apt-get install -y \
+        wget \
+        ca-certificates \
+        build-essential \
+        gfortran \
+        libopenblas-dev
+
+    # Install Julia
+    JULIA_VERSION=1.9.3
+    cd /tmp
+    wget https://julialang-s3.julialang.org/bin/linux/x64/1.9/julia-${JULIA_VERSION}-linux-x86_64.tar.gz
+    tar -xzf julia-${JULIA_VERSION}-linux-x86_64.tar.gz
+    mv julia-${JULIA_VERSION} /opt/julia
+    ln -s /opt/julia/bin/julia /usr/local/bin/julia
+
+    # Install Julia packages
+    julia -e 'using Pkg; Pkg.add(["DataFrames", "CSV", "JSON", "Plots", "StatsBase", "Distributions", "DifferentialEquations", "Optimization", "OptimizationOptimJL"])'
+
+    # Precompile packages
+    julia -e 'using DataFrames, CSV, JSON, Plots, StatsBase, Distributions'
+
+    # Clean up
+    apt-get clean
+    rm -rf /var/lib/apt/lists/*
+    rm -rf /tmp/*
+
+%environment
+    export JULIA_DEPOT_PATH=/opt/julia-depot
+    export PATH=/opt/julia/bin:$PATH
+
+%runscript
+    exec julia "$@"

@@ -1,16 +1,14 @@
 [build-system]
-requires = [
-    "setuptools>=61.0",
-    "wheel",
-]
+requires = ["setuptools>=61", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "idmtools_platform_container"
-version = "3.0.0"
+dynamic = ["version"]
 description = "Container platform for IDM-Tools"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
+license-files = ["LICENSE.txt"]
 keywords = [
     "modeling",
     "IDM",
@@ -28,16 +26,17 @@ authors = [
     { name = "Ross Carter", email = "rcarter@idmod.org" },
 ]
 classifiers = [
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Operating System :: OS Independent",
 ]
 dependencies = [
-    "idmtools_platform_general~=3.0.0",
-    "docker>5.0",
-    "rich",
+    "idmtools_platform_general~=3.0",
+    "docker~=7.0",
+    "rich~=14.3",
 ]
 
 [project.urls]
@@ -45,29 +44,17 @@ Homepage = "https://github.com/InstituteforDiseaseModeling/idmtools"
 
 [project.optional-dependencies]
 test = [
-    "pytest",
-    "pytest-runner",
-    "matplotlib",
-    "pytest-timeout",
-    "pytest-cache",
-    "pytest-lazy-fixture",
-    "flake8",
-    "coverage",
-    "bump2version",
-    "twine",
-    "natsort",
-    "idmtools_models",
+    "idmtools[test]",
     "idmtools_test",
+    "idmtools_models",
 ]
 packaging = [
     "flake8",
-    "coverage",
-    "bump2version",
     "twine",
     "natsort",
 ]
 
-[project.entry-points.idmtools_platform]
+[project.entry-points."idmtools_platform"]
 idmtools_platform_container = "idmtools_platform_container.plugin_info:ContainerPlatformSpecification"
 
 [project.entry-points."idmtools_cli.cli_plugins"]
@@ -85,3 +72,9 @@ exclude = [
 idmtools_platform_container = [
     "*",
 ]
+
+[tool.setuptools_scm]
+root = ".."
+version_scheme = "no-guess-dev"
+local_scheme = "no-local-version"
+fallback_version = "0.0.0.dev0"

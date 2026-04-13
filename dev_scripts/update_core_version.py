@@ -4,7 +4,7 @@ import os
 import glob
 import re
 import tomllib  # use 'tomli' if you're on Python <3.11
-import tomli_w  # write support; install with `pip install tomli-w`
+# import tomli_w  # write support; install with `pip install tomli-w`
 
 REPO_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 CORE_PATH = os.path.join(REPO_PATH, 'idmtools_core')
@@ -16,11 +16,17 @@ def get_current_version() -> str:
     Returns:
         Current version of idmtools_core.
     """
-    with open(os.path.join(CORE_PATH, "pyproject.toml"), "rb") as f:
-        data = tomllib.load(f)
+    from importlib.metadata import version, PackageNotFoundError
 
-    version = data["project"]["version"]
-    return version
+    package = "idmtools"
+    base_version = ""
+    try:
+        version_str = version(package)
+        base_version = ".".join(version_str.split(".")[:3])
+        print(f"{package}: {version}")
+    except PackageNotFoundError:
+        print(f"{package}: not installed")
+    return base_version
 
 
 def update_requirements():
@@ -45,9 +51,10 @@ def update_requirements():
 def update_idmtools_version_in_pyproject():
     """Update idmtools and idmtools_platform_general dependency versions in pyproject.toml files."""
     # Match idmtools or idmtools_platform_general optionally with version specifier
-    pattern_idmtools = re.compile(r'^idmtools([ \t]*(==|~=|>=|<=)?[ \t]*[\d\.]+)?$')
-    pattern_general = re.compile(r'^idmtools_platform_general([ \t]*(==|~=|>=|<=)?[ \t]*[\d\.]+)?$')
-    pattern_cli = re.compile(r'^idmtools_cli([ \t]*(==|~=|>=|<=)?[ \t]*[\d\.]+)?$')
+    # pattern_idmtools = re.compile(r'^idmtools([ \t]*(==|~=|>=|<=)?[ \t]*[\d\.]+)?$')
+    pattern_idmtools = re.compile(r'^idmtools([\t ]*(==|~=|>=|<=|>|<)[\t ]*[\d\.]+)*')
+    pattern_general = re.compile(r'^idmtools_platform_general([\t ]*(==|~=|>=|<=|>|<)[\t ]*[\d\.]+)*')
+    pattern_cli = re.compile(r'^idmtools_cli([\t ]*(==|~=|>=|<=|>|<)[\t ]*[\d\.]+)*')
 
     current_version = get_current_version()
     new_idmtools_dep = f"idmtools~={current_version}"
@@ -87,7 +94,8 @@ def update_idmtools_version_in_pyproject():
         # Only write once if something changed
         if updated:
             with open(file, "wb") as f:
-                tomli_w.dump(pyproject_data, f)
+                # tomli_w.dump(pyproject_data, f)  disable this to avoid changing the pyproject.toml file by accident
+                pass
 
 
 update_idmtools_version_in_pyproject()

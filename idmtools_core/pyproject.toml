@@ -1,14 +1,14 @@
 [build-system]
-requires = ["setuptools>=64.0", "wheel"]
+requires = ["setuptools>=61", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "idmtools"
-version = "3.0.0"
+dynamic = ["version"]
 description = "Core tools for modeling"
 readme = "README.md"
-requires-python = ">=3.8"
-license = { text = "Proprietary or specify if known" }
+requires-python = ">=3.10"
+license-files = ["LICENSE.txt"]
 authors = [
     { name = "Zhaowei Du", email = "zdu@idmod.org" },
     { name = "Sharon Chen", email = "shchen@idmod.org" },
@@ -20,30 +20,37 @@ authors = [
     { name = "Ross Carter", email = "rcarter@idmod.org" },
     { name = "Mandy Izzo", email = "mizzo@idmod.org" },
     { name = "Mary Fisher", email = "mafisher@idmod.org" },
-    { name = "Lauren George", email = "lgeorge@idmod.org" }
+    { name = "Lauren George", email = "lgeorge@idmod.org" },
 ]
-keywords = ["modeling", "IDM", "IDMTools"]
+keywords = [
+    "modeling",
+    "IDM",
+    "IDMTools",
+]
 classifiers = [
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Operating System :: OS Independent",
 ]
 dependencies = [
-    "backoff>=1.10.0,<2.3",
+    "backoff~=2.2",
     "coloredlogs~=15.0",
-    "diskcache~=5.4.0",
-    "filelock",
-    "more-itertools~=10.3.0",
-    "numpy!=1.19.4",
-    "pandas>=1.1.4",
-    "pluggy~=1.4",
-    "PyYAML>=5.3.0,<6.1",
-    "tabulate>=0.8.9,<0.10",
-    "tqdm>=4.52.0,<5",
-    "jinja2~=3.1.3",
-    "packaging>=20.4,<25.0"
+    "diskcache~=5.4",
+    "filelock~=3.21",
+    "more-itertools~=10.3",
+    "pandas~=3.0; python_version >= '3.11'",
+    "pandas~=2.2; python_version < '3.11'",
+    "numpy>=1.26,<3.0; python_version >= '3.11'",
+    "numpy>=1.26,<2.3; python_version < '3.11'",
+    "pluggy~=1.6",
+    "PyYAML~=6.0",
+    "tabulate~=0.9",
+    "tqdm~=4.67",
+    "jinja2~=3.1",
+    "packaging>24.0",
 ]
 
 [project.urls]
@@ -52,54 +59,30 @@ Documentation = "https://idmtools.readthedocs.io"
 "Bug Tracker" = "https://github.com/InstituteforDiseaseModeling/idmtools/issues"
 
 [project.optional-dependencies]
-dev = [
-    "allure-pytest>=2.8.34,<2.14",
-    "junitparser~=3.1.2",
-    "livereload~=2.6.3",
-    "pytest-cache~=1.0",
-    "pytest-cov>=2.11.1",
-    "pytest-html~=3.1.1",
-    "py>=1.11.0",
-    "pytest-mock",
-    "pytest-timeout~=2.3.1",
-    "pytest-xdist~=3.5",
-    "pytest~=7.2",
-    "pytest-lazy-fixture",
-    "jinja2~=3.1.3"
-]
-
-build = [
-    "build",
-    "bump2version~=1.0.1",
-    "coverage>=5.3,<7.5",
-    "flake8>=3.9.1",
-    "flake8-docstrings>=1.6.0",
-    "idm-buildtools>=1.0.3",
-    "twine>=3.4.1",
-    "jinja2~=3.1.3"
-]
-
 test = [
-    "allure-pytest>=2.8.34,<2.14",
-    "junitparser~=3.1.2",
-    "livereload~=2.6.3",
-    "pytest-cache~=1.0",
-    "pytest-cov>=2.11.1",
-    "pytest-html~=3.1.1",
-    "py>=1.11.0",
-    "pytest-mock",
-    "pytest-timeout~=2.3.1",
-    "pytest-xdist~=3.5",
-    "pytest~=7.2",
-    "pytest-lazy-fixture",
+    "allure-pytest~=2.15",
+    "junitparser~=4.0",
+    "livereload~=2.6",
+    "pytest~=9.0",
+    "pytest-cov~=7.0",
+    "pytest-html~=4.2",
+    "pytest-mock~=3.15",
+    "pytest-timeout~=2.4.0",
+    "pytest-xdist~=3.8",
+    "flake8~=7.3",
+    "flake8-docstrings~=1.7",
+    "coverage ~= 7.13; python_version >= '3.10'",
+    "coverage >= 7.6, < 7.11; python_version < '3.10'",
+    "twine~=6.2",
 ]
-
-notebooks = ["docker>5.0"]
+notebooks = [
+    "docker>5.0",
+]
 packaging = []
 idm = [
     "idmtools_platform_comps",
     "idmtools_cli",
-    "idmtools_models"
+    "idmtools_models",
 ]
 full = [
     "idmtools_platform_comps",
@@ -107,27 +90,20 @@ full = [
     "idmtools_models",
     "idmtools_platform_general",
     "idmtools_platform_slurm",
-    "idmtools_platform_container"
+    "idmtools_platform_container",
 ]
 container = [
     "idmtools_cli",
     "idmtools_models",
     "idmtools_platform_general",
-    "idmtools_platform_container"
+    "idmtools_platform_container",
 ]
 slurm = [
     "idmtools_cli",
     "idmtools_models",
     "idmtools_platform_general",
-    "idmtools_platform_slurm"
+    "idmtools_platform_slurm",
 ]
-
-[tool.setuptools]
-packages = { find = { exclude = ["tests"] } }
-include-package-data = true  #  This enables MANIFEST.in for wheel builds
-
-[tool.setuptools.package-data]
-"idmtools" = ["*"]
 
 [project.entry-points."idmtools_experiment"]
 idmtools_experiment = "idmtools.entities.experiment:ExperimentSpecification"
@@ -138,3 +114,22 @@ idmtools_task_docker = "idmtools.core.docker_task:DockerTaskSpecification"
 
 [project.entry-points."idmtools_hooks"]
 idmtools_add_git_tag = "idmtools.plugins.git_commit"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+exclude = [
+    "tests",
+]
+
+[tool.setuptools.package-data]
+idmtools = [
+    "*",
+]
+
+[tool.setuptools_scm]
+root = ".."
+version_scheme = "no-guess-dev"
+local_scheme = "no-local-version"
+fallback_version = "0.0.0.dev0"

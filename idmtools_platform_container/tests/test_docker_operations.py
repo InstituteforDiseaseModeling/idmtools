@@ -25,6 +25,7 @@ class TestDockerOperations(unittest.TestCase):
     @patch('idmtools_platform_container.container_operations.docker_operations.is_docker_daemon_running')
     @patch('idmtools_platform_container.container_operations.docker_operations.check_local_image')
     @patch('idmtools_platform_container.container_operations.docker_operations.pull_docker_image')
+    @patch('idmtools_platform_container.container_operations.docker_operations.pull_docker_image_if_changed')
     @patch('idmtools_platform_container.container_operations.docker_operations.stop_all_containers')
     @patch('idmtools_platform_container.container_operations.docker_operations.sort_containers_by_start')
     @patch('idmtools_platform_container.container_platform.ContainerPlatform.retrieve_match_containers')
@@ -33,11 +34,11 @@ class TestDockerOperations(unittest.TestCase):
     @patch('platform.system')
     def test_validate_container(self, mock_sys_platform, mock_get_container, mock_logger, mock_retrieve_match_containers,
                                         mock_sort_containers_by_start, mock_stop_all_containers,
-                                        mock_pull_docker_image, mock_check_local_image, mock_is_docker_daemon_running,
+                                        mock_pull_if_changed, mock_pull_docker_image, mock_check_local_image, mock_is_docker_daemon_running,
                                         mock_is_docker_installed):
         platform = MagicMock(spec=ContainerPlatform)
         platform.data_mount = '/home/container_data'
-        platform.docker_image = 'test_image'
+        platform.docker_image = 'test_image:latest'
         platform.force_start = False
         platform.new_container = False
         platform.include_stopped = False
@@ -46,6 +47,7 @@ class TestDockerOperations(unittest.TestCase):
         mock_is_docker_daemon_running.return_value = True
         mock_check_local_image.return_value = True
         mock_pull_docker_image.return_value = True
+        mock_pull_if_changed.return_value = True
         mock_sys_platform.return_value = "Linux"
         with self.subTest("test_with_running_container_exists_dir"):
             mock_container1 = MagicMock(short_id='test_container_id1')
@@ -61,7 +63,7 @@ class TestDockerOperations(unittest.TestCase):
             platform.retrieve_match_containers.return_value = mock_retrieve_match_containers.return_value
             platform.start_container.return_value = 'new_container_id'
             container_id = validate_container_running(platform)  # return latest running container which is mock_container2
-
+            mock_pull_if_changed.assert_called_once_with('test_image:latest')
             # Assert
             mock_container1.exec_run.assert_called_once_with(
                 "bash -c \'[ \"$(ls -lart /home/container_data | wc -l)\" -ge 3 ] && echo exists || echo not_exists\'")

@@ -1,16 +1,14 @@
 [build-system]
-requires = [
-    "setuptools>=61.0",
-    "wheel",
-]
+requires = ["setuptools>=61", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "idmtools_cli"
-version = "3.0.0"
+dynamic = ["version"]
 description = "CLI for IDM-Tools"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
+license-files = ["LICENSE.txt"]
 keywords = [
     "modeling",
     "IDM",
@@ -25,41 +23,26 @@ authors = [
     { name = "Benoit Raybaud", email = "braybaud@idmod.org" },
 ]
 classifiers = [
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Operating System :: OS Independent",
 ]
 dependencies = [
     "click~=8.1.7",
     "click-plugins",
     "colorama~=0.4.6",
-    "cookiecutter~=2.6.0",
-    "idmtools~=3.0.0",
-    "tabulate>=0.8.9,<0.10",
+    "cookiecutter~=2.6",
+    "idmtools~=3.0",
     "pyperclip~=1.8",
-    "yaspin>=1.2.0,<3.1.0",
+    "yaspin~=3.0",
 ]
 
 [project.optional-dependencies]
-dev = [
-    "flake8",
-    "coverage",
-    "bump2version",
-]
 test = [
-    "pytest",
-    "pytest-timeout",
-    "pytest-cache",
-    "flake8",
-    "coverage",
-    "bump2version",
-]
-packaging = [
-    "flake8",
-    "coverage",
-    "bump2version",
+    "idmtools[test]",
 ]
 
 [project.scripts]
@@ -80,3 +63,9 @@ exclude = [
 idmtools_cli = [
     "*",
 ]
+
+[tool.setuptools_scm]
+root = ".."                           # keep if your monorepo needs it
+version_scheme = "no-guess-dev"       # ← change to this (or "guess-next-dev")
+local_scheme = "no-local-version"     # ← change to this (critical for PyPI/TestPyPI uploads)
+fallback_version = "0.0.0.dev0"

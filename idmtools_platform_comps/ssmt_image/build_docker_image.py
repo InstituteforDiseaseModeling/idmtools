@@ -1,10 +1,12 @@
 """This script is currently a workaround so that we can use bump2version with docker since the nightly versions doesn't work with docker registry.
-
+This build script is deprecated — migrate to the new Docker build script: build_ssmt_image.py.
 Notes:
     If you are using this script locally, you need to set the environment variables *PYPI_STAGING_USERNAME* and *PYPI_STAGING_PASSWORD*.
     These can be set to your idm email/password
 
 Copyright 2021, Bill & Melinda Gates Foundation. All rights reserved.
+
+Note: this script is deprecated, use build_ssmt_image.py instead.
 """
 import argparse
 import glob

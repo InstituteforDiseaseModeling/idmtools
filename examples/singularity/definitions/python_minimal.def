@@ -1,0 +1,48 @@
+Bootstrap: library
+From: ubuntu:22.04
+
+%labels
+    Author idmtools
+    Version 1.0
+    Description Minimal Python environment - fast build time
+
+%help
+    This container provides a minimal Python 3.11 environment with only essential packages.
+    Build time: ~2-3 minutes (vs 10+ minutes for full environments)
+
+    Includes:
+    - Python 3.11
+    - NumPy (numerical computing)
+    - Matplotlib (basic plotting)
+
+    Usage:
+        singularity exec python_minimal.sif python3 script.py
+
+    When to use:
+    - Quick testing and prototyping
+    - Simple scripts that don't need heavy dependencies
+    - When build time is critical
+
+%post
+    # Update and install Python
+    apt-get update && apt-get install -y \
+        python3.11 \
+        python3-pip \
+        ca-certificates
+
+    # Install minimal packages
+    pip3 install --no-cache-dir \
+        numpy>=1.24.0 \
+        matplotlib>=3.7.0
+
+    # Clean up
+    apt-get clean
+    rm -rf /var/lib/apt/lists/*
+    pip3 cache purge
+
+%environment
+    export PYTHONUNBUFFERED=1
+    export MPLBACKEND=Agg
+
+%runscript
+    exec python3 "$@"

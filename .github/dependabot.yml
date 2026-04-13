@@ -4,8 +4,14 @@ updates:
     directory: "/" # Location of package manifests
     target-branch: "dev"
     reviewers:
-     - "devclinton"
      - "shchen-idmod"
      - "ZDu-idm"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    rebase-strategy: "auto"
+    ignore:
+      # Optional: example of skipping major version bumps
+      - dependency-name: "numpy"
+        update-types: [ "version-update:semver-major" ]

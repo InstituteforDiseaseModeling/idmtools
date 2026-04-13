@@ -1,16 +1,14 @@
 [build-system]
-requires = [
-    "setuptools>=61.0",
-    "wheel",
-]
+requires = ["setuptools>=61", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "idmtools_platform_slurm"
-version = "3.0.0"
+dynamic = ["version"]
 description = "Provides ability to run against Slurm"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
+license-files = ["LICENSE.txt"]
 keywords = [
     "modeling",
     "IDM",
@@ -23,15 +21,16 @@ authors = [
     { name = "Benoit Raybaud", email = "braybaud@idmod.org" },
 ]
 classifiers = [
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Operating System :: OS Independent",
 ]
 dependencies = [
-    "idmtools_platform_general~=3.0.0",
-    "dataclasses-json",
+    "idmtools_platform_general~=3.0",
+    "dataclasses-json~=0.6",
 ]
 
 [project.urls]
@@ -39,12 +38,12 @@ Homepage = "https://github.com/InstituteforDiseaseModeling/idmtools"
 
 [project.optional-dependencies]
 test = [
-    "pytest",
+    "idmtools[test]",
     "idmtools_models",
     "idmtools_test",
 ]
 
-[project.entry-points.idmtools_platform]
+[project.entry-points."idmtools_platform"]
 idmtools_platform_slurm = "idmtools_platform_slurm.plugin_info:SlurmPlatformSpecification"
 
 [project.entry-points."idmtools_cli.cli_plugins"]
@@ -62,3 +61,9 @@ exclude = [
 idmtools_platform_slurm = [
     "*",
 ]
+
+[tool.setuptools_scm]
+root = ".."                           # keep if your monorepo needs it
+version_scheme = "no-guess-dev"       # ← change to this (or "guess-next-dev")
+local_scheme = "no-local-version"     # ← change to this (critical for PyPI/TestPyPI uploads)
+fallback_version = "0.0.0.dev0"
