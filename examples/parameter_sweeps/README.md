@@ -17,7 +17,6 @@
   - [Troubleshooting](#troubleshooting)
     - [Model doesn't run](#model-doesnt-run)
     - [No output files](#no-output-files)
-    - [Import errors](#import-errors)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -197,6 +196,3 @@ See the [Parameter Sweeps Tutorial](../../../docs/tutorials/parameter-sweeps.md)
 ### No output files
 - Check the results directory path printed by the script
 - Verify simulations succeeded: Look for "Status: Succeeded" message
-
-### Import errors
-- Install required packages: `pip install idmtools-models`
