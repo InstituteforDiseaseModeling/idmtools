@@ -4,11 +4,31 @@ Run your first idmtools simulation using a SIR (Susceptible-Infected-Recovered) 
 
 ## Prerequisites
 
-Install idmtools with Container platform support:
+=== "Container"
 
-```bash
-pip install idmtools[container]
-```
+    Install idmtools with Container platform support:
+
+    ```bash
+    pip install idmtools[container]
+    ```
+
+    No account required — simulations run locally in Docker containers.
+
+=== "COMPS"
+
+    Install idmtools with COMPS platform support:
+
+    ```bash
+    pip install idmtools[idm]
+    ```
+
+    You will also need:
+
+    - A COMPS account (contact IDM to obtain credentials)
+    - Network access to the COMPS endpoint
+    - Your COMPS username and password ready for authentication
+
+    See [COMPS Platform](../platforms/comps.md) for full setup details.
 
 ## Step 1: Create the Model — `sir_model.py`
 

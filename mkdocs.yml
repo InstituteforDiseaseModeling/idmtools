@@ -65,9 +65,8 @@ nav:
   - Getting Started:
     - getting-started/index.md
     - Installation: getting-started/installation.md
-    - Quick Start: getting-started/quickstart.md
     - Configuration: getting-started/configuration.md
-    - Data Analysis: data-analysis/index.md
+    - Quick Start: getting-started/quickstart.md
 
   - User Guide:
     - user-guide/index.md

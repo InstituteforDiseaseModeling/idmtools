@@ -61,9 +61,10 @@ platform = Platform("My_container")
 # Without idmtools.ini
 platform = Platform("Container", job_directory="MY_JOB_DIRECTORY")
 ```
-Note, to get platform aliases, run idmtools cli command:
+!!! note
+    To get platform aliases, run idmtools cli command:
 
-`idmtools info plugins platform-aliases`
+    `idmtools info plugins platform-aliases`
 
 ## Next Steps
 
