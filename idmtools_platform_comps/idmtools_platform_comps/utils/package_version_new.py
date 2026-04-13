@@ -236,17 +236,14 @@ def get_ghcr_manifest(
         manifest = response.json()
         media_type = manifest.get('mediaType', '')
 
-        # Check if it's a manifest list/index (multi-platform)
         if 'index' in media_type or 'manifest.list' in media_type:
-            logger.info(f"Found multi-platform image, extracting {platform} manifest")
-            manifest = _extract_platform_manifest(
-                manifest,
-                platform,
-                manifest_url,
-                bearer_token,
-                org,
-                image_name
+            manifests = manifest.get('manifests', [])
+            # prefer amd64, fallback to first
+            amd64 = next(
+                (m for m in manifests if m.get('platform', {}).get('architecture') == 'amd64'),
+                manifests[0] if manifests else None
             )
+            return amd64
 
         return manifest
 
