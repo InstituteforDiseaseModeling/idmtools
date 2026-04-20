@@ -211,14 +211,17 @@ class ITask(metaclass=ABCMeta):
         """
         raise NotImplementedError("Reloading task from a simulation is not supported")
 
-    def to_simulation(self):
+    def to_simulation(self, name: str = None):
         """
         Convert task to simulation.
+
+        Args:
+            name: simulation name
 
         Returns: new simulation
         """
         from idmtools.entities.simulation import Simulation
-        s = Simulation()
+        s = Simulation(name=name)
         s.task = self
         return s
 
