@@ -74,31 +74,61 @@ def validate_container_running(platform, **kwargs) -> str:
 
     if not platform.new_container and platform.container_prefix is None:
         if len(container_running) > 0:
-            # Pick up the first running container
             container_running = sort_containers_by_start(container_running)
-            container_id = container_running[0].short_id
-            container = get_container(container_id)
-            if sys_platform.system() not in ["Windows"]:
-                command = f"bash -c '[ \"$(ls -lart {platform.data_mount} | wc -l)\" -ge 3 ] && echo exists || echo not_exists'"
-                result = container.exec_run(command)
-                output = result.output.decode().strip()
-                if output == "not_exists":
-                    stop_container(container_id, remove=True)
-                    if logger.isEnabledFor(DEBUG):
-                        logger.debug(f"Existing container {container_id} is not usable")
-                    container_id = None
 
-            if container_id is not None:
+            # Check if running container uses the current image
+            for candidate in container_running:
+                container = get_container(candidate.short_id)
+
+                # Get image ID the container was started with
+                container_image_id = container.attrs['Image']
+
+                # Get current local image ID
+                client = docker.from_env()
+                current_image = client.images.get(platform.docker_image)
+                current_image_id = current_image.id
+
+                if container_image_id != current_image_id:
+                    if logger.isEnabledFor(DEBUG):
+                        logger.debug(f"Container {candidate.short_id} is running old image, stopping it.")
+                    stop_container(candidate.short_id, remove=True)
+                    continue  # try next container
+
+                # Image matches, now check mount (non-Windows)
+                if sys_platform.system() not in ["Windows"]:
+                    command = f"bash -c '[ \"$(ls -lart {platform.data_mount} | wc -l)\" -ge 3 ] && echo exists || echo not_exists'"
+                    result = container.exec_run(command)
+                    output = result.output.decode().strip()
+                    if output == "not_exists":
+                        stop_container(candidate.short_id, remove=True)
+                        if logger.isEnabledFor(DEBUG):
+                            logger.debug(f"Container {candidate.short_id} mount not usable, stopping it.")
+                        continue
+
+                # Container is valid
+                container_id = candidate.short_id
                 if logger.isEnabledFor(DEBUG):
                     logger.debug(f"Pick running container {container_id}.")
+                break  # found a good one, stop looking
+
         elif len(container_stopped) > 0:
-            # Pick up the first stopped container and then restart it
             container_stopped = sort_containers_by_start(container_stopped)
-            container = container_stopped[0]
-            container.restart()
-            container_id = container.short_id
-            if logger.isEnabledFor(DEBUG):
-                logger.debug(f"Pick and restart the stopped container {container.short_id}.")
+            for candidate in container_stopped:
+                container_image_id = candidate.attrs['Image']
+                client = docker.from_env()
+                current_image_id = client.images.get(platform.docker_image).id
+
+                if container_image_id != current_image_id:
+                    if logger.isEnabledFor(DEBUG):
+                        logger.debug(f"Stopped container {candidate.short_id} has old image, removing it.")
+                    stop_container(candidate.short_id, remove=True)
+                    continue
+
+                candidate.restart()
+                container_id = candidate.short_id
+                if logger.isEnabledFor(DEBUG):
+                    logger.debug(f"Pick and restart stopped container {container_id}.")
+                break
 
     # Start the container
     if container_id is None:
