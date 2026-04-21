@@ -119,6 +119,7 @@ def validate_container_running(platform, **kwargs) -> str:
                 if container_image_id != current_image_id:
                     if logger.isEnabledFor(DEBUG):
                         logger.debug(f"Stopped container {candidate.short_id} has old image, removing it.")
+                    stop_container(candidate.short_id, remove=True)
                     continue
 
                 candidate.restart()

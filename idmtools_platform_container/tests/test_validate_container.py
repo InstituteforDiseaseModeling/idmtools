@@ -304,7 +304,7 @@ class TestValidateContainerRunning(unittest.TestCase):
 
         result = validate_container_running(platform)
 
-        mock_stop_container.assert_not_called()
+        mock_stop_container.assert_called_once_with("ctr_old_stopped", remove=True)
         container.restart.assert_not_called()
         platform.start_container.assert_called_once()
         self.assertEqual(result, "new_ctr")
