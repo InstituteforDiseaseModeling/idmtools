@@ -18,21 +18,27 @@ from idmtools_platform_container.container_platform import ContainerPlatform
 from idmtools_platform_container.utils.general import normalize_path, is_valid_uuid
 
 
+# ---------------------------------------------------------------------------
+# The module path to patch — adjust to match your actual module path
+# ---------------------------------------------------------------------------
+MODULE = "idmtools_platform_container.container_operations.docker_operations"
+
 @pytest.mark.serial
 class TestDockerOperations(unittest.TestCase):
 
-    @patch('idmtools_platform_container.container_operations.docker_operations.is_docker_installed')
-    @patch('idmtools_platform_container.container_operations.docker_operations.is_docker_daemon_running')
-    @patch('idmtools_platform_container.container_operations.docker_operations.check_local_image')
-    @patch('idmtools_platform_container.container_operations.docker_operations.pull_docker_image')
-    @patch('idmtools_platform_container.container_operations.docker_operations.pull_docker_image_if_changed')
-    @patch('idmtools_platform_container.container_operations.docker_operations.stop_all_containers')
-    @patch('idmtools_platform_container.container_operations.docker_operations.sort_containers_by_start')
+    @patch(f'{MODULE}.is_docker_installed')
+    @patch(f'{MODULE}.is_docker_daemon_running')
+    @patch(f'{MODULE}.check_local_image')
+    @patch(f'{MODULE}.pull_docker_image')
+    @patch(f'{MODULE}.pull_docker_image_if_changed')
+    @patch(f'{MODULE}.stop_all_containers')
+    @patch(f'{MODULE}.sort_containers_by_start')
     @patch('idmtools_platform_container.container_platform.ContainerPlatform.retrieve_match_containers')
-    @patch('idmtools_platform_container.container_operations.docker_operations.logger')
-    @patch('idmtools_platform_container.container_operations.docker_operations.get_container')
+    @patch(f'{MODULE}.logger')
+    @patch(f'{MODULE}.get_container')
+    @patch(f'{MODULE}.docker')
     @patch('platform.system')
-    def test_validate_container(self, mock_sys_platform, mock_get_container, mock_logger, mock_retrieve_match_containers,
+    def test_validate_container(self, mock_sys_platform, mock_docker, mock_get_container, mock_logger, mock_retrieve_match_containers,
                                         mock_sort_containers_by_start, mock_stop_all_containers,
                                         mock_pull_if_changed, mock_pull_docker_image, mock_check_local_image, mock_is_docker_daemon_running,
                                         mock_is_docker_installed):
@@ -49,10 +55,21 @@ class TestDockerOperations(unittest.TestCase):
         mock_pull_docker_image.return_value = True
         mock_pull_if_changed.return_value = True
         mock_sys_platform.return_value = "Linux"
+        # Set up mock docker client
+        mock_client = MagicMock()
+        mock_docker.from_env.return_value = mock_client
+
+        # Default: container image matches current image
+        current_image_id = "sha256:current123"
+        mock_client.images.get.return_value = MagicMock(id=current_image_id)
         with self.subTest("test_with_running_container_exists_dir"):
             mock_container1 = MagicMock(short_id='test_container_id1')
             mock_container2 = MagicMock(short_id='test_container_id2')
             mock_container3 = MagicMock(short_id='test_container_id3')
+            # Set image IDs to match current image so containers are reused
+            mock_container1.attrs = {'Image': current_image_id}
+            mock_container2.attrs = {'Image': current_image_id}
+            mock_container3.attrs = {'Image': current_image_id}
             mock_container1.exec_run = MagicMock(return_value=MagicMock(output=b'exists\n'))
             mock_get_container.return_value = mock_container1
             mock_retrieve_match_containers.return_value = [('running', mock_container1),
@@ -73,25 +90,53 @@ class TestDockerOperations(unittest.TestCase):
             mock_container1 = MagicMock(short_id='test_container_id1')
             mock_container2 = MagicMock(short_id='test_container_id2')
             mock_container3 = MagicMock(short_id='test_container_id3')
+
+            # Set image IDs to match current image
+            mock_container1.attrs = {'Image': current_image_id}
+            mock_container2.attrs = {'Image': current_image_id}
+            mock_container3.attrs = {'Image': current_image_id}
+
+            # container1 has empty mount, container2 has populated mount
             mock_container1.exec_run = MagicMock(return_value=MagicMock(output=b'not_exists\n'))
-            mock_get_container.return_value = mock_container1
+            mock_container2.exec_run = MagicMock(return_value=MagicMock(output=b'exists\n'))
+
+            # Return correct container based on ID lookup
+            def get_container_side_effect(cid):
+                return {
+                    'test_container_id1': mock_container1,
+                    'test_container_id2': mock_container2,
+                    'test_container_id3': mock_container3,
+                }[cid]
+
+            mock_get_container.side_effect = get_container_side_effect
+
             mock_retrieve_match_containers.return_value = [('running', mock_container1),
                                                            ('running', mock_container2),
                                                            ('stopped', mock_container3)]
-            mock_sort_containers_by_start.return_value = [mock_container2,
-                                                          mock_container1]  # assume container2 is the latest
+
+            # ← container1 first so it gets checked first and fails
+            mock_sort_containers_by_start.return_value = [mock_container1, mock_container2]
+
             platform.retrieve_match_containers.return_value = mock_retrieve_match_containers.return_value
             platform.start_container.return_value = 'new_container_id'
-            container_id = validate_container_running(platform)  # return new container id
 
-            # Assert
+            container_id = validate_container_running(platform)
+
+            # container1 checked first, failed mount
             mock_container1.exec_run.assert_called_once_with(
-                "bash -c \'[ \"$(ls -lart /home/container_data | wc -l)\" -ge 3 ] && echo exists || echo not_exists\'")
-            self.assertEqual(container_id, "new_container_id")
+                "bash -c '[ \"$(ls -lart /home/container_data | wc -l)\" -ge 3 ] && echo exists || echo not_exists'")
+            # container2 checked next, passed mount
+            mock_container2.exec_run.assert_called_once_with(
+                "bash -c '[ \"$(ls -lart /home/container_data | wc -l)\" -ge 3 ] && echo exists || echo not_exists'")
+            # container2 is returned
+            self.assertEqual(container_id, mock_container2.short_id)
 
         with self.subTest("test_with_stopped_container"):
             mock_container1 = MagicMock(short_id='test_container_id1')
             mock_container2 = MagicMock(short_id='test_container_id2')
+            # Set image IDs to match current image so containers are reused
+            mock_container1.attrs = {'Image': current_image_id}
+            mock_container2.attrs = {'Image': current_image_id}
             mock_retrieve_match_containers.return_value = [('exited', mock_container1),
                                                            ('stopped', mock_container2)]
             mock_sort_containers_by_start.return_value = [mock_container2,
@@ -99,7 +144,7 @@ class TestDockerOperations(unittest.TestCase):
             platform.retrieve_match_containers.return_value = mock_retrieve_match_containers.return_value
             result = validate_container_running(platform)
             self.assertEqual(result, mock_container2.short_id)
-            mock_logger.debug.assert_called_with(f"Pick and restart the stopped container {mock_container2.short_id}.")
+            mock_logger.debug.assert_called_with(f"Pick and restart stopped container {mock_container2.short_id}.")
 
         with self.subTest("test_with_no_container_start_new_container"):
             platform.retrieve_match_containers.return_value = []
@@ -121,7 +166,7 @@ class TestDockerOperations(unittest.TestCase):
             mock_logger.debug.call_args_list[1].assert_called_with(f"New container ID: new_container_id.")
         with self.subTest("test_with_failed_check_local_image_and_failed_pull_image"):
             with patch(
-                    'idmtools_platform_container.container_operations.docker_operations.user_logger') as mock_user_logger:
+                    f'{MODULE}.user_logger') as mock_user_logger:
                 mock_check_local_image.return_value = False
                 mock_pull_docker_image.return_value = False
                 with self.assertRaises(SystemExit) as cm:
@@ -134,7 +179,7 @@ class TestDockerOperations(unittest.TestCase):
 
 
     @patch('docker.from_env')
-    @patch('idmtools_platform_container.container_operations.docker_operations.logger')
+    @patch(f'{MODULE}.logger')
     def test_get_container(self, mock_logger, mock_docker):
         # Test get_container exists
         mock_client = MagicMock()
@@ -181,7 +226,7 @@ class TestDockerOperations(unittest.TestCase):
                 f"Error retrieving container with ID test_container_id: {mock_client.containers.get.side_effect}")
 
     @patch('docker.from_env')
-    @patch('idmtools_platform_container.container_operations.docker_operations.get_containers')
+    @patch(f'{MODULE}.get_containers')
     def test_find_container_by_image(self, mock_get_containers, mock_docker):
         mock_client = MagicMock()
         mock_docker.return_value = mock_client
@@ -219,7 +264,7 @@ class TestDockerOperations(unittest.TestCase):
             self.assertEqual(result, {'running': [], 'stopped': []})
 
     @patch('subprocess.run')
-    @patch('idmtools_platform_container.container_operations.docker_operations.logger')
+    @patch(f'{MODULE}.logger')
     def test_docker_installed(self, mock_logger, mock_subprocess):
         mock_result = MagicMock()
         with self.subTest("test_with_docker_installed"):
@@ -258,7 +303,7 @@ class TestDockerOperations(unittest.TestCase):
             mock_logger.debug.assert_called_with("Docker is not installed or not found in PATH.")
 
     @patch('docker.from_env')
-    @patch('idmtools_platform_container.container_operations.docker_operations.logger')
+    @patch(f'{MODULE}.logger')
     def test_is_docker_daemon_running(self, mock_logger, mock_docker):
         # Test is_docker_daemon_running function
         mock_client = MagicMock()
@@ -313,8 +358,8 @@ class TestDockerOperations(unittest.TestCase):
             self.assertFalse(result)
 
     @patch('docker.from_env')
-    @patch('idmtools_platform_container.container_operations.docker_operations.logger')
-    @patch('idmtools_platform_container.container_operations.docker_operations.user_logger')
+    @patch(f'{MODULE}.logger')
+    @patch(f'{MODULE}.user_logger')
     def test_pull_docker_image(self, mock_user_logger, mock_logger, mock_docker):
         mock_client = MagicMock()
         mock_docker.return_value = mock_client
@@ -370,7 +415,7 @@ class TestDockerOperations(unittest.TestCase):
             self.assertFalse(result)
 
     @patch(
-        'idmtools_platform_container.container_operations.docker_operations.get_container')
+        f'{MODULE}.get_container')
     def test_compare_container_mount(self, mock_get_container):
         # Test_compare_container_mount_same
         with self.subTest("test_compare_container_mounts_same"):
@@ -401,8 +446,8 @@ class TestDockerOperations(unittest.TestCase):
             self.assertFalse(result)
 
     @patch('docker.from_env')
-    @patch('idmtools_platform_container.container_operations.docker_operations.get_container')
-    @patch('idmtools_platform_container.container_operations.docker_operations.logger')
+    @patch(f'{MODULE}.get_container')
+    @patch(f'{MODULE}.logger')
     def test_stop_container(self, mock_logger, mock_get_container, mock_docker):
         mock_client = MagicMock()
         mock_docker.return_value = mock_client
@@ -505,7 +550,7 @@ class TestDockerOperations(unittest.TestCase):
             mock_container.remove.assert_not_called()
 
     @patch('docker.from_env')
-    @patch('idmtools_platform_container.container_operations.docker_operations.list_running_jobs')
+    @patch(f'{MODULE}.list_running_jobs')
     def test_stop_all_containers(self, mock_docker_env, mock_list_running_jobs):
         mock_client = MagicMock()
         mock_docker_env.return_value = mock_client
@@ -609,7 +654,7 @@ class TestDockerOperations(unittest.TestCase):
                 self.assertEqual(normalize_path(path).lower(), expected)
 
     @patch('docker.from_env')
-    @patch('idmtools_platform_container.container_operations.docker_operations.JobHistory.verify_container')
+    @patch(f'{MODULE}.JobHistory.verify_container')
     def test_list_containers(self, mock_verify_container, mock_docker_env):
         mock_client = MagicMock()
         mock_docker_env.return_value = mock_client
@@ -634,10 +679,10 @@ class TestDockerOperations(unittest.TestCase):
             self.assertEqual(len(result['running']), 1)
             self.assertEqual(len(result['stopped']), 1)
 
-    @patch('idmtools_platform_container.container_operations.docker_operations.get_container')
-    @patch('idmtools_platform_container.container_operations.docker_operations.JobHistory.verify_container')
-    @patch('idmtools_platform_container.container_operations.docker_operations.get_containers')
-    @patch('idmtools_platform_container.container_operations.docker_operations.logger')
+    @patch(f'{MODULE}.get_container')
+    @patch(f'{MODULE}.JobHistory.verify_container')
+    @patch(f'{MODULE}.get_containers')
+    @patch(f'{MODULE}.logger')
     def test_get_working_containers(self, mock_logger, mock_get_containers, mock_verify_container,
                                                        mock_get_container):
         # test not given any container id and expect return running container ids with entity=False
@@ -702,7 +747,7 @@ class TestDockerOperations(unittest.TestCase):
 
 
     @patch('subprocess.run')
-    @patch('idmtools_platform_container.container_operations.docker_operations.user_logger')
+    @patch(f'{MODULE}.user_logger')
     def test_list_running_jobs(self, mock_user_logger, mock_run):
         mock_container = MagicMock(spec=Container, short_id="container_id")
         with self.subTest("test_list_running_jobs_success"):
@@ -741,10 +786,10 @@ class TestDockerOperations(unittest.TestCase):
             self.assertEqual(result[0].item_id, "exp_id")
 
 
-    @patch('idmtools_platform_container.container_operations.docker_operations.JobHistory.get_job')
-    @patch('idmtools_platform_container.container_operations.docker_operations.get_working_containers')
-    @patch('idmtools_platform_container.container_operations.docker_operations.list_running_jobs')
-    @patch('idmtools_platform_container.container_operations.docker_operations.user_logger')
+    @patch(f'{MODULE}.JobHistory.get_job')
+    @patch(f'{MODULE}.get_working_containers')
+    @patch(f'{MODULE}.list_running_jobs')
+    @patch(f'{MODULE}.user_logger')
     def test_find_running_job(self, mock_user_logger, mock_list_running_jobs, mock_get_working_containers,
                                                 mock_get_job):
         with self.subTest("test_find_running_job_with_container_id"):
