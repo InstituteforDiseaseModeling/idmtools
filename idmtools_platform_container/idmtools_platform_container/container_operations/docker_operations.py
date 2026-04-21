@@ -73,6 +73,11 @@ def validate_container_running(platform, **kwargs) -> str:
         container_stopped = []
 
     if not platform.new_container and platform.container_prefix is None:
+        # Get current local image ID
+        client = docker.from_env()
+        current_image = client.images.get(platform.docker_image)
+        current_image_id = current_image.id
+
         if len(container_running) > 0:
             container_running = sort_containers_by_start(container_running)
 
@@ -82,11 +87,6 @@ def validate_container_running(platform, **kwargs) -> str:
 
                 # Get image ID the container was started with
                 container_image_id = container.attrs['Image']
-
-                # Get current local image ID
-                client = docker.from_env()
-                current_image = client.images.get(platform.docker_image)
-                current_image_id = current_image.id
 
                 if container_image_id != current_image_id:
                     if logger.isEnabledFor(DEBUG):
@@ -115,13 +115,10 @@ def validate_container_running(platform, **kwargs) -> str:
             container_stopped = sort_containers_by_start(container_stopped)
             for candidate in container_stopped:
                 container_image_id = candidate.attrs['Image']
-                client = docker.from_env()
-                current_image_id = client.images.get(platform.docker_image).id
 
                 if container_image_id != current_image_id:
                     if logger.isEnabledFor(DEBUG):
                         logger.debug(f"Stopped container {candidate.short_id} has old image, removing it.")
-                    stop_container(candidate.short_id, remove=True)
                     continue
 
                 candidate.restart()
