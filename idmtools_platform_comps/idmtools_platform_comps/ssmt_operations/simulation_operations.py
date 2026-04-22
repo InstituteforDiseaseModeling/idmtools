@@ -61,7 +61,7 @@ class SSMTPlatformSimulationOperations(CompsPlatformSimulationOperations):
             Files fetched
         """
         files = [f.replace("\\", '/') for f in files]
-        working_directory = simulation.hpc_jobs[0].working_directory
+        working_directory = simulation.hpc_jobs[-1].working_directory
         results = dict()
         for file in files:
             full_path = os.path.join(working_directory, file)

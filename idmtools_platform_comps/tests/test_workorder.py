@@ -312,8 +312,8 @@ class TestWorkOrder(ITestWithPersistence):
         for sim in experiment.simulations:
             comps_sim = sim.get_platform_object(load_children=["files", "configuration", "hpc_jobs"])
             comps_sim.refresh(QueryCriteria().select_children(['files', 'hpc_jobs'])) # refresh hpc_jobs
-            self.assertTrue(comps_sim.hpc_jobs[0].configuration.node_group_name == 'idm_cd')
-            self.assertTrue(comps_sim.hpc_jobs[0].configuration.min_cores >= 1)
+            self.assertTrue(comps_sim.hpc_jobs[-1].configuration.node_group_name == 'idm_cd')
+            self.assertTrue(comps_sim.hpc_jobs[-1].configuration.min_cores >= 1)
 
     @pytest.mark.timeout(60)
     def test_schedule_config_with_wrapper_script_execute_comps(self):
