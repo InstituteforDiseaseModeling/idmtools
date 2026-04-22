@@ -274,7 +274,8 @@ class CompsPlatformSimulationOperations(IPlatformSimulationOperations):
             simulations,
             batch_worker_thread_func=thread_func,
             progress_description="Creating Simulations on Comps",
-            unit="simulation"
+            unit="simulation",
+            **kwargs
         )
         # Always commission again
         try:
