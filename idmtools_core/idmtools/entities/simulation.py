@@ -199,7 +199,7 @@ class Simulation(IAssetsEnabled, INamedEntity):
 
     @classmethod
     def from_task(cls, task: 'ITask', tags: Dict[str, Any] = None,  # noqa E821
-                  asset_collection: AssetCollection = None):
+                  asset_collection: AssetCollection = None, name: str = None):
         """
         Create a simulation from a task.
 
@@ -207,12 +207,13 @@ class Simulation(IAssetsEnabled, INamedEntity):
             task: Task to create from
             tags: Tags to create on the simulation
             asset_collection: Simulation Assets
+            name: simulation name
 
         Returns:
             Simulation using the  parameters provided
         """
         return Simulation(task=task, tags=dict() if tags is None else tags,
-                          assets=asset_collection if asset_collection else AssetCollection())
+                          assets=asset_collection if asset_collection else AssetCollection(), name=name)
 
     def list_static_assets(self, platform: 'IPlatform' = None, **kwargs) -> List[Asset]:
         """
