@@ -9,6 +9,8 @@ This page describes how to manage versioning, build and publish Python packages 
 The release pipeline consists of the following coordinated steps:
 
 ```
+0. Update changelog (docs/changelog.md)
+        ↓
 1. Create a git tag (vX.Y.Z)
         ↓
 2. Build & publish packages to PyPI
@@ -19,6 +21,37 @@ The release pipeline consists of the following coordinated steps:
 ```
 
 All workflows are defined in `.github/workflows/`.
+
+---
+
+## 0. Updating the Changelog
+
+Before cutting a release tag, update `docs/changelog.md` with all issues from the associated GitHub project.
+
+### Prerequisites
+
+- [GitHub CLI (`gh`)](https://cli.github.com/) installed.
+- Authenticated via `gh auth login`.
+- Python dependencies installed (`pandas`).
+
+### Steps
+
+1. Identify the GitHub project number for the release. For example, project **83** tracks the `3.1.0` milestone.  
+   Find it in the project URL: `https://github.com/orgs/InstituteforDiseaseModeling/projects/<number>`.
+
+2. Run the script from the `dev_scripts/` directory:
+
+    ```bash
+    cd dev_scripts
+    python project_changelog.py --project_id 83 --version 3.1.0
+    ```
+
+3. Review the updated `docs/changelog.md` to verify entries look correct, then commit:
+
+    ```bash
+    git add docs/changelog.md
+    git commit -m "Update changelog for X.Y.Z release"
+    ```
 
 ---
 

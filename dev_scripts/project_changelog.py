@@ -1,21 +1,22 @@
 """
 Dev utility script to generate changelog file and changelog for release note based on GitHub project id and release version.
 
-Run script: python project_changelog.py --project_id 53 --version 2.0.2
+Run script: python project_changelog.py --project_id 83 --version 3.1.0
 
 Note, before run this script, you need to do following steps first:
 1) Install GitHub CLI (gh)
 2) Authenticate with your GitHub account (gh auth login) which need your token in prompt.
-3) Provide script arg1: --project_id 53. (for example: 53 is IDMTools project number for 'MPI Slurm and Container Support')
-4) Provide script arg2. --version 2.0.2 (2.0.2 is the current release number for IDMTools)
+3) Provide script arg1: --project_id 83. (for example: 83 is IDMTools project number for '3.1.0 release')
+4) Provide script arg2. --version 3.1.0 (3.1.0 is the current release number for IDMTools)
 """
 import argparse
 import os
+import re
 import subprocess
 import json
 import pandas as pd
 
-EXCLUDE_LABELS = ['Research', 'wontfix', 'Discuss', 'duplicate', 'Exclude from Changelog', 'Epic', 'Release/Packaging', 'Transition']
+EXCLUDE_LABELS = ['Research', 'wontfix', 'Discuss', 'duplicate', 'Exclude from Changelog', 'Epic']
 
 SECTION_ORDER = [
     "Feature Request",
@@ -34,6 +35,24 @@ SECTION_ORDER = [
     "Release/Packaging",
     "Other"
 ]
+
+SECTION_DISPLAY_NAMES = {
+    "Feature Request": "Feature Requests",
+    "Bugs": "Bug Fixes",
+    "Platforms": "Platforms",
+    "Core": "Core",
+    "Configuration": "Configuration",
+    "CLI": "CLI",
+    "Analyzers": "Analyzers",
+    "Models": "Models",
+    "Documentation": "Documentation",
+    "Developer/Test": "Developer/Test",
+    "User Experience": "User Experience",
+    "Support": "Support",
+    "Dependencies": "Dependencies",
+    "Release/Packaging": "Release/Packaging",
+    "Other": "Other"
+}
 
 
 def has_excluded_label(label_list):
@@ -92,6 +111,120 @@ def get_issue_type(labels):
         return 'Release/Packaging'
     else:
         return 'Other'
+
+
+def fetch_project_items(project_id: str) -> list:
+    """Fetch all items from a GitHub org project, handling pagination automatically.
+
+    Args:
+        project_id: GitHub project number (e.g. "83")
+
+    Returns:
+        list: All item nodes from the project across all pages.
+    """
+    all_nodes = []
+    after_cursor = None
+
+    while True:
+        after_part = f', after: "{after_cursor}"' if after_cursor else ''
+        paginated_query = f"""query {{
+    organization(login: "InstituteforDiseaseModeling") {{
+        projectV2(number: {project_id}) {{
+            items(first: 100{after_part}) {{
+                pageInfo {{
+                    hasNextPage
+                    endCursor
+                }}
+                nodes {{
+                    content {{
+                        ... on Issue {{
+                            title
+                            url
+                            state
+                            author {{ login url }}
+                            labels(first: 15) {{ nodes {{ name }} }}
+                        }}
+                        ... on PullRequest {{
+                            title
+                            url
+                            state
+                            author {{ login url }}
+                            labels(first: 15) {{ nodes {{ name }} }}
+                        }}
+                    }}
+                }}
+            }}
+        }}
+    }}
+}}"""
+        result = subprocess.run(
+            ["gh", "api", "graphql", "-f", f"query={paginated_query}"],
+            capture_output=True,
+            text=True
+        )
+        if result.returncode != 0:
+            print(f"Error fetching project items: {result.stderr}")
+            return all_nodes
+
+        data = json.loads(result.stdout)
+        items = data['data']['organization']['projectV2']['items']
+        all_nodes.extend(items['nodes'])
+        print(f"Fetched {len(items['nodes'])} items (total so far: {len(all_nodes)})")
+
+        if items['pageInfo']['hasNextPage']:
+            after_cursor = items['pageInfo']['endCursor']
+        else:
+            break
+
+    return all_nodes
+
+
+def update_markdown_changelog(project_df: pd.DataFrame, version: str, docs_path: str):
+    """Replace the ## [version] section in docs/changelog.md with project issues.
+
+    Args:
+        project_df: DataFrame containing changelog data from a specific GitHub project.
+        version: Release version string, e.g. "3.1.0".
+        docs_path: Relative path to the docs directory (e.g. "docs").
+
+    Returns:
+        None
+    """
+    project_df = project_df[~project_df['label'].apply(has_excluded_label)]
+
+    all_issue_types = project_df['issue_type'].unique()
+    ordered_issue_types = [s for s in SECTION_ORDER if s in all_issue_types] + \
+                          [s for s in all_issue_types if s not in SECTION_ORDER]
+
+    lines = [f"## [{version}]\n"]
+    for issue_type in ordered_issue_types:
+        display_name = SECTION_DISPLAY_NAMES.get(issue_type, issue_type)
+        lines.append(f"\n### {display_name}\n\n")
+        section_data = project_df[project_df['issue_type'] == issue_type]
+        for _, issue in section_data.iterrows():
+            url = issue.get('url', '')
+            if not isinstance(url, str) or 'issues' not in url.lower():
+                continue
+            lines.append(f"- [#{issue['issue_number']}]({issue['url']}) - {issue['title']}\n")
+
+    new_section = "".join(lines)
+
+    changelog_file = os.path.join("..", docs_path, 'changelog.md')
+    with open(changelog_file, 'r') as f:
+        content = f.read()
+
+    # Replace existing [version] section up to the next --- divider
+    pattern = rf'## \[{re.escape(version)}\].*?(?=\n---)'
+    if re.search(pattern, content, re.DOTALL):
+        new_content = re.sub(pattern, new_section.rstrip('\n'), content, flags=re.DOTALL)
+    else:
+        # Insert as the first release section after the file header
+        insert_pos = content.find('\n---\n') + 5
+        new_content = content[:insert_pos] + new_section + '\n---\n' + content[insert_pos:]
+
+    with open(changelog_file, 'w') as f:
+        f.write(new_content)
+    print(f"Markdown changelog updated: {changelog_file}")
 
 
 def generate_release_change_log(project_df: pd.DataFrame, docs_path: str):
@@ -267,7 +400,7 @@ query {
 }
 """
 
-# run this script: python project_changelog.py --project_id 53 --version 2.0.2
+# run this script: python project_changelog.py --project_id 83 --version 3.1.0
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--project_id', default="", help="Github Project ID")
@@ -275,35 +408,29 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    if args.project_id == "" or not args.project_id.isdigit() or int(args.project_id) < 52:
+    if args.project_id == "" or not args.project_id.isdigit() or int(args.project_id) < 1:
         print("Please provide correct project id")
         exit(1)
     if args.version == "":
         print("Please provide the correct release version")
         exit(1)
 
-    query = query.replace("project_number", args.project_id)
-    result = subprocess.run(
-        ["gh", "api", "graphql", "-f", f"query={query}"],
-        capture_output=True,
-        text=True
-    )
-    # Check for errors
-    if result.returncode != 0:
-        print(f"Error: {result.stderr}")
-    else:
-        # Parse JSON output
-        data = json.loads(result.stdout)
+    nodes = fetch_project_items(args.project_id)
+    if not nodes:
+        print("No items fetched from project.")
+        exit(1)
 
-        # Convert to DataFrame
-        df = pd.json_normalize(data, record_path=["data", "organization", "projectV2", "items", "nodes"])
-
-        docs_dir = 'docs'
-        release = args.version
-        df['release'] = release
-        df.rename(columns={'content.title': 'title', 'content.url': 'url', 'content.state': 'status', 'content.author.login': 'author', 'content.labels.nodes': 'label'}, inplace=True)
-        df['issue_number'] = df['url'].str.extract(r'(\d+)')
-        df['issue_type'] = df.apply(lambda x: get_issue_type(x['label']), axis=1)
-        generate_release_change_log(df, docs_dir)
-        generate_changelog_for_releasenote(df)
-        update_changelog(release, docs_dir)
+    df = pd.json_normalize(nodes)
+    docs_dir = 'docs'
+    release = args.version
+    df['release'] = release
+    df.rename(columns={
+        'content.title': 'title',
+        'content.url': 'url',
+        'content.state': 'status',
+        'content.author.login': 'author',
+        'content.labels.nodes': 'label'
+    }, inplace=True)
+    df['issue_number'] = df['url'].str.extract(r'(\d+)')
+    df['issue_type'] = df.apply(lambda x: get_issue_type(x['label']), axis=1)
+    update_markdown_changelog(df, release, docs_dir)
