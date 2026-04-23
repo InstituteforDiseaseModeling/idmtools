@@ -46,6 +46,9 @@ class SSMTPlatformSimulationOperations(CompsPlatformSimulationOperations):
         else:
             load_children = ['hpc_jobs']
 
+        # Add tags to simulation
+        load_children.append('tags')
+
         return super().get(simulation_id, load_children=load_children, query_criteria=query_criteria)
 
     def get_assets(self, simulation: Simulation, files: List[str], **kwargs) -> Dict[str, bytearray]:
@@ -61,7 +64,7 @@ class SSMTPlatformSimulationOperations(CompsPlatformSimulationOperations):
             Files fetched
         """
         files = [f.replace("\\", '/') for f in files]
-        working_directory = simulation.hpc_jobs[0].working_directory
+        working_directory = simulation.hpc_jobs[-1].working_directory
         results = dict()
         for file in files:
             full_path = os.path.join(working_directory, file)

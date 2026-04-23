@@ -267,7 +267,7 @@ def filter_experiment_assets(
                 logger.debug(f'Loading assets for {experiment.name} from simulation {simulation.id}')
             # create prefix from the format var
             prefix = get_simulation_prefix(work_item, simulation, simulation_prefix_format_str, experiment)
-            futures.append(pool.submit(gather_files, directory=simulation.hpc_jobs[0].working_directory, file_patterns=file_patterns, exclude_patterns=exclude_patterns_compiles, assets=assets, prefix=prefix, filename_format_func=filename_format_func))
+            futures.append(pool.submit(gather_files, directory=simulation.hpc_jobs[-1].working_directory, file_patterns=file_patterns, exclude_patterns=exclude_patterns_compiles, assets=assets, prefix=prefix, filename_format_func=filename_format_func))
 
 
 def filter_simulations_files(assets: bool, entity_filter_func: EntityFilterFunc, exclude_patterns_compiles: List, file_patterns: List[str], futures: List[Future], pool: ThreadPoolExecutor, simulation_prefix_format_str: str, work_item: WorkItem,
@@ -322,7 +322,7 @@ def filter_simulation_list(assets: bool, entity_filter_func: EntityFilterFunc, e
             prefix = get_simulation_prefix(parent_work_item=work_item, experiment=experiment, simulation=simulation, simulation_prefix_format_str=simulation_prefix_format_str)
             if simulation.hpc_jobs is None:
                 simulation = simulation.get(simulation.id, HPC_JOBS_QUERY)
-            futures.append(pool.submit(gather_files, directory=simulation.hpc_jobs[0].working_directory, file_patterns=file_patterns, exclude_patterns=exclude_patterns_compiles, assets=assets, prefix=prefix, filename_format_func=filename_format_func))
+            futures.append(pool.submit(gather_files, directory=simulation.hpc_jobs[-1].working_directory, file_patterns=file_patterns, exclude_patterns=exclude_patterns_compiles, assets=assets, prefix=prefix, filename_format_func=filename_format_func))
 
 
 def filter_work_items_files(assets: bool, entity_filter_func: EntityFilterFunc, exclude_patterns_compiles: List, file_patterns: List[str], futures: List[Future], pool: ThreadPoolExecutor, work_item: WorkItem, work_item_prefix_format_str: str,

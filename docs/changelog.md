@@ -7,24 +7,41 @@ All notable changes to idmtools will be documented here.
 
 ### Feature Requests
 
-- Migrated package management from JFrog Artifactory to PyPI and GitHub Container Registry.
-- Extended Python support from 3.10 to 3.14. 
-- Adopted dynamic versioning via `setuptools-scm`.
-- Corrected Python executable targeting for different platform environments.
-- Added new `SingularityJsonTask` and `SingularityJsonPythonTask` classes. 
-- Added `propagate_slurm_env_var` parameter to SlurmPlatform to control SLURM environment variable inheritance when submitting from a non-head node.
+- [#2727](https://github.com/InstituteforDiseaseModeling/idmtools/issues/2727) - Change codebase and release packages from Jfrog to Pypi
+- [#2648](https://github.com/InstituteforDiseaseModeling/idmtools/issues/2648) - Doc Update: Re-write/update idmtools document (MkDocs)
+- [#2711](https://github.com/InstituteforDiseaseModeling/idmtools/issues/2711) - Explicitly define parameters for add_schedule_config and default_add_schedule_config_sweep_callback in comps scheduling
+- [#2710](https://github.com/InstituteforDiseaseModeling/idmtools/issues/2710) - GHA toc-generator.yml update
+- [#2716](https://github.com/InstituteforDiseaseModeling/idmtools/issues/2716) - Remove bump2version code and package
+- [#2713](https://github.com/InstituteforDiseaseModeling/idmtools/issues/2713) - Remove no needed function platform_task_hooks and file python_version.py
 
 ### Bug Fixes
-- **Scheduling error messages**: Added explicit error messages when `add_work_order` / `add_schedule_config` are called without a `workorder.json` file or object. 
 
-### CI / Infrastructure
-- Created GitHub Actions to build and publish packages to PyPI
-- Created GitHub Actions to build and publish Docker images to GitHub Container Registry.
-- Created GitHub Actions to build and publish MKDocs to idmtools GitHub Pages.
+- [#2693](https://github.com/InstituteforDiseaseModeling/idmtools/issues/2693) - Platform(docker_image=<image>) does not check if the docker_image has been updated
+- [#2712](https://github.com/InstituteforDiseaseModeling/idmtools/issues/2712) - Bug: can not build singularity from GHCR docker image
+- [#2709](https://github.com/InstituteforDiseaseModeling/idmtools/issues/2709) - task.to_simulation missing name input
+- [#2717](https://github.com/InstituteforDiseaseModeling/idmtools/issues/2717) - Fix python command issue for all platforms
+- [#2723](https://github.com/InstituteforDiseaseModeling/idmtools/issues/2723) - Bug: when a running container is found, the code reuses it without checking if it was started from the current image version
+- [#2632](https://github.com/InstituteforDiseaseModeling/idmtools/issues/2632) - Simulation.from_task(task) missing name input
+- [#2633](https://github.com/InstituteforDiseaseModeling/idmtools/issues/2633) - COMPSPlatform:  batch_create didn't pass kwargs to batch_create_items
+
+### Configuration
+
+- [#2639](https://github.com/InstituteforDiseaseModeling/idmtools/issues/2639) - Remove legacy DTKTools ini file parameters (max_threads, sims_per_thread, max_local_sims)
 
 ### Documentation
-- Migrated documentation from Sphinx to MkDocs.
 
+- [#2714](https://github.com/InstituteforDiseaseModeling/idmtools/issues/2714) - Fix all README.md file
+- [#2715](https://github.com/InstituteforDiseaseModeling/idmtools/issues/2715) - Add Github Actions script to deploy mkdoc document
+
+### Developer/Test
+
+- [#2718](https://github.com/InstituteforDiseaseModeling/idmtools/issues/2718) - Cleanup Makefiles and devscripts
+- [#2719](https://github.com/InstituteforDiseaseModeling/idmtools/issues/2719) - Integration test with new emod ubuntu runtime docker image
+- [#2720](https://github.com/InstituteforDiseaseModeling/idmtools/issues/2720) - Build singularity image in COMPS from ubuntu docker image
+
+### Other
+
+- [#2649](https://github.com/InstituteforDiseaseModeling/idmtools/issues/2649) - Sync/Update idmtools-calibra
 ---
 
 ## [3.0.0]
