@@ -135,7 +135,7 @@ def build_image(username, password, disable_keyring_load, disable_keyring_save):
         username, password = get_username_and_password(disable_keyring_load, disable_keyring_save)
     get_dependency_packages()
     version = get_latest_image_version_from_registry(username, password)
-    cmd = ['docker', 'build', '--network=host', '--build-arg', f'SSMT_VERSION={version}', '--tag',
+    cmd = ['docker', 'build', '--output', 'type=docker', '--network=host', '--build-arg', f'SSMT_VERSION={version}', '--tag',
            f'{DOCKER_REPO}/{IMAGE_NAME}:{version}', '.']
     logger.info(f'Running: {" ".join(cmd)}')
     p = subprocess.Popen(" ".join(cmd), cwd=os.path.abspath(os.path.dirname(__file__)), shell=True)
