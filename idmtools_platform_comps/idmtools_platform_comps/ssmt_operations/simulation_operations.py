@@ -46,6 +46,9 @@ class SSMTPlatformSimulationOperations(CompsPlatformSimulationOperations):
         else:
             load_children = ['hpc_jobs']
 
+        # Add tags to simulation
+        load_children.append('tags')
+
         return super().get(simulation_id, load_children=load_children, query_criteria=query_criteria)
 
     def get_assets(self, simulation: Simulation, files: List[str], **kwargs) -> Dict[str, bytearray]:
