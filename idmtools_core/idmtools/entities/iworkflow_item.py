@@ -15,6 +15,7 @@ from idmtools.core.interfaces.iassets_enabled import IAssetsEnabled
 from idmtools.core.interfaces.inamed_entity import INamedEntity
 from idmtools.core.interfaces.irunnable_entity import IRunnableEntity
 from idmtools.entities.itask import ITask
+from idmtools.utils.entities import get_default_tags
 
 if TYPE_CHECKING:  # pragma: no cover
     from idmtools.entities.iplatform import IPlatform
@@ -130,6 +131,7 @@ class IWorkflowItem(IAssetsEnabled, INamedEntity, IRunnableEntity, ABC):
             self.assets.add_assets(self.task.common_assets)
             self.transient_assets.add_assets(self.task.transient_assets)
         self.transient_assets.files = [f for f in self.transient_assets.assets if f.filename.lower() not in files_to_be_removed]
+        self.tags.update(get_default_tags())
 
     def __check_for_platform(self, platform: 'IPlatform'):  # noqa: F821
         """
