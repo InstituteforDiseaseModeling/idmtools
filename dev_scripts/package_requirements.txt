@@ -1,5 +1,5 @@
 flake8~=7.3.0
-coverage>=5.3,<7.5
+coverage>=7.13.5,<7.14
 packaging~=25.0
 idm-buildtools~=1.0.5
 twine~=6.2.0
