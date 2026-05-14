@@ -65,7 +65,7 @@ def run_package_dists():
     print("Running Dist for core")
     subprocess.call([mk, "dist"], cwd=CORE_LOCAL_PACKAGE.parent.parent, shell=False)
     print("Running Dist for comps")
-    subprocess.call(f"{mk} dist", cwd=COMPS_LOCAL_PACKAGE.parent.parent, shell=True)
+    subprocess.call([mk, "dist"], cwd=COMPS_LOCAL_PACKAGE.parent.parent, shell=False)
 
 
 def get_asset_collection_id_for_simulation_id(sim_id):
