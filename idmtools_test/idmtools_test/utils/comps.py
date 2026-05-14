@@ -63,7 +63,7 @@ def load_library_dynamically(item, platform: IPlatform):
 def run_package_dists():
     mk = "pymake" if sys.platform == "win32" else "make"
     print("Running Dist for core")
-    subprocess.call(f"{mk} dist", cwd=CORE_LOCAL_PACKAGE.parent.parent, shell=True)
+    subprocess.call([mk, "dist"], cwd=CORE_LOCAL_PACKAGE.parent.parent, shell=False)
     print("Running Dist for comps")
     subprocess.call(f"{mk} dist", cwd=COMPS_LOCAL_PACKAGE.parent.parent, shell=True)
 
