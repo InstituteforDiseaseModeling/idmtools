@@ -140,7 +140,7 @@ def build_image(username, password, disable_keyring_load, disable_keyring_save):
     cmd = ['docker', 'build', '--network=host', '--build-arg', f'SSMT_VERSION={version}', '--tag',
            f'{DOCKER_REPO}/{IMAGE_NAME}:{version}', '.']
     logger.info(f'Running: {" ".join(cmd)}')
-    p = subprocess.Popen(" ".join(cmd), cwd=os.path.abspath(os.path.dirname(__file__)), shell=True)
+    p = subprocess.Popen(cmd, cwd=os.path.abspath(os.path.dirname(__file__)), shell=False)
     p.wait()
 
     if p.returncode == 0:
