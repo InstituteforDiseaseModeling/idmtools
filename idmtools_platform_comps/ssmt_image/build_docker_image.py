@@ -97,7 +97,7 @@ def get_latest_image_version_from_registry(username, password):
     url = f'https://{BASE_REPO}/artifactory/api/docker/{REPO_KEY}/v2/{IMAGE_NAME}/tags/list'
     auth = HTTPBasicAuth(username=username, password=password)
     logger.info(f"Loading Credentials from {url}")
-    response = requests.get(url, auth=auth)
+    response = requests.get(url, auth=auth, timeout=30)
     logger.debug(f"Return Code: {response.status_code}")
     if response.status_code != 200:
         print(response.status_code)
