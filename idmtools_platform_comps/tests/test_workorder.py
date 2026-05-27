@@ -158,6 +158,7 @@ class TestWorkOrder(ITestWithPersistence):
                     # don't check full version in case comps updates system
                     self.assertIn('Python 3.6', content)
 
+    @pytest.mark.skip(reason='comps2 disable Cumulus')
     def test_workorder_hpc(self):
         """
         To test workorder run in hpc cluster
@@ -350,6 +351,7 @@ class TestWorkOrder(ITestWithPersistence):
                     # don't check full version in case comps updates system
                     self.assertIn('Python 3.6', content)
 
+    @pytest.mark.skip(reason='comps2 disable Cumulus')
     def test_schedule_config_hpc(self):
         """
         To test workorder run in hpc cluster
