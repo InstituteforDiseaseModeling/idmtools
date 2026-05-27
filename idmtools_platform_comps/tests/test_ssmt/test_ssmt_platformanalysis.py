@@ -107,7 +107,7 @@ class TestPlatformAnalysis(ITestWithPersistence):
     @pytest.mark.smoke
     @run_in_temp_dir
     def test_platform_analysis_analyzer_manager_args_validation(self):
-        platform = Platform('CUMULUS')
+        platform = Platform('SlurmStage')
         with self.assertRaises(ValueError) as cxt:
             analysis = PlatformAnalysis(
                 platform=platform, experiment_ids=[TARGET_EXPERIMENT_ID],

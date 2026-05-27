@@ -96,11 +96,6 @@ class COMPSPlatformSpecification(PlatformSpecification):
                 endpoint="https://comps2.idmod.org",
                 environment="SlurmStage",
                 python_executable='python3'
-            ),
-            CUMULUS=dict(
-                endpoint="https://comps2.idmod.org",
-                environment="Cumulus",
-                python_executable='python'
             )
         )
         config_aliases['SLURM'] = config_aliases['CALCULON']
