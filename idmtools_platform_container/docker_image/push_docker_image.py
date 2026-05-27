@@ -42,7 +42,7 @@ def push_image(username, password, dockerfile, image_name, disable_keyring_load,
     version = get_latest_image_version_from_registry(username, password, image_name)
     cmd = ['docker', 'push', f'{BASE_IMAGE_NAME}/{image_name}:{version}']
     print(f'Running: {" ".join(cmd)}')
-    p = subprocess.Popen(" ".join(cmd), cwd=current_working_directory, shell=True)
+    p = subprocess.Popen(cmd, cwd=current_working_directory, shell=False)
     p.wait()
     sys.exit(p.returncode)
 

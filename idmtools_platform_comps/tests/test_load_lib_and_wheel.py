@@ -119,6 +119,7 @@ class TestLoadLibWheel(ITestWithPersistence):
 
     @pytest.mark.long
     @pytest.mark.comps
+    @pytest.mark.skip(reason='comps2 disable Cumulus')
     def test_exp_without_load_required_zipp_lib(self):
         # ------------------------------------------------------
         # First NOT load 'zipp' package to test negative case, (to see if zipp_file.py script will fail in comps)
@@ -153,6 +154,7 @@ class TestLoadLibWheel(ITestWithPersistence):
 
     @pytest.mark.long
     @pytest.mark.comps
+    @pytest.mark.skip(reason='comps2 disable Cumulus')
     def test_exp_load_wheel(self):
         # ------------------------------------------------------
         # First load custom wheel with RequirementsToAssetCollection
@@ -247,6 +249,7 @@ class TestLoadLibWheel(ITestWithPersistence):
 
     @pytest.mark.long
     @pytest.mark.comps
+    @pytest.mark.skip(reason='comps2 disable Cumulus')
     def test_exp_load_wheel_from_aritifactory(self):
         # ------------------------------------------------------
         # First load custom wheel with RequirementsToAssetCollection
@@ -274,6 +277,7 @@ class TestLoadLibWheel(ITestWithPersistence):
 
     @pytest.mark.long
     @pytest.mark.comps
+    @pytest.mark.skip(reason='comps2 disable Cumulus')
     def test_regenerate_ac(self):
         # ------------------------------------------------------
         # First load custom wheel with RequirementsToAssetCollection

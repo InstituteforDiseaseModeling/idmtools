@@ -585,8 +585,13 @@ def list_running_jobs(container_id: str, limit: int = None) -> List[Job]:
     Returns:
         list of running jobs
     """
-    command = f'docker exec {container_id} bash -c "({PS_QUERY})"'
-    result = subprocess.run(command, shell=True, check=False, capture_output=True, text=True)
+    result = subprocess.run(
+        ["docker", "exec", container_id, "bash", "-c", f"({PS_QUERY})"],
+        shell=False,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
 
     running_jobs = []
     if result.returncode == 0:

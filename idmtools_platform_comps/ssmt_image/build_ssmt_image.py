@@ -191,9 +191,9 @@ def build_image(username, token, disable_keyring_load, disable_keyring_save, use
     logger.info(f'Building image: {" ".join(build_cmd)}')
 
     build_process = subprocess.Popen(
-        " ".join(build_cmd),
+        build_cmd,
         cwd=os.path.abspath(os.path.dirname(__file__)),
-        shell=True
+        shell=False
     )
     build_process.wait()
 
