@@ -175,6 +175,9 @@ extra:
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/InstituteforDiseaseModeling/idmtools # update to your repo
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/search/?q=idmtools
+      name: idmtools on PyPI
     - icon: fontawesome/regular/envelope
       link: mailto:idm@gatesfoundation.org
     - icon: octicons/globe-24
