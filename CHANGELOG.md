@@ -3,6 +3,23 @@
 All notable changes to idmtools will be documented here.
 
 ---
+
+## [3.1.2]
+
+### Bug Fixes
+
+- [#2740](https://github.com/InstituteforDiseaseModeling/idmtools/issues/2740) - Fix shell injection vulnerability in subprocess.run
+
+---
+
+## [3.1.1]
+
+### Bug Fixes
+
+- [#2732](https://github.com/InstituteforDiseaseModeling/idmtools/issues/2732) - SSMT hpc_jobs index error
+
+---
+
 ## [3.1.0]
 
 ### Feature Requests
