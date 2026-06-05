@@ -1,4 +1,4 @@
-# Frequently Asked Questions
+# Frequently asked questions
 
 Common questions about idmtools.
 
@@ -12,9 +12,9 @@ A: Python 3.10+ (64-bit only).
 
 A: No! Use `pip install idmtools[platform]` to install only what you need. See [Installation Guide](../getting-started/installation.md).
 
-### Q: Do I need login to Docker Hub or Github Container Registry?
+### Q: Do I need login to Docker Hub or GitHub Container Registry?
 
-A: No, all docker images are public unless you want to push your docker image to Github Container Registry which is 
+A: No, all docker images are public unless you want to push your docker image to Github Container Registry which is
 idmtools default docker registry.
 
 ## Usage
@@ -59,7 +59,7 @@ A: Check your configuration and network connectivity. See [Configuration](../get
 
 A: Reduce batch size, use fewer workers, or increase system resources.
 
-## Common Workflow Questions
+## Common workflow questions
 
 ### Q: How do I check if my experiment is still running?
 
@@ -92,14 +92,14 @@ experiment.run(wait_until_done=True, platform)
 
 ### Q: How do I pass parameters to my model?
 
-Use `JSONConfiguredPythonTask` which automatically writes a `config.json` file that your model reads. Alternatively, 
+Use `JSONConfiguredPythonTask` which automatically writes a `config.json` file that your model reads. Alternatively,
 use `CommandLine` to pass arguments directly. See [Parameter Sweeps](../tutorials/parameter-sweeps.md).
 
-## Getting Help
+## Getting help
 
 Can't find your answer?
 
-- Check the [User Guide](../user-guide/index.md)
+- Check the [User guide](../user-guide/index.md)
 - Browse [Tutorials](../tutorials/index.md)
-- Search the [API Reference](../api/index.md)
+- Search the [API eeference](../api/index.md)
 - Open an issue on [GitHub](https://github.com/institutefordiseasemodeling/idmtools/issues)

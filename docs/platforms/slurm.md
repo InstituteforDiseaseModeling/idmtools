@@ -1,4 +1,4 @@
-# Slurm Platform
+# Slurm platform
 
 Comprehensive guide to using idmtools with Slurm HPC clusters.
 
@@ -9,7 +9,7 @@ Comprehensive guide to using idmtools with Slurm HPC clusters.
 !!! note "External HPC clusters"
     Unlike [COMPS](comps.md), which is IDM's internal cloud platform, the Slurm platform is designed for **any** Slurm-managed HPC cluster — including those operated by universities, research institutions, and national labs. If your institution provides HPC access (e.g., a university computing cluster), you can use idmtools to run simulations there without any IDM-specific account.
 
-## Key Features
+## Key features
 
 - **HPC Integration**: Use existing cluster infrastructure
 - **Resource Management**: Request specific CPU, memory, and GPU resources
@@ -20,7 +20,7 @@ Comprehensive guide to using idmtools with Slurm HPC clusters.
 
 ## Prerequisites
 
-### 1. Cluster Access
+### 1. Cluster access
 
 - SSH access to Slurm head node
 - Valid cluster account
@@ -43,7 +43,7 @@ module load python/3.11
 pip install --user idmtools[slurm]
 ```
 
-### 3. SSH Configuration
+### 3. SSH configuration
 
 Setup passwordless SSH (recommended):
 ```bash
@@ -57,7 +57,7 @@ ssh-copy-id username@cluster.example.com
 ssh username@cluster.example.com "hostname"
 ```
 
-## Verify Slurm is Running
+## Verify Slurm is running
 
 Before submitting jobs, verify your Slurm cluster is available:
 
@@ -72,9 +72,9 @@ PARTITION AVAIL  TIMELIMIT  NODES  STATE NODELIST
 LocalQ*      up   infinite      1   idle localhost
 ```
 
-## Basic Configuration
+## Basic configuration
 
-### Minimum Configuration
+### Minimum configuration
 
 Minimum required in `idmtools.ini`:
 
@@ -95,7 +95,7 @@ Platform('SLURM_LOCAL', job_directory='/home/userxyz/my_outputs')
 ```
 
 
-### Full Configuration File
+### Full configuration file
 
 Create `~/.idmtools/idmtools.ini`:
 
@@ -116,7 +116,7 @@ Load configuration:
 platform = Platform("my_Slurm")
 ```
 
-## SlurmPlatform Attributes
+## SlurmPlatform attributes
 
 All attributes from `SlurmPlatform` in `slurm_platform.py`:
 
@@ -148,9 +148,9 @@ All attributes from `SlurmPlatform` in `slurm_platform.py`:
 
 See the [sbatch documentation](https://slurm.schedmd.com/sbatch.html) for full details.
 
-## Running Simulations
+## Running simulations
 
-### Basic Example
+### Basic example
 
 ```python
 from idmtools.core.platform_factory import Platform
@@ -192,7 +192,7 @@ print(f"Experiment ID: {experiment.uid}")
 ```
 
 
-### Job Arrays
+### Job arrays
 
 idmtools automatically uses Slurm job arrays for efficiency:
 
@@ -221,9 +221,9 @@ experiment.run(platform=platform, wait_until_done=True)
 # 12345_[1-9]  myuser  compute   Slurm_Array  PD  0:00
 ```
 
-## Environment Configuration
+## Environment configuration
 
-### Module Loading
+### Module loading
 
 ```python
 # Load required modules
@@ -232,9 +232,9 @@ platform.modules = ["python/3.11", "gcc/11.2", "openmpi/4.1"]
 # Modules loaded automatically before job execution
 ```
 
-## Working with Partitions/Queues
+## Working with partitions/queues
 
-### Partition Selection
+### Partition selection
 
 ```python
 # Submit to specific partition
@@ -243,16 +243,16 @@ platform.partition = "compute"  # or "gpu", "bigmem", "debug", etc.
 
 
 
-### Account/Project
+### Account/project
 
 ```python
 # Charge to specific account
 platform.account = "proj12345"
 ```
 
-## File Management
+## File management
 
-### Working Directory
+### Working directory
 
 ```python
 # Set job working directory
@@ -262,7 +262,7 @@ platform = Platform(
 )
 ```
 
-### Asset Handling
+### Asset handling
 
 ```python
 # Assets are copied to job directory
@@ -270,9 +270,9 @@ experiment.add_asset("config.json")
 experiment.add_asset("input_data.csv")
 ```
 
-## Monitoring and Management
+## Monitoring and management
 
-### Check Job Status
+### Check job status
 
 ```python
 # Refresh experiment status
@@ -281,7 +281,7 @@ experiment.refresh_status(platform)
 print(f"Status: {experiment.status}")
 ```
 
-### Cancel Jobs
+### Cancel jobs
 
 idmtools submits jobs as Slurm job arrays. Use the `scancel` command on the cluster to cancel them.
 
@@ -305,7 +305,7 @@ scancel <job-id>
 
 See the [scancel documentation](https://slurm.schedmd.com/scancel.html) for full details.
 
-### Job Information
+### Job information
 
 ```bash
 # Check job status (on cluster)
@@ -321,7 +321,7 @@ sacct -u myusername --starttime=2024-01-01
 seff <job_id>
 ```
 
-## MPI/Parallel Jobs
+## MPI/parallel jobs
 
 ### OpenMPI
 
@@ -338,7 +338,7 @@ experiment.run(platform=platform, wait_until_done=True)
 
 ## Troubleshooting
 
-### SSH Connection Issues
+### SSH connection issues
 
 ```python
 # Test SSH connection
@@ -355,7 +355,7 @@ finally:
     ssh.close()
 ```
 
-### Job Submission Failures
+### Job submission failures
 
 ```bash
 # Check Slurm configuration
@@ -385,12 +385,12 @@ sshare -A <account_name>
 - Use appropriate partitions: `debug` for short tests, `compute` for production runs.
 - Monitor resource usage with `seff <job_id>` after jobs complete to optimize future requests.
 
-## Next Steps
+## Next steps
 
 - [User Guide](../user-guide/index.md) - General concepts
 - [Tutorials](../tutorials/index.md) - Hands-on examples
 - [Platform Comparison](index.md#platform-comparison) - Compare platforms
 - [Analyzers](../data-analysis/analyzers.md) - Process simulation results
 
-## See Also
+## See also
 - [Official Slurm Documentation](https://slurm.schedmd.com/)

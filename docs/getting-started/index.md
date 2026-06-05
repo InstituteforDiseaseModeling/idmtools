@@ -1,4 +1,4 @@
-# Getting Started
+# Getting started
 
 Welcome to idmtools! This section will help you get up and running quickly.
 
@@ -15,7 +15,7 @@ Welcome to idmtools! This section will help you get up and running quickly.
 
 Choose an installation method based on your needs:
 
-### Full Installation
+### Full installation
 
 Install all idmtools packages:
 
@@ -25,11 +25,11 @@ pip install idmtools[full]
 
 This installs: core, CLI, models, and all platform plugins.
 
-### Platform-Specific Installation
+### Platform-specific installation
 
 Install only what you need:
 
-=== "COMPS Platform"
+=== "COMPS platform"
 
     ```bash
     pip install idmtools[idm]
@@ -37,7 +37,7 @@ Install only what you need:
 
     Includes: core, CLI, models, COMPS platform
 
-=== "Slurm Platform"
+=== "Slurm platform"
 
     ```bash
     pip install idmtools[slurm]
@@ -45,7 +45,7 @@ Install only what you need:
 
     Includes: core, CLI, models, General platform, Slurm platform
 
-=== "Container Platform"
+=== "Container platform"
 
     ```bash
     pip install idmtools[container]
@@ -54,14 +54,14 @@ Install only what you need:
     Includes: core, CLI, models, General platform, Container platform
 
 
-## Next Steps
+## Next steps
 
-- [Installation Guide](installation.md) - Detailed installation instructions
+- [Installation guide](installation.md) - Detailed installation instructions
 - [Configuration](configuration.md) - Configure your environment
-- [Quick Start](quickstart.md) - Complete walkthrough
+- [Quick start](quickstart.md) - Complete walkthrough
 
 
-## Need Help?
+## Need help?
 
 - Check the [FAQ](../faq/index.md)
 - Browse [Tutorials](../tutorials/index.md)

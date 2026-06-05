@@ -2,7 +2,7 @@
 
 Step-by-step tutorials for common idmtools workflows.
 
-## Available Tutorials
+## Available tutorials
 
 ### Models
 
@@ -16,7 +16,7 @@ Step-by-step tutorials for common idmtools workflows.
 - [Data Analysis](../data-analysis/index.md) - Analyze simulation outputs with Analyzers, AnalyzeManager, and PlatformAnalysis
 - Coming soon: Calibration, Optimization, and more
 
-## Tutorial Format
+## Tutorial format
 
 Each tutorial includes:
 
@@ -26,7 +26,7 @@ Each tutorial includes:
 - **Complete Code** - Working examples
 - **Next Steps** - Where to go from here
 
-## Need Help?
+## Need help?
 
 If you get stuck:
 

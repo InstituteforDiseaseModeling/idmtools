@@ -2,13 +2,13 @@
 
 **idmtools** is a collection of Python tools designed to streamline disease modeling workflows on HPC clusters and various compute platforms.
 
-## idmtools Workflow
+## idmtools workflow
 
 idmtools provides a variety of options for each step of the modeling process. To accommodate different workflows, the tool suite is designed in a modular fashion, allowing users to select only the components they need. To simplify workflows, facilitate the modeling process, and make models and their results reusable and shareable, idmtools allows users to create and manage assets. Assets can be added at any level of the process — from running a specific task, to creating a simulation, to creating an experiment. The diagram below illustrates how idmtools and its related packages are used in an end-to-end workflow, using EMOD as the disease transmission model.
 
 ![Screenshot](images/overall.png)
 
-## Key Features
+## Key features
 
 - **Multi-Platform Support**: Run simulations on COMPS, Slurm, Docker containers, or locally
 - **Model Agnostic**: Works with Python, R, and custom models
@@ -17,7 +17,7 @@ idmtools provides a variety of options for each step of the modeling process. To
 - **Parameter Sweeps**: Easily run parameter sweeps and sensitivity analyses
 - **Data Analysis**: Aggregate and analyze simulation outputs using built-in analyzers and the AnalyzeManager
 
-## Quick Links
+## Quick links
 
 <div class="grid cards" markdown>
 
@@ -55,7 +55,7 @@ idmtools provides a variety of options for each step of the modeling process. To
 
 </div>
 
-## Supported Platforms
+## Supported platforms
 
 idmtools supports multiple compute platforms:
 
@@ -83,6 +83,3 @@ graph LR
 - **Issues**: Report bugs and request features on GitHub
 - **PyPI**: [All idmtools packages](https://pypi.org/search/?q=idmtools)
 
-## License
-
-Copyright © 2019-2026 Gates Foundation. All rights reserved.

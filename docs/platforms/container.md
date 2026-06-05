@@ -1,4 +1,4 @@
-# Container Platform
+# Container platform
 
 Comprehensive guide to using Docker containers with idmtools for reproducible simulations.
 
@@ -9,7 +9,7 @@ leverages Docker's containerization capabilities to provide a consistent and iso
 computational tasks. The `ContainerPlatform` is responsible for managing the creation, execution, and cleanup of
 Docker containers used to run simulations.
 
-## Key Features
+## Key features
 
 - **Docker Integration**: Ensures that Docker is installed and the Docker daemon is running before executing any tasks.
 - **Experiment and Simulation Management**: Provides methods to run and manage experiments and simulations within Docker containers.
@@ -55,7 +55,7 @@ Settings → Update & Security → For Developers → Select **Developer Mode**
 
 Local Computer Policy → Computer Configuration → Administrative Templates → System → Filesystem → Enable **Win32 long paths**
 
-## ContainerPlatform Attributes
+## ContainerPlatform attributes
 
 | Attribute | Description |
 |-----------|-------------|
@@ -74,7 +74,7 @@ Local Computer Policy → Computer Configuration → Administrative Templates �
 | `retries` | The number of retries to attempt for a job. |
 | `ntasks` | Number of MPI processes. If greater than 1, it triggers mpirun. |
 
-## Basic Usage
+## Basic usage
 
 Create a Python file named `example_demo.py` and add the following code:
 
@@ -116,7 +116,7 @@ Results inside the Docker container:
 
 ![Container results](images/example_demo_container_result_new.png)
 
-## Attribute Examples
+## Attribute examples
 
 ### extra_packages
 
@@ -215,7 +215,7 @@ with ContainerPlatform(job_directory="DEST", retries=3) as platform:
     experiment.run(wait_until_done=True)
 ```
 
-## Folder Structure
+## Folder structure
 
 By default, idmtools generates simulations with the following structure:
 
@@ -261,7 +261,7 @@ Results inside the container are at `/home/container-data/<suite_path>/<experime
 !!! note "Windows path length"
     Windows has a 255-character path limit. If needed, enable long path support via the Windows Group Policy Editor.
 
-## Docker Image
+## Docker image
 
 The default Docker image for `ContainerPlatform` is based on Rocky Linux 9.2 and includes:
 
@@ -306,7 +306,7 @@ python build_container_image.py --push
 ```
 Note: Build image script need GITHUB_TOKEN with read/write permission
 
-## Docker Utilities
+## Docker utilities
 
 The `docker_operations.py` module provides utilities to manage Docker containers within `ContainerPlatform`.
 
@@ -362,11 +362,11 @@ stop_container(container)
         emod_task.set_sif(sif_path)
         ```
 
-## Next Steps
+## Next steps
 
 - [Tutorials](../tutorials/index.md) - More detailed tutorials
 - [User Guide](../user-guide/index.md) - General concepts
 - [Platform Comparison](index.md) - Compare available platforms
 
-## See Also
+## See also
 - [Docker Documentation](https://docs.docker.com/)

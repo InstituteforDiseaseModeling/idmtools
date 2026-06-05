@@ -1,10 +1,10 @@
-# CLI Reference
+# CLI reference
 
 Command-line interface tools for idmtools.
 
-## Available Commands
+## Available commands
 
-### Getting Help
+### Getting help
 
 **Command:**
 ```bash
@@ -12,7 +12,7 @@ idmtools --help
 ```
 
 **Output:**
-```          
+```
 Usage: idmtools [OPTIONS] COMMAND [ARGS]...
 
   Allows you to perform multiple idmtools commands.
@@ -38,7 +38,7 @@ Commands:
 idmtools <command> --help    # Command-specific help
 ```
 
-### List Platform Plugins Configuration Aliases
+### List platform plugins configuration aliases
 
 **Command:**
 ```bash
@@ -49,7 +49,7 @@ idmtools info plugins platform-aliases
 ```
 (idmtools_pypi_313) PS C:\git_pypi\idmtools> idmtools info plugins platform-aliases
 +---------------------------+-------------------------------------------------------------------------------------------------------+
-| Platform Plugin Aliases   | Configuration Options                                                                                 |
+| Platform plugin aliases   | Configuration options                                                                                 |
 |---------------------------+-------------------------------------------------------------------------------------------------------|
 | CALCULON                  | {'endpoint': 'https://comps.idmod.org', 'environment': 'Calculon', 'python_executable': 'python3'}    |
 | NDCLOUD                   | {'endpoint': 'https://comps.idmod.org', 'environment': 'NDcloud', 'python_executable': 'python3'}     |
@@ -76,7 +76,7 @@ idmtools info plugins platform-aliases
 
 ```
 
-### COMPS Platform CLI Commands
+### COMPS platform CLI commands
 **Command:**
 ```bash
 idmtools comps --help
@@ -104,7 +104,7 @@ Commands:
 
 ```
 
-### Container Platform CLI commands
+### Container platform CLI commands
 
 **Command:**
 ```bash
@@ -133,7 +133,7 @@ Commands:
 
 ```
 
-### Slurm Platform CLI commands
+### Slurm platform CLI commands
 
 **Command:**
 ```bash
@@ -161,7 +161,7 @@ Commands:
 
 ```
 
-## Platform-Specific CLIs
+## Platform-specific CLIs
 
 Some platforms have additional CLI tools:
 
@@ -169,6 +169,6 @@ Some platforms have additional CLI tools:
 - **Slurm**: Job management commands
 - **Container**: Container management
 
-## See Also
+## See also
 
-- [User Guide](../user-guide/index.md) - Using the CLI in workflows
+- [User guide](../user-guide/index.md) - Using the CLI in workflows

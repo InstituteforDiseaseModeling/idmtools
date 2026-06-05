@@ -2,9 +2,9 @@
 
 idmtools supports multiple compute platforms for running simulations.
 
-## Available Platforms
+## Available platforms
 
-### Production Platforms
+### Production platforms
 
 - **[COMPS](comps.md)** - Computational Modeling Platform Service
   IDM's cloud-based HPC platform
@@ -15,15 +15,15 @@ idmtools supports multiple compute platforms for running simulations.
 - **[Container](container.md)** - Docker Platform
   Local execution in Docker containers
 
-## Choosing a Platform
+## Choosing a platform
 
-| Platform | Best For | Scale |
+| Platform | Best for | Scale |
 |----------|----------|-------|
 | **COMPS** | IDM users, cloud compute | Large (1000s of sims) |
 | **Slurm** | HPC cluster access | Large (1000s of sims) |
 | **Container** | Local testing, reproducibility | Medium (10s-100s of sims) |
 
-## Platform Comparison
+## Platform comparison
 
 ### COMPS
 - ✅ Cloud-based, no local resources needed
@@ -43,7 +43,7 @@ idmtools supports multiple compute platforms for running simulations.
 - ✅ No cluster needed
 - ❌ Limited by local resources
 
-## Getting Started
+## Getting started
 
 1. [Configure your platform](../getting-started/configuration.md)
 2. Follow platform-specific guides

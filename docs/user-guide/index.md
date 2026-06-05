@@ -1,4 +1,4 @@
-# User Guide
+# User guide
 
 Complete guide to using idmtools for disease modeling workflows.
 
@@ -12,7 +12,7 @@ This guide covers all aspects of using idmtools:
 - Analyzing results
 - Best practices
 
-## Key Concepts
+## Key concepts
 - Task — Defines *what* to run. A task wraps your model script, its parameters, and any assets it needs.
 - Simulation — A single run of a task with a specific set of parameters.
 - Experiment — A collection of simulations, typically created from a parameter sweep.
@@ -21,7 +21,7 @@ This guide covers all aspects of using idmtools:
 - Assets — Files your simulations need (scripts, data files, config files, container images).
 - Analyzer — Post-processing logic that runs after simulations complete.
 
-## Basic Workflow
+## Basic workflow
 - Write your model — Create a script that accepts parameters and produces output.
 - Define a task — Wrap your model in an idmtools Task.
 - Build simulations — Use a `SimulationBuilder` to sweep over parameters.
@@ -31,14 +31,14 @@ This guide covers all aspects of using idmtools:
 
 ## Topics
 
-### Core Concepts
+### Core concepts
 
 - [Creating Simulations & Experiments](creating-simulations.md) - Build simulations and organize them into experiments
 - [Asset Management](assets.md) - Handle files and resources
 - [Parameter Sweeps](../tutorials/parameter-sweeps.md) - Run parameter variations
 - [Data Analysis](../data-analysis/index.md) - Process simulation outputs with Analyzers, AnalyzeManager, and PlatformAnalysis
 
-### Quick Navigation
+### Quick navigation
 
 <div class="grid cards" markdown>
 
@@ -62,7 +62,7 @@ This guide covers all aspects of using idmtools:
 
 </div>
 
-## Getting Help
+## Getting help
 
 - Check the [FAQ](../faq/index.md)
 - See [Tutorials](../tutorials/index.md) for examples

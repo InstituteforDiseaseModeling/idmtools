@@ -1,8 +1,8 @@
-# Asset Management
+# Asset management
 
 Assets are files your simulations need to run — scripts, data files, config files, container images, etc. They are managed through `AssetCollection` and attached to tasks or experiments.
 
-## Adding Assets to a Task
+## Adding assets to a task
 
 Use `task.common_assets` to add files shared across all simulations that use this task:
 
@@ -16,7 +16,7 @@ task.common_assets.add_asset("model.py")
 task.common_assets.add_assets(AssetCollection.from_id("c94763e4-8f55-ed11-a9ff-b88303911bc1"))
 ```
 
-## Adding Assets to an Experiment
+## Adding assets to an experiment
 
 Assets added at the experiment level are shared across all simulations — useful for large files you don't want to duplicate per simulation:
 
@@ -48,7 +48,7 @@ task.common_assets.add_asset("model.py")
 task.transient_assets.add_asset("config.json")
 ```
 
-## AssetCollection from ID File
+## AssetCollection from ID file
 
 When working with Singularity images on COMPS/Slurm, use an `.id` file to reference a previously uploaded asset:
 
@@ -59,7 +59,7 @@ from idmtools.assets import AssetCollection
 task.common_assets.add_assets(AssetCollection.from_id_file("python_minimal.sif.id"))
 ```
 
-## Next Steps
+## Next steps
 
 - [Creating Simulations & Experiments](creating-simulations.md) - Use assets in simulations
 - [Parameter Sweeps](../tutorials/parameter-sweeps.md) - Assets in parameter sweeps
