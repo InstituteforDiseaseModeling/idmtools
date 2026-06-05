@@ -9,7 +9,5 @@ mkdocstrings-python # python handler for mkdocstrings
 mkdocs-table-reader-plugin # directly insert csv and other formats as tables
 mkdocs-mermaid2-plugin # render mermaid diagrams
 mkdocs-api-autonav # automatically add API ref to navigation
-mkdocs-gen-files # generate external module reference docs
-mkdocs-literate-nav # use a SUMMARY.md file for API reference TOC
 
 # include all packages needed for running Jupyter notebooks
