@@ -117,7 +117,11 @@ markdown_extensions:
       linenums: true
       default_lang: 'python'
   - pymdownx.inlinehilite # syntax highlighting for inline code
-  - pymdownx.superfences # enables code, diagram fences to be nested in lists, etc.e
+  - pymdownx.superfences: # enables code, diagram fences to be nested in lists, etc.
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:mermaid2.fence_mermaid_custom
   - pymdownx.details # collapsible elements
   - pymdownx.tabbed: # tabbed content that can be toggled
       alternate_style: true

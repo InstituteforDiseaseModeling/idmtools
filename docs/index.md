@@ -21,37 +21,37 @@ idmtools provides a variety of options for each step of the modeling process. To
 
 <div class="grid cards" markdown>
 
--   :material-clock-fast:{ .lg .middle } __Getting Started__
+-   :material-clock-fast:{ .lg .middle } __Getting started__
 
     ---
 
-    Install idmtools and run your first simulation in minutes
+    Install idmtools and run your first simulation in minutes.
 
     [:octicons-arrow-right-24: Installation](getting-started/installation.md)
 
--   :material-book-open-variant:{ .lg .middle } __User Guide__
+-   :material-book-open-variant:{ .lg .middle } __User guide__
 
     ---
 
-    Learn how to create simulations, run experiments, and analyze results
+    Learn how to create simulations, run experiments, and analyze results.
 
-    [:octicons-arrow-right-24: User Guide](user-guide/index.md)
+    [:octicons-arrow-right-24: User guide](user-guide/index.md)
 
 -   :material-school:{ .lg .middle } __Tutorials__
 
     ---
 
-    Step-by-step tutorials for common workflows
+    Step-by-step tutorials for common workflows.
 
     [:octicons-arrow-right-24: Tutorials](tutorials/index.md)
 
--   :material-api:{ .lg .middle } __API Reference__
+-   :material-api:{ .lg .middle } __API reference__
 
     ---
 
-    Complete API documentation for all modules
+    Complete API documentation for all modules.
 
-    [:octicons-arrow-right-24: API Docs](api/index.md)
+    [:octicons-arrow-right-24: API docs](api/index.md)
 
 </div>
 
@@ -67,13 +67,13 @@ idmtools supports multiple compute platforms:
 
 ```mermaid
 graph LR
-    A[User Code] --> B[idmtools Core]
-    B --> C[COMPS Platform]
-    B --> F[File Platform]
-    F --> D[Slurm Platform]
-    F --> E[Container Platform]
+    A[User Code] --> B[idmtools core]
+    B --> C[COMPS platform]
+    B --> F[File platform]
+    F --> D[Slurm platform]
+    F --> E[Container platform]
     C --> G[IDM COMPS]
-    D --> I[Slurm Cluster]
+    D --> I[Slurm cluster]
     E --> H[Docker]
 ```
 
