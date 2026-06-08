@@ -1,4 +1,4 @@
-# Singularity Containers Tutorial
+# Singularity containers tutorial
 
 Run models inside Singularity containers for reproducible, environment-controlled simulations on HPC clusters (COMPS and Slurm).
 
@@ -8,7 +8,7 @@ Run models inside Singularity containers for reproducible, environment-controlle
 - Singularity installed on your target cluster
 - A Singularity image (`.sif` file) for your environment
 
-## Learning Objectives
+## Learning objectives
 
 - Understand when and why to use Singularity containers
 - Run a Python model inside a Singularity container
@@ -28,7 +28,7 @@ Singularity containers package your entire software environment into a single `.
 
 ---
 
-## Tutorial 1: Build a Singularity Image
+## Tutorial 1: Build a Singularity image
 
 Use `SingularityBuildWorkItem` to build a container image on the platform. This is done once — the resulting `.sif.id` file is reused in all subsequent experiments.
 
@@ -80,7 +80,7 @@ From: ubuntu:22.04
     exec python3 "$@"
 ```
 
-### Step 1: Build the Image
+### Step 1: Build the image
 
 ```python
 # examples/singularity/definitions/build_images.py
@@ -114,7 +114,7 @@ else:
     print("Build failed")
 ```
 
-### Step 2: Use the Image in an Experiment
+### Step 2: Use the image in an experiment
 
 Once built, reference the `.sif.id` file in your task:
 
@@ -155,11 +155,11 @@ print(f"Status: {experiment.status}")
 
 ---
 
-## Tutorial 2: Generic Singularity Task (R, Shell, Binaries)
+## Tutorial 2: Generic Singularity task (R, shell, binaries)
 
 Use `SingularityJSONConfiguredTask` for any language or executable:
 
-### R Script Example
+### R script example
 
 ```python
 from idmtools.core.platform_factory import Platform
@@ -200,7 +200,7 @@ experiment = Experiment.from_task(task, name="R in Singularity")
 experiment.run(platform=platform, wait_until_done=True)
 ```
 
-### Shell Script Example
+### Shell script example
 
 ```python
 task = SingularityJSONConfiguredTask(config_file_name="params.json")
@@ -227,7 +227,7 @@ task.parameters = {
 
 ---
 
-## Tutorial 3: Parameter Sweep with Singularity
+## Tutorial 3: Parameter sweep with Singularity
 
 Combine Singularity tasks with `SimulationBuilder` for full parameter sweeps:
 
@@ -277,7 +277,7 @@ print(f"Status: {experiment.status}")
 
 ---
 
-## Using the `.id` File Pattern
+## Using the `.id` file pattern
 
 When working with COMPS or Slurm, upload your `.sif` once and reuse the asset ID:
 
@@ -293,7 +293,7 @@ This avoids re-uploading large container images on every run.
 
 ---
 
-## Project Structure
+## Project structure
 
 A typical Singularity-based project:
 
@@ -309,7 +309,7 @@ my_project/
 
 ---
 
-## Next Steps
+## Next steps
 
 - [Parameter Sweeps Guide](../tutorials/parameter-sweeps.md) - Advanced sweep patterns
 - [Asset Management](../user-guide/assets.md) - Managing `.sif` files and other assets

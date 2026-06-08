@@ -1,4 +1,4 @@
-# Models API Reference
+# Models API reference
 
 Task and model implementations for different programming languages and frameworks.
 
@@ -6,9 +6,9 @@ Task and model implementations for different programming languages and framework
 
 The `idmtools_models` package provides task implementations for running models written in various languages (Python, R) and with different frameworks.
 
-## Task Types Quick Reference
+## Task types quick reference
 
-| Task Class | Description |
+| Task class | Description |
 |------------|-------------|
 | `PythonTask` | Run Python scripts directly |
 | `JSONConfiguredPythonTask` | Python scripts with JSON config file |
@@ -19,7 +19,7 @@ The `idmtools_models` package provides task implementations for running models w
 | `SingularityJSONConfiguredPythonTask` | Python scripts in Singularity containers |
 | `SingularityJSONConfiguredTask` | Generic scripts in Singularity containers |
 
-## Python Models
+## Python models
 
 ### PythonTask
 
@@ -103,7 +103,7 @@ task.set_parameter("output.format", "csv")
 # Generates nested JSON structure
 ```
 
-## R Models
+## R models
 
 ### RTask (via CommandTask)
 
@@ -141,7 +141,7 @@ with open("config.json", "w") as f:
 task.add_asset("config.json")
 ```
 
-## Templated Scripts
+## Templated scripts
 
 ### TemplatedScriptTask
 
@@ -214,7 +214,7 @@ task.parameters = {
 }
 ```
 
-### Template Files
+### Template files
 
 Load templates from files:
 
@@ -250,9 +250,9 @@ task.parameters = {
 }
 ```
 
-## Generic Models
+## Generic models
 
-### Generic Command Tasks
+### Generic command tasks
 
 Run any executable:
 
@@ -274,7 +274,7 @@ task = CommandTask(
 )
 ```
 
-## Docker Tasks
+## Docker tasks
 
 ### DockerTask
 
@@ -320,9 +320,9 @@ task.docker_config = {
 }
 ```
 
-## Task Utilities
+## Task utilities
 
-### Parameter Management
+### Parameter management
 
 ```python
 # Set parameter
@@ -343,7 +343,7 @@ if "beta" in task.parameters:
     print(f"Beta: {task.parameters['beta']}")
 ```
 
-### Asset Management
+### Asset management
 
 ```python
 # Add single file
@@ -360,7 +360,7 @@ for file in ["file1.csv", "file2.csv", "file3.csv"]:
     task.add_asset(file)
 ```
 
-### Command Construction
+### Command construction
 
 ```python
 # CommandTask automatically builds command
@@ -379,9 +379,9 @@ task = CommandTask(
 print(task.command)  # "python model.py --beta 0.5 --gamma 0.1"
 ```
 
-## Model Specific Tasks
+## Model specific tasks
 
-### EMOD Task (if installed)
+### EMOD task (if installed)
 
 ```python
 # Requires emodpy
@@ -392,9 +392,9 @@ task.set_parameter("Simulation_Duration", 365)
 ```
 
 
-## Task Validation
+## Task validation
 
-### Pre-execution Validation
+### Pre-execution validation
 
 ```python
 def validate_parameters(task):
@@ -412,7 +412,7 @@ def validate_parameters(task):
 task.pre_creation_hooks.append(validate_parameters)
 ```
 
-### Asset Validation
+### Asset validation
 
 ```python
 def validate_assets(task):
@@ -426,9 +426,9 @@ def validate_assets(task):
 task.pre_creation_hooks.append(validate_assets)
 ```
 
-## Custom Tasks
+## Custom tasks
 
-### Creating Custom Task Types
+### Creating custom task types
 
 ```python
 from idmtools.entities.itask import ITask
@@ -459,7 +459,7 @@ task = CustomTask(custom_param="value")
 sim = Simulation.from_task(task)
 ```
 
-### Task Inheritance
+### Task inheritance
 
 ```python
 class EnhancedPythonTask(PythonTask):
@@ -482,9 +482,9 @@ task = EnhancedPythonTask(
 )
 ```
 
-## Best Practices
+## Best practices
 
-### 1. Parameter Naming
+### 1. Parameter naming
 
 ```python
 # Good: Clear, descriptive names
@@ -497,7 +497,7 @@ task.set_parameter("x", 0.5)
 task.set_parameter("y", 0.1)
 ```
 
-### 2. Type Safety
+### 2. Type safety
 
 ```python
 # Validate parameter types
@@ -511,7 +511,7 @@ set_typed_parameter(task, "beta", 0.5, float)
 set_typed_parameter(task, "days", 365, int)
 ```
 
-### 3. Asset Organization
+### 3. Asset organization
 
 ```python
 # Good: Organized asset structure
@@ -525,13 +525,13 @@ task.add_asset("file2.csv")
 # ... 50 more files ...
 ```
 
-## See Also
+## See also
 
 - [Core API](core.md) - Core classes and interfaces
 - [Platforms API](platforms.md) - Platform implementations
 - [Python Models Tutorial](../tutorials/python-models.md) - Hands-on examples
 
-## Full API Documentation
+## Full API documentation
 
 For complete API documentation:
 

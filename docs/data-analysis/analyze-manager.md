@@ -2,7 +2,7 @@
 
 `AnalyzeManager` is the local analysis driver. It retrieves simulation output files from the platform, runs each analyzer's `map()` in parallel, then calls each analyzer's `reduce()` to produce the final results — all on your local machine.
 
-## What Can AnalyzeManager Do?
+## What can AnalyzeManager do?
 
 - Run one or more [IAnalyzer](analyzers.md) instances against experiments, suites, or individual simulations
 - Process simulations in parallel using a configurable worker pool (process-based or thread-based)
@@ -18,7 +18,7 @@ from idmtools.core import ItemType
 from idmtools.core.platform_factory import Platform
 ```
 
-## Constructor Parameters
+## Constructor parameters
 
 ```python
 AnalyzeManager(
@@ -38,7 +38,7 @@ AnalyzeManager(
 )
 ```
 
-### Key Parameters
+### Key parameters
 
 #### `analyzers`
 
@@ -117,7 +117,7 @@ manager = AnalyzeManager(
 !!! tip
     On machines with many cores, leave `max_workers=None` to use all available CPUs. Set it explicitly if you need to limit resource usage or avoid memory pressure.
 
-### All Parameters
+### All parameters
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
@@ -145,7 +145,7 @@ manager = AnalyzeManager(
 
 ## Examples
 
-### Single Analyzer
+### Single analyzer
 
 ```python
 from idmtools.analysis.analyze_manager import AnalyzeManager
@@ -173,7 +173,7 @@ if __name__ == "__main__":
         manager.analyze()
 ```
 
-### Multiple Analyzers
+### Multiple analyzers
 
 ```python
 if __name__ == "__main__":
@@ -188,7 +188,7 @@ if __name__ == "__main__":
         manager.analyze()
 ```
 
-### Partial Analysis (some simulations may not be ready)
+### Partial analysis (some simulations may not be ready)
 
 ```python
 from idmtools.analysis.csv_analyzer import CSVAnalyzer
@@ -203,7 +203,7 @@ if __name__ == '__main__':
         manager.analyze()
 ```
 
-### Include Failed Simulations
+### Include failed simulations
 
 ```python
 if __name__ == '__main__':
@@ -217,7 +217,7 @@ if __name__ == '__main__':
         manager.analyze()
 ```
 
-### Limit Workers (e.g. for notebooks or low-memory machines)
+### Limit workers (e.g. for notebooks or low-memory machines)
 
 ```python
 if __name__ == '__main__':
@@ -231,7 +231,7 @@ if __name__ == '__main__':
         manager.analyze()
 ```
 
-## Next Steps
+## Next steps
 
 - [PlatformAnalysis](platform-analysis.md) — Run analysis remotely on COMPS
 - [Analyzers](analyzers.md) — Write custom analyzer logic

@@ -1,58 +1,44 @@
 site_name: idmtools
-site_url: https://institutefordiseasemodeling.github.io/idmtools/
+site_url: https://docs.idmod.org/idmtools/
 site_description: Python tools for streamlining disease modeling workflows on HPC clusters
 site_author: Institute for Disease Modeling
 
 # Repository
-repo_url: https://github.com/institutefordiseasemodeling/idmtools
-repo_name: institutefordiseasemodeling/idmtools
+repo_url: https://github.com/InstituteforDiseaseModeling/idmtools
+repo_name: InstituteforDiseaseModeling/idmtools
 edit_uri: edit/main/docs/
-
-# Copyright
-copyright: Copyright &copy; 2019-2026 Bill & Melinda Gates Foundation. All rights reserved.
 
 # Configuration
 docs_dir: docs
 site_dir: site
 
-# Theme
 theme:
   name: material
-  palette:
-    # Light mode
-    - scheme: default
-      primary: indigo
-      accent: indigo
-      toggle:
-        icon: material/brightness-7
-        name: Switch to dark mode
-    # Dark mode
-    - scheme: slate
-      primary: indigo
-      accent: indigo
-      toggle:
-        icon: material/brightness-4
-        name: Switch to light mode
-
+  custom_dir: docs/customization/overrides
   font:
     text: Roboto
     code: Roboto Mono
-
+  logo: images/idm-logo-transparent.png
+  favicon: images/favicon.ico
   features:
-    - navigation.instant
-    - navigation.tracking
-    - navigation.tabs
-    - navigation.tabs.sticky
-    - navigation.path
-    - navigation.top
-    - navigation.indexes
-    - search.suggest
-    - search.highlight
-    - search.share
-    - content.tabs.link
-    - content.code.copy
-    - content.code.annotate
-    - toc.follow
+    - navigation.footer # include a footer with links to privacy, terms, etc.
+    - content.code.copy # enable copy buttons for code blocks
+    - navigation.indexes # enable parent index page for sections
+  palette:
+    # Light Mode
+    - scheme: default
+      toggle:
+        icon: material/weather-night
+        name: Light mode
+      primary: white
+      accent: light blue
+    # Dark Mode
+    - scheme: slate
+      toggle:
+        icon: material/weather-sunny
+        name: Dark mode
+      primary: black
+      accent: light blue
 
   icon:
     repo: fontawesome/brands/github
@@ -61,135 +47,165 @@ theme:
 # Navigation
 nav:
   - Home: index.md
-
-  - Getting Started:
+  - What's new: whatsnew.md
+  - Getting started:
     - getting-started/index.md
     - Installation: getting-started/installation.md
     - Configuration: getting-started/configuration.md
-    - Quick Start: getting-started/quickstart.md
+    - Quick start: getting-started/quickstart.md
 
-  - User Guide:
+  - User guide:
     - user-guide/index.md
-    - Creating Simulations & Experiments: user-guide/creating-simulations.md
-    - Asset Management: user-guide/assets.md
-    - Parameter Sweeps: tutorials/parameter-sweeps.md
-    - Data Analysis: data-analysis/index.md
+    - Creating simulations and experiments: user-guide/creating-simulations.md
+    - Asset management: user-guide/assets.md
+    - Parameter sweeps: tutorials/parameter-sweeps.md
+    - Data analysis: data-analysis/index.md
 
   - Tutorials:
     - tutorials/index.md
-    - Python Models: tutorials/python-models.md
-    - Running Sweeps: tutorials/parameter-sweeps.md
-    - Singularity Containers: tutorials/singularity.md
-    - Filter Simulations: tutorials/filter-simulations.md
-    - Data Analysis: data-analysis/index.md
+    - Python models: tutorials/python-models.md
+    - Running sweeps: tutorials/parameter-sweeps.md
+    - Singularity containers: tutorials/singularity.md
+    - Filter simulations: tutorials/filter-simulations.md
+    - Data analysis: data-analysis/index.md
 
   - Platforms:
     - platforms/index.md
     - COMPS: platforms/comps.md
     - Slurm: platforms/slurm.md
     - Container: platforms/container.md
-
   - API:
     - api/index.md
     - Core: api/core.md
     - Models: api/models.md
     - Platforms: api/platforms.md
-    - Data Analysis:
+    - Data analysis:
       - data-analysis/index.md
       - Analyzers: data-analysis/analyzers.md
-      - Analyze Manager: data-analysis/analyze-manager.md
-      - Platform Analysis: data-analysis/platform-analysis.md
+      - Analyze manager: data-analysis/analyze-manager.md
+      - Platform analysis: data-analysis/platform-analysis.md
 
-  - CLI Reference:
+  - CLI reference:
     - cli/index.md
 
   - FAQ: faq/index.md
 
-  - Quick Reference: quick_ref.md
+  - Quick reference: quick_ref.md
 
   - Development:
-    - Release Process: development/release-process.md
+    - Release process: development/release-process.md
 
-  - Changelog: changelog.md
-
-# Plugins
-plugins:
-  - search:
-      separator: '[\s\-,:!=\[\]()"/]+|(?!\b)(?=[A-Z][a-z])|\.(?!\d)|&[lg]t;'
-      lang: en
-
-  - minify:
-      minify_html: true
-      minify_js: true
-      minify_css: true
-      htmlmin_opts:
-        remove_comments: true
-
-# Markdown Extensions
+# icons, semantic markup, emojis
 markdown_extensions:
-  # Python Markdown
-  - abbr
-  - admonition
-  - attr_list
-  - def_list
-  - footnotes
-  - md_in_html
-  - tables
   - toc:
-      permalink: true
       toc_depth: 3
-      permalink_title: Anchor link to this section
-
-  # PyMdown Extensions
-  - pymdownx.arithmatex:
-      generic: true
-  - pymdownx.betterem:
-      smart_enable: all
-  - pymdownx.caret
-  - pymdownx.details
-  - pymdownx.emoji:
+  - attr_list # enables HTMl and CSS classes to inline elements
+  - md_in_html # enables grids
+  - admonition # warnings, etc.
+  - def_list
+  - pymdownx.emoji: # emojis and icons
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
-  - pymdownx.highlight:
-      anchor_linenums: true
-      line_spans: __span
-      pygments_lang_class: true
-      auto_title: true
-  - pymdownx.inlinehilite
-  - pymdownx.keys
-  - pymdownx.mark
-  - pymdownx.smartsymbols
-  - pymdownx.superfences:
+  - pymdownx.arithmatex: # Latex processing for math equations
+      generic: true
+  - pymdownx.snippets: # insert content from other files
+      auto_append:
+        - docs/includes/glossary.md # definitions for glossary entries
+  - abbr # term/abbreviation hover descriptions
+  - pymdownx.blocks.details: # allows nesting of collapsible code
+  - pymdownx.highlight: # syntax highlighting for code blocks
+      linenums: true
+      default_lang: 'python'
+  - pymdownx.inlinehilite # syntax highlighting for inline code
+  - pymdownx.superfences: # enables code, diagram fences to be nested in lists, etc.
       custom_fences:
         - name: mermaid
           class: mermaid
-          format: !!python/name:pymdownx.superfences.fence_code_format
-  - pymdownx.tabbed:
+          format: !!python/name:mermaid2.fence_mermaid_custom
+  - pymdownx.details # collapsible elements
+  - pymdownx.tabbed: # tabbed content that can be toggled
       alternate_style: true
-  - pymdownx.tasklist:
-      custom_checkbox: true
-  - pymdownx.tilde
+  - pymdownx.blocks.caption # captions for images, tables, etc.
 
-# Extra
+# javascript and CSS customization
+extra_javascript:
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+extra_css:
+  - customization/css/extra.css # custom CSS for footer spacing
+
+plugins:
+  - search # search functionality
+  - autorefs # automatically create linkable references
+  - include-markdown # include other files, such as READMEs
+  - table-reader # enables rendering of CSV/TSV files as tables
+  - mermaid2 # enables mermaid diagrams inserted as text
+  - mkdocs-jupyter: # enables Jupyter notebooks to be rendered
+      execute: true
+      allow_errors: false # set to true to continue executing cells even if one fails
+      include_source: true
+  # - api-autonav: API reference currently manually written
+  #     modules: ['idmtools_core'] # provide path to package
+  #     module_options: {}
+  #     nav_section_title: "API reference"
+  #     api_root_uri: "reference"
+  #     nav_item_prefix: "<code class='doc-symbol doc-symbol-nav doc-symbol-module'></code>"
+  #     exclude_private: true
+  #     show_full_namespace: false
+  #     on_implicit_namespace_package: "warn"
+  # - mkdocstrings: # process docstrings to generate API reference
+  #     handlers:
+  #       python:
+  #         paths: [src] # path to source code
+  #         options:
+  #           docstring_style: google
+  #           show_source: false
+  #           merge_init_into_class: true
+  #           heading_level: 2
+  #           show_symbol_type_heading: true
+  #           show_symbol_type_toc: true
+  #           show_root_toc_entry: true
+  #           show_object_full_path: true
+# Copyright
+copyright: Copyright &copy; 2019-2026 Gates Foundation. All rights reserved.
+
+
 extra:
+  generator: false
+  footer_links:
+    - text: "Privacy and Cookies Notice"
+      href: "https://www.gatesfoundation.org/Privacy-and-Cookies-Notice"
+    - text: "Terms of Use"
+      href: "https://www.gatesfoundation.org/Terms-of-Use"
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/institutefordiseasemodeling/idmtools
-      name: idmtools on GitHub
+      link: https://github.com/InstituteforDiseaseModeling/idmtools # update to your repo
     - icon: fontawesome/brands/python
       link: https://pypi.org/search/?q=idmtools
       name: idmtools on PyPI
+    - icon: fontawesome/regular/envelope
+      link: mailto:idm@gatesfoundation.org
+    - icon: octicons/globe-24
+      link: https://idmod.org
+    - icon: simple/youtube
+      link: http://www.youtube.com/@institutefordiseasemodelin1987
+    - icon: fontawesome/brands/linkedin
+      link: https://linkedin.com/company/institute-disease-modeling
 
-  generator: false
-
-# Extra CSS
-extra_css:
-  - assets/css/extra.css
-
-# Extra JavaScript
-extra_javascript:
-  - assets/js/extra.js
-
-# Watch
-watch:
-  - mkdocs.yml
+  analytics:
+    provider: custom
+    tracking_id: GTM-NK4K647
+    feedback:
+      title: Was this page helpful?
+      ratings:
+        - icon: material/emoticon-happy-outline
+          name: This page was helpful
+          data: 1
+          note: >-
+            Thanks for your feedback! If you like, provide additional information by
+            using our <a href="https://app.smartsheet.com/b/form/ec8dbb77809949ecab7286a5ca74a206" target="_blank" rel="noopener">feedback form</a>.
+        - icon: material/emoticon-sad-outline
+          name: This page could be improved
+          data: 0
+          note: >-
+            Thanks for your feedback! Help us improve this page by
+            using our <a href="https://app.smartsheet.com/b/form/ec8dbb77809949ecab7286a5ca74a206" target="_blank" rel="noopener">feedback form</a>.

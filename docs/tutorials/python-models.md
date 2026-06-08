@@ -1,4 +1,4 @@
-# Python Models Tutorial
+# Python models tutorial
 
 Learn how to create and run Python-based simulations with idmtools.
 
@@ -17,7 +17,7 @@ pip install idmtools[slurm]      # Slurm platform
 pip install idmtools[full]       # All platforms
 ```
 
-## Step 1: Create Your Model
+## Step 1: Create your model
 
 First, create a simple SIR model in `sir_model.py`:
 
@@ -113,7 +113,7 @@ if __name__ == "__main__":
     sir_model(**config)
 ```
 
-## Step 2: Create idmtools Script
+## Step 2: Create idmtools script
 
 Create `run_python_sir.py` to run the model with idmtools:
 
@@ -154,7 +154,7 @@ print(f"Experiment ID: {experiment.id}")
 print(f"Status: {experiment.status}")
 ```
 
-## Step 3: Run Your First Simulation
+## Step 3: Run your first simulation
 
 ```bash
 python run_python_sir.py
@@ -169,7 +169,7 @@ Experiment ID: abc123...
 Status: Succeeded
 ```
 
-## Step 4: Parameter Sweeps
+## Step 4: Parameter sweeps
 
 Now let's explore different beta values using `SimulationBuilder`:
 
@@ -224,7 +224,7 @@ print(f"Experiment ID: {experiment.id}")
 print(f"Status: {experiment.status}")
 ```
 
-## Step 5: Using Configuration Files
+## Step 5: Using configuration files
 
 For complex models, use JSON configuration files to sweep parameters — each simulation gets its own config file with its specific parameter values:
 
@@ -290,7 +290,7 @@ print(f"Experiment complete: {experiment.id}")
 print(f"Status: {experiment.status}")
 ```
 
-## Step 6: Analyzing Results
+## Step 6: Analyzing results
 
 Create an analyzer to process outputs:
 
@@ -376,7 +376,7 @@ if __name__ == "__main__":
 
 ```
 
-## Step 7: Running on Different Platforms
+## Step 7: Running on different platforms
 
 All examples above use the Container platform for local execution. To run on COMPS or Slurm, swap the platform and use the appropriate task type. The `platform_type` check selects the right task and command for each environment:
 
@@ -417,12 +417,12 @@ elif platform_type == 'ContainerPlatform':
 # The rest of your script (set parameters, build simulations, run) is the same
 ```
 
-## Next Steps
+## Next steps
 
 - [Parameter Sweeps](parameter-sweeps.md) - Advanced sweep techniques
 - [User Guide](../user-guide/index.md) - Detailed documentation
 
-## See Also
+## See also
 
 - [API Reference](../api/index.md)
 - [Creating Simulations](../user-guide/creating-simulations.md)

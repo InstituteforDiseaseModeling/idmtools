@@ -1,4 +1,4 @@
-# Filtering Simulations by Tags
+# Filtering simulations by tags
 
 Filter simulations from a completed experiment or suite using tag-based criteria.
 
@@ -17,7 +17,7 @@ There are two ways to filter:
 
 ---
 
-## Experiment-Level Filtering
+## Experiment-level filtering
 
 ```python
 from idmtools.core import ItemType
@@ -44,7 +44,7 @@ filter_ids_p = platform.filter_simulations_by_tags(
 print(f"Matched {len(filter_ids2)} simulations")
 ```
 
-## Return Simulation Objects
+## Return simulation objects
 
 By default, filtering returns simulation IDs. Use `entity_type=True` to get full `Simulation` objects:
 
@@ -60,7 +60,7 @@ for sim in simulations:
 
 ---
 
-## Suite-Level Filtering
+## Suite-level filtering
 
 Filter simulations across all experiments in a suite:
 
@@ -88,7 +88,7 @@ suite_results_p = platform.filter_simulations_by_tags(
 
 ---
 
-## Next Steps
+## Next steps
 
 - [Parameter Sweeps](parameter-sweeps.md) - Tag simulations during sweeps for easy filtering
 - [Analyzing Results](../data-analysis/index.md) - Analyze filtered simulation outputs

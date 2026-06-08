@@ -1,4 +1,13 @@
-mkdocs>=1.6.0
-mkdocs-material>=9.5.0
-pymdown-extensions>=10.7.0
-mkdocs-minify-plugin>=0.8.0
+mkdocs-material~=9.7.0 # doc theme that includes extensive functionality, pinned to last stable version
+mkdocs-include-markdown-plugin # include files outside /docs
+mkdocs-autorefs # create automatic linkable references to sections, etc.
+python-markdown-math # integrate LaTeX math
+pymdown-extensions # various extensions for markdown
+mkdocs-jupyter # jupyter notebooks
+mkdocstrings # generate API reference from docstrings
+mkdocstrings-python # python handler for mkdocstrings
+mkdocs-table-reader-plugin # directly insert csv and other formats as tables
+mkdocs-mermaid2-plugin # render mermaid diagrams
+mkdocs-api-autonav # automatically add API ref to navigation
+
+# include all packages needed for running Jupyter notebooks

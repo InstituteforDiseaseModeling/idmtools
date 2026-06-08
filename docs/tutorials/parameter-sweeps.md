@@ -1,8 +1,8 @@
-# Parameter Sweeps
+# Parameter sweeps
 
 Systematic parameter exploration with idmtools.
 
-## Part 1: Simple Single-Parameter Sweep
+## Part 1: Simple single-parameter sweep
 
 ```python
 # examples/parameter_sweeps/single_sweep_in_container.py
@@ -45,7 +45,7 @@ print(f"Experiment ID: {experiment.id}")
 print(f"Status: {experiment.status}")
 ```
 
-## Part 2: Two-Dimensional Grid Sweep
+## Part 2: Two-dimensional grid sweep
 
 Sweeps all combinations of `beta` and `gamma`:
 
@@ -78,7 +78,7 @@ experiment = Experiment.from_builder(builder, task, name="2D Grid Sweep")
 experiment.run(platform=platform, wait_until_done=True)
 ```
 
-## Part 3: Multi-Dimensional Sweep
+## Part 3: Multi-dimensional sweep
 
 Sweeps four parameters:
 
@@ -128,7 +128,7 @@ experiment = Experiment.from_builder(builder, task, name="Multi-Dimensional Fact
 experiment.run(platform=platform, wait_until_done=True)
 ```
 
-## Part 4: Latin Hypercube Sampling
+## Part 4: Latin hypercube sampling
 
 Efficiently samples high-dimensional parameter spaces:
 
@@ -178,7 +178,7 @@ experiment = Experiment.from_builder(builder, task, name="Latin Hypercube Sampli
 experiment.run(platform=platform, wait_until_done=True)
 ```
 
-## Part 5: Scenario-Based Sweep
+## Part 5: Scenario-based sweep
 
 Organizes sweeps by named scenarios:
 
@@ -237,7 +237,7 @@ print(f"Experiment ID: {experiment.id}")
 print(f"Status: {experiment.status}")
 ```
 
-## Next Steps
+## Next steps
 
 - [Creating Simulations & Experiments](../user-guide/creating-simulations.md) - Core concepts
 - [Data Analysis](../data-analysis/index.md) - Process simulation results
