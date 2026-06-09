@@ -1,4 +1,4 @@
-# Platforms API Reference
+# Platforms API reference
 
 Platform implementations for different compute environments.
 
@@ -6,7 +6,7 @@ Platform implementations for different compute environments.
 
 The platform packages provide implementations for running simulations on various compute platforms including COMPS, Slurm, Docker containers, and local execution.
 
-## Platform Factory
+## Platform factory
 
 ### Platform
 
@@ -34,7 +34,7 @@ platform = Platform("COMPS", missing_ok=True)
 - `Platform(name, **kwargs)` - Create platform instance
 - `get_platform(name)` - Get platform class
 
-## COMPS Platform
+## COMPS platform
 
 ### COMPSPlatform
 
@@ -92,7 +92,7 @@ print(f"Simulations: {len(exp.simulations)}")
 ```
 
 
-### SSMT Work Items
+### SSMT work items
 
 
 ```python
@@ -107,7 +107,7 @@ wi = SSMTWorkItem(name=wi_name, command=command, assets=AssetCollection.from_dir
 wi.run(True, platform=platform)
 ```
 
-## Slurm Platform
+## Slurm platform
 
 ### SlurmPlatform
 
@@ -147,9 +147,9 @@ experiment.run(platform=platform, wait_until_done=True)
 experiment.refresh_status(platform)
 ```
 
-## Container Platform
+## Container platform
 
-### ContainerPlatform Attributes
+### ContainerPlatform attributes
 
 | Attribute | Description |
 |-----------|-------------|
@@ -180,9 +180,9 @@ platform = Platform(
 ```
 
 
-## Platform Configuration
+## Platform configuration
 
-### Configuration File
+### Configuration file
 
 Example `~/.idmtools/idmtools.ini`:
 
@@ -196,7 +196,7 @@ job_dirrectory = /tmp/idmtools
 ```
 
 
-## See Also
+## See also
 
 - [Core API](core.md) - Core interfaces and classes
 - [Models API](models.md) - Task implementations

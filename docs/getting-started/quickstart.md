@@ -1,4 +1,4 @@
-# Quick Start
+# Quick start
 
 Run your first idmtools simulation using a SIR (Susceptible-Infected-Recovered) epidemiological model.
 
@@ -30,7 +30,7 @@ Run your first idmtools simulation using a SIR (Susceptible-Infected-Recovered) 
 
     See [COMPS Platform](../platforms/comps.md) for full setup details.
 
-## Step 1: Create the Model — `sir_model.py`
+## Step 1: Create the model — `sir_model.py`
 
 This script runs a discrete-time SIR model and writes results to `output.json` and a plot to `sir_curve.png`.
 
@@ -103,7 +103,7 @@ if __name__ == "__main__":
     sir_model(**config)
 ```
 
-## Step 2: Create the Experiment Script — `run_python_sir.py`
+## Step 2: Create the experiment script — `run_python_sir.py`
 
 ```python
 # run_python_sir.py
@@ -142,7 +142,7 @@ print(f"Experiment ID: {experiment.id}")
 print(f"Status: {experiment.status}")
 ```
 
-## Step 3: Run It
+## Step 3: Run it
 
 ```bash
 python run_python_sir.py
@@ -158,9 +158,9 @@ Status: EntityStatus.SUCCEEDED
 
 Simulation outputs are written to the `DEST/` job directory including ![Screenshot](../images/sir_curve.png)
 
-## Next Steps
+## Next steps
 
-- [Parameter Sweeps](../tutorials/parameter-sweeps.md) — run multiple simulations with different `beta`/`gamma` values
-- [Data Analysis](../data-analysis/index.md) — aggregate results across simulations
+- [Parameter sweeps](../tutorials/parameter-sweeps.md) — run multiple simulations with different `beta`/`gamma` values
+- [Data analysis](../data-analysis/index.md) — aggregate results across simulations
 - [Platforms](../platforms/index.md) — run on COMPS or Slurm instead
 - [Tutorials](../tutorials/index.md) — more detailed walkthroughs

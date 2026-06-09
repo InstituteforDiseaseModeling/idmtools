@@ -424,3 +424,6 @@ allure_report.zip
 **/DEST
 .github/workflows/.secrets
 placeholder_packages
+
+# Claude Code local config (machine-specific, not for sharing)
+.claude/

@@ -1,4 +1,4 @@
-# COMPS Platform
+# COMPS platform
 
 Comprehensive guide to using the COMPS platform (Computational Modeling Platform Service) with idmtools.
 
@@ -8,7 +8,7 @@ Comprehensive guide to using the COMPS platform (Computational Modeling Platform
 
 **COMPS** is IDM's cloud-based high-performance computing platform designed for large-scale computational modeling. It provides scalable compute resources, data management, and job scheduling specifically optimized for disease modeling workflows.
 
-## Key Features
+## Key features
 
 - **Cloud-Based**: No local compute resources needed
 - **Massive Scale**: Run thousands of simulations simultaneously
@@ -19,7 +19,7 @@ Comprehensive guide to using the COMPS platform (Computational Modeling Platform
 
 ## Prerequisites
 
-### 1. Account Setup
+### 1. Account setup
 
 Contact IDM to obtain COMPS access:
 - COMPS account credentials
@@ -38,7 +38,7 @@ pip install idmtools-platform-comps
 
 COMPS needs username and password to login.
 
-## Basic Configuration
+## Basic configuration
 
 ### Predefined environments
 - SLURMSTAGE
@@ -73,7 +73,7 @@ platform = Platform(
 )
 ```
 
-### Configuration File
+### Configuration file
 
 Create `~/.idmtools/idmtools.ini`:
 
@@ -98,9 +98,9 @@ platform = Platform("Nibbler")  # Here Nibbler is a predefined platform alias
 platform = Platform("My_COMPS")
 ```
 
-## Running Simulations
+## Running simulations
 
-### Basic Example
+### Basic example
 
 ```python
 from idmtools.core.platform_factory import Platform
@@ -132,11 +132,11 @@ print(f"Experiment ID: {experiment.id}")
 print(f"COMPS URL: https://comps.idmod.org/experiments/{experiment.id}")
 ```
 
-### With Parameter Sweep
+### With parameter sweep
 
 See [Parameter Sweeps](../tutorials/parameter-sweeps.md) for full examples of sweeping parameters on any platform including COMPS.
 
-## COMPS-Specific Features
+## COMPS-specific features
 
 **Platform Parameters:**
 
@@ -158,9 +158,9 @@ For example to pass specific options priority, node group, and cores directly to
 platform = Platform('Calculon', priority='Highest', node_group="idm_abcd", num_cores=1)
 ```
 
-## Working with Assets
+## Working with assets
 
-### Uploading Assets
+### Uploading assets
 
 ```python
 # Add files to experiment (shared across simulations)
@@ -185,9 +185,9 @@ ao = AssetizeOutput(file_patterns=["output.json"], related_experiments=[experime
 ao.run(wait_until_done=True)
 ```
 
-## Monitoring and Management
+## Monitoring and management
 
-### Check Status
+### Check status
 
 ```python
 # Refresh experiment status
@@ -196,7 +196,7 @@ experiment.refresh_status(platform)
 print(f"Status: {experiment.status}")
 ```
 
-### Query Experiments
+### Query experiments
 
 ```python
 from idmtools.core import ItemType
@@ -208,9 +208,9 @@ exp = platform.get_item(
 )
 ```
 
-## Downloading Results
+## Downloading results
 
-### Simple Download
+### Simple download
 
 ```python
 from idmtools.core import ItemType
@@ -228,11 +228,11 @@ ret_files = platform.get_files(simulation, files=files, output="output")
 files = platform.get_files(experiment, files=files, output="output")
 ```
 
-### Using Analyzers
+### Using analyzers
 
 See [Analyzing Results](../data-analysis/analyzers.md) for full examples of using analyzers with COMPS.
 
-## Advanced Features
+## Advanced features
 
 ### SSMT Analyzer on COMPS
 
@@ -271,13 +271,13 @@ suite.run(platform=platform)
 print(f"Suite ID: {suite.uid}")
 print(f"COMPS URL: https://comps.idmod.org/suites/{suite.uid}")
 ```
-### COMPS Scheduling
+### COMPS scheduling
 
 idmtools supports job scheduling on the COMPS platform for multiple scenarios depending on your research requirements.
 
-#### Scheduling Scenarios
+#### Scheduling scenarios
 
-| Scenario | Use Case |
+| Scenario | Use case |
 |----------|----------|
 | N cores, N processes | Single-threaded or MPI-enabled workloads (e.g. EMOD) |
 | N cores, 1 node, 1 process | Models spawning worker threads (e.g. GenEpi) or requiring large memory |
@@ -313,7 +313,7 @@ add_schedule_config(
 experiment.run(scheduling=True)
 ```
 
-#### HPC Cluster — `workorder.json`
+#### HPC cluster — `workorder.json`
 
 ```json
 {
@@ -325,7 +325,7 @@ experiment.run(scheduling=True)
 }
 ```
 
-#### Slurm Cluster — `workorder.json`
+#### Slurm cluster — `workorder.json`
 
 ```json
 {
@@ -348,7 +348,7 @@ Use COMPS command-line tools:
 idmtools comps --help
 ```
 
-## Integration with Other Tools
+## Integration with other tools
 
 ### With EMOD
 
@@ -364,7 +364,7 @@ experiment = Experiment.from_template(emod_task, name="EMOD on COMPS")
 experiment.run(platform=platform)
 ```
 
-## Next Steps
+## Next steps
 
 - [User Guide](../user-guide/index.md) - General idmtools concepts
 - [Tutorials](../tutorials/index.md) - Hands-on examples

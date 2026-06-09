@@ -39,10 +39,7 @@ def platform(request):
 
 # Test PlatformAnalysis with PopulationAnalyzer for experiment id
 def do_platform_analysis_experiment(platform: Platform):
-    if platform.environment.lower() == "cumulus":
-        experiment_id = 'd0b75dba-0e18-ec11-92df-f0921c167864' # comps2 exp id
-    elif platform.environment.lower() == "slurmstage":
-        experiment_id = 'c348452d-921c-ec11-92e0-f0921c167864'  # comps2 exp id
+    experiment_id = 'c348452d-921c-ec11-92e0-f0921c167864'  # comps2 exp id
 
     # Run ssmt PlatformAnalysis with an experiment id which will run PopulationAnalyzer in COMPS docker worker
     analysis = PlatformAnalysis(platform=platform, experiment_ids=[experiment_id],
@@ -84,10 +81,7 @@ def do_platform_analysis_experiment(platform: Platform):
 
 # Test PlatformAnalysis with DownloadAnalyzer for workitem id
 def do_platform_analysis_wi(platform: Platform):
-    if platform.environment.lower() == "cumulus":
-        workitem_id = '22afccb1-d31f-ec11-92e0-f0921c167864'  # comps2 exp id
-    elif platform.environment.lower() == "slurmstage":
-        workitem_id = 'fe6a80b9-d31f-ec11-92e0-f0921c167864'  # comps2 exp id
+    workitem_id = 'fe6a80b9-d31f-ec11-92e0-f0921c167864'  # comps2 exp id
 
     # Run ssmt PlatformAnalysis for DownloadAnalyzer in COMPS with a workitem id
     # This will download stdout.txt and stderr.txt with original workitem_id with new workitem in comps
@@ -164,27 +158,24 @@ class TestSSMTPlatform(unittest.TestCase):
 
     @allure.feature("ssmt platform")
     def test_ssmt_platform(self):
-        ssmt_platform = Platform("CUMULUS_SSMT")
+        ssmt_platform = Platform("SLURMSTAGE_SSMT")
         self.assertTrue(isinstance(ssmt_platform, SSMTPlatform))
         self.assertTrue(isinstance(ssmt_platform, COMPSPlatform))
 
-        comps_platform = Platform("CUMULUS")
-        self.assertTrue(isinstance(comps_platform, COMPSPlatform))
-        self.assertFalse(isinstance(comps_platform, SSMTPlatform))
 
     @allure.feature("ssmt platform")
     def test_ssmt_platform_specification(self):
         from idmtools_platform_comps.plugin_info import SSMTPlatformSpecification
         ssmt_spec = SSMTPlatformSpecification()
         _aliases = ssmt_spec.get_configuration_aliases()
-        self.assertIn("CUMULUS_SSMT", _aliases)
+        self.assertIn("SLURMSTAGE_SSMT", _aliases)
 
     @allure.feature("ssmt platform")
     def test_comps_platform_pecification(self):
         from idmtools_platform_comps.plugin_info import COMPSPlatformSpecification
         comps_spec = COMPSPlatformSpecification()
         _aliases = comps_spec.get_configuration_aliases()
-        self.assertNotIn("CUMULUS_SSMT", _aliases)
+        self.assertNotIn("SLURMSTAGE_SSMT", _aliases)
 
     @allure.feature("ssmt platform")
     def test_platform_plugins(self):
@@ -193,4 +184,4 @@ class TestSSMTPlatform(unittest.TestCase):
         _aliases = PlatformPlugins().get_aliases()
 
         self.assertIn("SSMT", _platforms)
-        self.assertIn("CUMULUS_SSMT", _aliases)
+        self.assertIn("SLURMSTAGE_SSMT", _aliases)

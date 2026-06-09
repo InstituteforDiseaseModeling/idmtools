@@ -1,8 +1,8 @@
-# API Reference
+# API reference
 
 Complete API documentation for idmtools.
 
-## Core Modules
+## Core modules
 
 ### [idmtools.core](core.md)
 Core classes and functionality
@@ -37,7 +37,7 @@ Platform implementations
 - `container` - Container platform
 - `process` - Local process platforms
 
-### [Data Analysis](../data-analysis/index.md)
+### [Data analysis](../data-analysis/index.md)
 Analysis framework for post-processing simulation outputs
 
 **Key Classes:**
@@ -47,11 +47,11 @@ Analysis framework for post-processing simulation outputs
 - `PlatformAnalysis` - Run analyzers remotely on COMPS via SSMT
 - `DownloadAnalyzer`, `CSVAnalyzer`, `TagsAnalyzer`, `AddAnalyzer` - Built-in analyzers
 
-## API Navigation
+## API navigation
 
 Browse by module or use the search function to find specific classes and functions.
 
-## See Also
+## See also
 
 - [User Guide](../user-guide/index.md) - How to use the API
 - [Tutorials](../tutorials/index.md) - API usage examples

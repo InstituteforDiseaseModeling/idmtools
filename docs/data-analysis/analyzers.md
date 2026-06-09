@@ -2,7 +2,7 @@
 
 Analyzers define *how* to extract and aggregate data from simulation outputs. Every analyzer extends `IAnalyzer`, which provides the map-reduce interface.
 
-## What Is an Analyzer?
+## What is an analyzer?
 
 An `IAnalyzer` is a class you implement with two core methods:
 
@@ -15,7 +15,7 @@ You can optionally override:
 - **`filter(simulation)`** — return `True` to include a simulation, `False` to skip it
 - **`destroy()`** — called after `reduce()` completes; use it for cleanup
 
-## Constructor Parameters
+## Constructor parameters
 
 ```python
 IAnalyzer(uid=None, working_dir=None, parse=True, filenames=None)
@@ -28,7 +28,7 @@ IAnalyzer(uid=None, working_dir=None, parse=True, filenames=None)
 | `parse` | `bool` | `True` | When `True`, idmtools parses output files into Python objects (e.g. JSON → dict). When `False`, you receive raw `bytes` and must parse them yourself — useful for custom binary formats or CSV files you want to read with pandas. |
 | `filenames` | `List[str]` | `[]` | Paths of output files to retrieve from each simulation, relative to the simulation root (e.g. `"output/result.json"`). Only these files are downloaded. |
 
-## Basic Custom Analyzer
+## Basic custom analyzer
 
 ```python
 from typing import Dict, Any
@@ -47,7 +47,7 @@ class MyAnalyzer(IAnalyzer):
             print(f"Simulation {simulation.id}: {result}")
 ```
 
-## Filtering Simulations
+## Filtering simulations
 
 Override `filter()` to skip simulations that don't meet your criteria:
 
@@ -68,7 +68,7 @@ class FilteredAnalyzer(IAnalyzer):
             print(simulation.id, result)
 ```
 
-## Raw File Access (parse=False)
+## Raw file access (parse=False)
 
 Set `parse=False` to receive raw bytes and handle parsing yourself — useful for CSV files with non-standard formatting:
 
@@ -110,7 +110,7 @@ class MyCSVAnalyzer(IAnalyzer):
         results.to_csv(os.path.join(output_folder, self.__class__.__name__ + '.csv'))
 ```
 
-## Built-In Analyzers
+## Built-in analyzers
 
 idmtools ships several ready-to-use analyzers:
 
@@ -162,7 +162,7 @@ from idmtools.analysis.add_analyzer import AddAnalyzer
 analyzer = AddAnalyzer(filenames=['stdout.txt'])
 ```
 
-## Next Steps
+## Next steps
 
 - [AnalyzeManager](analyze-manager.md) — Run your analyzers locally
 - [PlatformAnalysis](platform-analysis.md) — Run your analyzers remotely on COMPS

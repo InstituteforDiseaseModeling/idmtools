@@ -1,14 +1,14 @@
-# Creating Simulations & Experiments
+# Creating simulations & experiments
 
 Learn how to create simulations and organize them into experiments in idmtools.
 
-## Key Concepts
+## Key concepts
 
 - **Task** — wraps your model script and its parameters
 - **Simulation** — a single run of a task with specific parameters
 - **Experiment** — a collection of simulations submitted together to a platform
 
-## Basic Example
+## Basic example
 
 ```python
 from idmtools.core.platform_factory import Platform
@@ -35,7 +35,7 @@ experiment.run(wait_until_done=True, platform=platform)
 print(f"Status: {experiment.status}")
 ```
 
-## Task Types
+## Task types
 
 ### JSONConfiguredPythonTask
 
@@ -73,7 +73,7 @@ from idmtools.entities.command_task import CommandTask
 task = CommandTask(command="python model.py --config config.json")
 ```
 
-## Simulation Tags
+## Simulation tags
 
 Tags are key-value metadata used for filtering and querying results:
 
@@ -85,7 +85,7 @@ sim.tags = {
 }
 ```
 
-## Adding Assets
+## Adding assets
 
 Add input files your model needs:
 
@@ -97,7 +97,7 @@ task.common_assets.add_asset("data.csv")
 task.common_assets.add_directory("inputs/")
 ```
 
-## Running an Experiment
+## Running an experiment
 
 ```python
 experiment.run(wait_until_done=True, platform=platform)
@@ -106,7 +106,7 @@ print(f"Experiment ID: {experiment.id}")
 print(f"Status: {experiment.status}")
 ```
 
-## Multiple Simulations
+## Multiple simulations
 
 ### Experiment.from_template
 
@@ -158,7 +158,7 @@ experiment.run(wait_until_done=True, platform=platform)
 
 See [Parameter Sweeps](../tutorials/parameter-sweeps.md) for more sweep patterns.
 
-## Next Steps
+## Next steps
 
 - [Parameter Sweeps](../tutorials/parameter-sweeps.md) - Run systematic parameter variations
 - [Asset Management](assets.md) - Manage input files and resources
