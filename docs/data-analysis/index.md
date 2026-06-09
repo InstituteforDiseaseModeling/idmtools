@@ -1,4 +1,4 @@
-# Data Analysis
+# Data analysis
 
 idmtools provides a **map-reduce** framework for analyzing simulation outputs after your experiment has finished running.
 
@@ -12,7 +12,7 @@ The analysis pipeline consists of three components:
 | [AnalyzeManager](analyze-manager.md) | Runs analyzers **locally** against one or more experiments, suites, or simulations |
 | [PlatformAnalysis](platform-analysis.md) | Runs analyzers **remotely** as an SSMT work item on COMPS — keeps data on the cluster and avoids large transfers |
 
-## How It Works
+## How it works
 
 Analysis follows a map-reduce pattern:
 
@@ -26,7 +26,7 @@ Simulations ──► map()   ──► per-simulation result
 1. **map** — called once per simulation; receives the simulation's output files and returns any Python object
 2. **reduce** — called once after all simulations are mapped; receives `{simulation: map_result}` and produces the final output
 
-## Quick Example
+## Quick example
 
 ```python
 from idmtools.analysis.analyze_manager import AnalyzeManager
@@ -53,7 +53,7 @@ with Platform('CALCULON') as platform:
     manager.analyze()
 ```
 
-## Choosing Between AnalyzeManager and PlatformAnalysis
+## Choosing between AnalyzeManager and PlatformAnalysis
 
 | | AnalyzeManager | PlatformAnalysis |
 |---|---|---|
@@ -62,7 +62,7 @@ with Platform('CALCULON') as platform:
 | **Best for** | Development, small datasets | Large datasets, production workflows |
 | **Platform required** | Any idmtools platform | COMPS only |
 
-## In This Section
+## In this section
 
 - [Analyzers (IAnalyzer)](analyzers.md) — Define custom analysis logic and use built-in analyzers
 - [AnalyzeManager](analyze-manager.md) — Run analysis locally with full parameter reference

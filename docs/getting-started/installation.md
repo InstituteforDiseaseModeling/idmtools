@@ -8,7 +8,7 @@ Before installing idmtools, ensure you have:
 - **pip** - Python package installer
 - **Virtual environment** (recommended)
 
-## Create Virtual Environment
+## Create virtual environment
 
 It's recommended to use a virtual environment:
 
@@ -26,9 +26,9 @@ It's recommended to use a virtual environment:
     source idmtools/bin/activate
     ```
 
-## Installation Options
+## Installation options
 
-### Full Installation
+### Full installation
 
 Install everything:
 
@@ -52,23 +52,23 @@ pip install idmtools[full]
 
 * idmtools-platform-slurm
 
-### Platform-Specific
+### Platform-specific
 
 Choose based on your compute platform:
 
-#### COMPS Platform
+#### COMPS platform
 
 ```bash
 pip install idmtools[idm]
 ```
 
-#### Slurm Platform
+#### Slurm platform
 
 ```bash
 pip install idmtools[slurm]
 ```
 
-#### Container (Docker) Platform
+#### Container (Docker) platform
 
 ```bash
 pip install idmtools[container]
@@ -76,7 +76,7 @@ pip install idmtools[container]
 
 Requires Docker or Docker Desktop.
 
-### Individual Packages
+### Individual packages
 
 Install only what you need:
 
@@ -90,7 +90,7 @@ pip install idmtools-platform-container  # Local Container platform related pack
 pip install idmtools-platform-general    # File and Process platform packages
 ```
 
-## Verify Installation
+## Verify installation
 
 ```bash
 # Using CLI
@@ -101,7 +101,7 @@ python -c "import idmtools; print(idmtools.__version__)"
 ```
 Note, Run the above command after installing the latest packages.
 
-## Project Structure
+## Project structure
 
 A typical user project that depends on idmtools looks like this:
 
@@ -116,7 +116,7 @@ my_project/
     └── python_model.sif  # Singularity image (COMPS/Slurm only)
 ```
 
-## Development Installation
+## Development installation
 
 For contributing to idmtools:
 
@@ -130,7 +130,7 @@ This installs all packages in editable mode.
 
 ## Troubleshooting
 
-### macOS Users
+### macOS users
 
 On macOS with square brackets in shell, escape them:
 
@@ -138,7 +138,7 @@ On macOS with square brackets in shell, escape them:
 pip install idmtools\[full\]
 ```
 
-### Docker Authentication
+### Docker authentication
 
 For Container platform, login to GitHub Container Registry:
 
@@ -146,7 +146,7 @@ For Container platform, login to GitHub Container Registry:
 echo YOUR_GITHUB_PAT | docker login ghcr.io -u YOUR_GITHUB_USERNAME --password-stdin
 ```
 
-### Permission Errors
+### Permission errors
 
 Use `--user` flag if you don't have admin rights:
 
@@ -154,8 +154,8 @@ Use `--user` flag if you don't have admin rights:
 pip install --user idmtools[full]
 ```
 
-## Next Steps
+## Next steps
 
 - [Configuration](configuration.md) - Configure your environment
-- [Quick Start](quickstart.md) - Run your first simulation
-- [User Guide](../user-guide/index.md) - Learn the basics
+- [Quick start](quickstart.md) - Run your first simulation
+- [User guide](../user-guide/index.md) - Learn the basics

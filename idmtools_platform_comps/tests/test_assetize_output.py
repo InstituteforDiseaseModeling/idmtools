@@ -175,6 +175,7 @@ class TestAssetizeOutput(unittest.TestCase):
         filelist = [f.filename for f in ac]
         self.assertEqual(9, len(filelist))
 
+    @pytest.mark.skip(reason='comps2 disable Cumulus')
     def test_experiment_cross_environment_fail(self):
         ao = AssetizeOutput(name=self.case_name, related_experiments=['73ba8f3b-8848-ee11-92fb-f0921c167864'], file_patterns=["**/a.csv"], verbose=True)
         with self.assertRaises(CrossEnvironmentFilterNotSupport) as err:

@@ -1,4 +1,4 @@
-# Release Process
+# Release process
 
 This page describes how to manage versioning, build and publish Python packages to PyPI, build and publish Docker images, and deploy documentation — all through GitHub Actions.
 
@@ -24,7 +24,7 @@ All workflows are defined in `.github/workflows/`.
 
 ---
 
-## 0. Updating the Changelog
+## 0. Updating the changelog
 
 Before cutting a release tag, update `docs/changelog.md` with all issues from the associated GitHub project.
 
@@ -123,7 +123,7 @@ Pushing a `v*` tag triggers the **Deploy Packages** workflow, which builds all p
 
 ---
 
-## 2. Building and Publishing Python Packages
+## 2. Building and publishing Python packages
 
 ### Packages in this repository
 
@@ -203,11 +203,11 @@ twine upload dist/* --repository-url https://test.pypi.org/legacy/
 
 ---
 
-## 3. Building and Publishing Docker Images
+## 3. Building and publishing Docker images
 
 Two Docker images are maintained in this repository, both published to the [GitHub Container Registry (GHCR)](https://ghcr.io/institutefordiseasemodeling/).
 
-### Image 1 — SSMT Worker Image (COMPS platform)
+### Image 1 — SSMT worker image (COMPS platform)
 
 **Registry path**: `ghcr.io/institutefordiseasemodeling/idmtools_comps_ssmt_worker`
 
@@ -264,7 +264,7 @@ make docker-build-publish           # production
 
 ---
 
-### Image 2 — Container Platform Runtime Image
+### Image 2 — Container platform runtime image
 
 **Registry path**: `ghcr.io/institutefordiseasemodeling/container-rocky-runtime`
 
@@ -308,7 +308,7 @@ The token requires `write:packages` and `read:packages` scopes.
 
 ---
 
-## 4. Building and Deploying Documentation
+## 4. Building and deploying documentation
 
 Documentation is built with [MkDocs](https://www.mkdocs.org/) and the [Material theme](https://squidfunk.github.io/mkdocs-material/), then deployed to GitHub Pages.
 
@@ -352,7 +352,7 @@ mkdocs-minify-plugin>=0.8.0
 
 ---
 
-## 5. Full Release Checklist
+## 5. Full release checklist
 
 Use this checklist when cutting a new release:
 
@@ -372,9 +372,9 @@ Use this checklist when cutting a new release:
 
 ---
 
-## 6. Required Secrets and Environments
+## 6. Required secrets and environments
 
-| Secret / Environment | Used by | Purpose |
+| Secret / environment | Used by | Purpose |
 |---|---|---|
 | `TEST_PYPI_API_TOKEN` | `deploy.yml` | Upload to TestPyPI |
 | `GITHUB_TOKEN` | `deploy.yml`, `deploy_docs_api.yml`, `build_ssmt_image_staging.yml` | GHCR login, Pages deploy (auto-provided by GitHub) |

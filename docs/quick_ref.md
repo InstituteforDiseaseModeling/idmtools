@@ -1,10 +1,10 @@
-# Quick Reference
+# Quick reference
 
 A one-page cheat sheet of the most common idmtools patterns. Each section links to the full documentation page for details.
 
 ---
 
-## Documentation Map
+## Documentation map
 
 | Section | What you'll find |
 |---------|-----------------|
@@ -35,7 +35,7 @@ pip install idmtools[container]  # core + Container (Docker)
 
 ---
 
-## Core Concepts
+## Core concepts
 
 | Term | Description |
 |------|-------------|
@@ -48,7 +48,7 @@ pip install idmtools[container]  # core + Container (Docker)
 
 ---
 
-## Common Imports
+## Common imports
 
 ```python
 from idmtools.core.platform_factory import Platform
@@ -68,7 +68,7 @@ from idmtools.core import ItemType
 
 ---
 
-## Task Types
+## Task types
 
 | Task | Use when |
 |------|----------|
@@ -92,7 +92,7 @@ task = CommandTask(command="python model.py --config config.json")
 
 ---
 
-## Experiment Patterns
+## Experiment patterns
 
 ### Single simulation
 
@@ -174,7 +174,7 @@ See [Data Analysis](data-analysis/index.md) for CSV analyzers, `parse=False`, mu
 
 ---
 
-## Platform Configuration
+## Platform configuration
 
 `idmtools.ini` is optional — all values can also be passed directly to `Platform()`.
 
@@ -218,7 +218,7 @@ See [Data Analysis](data-analysis/index.md) for CSV analyzers, `parse=False`, mu
 
 ---
 
-## CLI Quick Reference
+## CLI quick reference
 
 ```bash
 idmtools --help                                    # all top-level commands

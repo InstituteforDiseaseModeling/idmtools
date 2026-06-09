@@ -1,4 +1,4 @@
-# Core API Reference
+# Core API reference
 
 Core classes and functionality for idmtools.
 
@@ -6,9 +6,9 @@ Core classes and functionality for idmtools.
 
 The `idmtools.core` package provides the foundational classes and interfaces for building simulations, experiments, and interacting with platforms.
 
-## Quick Reference
+## Quick reference
 
-### Core Classes
+### Core classes
 
 | Class | Module | Description |
 |-------|--------|-------------|
@@ -22,7 +22,7 @@ The `idmtools.core` package provides the foundational classes and interfaces for
 | [`ITask`](#itask) | `idmtools.entities.itask` | Base class for all tasks |
 | [`IAnalyzer`](../data-analysis/analyzers.md) | `idmtools.entities` | Base class for analyzers |
 
-### Common Methods
+### Common methods
 
 ```python
 # Experiment
@@ -46,7 +46,7 @@ AssetCollection.from_id_file("path/to/id_file.id")
 platform = Platform("PlatformName")
 ```
 
-## Platform Factory
+## Platform factory
 
 ### Platform
 
@@ -225,7 +225,7 @@ asset = Asset(
 - `relative_path` - Destination path in simulation
 - `filename` - File name
 
-## Platform Interface
+## Platform interface
 
 ### IPlatform
 
@@ -275,9 +275,9 @@ comps_config = config.get_section("COMPS")
 - `get_option()` - Get config option
 
 
-## Hooks and Callbacks
+## Hooks and callbacks
 
-### Pre/Post Creation Hooks
+### Pre/post creation hooks
 
 ```python
 def on_pre_creation(item, platform):
@@ -290,7 +290,7 @@ experiment.pre_creation_hooks.append(on_pre_creation)
 experiment.post_creation_hooks.append(on_post_creation)
 ```
 
-## See Also
+## See also
 
 - [Models API](models.md) - Task implementations
 - [Platforms API](platforms.md) - Platform implementations

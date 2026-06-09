@@ -51,6 +51,7 @@ class TestCompsPlugin(unittest.TestCase):
 
     @pytest.mark.comps
     @pytest.mark.smoke
+    @pytest.mark.skip(reason='comps2 disable Cumulus')
     def test_comps_requirements(self):
         with Platform("CUMULUS") as platform:
             self.assertTrue(platform.are_requirements_met(PlatformRequirements.NativeBinary))

@@ -2,7 +2,7 @@
 
 `PlatformAnalysis` runs analyzers as a remote **SSMT** work item on COMPS, rather than locally. Simulation output files stay on the cluster, eliminating the need to transfer large datasets to your local machine.
 
-## What Can PlatformAnalysis Do?
+## What can PlatformAnalysis do?
 
 - Submit analyzer jobs directly to COMPS as SSMT work items
 - Keep simulation data on the cluster — no large file downloads
@@ -11,7 +11,7 @@
 - Forward extra [`AnalyzeManager`](analyze-manager.md) options (e.g. `partial_analyze_ok`) to the remote run via `extra_args`
 - Attach additional files, assets, or a custom idmtools config for the remote environment
 
-!!! note "COMPS Only"
+!!! note "COMPS only"
     `PlatformAnalysis` requires the `idmtools-platform-comps` package and a COMPS platform. For local analysis on any platform, use [`AnalyzeManager`](analyze-manager.md) instead.
 
 ## Import
@@ -21,7 +21,7 @@ from idmtools.analysis.platform_anaylsis import PlatformAnalysis
 from idmtools.core.platform_factory import Platform
 ```
 
-## Constructor Parameters
+## Constructor parameters
 
 ```python
 PlatformAnalysis(
@@ -45,7 +45,7 @@ PlatformAnalysis(
 )
 ```
 
-### Key Parameters
+### Key parameters
 
 #### `analyzers`
 
@@ -127,7 +127,7 @@ analysis = PlatformAnalysis(
 )
 ```
 
-### All Parameters
+### All parameters
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
@@ -158,7 +158,7 @@ analysis = PlatformAnalysis(
 
 ## Examples
 
-### Download Files Remotely
+### Download files remotely
 
 ```python
 from idmtools.analysis.download_analyzer import DownloadAnalyzer
@@ -180,7 +180,7 @@ wi = analysis.get_work_item()
 print(wi)
 ```
 
-### Multiple Analyzers with Extra Args
+### Multiple analyzers with extra args
 
 ```python
 from idmtools.analysis.csv_analyzer import CSVAnalyzer
@@ -205,7 +205,7 @@ analysis = PlatformAnalysis(
 analysis.analyze(check_status=True)
 ```
 
-### Custom Analyzer from a Local File
+### Custom analyzer from a local file
 
 ```python
 from myproject.analyzers import MyCustomAnalyzer
@@ -229,7 +229,7 @@ analysis.analyze(check_status=True)
 !!! tip
     The source file of each analyzer class is automatically packaged and sent to the remote worker. You do not need to manually add them to `additional_files`.
 
-## How It Works Internally
+## How it works internally
 
 1. `PlatformAnalysis` serializes analyzer constructor arguments into a pickle file (`analyzer_args.pkl`)
 2. The analyzer source files are added to the work item's transient assets
@@ -237,8 +237,8 @@ analysis.analyze(check_status=True)
 4. An `SSMTWorkItem` is created with all assets and submitted to COMPS
 5. On the remote worker, the bootstrap script deserializes the args, instantiates the analyzers, and runs `AnalyzeManager`
 
-## Next Steps
+## Next steps
 
 - [AnalyzeManager](analyze-manager.md) — Run analysis locally
 - [Analyzers](analyzers.md) — Write custom analyzer logic
-- [COMPS Platform](../platforms/comps.md) — Configure and use the COMPS platform
+- [COMPS platform](../platforms/comps.md) — Configure and use the COMPS platform
